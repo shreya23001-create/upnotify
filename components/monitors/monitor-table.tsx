@@ -16,9 +16,9 @@ interface MonitorTableProps {
 
 export function MonitorTable({ monitors, uptimeData }: MonitorTableProps) {
   const columns: Column<Monitor>[] = [
+    { key: 'type', label: 'Type', render: (m) => <MonitorTypeIcon type={m.type} /> },
     { key: 'name', label: 'Name', render: (m) => <Link href={`/dashboard/monitors/${m.id}`} className="table-link">{m.name}</Link> },
     { key: 'uptime', label: 'Uptime (12h)', sortable: false, searchable: false, render: (m) => <UptimeBar slots={uptimeData[m.id] || []} /> },
-    { key: 'type', label: 'Type', render: (m) => <MonitorTypeIcon type={m.type} /> },
     { key: 'status', label: 'Status', render: (m) => <MonitorStatusBadge status={m.status} /> },
     { key: 'last_checked_at', label: 'Last Checked', render: (m) => <span className="table-muted">{m.last_checked_at ? timeAgo(m.last_checked_at) : 'Never'}</span> },
   ]
