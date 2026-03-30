@@ -4,6 +4,7 @@ import { getMonitorById } from '@/lib/db/monitors'
 import { getIncidentsByWorkspace } from '@/lib/db/incidents'
 import { getCheckResultsByMonitor } from '@/lib/db/check-results'
 import { MonitorStatusBadge } from '@/components/monitors/monitor-status-badge'
+import { MonitorTypeIcon } from '@/components/monitors/monitor-type-icon'
 import { MonitorActions } from '@/components/monitors/monitor-actions'
 import { CheckResultsHistory } from '@/components/monitors/check-results-history'
 
@@ -27,6 +28,7 @@ export default async function MonitorDetailPage({
   return (
     <div>
       <div className="monitor-header">
+        <MonitorTypeIcon type={monitor.type} />
         <h1 className="page-title">{monitor.name}</h1>
         <MonitorStatusBadge status={monitor.status} />
       </div>
