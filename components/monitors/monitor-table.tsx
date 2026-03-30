@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { DataTable, type Column, type BulkAction } from '@/components/ui/data-table'
 import { MonitorStatusBadge } from './monitor-status-badge'
 import { UptimeBar } from './uptime-bar'
+import { monitorTypeIcons } from '@/components/icons'
 import type { Monitor } from '@/lib/types'
 
 interface UptimeSlot { slot: string; status: 'up' | 'down' | 'degraded' | 'none' }
@@ -17,7 +18,7 @@ export function MonitorTable({ monitors, uptimeData }: MonitorTableProps) {
   const columns: Column<Monitor>[] = [
     { key: 'name', label: 'Name', render: (m) => <Link href={`/dashboard/monitors/${m.id}`} className="table-link">{m.name}</Link> },
     { key: 'uptime', label: 'Uptime (12h)', sortable: false, searchable: false, render: (m) => <UptimeBar slots={uptimeData[m.id] || []} /> },
-    { key: 'type', label: 'Type', render: (m) => <span style={{ textTransform: 'capitalize' }}>{m.type}</span> },
+    { key: 'type', label: 'Type', render: (m) => { const Icon = monitorTypeIcons[m.type]; return <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, textTransform: 'capitalize' }}>{Icon && <Icon size={15} />}{m.type}</span> } },
     { key: 'status', label: 'Status', render: (m) => <MonitorStatusBadge status={m.status} /> },
     { key: 'last_checked_at', label: 'Last Checked', render: (m) => <span className="table-muted">{m.last_checked_at ? timeAgo(m.last_checked_at) : 'Never'}</span> },
   ]
