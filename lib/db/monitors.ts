@@ -65,12 +65,28 @@ export async function getDueMonitors(): Promise<Monitor[]> {
     .from('monitors')
     .select('*')
     .eq('is_paused', false)
-    .lte('next_check_at', now)
-    .order('next_check_at', { ascending: true })
+    .or(`next_check_at.lte.${now},next_check_at.is.null`)
+    .order('next_check_at', { ascending: true, nullsFirst: true })
     .limit(100)
 
   if (error) {
     logger.error('Failed to get due monitors', { error: error.message })
+    return []
+  }
+  return data ?? []
+}
+
+export async function getAllActiveMonitors(): Promise<Monitor[]> {
+  const supabase = createAdminClient()
+  const { data, error } = await supabase
+    .from('monitors')
+    .select('*')
+    .eq('is_paused', false)
+    .order('created_at', { ascending: false })
+    .limit(200)
+
+  if (error) {
+    logger.error('Failed to get all active monitors', { error: error.message })
     return []
   }
   return data ?? []

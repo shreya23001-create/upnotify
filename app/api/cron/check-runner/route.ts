@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getDueMonitors, updateMonitorStatus, incrementFlapCount } from '@/lib/db/monitors'
+import { getDueMonitors, getAllActiveMonitors, updateMonitorStatus, incrementFlapCount } from '@/lib/db/monitors'
 import { writeCheckResult } from '@/lib/db/check-results'
 import { createIncident, resolveIncident, getOpenIncidentForMonitor } from '@/lib/db/incidents'
 import { isMonitorInMaintenance } from '@/lib/db/maintenance-windows'
@@ -124,8 +124,11 @@ export async function GET(request: Request): Promise<NextResponse> {
   }
 
   try {
-    const monitors = await getDueMonitors()
-    logger.info('Check runner started', { dueMonitors: monitors.length })
+    const { searchParams } = new URL(request.url)
+    const force = searchParams.get('force') === 'true'
+
+    const monitors = force ? await getAllActiveMonitors() : await getDueMonitors()
+    logger.info('Check runner started', { dueMonitors: monitors.length, force })
 
     const results = await Promise.allSettled(
       monitors.map(monitor => runCheck(monitor))
