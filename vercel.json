@@ -2,7 +2,7 @@
   "crons": [
     {
       "path": "/api/cron/check-runner",
-      "schedule": "* * * * *"
+      "schedule": "0 0 * * *"
     }
   ]
 }
