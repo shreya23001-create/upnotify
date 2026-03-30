@@ -21,21 +21,15 @@ export default async function DashboardPage() {
   ])
 
   const defaultWorkspace = workspaces[0]
-  const statusPages = defaultWorkspace
-    ? await getStatusPagesByWorkspace(defaultWorkspace.id)
-    : []
+  const statusPages = defaultWorkspace ? await getStatusPagesByWorkspace(defaultWorkspace.id) : []
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Dashboard</h1>
+    <div>
+      <h1 className="page-title" style={{ marginBottom: 24 }}>Dashboard</h1>
       <StatsCards stats={stats} />
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid-2">
         <RecentIncidents incidents={incidents} />
-        <OnboardingChecklist
-          hasMonitors={stats.total > 0}
-          hasAlertChannels={alertChannels.length > 0}
-          hasStatusPages={statusPages.length > 0}
-        />
+        <OnboardingChecklist hasMonitors={stats.total > 0} hasAlertChannels={alertChannels.length > 0} hasStatusPages={statusPages.length > 0} />
       </div>
     </div>
   )

@@ -1,8 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { CheckCircle2, Circle } from 'lucide-react'
 
 interface OnboardingChecklistProps {
   hasMonitors: boolean
@@ -10,13 +8,8 @@ interface OnboardingChecklistProps {
   hasStatusPages: boolean
 }
 
-export function OnboardingChecklist({
-  hasMonitors,
-  hasAlertChannels,
-  hasStatusPages,
-}: OnboardingChecklistProps) {
-  const allDone = hasMonitors && hasAlertChannels && hasStatusPages
-  if (allDone) return null
+export function OnboardingChecklist({ hasMonitors, hasAlertChannels, hasStatusPages }: OnboardingChecklistProps) {
+  if (hasMonitors && hasAlertChannels && hasStatusPages) return null
 
   const items = [
     { label: 'Create your first monitor', done: hasMonitors, href: '/dashboard/monitors' },
@@ -25,30 +18,18 @@ export function OnboardingChecklist({
   ]
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Getting Started</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-3">
+    <div className="card">
+      <div className="card-header"><div className="card-title">Getting Started</div></div>
+      <div className="card-content">
+        <div className="space-y-sm">
           {items.map((item) => (
-            <Link
-              key={item.label}
-              href={item.href}
-              className="flex items-center gap-3 rounded-md p-2 text-sm transition-colors hover:bg-zinc-100 dark:hover:bg-zinc-900"
-            >
-              {item.done ? (
-                <CheckCircle2 className="h-5 w-5 text-green-500" />
-              ) : (
-                <Circle className="h-5 w-5 text-zinc-300" />
-              )}
-              <span className={item.done ? 'text-zinc-400 line-through' : ''}>
-                {item.label}
-              </span>
+            <Link key={item.label} href={item.href} className="checklist-item">
+              <span className={`checklist-icon${item.done ? ' done' : ''}`} />
+              <span className={item.done ? 'checklist-done' : ''}>{item.label}</span>
             </Link>
           ))}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 }

@@ -1,51 +1,35 @@
 'use client'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import type { Incident } from '@/lib/types'
 
-const severityVariant: Record<string, 'destructive' | 'secondary' | 'outline'> = {
-  P1: 'destructive',
-  P2: 'destructive',
-  P3: 'secondary',
-  P4: 'outline',
+const severityClass: Record<string, string> = {
+  P1: 'badge-danger', P2: 'badge-danger', P3: 'badge-muted', P4: 'badge-outline',
 }
 
 export function RecentIncidents({ incidents }: { incidents: Incident[] }) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Recent Incidents</CardTitle>
-      </CardHeader>
-      <CardContent>
+    <div className="card">
+      <div className="card-header"><div className="card-title">Recent Incidents</div></div>
+      <div className="card-content">
         {incidents.length === 0 ? (
-          <p className="text-sm text-zinc-500">No incidents recorded yet.</p>
+          <p style={{ fontSize: 14, color: '#71717a' }}>No incidents recorded yet.</p>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-sm">
             {incidents.map((incident) => (
-              <div
-                key={incident.id}
-                className="flex items-center justify-between rounded-md border p-3"
-              >
-                <div className="space-y-1">
-                  <p className="text-sm font-medium">{incident.title}</p>
-                  <p className="text-xs text-zinc-500">
-                    {new Date(incident.started_at).toLocaleString()}
-                  </p>
+              <div key={incident.id} className="incident-row">
+                <div className="incident-row-info">
+                  <span className="incident-row-title">{incident.title}</span>
+                  <span className="incident-row-time">{new Date(incident.started_at).toLocaleString()}</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Badge variant={severityVariant[incident.severity] ?? 'secondary'}>
-                    {incident.severity}
-                  </Badge>
-                  <Badge variant={incident.status === 'resolved' ? 'outline' : 'secondary'}>
-                    {incident.status}
-                  </Badge>
+                <div className="incident-row-badges">
+                  <span className={`badge ${severityClass[incident.severity] ?? 'badge-muted'}`}>{incident.severity}</span>
+                  <span className={`badge ${incident.status === 'resolved' ? 'badge-outline' : 'badge-muted'}`}>{incident.status}</span>
                 </div>
               </div>
             ))}
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 }

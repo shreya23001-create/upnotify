@@ -1,11 +1,7 @@
-export default function AuthLayout({
-  children,
-}: {
-  children: React.ReactNode
-}): React.JSX.Element {
+export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 px-4 dark:bg-zinc-950">
-      <div className="w-full max-w-md">{children}</div>
+    <div className="auth-container">
+      <div className="auth-wrapper">{children}</div>
     </div>
   )
 }

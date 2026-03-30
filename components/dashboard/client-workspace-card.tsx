@@ -1,20 +1,17 @@
 'use client'
 
 import Link from 'next/link'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import type { Workspace } from '@/lib/types'
 
 export function ClientWorkspaceCard({ workspace }: { workspace: Workspace }) {
   return (
     <Link href={`/dashboard/clients/${workspace.id}`}>
-      <Card className="transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base">{workspace.name}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-zinc-500">/{workspace.slug}</p>
-        </CardContent>
-      </Card>
+      <div className="card card-link">
+        <div className="card-content-compact">
+          <div style={{ fontWeight: 600, marginBottom: 4 }}>{workspace.name}</div>
+          <div style={{ fontSize: 14, color: '#71717a' }}>/{workspace.slug}</div>
+        </div>
+      </div>
     </Link>
   )
 }

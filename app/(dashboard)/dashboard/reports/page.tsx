@@ -2,9 +2,6 @@ import { redirect } from 'next/navigation'
 import { getCurrentUser } from '@/lib/db/users'
 import { getWorkspacesByOrg } from '@/lib/db/workspaces'
 import { getReportsByWorkspace } from '@/lib/db/reports'
-import { Card, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Plus } from 'lucide-react'
 
 export default async function ReportsPage() {
   const user = await getCurrentUser()
@@ -12,43 +9,28 @@ export default async function ReportsPage() {
 
   const workspaces = await getWorkspacesByOrg(user.org_id)
   const defaultWorkspace = workspaces[0]
-  const reports = defaultWorkspace
-    ? await getReportsByWorkspace(defaultWorkspace.id)
-    : []
+  const reports = defaultWorkspace ? await getReportsByWorkspace(defaultWorkspace.id) : []
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Reports</h1>
-        <Button disabled>
-          <Plus className="mr-2 h-4 w-4" />
-          Generate Report
-        </Button>
+    <div>
+      <div className="page-header">
+        <h1 className="page-title">Reports</h1>
+        <button className="btn btn-primary" disabled>+ Generate Report</button>
       </div>
       {reports.length === 0 ? (
-        <Card>
-          <CardContent className="p-8 text-center">
-            <p className="text-sm text-zinc-500">
-              No reports generated yet. Reports will be available once monitoring data is collected.
-            </p>
-          </CardContent>
-        </Card>
+        <div className="empty-state"><p>No reports generated yet. Reports will be available once monitoring data is collected.</p></div>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-sm">
           {reports.map((report) => (
-            <Card key={report.id}>
-              <CardContent className="flex items-center justify-between p-4">
+            <div key={report.id} className="card">
+              <div className="card-content-compact" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
-                  <p className="text-sm font-medium capitalize">{report.type} Report</p>
-                  <p className="text-xs text-zinc-500">
-                    {report.period_start} — {report.period_end}
-                  </p>
+                  <div style={{ fontWeight: 500, fontSize: 14, textTransform: 'capitalize' }}>{report.type} Report</div>
+                  <div style={{ fontSize: 12, color: '#71717a' }}>{report.period_start} — {report.period_end}</div>
                 </div>
-                <p className="text-xs text-zinc-500">
-                  {new Date(report.generated_at).toLocaleDateString()}
-                </p>
-              </CardContent>
-            </Card>
+                <span style={{ fontSize: 12, color: '#71717a' }}>{new Date(report.generated_at).toLocaleDateString()}</span>
+              </div>
+            </div>
           ))}
         </div>
       )}

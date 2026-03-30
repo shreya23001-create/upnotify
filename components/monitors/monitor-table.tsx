@@ -1,63 +1,36 @@
 'use client'
 
 import Link from 'next/link'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
 import { MonitorStatusBadge } from './monitor-status-badge'
 import type { Monitor } from '@/lib/types'
 
 export function MonitorTable({ monitors }: { monitors: Monitor[] }) {
   if (monitors.length === 0) {
-    return (
-      <div className="rounded-md border p-8 text-center">
-        <p className="text-sm text-zinc-500">No monitors yet. Create your first monitor to get started.</p>
-      </div>
-    )
+    return <div className="empty-state"><p>No monitors yet. Create your first monitor to get started.</p></div>
   }
 
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Name</TableHead>
-          <TableHead>Type</TableHead>
-          <TableHead>Target</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Last Checked</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
+    <table className="table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Target</th>
+          <th>Status</th>
+          <th>Last Checked</th>
+        </tr>
+      </thead>
+      <tbody>
         {monitors.map((monitor) => (
-          <TableRow key={monitor.id}>
-            <TableCell>
-              <Link
-                href={`/dashboard/monitors/${monitor.id}`}
-                className="font-medium hover:underline"
-              >
-                {monitor.name}
-              </Link>
-            </TableCell>
-            <TableCell className="capitalize">{monitor.type}</TableCell>
-            <TableCell className="max-w-48 truncate text-zinc-500">
-              {monitor.target}
-            </TableCell>
-            <TableCell>
-              <MonitorStatusBadge status={monitor.status} />
-            </TableCell>
-            <TableCell className="text-zinc-500">
-              {monitor.last_checked_at
-                ? new Date(monitor.last_checked_at).toLocaleString()
-                : 'Never'}
-            </TableCell>
-          </TableRow>
+          <tr key={monitor.id}>
+            <td><Link href={`/dashboard/monitors/${monitor.id}`} className="table-link">{monitor.name}</Link></td>
+            <td style={{ textTransform: 'capitalize' }}>{monitor.type}</td>
+            <td className="table-truncate table-muted">{monitor.target}</td>
+            <td><MonitorStatusBadge status={monitor.status} /></td>
+            <td className="table-muted">{monitor.last_checked_at ? new Date(monitor.last_checked_at).toLocaleString() : 'Never'}</td>
+          </tr>
         ))}
-      </TableBody>
-    </Table>
+      </tbody>
+    </table>
   )
 }

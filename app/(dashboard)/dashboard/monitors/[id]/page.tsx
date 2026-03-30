@@ -3,14 +3,8 @@ import { getCurrentUser } from '@/lib/db/users'
 import { getMonitorById } from '@/lib/db/monitors'
 import { getIncidentsByWorkspace } from '@/lib/db/incidents'
 import { MonitorStatusBadge } from '@/components/monitors/monitor-status-badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 
-export default async function MonitorDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>
-}) {
+export default async function MonitorDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const user = await getCurrentUser()
   if (!user) redirect('/login')
 
@@ -21,68 +15,46 @@ export default async function MonitorDetailPage({
   const incidents = await getIncidentsByWorkspace(monitor.workspace_id, { limit: 5 })
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <h1 className="text-2xl font-bold">{monitor.name}</h1>
+    <div>
+      <div className="monitor-header">
+        <h1 className="page-title">{monitor.name}</h1>
         <MonitorStatusBadge status={monitor.status} />
       </div>
-
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Configuration</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <InfoRow label="Type" value={monitor.type} />
-            <InfoRow label="Target" value={monitor.target} />
-            <InfoRow label="Check Interval" value={`${monitor.check_interval_seconds}s`} />
-            <InfoRow label="Timeout" value={`${monitor.timeout_ms}ms`} />
-            <InfoRow label="Severity" value={monitor.severity} />
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Check History</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-zinc-500">
-              Check history chart will appear here once monitoring is active.
-            </p>
-          </CardContent>
-        </Card>
+      <div className="grid-2">
+        <div className="card">
+          <div className="card-header"><div className="card-title">Configuration</div></div>
+          <div className="card-content">
+            <div className="info-row"><span className="info-row-label">Type</span><span className="info-row-value">{monitor.type}</span></div>
+            <div className="info-row"><span className="info-row-label">Target</span><span className="info-row-value">{monitor.target}</span></div>
+            <div className="info-row"><span className="info-row-label">Interval</span><span className="info-row-value">{monitor.check_interval_seconds}s</span></div>
+            <div className="info-row"><span className="info-row-label">Timeout</span><span className="info-row-value">{monitor.timeout_ms}ms</span></div>
+            <div className="info-row"><span className="info-row-label">Severity</span><span className="info-row-value">{monitor.severity}</span></div>
+          </div>
+        </div>
+        <div className="card">
+          <div className="card-header"><div className="card-title">Check History</div></div>
+          <div className="card-content">
+            <p style={{ fontSize: 14, color: '#71717a' }}>Check history will appear here once monitoring is active.</p>
+          </div>
+        </div>
       </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Recent Incidents</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <div className="card" style={{ marginTop: 24 }}>
+        <div className="card-header"><div className="card-title">Recent Incidents</div></div>
+        <div className="card-content">
           {incidents.length === 0 ? (
-            <p className="text-sm text-zinc-500">No incidents for this monitor.</p>
+            <p style={{ fontSize: 14, color: '#71717a' }}>No incidents for this monitor.</p>
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-sm">
               {incidents.map((inc) => (
-                <div key={inc.id} className="flex items-center justify-between border-b pb-2">
-                  <span className="text-sm">{inc.title}</span>
-                  <Badge variant={inc.status === 'resolved' ? 'outline' : 'destructive'}>
-                    {inc.status}
-                  </Badge>
+                <div key={inc.id} style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f4f4f5', paddingBottom: 8 }}>
+                  <span style={{ fontSize: 14 }}>{inc.title}</span>
+                  <span className={`badge ${inc.status === 'resolved' ? 'badge-outline' : 'badge-danger'}`}>{inc.status}</span>
                 </div>
               ))}
             </div>
           )}
-        </CardContent>
-      </Card>
-    </div>
-  )
-}
-
-function InfoRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex justify-between text-sm">
-      <span className="text-zinc-500">{label}</span>
-      <span className="font-medium capitalize">{value}</span>
+        </div>
+      </div>
     </div>
   )
 }
