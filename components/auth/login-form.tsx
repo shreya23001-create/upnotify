@@ -18,6 +18,7 @@ export function LoginForm({ mode = 'login' }: LoginFormProps): React.JSX.Element
 
   function handleEmailSubmit(formData: FormData): void {
     setError(null)
+    formData.set('origin', window.location.origin)
     startTransition(async () => {
       const result = await signInWithEmail(formData)
       if (result.error) {
@@ -31,7 +32,7 @@ export function LoginForm({ mode = 'login' }: LoginFormProps): React.JSX.Element
   function handleGoogleClick(): void {
     setError(null)
     startTransition(async () => {
-      const result = await signInWithGoogle()
+      const result = await signInWithGoogle(window.location.origin)
       if (result.error) {
         setError(result.error)
       } else if (result.url) {

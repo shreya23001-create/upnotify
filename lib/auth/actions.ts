@@ -13,17 +13,18 @@ export async function signInWithEmail(
   formData: FormData
 ): Promise<{ error?: string }> {
   const email = formData.get('email') as string | null
+  const origin = formData.get('origin') as string | null
 
   if (!email) {
     return { error: 'Email is required' }
   }
 
   const supabase = await createClient()
-  const config = getConfig()
+  const baseUrl = origin || getConfig().app.url
 
   const { error } = await supabase.auth.signInWithOtp({
     email,
-    options: { emailRedirectTo: `${config.app.url}/auth/callback` },
+    options: { emailRedirectTo: `${baseUrl}/auth/callback` },
   })
 
   if (error) {
@@ -38,16 +39,16 @@ export async function signInWithEmail(
  * Start a Google OAuth flow and return the redirect URL.
  * The caller (client component) must redirect the browser.
  */
-export async function signInWithGoogle(): Promise<{
+export async function signInWithGoogle(origin: string): Promise<{
   url?: string
   error?: string
 }> {
   const supabase = await createClient()
-  const config = getConfig()
+  const baseUrl = origin || getConfig().app.url
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
-    options: { redirectTo: `${config.app.url}/auth/callback` },
+    options: { redirectTo: `${baseUrl}/auth/callback` },
   })
 
   if (error || !data.url) {
