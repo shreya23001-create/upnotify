@@ -9,7 +9,9 @@
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "db:push": "npx supabase db push",
+    "db:types": "npx supabase gen types typescript --project-id tooubecrkfuhxwjikwvb > lib/types/database.types.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.9.0",

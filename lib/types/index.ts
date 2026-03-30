@@ -1,0 +1,32 @@
+import type { Database } from './database.types'
+
+// Row types — use these throughout the app
+export type Organisation = Database['public']['Tables']['organisations']['Row']
+export type Workspace = Database['public']['Tables']['workspaces']['Row']
+export type User = Database['public']['Tables']['users']['Row']
+export type Plan = Database['public']['Tables']['plans']['Row']
+export type Subscription = Database['public']['Tables']['subscriptions']['Row']
+export type Invoice = Database['public']['Tables']['invoices']['Row']
+export type StripeConnectPayout = Database['public']['Tables']['stripe_connect_payouts']['Row']
+export type ContactPreference = Database['public']['Tables']['contact_preferences']['Row']
+export type Monitor = Database['public']['Tables']['monitors']['Row']
+export type CheckResult = Database['public']['Tables']['check_results']['Row']
+export type Incident = Database['public']['Tables']['incidents']['Row']
+export type MaintenanceWindow = Database['public']['Tables']['maintenance_windows']['Row']
+export type AlertChannel = Database['public']['Tables']['alert_channels']['Row']
+export type Alert = Database['public']['Tables']['alerts']['Row']
+export type VoiceCallLog = Database['public']['Tables']['voice_call_logs']['Row']
+export type ApiKey = Database['public']['Tables']['api_keys']['Row']
+export type AuditLogEntry = Database['public']['Tables']['audit_log']['Row']
+export type Report = Database['public']['Tables']['reports']['Row']
+export type StatusPage = Database['public']['Tables']['status_pages']['Row']
+export type StatusPageSubscriber = Database['public']['Tables']['status_page_subscribers']['Row']
+export type BlogPost = Database['public']['Tables']['blog_posts']['Row']
+export type PageSection = Database['public']['Tables']['page_sections']['Row']
+export type AdminPermission = Database['public']['Tables']['admin_permissions']['Row']
+export type FeatureFlag = Database['public']['Tables']['feature_flags']['Row']
+export type FeatureFlagUsage = Database['public']['Tables']['feature_flag_usage']['Row']
+export type AgencyTag = Database['public']['Tables']['agency_tags']['Row']
+
+// Re-export Database type for Supabase client generics
+export type { Database }
