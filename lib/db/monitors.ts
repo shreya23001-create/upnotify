@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
 import type { Monitor } from '@/lib/types'
 
@@ -53,4 +54,106 @@ export async function getMonitorStats(
     degraded: data.filter(m => m.status === 'degraded').length,
     paused: data.filter(m => m.status === 'paused').length,
   }
+}
+
+// --- Admin client functions (for cron jobs and background tasks) ---
+
+export async function getDueMonitors(): Promise<Monitor[]> {
+  const supabase = createAdminClient()
+  const now = new Date().toISOString()
+  const { data, error } = await supabase
+    .from('monitors')
+    .select('*')
+    .eq('is_paused', false)
+    .lte('next_check_at', now)
+    .order('next_check_at', { ascending: true })
+    .limit(100)
+
+  if (error) {
+    logger.error('Failed to get due monitors', { error: error.message })
+    return []
+  }
+  return data ?? []
+}
+
+export async function updateMonitorStatus(
+  id: string,
+  updates: { status: string; last_checked_at: string; next_check_at: string }
+): Promise<void> {
+  const supabase = createAdminClient()
+  const { error } = await supabase
+    .from('monitors')
+    .update(updates)
+    .eq('id', id)
+
+  if (error) {
+    logger.error('Failed to update monitor status', { error: error.message, monitorId: id })
+  }
+}
+
+export async function incrementFlapCount(id: string): Promise<void> {
+  const supabase = createAdminClient()
+  const { data } = await supabase.from('monitors').select('flap_count').eq('id', id).single()
+  if (data) {
+    await supabase.from('monitors').update({ flap_count: (data.flap_count || 0) + 1 }).eq('id', id)
+  }
+}
+
+export async function createMonitor(data: {
+  org_id: string
+  workspace_id: string
+  name: string
+  type: string
+  target: string
+  check_interval_seconds?: number
+  timeout_ms?: number
+  config?: Record<string, unknown>
+  severity?: string
+}): Promise<Monitor | null> {
+  const supabase = createAdminClient()
+  const now = new Date().toISOString()
+  const { data: monitor, error } = await supabase
+    .from('monitors')
+    .insert({
+      org_id: data.org_id,
+      workspace_id: data.workspace_id,
+      name: data.name,
+      type: data.type,
+      target: data.target,
+      check_interval_seconds: data.check_interval_seconds,
+      timeout_ms: data.timeout_ms,
+      severity: data.severity,
+      config: (data.config ?? {}) as import('@/lib/types/database.types').Json,
+      next_check_at: now,
+      status: 'unknown',
+    })
+    .select()
+    .single()
+
+  if (error) {
+    logger.error('Failed to create monitor', { error: error.message })
+    return null
+  }
+  return monitor
+}
+
+export async function deleteMonitor(id: string): Promise<boolean> {
+  const supabase = createAdminClient()
+  const { error } = await supabase.from('monitors').delete().eq('id', id)
+  if (error) {
+    logger.error('Failed to delete monitor', { error: error.message })
+    return false
+  }
+  return true
+}
+
+export async function pauseMonitor(id: string): Promise<void> {
+  const supabase = createAdminClient()
+  await supabase.from('monitors').update({ is_paused: true, status: 'paused' }).eq('id', id)
+}
+
+export async function resumeMonitor(id: string): Promise<void> {
+  const supabase = createAdminClient()
+  const now = new Date().toISOString()
+  await supabase.from('monitors').update({ is_paused: false, status: 'unknown', next_check_at: now }).eq('id', id)
 }

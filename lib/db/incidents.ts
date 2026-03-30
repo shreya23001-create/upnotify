@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
 import type { Incident } from '@/lib/types'
 
@@ -54,4 +55,74 @@ export async function getRecentIncidents(orgId: string, limit: number = 10): Pro
     return []
   }
   return data ?? []
+}
+
+// --- Admin client functions (for cron jobs and background tasks) ---
+
+export async function createIncident(data: {
+  org_id: string
+  workspace_id: string
+  monitor_id: string
+  title: string
+  severity: string
+}): Promise<Incident | null> {
+  const supabase = createAdminClient()
+  const { data: incident, error } = await supabase
+    .from('incidents')
+    .insert({
+      ...data,
+      status: 'investigating',
+      started_at: new Date().toISOString(),
+    })
+    .select()
+    .single()
+
+  if (error) {
+    logger.error('Failed to create incident', { error: error.message })
+    return null
+  }
+  return incident
+}
+
+export async function resolveIncident(monitorId: string): Promise<void> {
+  const supabase = createAdminClient()
+  const now = new Date()
+
+  const { data: incident } = await supabase
+    .from('incidents')
+    .select('*')
+    .eq('monitor_id', monitorId)
+    .neq('status', 'resolved')
+    .order('started_at', { ascending: false })
+    .limit(1)
+    .single()
+
+  if (incident) {
+    const startedAt = new Date(incident.started_at)
+    const durationSeconds = Math.floor((now.getTime() - startedAt.getTime()) / 1000)
+
+    await supabase
+      .from('incidents')
+      .update({
+        status: 'resolved',
+        resolved_at: now.toISOString(),
+        duration_seconds: durationSeconds,
+      })
+      .eq('id', incident.id)
+  }
+}
+
+export async function getOpenIncidentForMonitor(monitorId: string): Promise<Incident | null> {
+  const supabase = createAdminClient()
+  const { data, error } = await supabase
+    .from('incidents')
+    .select('*')
+    .eq('monitor_id', monitorId)
+    .neq('status', 'resolved')
+    .order('started_at', { ascending: false })
+    .limit(1)
+    .single()
+
+  if (error) return null
+  return data
 }
