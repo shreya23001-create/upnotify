@@ -3,6 +3,7 @@ import { getCurrentUser } from '@/lib/db/users'
 import { getWorkspaceById } from '@/lib/db/workspaces'
 import { getMonitorsByWorkspace } from '@/lib/db/monitors'
 import { getIncidentsByWorkspace } from '@/lib/db/incidents'
+import { getUptimeBarData } from '@/lib/db/check-results'
 import { MonitorTable } from '@/components/monitors/monitor-table'
 
 export default async function ClientDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -31,7 +32,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
         <div className="card"><div className="card-content-compact"><div className="stat-label">Up</div><div className="stat-value stat-value-green">{monitors.filter(m => m.status === 'up').length}</div></div></div>
         <div className="card"><div className="card-content-compact"><div className="stat-label">Down</div><div className="stat-value stat-value-red">{monitors.filter(m => m.status === 'down').length}</div></div></div>
       </div>
-      <MonitorTable monitors={monitors} />
+      <MonitorTable monitors={monitors} uptimeData={Object.fromEntries(await Promise.all(monitors.map(async (m) => [m.id, await getUptimeBarData(m.id)] as const)))} />
     </div>
   )
 }

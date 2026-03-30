@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { DataTable, type Column, type BulkAction } from '@/components/ui/data-table'
 import type { Organisation, User, Subscription, Invoice, ApiKey } from '@/lib/types'
 
 interface SettingsContentProps {
@@ -14,6 +15,28 @@ interface SettingsContentProps {
 
 export function SettingsContent({ organisation, members, currentUserId, subscription, invoices, apiKeys }: SettingsContentProps) {
   const [tab, setTab] = useState('organisation')
+
+  const memberColumns: Column<User>[] = [
+    { key: 'full_name', label: 'Name', render: (m) => (
+      <span style={{ fontWeight: 500 }}>
+        {m.full_name ?? '—'}
+        {m.id === currentUserId && <span style={{ marginLeft: 8, fontSize: 12, color: '#a1a1aa' }}>(you)</span>}
+      </span>
+    )},
+    { key: 'email', label: 'Email' },
+    { key: 'role', label: 'Role', render: (m) => <span className="badge badge-outline" style={{ textTransform: 'capitalize' }}>{m.role}</span> },
+  ]
+
+  const apiKeyColumns: Column<ApiKey>[] = [
+    { key: 'name', label: 'Name', render: (k) => <span style={{ fontWeight: 500 }}>{k.name}</span> },
+    { key: 'key_prefix', label: 'Prefix', render: (k) => <span style={{ fontFamily: 'monospace', fontSize: 13 }}>{k.key_prefix}...</span> },
+    { key: 'created_at', label: 'Created', render: (k) => <span className="table-muted">{new Date(k.created_at).toLocaleDateString()}</span> },
+    { key: 'last_used_at', label: 'Last Used', render: (k) => <span className="table-muted">{k.last_used_at ? new Date(k.last_used_at).toLocaleDateString() : 'Never'}</span> },
+  ]
+
+  const apiKeyBulkActions: BulkAction[] = [
+    { label: 'Revoke', onClick: (ids) => { /* TODO: implement bulk revoke */ }, variant: 'danger' },
+  ]
 
   return (
     <div>
@@ -43,21 +66,12 @@ export function SettingsContent({ organisation, members, currentUserId, subscrip
         <div className="card">
           <div className="card-header card-header-row"><div className="card-title">Team Members</div><button className="btn btn-primary btn-sm" disabled>+ Invite</button></div>
           <div className="card-content">
-            {members.length === 0 ? <p style={{ fontSize: 14, color: '#71717a' }}>No team members.</p> : (
-              <table className="table">
-                <thead><tr><th>Name</th><th>Email</th><th>Role</th><th></th></tr></thead>
-                <tbody>
-                  {members.map((m) => (
-                    <tr key={m.id}>
-                      <td style={{ fontWeight: 500 }}>{m.full_name ?? '—'}{m.id === currentUserId && <span style={{ marginLeft: 8, fontSize: 12, color: '#a1a1aa' }}>(you)</span>}</td>
-                      <td>{m.email}</td>
-                      <td><span className="badge badge-outline" style={{ textTransform: 'capitalize' }}>{m.role}</span></td>
-                      <td>{m.id !== currentUserId && <button className="btn btn-ghost btn-sm" disabled>Remove</button>}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
+            <DataTable
+              columns={memberColumns}
+              data={members}
+              searchPlaceholder="Search members..."
+              emptyMessage="No team members."
+            />
           </div>
         </div>
       )}
@@ -102,22 +116,13 @@ export function SettingsContent({ organisation, members, currentUserId, subscrip
         <div className="card">
           <div className="card-header card-header-row"><div className="card-title">API Keys</div><button className="btn btn-primary btn-sm" disabled>+ Create Key</button></div>
           <div className="card-content">
-            {apiKeys.length === 0 ? <p style={{ fontSize: 14, color: '#71717a' }}>No API keys created yet.</p> : (
-              <table className="table">
-                <thead><tr><th>Name</th><th>Prefix</th><th>Created</th><th>Last Used</th><th></th></tr></thead>
-                <tbody>
-                  {apiKeys.map((key) => (
-                    <tr key={key.id}>
-                      <td style={{ fontWeight: 500 }}>{key.name}</td>
-                      <td style={{ fontFamily: 'monospace', fontSize: 13 }}>{key.key_prefix}...</td>
-                      <td className="table-muted">{new Date(key.created_at).toLocaleDateString()}</td>
-                      <td className="table-muted">{key.last_used_at ? new Date(key.last_used_at).toLocaleDateString() : 'Never'}</td>
-                      <td><button className="btn btn-ghost btn-sm" disabled>Revoke</button></td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
+            <DataTable
+              columns={apiKeyColumns}
+              data={apiKeys}
+              searchPlaceholder="Search API keys..."
+              bulkActions={apiKeyBulkActions}
+              emptyMessage="No API keys created yet."
+            />
           </div>
         </div>
       )}

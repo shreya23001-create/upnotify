@@ -211,6 +211,45 @@ img { max-width: 100%; display: block; }
 .google-icon { width: 16px; height: 16px; margin-right: 8px; }
 
 /* ==========================================================================
+   Data Table
+   ========================================================================== */
+
+.data-table-toolbar { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+.data-table-search { flex: 1; min-width: 200px; height: 36px; padding: 0 12px; border: 1px solid #e4e4e7; border-radius: 8px; font-size: 14px; outline: none; background: #fff; }
+.data-table-search:focus { border-color: #a1a1aa; box-shadow: 0 0 0 3px rgba(161,161,170,0.15); }
+.data-table-filter { height: 36px; padding: 0 12px; border: 1px solid #e4e4e7; border-radius: 8px; font-size: 13px; background: #fff; cursor: pointer; }
+.data-table-bulk-bar { display: flex; align-items: center; gap: 12px; padding: 10px 16px; margin-bottom: 12px; background: #f4f4f5; border-radius: 8px; font-size: 13px; }
+.data-table-bulk-bar span { color: #52525b; }
+.data-table-checkbox { width: 16px; height: 16px; cursor: pointer; accent-color: #18181b; }
+.data-table-sort-header { cursor: pointer; user-select: none; display: inline-flex; align-items: center; gap: 4px; }
+.data-table-sort-header:hover { color: #18181b; }
+.data-table-sort-icon { font-size: 10px; color: #a1a1aa; }
+.data-table-sort-icon.active { color: #18181b; }
+.data-table-pagination { display: flex; align-items: center; justify-content: space-between; margin-top: 16px; font-size: 13px; color: #71717a; }
+.data-table-pagination-buttons { display: flex; gap: 4px; }
+.data-table-pagination-btn { height: 32px; padding: 0 12px; border: 1px solid #e4e4e7; border-radius: 6px; font-size: 13px; background: #fff; cursor: pointer; }
+.data-table-pagination-btn:hover { background: #f4f4f5; }
+.data-table-pagination-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.data-table-pagination-btn.active { background: #18181b; color: #fff; border-color: #18181b; }
+.data-table-page-size { height: 32px; padding: 0 8px; border: 1px solid #e4e4e7; border-radius: 6px; font-size: 13px; background: #fff; }
+.table tr.selected { background: #f0f9ff; }
+.table tr:hover { background: #fafafa; }
+
+/* ==========================================================================
+   Uptime Bar
+   ========================================================================== */
+
+.uptime-bar { display: inline-flex; align-items: flex-end; gap: 1px; height: 24px; }
+.uptime-slot { width: 3px; height: 24px; border-radius: 1px; position: relative; cursor: pointer; transition: opacity 0.15s; }
+.uptime-slot:hover { opacity: 0.7; }
+.uptime-slot-up { background: #22c55e; }
+.uptime-slot-down { background: #ef4444; }
+.uptime-slot-degraded { background: #eab308; }
+.uptime-slot-none { background: #e4e4e7; }
+.uptime-tooltip { position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); margin-bottom: 6px; padding: 4px 8px; background: #18181b; color: #fff; font-size: 11px; white-space: nowrap; border-radius: 4px; pointer-events: none; opacity: 0; transition: opacity 0.15s; z-index: 10; }
+.uptime-slot:hover .uptime-tooltip { opacity: 1; }
+
+/* ==========================================================================
    Responsive
    ========================================================================== */
 

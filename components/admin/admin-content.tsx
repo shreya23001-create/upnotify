@@ -1,16 +1,55 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
+import { DataTable, type Column } from '@/components/ui/data-table'
 import type { User, Organisation, FeatureFlag, Plan } from '@/lib/types'
 
 interface AdminContentProps { users: User[]; organisations: Organisation[]; featureFlags: FeatureFlag[]; plans: Plan[] }
 
 export function AdminContent({ users, organisations, featureFlags, plans }: AdminContentProps) {
   const [tab, setTab] = useState('users')
-  const [search, setSearch] = useState('')
 
-  const orgMap = new Map(organisations.map((o) => [o.id, o.name]))
-  const filtered = search ? users.filter(u => u.email.toLowerCase().includes(search.toLowerCase()) || (u.full_name ?? '').toLowerCase().includes(search.toLowerCase())) : users
+  const orgMap = useMemo(() => new Map(organisations.map((o) => [o.id, o.name])), [organisations])
+
+  const userColumns: Column<User>[] = [
+    { key: 'full_name', label: 'Name', render: (u) => <span style={{ fontWeight: 500 }}>{u.full_name ?? '—'}</span> },
+    { key: 'email', label: 'Email' },
+    { key: 'org_id', label: 'Organisation', searchable: false, render: (u) => <span>{orgMap.get(u.org_id) ?? '—'}</span> },
+    { key: 'role', label: 'Role', render: (u) => (
+      <span>
+        <span className="badge badge-outline" style={{ textTransform: 'capitalize' }}>{u.role}</span>
+        {u.is_super_admin && <span className="badge badge-danger" style={{ marginLeft: 4 }}>Admin</span>}
+      </span>
+    )},
+  ]
+
+  const userFilters = [
+    { key: 'role', label: 'All Roles', options: [
+      { label: 'Owner', value: 'owner' },
+      { label: 'Admin', value: 'admin' },
+      { label: 'Member', value: 'member' },
+      { label: 'Viewer', value: 'viewer' },
+    ]},
+  ]
+
+  const planColumns: Column<Plan>[] = [
+    { key: 'name', label: 'Plan', render: (p) => <span style={{ fontWeight: 500 }}>{p.name}</span> },
+    { key: 'type', label: 'Type', render: (p) => <span className="badge badge-outline" style={{ textTransform: 'capitalize' }}>{p.type}</span> },
+    { key: 'price_monthly_gbp', label: 'Monthly', render: (p) => p.price_monthly_gbp > 0 ? `\u00A3${(p.price_monthly_gbp / 100).toFixed(2)}` : p.onboarding_fee_gbp > 0 ? `\u00A3${(p.onboarding_fee_gbp / 100).toFixed(2)} one-time` : 'Free' },
+    { key: 'monitor_limit', label: 'Monitors', render: (p) => <span>{p.monitor_limit ?? 'Unlimited'}</span> },
+    { key: 'check_interval_seconds', label: 'Interval', render: (p) => `${p.check_interval_seconds}s` },
+    { key: 'has_api_access', label: 'API', render: (p) => p.has_api_access ? 'Yes' : 'No' },
+    { key: 'has_ai_predictive', label: 'AI', render: (p) => p.has_ai_predictive ? 'Yes' : 'No' },
+    { key: 'is_visible', label: 'Visible', render: (p) => <span className={`badge ${p.is_visible ? 'badge-success' : 'badge-outline'}`}>{p.is_visible ? 'Yes' : 'Hidden'}</span> },
+  ]
+
+  const planFilters = [
+    { key: 'type', label: 'All Types', options: [
+      { label: 'Direct', value: 'direct' },
+      { label: 'Agency', value: 'agency' },
+      { label: 'Free', value: 'free' },
+    ]},
+  ]
 
   return (
     <div>
@@ -23,26 +62,14 @@ export function AdminContent({ users, organisations, featureFlags, plans }: Admi
       </div>
 
       {tab === 'users' && (
-        <div>
-          <input className="form-input" placeholder="Search users by email or name..." value={search} onChange={(e) => setSearch(e.target.value)} style={{ marginBottom: 16 }} />
-          <table className="table">
-            <thead><tr><th>Name</th><th>Email</th><th>Organisation</th><th>Role</th></tr></thead>
-            <tbody>
-              {filtered.slice(0, 50).map((u) => (
-                <tr key={u.id}>
-                  <td style={{ fontWeight: 500 }}>{u.full_name ?? '—'}</td>
-                  <td>{u.email}</td>
-                  <td>{orgMap.get(u.org_id) ?? '—'}</td>
-                  <td>
-                    <span className="badge badge-outline" style={{ textTransform: 'capitalize' }}>{u.role}</span>
-                    {u.is_super_admin && <span className="badge badge-danger" style={{ marginLeft: 4 }}>Admin</span>}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          {filtered.length > 50 && <p style={{ fontSize: 14, color: '#71717a', marginTop: 8 }}>Showing 50 of {filtered.length} results.</p>}
-        </div>
+        <DataTable
+          columns={userColumns}
+          data={users}
+          searchPlaceholder="Search users by email or name..."
+          filters={userFilters}
+          pageSize={50}
+          emptyMessage="No users found."
+        />
       )}
 
       {tab === 'flags' && (
@@ -66,23 +93,13 @@ export function AdminContent({ users, organisations, featureFlags, plans }: Admi
       )}
 
       {tab === 'plans' && (
-        <table className="table">
-          <thead><tr><th>Plan</th><th>Type</th><th>Monthly</th><th>Monitors</th><th>Interval</th><th>API</th><th>AI</th><th>Visible</th></tr></thead>
-          <tbody>
-            {plans.map((plan) => (
-              <tr key={plan.id}>
-                <td style={{ fontWeight: 500 }}>{plan.name}</td>
-                <td><span className="badge badge-outline" style={{ textTransform: 'capitalize' }}>{plan.type}</span></td>
-                <td>{plan.price_monthly_gbp > 0 ? `\u00A3${(plan.price_monthly_gbp / 100).toFixed(2)}` : plan.onboarding_fee_gbp > 0 ? `\u00A3${(plan.onboarding_fee_gbp / 100).toFixed(2)} one-time` : 'Free'}</td>
-                <td>{plan.monitor_limit ?? 'Unlimited'}</td>
-                <td>{plan.check_interval_seconds}s</td>
-                <td>{plan.has_api_access ? 'Yes' : 'No'}</td>
-                <td>{plan.has_ai_predictive ? 'Yes' : 'No'}</td>
-                <td><span className={`badge ${plan.is_visible ? 'badge-success' : 'badge-outline'}`}>{plan.is_visible ? 'Yes' : 'Hidden'}</span></td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <DataTable
+          columns={planColumns}
+          data={plans}
+          searchPlaceholder="Search plans..."
+          filters={planFilters}
+          emptyMessage="No plans configured."
+        />
       )}
     </div>
   )
