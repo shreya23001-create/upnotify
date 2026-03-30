@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useAuth } from '@/components/providers/auth-provider'
 import { useWorkspace } from '@/components/providers/workspace-provider'
 import { WorkspaceSwitcher } from './workspace-switcher'
+import { IconSettings, IconLogOut, IconUser } from '@/components/icons'
 
 export function Header() {
   const { user, signOut } = useAuth()
@@ -42,11 +43,14 @@ export function Header() {
             </div>
             <div className="header-dropdown-divider" />
             <Link href="/dashboard/settings" className="header-dropdown-item" onClick={() => setDropdownOpen(false)}>
-              Settings
+              <IconSettings size={15} /> Settings
+            </Link>
+            <Link href="/dashboard/settings" className="header-dropdown-item" onClick={() => setDropdownOpen(false)}>
+              <IconUser size={15} /> Profile
             </Link>
             <div className="header-dropdown-divider" />
-            <button className="header-dropdown-item" onClick={() => signOut()}>
-              Sign out
+            <button className="header-dropdown-item header-dropdown-item-danger" onClick={() => signOut()}>
+              <IconLogOut size={15} /> Sign out
             </button>
           </div>
         )}
