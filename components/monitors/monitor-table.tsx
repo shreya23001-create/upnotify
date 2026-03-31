@@ -20,6 +20,8 @@ export function MonitorTable({ monitors, uptimeData }: MonitorTableProps) {
   const [isPending, startTransition] = useTransition()
 
   function handlePauseResume(id: string, isPaused: boolean): void {
+    const action = isPaused ? 'resume' : 'pause'
+    if (!confirm(`Are you sure you want to ${action} this monitor?`)) return
     startTransition(async () => {
       if (isPaused) {
         await resumeMonitorAction(id)
@@ -49,7 +51,7 @@ export function MonitorTable({ monitors, uptimeData }: MonitorTableProps) {
       searchable: false,
       render: (m) => (
         <span style={{ display: 'flex', gap: 8 }}>
-          <Link href={`/dashboard/monitors/${m.id}`} className="btn btn-sm btn-secondary">Edit</Link>
+          <Link href={`/dashboard/monitors/${m.id}/edit`} className="btn btn-sm btn-secondary">Edit</Link>
           <button
             className="btn btn-sm btn-secondary"
             onClick={() => handlePauseResume(m.id, m.is_paused)}

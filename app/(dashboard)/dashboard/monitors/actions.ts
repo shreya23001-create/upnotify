@@ -1,7 +1,7 @@
 'use server'
 
 import { redirect } from 'next/navigation'
-import { createMonitor, deleteMonitor, pauseMonitor, resumeMonitor } from '@/lib/db/monitors'
+import { createMonitor, updateMonitor, deleteMonitor, pauseMonitor, resumeMonitor } from '@/lib/db/monitors'
 import { getCurrentUser } from '@/lib/db/users'
 import { getWorkspacesByOrg } from '@/lib/db/workspaces'
 import { logger } from '@/lib/utils/logger'
@@ -66,6 +66,50 @@ export async function createMonitorAction(formData: FormData): Promise<{ error?:
 
   logger.info('Monitor created', { monitorId: monitor.id, name, type })
   redirect('/dashboard/monitors')
+}
+
+export async function updateMonitorAction(monitorId: string, formData: FormData): Promise<{ error?: string }> {
+  const name = formData.get('name') as string
+  const target = formData.get('target') as string
+  const intervalStr = formData.get('check_interval_seconds') as string
+  const severity = formData.get('severity') as string
+
+  if (!name || !target) return { error: 'Name and target are required' }
+
+  const config: Record<string, unknown> = {}
+  const type = formData.get('type') as string
+
+  if (type === 'keyword') {
+    config.keyword = formData.get('keyword') as string
+    config.shouldExist = formData.get('shouldExist') !== 'false'
+  }
+  if (type === 'port') {
+    config.port = parseInt(formData.get('port') as string || '80', 10)
+  }
+  if (type === 'heartbeat') {
+    config.expectedIntervalSeconds = parseInt(formData.get('expectedInterval') as string || '300', 10)
+  }
+  if (type === 'api') {
+    config.method = formData.get('method') as string || 'GET'
+    const headersStr = formData.get('headers') as string
+    if (headersStr) {
+      try { config.headers = JSON.parse(headersStr) } catch { /* ignore */ }
+    }
+    config.body = formData.get('body') as string || undefined
+  }
+
+  const monitor = await updateMonitor(monitorId, {
+    name,
+    target,
+    check_interval_seconds: intervalStr ? parseInt(intervalStr, 10) : undefined,
+    severity: severity || undefined,
+    config: Object.keys(config).length > 0 ? config : undefined,
+  })
+
+  if (!monitor) return { error: 'Failed to update monitor' }
+
+  logger.info('Monitor updated', { monitorId })
+  redirect(`/dashboard/monitors/${monitorId}`)
 }
 
 export async function deleteMonitorAction(monitorId: string): Promise<{ error?: string }> {

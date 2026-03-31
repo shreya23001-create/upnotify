@@ -153,6 +153,33 @@ export async function createMonitor(data: {
   return monitor
 }
 
+export async function updateMonitor(
+  id: string,
+  updates: { name?: string; target?: string; check_interval_seconds?: number; timeout_ms?: number; severity?: string; config?: Record<string, unknown> }
+): Promise<Monitor | null> {
+  const supabase = createAdminClient()
+  const updateData: Record<string, unknown> = {}
+  if (updates.name) updateData.name = updates.name
+  if (updates.target) updateData.target = updates.target
+  if (updates.check_interval_seconds) updateData.check_interval_seconds = updates.check_interval_seconds
+  if (updates.timeout_ms) updateData.timeout_ms = updates.timeout_ms
+  if (updates.severity) updateData.severity = updates.severity
+  if (updates.config) updateData.config = updates.config as import('@/lib/types/database.types').Json
+
+  const { data, error } = await supabase
+    .from('monitors')
+    .update(updateData)
+    .eq('id', id)
+    .select()
+    .single()
+
+  if (error) {
+    logger.error('Failed to update monitor', { error: error.message })
+    return null
+  }
+  return data
+}
+
 export async function deleteMonitor(id: string): Promise<boolean> {
   const supabase = createAdminClient()
   const { error } = await supabase.from('monitors').delete().eq('id', id)
