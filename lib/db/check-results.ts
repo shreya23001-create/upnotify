@@ -110,7 +110,60 @@ export async function getUptimeBarData(monitorId: string): Promise<UptimeSlot[]>
   return slots
 }
 
-function formatSlotTime(base: Date, slotIndex: number): string {
-  const time = new Date(base.getTime() + slotIndex * 15 * 60 * 1000)
+function formatSlotTime(base: Date, slotIndex: number, slotMinutes: number = 15): string {
+  const time = new Date(base.getTime() + slotIndex * slotMinutes * 60 * 1000)
   return time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+}
+
+const rangeConfig: Record<string, { hours: number; slots: number; slotMinutes: number }> = {
+  '24h': { hours: 24, slots: 48, slotMinutes: 30 },
+  '7d': { hours: 168, slots: 56, slotMinutes: 180 },
+  '30d': { hours: 720, slots: 60, slotMinutes: 720 },
+  '90d': { hours: 2160, slots: 90, slotMinutes: 1440 },
+}
+
+export async function getUptimeBarDataForRange(monitorId: string, range: string): Promise<UptimeSlot[]> {
+  const config = rangeConfig[range] || rangeConfig['24h']
+  const supabase = createAdminClient()
+  const now = new Date()
+  const since = new Date(now.getTime() - config.hours * 60 * 60 * 1000)
+
+  const { data, error } = await supabase
+    .from('check_results')
+    .select('status, checked_at')
+    .eq('monitor_id', monitorId)
+    .gte('checked_at', since.toISOString())
+    .order('checked_at', { ascending: true })
+
+  if (error) {
+    logger.error('Failed to get uptime bar data for range', { error: error.message })
+    return Array.from({ length: config.slots }, (_, i) => ({
+      slot: formatSlotTime(since, i, config.slotMinutes),
+      status: 'none' as const,
+    }))
+  }
+
+  const results = data ?? []
+  const slots: UptimeSlot[] = []
+
+  for (let i = 0; i < config.slots; i++) {
+    const slotStart = new Date(since.getTime() + i * config.slotMinutes * 60 * 1000)
+    const slotEnd = new Date(slotStart.getTime() + config.slotMinutes * 60 * 1000)
+
+    const checksInSlot = results.filter(r => {
+      const t = new Date(r.checked_at).getTime()
+      return t >= slotStart.getTime() && t < slotEnd.getTime()
+    })
+
+    let status: UptimeSlot['status'] = 'none'
+    if (checksInSlot.length > 0) {
+      if (checksInSlot.some(c => c.status === 'down')) status = 'down'
+      else if (checksInSlot.some(c => c.status === 'degraded')) status = 'degraded'
+      else status = 'up'
+    }
+
+    slots.push({ slot: formatSlotTime(since, i, config.slotMinutes), status })
+  }
+
+  return slots
 }

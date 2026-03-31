@@ -1,13 +1,14 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { getStatusPageBySlug, getUptimePercentage } from '@/lib/db/status-pages'
-import { getUptimeBarData } from '@/lib/db/check-results'
+import { getUptimeBarDataForRange } from '@/lib/db/check-results'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { StatusOverallBanner } from '@/components/status-page/status-overall-banner'
 import { StatusMonitorRow } from '@/components/status-page/status-monitor-row'
 import { StatusIncidentList } from '@/components/status-page/status-incident-list'
 import { StatusSubscribeForm } from '@/components/status-page/status-subscribe-form'
 import { UptimeBarLegend } from '@/components/status-page/uptime-bar-legend'
+import { StatusTimeRangeLinks } from '@/components/status-page/status-time-range-links'
 import type { Monitor, Incident } from '@/lib/types'
 
 export const dynamic = 'force-dynamic'
@@ -22,30 +23,38 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   }
 }
 
-export default async function PublicStatusPage({ params }: { params: Promise<{ slug: string }> }): Promise<React.ReactElement> {
+export default async function PublicStatusPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ slug: string }>
+  searchParams: Promise<{ range?: string }>
+}): Promise<React.ReactElement> {
   const { slug } = await params
+  const { range: rangeParam } = await searchParams
+  const range = ['24h', '7d', '30d', '90d'].includes(rangeParam || '') ? rangeParam! : '24h'
+
   const statusPage = await getStatusPageBySlug(slug)
   if (!statusPage) notFound()
 
   const supabase = createAdminClient()
   const monitorIds = (statusPage.monitor_ids || []) as string[]
 
-  // Fetch monitors
   let monitors: Monitor[] = []
   if (monitorIds.length > 0) {
     const { data } = await supabase.from('monitors').select('*').in('id', monitorIds)
     monitors = data ?? []
   }
 
-  // Fetch uptime data and percentages in parallel
+  const uptimeDays = range === '24h' ? 1 : range === '7d' ? 7 : range === '30d' ? 30 : 90
+
   const [uptimeEntries, uptimePercentages] = await Promise.all([
-    Promise.all(monitors.map(async (m) => [m.id, await getUptimeBarData(m.id)] as const)),
-    Promise.all(monitors.map(async (m) => [m.id, await getUptimePercentage(m.id)] as const)),
+    Promise.all(monitors.map(async (m) => [m.id, await getUptimeBarDataForRange(m.id, range)] as const)),
+    Promise.all(monitors.map(async (m) => [m.id, await getUptimePercentage(m.id, uptimeDays)] as const)),
   ])
   const uptimeData = Object.fromEntries(uptimeEntries)
   const uptimePercent = Object.fromEntries(uptimePercentages)
 
-  // Fetch recent incidents for these monitors
   let incidents: Incident[] = []
   if (monitorIds.length > 0) {
     const { data } = await supabase
@@ -69,7 +78,10 @@ export default async function PublicStatusPage({ params }: { params: Promise<{ s
       <StatusOverallBanner monitors={monitors} openIncidents={openIncidents.length} />
 
       <div className="status-page-section">
-        <h2 className="status-page-section-title">Monitors</h2>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 16 }}>
+          <h2 className="status-page-section-title" style={{ margin: 0, border: 'none', padding: 0 }}>Monitors</h2>
+          <StatusTimeRangeLinks slug={slug} currentRange={range} />
+        </div>
         <UptimeBarLegend />
         {monitors.length === 0 ? (
           <p style={{ color: '#94a3b8', fontSize: 14 }}>No monitors configured for this status page.</p>
