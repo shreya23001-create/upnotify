@@ -1,18 +1,54 @@
 'use client'
 
+import { useTransition } from 'react'
 import { DataTable, type Column, type BulkAction } from '@/components/ui/data-table'
+import { deleteAlertChannelAction, toggleAlertChannelAction } from '@/app/(dashboard)/dashboard/alerts/actions'
 import type { AlertChannel } from '@/lib/types'
 
 const typeLabels: Record<string, string> = {
-  email: '\u{1F4E7} Email',
-  slack: '\u{1F4AC} Slack',
-  teams: '\u{1F465} Teams',
-  whatsapp: '\u{1F4F1} WhatsApp',
-  voice: '\u{1F4DE} Voice',
-  webhook: '\u{1F517} Webhook',
+  email: '📧 Email',
+  slack: '💬 Slack',
+  teams: '👥 Teams',
+  whatsapp: '📱 WhatsApp',
+  voice: '📞 Voice',
+  webhook: '🔗 Webhook',
+}
+
+interface ChannelConfig {
+  email?: string
+  slackWebhookUrl?: string
+  slackChannel?: string
+  teamsWebhookUrl?: string
+  webhookUrl?: string
+}
+
+function getDestination(channel: AlertChannel): string {
+  const config = channel.config as ChannelConfig
+  switch (channel.type) {
+    case 'email': return config.email || '—'
+    case 'slack': return config.slackChannel || config.slackWebhookUrl?.slice(0, 40) + '...' || '—'
+    case 'teams': return config.teamsWebhookUrl?.slice(0, 40) + '...' || '—'
+    case 'webhook': return config.webhookUrl?.slice(0, 40) + '...' || '—'
+    default: return '—'
+  }
 }
 
 export function AlertChannelsTable({ channels }: { channels: AlertChannel[] }) {
+  const [isPending, startTransition] = useTransition()
+
+  function handleToggle(id: string, currentlyEnabled: boolean): void {
+    startTransition(async () => {
+      await toggleAlertChannelAction(id, !currentlyEnabled)
+    })
+  }
+
+  function handleDelete(id: string): void {
+    if (!confirm('Delete this alert channel? This cannot be undone.')) return
+    startTransition(async () => {
+      await deleteAlertChannelAction(id)
+    })
+  }
+
   const columns: Column<AlertChannel>[] = [
     {
       key: 'type',
@@ -23,6 +59,17 @@ export function AlertChannelsTable({ channels }: { channels: AlertChannel[] }) {
       key: 'name',
       label: 'Name',
       render: (ch) => <span style={{ fontWeight: 600 }}>{ch.name}</span>,
+    },
+    {
+      key: 'destination',
+      label: 'Destination',
+      sortable: false,
+      searchable: false,
+      render: (ch) => (
+        <span className="table-muted" style={{ fontFamily: 'monospace', fontSize: 12 }}>
+          {getDestination(ch)}
+        </span>
+      ),
     },
     {
       key: 'severity_filter',
@@ -56,6 +103,31 @@ export function AlertChannelsTable({ channels }: { channels: AlertChannel[] }) {
             style={{ marginRight: 6 }}
           />
           {ch.is_enabled ? 'Enabled' : 'Disabled'}
+        </span>
+      ),
+    },
+    {
+      key: 'actions',
+      label: '',
+      sortable: false,
+      searchable: false,
+      render: (ch) => (
+        <span style={{ display: 'flex', gap: 8 }}>
+          <button
+            className="btn btn-sm btn-secondary"
+            onClick={() => handleToggle(ch.id, ch.is_enabled)}
+            disabled={isPending}
+          >
+            {ch.is_enabled ? 'Disable' : 'Enable'}
+          </button>
+          <button
+            className="btn btn-sm btn-ghost"
+            style={{ color: '#dc2626' }}
+            onClick={() => handleDelete(ch.id)}
+            disabled={isPending}
+          >
+            Delete
+          </button>
         </span>
       ),
     },
