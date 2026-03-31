@@ -32,7 +32,7 @@ export default async function PublicStatusPage({
 }): Promise<React.ReactElement> {
   const { slug } = await params
   const { range: rangeParam } = await searchParams
-  const range = ['24h', '7d', '30d', '90d'].includes(rangeParam || '') ? rangeParam! : '24h'
+  const range = ['24h', '7d', '30d'].includes(rangeParam || '') ? rangeParam! : '24h'
 
   const statusPage = await getStatusPageBySlug(slug)
   if (!statusPage) notFound()
