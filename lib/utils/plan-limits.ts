@@ -1,0 +1,119 @@
+import { createAdminClient } from '@/lib/supabase/admin'
+
+interface PlanLimits {
+  monitors: number | null // null = unlimited (usage-based)
+  workspaces: number | null
+  hasApiAccess: boolean
+  hasAiPredictive: boolean
+  hasStatusPageCustomDomain: boolean
+  hasWhiteLabel: boolean
+  hasVoiceCalls: boolean
+  checkIntervalSeconds: number
+}
+
+const UPGRADE_NUDGE_THRESHOLD = 15
+
+/** Usage-based defaults when no subscription exists */
+const USAGE_BASED_DEFAULTS: PlanLimits = {
+  monitors: null,
+  workspaces: 1,
+  hasApiAccess: false,
+  hasAiPredictive: false,
+  hasStatusPageCustomDomain: false,
+  hasWhiteLabel: false,
+  hasVoiceCalls: false,
+  checkIntervalSeconds: 300,
+}
+
+/** Fetch plan limits for an org based on its active subscription */
+export async function getPlanLimits(orgId: string): Promise<PlanLimits> {
+  const supabase = createAdminClient()
+
+  const { data: sub } = await supabase
+    .from('subscriptions')
+    .select('*, plans(*)')
+    .eq('org_id', orgId)
+    .eq('status', 'active')
+    .single()
+
+  if (!sub || !sub.plans) {
+    return USAGE_BASED_DEFAULTS
+  }
+
+  const plan = sub.plans as Record<string, unknown>
+  return {
+    monitors: (plan.monitor_limit as number | null) ?? null,
+    workspaces: (plan.client_workspace_limit as number | null) ?? null,
+    hasApiAccess: (plan.has_api_access as boolean) ?? false,
+    hasAiPredictive: (plan.has_ai_predictive as boolean) ?? false,
+    hasStatusPageCustomDomain:
+      (plan.has_status_page_custom_domain as boolean) ?? false,
+    hasWhiteLabel: (plan.has_white_label as boolean) ?? false,
+    hasVoiceCalls: (plan.has_voice_calls as boolean) ?? false,
+    checkIntervalSeconds: (plan.check_interval_seconds as number) ?? 300,
+  }
+}
+
+/**
+ * Check if the org can create another monitor.
+ * Returns shouldNudge=true at 15 monitors on usage-based plan.
+ */
+export async function checkMonitorLimit(orgId: string): Promise<{
+  allowed: boolean
+  shouldNudge: boolean
+  currentCount: number
+  limit: number | null
+}> {
+  const supabase = createAdminClient()
+  const limits = await getPlanLimits(orgId)
+
+  const { count } = await supabase
+    .from('monitors')
+    .select('id', { count: 'exact', head: true })
+    .eq('org_id', orgId)
+
+  const currentCount = count ?? 0
+  const allowed =
+    limits.monitors === null || currentCount < limits.monitors
+  const shouldNudge =
+    limits.monitors === null && currentCount >= UPGRADE_NUDGE_THRESHOLD
+
+  return { allowed, shouldNudge, currentCount, limit: limits.monitors }
+}
+
+/** Check if the org can create another workspace */
+export async function checkWorkspaceLimit(orgId: string): Promise<{
+  allowed: boolean
+  currentCount: number
+  limit: number | null
+}> {
+  const supabase = createAdminClient()
+  const limits = await getPlanLimits(orgId)
+
+  const { count } = await supabase
+    .from('workspaces')
+    .select('id', { count: 'exact', head: true })
+    .eq('org_id', orgId)
+
+  const currentCount = count ?? 0
+  const allowed =
+    limits.workspaces === null || currentCount < limits.workspaces
+
+  return { allowed, currentCount, limit: limits.workspaces }
+}
+
+/** Check if a specific feature is available for the org's plan */
+export async function checkFeatureAccess(
+  orgId: string,
+  feature: keyof Pick<
+    PlanLimits,
+    | 'hasApiAccess'
+    | 'hasAiPredictive'
+    | 'hasStatusPageCustomDomain'
+    | 'hasWhiteLabel'
+    | 'hasVoiceCalls'
+  >
+): Promise<boolean> {
+  const limits = await getPlanLimits(orgId)
+  return limits[feature]
+}

@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { getUserProfile, getUsersByOrg } from '@/lib/db/users'
-import { getSubscription, getInvoices } from '@/lib/db/subscriptions'
+import { getSubscription, getInvoices, getAllVisiblePlans, getSubscriptionWithPlan } from '@/lib/db/subscriptions'
 import { getApiKeysByOrg } from '@/lib/db/api-keys'
 import { SettingsContent } from '@/components/dashboard/settings/settings-content'
 
@@ -9,12 +9,16 @@ export default async function SettingsPage() {
   if (!profile) redirect('/login')
 
   const { user, organisation } = profile
-  const [members, subscription, invoices, apiKeys] = await Promise.all([
+  const [members, subscription, invoices, apiKeys, plans, subscriptionWithPlan] = await Promise.all([
     getUsersByOrg(organisation.id),
     getSubscription(organisation.id),
     getInvoices(organisation.id),
     getApiKeysByOrg(organisation.id),
+    getAllVisiblePlans(),
+    getSubscriptionWithPlan(organisation.id),
   ])
+
+  const currentPlan = subscriptionWithPlan?.plan ?? null
 
   return (
     <div>
@@ -26,6 +30,8 @@ export default async function SettingsPage() {
         subscription={subscription}
         invoices={invoices}
         apiKeys={apiKeys}
+        plans={plans}
+        currentPlan={currentPlan}
       />
     </div>
   )

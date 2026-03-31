@@ -772,8 +772,18 @@ export type Database = {
       }
       organisations: {
         Row: {
+          billing_email: string | null
+          company_address_line1: string | null
+          company_address_line2: string | null
+          company_city: string | null
+          company_country: string | null
+          company_name: string | null
+          company_postcode: string | null
+          company_registration_number: string | null
+          company_vat_number: string | null
           created_at: string
           id: string
+          logo_url: string | null
           name: string
           slug: string
           stripe_connect_account_id: string | null
@@ -783,8 +793,18 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          billing_email?: string | null
+          company_address_line1?: string | null
+          company_address_line2?: string | null
+          company_city?: string | null
+          company_country?: string | null
+          company_name?: string | null
+          company_postcode?: string | null
+          company_registration_number?: string | null
+          company_vat_number?: string | null
           created_at?: string
           id?: string
+          logo_url?: string | null
           name: string
           slug: string
           stripe_connect_account_id?: string | null
@@ -794,8 +814,18 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          billing_email?: string | null
+          company_address_line1?: string | null
+          company_address_line2?: string | null
+          company_city?: string | null
+          company_country?: string | null
+          company_name?: string | null
+          company_postcode?: string | null
+          company_registration_number?: string | null
+          company_vat_number?: string | null
           created_at?: string
           id?: string
+          logo_url?: string | null
           name?: string
           slug?: string
           stripe_connect_account_id?: string | null

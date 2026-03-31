@@ -373,6 +373,22 @@ img { max-width: 100%; display: block; }
 /* Report AI card highlight */
 .report-ai-card .card { border-left: 4px solid #667eea; }
 
+/* Pricing cards */
+.pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 24px 0; }
+.pricing-card { background: #fff; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 24px; position: relative; transition: all 0.2s; }
+.pricing-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.06); transform: translateY(-2px); }
+.pricing-card-current { border-color: #667eea; box-shadow: 0 0 0 1px #667eea; }
+.pricing-card-badge { position: absolute; top: -10px; right: 16px; background: #667eea; color: #fff; padding: 2px 12px; border-radius: 9999px; font-size: 12px; font-weight: 600; }
+.pricing-card-name { font-size: 18px; font-weight: 700; color: #1a1a2e; margin-bottom: 8px; }
+.pricing-card-price { margin-bottom: 4px; }
+.pricing-card-amount { font-size: 32px; font-weight: 800; color: #1a1a2e; }
+.pricing-card-period { font-size: 14px; color: #94a3b8; }
+.pricing-card-annual { font-size: 13px; color: #059669; font-weight: 500; margin-bottom: 16px; }
+.pricing-card-features { list-style: none; padding: 0; margin: 16px 0 0; }
+.pricing-card-features li { padding: 6px 0; font-size: 14px; color: #475569; border-bottom: 1px solid #f1f5f9; }
+.pricing-card-features li:last-child { border-bottom: none; }
+.pricing-card-current-label { text-align: center; margin-top: 16px; font-size: 14px; font-weight: 600; color: #667eea; }
+
 /* ==========================================================================
    Responsive
    ========================================================================== */

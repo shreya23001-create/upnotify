@@ -2,7 +2,11 @@
 
 import { useState } from 'react'
 import { DataTable, type Column, type BulkAction } from '@/components/ui/data-table'
-import type { Organisation, User, Subscription, Invoice, ApiKey } from '@/lib/types'
+import type { Organisation, User, Subscription, Invoice, ApiKey, Plan } from '@/lib/types'
+import { CurrentPlan } from '@/components/billing/current-plan'
+import { PricingTable } from '@/components/billing/pricing-table'
+import { InvoiceList } from '@/components/billing/invoice-list'
+import { CompanyDetailsForm } from '@/components/dashboard/settings/company-details-form'
 
 interface SettingsContentProps {
   organisation: Organisation
@@ -11,15 +15,17 @@ interface SettingsContentProps {
   subscription: Subscription | null
   invoices: Invoice[]
   apiKeys: ApiKey[]
+  plans: Plan[]
+  currentPlan: Plan | null
 }
 
-export function SettingsContent({ organisation, members, currentUserId, subscription, invoices, apiKeys }: SettingsContentProps) {
+export function SettingsContent({ organisation, members, currentUserId, subscription, invoices, apiKeys, plans, currentPlan }: SettingsContentProps) {
   const [tab, setTab] = useState('organisation')
 
   const memberColumns: Column<User>[] = [
     { key: 'full_name', label: 'Name', render: (m) => (
       <span style={{ fontWeight: 500 }}>
-        {m.full_name ?? '—'}
+        {m.full_name ?? '\u2014'}
         {m.id === currentUserId && <span style={{ marginLeft: 8, fontSize: 12, color: '#a1a1aa' }}>(you)</span>}
       </span>
     )},
@@ -38,10 +44,31 @@ export function SettingsContent({ organisation, members, currentUserId, subscrip
     { label: 'Revoke', onClick: (ids) => { /* TODO: implement bulk revoke */ }, variant: 'danger' },
   ]
 
+  async function saveCompanyDetails(formData: FormData): Promise<{ error?: string }> {
+    const res = await fetch('/api/v1/organisation/company', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        company_name: formData.get('company_name'),
+        billing_email: formData.get('billing_email'),
+        company_address_line1: formData.get('company_address_line1'),
+        company_address_line2: formData.get('company_address_line2'),
+        company_city: formData.get('company_city'),
+        company_postcode: formData.get('company_postcode'),
+        company_country: formData.get('company_country'),
+        company_registration_number: formData.get('company_registration_number'),
+        company_vat_number: formData.get('company_vat_number'),
+      }),
+    })
+    const data = await res.json()
+    if (!res.ok) return { error: data.error || 'Failed to save company details.' }
+    return {}
+  }
+
   return (
     <div>
       <div className="tabs-list">
-        {['organisation', 'team', 'billing', 'api-keys'].map((t) => (
+        {['organisation', 'team', 'billing', 'company', 'api-keys'].map((t) => (
           <button key={t} className={`tab-trigger${tab === t ? ' active' : ''}`} onClick={() => setTab(t)}>
             {t === 'api-keys' ? 'API Keys' : t.charAt(0).toUpperCase() + t.slice(1)}
           </button>
@@ -78,36 +105,17 @@ export function SettingsContent({ organisation, members, currentUserId, subscrip
 
       {tab === 'billing' && (
         <div className="space-y">
-          <div className="card">
-            <div className="card-header"><div className="card-title">Current Plan</div></div>
-            <div className="card-content">
-              {subscription ? (
-                <div>
-                  <span className={`badge ${subscription.status === 'active' ? 'badge-success' : 'badge-danger'}`}>{subscription.status}</span>
-                  <span style={{ marginLeft: 8, fontSize: 14, textTransform: 'capitalize' }}>{subscription.billing_cycle}</span>
-                  {subscription.current_period_end && <p style={{ fontSize: 14, color: '#71717a', marginTop: 8 }}>Next billing: {new Date(subscription.current_period_end).toLocaleDateString()}</p>}
-                </div>
-              ) : <p style={{ fontSize: 14, color: '#71717a' }}>No active subscription.</p>}
-              <button className="btn btn-primary" disabled style={{ marginTop: 16 }}>Manage Subscription</button>
-            </div>
-          </div>
-          <div className="card">
-            <div className="card-header"><div className="card-title">Invoices</div></div>
-            <div className="card-content">
-              {invoices.length === 0 ? <p style={{ fontSize: 14, color: '#71717a' }}>No invoices yet.</p> : (
-                <div className="space-y-sm">
-                  {invoices.map((inv) => (
-                    <div key={inv.id} style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f4f4f5', paddingBottom: 8 }}>
-                      <div>
-                        <div style={{ fontWeight: 500, fontSize: 14 }}>{'\u00A3'}{(inv.amount_gbp / 100).toFixed(2)}</div>
-                        <div style={{ fontSize: 12, color: '#71717a' }}>{new Date(inv.created_at).toLocaleDateString()}</div>
-                      </div>
-                      <span className={`badge ${inv.status === 'paid' ? 'badge-success' : 'badge-outline'}`}>{inv.status}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+          <CurrentPlan plan={currentPlan} subscription={subscription} />
+          <PricingTable plans={plans} currentPlanSlug={currentPlan?.slug} />
+          <InvoiceList invoices={invoices} />
+        </div>
+      )}
+
+      {tab === 'company' && (
+        <div className="card">
+          <div className="card-header"><div className="card-title">Company Details</div></div>
+          <div className="card-content">
+            <CompanyDetailsForm organisation={organisation} onSave={saveCompanyDetails} />
           </div>
         </div>
       )}
