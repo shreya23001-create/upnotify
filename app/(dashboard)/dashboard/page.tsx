@@ -1,5 +1,5 @@
 import { getCurrentUser } from '@/lib/db/users'
-import { getMonitorStats } from '@/lib/db/monitors'
+import { getMonitorStats, getMonitorsByWorkspace } from '@/lib/db/monitors'
 import { getRecentIncidents } from '@/lib/db/incidents'
 import { getAlertChannelsByOrg } from '@/lib/db/alerts'
 import { getStatusPagesByWorkspace } from '@/lib/db/status-pages'
@@ -7,6 +7,8 @@ import { getWorkspacesByOrg } from '@/lib/db/workspaces'
 import { StatsCards } from '@/components/dashboard/stats-cards'
 import { RecentIncidents } from '@/components/dashboard/recent-incidents'
 import { OnboardingChecklist } from '@/components/dashboard/onboarding-checklist'
+import { PausedMonitors } from '@/components/dashboard/paused-monitors'
+import { DisabledAlerts } from '@/components/dashboard/disabled-alerts'
 import { redirect } from 'next/navigation'
 
 export default async function DashboardPage() {
@@ -21,12 +23,26 @@ export default async function DashboardPage() {
   ])
 
   const defaultWorkspace = workspaces[0]
-  const statusPages = defaultWorkspace ? await getStatusPagesByWorkspace(defaultWorkspace.id) : []
+  const [statusPages, monitors] = await Promise.all([
+    defaultWorkspace ? getStatusPagesByWorkspace(defaultWorkspace.id) : [],
+    defaultWorkspace ? getMonitorsByWorkspace(defaultWorkspace.id) : [],
+  ])
+
+  const pausedMonitors = monitors.filter(m => m.is_paused)
+  const disabledChannels = alertChannels.filter(ch => !ch.is_enabled)
 
   return (
     <div>
       <h1 className="page-title" style={{ marginBottom: 24 }}>Dashboard</h1>
       <StatsCards stats={stats} />
+
+      {(pausedMonitors.length > 0 || disabledChannels.length > 0) && (
+        <div className="grid-2" style={{ marginBottom: 24 }}>
+          {pausedMonitors.length > 0 && <PausedMonitors monitors={pausedMonitors} />}
+          {disabledChannels.length > 0 && <DisabledAlerts channels={disabledChannels} />}
+        </div>
+      )}
+
       <div className="grid-2">
         <RecentIncidents incidents={incidents} />
         <OnboardingChecklist hasMonitors={stats.total > 0} hasAlertChannels={alertChannels.length > 0} hasStatusPages={statusPages.length > 0} />
