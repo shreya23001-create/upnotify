@@ -1,0 +1,196 @@
+openapi: 3.0.3
+info:
+  title: Uptrue API
+  version: 1.0.0
+  description: |
+    Uptrue is a multi-tenant SaaS platform for uptime, performance, and infrastructure monitoring.
+
+    ## Authentication
+    - Dashboard API routes require Supabase Auth session (cookie-based)
+    - Public API routes (status pages, subscribe) require no authentication
+    - Cron routes verify `Authorization: Bearer <CRON_SECRET>` or `x-vercel-cron` header
+    - Webhook endpoints verify `x-api-key` header
+
+    ## Webhook Signatures
+    All outgoing webhooks are signed with HMAC-SHA256.
+    Verify using the `X-Uptrue-Signature` header: `sha256=<hex>`
+  contact:
+    name: Uptrue Support
+    url: https://uptrue.io
+  license:
+    name: Proprietary
+
+servers:
+  - url: https://dev.uptrue.io
+    description: Development
+  - url: https://uptrue.io
+    description: Production
+
+paths:
+  /api/cron/check-runner:
+    get:
+      summary: Run monitor checks
+      description: |
+        Triggers all due monitor checks. Called by Vercel Cron or manually.
+        Use `?force=true` to check all active monitors regardless of schedule.
+      tags: [Cron]
+      parameters:
+        - name: force
+          in: query
+          schema:
+            type: string
+            enum: ['true', 'false']
+          description: Force check all active monitors
+      security:
+        - cronAuth: []
+      responses:
+        '200':
+          description: Check run completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+                  checked: { type: integer }
+                  down: { type: integer }
+        '401':
+          description: Unauthorized
+
+  /api/webhooks/heartbeat:
+    post:
+      summary: Receive heartbeat ping
+      description: Endpoint for heartbeat monitors to ping. Updates the monitor's last_checked_at timestamp.
+      tags: [Webhooks]
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema: { type: string, format: uuid }
+          description: Monitor ID
+      security:
+        - apiKeyAuth: []
+      responses:
+        '200':
+          description: Heartbeat received
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+                  received_at: { type: string, format: date-time }
+        '400':
+          description: Missing monitor ID
+        '401':
+          description: Missing API key
+
+  /api/v1/status-pages/subscribe:
+    post:
+      summary: Subscribe to status page updates
+      description: Subscribe via email or webhook URL to receive incident notifications for a status page.
+      tags: [Status Pages]
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [statusPageId]
+              properties:
+                statusPageId:
+                  type: string
+                  format: uuid
+                  description: Status page ID
+                email:
+                  type: string
+                  format: email
+                  description: Email address (provide email OR webhookUrl)
+                webhookUrl:
+                  type: string
+                  format: uri
+                  description: Webhook URL to receive POST notifications
+      responses:
+        '200':
+          description: Subscription created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  error: { type: string }
+        '400':
+          description: Missing required fields
+
+  /api/v1/status-pages/unsubscribe:
+    get:
+      summary: Unsubscribe from status page
+      description: Unsubscribe using the token from the subscription email/webhook.
+      tags: [Status Pages]
+      security: []
+      parameters:
+        - name: token
+          in: query
+          required: true
+          schema: { type: string }
+          description: Unsubscribe token
+      responses:
+        '200':
+          description: Successfully unsubscribed (returns HTML)
+          content:
+            text/html:
+              schema: { type: string }
+        '400':
+          description: Invalid token
+
+components:
+  securitySchemes:
+    cronAuth:
+      type: http
+      scheme: bearer
+      description: CRON_SECRET or x-vercel-cron header
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+
+  schemas:
+    WebhookPayload:
+      type: object
+      description: |
+        Payload sent to webhook subscribers and alert channels.
+        All payloads are signed with HMAC-SHA256 via the X-Uptrue-Signature header.
+      properties:
+        event:
+          type: string
+          enum: [incident.created, incident.resolved]
+          description: Event type
+        incident:
+          type: object
+          properties:
+            id: { type: string, format: uuid }
+            title: { type: string }
+            status: { type: string, enum: [investigating, identified, monitoring, resolved] }
+            severity: { type: string, enum: [P1, P2, P3, P4] }
+            started_at: { type: string, format: date-time }
+            resolved_at: { type: string, format: date-time, nullable: true }
+        monitor:
+          type: object
+          properties:
+            id: { type: string, format: uuid }
+            name: { type: string }
+            type: { type: string, enum: [http, ssl, dns, keyword, domain, port, ping, api, heartbeat, competitor] }
+            target: { type: string }
+        timestamp:
+          type: string
+          format: date-time
+
+tags:
+  - name: Cron
+    description: Scheduled task endpoints
+  - name: Webhooks
+    description: Inbound webhook receivers
+  - name: Status Pages
+    description: Public status page endpoints

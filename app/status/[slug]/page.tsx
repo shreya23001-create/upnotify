@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation'
+import type { Metadata } from 'next'
 import { getStatusPageBySlug, getUptimePercentage } from '@/lib/db/status-pages'
 import { getUptimeBarData } from '@/lib/db/check-results'
 import { createAdminClient } from '@/lib/supabase/admin'
@@ -6,9 +7,20 @@ import { StatusOverallBanner } from '@/components/status-page/status-overall-ban
 import { StatusMonitorRow } from '@/components/status-page/status-monitor-row'
 import { StatusIncidentList } from '@/components/status-page/status-incident-list'
 import { StatusSubscribeForm } from '@/components/status-page/status-subscribe-form'
+import { UptimeBarLegend } from '@/components/status-page/uptime-bar-legend'
 import type { Monitor, Incident } from '@/lib/types'
 
 export const dynamic = 'force-dynamic'
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params
+  const statusPage = await getStatusPageBySlug(slug)
+  if (!statusPage) return { title: 'Status Page Not Found' }
+  return {
+    title: `${statusPage.name} — Status | Uptrue`,
+    description: `Real-time status and uptime monitoring for ${statusPage.name}. Check current service status, incident history, and subscribe for updates.`,
+  }
+}
 
 export default async function PublicStatusPage({ params }: { params: Promise<{ slug: string }> }): Promise<React.ReactElement> {
   const { slug } = await params
@@ -51,12 +63,14 @@ export default async function PublicStatusPage({ params }: { params: Promise<{ s
     <div className="status-page">
       <div className="status-page-header">
         <h1 className="status-page-title">{statusPage.name}</h1>
+        <p className="status-last-updated">Last updated: {new Date().toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' })}</p>
       </div>
 
       <StatusOverallBanner monitors={monitors} openIncidents={openIncidents.length} />
 
       <div className="status-page-section">
         <h2 className="status-page-section-title">Monitors</h2>
+        <UptimeBarLegend />
         {monitors.length === 0 ? (
           <p style={{ color: '#94a3b8', fontSize: 14 }}>No monitors configured for this status page.</p>
         ) : (
