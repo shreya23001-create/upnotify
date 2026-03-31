@@ -84,6 +84,45 @@ export async function deleteAlertChannel(id: string): Promise<boolean> {
   return true
 }
 
+export async function getAlertChannelById(id: string): Promise<AlertChannel | null> {
+  const supabase = createAdminClient()
+  const { data, error } = await supabase
+    .from('alert_channels')
+    .select('*')
+    .eq('id', id)
+    .single()
+
+  if (error) {
+    logger.error('Failed to get alert channel', { error: error.message })
+    return null
+  }
+  return data
+}
+
+export async function updateAlertChannel(
+  id: string,
+  updates: { name?: string; config?: Record<string, unknown>; severity_filter?: string[] }
+): Promise<AlertChannel | null> {
+  const supabase = createAdminClient()
+  const updateData: Record<string, unknown> = {}
+  if (updates.name) updateData.name = updates.name
+  if (updates.config) updateData.config = updates.config as import('@/lib/types/database.types').Json
+  if (updates.severity_filter) updateData.severity_filter = updates.severity_filter
+
+  const { data, error } = await supabase
+    .from('alert_channels')
+    .update(updateData)
+    .eq('id', id)
+    .select()
+    .single()
+
+  if (error) {
+    logger.error('Failed to update alert channel', { error: error.message })
+    return null
+  }
+  return data
+}
+
 export async function toggleAlertChannel(id: string, enabled: boolean): Promise<boolean> {
   const supabase = createAdminClient()
   const { error } = await supabase

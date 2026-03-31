@@ -1,6 +1,7 @@
 'use client'
 
 import { useTransition } from 'react'
+import Link from 'next/link'
 import { DataTable, type Column, type BulkAction } from '@/components/ui/data-table'
 import { deleteAlertChannelAction, toggleAlertChannelAction } from '@/app/(dashboard)/dashboard/alerts/actions'
 import type { AlertChannel } from '@/lib/types'
@@ -113,6 +114,9 @@ export function AlertChannelsTable({ channels }: { channels: AlertChannel[] }) {
       searchable: false,
       render: (ch) => (
         <span style={{ display: 'flex', gap: 8 }}>
+          <Link href={`/dashboard/alerts/${ch.id}`} className="btn btn-sm btn-secondary">
+            Edit
+          </Link>
           <button
             className="btn btn-sm btn-secondary"
             onClick={() => handleToggle(ch.id, ch.is_enabled)}

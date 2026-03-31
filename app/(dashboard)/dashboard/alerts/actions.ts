@@ -1,7 +1,7 @@
 'use server'
 
 import { redirect } from 'next/navigation'
-import { createAlertChannel, deleteAlertChannel, toggleAlertChannel } from '@/lib/db/alerts'
+import { createAlertChannel, updateAlertChannel, deleteAlertChannel, toggleAlertChannel } from '@/lib/db/alerts'
 import { getCurrentUser } from '@/lib/db/users'
 import { getWorkspacesByOrg } from '@/lib/db/workspaces'
 import { logger } from '@/lib/utils/logger'
@@ -57,6 +57,39 @@ export async function createAlertChannelAction(formData: FormData): Promise<{ er
   if (!channel) return { error: 'Failed to create alert channel' }
 
   logger.info('Alert channel created', { channelId: channel.id, type, name })
+  redirect('/dashboard/alerts')
+}
+
+export async function updateAlertChannelAction(channelId: string, formData: FormData): Promise<{ error?: string }> {
+  const name = formData.get('name') as string
+  const type = formData.get('type') as string
+
+  if (!name) return { error: 'Name is required' }
+
+  const config: Record<string, unknown> = {}
+
+  if (type === 'email') {
+    config.email = formData.get('email') as string
+  }
+  if (type === 'slack') {
+    config.slackWebhookUrl = formData.get('slackWebhookUrl') as string
+    config.slackChannel = formData.get('slackChannel') as string
+  }
+  if (type === 'teams') {
+    config.teamsWebhookUrl = formData.get('teamsWebhookUrl') as string
+  }
+  if (type === 'webhook') {
+    config.webhookUrl = formData.get('webhookUrl') as string
+    config.webhookSecret = formData.get('webhookSecret') as string
+  }
+
+  const severityStr = formData.get('severity_filter') as string
+  const severityFilter = severityStr ? severityStr.split(',') : ['P1', 'P2', 'P3', 'P4']
+
+  const channel = await updateAlertChannel(channelId, { name, config, severity_filter: severityFilter })
+  if (!channel) return { error: 'Failed to update alert channel' }
+
+  logger.info('Alert channel updated', { channelId })
   redirect('/dashboard/alerts')
 }
 
