@@ -7,6 +7,7 @@ import { CurrentPlan } from '@/components/billing/current-plan'
 import { PricingTable } from '@/components/billing/pricing-table'
 import { InvoiceList } from '@/components/billing/invoice-list'
 import { CompanyDetailsForm } from '@/components/dashboard/settings/company-details-form'
+import { OrgSettingsForm } from '@/components/dashboard/settings/org-settings-form'
 
 interface SettingsContentProps {
   organisation: Organisation
@@ -76,17 +77,7 @@ export function SettingsContent({ organisation, members, currentUserId, subscrip
       </div>
 
       {tab === 'organisation' && (
-        <div className="card">
-          <div className="card-header"><div className="card-title">Organisation Details</div></div>
-          <div className="card-content">
-            <div className="form-group"><label className="form-label">Name</label><input className="form-input" defaultValue={organisation.name} disabled /></div>
-            <div className="form-group"><label className="form-label">Slug</label><input className="form-input" defaultValue={organisation.slug} disabled /></div>
-            <div className="form-group"><label className="form-label">Type</label><input className="form-input" defaultValue={organisation.type} disabled style={{ textTransform: 'capitalize' }} /></div>
-            <div className="form-group"><label className="form-label">Timezone</label><input className="form-input" defaultValue={organisation.timezone} disabled /></div>
-            <button className="btn btn-primary" disabled>Save Changes</button>
-            <p style={{ fontSize: 12, color: '#71717a', marginTop: 8 }}>Settings editing will be enabled in a future update.</p>
-          </div>
-        </div>
+        <OrgSettingsForm organisation={organisation} />
       )}
 
       {tab === 'team' && (
