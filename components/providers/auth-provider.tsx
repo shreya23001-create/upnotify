@@ -38,7 +38,7 @@ interface AuthProviderProps {
 export function AuthProvider({
   children,
   initialUser,
-}: AuthProviderProps): React.JSX.Element {
+}: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(initialUser)
   const [session, setSession] = useState<Session | null>(null)
   const [isLoading, setIsLoading] = useState(!initialUser)

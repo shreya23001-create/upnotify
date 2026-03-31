@@ -41,7 +41,7 @@ export function WorkspaceProvider({
   children,
   organisation,
   workspaces,
-}: WorkspaceProviderProps): React.JSX.Element {
+}: WorkspaceProviderProps) {
   const isAgency = organisation?.type === 'agency'
 
   const [currentWorkspace, setCurrentWorkspaceState] =

@@ -152,8 +152,17 @@ export function AlertChannelsTable({ channels }: { channels: AlertChannel[] }) {
     },
   ]
 
+  async function handleBulkDelete(selectedIds: string[]): Promise<void> {
+    if (!confirm(`Delete ${selectedIds.length} alert channel(s)? This cannot be undone.`)) return
+    startTransition(async () => {
+      for (const id of selectedIds) {
+        await deleteAlertChannelAction(id)
+      }
+    })
+  }
+
   const bulkActions: BulkAction[] = [
-    { label: 'Delete', onClick: () => { /* TODO: bulk delete */ }, variant: 'danger' },
+    { label: 'Delete', onClick: handleBulkDelete, variant: 'danger' },
   ]
 
   return (

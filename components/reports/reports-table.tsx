@@ -45,12 +45,26 @@ export function ReportsTable({ reports }: { reports: Report[] }) {
     ]},
   ]
 
+  async function handleBulkDelete(selectedIds: string[]): Promise<void> {
+    if (!confirm(`Delete ${selectedIds.length} report(s)?`)) return
+    startTransition(async () => {
+      for (const id of selectedIds) {
+        await deleteReportAction(id)
+      }
+    })
+  }
+
+  const bulkActions: BulkAction[] = [
+    { label: 'Delete', onClick: handleBulkDelete, variant: 'danger' },
+  ]
+
   return (
     <DataTable
       columns={columns}
       data={reports}
       searchPlaceholder="Search reports..."
       filters={filters}
+      bulkActions={bulkActions}
       emptyMessage="No reports generated yet. Click Generate Report to create your first report."
     />
   )

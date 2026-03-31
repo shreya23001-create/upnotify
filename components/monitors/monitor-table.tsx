@@ -94,9 +94,27 @@ export function MonitorTable({ monitors, uptimeData }: MonitorTableProps) {
     ]},
   ]
 
+  async function handleBulkPause(selectedIds: string[]): Promise<void> {
+    if (!confirm(`Pause ${selectedIds.length} monitor(s)?`)) return
+    startTransition(async () => {
+      for (const id of selectedIds) {
+        await pauseMonitorAction(id)
+      }
+    })
+  }
+
+  async function handleBulkDelete(selectedIds: string[]): Promise<void> {
+    if (!confirm(`Delete ${selectedIds.length} monitor(s)? All check history will be lost.`)) return
+    startTransition(async () => {
+      for (const id of selectedIds) {
+        await deleteMonitorAction(id)
+      }
+    })
+  }
+
   const bulkActions: BulkAction[] = [
-    { label: 'Pause', onClick: () => { /* TODO: bulk pause */ } },
-    { label: 'Delete', onClick: () => { /* TODO: bulk delete */ }, variant: 'danger' },
+    { label: 'Pause', onClick: handleBulkPause },
+    { label: 'Delete', onClick: handleBulkDelete, variant: 'danger' },
   ]
 
   return (

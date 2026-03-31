@@ -7,6 +7,7 @@ import { Providers } from '@/components/providers'
 import { Sidebar } from '@/components/dashboard/sidebar'
 import { Header } from '@/components/dashboard/header'
 import { EnvironmentBanner } from '@/components/dashboard/environment-banner'
+import { Breadcrumbs } from '@/components/ui/breadcrumbs'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const profile = await getUserProfile()
@@ -22,6 +23,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         <div className="main-wrapper">
           <Header />
           <EnvironmentBanner />
+          <Breadcrumbs />
           <main className="main-content">{children}</main>
         </div>
       </div>

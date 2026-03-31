@@ -6,6 +6,7 @@ import { useAuth } from '@/components/providers/auth-provider'
 import { useWorkspace } from '@/components/providers/workspace-provider'
 import { WorkspaceSwitcher } from './workspace-switcher'
 import { IconSettings, IconLogOut, IconUser } from '@/components/icons'
+import { MobileSidebar } from './mobile-sidebar'
 
 export function Header() {
   const { user, signOut } = useAuth()
@@ -29,6 +30,7 @@ export function Header() {
 
   return (
     <header className="header">
+      <MobileSidebar />
       <span className="header-org">{organisation?.name}</span>
       <WorkspaceSwitcher />
       <div className="header-user" ref={dropdownRef}>

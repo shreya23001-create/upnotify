@@ -2,6 +2,7 @@
 
 import { AuthProvider } from './auth-provider'
 import { WorkspaceProvider } from './workspace-provider'
+import { ToastProvider } from '@/components/ui/toast'
 import type { User, Organisation, Workspace } from '@/lib/types'
 
 interface ProvidersProps {
@@ -16,11 +17,13 @@ export function Providers({
   user,
   organisation,
   workspaces,
-}: ProvidersProps): React.JSX.Element {
+}: ProvidersProps) {
   return (
     <AuthProvider initialUser={user}>
       <WorkspaceProvider organisation={organisation} workspaces={workspaces}>
-        {children}
+        <ToastProvider>
+          {children}
+        </ToastProvider>
       </WorkspaceProvider>
     </AuthProvider>
   )
