@@ -171,39 +171,32 @@ export async function createPortalSession(
   return session.url
 }
 
-/** Charge £1 immediately for a new monitor on the usage-based plan */
-export async function chargeForMonitor(
+/** Create a Checkout session to charge £1 for a new monitor (usage-based plan) */
+export async function createMonitorChargeSession(
   orgId: string,
   email: string,
-  orgName: string
-): Promise<{ success: boolean; error?: string }> {
-  try {
-    const stripe = getStripe()
-    const customerId = await ensureStripeCustomer(orgId, email, orgName)
+  orgName: string,
+  appUrl: string
+): Promise<string> {
+  const stripe = getStripe()
+  const customerId = await ensureStripeCustomer(orgId, email, orgName)
 
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: 100, // £1 in pence
-      currency: 'gbp',
-      customer: customerId,
-      description: 'Uptrue — New monitor (usage-based)',
+  const priceId = await ensureStripePrice('usage-monitor', 'Monitor (Usage-based)', 100, null)
+
+  const session = await stripe.checkout.sessions.create({
+    customer: customerId,
+    mode: 'payment',
+    line_items: [{ price: priceId, quantity: 1 }],
+    success_url: `${appUrl}/dashboard/monitors/new?paid=true`,
+    cancel_url: `${appUrl}/dashboard/monitors/new?paid=canceled`,
+    metadata: { org_id: orgId, type: 'monitor_creation' },
+    payment_intent_data: {
       metadata: { org_id: orgId, type: 'monitor_creation' },
-      confirm: true,
-      automatic_payment_methods: {
-        enabled: true,
-        allow_redirects: 'never',
-      },
-    })
+    },
+  })
 
-    logger.info('Monitor charge created', {
-      orgId,
-      paymentIntentId: paymentIntent.id,
-    })
+  logger.info('Monitor charge session created', { orgId, sessionId: session.id })
 
-    return { success: paymentIntent.status === 'succeeded' }
-  } catch (error) {
-    const message =
-      error instanceof Error ? error.message : 'Payment failed'
-    logger.error('Monitor charge failed', { orgId, error: message })
-    return { success: false, error: message }
-  }
+  if (!session.url) throw new Error('Stripe checkout session URL was not returned')
+  return session.url
 }
