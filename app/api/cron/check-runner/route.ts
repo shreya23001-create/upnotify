@@ -4,6 +4,7 @@ import { writeCheckResult } from '@/lib/db/check-results'
 import { createIncident, resolveIncident, getOpenIncidentForMonitor } from '@/lib/db/incidents'
 import { isMonitorInMaintenance } from '@/lib/db/maintenance-windows'
 import { dispatchChecker } from '@/lib/services/checker'
+import { dispatchAlerts, dispatchRecoveryAlerts } from '@/lib/services/alert-dispatcher'
 import { logger } from '@/lib/utils/logger'
 import type { Monitor } from '@/lib/types'
 
@@ -68,7 +69,7 @@ async function runCheck(monitor: Monitor): Promise<void> {
       // Confirmed down — create incident if not already open
       const existingIncident = await getOpenIncidentForMonitor(monitor.id)
       if (!existingIncident) {
-        await createIncident({
+        const newIncident = await createIncident({
           org_id: monitor.org_id,
           workspace_id: monitor.workspace_id,
           monitor_id: monitor.id,
@@ -76,6 +77,11 @@ async function runCheck(monitor: Monitor): Promise<void> {
           severity: monitor.severity,
         })
         logger.warn('Monitor confirmed down, incident created', { monitorId: monitor.id, name: monitor.name })
+
+        // Dispatch alerts to all matching channels
+        if (newIncident) {
+          await dispatchAlerts(newIncident, monitor)
+        }
       }
 
       await updateMonitorStatus(monitor.id, {
@@ -97,9 +103,20 @@ async function runCheck(monitor: Monitor): Promise<void> {
   } else {
     // Check passed
     if (monitor.status === 'down') {
-      // Was down, now up — resolve incident
+      // Was down, now up — get incident before resolving for recovery alerts
+      const openIncident = await getOpenIncidentForMonitor(monitor.id)
       await resolveIncident(monitor.id)
       logger.info('Monitor recovered', { monitorId: monitor.id, name: monitor.name })
+
+      // Dispatch recovery alerts
+      if (openIncident) {
+        const resolvedIncidentData = {
+          ...openIncident,
+          status: 'resolved' as const,
+          resolved_at: new Date().toISOString(),
+        }
+        await dispatchRecoveryAlerts(resolvedIncidentData, monitor)
+      }
     }
 
     await updateMonitorStatus(monitor.id, {
