@@ -256,8 +256,8 @@ export default function TermsOfServicePage(): React.ReactElement {
         <li>
           <strong>Liability cap.</strong> Our total aggregate liability to you for any and all claims
           arising under or in connection with these Terms or the Service shall not exceed the total
-          amount you have paid to Uptrue in the twelve (12) months immediately preceding the event
-          giving rise to the claim, or one hundred pounds sterling (&pound;100), whichever is greater.
+          amount you have paid to Uptrue in the three (3) months immediately preceding the event
+          giving rise to the claim, or fifty pounds sterling (&pound;50), whichever is less.
         </li>
         <li>
           <strong>No guarantee of detection.</strong> While we endeavour to provide accurate and timely
@@ -315,13 +315,38 @@ export default function TermsOfServicePage(): React.ReactElement {
       <h2>11. Disclaimers</h2>
       <p>
         The Service is provided on an &quot;as is&quot; and &quot;as available&quot; basis without warranties of any kind,
-        whether express, implied, or statutory. We disclaim all warranties, including but not limited to
-        implied warranties of merchantability, fitness for a particular purpose, and non-infringement.
+        whether express, implied, or statutory. To the maximum extent permitted by applicable law, we
+        expressly disclaim all warranties, including but not limited to implied warranties of
+        merchantability, fitness for a particular purpose, non-infringement, accuracy, and reliability.
       </p>
       <p>
-        We do not warrant that the Service will be uninterrupted, error-free, secure, or free of viruses
-        or other harmful components. We do not warrant that monitoring results will be accurate, complete,
-        or timely in all circumstances.
+        We do not warrant that: (a) the Service will be uninterrupted, error-free, secure, or free of
+        viruses or other harmful components; (b) monitoring results will be accurate, complete, or timely
+        in all circumstances; (c) alerts or notifications will be delivered successfully; (d) the Service
+        will detect every outage, security vulnerability, or performance issue; (e) third-party services
+        integrated with the platform (including but not limited to Stripe, Supabase, Vercel, and
+        communication providers) will be available or functioning correctly.
+      </p>
+      <p>
+        You acknowledge that uptime monitoring is inherently imperfect and that no monitoring solution
+        can guarantee detection of all incidents. You are solely responsible for your own disaster
+        recovery, backup, and incident response procedures. Uptrue is a supplementary tool and does not
+        replace your operational obligations.
+      </p>
+      <p>
+        You use the Service at your own risk. Any reliance on monitoring data, reports, AI-generated
+        summaries, or alerts is at your sole discretion and risk.
+      </p>
+
+      <h2>11A. Force Majeure</h2>
+      <p>
+        We shall not be liable for any failure or delay in performing our obligations under these Terms
+        where such failure or delay results from circumstances beyond our reasonable control, including
+        but not limited to: acts of God, natural disasters, pandemics, war, terrorism, riots, government
+        actions, power failures, internet or telecommunications failures, third-party service outages
+        (including cloud hosting providers, payment processors, and email delivery services), cyberattacks,
+        or any other force majeure event. During any such event, our obligations shall be suspended for
+        the duration of the event.
       </p>
 
       <h2>12. Changes to These Terms</h2>

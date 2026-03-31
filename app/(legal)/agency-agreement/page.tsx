@@ -344,8 +344,8 @@ export default function AgencyPartnerAgreementPage(): React.ReactElement {
         </li>
         <li>
           Uptrue&apos;s total liability to the Agency under this Agreement shall not exceed the total
-          amount paid by the Agency to Uptrue in the 12 months preceding the claim, or &pound;149,
-          whichever is greater.
+          amount paid by the Agency to Uptrue in the three (3) months preceding the claim, or &pound;50,
+          whichever is less.
         </li>
       </ul>
 
