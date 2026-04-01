@@ -17,9 +17,25 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params
   const statusPage = await getStatusPageBySlug(slug)
   if (!statusPage) return { title: 'Status Page Not Found' }
+
+  const title = `${statusPage.name} — Status`
+  const description = `Real-time status and uptime monitoring for ${statusPage.name}. Check current service status, incident history, and subscribe for updates.`
+
   return {
-    title: `${statusPage.name} — Status | Uptrue`,
-    description: `Real-time status and uptime monitoring for ${statusPage.name}. Check current service status, incident history, and subscribe for updates.`,
+    title,
+    description,
+    alternates: { canonical: `https://uptrue.io/status/${slug}` },
+    openGraph: {
+      title: `${statusPage.name} — Status | Uptrue`,
+      description,
+      url: `https://uptrue.io/status/${slug}`,
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary',
+      title: `${statusPage.name} — Status | Uptrue`,
+      description,
+    },
   }
 }
 

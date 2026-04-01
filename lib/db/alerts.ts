@@ -135,3 +135,35 @@ export async function toggleAlertChannel(id: string, enabled: boolean): Promise<
   }
   return true
 }
+
+export async function bulkDeleteAlertChannels(ids: string[], orgId: string): Promise<boolean> {
+  const supabase = createAdminClient()
+  const { error } = await supabase
+    .from('alert_channels')
+    .delete()
+    .in('id', ids)
+    .eq('org_id', orgId)
+
+  if (error) {
+    logger.error('Failed to bulk delete alert channels', { error: error.message, count: ids.length })
+    return false
+  }
+  logger.info('Bulk deleted alert channels', { count: ids.length, orgId })
+  return true
+}
+
+export async function bulkUpdateAlertChannelStatus(ids: string[], orgId: string, isEnabled: boolean): Promise<boolean> {
+  const supabase = createAdminClient()
+  const { error } = await supabase
+    .from('alert_channels')
+    .update({ is_enabled: isEnabled })
+    .in('id', ids)
+    .eq('org_id', orgId)
+
+  if (error) {
+    logger.error('Failed to bulk update alert channel status', { error: error.message, isEnabled, count: ids.length })
+    return false
+  }
+  logger.info('Bulk updated alert channel status', { count: ids.length, isEnabled, orgId })
+  return true
+}

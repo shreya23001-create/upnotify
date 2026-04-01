@@ -1,7 +1,8 @@
 'use server'
 
 import { redirect } from 'next/navigation'
-import { createAlertChannel, updateAlertChannel, deleteAlertChannel, toggleAlertChannel } from '@/lib/db/alerts'
+import { revalidatePath } from 'next/cache'
+import { createAlertChannel, updateAlertChannel, deleteAlertChannel, toggleAlertChannel, bulkDeleteAlertChannels, bulkUpdateAlertChannelStatus } from '@/lib/db/alerts'
 import { getCurrentUser } from '@/lib/db/users'
 import { getWorkspacesByOrg } from '@/lib/db/workspaces'
 import { logger } from '@/lib/utils/logger'
@@ -102,4 +103,40 @@ export async function deleteAlertChannelAction(channelId: string): Promise<{ err
 export async function toggleAlertChannelAction(channelId: string, enabled: boolean): Promise<void> {
   await toggleAlertChannel(channelId, enabled)
   redirect('/dashboard/alerts')
+}
+
+export async function bulkDeleteAlertChannelsAction(ids: string[]): Promise<{ error?: string }> {
+  const user = await getCurrentUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  const success = await bulkDeleteAlertChannels(ids, user.org_id)
+  if (!success) return { error: 'Failed to delete alert channels' }
+
+  logger.info('Bulk deleted alert channels', { count: ids.length })
+  revalidatePath('/dashboard/alerts')
+  return {}
+}
+
+export async function bulkEnableAlertChannelsAction(ids: string[]): Promise<{ error?: string }> {
+  const user = await getCurrentUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  const success = await bulkUpdateAlertChannelStatus(ids, user.org_id, true)
+  if (!success) return { error: 'Failed to enable alert channels' }
+
+  logger.info('Bulk enabled alert channels', { count: ids.length })
+  revalidatePath('/dashboard/alerts')
+  return {}
+}
+
+export async function bulkDisableAlertChannelsAction(ids: string[]): Promise<{ error?: string }> {
+  const user = await getCurrentUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  const success = await bulkUpdateAlertChannelStatus(ids, user.org_id, false)
+  if (!success) return { error: 'Failed to disable alert channels' }
+
+  logger.info('Bulk disabled alert channels', { count: ids.length })
+  revalidatePath('/dashboard/alerts')
+  return {}
 }

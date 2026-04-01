@@ -200,3 +200,40 @@ export async function resumeMonitor(id: string): Promise<void> {
   const now = new Date().toISOString()
   await supabase.from('monitors').update({ is_paused: false, status: 'unknown', next_check_at: now }).eq('id', id)
 }
+
+export async function bulkDeleteMonitors(ids: string[], orgId: string): Promise<boolean> {
+  const supabase = createAdminClient()
+  const { error } = await supabase
+    .from('monitors')
+    .delete()
+    .in('id', ids)
+    .eq('org_id', orgId)
+
+  if (error) {
+    logger.error('Failed to bulk delete monitors', { error: error.message, count: ids.length })
+    return false
+  }
+  logger.info('Bulk deleted monitors', { count: ids.length, orgId })
+  return true
+}
+
+export async function bulkUpdateMonitorStatus(ids: string[], orgId: string, isPaused: boolean): Promise<boolean> {
+  const supabase = createAdminClient()
+  const now = new Date().toISOString()
+  const updateData = isPaused
+    ? { is_paused: true, status: 'paused' }
+    : { is_paused: false, status: 'unknown', next_check_at: now }
+
+  const { error } = await supabase
+    .from('monitors')
+    .update(updateData)
+    .in('id', ids)
+    .eq('org_id', orgId)
+
+  if (error) {
+    logger.error('Failed to bulk update monitor status', { error: error.message, isPaused, count: ids.length })
+    return false
+  }
+  logger.info('Bulk updated monitor status', { count: ids.length, isPaused, orgId })
+  return true
+}

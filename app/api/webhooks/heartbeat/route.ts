@@ -1,26 +1,54 @@
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { validateApiKey } from '@/lib/db/api-keys'
 import { logger } from '@/lib/utils/logger'
+import { heartbeatParamsSchema } from '@/lib/validations/schemas'
+import { validateInput } from '@/lib/validations/validate'
 
 export const dynamic = 'force-dynamic'
 
 export async function POST(request: Request): Promise<NextResponse> {
   const url = new URL(request.url)
-  const monitorId = url.searchParams.get('id')
+  const params = { id: url.searchParams.get('id') ?? undefined }
+  const parsed = validateInput(heartbeatParamsSchema, params, 'heartbeat')
+  if (!parsed.success) return parsed.response
 
-  if (!monitorId) {
-    return NextResponse.json({ error: 'Missing monitor id' }, { status: 400 })
-  }
+  const monitorId = parsed.data.id
 
-  const apiKey = request.headers.get('x-api-key')
-  if (!apiKey) {
+  const rawKey = request.headers.get('x-api-key')
+  if (!rawKey) {
     return NextResponse.json({ error: 'Missing API key' }, { status: 401 })
   }
 
-  // TODO: validate API key against api_keys table
+  const apiKey = await validateApiKey(rawKey)
+  if (!apiKey) {
+    logger.warn('Heartbeat rejected: invalid API key', { monitorId })
+    return NextResponse.json({ error: 'Invalid API key' }, { status: 401 })
+  }
 
+  // Verify the monitor belongs to the same org as the API key
   const supabase = createAdminClient()
   const now = new Date().toISOString()
+
+  const { data: monitor, error: lookupError } = await supabase
+    .from('monitors')
+    .select('org_id')
+    .eq('id', monitorId)
+    .eq('type', 'heartbeat')
+    .single()
+
+  if (lookupError || !monitor) {
+    return NextResponse.json({ error: 'Monitor not found' }, { status: 404 })
+  }
+
+  if (monitor.org_id !== apiKey.org_id) {
+    logger.warn('Heartbeat rejected: org mismatch', {
+      monitorId,
+      monitorOrg: monitor.org_id,
+      keyOrg: apiKey.org_id,
+    })
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
+  }
 
   const { error } = await supabase
     .from('monitors')

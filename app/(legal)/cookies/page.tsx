@@ -1,3 +1,12 @@
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Cookie Policy',
+  description:
+    'Uptrue Cookie Policy. Understand what cookies and similar technologies we use on our website and monitoring platform.',
+  alternates: { canonical: 'https://uptrue.io/cookies' },
+}
+
 export default function CookiePolicyPage(): React.ReactElement {
   return (
     <>

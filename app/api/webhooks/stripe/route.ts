@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { getStripe } from '@/lib/services/stripe'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
+import { isProduction } from '@/lib/utils/environment'
 import type Stripe from 'stripe'
 
 export const dynamic = 'force-dynamic'
@@ -176,6 +177,15 @@ export async function POST(request: Request): Promise<NextResponse> {
   const signature = request.headers.get('stripe-signature')
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
 
+  // In production, webhook signature verification is mandatory
+  if (isProduction() && !webhookSecret) {
+    logger.error('STRIPE_WEBHOOK_SECRET is not configured in production — rejecting webhook')
+    return NextResponse.json(
+      { error: 'Webhook configuration error' },
+      { status: 500 }
+    )
+  }
+
   let event: Stripe.Event
 
   try {
@@ -185,9 +195,17 @@ export async function POST(request: Request): Promise<NextResponse> {
         signature,
         webhookSecret
       )
-    } else {
-      // In development without webhook secret, parse directly
+    } else if (!isProduction()) {
+      // Development/staging only: allow unverified parsing for local testing
+      logger.warn('Stripe webhook parsed without signature verification (non-production)')
       event = JSON.parse(body) as Stripe.Event
+    } else {
+      // Production with missing signature — reject
+      logger.error('Stripe webhook missing signature in production')
+      return NextResponse.json(
+        { error: 'Missing signature' },
+        { status: 400 }
+      )
     }
   } catch (err) {
     logger.error('Stripe webhook signature verification failed', {

@@ -150,7 +150,7 @@ export function DataTable<T extends { id: string }>({
               key={action.label}
               className={`btn btn-sm ${action.variant === 'danger' ? '' : 'btn-secondary'}`}
               style={action.variant === 'danger' ? { color: '#dc2626' } : undefined}
-              onClick={() => { action.onClick(Array.from(selectedIds)); setSelectedIds(new Set()) }}
+              onClick={() => { action.onClick(Array.from(selectedIds)) }}
             >
               {action.label}
             </button>

@@ -5,6 +5,8 @@ import { createCheckoutSession } from '@/lib/services/stripe'
 import { getPlanBySlug } from '@/lib/db/subscriptions'
 import { getConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
+import { billingCheckoutSchema } from '@/lib/validations/schemas'
+import { validateInput } from '@/lib/validations/validate'
 
 export const dynamic = 'force-dynamic'
 
@@ -23,18 +25,11 @@ export async function POST(request: Request): Promise<NextResponse> {
       )
     }
 
-    const body = (await request.json()) as {
-      planSlug: string
-      billingCycle: string
-    }
-    const { planSlug, billingCycle } = body
+    const body: unknown = await request.json()
+    const parsed = validateInput(billingCheckoutSchema, body, 'billing-checkout')
+    if (!parsed.success) return parsed.response
 
-    if (!planSlug) {
-      return NextResponse.json(
-        { error: 'Plan slug required' },
-        { status: 400 }
-      )
-    }
+    const { planSlug, billingCycle } = parsed.data
 
     const plan = await getPlanBySlug(planSlug)
     if (!plan) {

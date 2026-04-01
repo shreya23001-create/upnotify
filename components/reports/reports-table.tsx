@@ -1,17 +1,28 @@
 'use client'
 
-import { useTransition } from 'react'
+import { useState, useTransition } from 'react'
 import Link from 'next/link'
 import { DataTable, type Column, type BulkAction } from '@/components/ui/data-table'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { deleteReportAction } from '@/app/(dashboard)/dashboard/reports/actions'
 import type { Report } from '@/lib/types'
 
 export function ReportsTable({ reports }: { reports: Report[] }) {
   const [isPending, startTransition] = useTransition()
+  const [deleteIds, setDeleteIds] = useState<string[]>([])
 
   function handleDelete(id: string): void {
-    if (!confirm('Delete this report?')) return
-    startTransition(async () => { await deleteReportAction(id) })
+    setDeleteIds([id])
+  }
+
+  function executeDelete(): void {
+    const ids = [...deleteIds]
+    setDeleteIds([])
+    startTransition(async () => {
+      for (const id of ids) {
+        await deleteReportAction(id)
+      }
+    })
   }
 
   const columns: Column<Report>[] = [
@@ -45,13 +56,8 @@ export function ReportsTable({ reports }: { reports: Report[] }) {
     ]},
   ]
 
-  async function handleBulkDelete(selectedIds: string[]): Promise<void> {
-    if (!confirm(`Delete ${selectedIds.length} report(s)?`)) return
-    startTransition(async () => {
-      for (const id of selectedIds) {
-        await deleteReportAction(id)
-      }
-    })
+  function handleBulkDelete(selectedIds: string[]): void {
+    setDeleteIds(selectedIds)
   }
 
   const bulkActions: BulkAction[] = [
@@ -59,13 +65,26 @@ export function ReportsTable({ reports }: { reports: Report[] }) {
   ]
 
   return (
-    <DataTable
-      columns={columns}
-      data={reports}
-      searchPlaceholder="Search reports..."
-      filters={filters}
-      bulkActions={bulkActions}
-      emptyMessage="No reports generated yet. Click Generate Report to create your first report."
-    />
+    <>
+      <DataTable
+        columns={columns}
+        data={reports}
+        searchPlaceholder="Search reports..."
+        filters={filters}
+        bulkActions={bulkActions}
+        emptyMessage="No reports generated yet. Click Generate Report to create your first report."
+      />
+      <ConfirmDialog
+        isOpen={deleteIds.length > 0}
+        onConfirm={executeDelete}
+        onCancel={() => setDeleteIds([])}
+        title={deleteIds.length === 1 ? 'Delete Report' : `Delete ${deleteIds.length} Report(s)`}
+        message={deleteIds.length === 1
+          ? 'This report will be permanently deleted. This action cannot be undone.'
+          : `${deleteIds.length} report(s) will be permanently deleted. This action cannot be undone.`}
+        confirmText={deleteIds.length === 1 ? 'Delete' : 'Delete All'}
+        variant="danger"
+      />
+    </>
   )
 }

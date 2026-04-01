@@ -1,7 +1,16 @@
+import type { Metadata } from 'next'
 import { LoginForm } from '@/components/auth/login-form'
 import Link from 'next/link'
 
-export default function LoginPage() {
+export const metadata: Metadata = {
+  title: 'Log In',
+  description:
+    'Log in to your Uptrue account. Monitor uptime, performance and infrastructure for all your sites.',
+  alternates: { canonical: 'https://uptrue.io/login' },
+  robots: { index: false, follow: true },
+}
+
+export default function LoginPage(): React.ReactElement {
   return (
     <div>
       <div className="auth-card">

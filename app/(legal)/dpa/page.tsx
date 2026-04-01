@@ -1,3 +1,12 @@
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Data Processing Agreement',
+  description:
+    'Uptrue Data Processing Agreement (DPA). Covers data processing terms for GDPR compliance between Uptrue and its customers.',
+  alternates: { canonical: 'https://uptrue.io/dpa' },
+}
+
 export default function DataProcessingAgreementPage(): React.ReactElement {
   return (
     <>

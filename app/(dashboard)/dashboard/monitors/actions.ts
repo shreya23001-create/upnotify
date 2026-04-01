@@ -1,7 +1,8 @@
 'use server'
 
 import { redirect } from 'next/navigation'
-import { createMonitor, updateMonitor, deleteMonitor, pauseMonitor, resumeMonitor } from '@/lib/db/monitors'
+import { revalidatePath } from 'next/cache'
+import { createMonitor, updateMonitor, deleteMonitor, pauseMonitor, resumeMonitor, bulkDeleteMonitors, bulkUpdateMonitorStatus } from '@/lib/db/monitors'
 import { getCurrentUser } from '@/lib/db/users'
 import { getWorkspacesByOrg } from '@/lib/db/workspaces'
 import { getSubscriptionWithPlan } from '@/lib/db/subscriptions'
@@ -186,4 +187,40 @@ export async function pauseMonitorAction(monitorId: string): Promise<void> {
 export async function resumeMonitorAction(monitorId: string): Promise<void> {
   await resumeMonitor(monitorId)
   redirect(`/dashboard/monitors/${monitorId}`)
+}
+
+export async function bulkDeleteMonitorsAction(ids: string[]): Promise<{ error?: string }> {
+  const user = await getCurrentUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  const success = await bulkDeleteMonitors(ids, user.org_id)
+  if (!success) return { error: 'Failed to delete monitors' }
+
+  logger.info('Bulk deleted monitors', { count: ids.length })
+  revalidatePath('/dashboard/monitors')
+  return {}
+}
+
+export async function bulkPauseMonitorsAction(ids: string[]): Promise<{ error?: string }> {
+  const user = await getCurrentUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  const success = await bulkUpdateMonitorStatus(ids, user.org_id, true)
+  if (!success) return { error: 'Failed to pause monitors' }
+
+  logger.info('Bulk paused monitors', { count: ids.length })
+  revalidatePath('/dashboard/monitors')
+  return {}
+}
+
+export async function bulkResumeMonitorsAction(ids: string[]): Promise<{ error?: string }> {
+  const user = await getCurrentUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  const success = await bulkUpdateMonitorStatus(ids, user.org_id, false)
+  if (!success) return { error: 'Failed to resume monitors' }
+
+  logger.info('Bulk resumed monitors', { count: ids.length })
+  revalidatePath('/dashboard/monitors')
+  return {}
 }

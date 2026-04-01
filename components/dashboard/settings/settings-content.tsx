@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { DataTable, type Column, type BulkAction } from '@/components/ui/data-table'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import type { Organisation, User, Subscription, Invoice, ApiKey, Plan } from '@/lib/types'
 import { CurrentPlan } from '@/components/billing/current-plan'
 import { PricingTable } from '@/components/billing/pricing-table'
@@ -22,6 +23,12 @@ interface SettingsContentProps {
 
 export function SettingsContent({ organisation, members, currentUserId, subscription, invoices, apiKeys, plans, currentPlan }: SettingsContentProps) {
   const [tab, setTab] = useState('organisation')
+  const [revokeIds, setRevokeIds] = useState<string[]>([])
+
+  const executeRevoke = useCallback((): void => {
+    // TODO: implement actual revoke API call for revokeIds
+    setRevokeIds([])
+  }, [])
 
   const memberColumns: Column<User>[] = [
     { key: 'full_name', label: 'Name', render: (m) => (
@@ -42,7 +49,7 @@ export function SettingsContent({ organisation, members, currentUserId, subscrip
   ]
 
   const apiKeyBulkActions: BulkAction[] = [
-    { label: 'Revoke', onClick: (ids) => { /* TODO: implement bulk revoke */ }, variant: 'danger' },
+    { label: 'Revoke', onClick: (ids: string[]) => { setRevokeIds(ids) }, variant: 'danger' },
   ]
 
   async function saveCompanyDetails(formData: FormData): Promise<{ error?: string }> {
@@ -67,6 +74,7 @@ export function SettingsContent({ organisation, members, currentUserId, subscrip
   }
 
   return (
+    <>
     <div>
       <div className="tabs-list">
         {['organisation', 'team', 'billing', 'company', 'api-keys'].map((t) => (
@@ -126,5 +134,17 @@ export function SettingsContent({ organisation, members, currentUserId, subscrip
         </div>
       )}
     </div>
+      <ConfirmDialog
+        isOpen={revokeIds.length > 0}
+        onConfirm={executeRevoke}
+        onCancel={() => setRevokeIds([])}
+        title={revokeIds.length === 1 ? 'Revoke API Key' : `Revoke ${revokeIds.length} API Key(s)`}
+        message={revokeIds.length === 1
+          ? 'This API key will be permanently revoked. Any integrations using it will stop working immediately. This action cannot be undone.'
+          : `${revokeIds.length} API key(s) will be permanently revoked. Any integrations using them will stop working immediately. This action cannot be undone.`}
+        confirmText={revokeIds.length === 1 ? 'Revoke' : 'Revoke All'}
+        variant="danger"
+      />
+    </>
   )
 }

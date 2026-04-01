@@ -95,3 +95,35 @@ export async function unsubscribeFromStatusPage(token: string): Promise<boolean>
   if (error) { logger.error('Failed to unsubscribe', { error: error.message }); return false }
   return true
 }
+
+export async function bulkDeleteStatusPages(ids: string[], orgId: string): Promise<boolean> {
+  const supabase = createAdminClient()
+  const { error } = await supabase
+    .from('status_pages')
+    .delete()
+    .in('id', ids)
+    .eq('org_id', orgId)
+
+  if (error) {
+    logger.error('Failed to bulk delete status pages', { error: error.message, count: ids.length })
+    return false
+  }
+  logger.info('Bulk deleted status pages', { count: ids.length, orgId })
+  return true
+}
+
+export async function bulkUpdateStatusPageVisibility(ids: string[], orgId: string, isPublished: boolean): Promise<boolean> {
+  const supabase = createAdminClient()
+  const { error } = await supabase
+    .from('status_pages')
+    .update({ is_published: isPublished })
+    .in('id', ids)
+    .eq('org_id', orgId)
+
+  if (error) {
+    logger.error('Failed to bulk update status page visibility', { error: error.message, isPublished, count: ids.length })
+    return false
+  }
+  logger.info('Bulk updated status page visibility', { count: ids.length, isPublished, orgId })
+  return true
+}

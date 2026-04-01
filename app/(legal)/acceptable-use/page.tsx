@@ -1,3 +1,12 @@
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Acceptable Use Policy',
+  description:
+    'Uptrue Acceptable Use Policy. Rules and restrictions governing your use of the Uptrue monitoring platform and services.',
+  alternates: { canonical: 'https://uptrue.io/acceptable-use' },
+}
+
 export default function AcceptableUsePolicyPage(): React.ReactElement {
   return (
     <>

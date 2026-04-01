@@ -1,3 +1,12 @@
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Agency Partner Agreement',
+  description:
+    'Uptrue Agency Partner Agreement. Terms for agencies using white-label monitoring, revenue sharing, and Stripe Connect.',
+  alternates: { canonical: 'https://uptrue.io/agency-agreement' },
+}
+
 export default function AgencyPartnerAgreementPage(): React.ReactElement {
   return (
     <>

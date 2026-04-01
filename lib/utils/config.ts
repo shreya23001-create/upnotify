@@ -15,11 +15,19 @@ interface PublicConfig {
   admin: {
     emails: string[]
   }
+  analytics: {
+    gaMeasurementId: string
+  }
 }
 
 interface ServerConfig extends PublicConfig {
   supabase: PublicConfig['supabase'] & {
     serviceRoleKey: string
+  }
+  resend: {
+    apiKey: string
+    fromEmail: string
+    fromName: string
   }
 }
 
@@ -39,6 +47,7 @@ export function getConfig(): PublicConfig {
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? ''
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
   const adminEmails = process.env.ADMIN_EMAILS || ''
+  const gaMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? ''
 
   if (!url || !anonKey) {
     if (typeof window === 'undefined') {
@@ -51,6 +60,9 @@ export function getConfig(): PublicConfig {
     app: { url: appUrl },
     admin: {
       emails: adminEmails.split(',').map(e => e.trim()).filter(Boolean),
+    },
+    analytics: {
+      gaMeasurementId,
     },
   }
 
@@ -73,11 +85,20 @@ export function getServerConfig(): ServerConfig {
     throw new Error('Missing required environment variable: SUPABASE_SERVICE_ROLE_KEY')
   }
 
+  const resendApiKey = process.env.RESEND_API_KEY ?? ''
+  const resendFromEmail = process.env.RESEND_FROM_EMAIL || 'alerts@uptrue.io'
+  const resendFromName = process.env.RESEND_FROM_NAME || 'Uptrue Alerts'
+
   cachedServerConfig = {
     ...publicConfig,
     supabase: {
       ...publicConfig.supabase,
       serviceRoleKey,
+    },
+    resend: {
+      apiKey: resendApiKey,
+      fromEmail: resendFromEmail,
+      fromName: resendFromName,
     },
   }
 

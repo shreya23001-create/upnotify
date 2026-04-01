@@ -1,3 +1,12 @@
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Terms of Service',
+  description:
+    'Read the Uptrue Terms of Service. These terms govern your access to and use of the Uptrue uptime monitoring platform.',
+  alternates: { canonical: 'https://uptrue.io/terms' },
+}
+
 export default function TermsOfServicePage(): React.ReactElement {
   return (
     <>

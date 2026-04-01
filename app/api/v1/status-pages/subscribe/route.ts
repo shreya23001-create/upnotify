@@ -1,15 +1,15 @@
 import { NextResponse } from 'next/server'
 import { subscribeToStatusPage } from '@/lib/db/status-pages'
+import { statusPageSubscribeSchema } from '@/lib/validations/schemas'
+import { validateInput } from '@/lib/validations/validate'
 
 export async function POST(request: Request): Promise<NextResponse> {
   try {
-    const body = await request.json()
-    const { statusPageId, email } = body as { statusPageId?: string; email?: string }
+    const body: unknown = await request.json()
+    const parsed = validateInput(statusPageSubscribeSchema, body, 'status-page-subscribe')
+    if (!parsed.success) return parsed.response
 
-    if (!statusPageId || !email) {
-      return NextResponse.json({ success: false, error: 'Missing statusPageId or email' }, { status: 400 })
-    }
-
+    const { statusPageId, email } = parsed.data
     const result = await subscribeToStatusPage(statusPageId, email)
     return NextResponse.json(result)
   } catch {

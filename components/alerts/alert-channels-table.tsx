@@ -1,9 +1,10 @@
 'use client'
 
-import { useTransition } from 'react'
+import { useState, useTransition } from 'react'
 import Link from 'next/link'
 import { DataTable, type Column, type BulkAction } from '@/components/ui/data-table'
-import { deleteAlertChannelAction, toggleAlertChannelAction } from '@/app/(dashboard)/dashboard/alerts/actions'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
+import { deleteAlertChannelAction, toggleAlertChannelAction, bulkDeleteAlertChannelsAction, bulkEnableAlertChannelsAction, bulkDisableAlertChannelsAction } from '@/app/(dashboard)/dashboard/alerts/actions'
 import type { AlertChannel } from '@/lib/types'
 
 const typeLabels: Record<string, string> = {
@@ -34,8 +35,14 @@ function getDestination(channel: AlertChannel): string {
   }
 }
 
+interface PendingConfirm {
+  type: 'delete' | 'bulk-delete' | 'bulk-enable' | 'bulk-disable'
+  ids: string[]
+}
+
 export function AlertChannelsTable({ channels }: { channels: AlertChannel[] }) {
   const [isPending, startTransition] = useTransition()
+  const [pendingConfirm, setPendingConfirm] = useState<PendingConfirm | null>(null)
 
   function handleToggle(id: string, currentlyEnabled: boolean): void {
     startTransition(async () => {
@@ -44,10 +51,44 @@ export function AlertChannelsTable({ channels }: { channels: AlertChannel[] }) {
   }
 
   function handleDelete(id: string): void {
-    if (!confirm('Delete this alert channel? This cannot be undone.')) return
+    setPendingConfirm({ type: 'delete', ids: [id] })
+  }
+
+  function executeConfirm(): void {
+    if (!pendingConfirm) return
+    const { type, ids } = pendingConfirm
+    setPendingConfirm(null)
+
     startTransition(async () => {
-      await deleteAlertChannelAction(id)
+      switch (type) {
+        case 'delete':
+          await deleteAlertChannelAction(ids[0])
+          break
+        case 'bulk-delete':
+          await bulkDeleteAlertChannelsAction(ids)
+          break
+        case 'bulk-enable':
+          await bulkEnableAlertChannelsAction(ids)
+          break
+        case 'bulk-disable':
+          await bulkDisableAlertChannelsAction(ids)
+          break
+      }
     })
+  }
+
+  function getConfirmProps(): { title: string; message: string; confirmText: string; variant: 'danger' | 'warning' } {
+    if (!pendingConfirm) return { title: '', message: '', confirmText: '', variant: 'danger' }
+    switch (pendingConfirm.type) {
+      case 'delete':
+        return { title: 'Delete Alert Channel', message: 'This alert channel will be permanently deleted. You will no longer receive notifications through it. This action cannot be undone.', confirmText: 'Delete', variant: 'danger' }
+      case 'bulk-delete':
+        return { title: `Delete ${pendingConfirm.ids.length} Alert Channel(s)`, message: `${pendingConfirm.ids.length} alert channel(s) will be permanently deleted. This action cannot be undone.`, confirmText: 'Delete All', variant: 'danger' }
+      case 'bulk-enable':
+        return { title: `Enable ${pendingConfirm.ids.length} Alert Channel(s)`, message: `${pendingConfirm.ids.length} alert channel(s) will be enabled and start sending notifications.`, confirmText: 'Enable All', variant: 'warning' }
+      case 'bulk-disable':
+        return { title: `Disable ${pendingConfirm.ids.length} Alert Channel(s)`, message: `${pendingConfirm.ids.length} alert channel(s) will be disabled. You will stop receiving notifications through them.`, confirmText: 'Disable All', variant: 'warning' }
+    }
   }
 
   const columns: Column<AlertChannel>[] = [
@@ -152,27 +193,45 @@ export function AlertChannelsTable({ channels }: { channels: AlertChannel[] }) {
     },
   ]
 
-  async function handleBulkDelete(selectedIds: string[]): Promise<void> {
-    if (!confirm(`Delete ${selectedIds.length} alert channel(s)? This cannot be undone.`)) return
-    startTransition(async () => {
-      for (const id of selectedIds) {
-        await deleteAlertChannelAction(id)
-      }
-    })
+  function handleBulkDelete(selectedIds: string[]): void {
+    setPendingConfirm({ type: 'bulk-delete', ids: selectedIds })
+  }
+
+  function handleBulkEnable(selectedIds: string[]): void {
+    setPendingConfirm({ type: 'bulk-enable', ids: selectedIds })
+  }
+
+  function handleBulkDisable(selectedIds: string[]): void {
+    setPendingConfirm({ type: 'bulk-disable', ids: selectedIds })
   }
 
   const bulkActions: BulkAction[] = [
+    { label: 'Enable', onClick: handleBulkEnable },
+    { label: 'Disable', onClick: handleBulkDisable },
     { label: 'Delete', onClick: handleBulkDelete, variant: 'danger' },
   ]
 
+  const confirmProps = getConfirmProps()
+
   return (
-    <DataTable
-      columns={columns}
-      data={channels}
-      searchPlaceholder="Search alert channels..."
-      filters={filters}
-      bulkActions={bulkActions}
-      emptyMessage="No alert channels configured. Add a channel to receive downtime notifications."
-    />
+    <>
+      <DataTable
+        columns={columns}
+        data={channels}
+        searchPlaceholder="Search alert channels..."
+        filters={filters}
+        bulkActions={bulkActions}
+        emptyMessage="No alert channels configured. Add a channel to receive downtime notifications."
+      />
+      <ConfirmDialog
+        isOpen={pendingConfirm !== null}
+        onConfirm={executeConfirm}
+        onCancel={() => setPendingConfirm(null)}
+        title={confirmProps.title}
+        message={confirmProps.message}
+        confirmText={confirmProps.confirmText}
+        variant={confirmProps.variant}
+      />
+    </>
   )
 }

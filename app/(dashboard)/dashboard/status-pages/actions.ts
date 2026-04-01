@@ -1,7 +1,8 @@
 'use server'
 
 import { redirect } from 'next/navigation'
-import { createStatusPage, updateStatusPage, deleteStatusPage } from '@/lib/db/status-pages'
+import { revalidatePath } from 'next/cache'
+import { createStatusPage, updateStatusPage, deleteStatusPage, bulkDeleteStatusPages, bulkUpdateStatusPageVisibility } from '@/lib/db/status-pages'
 import { getCurrentUser } from '@/lib/db/users'
 import { getWorkspacesByOrg } from '@/lib/db/workspaces'
 import { logger } from '@/lib/utils/logger'
@@ -65,4 +66,40 @@ export async function deleteStatusPageAction(pageId: string): Promise<{ error?: 
   const success = await deleteStatusPage(pageId)
   if (!success) return { error: 'Failed to delete' }
   redirect('/dashboard/status-pages')
+}
+
+export async function bulkDeleteStatusPagesAction(ids: string[]): Promise<{ error?: string }> {
+  const user = await getCurrentUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  const success = await bulkDeleteStatusPages(ids, user.org_id)
+  if (!success) return { error: 'Failed to delete status pages' }
+
+  logger.info('Bulk deleted status pages', { count: ids.length })
+  revalidatePath('/dashboard/status-pages')
+  return {}
+}
+
+export async function bulkPublishStatusPagesAction(ids: string[]): Promise<{ error?: string }> {
+  const user = await getCurrentUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  const success = await bulkUpdateStatusPageVisibility(ids, user.org_id, true)
+  if (!success) return { error: 'Failed to publish status pages' }
+
+  logger.info('Bulk published status pages', { count: ids.length })
+  revalidatePath('/dashboard/status-pages')
+  return {}
+}
+
+export async function bulkUnpublishStatusPagesAction(ids: string[]): Promise<{ error?: string }> {
+  const user = await getCurrentUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  const success = await bulkUpdateStatusPageVisibility(ids, user.org_id, false)
+  if (!success) return { error: 'Failed to unpublish status pages' }
+
+  logger.info('Bulk unpublished status pages', { count: ids.length })
+  revalidatePath('/dashboard/status-pages')
+  return {}
 }

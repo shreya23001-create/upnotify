@@ -1,17 +1,60 @@
 'use client'
 
-import { useTransition } from 'react'
+import { useState, useTransition } from 'react'
 import Link from 'next/link'
 import { DataTable, type Column, type BulkAction } from '@/components/ui/data-table'
-import { deleteStatusPageAction } from '@/app/(dashboard)/dashboard/status-pages/actions'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
+import { deleteStatusPageAction, bulkDeleteStatusPagesAction, bulkPublishStatusPagesAction, bulkUnpublishStatusPagesAction } from '@/app/(dashboard)/dashboard/status-pages/actions'
 import type { StatusPage } from '@/lib/types'
+
+interface PendingConfirm {
+  type: 'delete' | 'bulk-delete' | 'bulk-publish' | 'bulk-unpublish'
+  ids: string[]
+}
 
 export function StatusPagesTable({ pages }: { pages: StatusPage[] }) {
   const [isPending, startTransition] = useTransition()
+  const [pendingConfirm, setPendingConfirm] = useState<PendingConfirm | null>(null)
 
   function handleDelete(id: string): void {
-    if (!confirm('Delete this status page?')) return
-    startTransition(async () => { await deleteStatusPageAction(id) })
+    setPendingConfirm({ type: 'delete', ids: [id] })
+  }
+
+  function executeConfirm(): void {
+    if (!pendingConfirm) return
+    const { type, ids } = pendingConfirm
+    setPendingConfirm(null)
+
+    startTransition(async () => {
+      switch (type) {
+        case 'delete':
+          await deleteStatusPageAction(ids[0])
+          break
+        case 'bulk-delete':
+          await bulkDeleteStatusPagesAction(ids)
+          break
+        case 'bulk-publish':
+          await bulkPublishStatusPagesAction(ids)
+          break
+        case 'bulk-unpublish':
+          await bulkUnpublishStatusPagesAction(ids)
+          break
+      }
+    })
+  }
+
+  function getConfirmProps(): { title: string; message: string; confirmText: string; variant: 'danger' | 'warning' } {
+    if (!pendingConfirm) return { title: '', message: '', confirmText: '', variant: 'danger' }
+    switch (pendingConfirm.type) {
+      case 'delete':
+        return { title: 'Delete Status Page', message: 'This status page will be permanently deleted. The public URL will no longer be accessible. This action cannot be undone.', confirmText: 'Delete', variant: 'danger' }
+      case 'bulk-delete':
+        return { title: `Delete ${pendingConfirm.ids.length} Status Page(s)`, message: `${pendingConfirm.ids.length} status page(s) will be permanently deleted. This action cannot be undone.`, confirmText: 'Delete All', variant: 'danger' }
+      case 'bulk-publish':
+        return { title: `Publish ${pendingConfirm.ids.length} Status Page(s)`, message: `${pendingConfirm.ids.length} status page(s) will be published and accessible via their public URLs.`, confirmText: 'Publish All', variant: 'warning' }
+      case 'bulk-unpublish':
+        return { title: `Unpublish ${pendingConfirm.ids.length} Status Page(s)`, message: `${pendingConfirm.ids.length} status page(s) will be unpublished. Their public URLs will no longer be accessible.`, confirmText: 'Unpublish All', variant: 'warning' }
+    }
   }
 
   const columns: Column<StatusPage>[] = [
@@ -39,17 +82,44 @@ export function StatusPagesTable({ pages }: { pages: StatusPage[] }) {
     )},
   ]
 
+  function handleBulkDelete(selectedIds: string[]): void {
+    setPendingConfirm({ type: 'bulk-delete', ids: selectedIds })
+  }
+
+  function handleBulkPublish(selectedIds: string[]): void {
+    setPendingConfirm({ type: 'bulk-publish', ids: selectedIds })
+  }
+
+  function handleBulkUnpublish(selectedIds: string[]): void {
+    setPendingConfirm({ type: 'bulk-unpublish', ids: selectedIds })
+  }
+
   const bulkActions: BulkAction[] = [
-    { label: 'Delete', onClick: () => {}, variant: 'danger' },
+    { label: 'Publish', onClick: handleBulkPublish },
+    { label: 'Unpublish', onClick: handleBulkUnpublish },
+    { label: 'Delete', onClick: handleBulkDelete, variant: 'danger' },
   ]
 
+  const confirmProps = getConfirmProps()
+
   return (
-    <DataTable
-      columns={columns}
-      data={pages}
-      searchPlaceholder="Search status pages..."
-      bulkActions={bulkActions}
-      emptyMessage="No status pages yet. Create one to share uptime status publicly."
-    />
+    <>
+      <DataTable
+        columns={columns}
+        data={pages}
+        searchPlaceholder="Search status pages..."
+        bulkActions={bulkActions}
+        emptyMessage="No status pages yet. Create one to share uptime status publicly."
+      />
+      <ConfirmDialog
+        isOpen={pendingConfirm !== null}
+        onConfirm={executeConfirm}
+        onCancel={() => setPendingConfirm(null)}
+        title={confirmProps.title}
+        message={confirmProps.message}
+        confirmText={confirmProps.confirmText}
+        variant={confirmProps.variant}
+      />
+    </>
   )
 }

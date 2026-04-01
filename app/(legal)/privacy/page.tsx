@@ -1,3 +1,12 @@
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Privacy Policy',
+  description:
+    'Uptrue Privacy Policy. Learn how we collect, use, store, and protect your personal data. GDPR compliant with EU data storage.',
+  alternates: { canonical: 'https://uptrue.io/privacy' },
+}
+
 export default function PrivacyPolicyPage(): React.ReactElement {
   return (
     <>

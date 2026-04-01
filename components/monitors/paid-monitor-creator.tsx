@@ -1,18 +1,26 @@
 'use client'
 
-import { useEffect, useState, useTransition } from 'react'
+import { useEffect, useRef, useState, useTransition } from 'react'
+import Link from 'next/link'
 import { createMonitorAfterPaymentAction } from '@/app/(dashboard)/dashboard/monitors/actions'
 
 export function PaidMonitorCreator() {
   const [status, setStatus] = useState<'creating' | 'success' | 'error'>('creating')
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
+  const didRun = useRef(false)
 
   useEffect(() => {
+    if (didRun.current) return
+    didRun.current = true
+
     const stored = localStorage.getItem('uptrue_pending_monitor')
     if (!stored) {
-      setStatus('error')
-      setError('No pending monitor data found. Please create a monitor again.')
+      /* Defer state update to avoid synchronous setState in effect */
+      queueMicrotask(() => {
+        setStatus('error')
+        setError('No pending monitor data found. Please create a monitor again.')
+      })
       return
     }
 
@@ -50,7 +58,7 @@ export function PaidMonitorCreator() {
       <div className="card">
         <div className="card-content">
           <div className="form-error">{error}</div>
-          <a href="/dashboard/monitors/new" className="btn btn-primary">Try Again</a>
+          <Link href="/dashboard/monitors/new" className="btn btn-primary">Try Again</Link>
         </div>
       </div>
     )
@@ -62,7 +70,7 @@ export function PaidMonitorCreator() {
         <div style={{ fontSize: 32, marginBottom: 16 }}>✅</div>
         <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>Monitor created!</h3>
         <p style={{ color: '#94a3b8', marginBottom: 20 }}>Your monitor is now active and will start checking shortly.</p>
-        <a href="/dashboard/monitors" className="btn btn-primary">View Monitors</a>
+        <Link href="/dashboard/monitors" className="btn btn-primary">View Monitors</Link>
       </div>
     </div>
   )

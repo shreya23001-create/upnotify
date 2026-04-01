@@ -1,12 +1,13 @@
 'use client'
 
-import { useTransition } from 'react'
+import { useState, useTransition } from 'react'
 import Link from 'next/link'
 import { DataTable, type Column, type BulkAction } from '@/components/ui/data-table'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { MonitorStatusBadge } from './monitor-status-badge'
 import { UptimeBar } from './uptime-bar'
 import { MonitorTypeIcon } from './monitor-type-icon'
-import { pauseMonitorAction, resumeMonitorAction, deleteMonitorAction } from '@/app/(dashboard)/dashboard/monitors/actions'
+import { pauseMonitorAction, resumeMonitorAction, deleteMonitorAction, bulkDeleteMonitorsAction, bulkPauseMonitorsAction, bulkResumeMonitorsAction } from '@/app/(dashboard)/dashboard/monitors/actions'
 import type { Monitor } from '@/lib/types'
 
 interface UptimeSlot { slot: string; status: 'up' | 'down' | 'degraded' | 'none' }
@@ -16,26 +17,68 @@ interface MonitorTableProps {
   uptimeData: Record<string, UptimeSlot[]>
 }
 
+interface PendingConfirm {
+  type: 'delete' | 'bulk-delete' | 'pause' | 'bulk-pause' | 'bulk-resume'
+  ids: string[]
+  isPaused?: boolean
+}
+
 export function MonitorTable({ monitors, uptimeData }: MonitorTableProps) {
   const [isPending, startTransition] = useTransition()
+  const [pendingConfirm, setPendingConfirm] = useState<PendingConfirm | null>(null)
 
   function handlePauseResume(id: string, isPaused: boolean): void {
-    const action = isPaused ? 'resume' : 'pause'
-    if (!confirm(`Are you sure you want to ${action} this monitor?`)) return
+    setPendingConfirm({ type: 'pause', ids: [id], isPaused })
+  }
+
+  function handleDelete(id: string): void {
+    setPendingConfirm({ type: 'delete', ids: [id] })
+  }
+
+  function executeConfirm(): void {
+    if (!pendingConfirm) return
+    const { type, ids, isPaused } = pendingConfirm
+    setPendingConfirm(null)
+
     startTransition(async () => {
-      if (isPaused) {
-        await resumeMonitorAction(id)
-      } else {
-        await pauseMonitorAction(id)
+      switch (type) {
+        case 'delete':
+          await deleteMonitorAction(ids[0])
+          break
+        case 'bulk-delete':
+          await bulkDeleteMonitorsAction(ids)
+          break
+        case 'pause':
+          if (isPaused) {
+            await resumeMonitorAction(ids[0])
+          } else {
+            await pauseMonitorAction(ids[0])
+          }
+          break
+        case 'bulk-pause':
+          await bulkPauseMonitorsAction(ids)
+          break
+        case 'bulk-resume':
+          await bulkResumeMonitorsAction(ids)
+          break
       }
     })
   }
 
-  function handleDelete(id: string): void {
-    if (!confirm('Delete this monitor? All check history will be lost.')) return
-    startTransition(async () => {
-      await deleteMonitorAction(id)
-    })
+  function getConfirmProps(): { title: string; message: string; confirmText: string; variant: 'danger' | 'warning' } {
+    if (!pendingConfirm) return { title: '', message: '', confirmText: '', variant: 'danger' }
+    switch (pendingConfirm.type) {
+      case 'delete':
+        return { title: 'Delete Monitor', message: 'This monitor and all its check history will be permanently deleted. This action cannot be undone.', confirmText: 'Delete', variant: 'danger' }
+      case 'bulk-delete':
+        return { title: `Delete ${pendingConfirm.ids.length} Monitor(s)`, message: `${pendingConfirm.ids.length} monitor(s) and all their check history will be permanently deleted. This action cannot be undone.`, confirmText: 'Delete All', variant: 'danger' }
+      case 'pause':
+        return { title: pendingConfirm.isPaused ? 'Resume Monitor' : 'Pause Monitor', message: pendingConfirm.isPaused ? 'This monitor will start checking again.' : 'This monitor will stop checking until resumed.', confirmText: pendingConfirm.isPaused ? 'Resume' : 'Pause', variant: 'warning' }
+      case 'bulk-pause':
+        return { title: `Pause ${pendingConfirm.ids.length} Monitor(s)`, message: `${pendingConfirm.ids.length} monitor(s) will stop checking until resumed.`, confirmText: 'Pause All', variant: 'warning' }
+      case 'bulk-resume':
+        return { title: `Resume ${pendingConfirm.ids.length} Monitor(s)`, message: `${pendingConfirm.ids.length} monitor(s) will start checking again.`, confirmText: 'Resume All', variant: 'warning' }
+    }
   }
 
   const columns: Column<Monitor>[] = [
@@ -94,38 +137,46 @@ export function MonitorTable({ monitors, uptimeData }: MonitorTableProps) {
     ]},
   ]
 
-  async function handleBulkPause(selectedIds: string[]): Promise<void> {
-    if (!confirm(`Pause ${selectedIds.length} monitor(s)?`)) return
-    startTransition(async () => {
-      for (const id of selectedIds) {
-        await pauseMonitorAction(id)
-      }
-    })
+  function handleBulkPause(selectedIds: string[]): void {
+    setPendingConfirm({ type: 'bulk-pause', ids: selectedIds })
   }
 
-  async function handleBulkDelete(selectedIds: string[]): Promise<void> {
-    if (!confirm(`Delete ${selectedIds.length} monitor(s)? All check history will be lost.`)) return
-    startTransition(async () => {
-      for (const id of selectedIds) {
-        await deleteMonitorAction(id)
-      }
-    })
+  function handleBulkResume(selectedIds: string[]): void {
+    setPendingConfirm({ type: 'bulk-resume', ids: selectedIds })
+  }
+
+  function handleBulkDelete(selectedIds: string[]): void {
+    setPendingConfirm({ type: 'bulk-delete', ids: selectedIds })
   }
 
   const bulkActions: BulkAction[] = [
     { label: 'Pause', onClick: handleBulkPause },
+    { label: 'Resume', onClick: handleBulkResume },
     { label: 'Delete', onClick: handleBulkDelete, variant: 'danger' },
   ]
 
+  const confirmProps = getConfirmProps()
+
   return (
-    <DataTable
-      columns={columns}
-      data={monitors}
-      searchPlaceholder="Search monitors..."
-      filters={filters}
-      bulkActions={bulkActions}
-      emptyMessage="No monitors yet. Create your first monitor to get started."
-    />
+    <>
+      <DataTable
+        columns={columns}
+        data={monitors}
+        searchPlaceholder="Search monitors..."
+        filters={filters}
+        bulkActions={bulkActions}
+        emptyMessage="No monitors yet. Create your first monitor to get started."
+      />
+      <ConfirmDialog
+        isOpen={pendingConfirm !== null}
+        onConfirm={executeConfirm}
+        onCancel={() => setPendingConfirm(null)}
+        title={confirmProps.title}
+        message={confirmProps.message}
+        confirmText={confirmProps.confirmText}
+        variant={confirmProps.variant}
+      />
+    </>
   )
 }
 

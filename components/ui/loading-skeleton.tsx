@@ -6,7 +6,7 @@ export function LoadingSkeleton({ type = 'card' }: { type?: 'card' | 'table' | '
       <div style={{ padding: 20 }}>
         <div className="skeleton skeleton-title" />
         {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="skeleton skeleton-text" style={{ width: `${70 + Math.random() * 30}%` }} />
+          <div key={i} className="skeleton skeleton-text" style={{ width: `${70 + (i * 7) % 30}%` }} />
         ))}
       </div>
     )
