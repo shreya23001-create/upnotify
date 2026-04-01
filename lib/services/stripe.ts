@@ -36,10 +36,18 @@ export async function ensureStripeCustomer(
     metadata: { org_id: orgId },
   })
 
-  await supabase
+  const { error: updateError } = await supabase
     .from('organisations')
     .update({ stripe_customer_id: customer.id })
     .eq('id', orgId)
+
+  if (updateError) {
+    logger.error('Failed to save Stripe customer ID to org', {
+      orgId,
+      customerId: customer.id,
+      error: updateError.message,
+    })
+  }
 
   logger.info('Stripe customer created', { orgId, customerId: customer.id })
   return customer.id

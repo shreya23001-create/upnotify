@@ -1,6 +1,6 @@
 'use client'
 
-import { useTransition } from 'react'
+import { useState, useTransition } from 'react'
 import type { Plan } from '@/lib/types'
 
 interface Props {
@@ -10,20 +10,40 @@ interface Props {
 
 export function PricingTable({ plans, currentPlanSlug }: Props) {
   const [isPending, startTransition] = useTransition()
+  const [error, setError] = useState<string | null>(null)
 
   function handleSubscribe(planSlug: string, billingCycle: string): void {
+    setError(null)
     startTransition(async () => {
-      const res = await fetch('/api/v1/billing/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ planSlug, billingCycle }),
-      })
-      const data = await res.json()
-      if (data.url) window.location.href = data.url
+      try {
+        const res = await fetch('/api/v1/billing/checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ planSlug, billingCycle }),
+        })
+        const data = await res.json()
+        if (!res.ok) {
+          setError(data.error || 'Failed to create checkout session. Please try again.')
+          return
+        }
+        if (data.url) {
+          window.location.href = data.url
+        } else {
+          setError('No checkout URL received. Please try again.')
+        }
+      } catch {
+        setError('Something went wrong. Please check your connection and try again.')
+      }
     })
   }
 
   return (
+    <div>
+      {error && (
+        <div className="form-error" style={{ marginBottom: 16, padding: 12, textAlign: 'center' }}>
+          {error}
+        </div>
+      )}
     <div className="pricing-grid">
       {plans.filter(p => p.type === 'direct').map(plan => {
         const isCurrent = plan.slug === currentPlanSlug
@@ -87,6 +107,7 @@ export function PricingTable({ plans, currentPlanSlug }: Props) {
           </div>
         )
       })}
+    </div>
     </div>
   )
 }
