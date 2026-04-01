@@ -129,7 +129,7 @@ export default function PricingTable(): React.ReactElement {
                 ))}
               </ul>
               <a
-                href="/auth/signup"
+                href="/signup"
                 className={`btn btn-full ${plan.highlighted ? 'btn-primary' : 'btn-secondary'}`}
               >
                 {plan.cta}

@@ -114,10 +114,10 @@ export default function LandingPage(): React.ReactElement {
             <a href="#faq">FAQ</a>
           </div>
           <div className="landing-nav-actions">
-            <a href="/auth/login" className="btn btn-ghost">
+            <a href="/login" className="btn btn-ghost">
               Log in
             </a>
-            <a href="/auth/signup" className="btn btn-primary">
+            <a href="/signup" className="btn btn-primary">
               Start Free
             </a>
           </div>
@@ -145,7 +145,7 @@ export default function LandingPage(): React.ReactElement {
               and multi-channel alerts — all in one platform.
             </p>
             <div className="hero-actions">
-              <a href="/auth/signup" className="btn btn-primary btn-lg">
+              <a href="/signup" className="btn btn-primary btn-lg">
                 Start Monitoring Free
               </a>
               <a href="#how-it-works" className="btn btn-secondary btn-lg">
@@ -326,7 +326,7 @@ export default function LandingPage(): React.ReactElement {
                   One-time fee of {'\u00A3'}149 — no recurring charges
                 </li>
               </ul>
-              <a href="/auth/signup" className="btn btn-primary btn-lg">
+              <a href="/signup" className="btn btn-primary btn-lg">
                 Start Your Agency Account
               </a>
             </div>
@@ -378,7 +378,7 @@ export default function LandingPage(): React.ReactElement {
           <p className="cta-subtitle">
             Free plan available. No credit card required. Cancel any time.
           </p>
-          <a href="/auth/signup" className="btn btn-primary btn-lg">
+          <a href="/signup" className="btn btn-primary btn-lg">
             Get Started Free
           </a>
         </div>
