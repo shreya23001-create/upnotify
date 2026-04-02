@@ -175,7 +175,19 @@ export function TrackerManager({ monitors }: TrackerManagerProps): React.ReactEl
                 <td>
                   <span style={{ fontWeight: 600 }}>{m.display_name}</span>
                   <br />
-                  <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{m.domain}</span>
+                  <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+                    {m.domain}
+                    {' '}
+                    <a
+                      href={`/tracker/${m.domain}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title="Open public tracker page"
+                      style={{ color: 'var(--accent)', textDecoration: 'none', fontSize: 11 }}
+                    >
+                      ↗
+                    </a>
+                  </span>
                 </td>
                 <td>
                   <span className="badge badge-outline">{m.category}</span>

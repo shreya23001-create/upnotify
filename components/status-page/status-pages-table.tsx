@@ -60,8 +60,8 @@ export function StatusPagesTable({ pages }: { pages: StatusPage[] }) {
   const columns: Column<StatusPage>[] = [
     { key: 'name', label: 'Name', render: (p) => <span style={{ fontWeight: 600 }}>{p.name}</span> },
     { key: 'slug', label: 'Public URL', render: (p) => (
-      <a href={`/status/${p.slug}`} target="_blank" rel="noopener noreferrer" className="table-link" style={{ fontFamily: 'monospace', fontSize: 13 }}>
-        /status/{p.slug}
+      <a href={`/status/${p.slug}`} target="_blank" rel="noopener noreferrer" className="table-link" style={{ fontFamily: 'monospace', fontSize: 13, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+        /status/{p.slug} <span style={{ fontSize: 11 }}>↗</span>
       </a>
     )},
     { key: 'monitor_ids', label: 'Monitors', sortable: false, searchable: false, render: (p) => {
