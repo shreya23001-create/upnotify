@@ -1,3 +1,4 @@
+import { UptrueLogo } from '@/components/ui/uptrue-logo'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import {
@@ -51,13 +52,7 @@ export default function ContactPage(): React.ReactElement {
       <nav className="landing-nav">
         <div className="landing-nav-inner">
           <Link href="/" className="landing-logo" aria-label="Uptrue home">
-            <img
-              src="/logo.svg"
-              alt="Uptrue"
-              width={140}
-              height={35}
-              className="landing-logo-img"
-            />
+            <UptrueLogo />
           </Link>
           <div className="landing-nav-links">
             <Link href="/#features">Features</Link>
@@ -128,13 +123,7 @@ export default function ContactPage(): React.ReactElement {
         <div className="landing-container">
           <div className="footer-grid">
             <div className="footer-brand">
-              <img
-                src="/logo.svg"
-                alt="Uptrue"
-                width={140}
-                height={35}
-                className="landing-logo-img"
-              />
+              <UptrueLogo />
               <p className="footer-tagline">
                 Uptime, performance &amp; infrastructure monitoring for agencies
                 and teams.

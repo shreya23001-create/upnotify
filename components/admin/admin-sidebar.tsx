@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { UptrueLogo } from '@/components/ui/uptrue-logo'
 import {
   IconDashboard, IconUsers, IconBuilding, IconCreditCard,
   IconGlobe, IconToggle, IconEdit, IconMail, IconSettings, IconX, IconShield,
@@ -56,7 +57,7 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps): React.Reac
         {/* Logo */}
         <div className="admin-sidebar-logo">
           <Link href="/admin" onClick={onClose} style={{ display: 'flex', alignItems: 'center' }}>
-            <img src="/logo-light.svg" alt="Uptrue Admin" width={130} height={32} style={{ display: 'block' }} />
+            <UptrueLogo variant="light" />
           </Link>
           <button
             className="admin-sidebar-close"

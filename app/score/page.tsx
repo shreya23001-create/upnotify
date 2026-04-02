@@ -6,6 +6,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ScoreForm } from '@/components/score/score-form'
+import { UptrueLogo } from '@/components/ui/uptrue-logo'
 
 export const metadata: Metadata = {
   title: 'Free Website Health Score',
@@ -19,7 +20,7 @@ export default function ScorePage(): React.ReactElement {
     <div className="score-hero">
       <nav className="score-nav">
         <Link href="/" className="score-nav-logo">
-          <img src="/logo.svg" alt="Uptrue" width={120} height={30} />
+          <UptrueLogo />
         </Link>
         <Link href="/login" className="btn btn-secondary btn-sm">
           Sign in

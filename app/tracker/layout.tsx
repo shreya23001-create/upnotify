@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { UptrueLogo } from '@/components/ui/uptrue-logo'
 
 export const metadata: Metadata = {
   title: {
@@ -14,7 +15,7 @@ export default function TrackerLayout({ children }: { children: React.ReactNode 
     <div className="tracker-layout">
       <header className="tracker-header">
         <Link href="/" className="tracker-logo">
-          <img src="/logo.svg" alt="Uptrue" width={120} height={30} />
+          <UptrueLogo />
         </Link>
         <nav className="tracker-nav">
           <Link href="/tracker">All Sites</Link>

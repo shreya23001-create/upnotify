@@ -1,3 +1,4 @@
+import { UptrueLogo } from '@/components/ui/uptrue-logo'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 
@@ -23,13 +24,7 @@ export default function BlogLayout({ children }: { children: React.ReactNode }):
       <header className="blog-header">
         <div className="blog-header-inner">
           <Link href="/" className="blog-logo" aria-label="Uptrue home">
-            <img
-              src="/logo.svg"
-              alt="Uptrue"
-              width={140}
-              height={35}
-              className="landing-logo-img"
-            />
+            <UptrueLogo />
           </Link>
           <nav className="blog-nav">
             <Link href="/blog">Blog</Link>
@@ -48,13 +43,7 @@ export default function BlogLayout({ children }: { children: React.ReactNode }):
         <div className="blog-footer-inner">
           <div className="blog-footer-grid">
             <div className="blog-footer-brand">
-              <img
-                src="/logo.svg"
-                alt="Uptrue"
-                width={120}
-                height={30}
-                className="landing-logo-img"
-              />
+              <UptrueLogo />
               <p className="blog-footer-tagline">
                 Uptime, performance &amp; infrastructure monitoring for agencies and teams.
               </p>

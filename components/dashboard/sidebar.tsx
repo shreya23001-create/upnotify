@@ -1,3 +1,4 @@
+import { UptrueLogo } from '@/components/ui/uptrue-logo'
 'use client'
 
 import Link from 'next/link'
@@ -66,13 +67,7 @@ export function Sidebar(): React.ReactElement {
           {collapsed ? (
             <span className="sidebar-logo-mark">U</span>
           ) : (
-            <img
-              src="/logo-light.svg"
-              alt="Uptrue"
-              width={130}
-              height={32}
-              className="sidebar-logo-img"
-            />
+            <UptrueLogo variant="light" />
           )}
         </Link>
       </div>
