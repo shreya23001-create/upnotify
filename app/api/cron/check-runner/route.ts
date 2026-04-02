@@ -5,6 +5,7 @@ import { createIncident, resolveIncident, getOpenIncidentForMonitor } from '@/li
 import { isMonitorInMaintenance } from '@/lib/db/maintenance-windows'
 import { dispatchChecker } from '@/lib/services/checker'
 import { dispatchAlerts, dispatchRecoveryAlerts } from '@/lib/services/alert-dispatcher'
+import { getServerConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
 import type { Monitor } from '@/lib/types'
 import type { CheckerResult } from '@/lib/checkers/types'
@@ -23,7 +24,8 @@ interface FirstCheckResult {
 
 export async function GET(request: Request): Promise<NextResponse> {
   const authHeader = request.headers.get('authorization')
-  const cronSecret = process.env.CRON_SECRET
+  const { cron } = getServerConfig()
+  const cronSecret = cron.secret
 
   if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
     const isVercelCron = request.headers.get('x-vercel-cron')

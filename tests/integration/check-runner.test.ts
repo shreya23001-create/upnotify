@@ -59,6 +59,22 @@ vi.mock('@/lib/utils/logger', () => ({
   },
 }))
 
+vi.mock('@/lib/utils/config', () => ({
+  getConfig: () => ({
+    supabase: { url: 'http://localhost:54321', anonKey: 'test-anon-key' },
+    app: { url: 'http://localhost:3000' },
+    admin: { emails: [] },
+    analytics: { gaMeasurementId: '' },
+  }),
+  getServerConfig: () => ({
+    supabase: { serviceRoleKey: 'test-service-key' },
+    stripe: { secretKey: 'sk_test_xxx', webhookSecret: 'whsec_test' },
+    resend: { apiKey: '', fromEmail: 'test@test.com', fromName: 'Test' },
+    anthropic: { apiKey: 'test-key' },
+    cron: { secret: 'test-cron-secret' },
+  }),
+}))
+
 // ---------------------------------------------------------------------------
 // Import module under test (AFTER mocks are set up)
 // ---------------------------------------------------------------------------
@@ -125,7 +141,7 @@ describe('check-runner cron route', () => {
   // ── Auth ───────────────────────────────────────────────────────────
 
   it('returns 401 when cron secret is set and auth header is wrong', async () => {
-    process.env.CRON_SECRET = 'test-secret'
+    // Config mock returns cron.secret = 'test-cron-secret'
     const req = new Request('https://uptrue.io/api/cron/check-runner', {
       method: 'GET',
       headers: { authorization: 'Bearer wrong' },

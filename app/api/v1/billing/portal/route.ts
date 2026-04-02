@@ -4,11 +4,20 @@ import { getCurrentOrganisation } from '@/lib/db/organisations'
 import { createPortalSession } from '@/lib/services/stripe'
 import { getConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
+import { checkRateLimit, API_V1_RATE_LIMIT } from '@/lib/utils/rate-limiter'
 
 export const dynamic = 'force-dynamic'
 
-export async function POST(): Promise<NextResponse> {
+export async function POST(request: Request): Promise<NextResponse> {
   try {
+    const rateLimit = checkRateLimit(request, API_V1_RATE_LIMIT, 'billing-portal')
+    if (!rateLimit.allowed) {
+      return NextResponse.json({ error: 'Too many requests' }, {
+        status: 429,
+        headers: { 'Retry-After': String(Math.ceil((rateLimit.resetAt - Date.now()) / 1000)) },
+      })
+    }
+
     const user = await getCurrentUser()
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

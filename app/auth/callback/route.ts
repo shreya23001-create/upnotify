@@ -4,6 +4,18 @@ import { logger } from '@/lib/utils/logger'
 import { checkRateLimit, AUTH_RATE_LIMIT } from '@/lib/utils/rate-limiter'
 
 /**
+ * Validates that a redirect path is safe (relative, no open-redirect vectors).
+ * Rejects protocol-relative URLs ("//evil.com"), absolute URLs ("https://…"),
+ * and paths that don't start with "/".
+ */
+function isValidRedirectPath(path: string): boolean {
+  if (!path.startsWith('/')) return false
+  if (path.startsWith('//')) return false
+  if (path.includes('://')) return false
+  return true
+}
+
+/**
  * Auth callback handler.
  * Supabase redirects here after magic-link click or Google OAuth.
  * Exchanges the one-time code for a session, then redirects to
@@ -24,7 +36,12 @@ export async function GET(request: Request): Promise<NextResponse> {
   }
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
-  const next = searchParams.get('next') ?? '/dashboard'
+  const nextParam = searchParams.get('next') ?? '/dashboard'
+
+  // Validate redirect target to prevent open redirect attacks.
+  // Must be a relative path starting with "/" and must not be
+  // a protocol-relative URL ("//evil.com") or contain "://".
+  const nextPath = isValidRedirectPath(nextParam) ? nextParam : '/dashboard'
 
   if (code) {
     const supabase = await createClient()
@@ -35,7 +52,7 @@ export async function GET(request: Request): Promise<NextResponse> {
       return NextResponse.redirect(`${origin}/login?error=auth_error`)
     }
 
-    return NextResponse.redirect(`${origin}${next}`)
+    return NextResponse.redirect(`${origin}${nextPath}`)
   }
 
   return NextResponse.redirect(`${origin}/login?error=no_code`)

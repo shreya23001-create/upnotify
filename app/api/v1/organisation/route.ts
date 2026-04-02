@@ -4,11 +4,20 @@ import { updateOrganisation } from '@/lib/db/organisations'
 import { logger } from '@/lib/utils/logger'
 import { organisationUpdateSchema } from '@/lib/validations/schemas'
 import { validateInput } from '@/lib/validations/validate'
+import { checkRateLimit, API_V1_RATE_LIMIT } from '@/lib/utils/rate-limiter'
 
 export const dynamic = 'force-dynamic'
 
 export async function PUT(request: Request): Promise<NextResponse> {
   try {
+    const rateLimit = checkRateLimit(request, API_V1_RATE_LIMIT, 'organisation-update')
+    if (!rateLimit.allowed) {
+      return NextResponse.json({ error: 'Too many requests' }, {
+        status: 429,
+        headers: { 'Retry-After': String(Math.ceil((rateLimit.resetAt - Date.now()) / 1000)) },
+      })
+    }
+
     const user = await getCurrentUser()
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     if (user.role !== 'admin') return NextResponse.json({ error: 'Only admins can update organisation' }, { status: 403 })

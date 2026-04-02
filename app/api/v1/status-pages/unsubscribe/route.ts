@@ -1,7 +1,19 @@
 import { NextResponse } from 'next/server'
 import { unsubscribeFromStatusPage } from '@/lib/db/status-pages'
+import { checkRateLimit, PUBLIC_UNSUBSCRIBE_RATE_LIMIT } from '@/lib/utils/rate-limiter'
 
 export async function GET(request: Request): Promise<NextResponse> {
+  const rateLimit = checkRateLimit(request, PUBLIC_UNSUBSCRIBE_RATE_LIMIT, 'status-page-unsubscribe')
+  if (!rateLimit.allowed) {
+    return new NextResponse('<html><body><h1>Too Many Requests</h1><p>Please try again later.</p></body></html>', {
+      status: 429,
+      headers: {
+        'Content-Type': 'text/html',
+        'Retry-After': String(Math.ceil((rateLimit.resetAt - Date.now()) / 1000)),
+      },
+    })
+  }
+
   const { searchParams } = new URL(request.url)
   const token = searchParams.get('token')
 

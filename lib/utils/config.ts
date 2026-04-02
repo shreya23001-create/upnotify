@@ -29,6 +29,16 @@ interface ServerConfig extends PublicConfig {
     fromEmail: string
     fromName: string
   }
+  stripe: {
+    secretKey: string
+    webhookSecret: string
+  }
+  anthropic: {
+    apiKey: string
+  }
+  cron: {
+    secret: string
+  }
 }
 
 /**
@@ -89,6 +99,11 @@ export function getServerConfig(): ServerConfig {
   const resendFromEmail = process.env.RESEND_FROM_EMAIL || 'alerts@uptrue.io'
   const resendFromName = process.env.RESEND_FROM_NAME || 'Uptrue Alerts'
 
+  const stripeSecretKey = process.env.STRIPE_SECRET_KEY ?? ''
+  const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET ?? ''
+  const anthropicApiKey = process.env.ANTHROPIC_API_KEY ?? ''
+  const cronSecret = process.env.CRON_SECRET ?? ''
+
   cachedServerConfig = {
     ...publicConfig,
     supabase: {
@@ -99,6 +114,16 @@ export function getServerConfig(): ServerConfig {
       apiKey: resendApiKey,
       fromEmail: resendFromEmail,
       fromName: resendFromName,
+    },
+    stripe: {
+      secretKey: stripeSecretKey,
+      webhookSecret: stripeWebhookSecret,
+    },
+    anthropic: {
+      apiKey: anthropicApiKey,
+    },
+    cron: {
+      secret: cronSecret,
     },
   }
 

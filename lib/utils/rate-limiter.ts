@@ -62,6 +62,18 @@ export const API_V1_RATE_LIMIT: RateLimitOptions = {
   windowMs: 60 * 1000,
 }
 
+/** Public subscribe endpoints: 5 requests per minute per IP (abuse-prone). */
+export const PUBLIC_SUBSCRIBE_RATE_LIMIT: RateLimitOptions = {
+  maxRequests: 5,
+  windowMs: 60 * 1000,
+}
+
+/** Public unsubscribe endpoints: 10 requests per minute per IP. */
+export const PUBLIC_UNSUBSCRIBE_RATE_LIMIT: RateLimitOptions = {
+  maxRequests: 10,
+  windowMs: 60 * 1000,
+}
+
 // ---------------------------------------------------------------------------
 // Store
 // ---------------------------------------------------------------------------

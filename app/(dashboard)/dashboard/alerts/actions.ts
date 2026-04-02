@@ -2,7 +2,7 @@
 
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
-import { createAlertChannel, updateAlertChannel, deleteAlertChannel, toggleAlertChannel, bulkDeleteAlertChannels, bulkUpdateAlertChannelStatus } from '@/lib/db/alerts'
+import { createAlertChannel, updateAlertChannel, deleteAlertChannel, toggleAlertChannel, bulkDeleteAlertChannels, bulkUpdateAlertChannelStatus, getAlertChannelById } from '@/lib/db/alerts'
 import { getCurrentUser } from '@/lib/db/users'
 import { getWorkspacesByOrg } from '@/lib/db/workspaces'
 import { logger } from '@/lib/utils/logger'
@@ -62,6 +62,15 @@ export async function createAlertChannelAction(formData: FormData): Promise<{ er
 }
 
 export async function updateAlertChannelAction(channelId: string, formData: FormData): Promise<{ error?: string }> {
+  const user = await getCurrentUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  // Verify the alert channel belongs to the user's org before updating
+  const existing = await getAlertChannelById(channelId)
+  if (!existing || existing.org_id !== user.org_id) {
+    return { error: 'Alert channel not found' }
+  }
+
   const name = formData.get('name') as string
   const type = formData.get('type') as string
 
@@ -95,12 +104,30 @@ export async function updateAlertChannelAction(channelId: string, formData: Form
 }
 
 export async function deleteAlertChannelAction(channelId: string): Promise<{ error?: string }> {
+  const user = await getCurrentUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  // Verify the alert channel belongs to the user's org before deleting
+  const existing = await getAlertChannelById(channelId)
+  if (!existing || existing.org_id !== user.org_id) {
+    return { error: 'Alert channel not found' }
+  }
+
   const success = await deleteAlertChannel(channelId)
   if (!success) return { error: 'Failed to delete alert channel' }
   redirect('/dashboard/alerts')
 }
 
-export async function toggleAlertChannelAction(channelId: string, enabled: boolean): Promise<void> {
+export async function toggleAlertChannelAction(channelId: string, enabled: boolean): Promise<{ error?: string } | void> {
+  const user = await getCurrentUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  // Verify the alert channel belongs to the user's org before toggling
+  const existing = await getAlertChannelById(channelId)
+  if (!existing || existing.org_id !== user.org_id) {
+    return { error: 'Alert channel not found' }
+  }
+
   await toggleAlertChannel(channelId, enabled)
   redirect('/dashboard/alerts')
 }

@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from 'next/server'
 import { createProxyClient } from '@/lib/supabase/proxy'
 import { isPublicRoute, isAuthRoute, isAdminRoute } from '@/lib/auth/helpers'
+import { getConfig } from '@/lib/utils/config'
 
 /**
  * Next.js 16 proxy (replaces middleware.ts).
@@ -36,12 +37,12 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
   }
 
   // Admin routes: verify super-admin email whitelist
+  // Note: getConfig() is safe in edge runtime — it only reads process.env
+  // literals (no Node.js-only APIs). ADMIN_EMAILS is already parsed there.
   if (isAdminRoute(pathname)) {
-    const adminEmails = (process.env.ADMIN_EMAILS || '')
-      .split(',')
-      .map((e) => e.trim())
+    const { admin } = getConfig()
 
-    if (!adminEmails.includes(user.email || '')) {
+    if (!admin.emails.includes(user.email || '')) {
       return NextResponse.redirect(new URL('/dashboard', request.url))
     }
   }

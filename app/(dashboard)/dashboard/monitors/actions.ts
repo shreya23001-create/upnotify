@@ -2,7 +2,7 @@
 
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
-import { createMonitor, updateMonitor, deleteMonitor, pauseMonitor, resumeMonitor, bulkDeleteMonitors, bulkUpdateMonitorStatus } from '@/lib/db/monitors'
+import { createMonitor, updateMonitor, deleteMonitor, pauseMonitor, resumeMonitor, bulkDeleteMonitors, bulkUpdateMonitorStatus, getMonitorById } from '@/lib/db/monitors'
 import { getCurrentUser } from '@/lib/db/users'
 import { getWorkspacesByOrg } from '@/lib/db/workspaces'
 import { getSubscriptionWithPlan } from '@/lib/db/subscriptions'
@@ -130,6 +130,15 @@ export async function createMonitorAfterPaymentAction(formData: FormData): Promi
 }
 
 export async function updateMonitorAction(monitorId: string, formData: FormData): Promise<{ error?: string }> {
+  const user = await getCurrentUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  // Verify the monitor belongs to the user's org before updating
+  const existing = await getMonitorById(monitorId)
+  if (!existing || existing.org_id !== user.org_id) {
+    return { error: 'Monitor not found' }
+  }
+
   const name = formData.get('name') as string
   const target = formData.get('target') as string
   const intervalStr = formData.get('check_interval_seconds') as string
@@ -174,17 +183,44 @@ export async function updateMonitorAction(monitorId: string, formData: FormData)
 }
 
 export async function deleteMonitorAction(monitorId: string): Promise<{ error?: string }> {
+  const user = await getCurrentUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  // Verify the monitor belongs to the user's org before deleting
+  const existing = await getMonitorById(monitorId)
+  if (!existing || existing.org_id !== user.org_id) {
+    return { error: 'Monitor not found' }
+  }
+
   const success = await deleteMonitor(monitorId)
   if (!success) return { error: 'Failed to delete monitor' }
   redirect('/dashboard/monitors')
 }
 
-export async function pauseMonitorAction(monitorId: string): Promise<void> {
+export async function pauseMonitorAction(monitorId: string): Promise<{ error?: string } | void> {
+  const user = await getCurrentUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  // Verify the monitor belongs to the user's org before pausing
+  const existing = await getMonitorById(monitorId)
+  if (!existing || existing.org_id !== user.org_id) {
+    return { error: 'Monitor not found' }
+  }
+
   await pauseMonitor(monitorId)
   redirect(`/dashboard/monitors/${monitorId}`)
 }
 
-export async function resumeMonitorAction(monitorId: string): Promise<void> {
+export async function resumeMonitorAction(monitorId: string): Promise<{ error?: string } | void> {
+  const user = await getCurrentUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  // Verify the monitor belongs to the user's org before resuming
+  const existing = await getMonitorById(monitorId)
+  if (!existing || existing.org_id !== user.org_id) {
+    return { error: 'Monitor not found' }
+  }
+
   await resumeMonitor(monitorId)
   redirect(`/dashboard/monitors/${monitorId}`)
 }

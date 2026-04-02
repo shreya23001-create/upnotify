@@ -1,13 +1,14 @@
 import Anthropic from '@anthropic-ai/sdk'
+import { getServerConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
 
 const getClient = (): Anthropic | null => {
-  const apiKey = process.env.ANTHROPIC_API_KEY
-  if (!apiKey) {
+  const { anthropic } = getServerConfig()
+  if (!anthropic.apiKey) {
     logger.warn('ANTHROPIC_API_KEY not set, AI summaries disabled')
     return null
   }
-  return new Anthropic({ apiKey })
+  return new Anthropic({ apiKey: anthropic.apiKey })
 }
 
 interface ReportMetrics {

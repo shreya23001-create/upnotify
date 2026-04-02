@@ -2,7 +2,7 @@
 
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
-import { createStatusPage, updateStatusPage, deleteStatusPage, bulkDeleteStatusPages, bulkUpdateStatusPageVisibility } from '@/lib/db/status-pages'
+import { createStatusPage, updateStatusPage, deleteStatusPage, bulkDeleteStatusPages, bulkUpdateStatusPageVisibility, getStatusPageById } from '@/lib/db/status-pages'
 import { getCurrentUser } from '@/lib/db/users'
 import { getWorkspacesByOrg } from '@/lib/db/workspaces'
 import { logger } from '@/lib/utils/logger'
@@ -40,6 +40,15 @@ export async function createStatusPageAction(formData: FormData): Promise<{ erro
 }
 
 export async function updateStatusPageAction(pageId: string, formData: FormData): Promise<{ error?: string }> {
+  const user = await getCurrentUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  // Verify the status page belongs to the user's org before updating
+  const existing = await getStatusPageById(pageId)
+  if (!existing || existing.org_id !== user.org_id) {
+    return { error: 'Status page not found' }
+  }
+
   const name = formData.get('name') as string
   const slug = formData.get('slug') as string
   const monitorIdsStr = formData.get('monitor_ids') as string
@@ -63,6 +72,15 @@ export async function updateStatusPageAction(pageId: string, formData: FormData)
 }
 
 export async function deleteStatusPageAction(pageId: string): Promise<{ error?: string }> {
+  const user = await getCurrentUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  // Verify the status page belongs to the user's org before deleting
+  const existing = await getStatusPageById(pageId)
+  if (!existing || existing.org_id !== user.org_id) {
+    return { error: 'Status page not found' }
+  }
+
   const success = await deleteStatusPage(pageId)
   if (!success) return { error: 'Failed to delete' }
   redirect('/dashboard/status-pages')

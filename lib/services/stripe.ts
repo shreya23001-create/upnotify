@@ -1,14 +1,15 @@
 import Stripe from 'stripe'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { getServerConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
 
 let stripeClient: Stripe | null = null
 
 export function getStripe(): Stripe {
   if (!stripeClient) {
-    const key = process.env.STRIPE_SECRET_KEY
-    if (!key) throw new Error('STRIPE_SECRET_KEY not set')
-    stripeClient = new Stripe(key)
+    const { stripe } = getServerConfig()
+    if (!stripe.secretKey) throw new Error('STRIPE_SECRET_KEY not set')
+    stripeClient = new Stripe(stripe.secretKey)
   }
   return stripeClient
 }
