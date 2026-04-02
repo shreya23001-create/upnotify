@@ -23,8 +23,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
     }
 
-    // Only owners and admins can invite
-    if (user.role !== 'owner' && user.role !== 'admin') {
+    // Only owners, admins, and super admins can invite
+    const canManageTeam = user.role === 'owner' || user.role === 'admin' || user.is_super_admin
+    if (!canManageTeam) {
       return NextResponse.json({ error: 'You do not have permission to invite team members.' }, { status: 403 })
     }
 
@@ -73,8 +74,9 @@ export async function DELETE(request: NextRequest): Promise<NextResponse> {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
     }
 
-    // Only owners and admins can remove
-    if (user.role !== 'owner' && user.role !== 'admin') {
+    // Only owners, admins, and super admins can remove
+    const canManageTeam = user.role === 'owner' || user.role === 'admin' || user.is_super_admin
+    if (!canManageTeam) {
       return NextResponse.json({ error: 'You do not have permission to remove team members.' }, { status: 403 })
     }
 
