@@ -197,12 +197,12 @@ export default function AcceptableUsePolicyPage(): React.ReactElement {
         </thead>
         <tbody>
           <tr>
-            <td>Usage-Based / Starter</td>
+            <td>Free / Lite / Builder</td>
             <td>60 requests per minute</td>
             <td>1,000 requests per day</td>
           </tr>
           <tr>
-            <td>Pro</td>
+            <td>Scale</td>
             <td>60 requests per minute</td>
             <td>1,000 requests per day</td>
           </tr>

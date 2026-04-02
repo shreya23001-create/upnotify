@@ -180,32 +180,16 @@ export async function createPortalSession(
   return session.url
 }
 
-/** Create a Checkout session to charge £1 for a new monitor (usage-based plan) */
+/**
+ * @deprecated The per-monitor usage-based charge has been removed.
+ * Monitors are now included in plan limits (Free: 3, Lite: 5, Builder: 25, Scale: 100).
+ * This function is retained temporarily for backward compatibility but should not be called.
+ */
 export async function createMonitorChargeSession(
-  orgId: string,
-  email: string,
-  orgName: string,
-  appUrl: string
+  _orgId: string,
+  _email: string,
+  _orgName: string,
+  _appUrl: string
 ): Promise<string> {
-  const stripe = getStripe()
-  const customerId = await ensureStripeCustomer(orgId, email, orgName)
-
-  const priceId = await ensureStripePrice('usage-monitor', 'Monitor (Usage-based)', 100, null)
-
-  const session = await stripe.checkout.sessions.create({
-    customer: customerId,
-    mode: 'payment',
-    line_items: [{ price: priceId, quantity: 1 }],
-    success_url: `${appUrl}/dashboard/monitors/new?paid=true`,
-    cancel_url: `${appUrl}/dashboard/monitors/new?paid=canceled`,
-    metadata: { org_id: orgId, type: 'monitor_creation' },
-    payment_intent_data: {
-      metadata: { org_id: orgId, type: 'monitor_creation' },
-    },
-  })
-
-  logger.info('Monitor charge session created', { orgId, sessionId: session.id })
-
-  if (!session.url) throw new Error('Stripe checkout session URL was not returned')
-  return session.url
+  throw new Error('Per-monitor charging has been removed. Monitors are included in plan limits.')
 }

@@ -30,7 +30,7 @@ export const FAQ_ITEMS: FaqItem[] = [
   },
   {
     question: 'Is there a free plan?',
-    answer: 'Yes. The Free plan includes usage-based monitoring with basic features. No credit card required to start. You can upgrade at any time as your needs grow.',
+    answer: 'Yes. The Free plan includes 3 monitors with 10-minute checks and email alerts. No credit card required to start. You can upgrade at any time as your needs grow.',
   },
   {
     question: 'Where is my data stored?',

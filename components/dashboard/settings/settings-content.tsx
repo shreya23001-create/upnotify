@@ -9,6 +9,7 @@ import { PricingTable } from '@/components/billing/pricing-table'
 import { InvoiceList } from '@/components/billing/invoice-list'
 import { CompanyDetailsForm } from '@/components/dashboard/settings/company-details-form'
 import { OrgSettingsForm } from '@/components/dashboard/settings/org-settings-form'
+import { LogoUpload } from '@/components/ui/logo-upload'
 
 interface SettingsContentProps {
   organisation: Organisation
@@ -51,6 +52,17 @@ export function SettingsContent({ organisation, members, currentUserId, subscrip
   const apiKeyBulkActions: BulkAction[] = [
     { label: 'Revoke', onClick: (ids: string[]) => { setRevokeIds(ids) }, variant: 'danger' },
   ]
+
+  async function uploadLogo(base64Data: string): Promise<{ error?: string }> {
+    const res = await fetch('/api/v1/organisation/company', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ logo_url: base64Data }),
+    })
+    const data: Record<string, unknown> = await res.json()
+    if (!res.ok) return { error: (data.error as string) || 'Failed to upload logo.' }
+    return {}
+  }
 
   async function saveCompanyDetails(formData: FormData): Promise<{ error?: string }> {
     const res = await fetch('/api/v1/organisation/company', {
@@ -111,10 +123,22 @@ export function SettingsContent({ organisation, members, currentUserId, subscrip
       )}
 
       {tab === 'company' && (
-        <div className="card">
-          <div className="card-header"><div className="card-title">Company Details</div></div>
-          <div className="card-content">
-            <CompanyDetailsForm organisation={organisation} onSave={saveCompanyDetails} />
+        <div className="space-y">
+          <div className="card">
+            <div className="card-header"><div className="card-title">Organisation Logo</div></div>
+            <div className="card-content">
+              <LogoUpload
+                currentLogoUrl={organisation.logo_url}
+                orgName={organisation.name}
+                onUpload={uploadLogo}
+              />
+            </div>
+          </div>
+          <div className="card">
+            <div className="card-header"><div className="card-title">Company Details</div></div>
+            <div className="card-content">
+              <CompanyDetailsForm organisation={organisation} onSave={saveCompanyDetails} />
+            </div>
           </div>
         </div>
       )}

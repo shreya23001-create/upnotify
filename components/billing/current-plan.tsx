@@ -25,9 +25,9 @@ export function CurrentPlan({ plan, subscription }: Props) {
       <div className="card stat-card stat-card-blue">
         <div className="card-content">
           <div className="stat-label">Current Plan</div>
-          <div style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>Usage-based (Free)</div>
+          <div style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>Free</div>
           <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 16 }}>
-            Pay &pound;1 per monitor per month. No monthly fee.
+            3 monitors, 10-minute checks. Upgrade anytime for more power.
           </p>
         </div>
       </div>

@@ -48,6 +48,15 @@ export async function POST(request: Request): Promise<NextResponse> {
       )
     }
 
+    // Guard: Free plan should never go to Stripe checkout
+    if (plan.slug === 'free' || (plan.price_monthly_gbp === 0 && (!plan.price_annual_gbp || plan.price_annual_gbp === 0) && plan.onboarding_fee_gbp === 0)) {
+      logger.warn('Checkout attempted for free plan', { orgId: org.id, planSlug })
+      return NextResponse.json(
+        { error: 'The Free plan does not require payment. You are already on this plan.' },
+        { status: 400 }
+      )
+    }
+
     // Determine the correct amount based on billing cycle and plan type
     const amount =
       billingCycle === 'annual' && plan.price_annual_gbp

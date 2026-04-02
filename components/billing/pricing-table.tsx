@@ -3,14 +3,95 @@
 import { useState, useTransition } from 'react'
 import type { Plan } from '@/lib/types'
 
+interface PlanFeatureDisplay {
+  text: string
+  included: boolean
+}
+
 interface Props {
   plans: Plan[]
   currentPlanSlug?: string
 }
 
-export function PricingTable({ plans, currentPlanSlug }: Props) {
+function getPlanFeatures(plan: Plan): PlanFeatureDisplay[] {
+  const features: PlanFeatureDisplay[] = []
+
+  features.push({
+    text: plan.monitor_limit ? `${plan.monitor_limit} monitors` : 'Unlimited monitors',
+    included: true,
+  })
+  features.push({
+    text: plan.check_interval_seconds >= 300
+      ? `${plan.check_interval_seconds / 60}-minute check interval`
+      : `${plan.check_interval_seconds}-second check interval`,
+    included: true,
+  })
+  features.push({
+    text: plan.client_workspace_limit
+      ? `${plan.client_workspace_limit} workspace${plan.client_workspace_limit > 1 ? 's' : ''}`
+      : 'Unlimited workspaces',
+    included: true,
+  })
+  features.push({ text: 'Email alerts', included: true })
+
+  const teamLimit = (plan as Record<string, unknown>).max_team_members as number | undefined
+  if (teamLimit && teamLimit > 0) {
+    features.push({ text: `${teamLimit} team members`, included: true })
+  } else {
+    features.push({ text: 'Solo use only', included: true })
+  }
+
+  features.push({
+    text: plan.has_status_page_custom_domain ? 'Custom domain status pages' : 'Status pages',
+    included: Boolean(plan.has_status_page_custom_domain || (plan as Record<string, unknown>).has_status_pages),
+  })
+  features.push({ text: 'Slack & Teams alerts', included: Boolean((plan as Record<string, unknown>).has_slack_teams) || plan.has_api_access })
+  features.push({ text: 'Webhooks', included: Boolean((plan as Record<string, unknown>).has_webhooks) || plan.has_api_access })
+  features.push({ text: 'AI reports', included: plan.has_ai_predictive })
+  features.push({ text: 'API access', included: plan.has_api_access })
+
+  return features
+}
+
+function getPlanPrice(plan: Plan): { amount: string; period: string; note?: string } {
+  const monthlyPence = plan.price_monthly_gbp
+  const annualPence = plan.price_annual_gbp
+
+  if (monthlyPence === 0 && (!annualPence || annualPence === 0)) {
+    return { amount: '\u00A30', period: 'forever' }
+  }
+
+  // Annual-only plan (like Lite at GBP10/yr)
+  if (monthlyPence === 0 && annualPence && annualPence > 0) {
+    const annualGbp = annualPence / 100
+    const monthlyEquiv = Math.round((annualPence / 12)) / 100
+    return {
+      amount: `\u00A3${annualGbp}`,
+      period: '/year',
+      note: `Just ${monthlyEquiv < 1 ? `${Math.round(monthlyEquiv * 100)}p` : `\u00A3${monthlyEquiv.toFixed(2)}`}/mo`,
+    }
+  }
+
+  const monthlyGbp = monthlyPence / 100
+  return { amount: `\u00A3${monthlyGbp}`, period: '/month' }
+}
+
+function getPlanCta(plan: Plan, isCurrent: boolean, isHigherTier: boolean): string {
+  if (isCurrent) return 'Current Plan'
+  if (plan.slug === 'free') return 'Current Plan'
+  if (isHigherTier) return 'Upgrade'
+  return 'Downgrade'
+}
+
+export function PricingTable({ plans, currentPlanSlug }: Props): React.ReactElement {
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
+
+  const directPlans = plans.filter(p => p.type === 'direct')
+
+  // Determine the index of the current plan for upgrade/downgrade logic
+  const currentPlanIndex = directPlans.findIndex(p => p.slug === currentPlanSlug)
+  const effectiveCurrentIndex = currentPlanIndex >= 0 ? currentPlanIndex : 0 // Free if no subscription
 
   function handleSubscribe(planSlug: string, billingCycle: string): void {
     setError(null)
@@ -21,7 +102,7 @@ export function PricingTable({ plans, currentPlanSlug }: Props) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ planSlug, billingCycle }),
         })
-        const data = await res.json()
+        const data: { url?: string; error?: string } = await res.json()
         if (!res.ok) {
           setError(data.error || 'Failed to create checkout session. Please try again.')
           return
@@ -44,70 +125,85 @@ export function PricingTable({ plans, currentPlanSlug }: Props) {
           {error}
         </div>
       )}
-    <div className="pricing-grid">
-      {plans.filter(p => p.type === 'direct').map(plan => {
-        const isCurrent = plan.slug === currentPlanSlug
-        const monthlyPrice = plan.price_monthly_gbp / 100
-        const annualPrice = plan.price_annual_gbp ? plan.price_annual_gbp / 100 : null
-        const isUsageBased = plan.slug === 'usage-based'
+      <div className="pricing-grid">
+        {directPlans.map((plan, index) => {
+          const isCurrent = plan.slug === currentPlanSlug || (plan.slug === 'free' && !currentPlanSlug)
+          const isHigherTier = index > effectiveCurrentIndex
+          const isFree = plan.price_monthly_gbp === 0 && (!plan.price_annual_gbp || plan.price_annual_gbp === 0)
+          const price = getPlanPrice(plan)
+          const features = getPlanFeatures(plan)
+          const ctaText = getPlanCta(plan, isCurrent, isHigherTier)
+          const isPopular = plan.slug === 'builder'
+          const hasAnnual = plan.price_annual_gbp && plan.price_annual_gbp > 0 && plan.price_monthly_gbp > 0
 
-        return (
-          <div key={plan.id} className={`pricing-card ${isCurrent ? 'pricing-card-current' : ''}`}>
-            {isCurrent && <div className="pricing-card-badge">Current Plan</div>}
-            <div className="pricing-card-name">{plan.name}</div>
-            <div className="pricing-card-price">
-              {isUsageBased ? (
-                <>
-                  <span className="pricing-card-amount">&pound;0</span>
-                  <span className="pricing-card-period"> + &pound;1/monitor</span>
-                </>
-              ) : (
-                <>
-                  <span className="pricing-card-amount">&pound;{monthlyPrice}</span>
-                  <span className="pricing-card-period">/month</span>
-                </>
-              )}
-            </div>
-            {annualPrice && (
-              <div className="pricing-card-annual">&pound;{annualPrice}/year (save 20%)</div>
-            )}
-            <ul className="pricing-card-features">
-              <li>{plan.monitor_limit ? `${plan.monitor_limit} monitors` : 'Unlimited monitors'}</li>
-              <li>{plan.check_interval_seconds >= 300 ? `${plan.check_interval_seconds / 60} min checks` : `${plan.check_interval_seconds}s checks`}</li>
-              <li>{plan.client_workspace_limit ? `${plan.client_workspace_limit} workspaces` : 'Unlimited workspaces'}</li>
-              {plan.has_api_access && <li>{'\u2713'} API access</li>}
-              {plan.has_ai_predictive && <li>{'\u2713'} AI predictive alerts</li>}
-              {plan.has_status_page_custom_domain && <li>{'\u2713'} Custom status page domain</li>}
-              {plan.has_white_label && <li>{'\u2713'} White label</li>}
-              {plan.has_voice_calls && <li>{'\u2713'} Voice calls ({plan.voice_call_monthly_limit}/mo)</li>}
-            </ul>
-            {!isCurrent && !isUsageBased && (
-              <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
-                <button
-                  className="btn btn-primary btn-full"
-                  onClick={() => handleSubscribe(plan.slug, 'monthly')}
-                  disabled={isPending}
-                >
-                  {isPending ? 'Loading...' : 'Subscribe Monthly'}
-                </button>
-                {annualPrice && (
-                  <button
-                    className="btn btn-secondary btn-full"
-                    onClick={() => handleSubscribe(plan.slug, 'annual')}
-                    disabled={isPending}
-                  >
-                    Annual
-                  </button>
+          return (
+            <div
+              key={plan.id}
+              className={`pricing-card${isCurrent ? ' pricing-card-current' : ''}${isPopular ? ' pricing-card-highlighted' : ''}`}
+            >
+              {isCurrent && <div className="pricing-badge">Current Plan</div>}
+              {isPopular && !isCurrent && <div className="pricing-badge">Most Popular</div>}
+
+              <div className="pricing-card-header">
+                <h3 className="pricing-plan-name">{plan.name}</h3>
+                <div className="pricing-price">
+                  <span className="pricing-amount">{price.amount}</span>
+                  <span className="pricing-period">{price.period}</span>
+                </div>
+                {price.note && (
+                  <p className="pricing-description">{price.note}</p>
                 )}
               </div>
-            )}
-            {isCurrent && (
-              <div className="pricing-card-current-label">{'\u2713'} You&apos;re on this plan</div>
-            )}
-          </div>
-        )
-      })}
-    </div>
+
+              <ul className="pricing-features">
+                {features.map((feature, fi) => (
+                  <li
+                    key={fi}
+                    className={`pricing-feature${!feature.included ? ' pricing-feature-disabled' : ''}`}
+                  >
+                    <span className="pricing-feature-icon">
+                      {feature.included ? '\u2713' : '\u2014'}
+                    </span>
+                    {feature.text}
+                  </li>
+                ))}
+              </ul>
+
+              {isCurrent ? (
+                <div className="pricing-card-current-label">{'\u2713'} You&apos;re on this plan</div>
+              ) : isFree ? (
+                <button className="btn btn-secondary btn-full" disabled>
+                  Free Plan
+                </button>
+              ) : isHigherTier ? (
+                <div style={{ display: 'flex', gap: 8, marginTop: 'auto' }}>
+                  <button
+                    className="btn btn-primary btn-full"
+                    onClick={() => handleSubscribe(plan.slug, hasAnnual ? 'annual' : 'monthly')}
+                    disabled={isPending}
+                  >
+                    {isPending ? 'Loading...' : ctaText}
+                    {hasAnnual ? '' : ''}
+                  </button>
+                  {hasAnnual && (
+                    <button
+                      className="btn btn-secondary btn-full"
+                      onClick={() => handleSubscribe(plan.slug, 'monthly')}
+                      disabled={isPending}
+                    >
+                      Monthly
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <button className="btn btn-secondary btn-full" disabled style={{ opacity: 0.6 }}>
+                  {ctaText}
+                </button>
+              )}
+            </div>
+          )
+        })}
+      </div>
     </div>
   )
 }

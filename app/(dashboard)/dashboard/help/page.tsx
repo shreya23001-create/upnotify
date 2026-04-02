@@ -9,7 +9,9 @@ export default function HelpIndexPage(): React.ReactElement {
   const [search, setSearch] = useState('')
   const pathname = usePathname()
 
-  const filtered = helpTopics.filter((topic) => {
+  // Filter out admin-only topics for regular users, then apply search
+  const userTopics = helpTopics.filter((topic) => !topic.adminOnly)
+  const filtered = userTopics.filter((topic) => {
     const q = search.toLowerCase()
     return (
       topic.title.toLowerCase().includes(q) ||

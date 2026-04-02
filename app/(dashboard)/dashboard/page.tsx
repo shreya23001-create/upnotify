@@ -35,6 +35,11 @@ export default async function DashboardPage(): Promise<React.ReactElement> {
   return (
     <div>
       <h1 className="page-title" style={{ marginBottom: 24 }}>Dashboard</h1>
+
+      <div style={{ marginBottom: 24 }}>
+        <OnboardingChecklist hasMonitors={stats.total > 0} hasAlertChannels={alertChannels.length > 0} hasStatusPages={statusPages.length > 0} />
+      </div>
+
       <StatsCards stats={stats} />
 
       <DashboardCharts stats={stats} incidents={incidents} />
@@ -48,7 +53,6 @@ export default async function DashboardPage(): Promise<React.ReactElement> {
 
       <div className="grid-2">
         <RecentIncidents incidents={incidents} />
-        <OnboardingChecklist hasMonitors={stats.total > 0} hasAlertChannels={alertChannels.length > 0} hasStatusPages={statusPages.length > 0} />
       </div>
     </div>
   )

@@ -24,6 +24,7 @@ export type StatusPageSubscriber = Database['public']['Tables']['status_page_sub
 export type BlogPost = Database['public']['Tables']['blog_posts']['Row']
 export type PageSection = Database['public']['Tables']['page_sections']['Row']
 export type AdminPermission = Database['public']['Tables']['admin_permissions']['Row']
+export type AdminRole = Database['public']['Tables']['admin_roles']['Row']
 export type FeatureFlag = Database['public']['Tables']['feature_flags']['Row']
 export type FeatureFlagUsage = Database['public']['Tables']['feature_flag_usage']['Row']
 export type AgencyTag = Database['public']['Tables']['agency_tags']['Row']

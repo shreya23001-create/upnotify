@@ -5,14 +5,11 @@ import { revalidatePath } from 'next/cache'
 import { createMonitor, updateMonitor, deleteMonitor, pauseMonitor, resumeMonitor, bulkDeleteMonitors, bulkUpdateMonitorStatus, getMonitorById } from '@/lib/db/monitors'
 import { getCurrentUser } from '@/lib/db/users'
 import { getWorkspacesByOrg } from '@/lib/db/workspaces'
-import { getSubscriptionWithPlan } from '@/lib/db/subscriptions'
 import { checkMonitorLimit } from '@/lib/utils/plan-limits'
-import { createMonitorChargeSession } from '@/lib/services/stripe'
-import { getConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
 import { impersonationGuard } from '@/lib/auth/impersonation-guard'
 
-export async function createMonitorAction(formData: FormData): Promise<{ error?: string; checkoutUrl?: string; nudge?: boolean }> {
+export async function createMonitorAction(formData: FormData): Promise<{ error?: string }> {
   const guard = await impersonationGuard()
   if (guard.isBlocked) return { error: guard.error }
 
@@ -29,23 +26,8 @@ export async function createMonitorAction(formData: FormData): Promise<{ error?:
     return { error: `Monitor limit reached (${limitCheck.currentCount}/${limitCheck.limit}). Upgrade your plan to add more monitors.` }
   }
 
-  // Check if on usage-based plan (no active subscription) — charge £1 via Stripe Checkout
-  const subWithPlan = await getSubscriptionWithPlan(user.org_id)
-  if (!subWithPlan) {
-    // Usage-based plan — redirect to Stripe Checkout for £1 charge
-    try {
-      const config = getConfig()
-      const checkoutUrl = await createMonitorChargeSession(
-        user.org_id, user.email, workspace.name, config.app.url
-      )
-      // Store form data in session/cookie so we can create the monitor after payment
-      // For now, return the checkout URL — the form will store data in localStorage
-      return { checkoutUrl, nudge: limitCheck.shouldNudge }
-    } catch (error) {
-      logger.error('Failed to create checkout for monitor', { error: error instanceof Error ? error.message : 'Unknown' })
-      return { error: 'Failed to initiate payment. Please try again.' }
-    }
-  }
+  // Free plan users can create monitors directly (within their plan limit)
+  // No per-monitor charge — the old usage-based billing model has been removed
 
   const name = formData.get('name') as string
   const type = formData.get('type') as string

@@ -1,7 +1,7 @@
 import { createAdminClient } from '@/lib/supabase/admin'
 
 interface PlanLimits {
-  monitors: number | null // null = unlimited (usage-based)
+  monitors: number | null // null = unlimited (agency plans)
   workspaces: number | null
   maxTeamMembers: number
   hasApiAccess: boolean
@@ -60,7 +60,7 @@ export async function getPlanLimits(orgId: string): Promise<PlanLimits> {
 
 /**
  * Check if the org can create another monitor.
- * Returns shouldNudge=true at 15 monitors on usage-based plan.
+ * Returns shouldNudge=true at 15 monitors on unlimited plans (agency).
  */
 export async function checkMonitorLimit(orgId: string): Promise<{
   allowed: boolean

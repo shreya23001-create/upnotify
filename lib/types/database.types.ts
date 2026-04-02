@@ -49,6 +49,42 @@ export type Database = {
           },
         ]
       }
+      admin_roles: {
+        Row: {
+          id: string
+          email: string
+          role: string
+          display_name: string | null
+          permissions: Json
+          is_active: boolean
+          added_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          email: string
+          role?: string
+          display_name?: string | null
+          permissions?: Json
+          is_active?: boolean
+          added_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          email?: string
+          role?: string
+          display_name?: string | null
+          permissions?: Json
+          is_active?: boolean
+          added_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       agency_tags: {
         Row: {
           created_at: string

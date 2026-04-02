@@ -35,14 +35,27 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
-  // Admin routes: verify super-admin email whitelist
+  // Admin routes: verify admin access via env whitelist OR admin_roles table
   if (isAdminRoute(pathname)) {
-    // Read ADMIN_EMAILS directly in edge context for reliability
     const adminEmailsRaw = process.env.ADMIN_EMAILS || ''
     const adminEmails = adminEmailsRaw.split(',').map(e => e.trim().toLowerCase()).filter(Boolean)
     const userEmail = (user.email || '').toLowerCase().trim()
 
-    if (!adminEmails.includes(userEmail)) {
+    // Check env whitelist first (fast path for super admin)
+    let hasAccess = adminEmails.includes(userEmail)
+
+    // If not in env whitelist, check admin_roles table
+    if (!hasAccess) {
+      const { data: adminRole } = await supabase
+        .from('admin_roles')
+        .select('is_active')
+        .ilike('email', userEmail)
+        .single()
+
+      hasAccess = adminRole?.is_active === true
+    }
+
+    if (!hasAccess) {
       return NextResponse.redirect(new URL('/dashboard', request.url))
     }
   }

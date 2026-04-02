@@ -15,6 +15,7 @@ const PAGE_TITLES: Record<string, string> = {
   '/admin/plans': 'Plans & Pricing',
   '/admin/tracker': 'Public Tracker',
   '/admin/feature-flags': 'Feature Flags',
+  '/admin/team': 'Admin Team',
   '/admin/blog': 'Blog',
   '/admin/emails': 'Email & Nurture',
   '/admin/settings': 'Settings',

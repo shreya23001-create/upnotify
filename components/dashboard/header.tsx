@@ -37,7 +37,11 @@ export function Header() {
       <ThemeToggle />
       <div className="header-user" ref={dropdownRef}>
         <div className="header-avatar" onClick={() => setDropdownOpen(!dropdownOpen)}>
-          {initials}
+          {organisation?.logo_url ? (
+            <img src={organisation.logo_url} alt={`${organisation.name} logo`} className="header-avatar-img" />
+          ) : (
+            initials
+          )}
         </div>
         {dropdownOpen && (
           <div className="header-dropdown">

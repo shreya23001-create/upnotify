@@ -2,7 +2,16 @@
 
 import Link from 'next/link'
 
-export const helpTopics = [
+interface HelpTopic {
+  href: string
+  title: string
+  description: string
+  icon: string
+  keywords: string[]
+  adminOnly?: boolean
+}
+
+export const helpTopics: HelpTopic[] = [
   {
     href: '/dashboard/help/getting-started',
     title: 'Getting Started',
@@ -44,17 +53,25 @@ export const helpTopics = [
     description: 'For super admins: edit plan pricing, toggle visibility, and manage credit rules.',
     icon: '🛡️',
     keywords: ['admin', 'plan', 'pricing', 'visibility', 'credits', 'super admin', 'manage'],
+    adminOnly: true,
   },
 ]
 
-export function HelpSidebar({ currentPath }: { currentPath: string }): React.ReactElement {
+interface HelpSidebarProps {
+  currentPath: string
+  isSuperAdmin?: boolean
+}
+
+export function HelpSidebar({ currentPath, isSuperAdmin = false }: HelpSidebarProps): React.ReactElement {
+  const visibleTopics = helpTopics.filter(topic => !topic.adminOnly || isSuperAdmin)
+
   return (
     <nav className="help-sidebar" aria-label="Help topics navigation">
       <div className="help-sidebar-title">
         <Link href="/dashboard/help">Help Topics</Link>
       </div>
       <ul className="help-sidebar-list">
-        {helpTopics.map((topic) => (
+        {visibleTopics.map((topic) => (
           <li key={topic.href}>
             <Link
               href={topic.href}

@@ -103,7 +103,10 @@ export const companyDetailsSchema = z
     company_registration_number: z.string().max(64, 'Registration number must not exceed 64 characters').optional(),
     company_vat_number: z.string().max(64, 'VAT number must not exceed 64 characters').optional(),
     billing_email: emailSchema.optional(),
-    logo_url: urlSchema.optional(),
+    logo_url: z
+      .string()
+      .max(500000, 'Logo data must not exceed 500KB')
+      .optional(),
   })
   .refine(
     (data) => Object.values(data).some((v) => v !== undefined),

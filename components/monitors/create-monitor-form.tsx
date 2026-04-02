@@ -25,26 +25,17 @@ const intervals = [
   { value: '3600', label: 'Every 1 hour' },
 ]
 
-export function CreateMonitorForm() {
+export function CreateMonitorForm(): React.ReactElement {
   const [type, setType] = useState('http')
   const [error, setError] = useState<string | null>(null)
-  const [nudge, setNudge] = useState(false)
   const [isPending, startTransition] = useTransition()
 
   function handleSubmit(formData: FormData): void {
     setError(null)
-    setNudge(false)
     startTransition(async () => {
       const result = await createMonitorAction(formData)
       if (result?.error) {
         setError(result.error)
-      } else if (result?.checkoutUrl) {
-        // Usage-based plan — save form data to localStorage, redirect to Stripe
-        const data: Record<string, string> = {}
-        formData.forEach((val, key) => { data[key] = val.toString() })
-        localStorage.setItem('uptrue_pending_monitor', JSON.stringify(data))
-        if (result.nudge) setNudge(true)
-        window.location.href = result.checkoutUrl
       }
     })
   }
@@ -52,11 +43,6 @@ export function CreateMonitorForm() {
   return (
     <form action={handleSubmit}>
       {error && <div className="form-error">{error}</div>}
-      {nudge && (
-        <div style={{ padding: 14, borderRadius: 10, background: '#eff6ff', border: '1px solid #bfdbfe', marginBottom: 16, fontSize: 14, color: '#1d4ed8' }}>
-          💡 <strong>Tip:</strong> You have 15+ monitors. Save money with the <a href="/dashboard/settings" style={{ fontWeight: 600, textDecoration: 'underline' }}>Starter plan (£19/mo for 20 monitors)</a> instead of paying per monitor.
-        </div>
-      )}
 
       <div className="form-group">
         <label className="form-label" htmlFor="name">Monitor Name</label>

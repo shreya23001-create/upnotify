@@ -96,18 +96,23 @@ export default function TermsOfServicePage(): React.ReactElement {
         </thead>
         <tbody>
           <tr>
-            <td>Usage-Based</td>
-            <td>&pound;1 per monitor per month</td>
+            <td>Free</td>
+            <td>&pound;0</td>
+            <td>Forever</td>
+          </tr>
+          <tr>
+            <td>Lite</td>
+            <td>&pound;10 per year</td>
+            <td>Annual</td>
+          </tr>
+          <tr>
+            <td>Builder</td>
+            <td>&pound;15 per month</td>
             <td>Monthly</td>
           </tr>
           <tr>
-            <td>Starter</td>
-            <td>&pound;19 per month</td>
-            <td>Monthly</td>
-          </tr>
-          <tr>
-            <td>Pro</td>
-            <td>&pound;49 per month</td>
+            <td>Scale</td>
+            <td>&pound;39 per month</td>
             <td>Monthly</td>
           </tr>
           <tr>
