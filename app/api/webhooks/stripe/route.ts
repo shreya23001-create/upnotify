@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { getStripe } from '@/lib/services/stripe'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
+import { getServerConfig } from '@/lib/utils/config'
 import { isProduction } from '@/lib/utils/environment'
 import type Stripe from 'stripe'
 
@@ -175,7 +176,8 @@ async function handleSubscriptionDeleted(
 export async function POST(request: Request): Promise<NextResponse> {
   const body = await request.text()
   const signature = request.headers.get('stripe-signature')
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
+  const { stripe } = getServerConfig()
+  const webhookSecret = stripe.webhookSecret
 
   // In production, webhook signature verification is mandatory
   if (isProduction() && !webhookSecret) {

@@ -354,27 +354,33 @@ export function PlansManager({ plans, creditRules, subscriberCounts }: PlansMana
               <h3 className="plans-section-title">Features</h3>
               <div className="plans-features-grid">
                 <label className="plans-checkbox-label">
-                  <input type="checkbox" name="has_api_access" defaultChecked={editingPlan.has_api_access} />
+                  <input type="hidden" name="has_api_access" value="false" />
+                  <input type="checkbox" name="has_api_access" value="true" defaultChecked={editingPlan.has_api_access} />
                   <span>API Access</span>
                 </label>
                 <label className="plans-checkbox-label">
-                  <input type="checkbox" name="has_ai_predictive" defaultChecked={editingPlan.has_ai_predictive} />
+                  <input type="hidden" name="has_ai_predictive" value="false" />
+                  <input type="checkbox" name="has_ai_predictive" value="true" defaultChecked={editingPlan.has_ai_predictive} />
                   <span>AI Predictive</span>
                 </label>
                 <label className="plans-checkbox-label">
-                  <input type="checkbox" name="has_status_page_custom_domain" defaultChecked={editingPlan.has_status_page_custom_domain} />
+                  <input type="hidden" name="has_status_page_custom_domain" value="false" />
+                  <input type="checkbox" name="has_status_page_custom_domain" value="true" defaultChecked={editingPlan.has_status_page_custom_domain} />
                   <span>Custom Domain Status Pages</span>
                 </label>
                 <label className="plans-checkbox-label">
-                  <input type="checkbox" name="has_white_label" defaultChecked={editingPlan.has_white_label} />
+                  <input type="hidden" name="has_white_label" value="false" />
+                  <input type="checkbox" name="has_white_label" value="true" defaultChecked={editingPlan.has_white_label} />
                   <span>White Label</span>
                 </label>
                 <label className="plans-checkbox-label">
-                  <input type="checkbox" name="has_voice_calls" defaultChecked={editingPlan.has_voice_calls} />
+                  <input type="hidden" name="has_voice_calls" value="false" />
+                  <input type="checkbox" name="has_voice_calls" value="true" defaultChecked={editingPlan.has_voice_calls} />
                   <span>Voice Calls</span>
                 </label>
                 <label className="plans-checkbox-label">
-                  <input type="checkbox" name="is_visible" defaultChecked={editingPlan.is_visible} />
+                  <input type="hidden" name="is_visible" value="false" />
+                  <input type="checkbox" name="is_visible" value="true" defaultChecked={editingPlan.is_visible} />
                   <span>Visible to Users</span>
                 </label>
               </div>

@@ -162,3 +162,9 @@ CREATE POLICY "Super admin can manage user credits"
   ON public.user_credits FOR ALL TO authenticated
   USING (public.is_super_admin())
   WITH CHECK (public.is_super_admin());
+
+-- Service role can insert/update credits (for cron jobs, webhooks, badge detection)
+CREATE POLICY "Service role can manage credits"
+  ON public.user_credits FOR ALL TO service_role
+  USING (true)
+  WITH CHECK (true);

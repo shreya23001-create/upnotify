@@ -22,7 +22,7 @@ export const FAQ_ITEMS: FaqItem[] = [
   },
   {
     question: 'Can I white-label Uptrue for my agency?',
-    answer: 'Yes. The Agency plan includes full white-label capabilities. Your clients see your brand, not ours. You can add your own Google Tag Manager, analytics, and custom scripts to client-facing pages.',
+    answer: 'Yes. Our upcoming Agency tier will include full white-label capabilities — your clients see your brand, not ours. You will be able to add your own Google Tag Manager, analytics, and custom scripts to client-facing pages. Join the waitlist now for early access.',
   },
   {
     question: 'What alert channels are supported?',

@@ -85,6 +85,23 @@ vi.mock('@/lib/utils/environment', () => ({
   isProduction: () => mockIsProductionValue,
 }))
 
+let mockWebhookSecret: string | undefined = 'whsec_test_secret'
+vi.mock('@/lib/utils/config', () => ({
+  getConfig: () => ({
+    supabase: { url: 'http://localhost:54321', anonKey: 'test-anon-key' },
+    app: { url: 'http://localhost:3000' },
+    admin: { emails: [] },
+    analytics: { gaMeasurementId: '' },
+  }),
+  getServerConfig: () => ({
+    supabase: { serviceRoleKey: 'test-service-key' },
+    stripe: { secretKey: 'sk_test_xxx', webhookSecret: mockWebhookSecret },
+    resend: { apiKey: '', fromEmail: 'test@test.com', fromName: 'Test' },
+    anthropic: { apiKey: 'test-key' },
+    cron: { secret: 'test-cron-secret' },
+  }),
+}))
+
 // ---------------------------------------------------------------------------
 // Import module under test
 // ---------------------------------------------------------------------------
@@ -127,7 +144,7 @@ describe('Stripe webhook handler', () => {
       delete mockDbOps[key]
     }
 
-    process.env.STRIPE_WEBHOOK_SECRET = 'whsec_test'
+    mockWebhookSecret = 'whsec_test'
   })
 
   afterEach(() => {
@@ -330,7 +347,7 @@ describe('Stripe webhook handler', () => {
 
   it('returns 500 when webhook secret is not set in production', async () => {
     mockIsProductionValue = true
-    delete process.env.STRIPE_WEBHOOK_SECRET
+    mockWebhookSecret = undefined
 
     const response = await POST(makeStripeRequest({ type: 'test' }))
     expect(response.status).toBe(500)
@@ -341,7 +358,7 @@ describe('Stripe webhook handler', () => {
 
   it('returns 400 when signature is missing in production', async () => {
     mockIsProductionValue = true
-    process.env.STRIPE_WEBHOOK_SECRET = 'whsec_test'
+    mockWebhookSecret = 'whsec_test'
 
     // Request without stripe-signature header
     const req = new Request('https://uptrue.io/api/webhooks/stripe', {
@@ -364,7 +381,7 @@ describe('Stripe webhook handler', () => {
 
   it('allows unverified event parsing in non-production mode', async () => {
     mockIsProductionValue = false
-    delete process.env.STRIPE_WEBHOOK_SECRET
+    mockWebhookSecret = undefined
 
     const event = {
       type: 'checkout.session.completed',

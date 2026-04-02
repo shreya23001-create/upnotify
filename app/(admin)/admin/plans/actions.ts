@@ -24,7 +24,7 @@ export async function updatePlanAction(formData: FormData): Promise<ActionResult
   const stringFields = ['name', 'slug', 'type'] as const
   for (const field of stringFields) {
     const value = formData.get(field)
-    if (value !== null && value !== '') updates[field] = value
+    if (typeof value === 'string' && value.trim() !== '') updates[field] = value
   }
 
   const intFields = [
@@ -36,14 +36,17 @@ export async function updatePlanAction(formData: FormData): Promise<ActionResult
     'client_workspace_limit', 'max_team_members',
     'data_retention_days', 'voice_call_monthly_limit',
   ] as const
+  const nullableIntFields = ['price_annual_gbp', 'price_annual_usd', 'price_annual_inr', 'monitor_limit', 'client_workspace_limit', 'data_retention_days']
   for (const field of intFields) {
-    const raw = formData.get(field) as string | null
-    if (raw !== null && raw !== '') {
-      updates[field] = parseInt(raw, 10)
-    } else if (raw === '') {
-      // Nullable integer fields
-      const nullableFields = ['price_annual_gbp', 'price_annual_usd', 'price_annual_inr', 'monitor_limit', 'client_workspace_limit', 'data_retention_days']
-      if (nullableFields.includes(field)) {
+    const raw = formData.get(field)
+    if (typeof raw === 'string' && raw.trim() !== '') {
+      const parsed = parseInt(raw, 10)
+      if (isNaN(parsed)) {
+        return { success: false, error: `Invalid number for ${field}` }
+      }
+      updates[field] = parsed
+    } else if (raw === '' || raw === null) {
+      if (nullableIntFields.includes(field)) {
         updates[field] = null
       }
     }
@@ -106,11 +109,15 @@ export async function updateCreditRuleAction(formData: FormData): Promise<Action
   const creditType = formData.get('credit_type') as string | null
   if (creditType) updates.credit_type = creditType
 
-  const intFields = ['credit_amount_pence', 'max_per_user', 'max_credit_per_month_pence'] as const
-  for (const field of intFields) {
-    const raw = formData.get(field) as string | null
-    if (raw !== null && raw !== '') {
-      updates[field] = parseInt(raw, 10)
+  const creditIntFields = ['credit_amount_pence', 'max_per_user', 'max_credit_per_month_pence'] as const
+  for (const field of creditIntFields) {
+    const raw = formData.get(field)
+    if (typeof raw === 'string' && raw.trim() !== '') {
+      const parsed = parseInt(raw, 10)
+      if (isNaN(parsed)) {
+        return { success: false, error: `Invalid number for ${field}` }
+      }
+      updates[field] = parsed
     }
   }
 
