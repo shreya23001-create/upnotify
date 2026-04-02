@@ -45,20 +45,18 @@ vi.mock('@/lib/supabase/admin', () => ({
       lastTableName = table
       mockChain = buildChain()
 
-      // Override update to also support .select().single() chain
+      // Override update to support .eq().select().single() chain
       mockChain.update = vi.fn().mockReturnValue({
-        ...mockChain,
         eq: vi.fn().mockReturnValue({
           data: mockTerminalData,
           error: mockTerminalError,
           select: vi.fn().mockReturnValue({
-              single: vi.fn().mockReturnValue({
-                data: mockTerminalData,
-                error: mockTerminalError,
-              }),
+            single: vi.fn().mockReturnValue({
+              data: mockTerminalData,
+              error: mockTerminalError,
             }),
           }),
-        }
+        }),
       })
 
       // For insert().select().single() pattern
