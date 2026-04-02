@@ -1,6 +1,26 @@
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
 import type { Workspace } from '@/lib/types'
+
+/**
+ * Get workspaces by org, using admin client to bypass RLS.
+ * Used during impersonation when the admin user cannot access another org's data via RLS.
+ */
+export async function getWorkspacesByOrgAdmin(orgId: string): Promise<Workspace[]> {
+  const adminClient = createAdminClient()
+  const { data, error } = await adminClient
+    .from('workspaces')
+    .select('*')
+    .eq('org_id', orgId)
+    .order('created_at', { ascending: true })
+
+  if (error) {
+    logger.error('Admin: Failed to get workspaces', { error: error.message })
+    return []
+  }
+  return data ?? []
+}
 
 export async function getWorkspacesByOrg(orgId: string): Promise<Workspace[]> {
   const supabase = await createClient()

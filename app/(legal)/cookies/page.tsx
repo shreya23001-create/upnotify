@@ -11,7 +11,7 @@ export default function CookiePolicyPage(): React.ReactElement {
   return (
     <>
       <h1>Cookie Policy</h1>
-      <p className="legal-updated">Last updated: 30 March 2026</p>
+      <p className="legal-updated">Last updated: 2 April 2026</p>
 
       <p>
         This Cookie Policy explains how Vision Software Solutions Limited (&quot;Uptrue&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;) uses
@@ -64,6 +64,12 @@ export default function CookiePolicyPage(): React.ReactElement {
             <td>Stores a refresh token used to obtain a new access token when the current one expires, maintaining your session without requiring you to log in again.</td>
             <td>7 days</td>
           </tr>
+          <tr>
+            <td>uptrue_impersonate</td>
+            <td>Uptrue (first-party)</td>
+            <td>Set only when an authorised Uptrue administrator accesses your account for support purposes (account impersonation). This cookie identifies the active impersonation session and ensures it is properly scoped and audited. It is never set during normal user activity.</td>
+            <td>Session (cleared when impersonation ends)</td>
+          </tr>
         </tbody>
       </table>
 
@@ -112,7 +118,17 @@ export default function CookiePolicyPage(): React.ReactElement {
         analytics are never injected on white-label pages.
       </p>
 
-      <h3>2.4 Third-Party Cookies</h3>
+      <h3>2.4 Email Tracking Technologies</h3>
+      <p>
+        Our email delivery provider (Resend) may embed a small, invisible image (commonly known as a
+        &quot;tracking pixel&quot; or &quot;web beacon&quot;) in transactional and notification emails we send to you.
+        This pixel records whether the email was opened and, where applicable, whether links in the
+        email were clicked. This data is used solely to monitor email deliverability and troubleshoot
+        delivery issues. It does not set cookies on your device. You can prevent tracking pixel
+        loading by configuring your email client to block remote images.
+      </p>
+
+      <h3>2.5 Third-Party Cookies</h3>
       <table>
         <thead>
           <tr>

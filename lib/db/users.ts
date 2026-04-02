@@ -1,12 +1,61 @@
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
+import { getImpersonatedUserId } from '@/lib/utils/impersonation'
 import type { User, Organisation } from '@/lib/types'
 
-export async function getCurrentUser(): Promise<User | null> {
+/** User with optional impersonation metadata */
+export interface ImpersonatedUser extends User {
+  _impersonatedBy?: string
+  _impersonatedByEmail?: string
+}
+
+export async function getCurrentUser(): Promise<ImpersonatedUser | null> {
   const supabase = await createClient()
   const { data: { user: authUser } } = await supabase.auth.getUser()
   if (!authUser) return null
 
+  // Check for active impersonation session
+  const impersonateId = await getImpersonatedUserId()
+
+  if (impersonateId) {
+    // Verify the real user is a super admin before allowing impersonation
+    const { data: realUser, error: realError } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', authUser.id)
+      .single()
+
+    if (realError) {
+      logger.error('Failed to get real user during impersonation check', { error: realError.message })
+      return null
+    }
+
+    if (realUser?.is_super_admin) {
+      // Use admin client to bypass RLS and load the impersonated user
+      const adminClient = createAdminClient()
+      const { data: impersonatedUser, error: impError } = await adminClient
+        .from('users')
+        .select('*')
+        .eq('id', impersonateId)
+        .single()
+
+      if (impError) {
+        logger.error('Failed to load impersonated user', { error: impError.message, impersonateId })
+        return null
+      }
+
+      if (impersonatedUser) {
+        return {
+          ...impersonatedUser,
+          _impersonatedBy: authUser.id,
+          _impersonatedByEmail: realUser.email,
+        } as ImpersonatedUser
+      }
+    }
+  }
+
+  // Normal flow — no impersonation
   const { data, error } = await supabase
     .from('users')
     .select('*')
@@ -20,22 +69,32 @@ export async function getCurrentUser(): Promise<User | null> {
   return data
 }
 
-export async function getUserProfile(): Promise<{ user: User; organisation: Organisation } | null> {
-  const supabase = await createClient()
-  const { data: { user: authUser } } = await supabase.auth.getUser()
-  if (!authUser) return null
+export async function getUserProfile(): Promise<{ user: ImpersonatedUser; organisation: Organisation; isImpersonating: boolean } | null> {
+  // getCurrentUser already handles impersonation
+  const user = await getCurrentUser()
+  if (!user) return null
 
-  const { data: user, error: userError } = await supabase
-    .from('users')
-    .select('*')
-    .eq('id', authUser.id)
-    .single()
+  const isImpersonation = '_impersonatedBy' in user && Boolean(user._impersonatedBy)
 
-  if (userError || !user) {
-    logger.error('Failed to get user profile', { error: userError?.message })
-    return null
+  // When impersonating, use admin client to load the org (bypasses RLS)
+  if (isImpersonation) {
+    const adminClient = createAdminClient()
+    const { data: organisation, error: orgError } = await adminClient
+      .from('organisations')
+      .select('*')
+      .eq('id', user.org_id)
+      .single()
+
+    if (orgError || !organisation) {
+      logger.error('Failed to get impersonated user organisation', { error: orgError?.message })
+      return null
+    }
+
+    return { user, organisation, isImpersonating: true }
   }
 
+  // Normal flow
+  const supabase = await createClient()
   const { data: organisation, error: orgError } = await supabase
     .from('organisations')
     .select('*')
@@ -47,7 +106,7 @@ export async function getUserProfile(): Promise<{ user: User; organisation: Orga
     return null
   }
 
-  return { user, organisation }
+  return { user, organisation, isImpersonating: false }
 }
 
 export async function getUsersByOrg(orgId: string): Promise<User[]> {

@@ -11,7 +11,7 @@ export default function PrivacyPolicyPage(): React.ReactElement {
   return (
     <>
       <h1>Privacy Policy</h1>
-      <p className="legal-updated">Last updated: 30 March 2026</p>
+      <p className="legal-updated">Last updated: 2 April 2026</p>
 
       <p>
         This Privacy Policy explains how Vision Software Solutions Limited, a company registered in England and Wales with
@@ -45,6 +45,7 @@ export default function PrivacyPolicyPage(): React.ReactElement {
         <li>Organisation name (if applicable)</li>
         <li>Password (stored as a cryptographic hash; we never store or have access to your plain-text password)</li>
         <li>Profile preferences and notification settings</li>
+        <li>Currency preference (GBP, USD, or INR)</li>
       </ul>
 
       <h3>2.2 Billing Information</h3>
@@ -68,9 +69,19 @@ export default function PrivacyPolicyPage(): React.ReactElement {
         <li>Incident records and resolution history</li>
         <li>Status page content and configuration</li>
         <li>AI-generated report summaries and analysis</li>
+        <li>Community Credit balance and credit transaction history</li>
       </ul>
 
-      <h3>2.4 Technical and Usage Data</h3>
+      <h3>2.4 Email Engagement Data</h3>
+      <p>
+        Our email delivery provider (Resend) may collect data relating to your interaction with
+        transactional and notification emails we send, including whether an email was opened and
+        whether links within the email were clicked. This data is used to monitor email deliverability,
+        improve our communications, and troubleshoot delivery issues. We do not use this data for
+        marketing profiling.
+      </p>
+
+      <h3>2.5 Technical and Usage Data</h3>
       <p>We automatically collect:</p>
       <ul>
         <li>IP address</li>
@@ -81,7 +92,7 @@ export default function PrivacyPolicyPage(): React.ReactElement {
         <li>Referring URL</li>
       </ul>
 
-      <h3>2.5 Communication Data</h3>
+      <h3>2.6 Communication Data</h3>
       <p>
         If you contact us via email or support channels, we collect the content of your communications,
         your email address, and any other information you choose to provide.
@@ -147,6 +158,60 @@ export default function PrivacyPolicyPage(): React.ReactElement {
         <li>Send marketing communications (only with your explicit consent, and you may opt out at any time)</li>
       </ul>
 
+      <h2>4A. Publicly Visible Data</h2>
+      <p>
+        Certain features of the Service generate data that is publicly accessible:
+      </p>
+      <ul>
+        <li>
+          <strong>Public Tracker:</strong> Uptime monitoring results for selected third-party websites
+          and services are displayed publicly on the Uptrue website. This data relates to the monitored
+          third-party services, not to your personal data. No personal data from your account is
+          included in Public Tracker results.
+        </li>
+        <li>
+          <strong>Uptrue Score:</strong> When you or any visitor uses the Uptrue Score tool to scan a
+          URL, the resulting health score and diagnostic summary may be cached and displayed publicly.
+          The scanned URL and the resulting score are not linked to your account or personal data
+          unless you are logged in at the time of the scan, in which case the scan is associated with
+          your account for your convenience but the public display does not reveal your identity.
+        </li>
+        <li>
+          <strong>Status Pages:</strong> If you create a public status page, the monitoring data,
+          incident history, and uptime statistics displayed on that page are publicly visible by design.
+        </li>
+      </ul>
+
+      <h2>4B. Account Access by Uptrue Personnel</h2>
+      <p>
+        To provide customer support, diagnose technical issues, and maintain the integrity of the
+        Service, authorised Uptrue administrators may access your account in a read-only view
+        (&quot;account impersonation&quot;). When this occurs:
+      </p>
+      <ul>
+        <li>
+          Access is limited to authorised personnel and is used solely for support and operational
+          purposes.
+        </li>
+        <li>
+          Every instance of impersonation access is recorded in an immutable audit log, including
+          the administrator&apos;s identity, the account accessed, the timestamp, duration, and IP
+          address.
+        </li>
+        <li>
+          Administrators cannot modify your data, change your settings, or take actions on your
+          behalf during impersonation access.
+        </li>
+        <li>
+          You may request a copy of the audit log entries relating to any impersonation access to
+          your account by contacting support@uptrue.io.
+        </li>
+      </ul>
+      <p>
+        The legal basis for this processing is our legitimate interest (Article 6(1)(f)) in providing
+        effective customer support and maintaining the security and integrity of the Service.
+      </p>
+
       <h2>5. Third-Party Data Processors</h2>
       <p>
         We share your personal data with the following third-party service providers, each of whom acts
@@ -192,6 +257,12 @@ export default function PrivacyPolicyPage(): React.ReactElement {
             <td>AI-powered report generation and analysis</td>
             <td>Aggregated, anonymised monitoring data</td>
             <td>US (with EU SCCs)</td>
+          </tr>
+          <tr>
+            <td>Razorpay</td>
+            <td>Payment processing for customers in India (coming soon)</td>
+            <td>Billing information, transaction data</td>
+            <td>India (with EU SCCs)</td>
           </tr>
           <tr>
             <td>Twilio</td>

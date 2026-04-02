@@ -10,8 +10,12 @@ import { checkMonitorLimit } from '@/lib/utils/plan-limits'
 import { createMonitorChargeSession } from '@/lib/services/stripe'
 import { getConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
+import { impersonationGuard } from '@/lib/auth/impersonation-guard'
 
 export async function createMonitorAction(formData: FormData): Promise<{ error?: string; checkoutUrl?: string; nudge?: boolean }> {
+  const guard = await impersonationGuard()
+  if (guard.isBlocked) return { error: guard.error }
+
   const user = await getCurrentUser()
   if (!user) return { error: 'Not authenticated' }
 
@@ -98,6 +102,9 @@ export async function createMonitorAction(formData: FormData): Promise<{ error?:
 }
 
 export async function createMonitorAfterPaymentAction(formData: FormData): Promise<{ error?: string }> {
+  const guard2 = await impersonationGuard()
+  if (guard2.isBlocked) return { error: guard2.error }
+
   const user = await getCurrentUser()
   if (!user) return { error: 'Not authenticated' }
 
@@ -130,6 +137,9 @@ export async function createMonitorAfterPaymentAction(formData: FormData): Promi
 }
 
 export async function updateMonitorAction(monitorId: string, formData: FormData): Promise<{ error?: string }> {
+  const guardUpdate = await impersonationGuard()
+  if (guardUpdate.isBlocked) return { error: guardUpdate.error }
+
   const user = await getCurrentUser()
   if (!user) return { error: 'Not authenticated' }
 
@@ -183,6 +193,9 @@ export async function updateMonitorAction(monitorId: string, formData: FormData)
 }
 
 export async function deleteMonitorAction(monitorId: string): Promise<{ error?: string }> {
+  const guardDelete = await impersonationGuard()
+  if (guardDelete.isBlocked) return { error: guardDelete.error }
+
   const user = await getCurrentUser()
   if (!user) return { error: 'Not authenticated' }
 
@@ -198,6 +211,9 @@ export async function deleteMonitorAction(monitorId: string): Promise<{ error?: 
 }
 
 export async function pauseMonitorAction(monitorId: string): Promise<{ error?: string } | void> {
+  const guardPause = await impersonationGuard()
+  if (guardPause.isBlocked) return { error: guardPause.error }
+
   const user = await getCurrentUser()
   if (!user) return { error: 'Not authenticated' }
 
@@ -212,6 +228,9 @@ export async function pauseMonitorAction(monitorId: string): Promise<{ error?: s
 }
 
 export async function resumeMonitorAction(monitorId: string): Promise<{ error?: string } | void> {
+  const guardResume = await impersonationGuard()
+  if (guardResume.isBlocked) return { error: guardResume.error }
+
   const user = await getCurrentUser()
   if (!user) return { error: 'Not authenticated' }
 
@@ -226,6 +245,9 @@ export async function resumeMonitorAction(monitorId: string): Promise<{ error?: 
 }
 
 export async function bulkDeleteMonitorsAction(ids: string[]): Promise<{ error?: string }> {
+  const guardBulkDel = await impersonationGuard()
+  if (guardBulkDel.isBlocked) return { error: guardBulkDel.error }
+
   const user = await getCurrentUser()
   if (!user) return { error: 'Not authenticated' }
 
@@ -238,6 +260,9 @@ export async function bulkDeleteMonitorsAction(ids: string[]): Promise<{ error?:
 }
 
 export async function bulkPauseMonitorsAction(ids: string[]): Promise<{ error?: string }> {
+  const guardBulkPause = await impersonationGuard()
+  if (guardBulkPause.isBlocked) return { error: guardBulkPause.error }
+
   const user = await getCurrentUser()
   if (!user) return { error: 'Not authenticated' }
 
@@ -250,6 +275,9 @@ export async function bulkPauseMonitorsAction(ids: string[]): Promise<{ error?: 
 }
 
 export async function bulkResumeMonitorsAction(ids: string[]): Promise<{ error?: string }> {
+  const guardBulkResume = await impersonationGuard()
+  if (guardBulkResume.isBlocked) return { error: guardBulkResume.error }
+
   const user = await getCurrentUser()
   if (!user) return { error: 'Not authenticated' }
 

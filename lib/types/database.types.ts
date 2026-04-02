@@ -1574,6 +1574,57 @@ export type Database = {
           },
         ]
       }
+      email_sends: {
+        Row: {
+          id: string
+          user_id: string
+          email_key: string
+          sent_at: string
+          opened_at: string | null
+          clicked_at: string | null
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          email_key: string
+          sent_at?: string
+          opened_at?: string | null
+          clicked_at?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          email_key?: string
+          sent_at?: string
+          opened_at?: string | null
+          clicked_at?: string | null
+        }
+        Relationships: []
+      }
+      email_preferences: {
+        Row: {
+          user_id: string
+          product_updates: boolean
+          usage_digests: boolean
+          upgrade_tips: boolean
+          updated_at: string
+        }
+        Insert: {
+          user_id: string
+          product_updates?: boolean
+          usage_digests?: boolean
+          upgrade_tips?: boolean
+          updated_at?: string
+        }
+        Update: {
+          user_id?: string
+          product_updates?: boolean
+          usage_digests?: boolean
+          upgrade_tips?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

@@ -6,8 +6,12 @@ import { createAlertChannel, updateAlertChannel, deleteAlertChannel, toggleAlert
 import { getCurrentUser } from '@/lib/db/users'
 import { getWorkspacesByOrg } from '@/lib/db/workspaces'
 import { logger } from '@/lib/utils/logger'
+import { impersonationGuard } from '@/lib/auth/impersonation-guard'
 
 export async function createAlertChannelAction(formData: FormData): Promise<{ error?: string }> {
+  const guard = await impersonationGuard()
+  if (guard.isBlocked) return { error: guard.error }
+
   const user = await getCurrentUser()
   if (!user) return { error: 'Not authenticated' }
 
@@ -62,6 +66,9 @@ export async function createAlertChannelAction(formData: FormData): Promise<{ er
 }
 
 export async function updateAlertChannelAction(channelId: string, formData: FormData): Promise<{ error?: string }> {
+  const guardUpdate = await impersonationGuard()
+  if (guardUpdate.isBlocked) return { error: guardUpdate.error }
+
   const user = await getCurrentUser()
   if (!user) return { error: 'Not authenticated' }
 
@@ -104,6 +111,9 @@ export async function updateAlertChannelAction(channelId: string, formData: Form
 }
 
 export async function deleteAlertChannelAction(channelId: string): Promise<{ error?: string }> {
+  const guardDel = await impersonationGuard()
+  if (guardDel.isBlocked) return { error: guardDel.error }
+
   const user = await getCurrentUser()
   if (!user) return { error: 'Not authenticated' }
 
@@ -119,6 +129,9 @@ export async function deleteAlertChannelAction(channelId: string): Promise<{ err
 }
 
 export async function toggleAlertChannelAction(channelId: string, enabled: boolean): Promise<{ error?: string } | void> {
+  const guardToggle = await impersonationGuard()
+  if (guardToggle.isBlocked) return { error: guardToggle.error }
+
   const user = await getCurrentUser()
   if (!user) return { error: 'Not authenticated' }
 
@@ -133,6 +146,9 @@ export async function toggleAlertChannelAction(channelId: string, enabled: boole
 }
 
 export async function bulkDeleteAlertChannelsAction(ids: string[]): Promise<{ error?: string }> {
+  const guardBulkDel = await impersonationGuard()
+  if (guardBulkDel.isBlocked) return { error: guardBulkDel.error }
+
   const user = await getCurrentUser()
   if (!user) return { error: 'Not authenticated' }
 
@@ -145,6 +161,9 @@ export async function bulkDeleteAlertChannelsAction(ids: string[]): Promise<{ er
 }
 
 export async function bulkEnableAlertChannelsAction(ids: string[]): Promise<{ error?: string }> {
+  const guardBulkEn = await impersonationGuard()
+  if (guardBulkEn.isBlocked) return { error: guardBulkEn.error }
+
   const user = await getCurrentUser()
   if (!user) return { error: 'Not authenticated' }
 
@@ -157,6 +176,9 @@ export async function bulkEnableAlertChannelsAction(ids: string[]): Promise<{ er
 }
 
 export async function bulkDisableAlertChannelsAction(ids: string[]): Promise<{ error?: string }> {
+  const guardBulkDis = await impersonationGuard()
+  if (guardBulkDis.isBlocked) return { error: guardBulkDis.error }
+
   const user = await getCurrentUser()
   if (!user) return { error: 'Not authenticated' }
 

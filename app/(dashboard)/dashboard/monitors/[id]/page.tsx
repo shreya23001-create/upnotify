@@ -7,6 +7,7 @@ import { MonitorStatusBadge } from '@/components/monitors/monitor-status-badge'
 import { MonitorTypeIcon } from '@/components/monitors/monitor-type-icon'
 import { MonitorActions } from '@/components/monitors/monitor-actions'
 import { CheckResultsHistory } from '@/components/monitors/check-results-history'
+import { BadgeEmbed } from '@/components/monitors/badge-embed'
 
 export default async function MonitorDetailPage({
   params,
@@ -72,6 +73,10 @@ export default async function MonitorDetailPage({
 
       <div style={{ marginTop: 24 }}>
         <CheckResultsHistory results={checkResults} />
+      </div>
+
+      <div style={{ marginTop: 24 }}>
+        <BadgeEmbed monitorId={monitor.id} />
       </div>
     </div>
   )

@@ -128,7 +128,7 @@ function getResendClient(): Resend | null {
 // Core send function
 // ---------------------------------------------------------------------------
 
-async function sendEmail(
+export async function sendEmail(
   to: string,
   subject: string,
   html: string

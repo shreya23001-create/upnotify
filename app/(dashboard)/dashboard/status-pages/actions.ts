@@ -6,8 +6,12 @@ import { createStatusPage, updateStatusPage, deleteStatusPage, bulkDeleteStatusP
 import { getCurrentUser } from '@/lib/db/users'
 import { getWorkspacesByOrg } from '@/lib/db/workspaces'
 import { logger } from '@/lib/utils/logger'
+import { impersonationGuard } from '@/lib/auth/impersonation-guard'
 
 export async function createStatusPageAction(formData: FormData): Promise<{ error?: string }> {
+  const guard = await impersonationGuard()
+  if (guard.isBlocked) return { error: guard.error }
+
   const user = await getCurrentUser()
   if (!user) return { error: 'Not authenticated' }
 
@@ -40,6 +44,9 @@ export async function createStatusPageAction(formData: FormData): Promise<{ erro
 }
 
 export async function updateStatusPageAction(pageId: string, formData: FormData): Promise<{ error?: string }> {
+  const guardUpdate = await impersonationGuard()
+  if (guardUpdate.isBlocked) return { error: guardUpdate.error }
+
   const user = await getCurrentUser()
   if (!user) return { error: 'Not authenticated' }
 
@@ -72,6 +79,9 @@ export async function updateStatusPageAction(pageId: string, formData: FormData)
 }
 
 export async function deleteStatusPageAction(pageId: string): Promise<{ error?: string }> {
+  const guardDel = await impersonationGuard()
+  if (guardDel.isBlocked) return { error: guardDel.error }
+
   const user = await getCurrentUser()
   if (!user) return { error: 'Not authenticated' }
 
@@ -87,6 +97,9 @@ export async function deleteStatusPageAction(pageId: string): Promise<{ error?: 
 }
 
 export async function bulkDeleteStatusPagesAction(ids: string[]): Promise<{ error?: string }> {
+  const guardBulkDel = await impersonationGuard()
+  if (guardBulkDel.isBlocked) return { error: guardBulkDel.error }
+
   const user = await getCurrentUser()
   if (!user) return { error: 'Not authenticated' }
 
@@ -99,6 +112,9 @@ export async function bulkDeleteStatusPagesAction(ids: string[]): Promise<{ erro
 }
 
 export async function bulkPublishStatusPagesAction(ids: string[]): Promise<{ error?: string }> {
+  const guardBulkPub = await impersonationGuard()
+  if (guardBulkPub.isBlocked) return { error: guardBulkPub.error }
+
   const user = await getCurrentUser()
   if (!user) return { error: 'Not authenticated' }
 
@@ -111,6 +127,9 @@ export async function bulkPublishStatusPagesAction(ids: string[]): Promise<{ err
 }
 
 export async function bulkUnpublishStatusPagesAction(ids: string[]): Promise<{ error?: string }> {
+  const guardBulkUnpub = await impersonationGuard()
+  if (guardBulkUnpub.isBlocked) return { error: guardBulkUnpub.error }
+
   const user = await getCurrentUser()
   if (!user) return { error: 'Not authenticated' }
 

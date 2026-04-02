@@ -11,7 +11,7 @@ export default function AcceptableUsePolicyPage(): React.ReactElement {
   return (
     <>
       <h1>Acceptable Use Policy</h1>
-      <p className="legal-updated">Last updated: 30 March 2026</p>
+      <p className="legal-updated">Last updated: 2 April 2026</p>
 
       <p>
         This Acceptable Use Policy (&quot;AUP&quot;) sets out the rules and restrictions governing your use of
@@ -129,6 +129,56 @@ export default function AcceptableUsePolicyPage(): React.ReactElement {
         <li>
           Provide false, misleading, or fraudulent information during registration or at any point during
           your use of the Service.
+        </li>
+      </ul>
+
+      <h3>1.6 Competitive Intelligence (Uptrue Compete)</h3>
+      <p>
+        If you use or access the Uptrue Compete feature (competitive intelligence, price tracking,
+        stock monitoring), you must comply with the following additional restrictions:
+      </p>
+      <ul>
+        <li>
+          You must not use Uptrue Compete to scrape, collect, or store data from any website that
+          prohibits such activity in its terms of service or robots.txt file.
+        </li>
+        <li>
+          You must not use Uptrue Compete to circumvent access controls, CAPTCHAs, rate limits, or
+          other technical measures employed by any third-party website.
+        </li>
+        <li>
+          You must respect the robots.txt directives of any website monitored through Uptrue Compete.
+          Uptrue will make reasonable efforts to honour robots.txt restrictions automatically, but
+          you remain responsible for ensuring your use is compliant.
+        </li>
+        <li>
+          You must not use data obtained through Uptrue Compete to engage in price fixing, market
+          manipulation, or any other activity that would violate competition law.
+        </li>
+        <li>
+          You must not redistribute, resell, or publicly publish raw data obtained through Uptrue
+          Compete without our prior written consent.
+        </li>
+      </ul>
+
+      <h3>1.7 Public Tracker Disclaimer</h3>
+      <p>
+        The Uptrue Public Tracker displays uptime and performance data for selected third-party
+        websites and services. This data is collected through external monitoring and is provided
+        for informational purposes only. You acknowledge that:
+      </p>
+      <ul>
+        <li>
+          Public Tracker results may not reflect the actual internal status of the monitored service
+          and may be affected by network conditions, regional variations, or transient issues.
+        </li>
+        <li>
+          Uptrue is not affiliated with, endorsed by, or responsible for any third-party website or
+          service displayed on the Public Tracker.
+        </li>
+        <li>
+          You must not rely on Public Tracker data as the sole basis for business, financial, or
+          operational decisions.
         </li>
       </ul>
 

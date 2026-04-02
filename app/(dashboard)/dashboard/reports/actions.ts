@@ -6,8 +6,12 @@ import { getWorkspacesByOrg } from '@/lib/db/workspaces'
 import { deleteReport } from '@/lib/db/reports'
 import { generateReport } from '@/lib/services/reports'
 import { logger } from '@/lib/utils/logger'
+import { impersonationGuard } from '@/lib/auth/impersonation-guard'
 
 export async function generateReportAction(formData: FormData): Promise<{ error?: string }> {
+  const guard = await impersonationGuard()
+  if (guard.isBlocked) return { error: guard.error }
+
   const user = await getCurrentUser()
   if (!user) return { error: 'Not authenticated' }
 
@@ -36,6 +40,9 @@ export async function generateReportAction(formData: FormData): Promise<{ error?
 }
 
 export async function deleteReportAction(reportId: string): Promise<{ error?: string }> {
+  const guardDel = await impersonationGuard()
+  if (guardDel.isBlocked) return { error: guardDel.error }
+
   const success = await deleteReport(reportId)
   if (!success) return { error: 'Failed to delete report' }
   redirect('/dashboard/reports')

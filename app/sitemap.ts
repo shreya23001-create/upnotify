@@ -57,6 +57,42 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'yearly',
       priority: 0.2,
     },
+    {
+      url: 'https://uptrue.io/blog',
+      lastModified: new Date('2026-04-18'),
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
+    {
+      url: 'https://uptrue.io/blog/website-monitoring-guide',
+      lastModified: new Date('2026-04-02'),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: 'https://uptrue.io/blog/public-status-page-guide',
+      lastModified: new Date('2026-04-05'),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: 'https://uptrue.io/blog/uptime-monitoring-agencies',
+      lastModified: new Date('2026-04-09'),
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
+      url: 'https://uptrue.io/blog/ssl-certificate-monitoring',
+      lastModified: new Date('2026-04-14'),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: 'https://uptrue.io/blog/competitor-analysis-ecommerce',
+      lastModified: new Date('2026-04-18'),
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
   ]
 
   let statusPages: MetadataRoute.Sitemap = []

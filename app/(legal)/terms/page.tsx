@@ -11,7 +11,7 @@ export default function TermsOfServicePage(): React.ReactElement {
   return (
     <>
       <h1>Terms of Service</h1>
-      <p className="legal-updated">Last updated: 30 March 2026</p>
+      <p className="legal-updated">Last updated: 2 April 2026</p>
 
       <p>
         These Terms of Service (&quot;Terms&quot;) govern your access to and use of the Uptrue platform,
@@ -41,6 +41,9 @@ export default function TermsOfServicePage(): React.ReactElement {
         <li>Heartbeat (cron job) monitoring</li>
         <li>Alerting via email, SMS, WhatsApp, voice call, Slack, and webhook</li>
         <li>Public and private status pages</li>
+        <li>Public Tracker &mdash; publicly visible uptime monitoring of major third-party websites and services, provided for informational purposes</li>
+        <li>Uptrue Score &mdash; a free website health assessment tool that scans a given URL and displays a publicly visible health score and diagnostic summary</li>
+        <li>Uptrue Compete &mdash; competitive intelligence features including price tracking and stock monitoring for ecommerce websites (coming soon; availability subject to separate terms when launched)</li>
         <li>AI-powered performance and incident reports</li>
         <li>Incident management and resolution tracking</li>
         <li>White-label agency monitoring and client management</li>
@@ -120,10 +123,22 @@ export default function TermsOfServicePage(): React.ReactElement {
       </p>
       <h3>3.2 Payment</h3>
       <p>
-        All payments are processed securely through Stripe. By providing your payment information, you
-        authorise us to charge the applicable fees to your chosen payment method. All prices are quoted
-        in British Pounds Sterling (GBP) unless otherwise stated. Prices are exclusive of applicable
-        taxes, which will be added where required by law.
+        Payments are processed securely through Stripe and, where available, through Razorpay for
+        customers in India. By providing your payment information, you authorise us to charge the
+        applicable fees to your chosen payment method via the relevant payment processor.
+      </p>
+      <p>
+        Prices are displayed in the currency applicable to your region. We currently support British
+        Pounds Sterling (GBP), United States Dollars (USD), and Indian Rupees (INR). The currency
+        charged to your payment method will be confirmed at checkout. All prices are exclusive of
+        applicable taxes, which will be added where required by law. Exchange rate conversions, where
+        applicable, are handled by your payment processor and are outside our control.
+      </p>
+      <p>
+        Where available, you may choose to pay annually. Annual billing is charged as a single upfront
+        payment for the full year at the applicable annual rate. Annual subscriptions are non-refundable
+        except as set out in Section 3.5. When upgrading your plan mid-billing period, you will be
+        charged the prorated difference for the remainder of the current billing period.
       </p>
       <h3>3.3 Auto-Renewal</h3>
       <p>
@@ -158,6 +173,69 @@ export default function TermsOfServicePage(): React.ReactElement {
         remains unsuccessful, your account will be downgraded to a restricted state with monitoring paused.
         If payment is not resolved within 30 days, we reserve the right to suspend or terminate your account.
       </p>
+
+      <h2>3A. Community Credits</h2>
+      <p>
+        Uptrue may offer a credit system (&quot;Community Credits&quot;) that allows you to earn credits
+        through certain activities, including but not limited to: referring new users, embedding the
+        Uptrue trust badge on your website, and leaving verified reviews.
+      </p>
+      <p>
+        Community Credits are subject to the following conditions:
+      </p>
+      <ul>
+        <li>
+          Credits are issued at our sole discretion and may be subject to caps, which we may adjust
+          from time to time.
+        </li>
+        <li>
+          Credits may be redeemed only against Uptrue subscription fees or eligible add-on services
+          within the Service. Credits have no cash value and cannot be exchanged, transferred, or
+          cashed out.
+        </li>
+        <li>
+          Credits are personal to your account and may not be transferred to another user or
+          organisation.
+        </li>
+        <li>
+          If your account is cancelled or terminated for any reason, any unused credits will expire
+          immediately and will not be refunded, credited, or transferred.
+        </li>
+        <li>
+          We reserve the right to revoke credits that were earned through fraudulent activity,
+          manipulation, or abuse of the credit system.
+        </li>
+        <li>
+          We may modify, suspend, or discontinue the Community Credits programme at any time, with
+          reasonable notice where practicable. Any credits already earned will remain redeemable for
+          a period of 90 days following discontinuation of the programme.
+        </li>
+      </ul>
+
+      <h2>3B. Account Access by Uptrue Personnel</h2>
+      <p>
+        To provide technical support, diagnose issues, and ensure the integrity of the Service,
+        authorised Uptrue administrators may access your account in a read-only view (&quot;account
+        impersonation&quot;). This access is subject to the following safeguards:
+      </p>
+      <ul>
+        <li>
+          Impersonation access is limited to authorised Uptrue personnel only and is used solely
+          for customer support, debugging, and operational purposes.
+        </li>
+        <li>
+          Every instance of impersonation access is recorded in an immutable audit log, including
+          the identity of the administrator, the account accessed, the time, duration, and IP address.
+        </li>
+        <li>
+          Administrators accessing your account via impersonation cannot modify your data, change
+          your settings, or take actions on your behalf.
+        </li>
+        <li>
+          You may request a copy of the audit log entries relating to any impersonation access to
+          your account by contacting support@uptrue.io.
+        </li>
+      </ul>
 
       <h2>4. Service Level Agreement</h2>
       <p>
@@ -243,6 +321,16 @@ export default function TermsOfServicePage(): React.ReactElement {
         </li>
         <li>
           Circumvent or attempt to circumvent any rate limits, usage limits, or security measures.
+        </li>
+        <li>
+          Use the Uptrue Compete feature (or any competitive intelligence functionality) to violate the
+          terms of service of any target website, or to circumvent access controls, CAPTCHAs, or
+          anti-scraping measures employed by any third-party website.
+        </li>
+        <li>
+          Use the Uptrue Compete feature to collect, store, or redistribute data from third-party
+          websites in a manner that infringes the intellectual property rights or data protection
+          rights of the website operator or any third party.
         </li>
       </ul>
       <p>

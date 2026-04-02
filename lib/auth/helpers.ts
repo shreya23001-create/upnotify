@@ -14,6 +14,7 @@ const PUBLIC_ROUTES: ReadonlyArray<string> = [
   '/dpa',
   '/acceptable-use',
   '/agency-agreement',
+  '/blog',
 ]
 
 export function isPublicRoute(pathname: string): boolean {
@@ -21,6 +22,7 @@ export function isPublicRoute(pathname: string): boolean {
   if (pathname.startsWith('/status/')) return true
   if (pathname.startsWith('/score/')) return true
   if (pathname.startsWith('/tracker/')) return true
+  if (pathname.startsWith('/blog/')) return true
   if (pathname.startsWith('/api/badge/')) return true
   if (pathname.startsWith('/api/v1/tracker/')) return true
   return false

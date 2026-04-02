@@ -115,6 +115,34 @@ function formatSlotTime(base: Date, slotIndex: number, slotMinutes: number = 15)
   return time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 }
 
+/**
+ * Calculate the uptime percentage for a monitor over a given number of days.
+ * Returns a value between 0 and 100 (e.g. 99.97).
+ * If no check results exist, returns 100.
+ */
+export async function getMonitorUptimePercentage(monitorId: string, days: number = 30): Promise<number> {
+  const supabase = createAdminClient()
+  const since = new Date()
+  since.setDate(since.getDate() - days)
+
+  const { data, error } = await supabase
+    .from('check_results')
+    .select('status')
+    .eq('monitor_id', monitorId)
+    .gte('checked_at', since.toISOString())
+
+  if (error) {
+    logger.error('Failed to calculate uptime percentage', { error: error.message, monitorId })
+    return 100
+  }
+
+  if (!data || data.length === 0) return 100
+
+  const total = data.length
+  const upCount = data.filter(r => r.status === 'up').length
+  return Math.round((upCount / total) * 10000) / 100
+}
+
 const rangeConfig: Record<string, { hours: number; slots: number; slotMinutes: number }> = {
   '24h': { hours: 24, slots: 48, slotMinutes: 30 },
   '7d': { hours: 168, slots: 56, slotMinutes: 180 },

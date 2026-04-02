@@ -118,6 +118,7 @@ export default function LandingPage(): React.ReactElement {
             <a href="#how-it-works">How It Works</a>
             <a href="#pricing">Pricing</a>
             <a href="#faq">FAQ</a>
+            <Link href="/blog">Blog</Link>
           </div>
           <div className="landing-nav-actions">
             <a href="/login" className="btn btn-ghost">
@@ -410,6 +411,7 @@ export default function LandingPage(): React.ReactElement {
               <a href="#pricing">Pricing</a>
               <a href="#faq">FAQ</a>
               <Link href="/status">Status</Link>
+              <Link href="/blog">Blog</Link>
             </div>
             <div className="footer-col">
               <h4 className="footer-col-title">Legal</h4>

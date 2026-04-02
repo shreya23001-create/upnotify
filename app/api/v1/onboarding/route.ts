@@ -6,6 +6,7 @@ import { checkMonitorLimit } from '@/lib/utils/plan-limits'
 import { dispatchChecker } from '@/lib/services/checker'
 import { writeCheckResult } from '@/lib/db/check-results'
 import { updateMonitorStatus } from '@/lib/db/monitors'
+import { sendWelcomeEmail } from '@/lib/services/email-nurture'
 import { logger } from '@/lib/utils/logger'
 import type { Monitor } from '@/lib/types'
 import type { CheckerResult } from '@/lib/checkers/types'
@@ -158,6 +159,12 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     logger.info('Onboarding monitors created', {
       orgId: user.org_id,
       count: results.length,
+    })
+
+    // Send welcome email (fire-and-forget, does not block response)
+    sendWelcomeEmail(user.id, user.email, user.full_name ?? 'there').catch((err: unknown) => {
+      const errMsg = err instanceof Error ? err.message : 'Unknown error'
+      logger.error('Failed to send welcome email during onboarding', { userId: user.id, error: errMsg })
     })
 
     return NextResponse.json({ success: true, monitors: results })
