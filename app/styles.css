@@ -1819,3 +1819,55 @@ html.dark .landing-cta { background: linear-gradient(135deg, #1a1d27 0%, #242736
   .chart-card-header { padding: 14px 16px 0; }
   .chart-card-body { padding: 12px 14px 16px; }
 }
+
+/* ==========================================================================
+   About & Contact Pages
+   ========================================================================== */
+
+.about-hero { padding: 120px 0 60px; text-align: center; background: var(--bg-card); border-bottom: 1px solid var(--border-primary); }
+.about-hero-title { font-size: 42px; font-weight: 800; color: var(--text-primary); margin-bottom: 16px; letter-spacing: -0.5px; }
+.about-hero-subtitle { font-size: 19px; color: var(--text-secondary); max-width: 560px; margin: 0 auto; line-height: 1.7; }
+
+.about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; }
+.about-block { display: flex; flex-direction: column; gap: 16px; }
+.about-section-title { font-size: 24px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+.about-text { font-size: 15px; line-height: 1.8; color: var(--text-secondary); }
+.about-list { padding-left: 20px; display: flex; flex-direction: column; gap: 10px; }
+.about-list li { font-size: 15px; line-height: 1.7; color: var(--text-secondary); }
+.about-list li strong { color: var(--text-primary); }
+
+/* Contact page */
+.contact-channels { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+.contact-channel-card { background: var(--bg-card); border: 1px solid var(--border-primary); border-radius: 16px; padding: 32px 28px; text-align: center; box-shadow: var(--shadow-sm); transition: box-shadow 0.2s, transform 0.2s; }
+.contact-channel-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+.contact-email-link { display: inline-block; margin-top: 12px; font-size: 15px; font-weight: 600; color: var(--accent); text-decoration: none; transition: color 0.15s; }
+.contact-email-link:hover { color: var(--accent-hover); text-decoration: underline; }
+
+.contact-form { display: flex; flex-direction: column; gap: 20px; margin-top: 32px; }
+.contact-form-row { display: flex; flex-direction: column; gap: 6px; }
+.contact-label { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+.contact-input { padding: 12px 14px; border: 1px solid var(--border-input); border-radius: 10px; font-size: 15px; background: var(--bg-input); color: var(--text-primary); transition: border-color 0.2s, box-shadow 0.2s; }
+.contact-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12); }
+.contact-textarea { resize: vertical; min-height: 120px; }
+
+/* Team invite form */
+.team-invite-form { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 20px; }
+.team-invite-field { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 200px; }
+.team-invite-field label { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
+.team-invite-field input, .team-invite-field select { padding: 8px 12px; border: 1px solid var(--border-input); border-radius: 8px; font-size: 14px; background: var(--bg-input); color: var(--text-primary); }
+.team-invite-field input:focus, .team-invite-field select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12); }
+.team-limit-notice { font-size: 13px; color: var(--text-muted); margin-bottom: 16px; }
+
+@media (max-width: 768px) {
+  .about-grid { grid-template-columns: 1fr; gap: 40px; }
+  .about-hero-title { font-size: 32px; }
+  .contact-channels { grid-template-columns: 1fr; gap: 20px; }
+  .team-invite-form { flex-direction: column; }
+  .team-invite-field { min-width: 100%; }
+}
+
+@media (max-width: 480px) {
+  .about-hero { padding: 100px 0 40px; }
+  .about-hero-title { font-size: 28px; }
+  .about-hero-subtitle { font-size: 16px; }
+}

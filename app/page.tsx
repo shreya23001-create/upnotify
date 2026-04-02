@@ -424,7 +424,8 @@ export default function LandingPage(): React.ReactElement {
             </div>
             <div className="footer-col">
               <h4 className="footer-col-title">Company</h4>
-              <a href="mailto:support@uptrue.io">Contact</a>
+              <Link href="/about">About</Link>
+              <Link href="/contact">Contact</Link>
             </div>
           </div>
           <div className="footer-bottom">

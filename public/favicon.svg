@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 48" width="40" height="48">
+  <defs>
+    <linearGradient id="fg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3b82f6"/>
+      <stop offset="100%" style="stop-color:#06b6d4"/>
+    </linearGradient>
+  </defs>
+  <!-- Shield shape -->
+  <path d="M20 2 L38 9 L38 23 C38 33 29 40 20 45 C11 40 2 33 2 23 L2 9 Z" fill="url(#fg)"/>
+  <!-- "Up" text -->
+  <text x="8" y="30" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="800" fill="white" letter-spacing="0.5">
+    <tspan dy="0">U</tspan><tspan dy="-5">p</tspan>
+  </text>
+</svg>

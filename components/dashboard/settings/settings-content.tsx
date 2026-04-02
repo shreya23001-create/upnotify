@@ -10,26 +10,75 @@ import { InvoiceList } from '@/components/billing/invoice-list'
 import { CompanyDetailsForm } from '@/components/dashboard/settings/company-details-form'
 import { OrgSettingsForm } from '@/components/dashboard/settings/org-settings-form'
 import { LogoUpload } from '@/components/ui/logo-upload'
+import { TeamInviteForm } from '@/components/dashboard/settings/team-invite-form'
 
 interface SettingsContentProps {
   organisation: Organisation
   members: User[]
   currentUserId: string
+  currentUserRole: string
   subscription: Subscription | null
   invoices: Invoice[]
   apiKeys: ApiKey[]
   plans: Plan[]
   currentPlan: Plan | null
+  teamMemberLimit: number
+  teamMemberCount: number
+  canInvite: boolean
 }
 
-export function SettingsContent({ organisation, members, currentUserId, subscription, invoices, apiKeys, plans, currentPlan }: SettingsContentProps) {
+export function SettingsContent({
+  organisation,
+  members,
+  currentUserId,
+  currentUserRole,
+  subscription,
+  invoices,
+  apiKeys,
+  plans,
+  currentPlan,
+  teamMemberLimit,
+  teamMemberCount,
+  canInvite,
+}: SettingsContentProps): React.ReactElement {
   const [tab, setTab] = useState('organisation')
   const [revokeIds, setRevokeIds] = useState<string[]>([])
+  const [teamMembers, setTeamMembers] = useState<User[]>(members)
+  const [removeTarget, setRemoveTarget] = useState<string | null>(null)
+  const [removeError, setRemoveError] = useState<string | null>(null)
 
   const executeRevoke = useCallback((): void => {
     // TODO: implement actual revoke API call for revokeIds
     setRevokeIds([])
   }, [])
+
+  const handleMemberAdded = useCallback((newMember: User): void => {
+    setTeamMembers((prev) => [...prev, newMember])
+  }, [])
+
+  const executeRemoveMember = useCallback(async (): Promise<void> => {
+    if (!removeTarget) return
+    setRemoveError(null)
+
+    try {
+      const res = await fetch('/api/v1/team', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: removeTarget }),
+      })
+      const data: Record<string, unknown> = await res.json()
+      if (!res.ok) {
+        setRemoveError((data.error as string) || 'Failed to remove member.')
+        return
+      }
+      setTeamMembers((prev) => prev.filter((m) => m.id !== removeTarget))
+      setRemoveTarget(null)
+    } catch {
+      setRemoveError('Network error. Please try again.')
+    }
+  }, [removeTarget])
+
+  const canManageTeam = currentUserRole === 'owner' || currentUserRole === 'admin'
 
   const memberColumns: Column<User>[] = [
     { key: 'full_name', label: 'Name', render: (m) => (
@@ -40,6 +89,21 @@ export function SettingsContent({ organisation, members, currentUserId, subscrip
     )},
     { key: 'email', label: 'Email' },
     { key: 'role', label: 'Role', render: (m) => <span className="badge badge-outline" style={{ textTransform: 'capitalize' }}>{m.role}</span> },
+    ...(canManageTeam ? [{
+      key: 'actions' as keyof User,
+      label: '',
+      render: (m: User) => (
+        m.id !== currentUserId && m.role !== 'owner' ? (
+          <button
+            className="btn btn-ghost btn-sm"
+            style={{ color: '#ef4444', fontSize: 13 }}
+            onClick={() => setRemoveTarget(m.id)}
+          >
+            Remove
+          </button>
+        ) : null
+      ),
+    }] : []),
   ]
 
   const apiKeyColumns: Column<ApiKey>[] = [
@@ -102,11 +166,24 @@ export function SettingsContent({ organisation, members, currentUserId, subscrip
 
       {tab === 'team' && (
         <div className="card">
-          <div className="card-header card-header-row"><div className="card-title">Team Members</div><button className="btn btn-primary btn-sm" disabled>+ Invite</button></div>
+          <div className="card-header card-header-row">
+            <div className="card-title">Team Members</div>
+            <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>
+              {teamMembers.length - 1} / {teamMemberLimit === 0 ? '0' : teamMemberLimit} members
+            </span>
+          </div>
           <div className="card-content">
+            {canManageTeam && (
+              <TeamInviteForm
+                canInvite={canInvite}
+                teamMemberLimit={teamMemberLimit}
+                teamMemberCount={teamMemberCount}
+                onMemberAdded={handleMemberAdded}
+              />
+            )}
             <DataTable
               columns={memberColumns}
-              data={members}
+              data={teamMembers}
               searchPlaceholder="Search members..."
               emptyMessage="No team members."
             />
@@ -167,6 +244,15 @@ export function SettingsContent({ organisation, members, currentUserId, subscrip
           ? 'This API key will be permanently revoked. Any integrations using it will stop working immediately. This action cannot be undone.'
           : `${revokeIds.length} API key(s) will be permanently revoked. Any integrations using them will stop working immediately. This action cannot be undone.`}
         confirmText={revokeIds.length === 1 ? 'Revoke' : 'Revoke All'}
+        variant="danger"
+      />
+      <ConfirmDialog
+        isOpen={removeTarget !== null}
+        onConfirm={() => { void executeRemoveMember() }}
+        onCancel={() => { setRemoveTarget(null); setRemoveError(null) }}
+        title="Remove Team Member"
+        message={removeError || 'This person will immediately lose access to all monitors, alerts, and settings. This action cannot be undone.'}
+        confirmText="Remove"
         variant="danger"
       />
     </>

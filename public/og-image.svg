@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="og-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e3a8a"/>
+      <stop offset="50%" style="stop-color:#3b82f6"/>
+      <stop offset="100%" style="stop-color:#06b6d4"/>
+    </linearGradient>
+    <linearGradient id="og-shield" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:rgba(255,255,255,0.25)"/>
+      <stop offset="100%" style="stop-color:rgba(255,255,255,0.1)"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background gradient -->
+  <rect width="1200" height="630" fill="url(#og-bg)"/>
+
+  <!-- Subtle grid pattern -->
+  <g opacity="0.06">
+    <line x1="0" y1="0" x2="1200" y2="630" stroke="white" stroke-width="1"/>
+    <line x1="400" y1="0" x2="1200" y2="420" stroke="white" stroke-width="1"/>
+    <line x1="800" y1="0" x2="1200" y2="210" stroke="white" stroke-width="1"/>
+    <line x1="0" y1="210" x2="800" y2="630" stroke="white" stroke-width="1"/>
+    <line x1="0" y1="420" x2="400" y2="630" stroke="white" stroke-width="1"/>
+  </g>
+
+  <!-- Shield icon (large, semi-transparent) -->
+  <g transform="translate(820, 140) scale(4.5)" opacity="0.12">
+    <path d="M20 2 L38 9 L38 23 C38 33 29 40 20 45 C11 40 2 33 2 23 L2 9 Z" fill="white"/>
+  </g>
+
+  <!-- Shield icon (small, prominent) -->
+  <g transform="translate(100, 180)">
+    <path d="M20 2 L38 9 L38 23 C38 33 29 40 20 45 C11 40 2 33 2 23 L2 9 Z" fill="url(#og-shield)" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
+    <text x="8" y="30" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="800" fill="white" letter-spacing="0.5">
+      <tspan dy="0">U</tspan><tspan dy="-5">p</tspan>
+    </text>
+  </g>
+
+  <!-- "Uptrue" text -->
+  <text x="155" y="220" font-family="system-ui, -apple-system, sans-serif" font-size="64" font-weight="800" fill="white" letter-spacing="-1">
+    Uptrue
+  </text>
+
+  <!-- Tagline -->
+  <text x="105" y="290" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="500" fill="rgba(255,255,255,0.85)" letter-spacing="0.5">
+    Monitoring + Competitive Intelligence
+  </text>
+
+  <!-- Sub-tagline -->
+  <text x="105" y="340" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="400" fill="rgba(255,255,255,0.6)">
+    Uptime, performance &amp; infrastructure monitoring for agencies and teams
+  </text>
+
+  <!-- Stats bar at bottom -->
+  <rect x="0" y="530" width="1200" height="100" fill="rgba(0,0,0,0.15)"/>
+  <text x="150" y="585" font-family="system-ui, -apple-system, sans-serif" font-size="20" font-weight="700" fill="white" text-anchor="middle">10 Monitor Types</text>
+  <line x1="300" y1="555" x2="300" y2="600" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+  <text x="450" y="585" font-family="system-ui, -apple-system, sans-serif" font-size="20" font-weight="700" fill="white" text-anchor="middle">AI Reports</text>
+  <line x1="600" y1="555" x2="600" y2="600" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+  <text x="750" y="585" font-family="system-ui, -apple-system, sans-serif" font-size="20" font-weight="700" fill="white" text-anchor="middle">Status Pages</text>
+  <line x1="900" y1="555" x2="900" y2="600" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+  <text x="1050" y="585" font-family="system-ui, -apple-system, sans-serif" font-size="20" font-weight="700" fill="white" text-anchor="middle">30s Intervals</text>
+
+  <!-- uptrue.io URL -->
+  <text x="105" y="480" font-family="system-ui, -apple-system, sans-serif" font-size="22" font-weight="600" fill="rgba(255,255,255,0.5)">
+    uptrue.io
+  </text>
+</svg>

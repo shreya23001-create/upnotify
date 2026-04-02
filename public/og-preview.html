@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1200">
+  <title>Uptrue OG Image Preview</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: #f1f5f9;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+    }
+    .label {
+      font-size: 14px;
+      color: #64748b;
+      font-weight: 500;
+    }
+    .preview {
+      width: 1200px;
+      height: 630px;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #06b6d4 100%);
+      position: relative;
+      color: white;
+    }
+    .grid-lines {
+      position: absolute;
+      inset: 0;
+      opacity: 0.06;
+    }
+    .grid-lines line { stroke: white; stroke-width: 1; }
+    .shield-bg {
+      position: absolute;
+      right: 80px;
+      top: 100px;
+      opacity: 0.1;
+      font-size: 300px;
+      line-height: 1;
+    }
+    .content {
+      position: absolute;
+      top: 180px;
+      left: 100px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .logo-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .shield-icon {
+      width: 48px;
+      height: 56px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: 800;
+      border: 1.5px solid rgba(255,255,255,0.2);
+    }
+    .brand-name {
+      font-size: 64px;
+      font-weight: 800;
+      letter-spacing: -1px;
+    }
+    .tagline {
+      font-size: 28px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.85);
+      letter-spacing: 0.5px;
+    }
+    .sub-tagline {
+      font-size: 18px;
+      font-weight: 400;
+      color: rgba(255,255,255,0.6);
+    }
+    .url {
+      font-size: 22px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.5);
+      margin-top: 100px;
+    }
+    .stats-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 100px;
+      background: rgba(0,0,0,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 0 80px;
+    }
+    .stat {
+      font-size: 20px;
+      font-weight: 700;
+    }
+    .stat-divider {
+      width: 1px;
+      height: 40px;
+      background: rgba(255,255,255,0.2);
+    }
+    .instructions {
+      max-width: 600px;
+      text-align: center;
+      color: #475569;
+      font-size: 14px;
+      line-height: 1.6;
+      padding: 16px 24px;
+      background: white;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="label">OG Image Preview (1200 x 630)</div>
+    <div class="preview">
+      <div class="content">
+        <div class="logo-row">
+          <div class="shield-icon">Up</div>
+          <span class="brand-name">Uptrue</span>
+        </div>
+        <div class="tagline">Monitoring + Competitive Intelligence</div>
+        <div class="sub-tagline">Uptime, performance &amp; infrastructure monitoring for agencies and teams</div>
+        <div class="url">uptrue.io</div>
+      </div>
+      <div class="stats-bar">
+        <span class="stat">10 Monitor Types</span>
+        <div class="stat-divider"></div>
+        <span class="stat">AI Reports</span>
+        <div class="stat-divider"></div>
+        <span class="stat">Status Pages</span>
+        <div class="stat-divider"></div>
+        <span class="stat">30s Intervals</span>
+      </div>
+    </div>
+    <div class="instructions">
+      <strong>How to create the final OG image:</strong><br>
+      Open this page in Chrome at 1200px width, then take a screenshot of the preview above.
+      Save it as <code>/public/og-image.png</code> (1200x630 pixels).
+    </div>
+  </div>
+</body>
+</html>

@@ -58,6 +58,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.2,
     },
     {
+      url: 'https://uptrue.io/about',
+      lastModified: new Date('2026-04-01'),
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
+    {
+      url: 'https://uptrue.io/contact',
+      lastModified: new Date('2026-04-01'),
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
+    {
       url: 'https://uptrue.io/blog',
       lastModified: new Date('2026-04-18'),
       changeFrequency: 'weekly',

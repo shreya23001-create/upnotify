@@ -37,6 +37,10 @@ vi.mock('@/lib/db/check-results', () => ({
   writeCheckResult: (...args: unknown[]) => mockWriteCheckResult(...args),
 }))
 
+vi.mock('@/lib/services/email-nurture', () => ({
+  sendWelcomeEmail: vi.fn().mockResolvedValue(undefined),
+}))
+
 vi.mock('@/lib/utils/logger', () => ({
   logger: { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() },
 }))
@@ -250,6 +254,7 @@ describe('POST /api/v1/onboarding', () => {
         status: 'up',
         responseTimeMs: 150,
         statusCode: 200,
+        metadata: null,
       })
     })
 
@@ -304,8 +309,10 @@ describe('POST /api/v1/onboarding', () => {
       const body = await response.json()
 
       expect(body.success).toBe(true)
-      // Only one monitor should have a result (the second one)
-      expect(body.monitors).toHaveLength(1)
+      // Both monitors are in the results: one with status 'error', one successful
+      expect(body.monitors).toHaveLength(2)
+      expect(body.monitors[0].status).toBe('error')
+      expect(body.monitors[1].status).toBe('up')
     })
 
     it('handles checker failure gracefully', async () => {

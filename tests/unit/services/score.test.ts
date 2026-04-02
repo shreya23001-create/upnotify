@@ -67,6 +67,10 @@ vi.stubGlobal('fetch', mockFetch)
 
 import { calculateScore } from '@/lib/services/score'
 import type { ScoreResult } from '@/lib/services/score'
+import * as tlsModule from 'tls'
+
+// tls.connect has complex overloads; cast to a simple mock for test control
+const mockTlsConnect = tlsModule.connect as unknown as ReturnType<typeof vi.fn>
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -182,17 +186,16 @@ describe('calculateScore', () => {
 
   describe('unhealthy site — everything fails', () => {
     beforeEach(() => {
-      // TODO: Fix TLS mocking — require('tls').connect.mockImplementation doesn't work in Vitest ESM
-      // These tests need a different approach: mock the SSL checker module instead of tls directly
       // HTTP fails entirely
       mockFetch.mockRejectedValue(new Error('Connection refused'))
 
-      // SSL connection error — SKIPPED due to tls mock issue
-      const tls = require('tls') as Record<string, ReturnType<typeof vi.fn>>
-      if (typeof tls.connect?.mockImplementation !== 'function') return
-      tls.connect.mockImplementation((_opts: unknown, _cb: unknown) => {
+      // SSL: override tls.connect to emit an error instead of calling the success callback
+      mockTlsConnect.mockImplementation((_opts: unknown) => {
         const errorSocket = {
-          ...mockTlsSocket,
+          getPeerCertificate: vi.fn(),
+          getProtocol: vi.fn(),
+          end: vi.fn(),
+          destroy: vi.fn(),
           on: vi.fn((event: string, handler: (err?: Error) => void) => {
             if (event === 'error') {
               setTimeout(() => handler(new Error('ECONNREFUSED')), 0)
@@ -200,7 +203,8 @@ describe('calculateScore', () => {
             return errorSocket
           }),
         }
-        return errorSocket
+        // Return needs to match TLSSocket shape enough for the code
+        return errorSocket as unknown as ReturnType<typeof tlsModule.connect>
       })
 
       // DNS fails

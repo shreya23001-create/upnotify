@@ -9,126 +9,42 @@ vi.mock('@/lib/utils/logger', () => ({
 }))
 
 // Supabase chain builder — simulates the fluent query API
+// Uses a fully recursive proxy so any chaining pattern (e.g. .order().order().limit())
+// resolves correctly without hand-wiring every combination.
 let mockTerminalData: unknown = null
 let mockTerminalError: unknown = null
 
-function buildChain() {
-  const chain: Record<string, unknown> = {}
-  // Make data/error resolve lazily so tests can set mockTerminalData after from() is called
-  Object.defineProperty(chain, 'data', { get: () => mockTerminalData, enumerable: true })
-  Object.defineProperty(chain, 'error', { get: () => mockTerminalError, enumerable: true })
-  chain.then = vi.fn().mockImplementation((resolve: (v: unknown) => void) =>
-    resolve({ data: mockTerminalData, error: mockTerminalError })
-  )
-  chain.select = vi.fn().mockReturnValue(chain)
-  chain.insert = vi.fn().mockReturnValue(chain)
-  chain.update = vi.fn().mockReturnValue(chain)
-  chain.delete = vi.fn().mockReturnValue(chain)
-  chain.eq = vi.fn().mockReturnValue(chain)
-  chain.is = vi.fn().mockReturnValue(chain)
-  chain.gte = vi.fn().mockReturnValue(chain)
-  chain.order = vi.fn().mockReturnValue(chain)
-  chain.limit = vi.fn().mockReturnValue(chain)
-  chain.single = vi.fn().mockImplementation(() => ({
-    data: mockTerminalData,
-    error: mockTerminalError,
-  }))
-  return chain
-}
+function buildRecursiveChain(): Record<string, unknown> {
+  const handler: ProxyHandler<Record<string, unknown>> = {
+    get(_target, prop: string) {
+      // Terminal data accessors
+      if (prop === 'data') return mockTerminalData
+      if (prop === 'error') return mockTerminalError
 
-let mockChain: ReturnType<typeof buildChain>
-let lastTableName: string = ''
+      // .then() — makes the chain awaitable (Supabase returns PromiseLike)
+      if (prop === 'then') {
+        return (resolve: (v: unknown) => void) =>
+          resolve({ data: mockTerminalData, error: mockTerminalError })
+      }
+
+      // .single() — returns a plain object (not chainable)
+      if (prop === 'single') {
+        return vi.fn().mockImplementation(() => ({
+          data: mockTerminalData,
+          error: mockTerminalError,
+        }))
+      }
+
+      // All other methods return a new recursive chain
+      return vi.fn().mockImplementation(() => buildRecursiveChain())
+    },
+  }
+  return new Proxy({} as Record<string, unknown>, handler)
+}
 
 vi.mock('@/lib/supabase/admin', () => ({
   createAdminClient: () => ({
-    from: (table: string) => {
-      lastTableName = table
-      mockChain = buildChain()
-
-      // Override update to support .eq().select().single() chain
-      mockChain.update = vi.fn().mockReturnValue({
-        eq: vi.fn().mockReturnValue({
-          data: mockTerminalData,
-          error: mockTerminalError,
-          select: vi.fn().mockReturnValue({
-            single: vi.fn().mockReturnValue({
-              data: mockTerminalData,
-              error: mockTerminalError,
-            }),
-          }),
-        }),
-      })
-
-      // For insert().select().single() pattern
-      mockChain.insert = vi.fn().mockImplementation(() => {
-        return {
-          select: vi.fn().mockReturnValue({
-            single: vi.fn().mockReturnValue({
-              data: mockTerminalData,
-              error: mockTerminalError,
-            }),
-          }),
-          // For insert without select (subscribe)
-          data: mockTerminalData,
-          error: mockTerminalError,
-        }
-      })
-
-      // For select().eq().single() pattern
-      mockChain.select = vi.fn().mockReturnValue({
-        eq: vi.fn().mockReturnValue({
-          single: vi.fn().mockReturnValue({
-            data: mockTerminalData,
-            error: mockTerminalError,
-          }),
-          order: vi.fn().mockReturnValue({
-            data: mockTerminalData,
-            error: mockTerminalError,
-            order: vi.fn().mockReturnValue({
-              data: mockTerminalData,
-              error: mockTerminalError,
-            }),
-          }),
-          eq: vi.fn().mockReturnValue({
-            data: mockTerminalData,
-            error: mockTerminalError,
-            limit: vi.fn().mockReturnValue({
-              data: mockTerminalData,
-              error: mockTerminalError,
-            }),
-          }),
-          is: vi.fn().mockReturnValue({
-            order: vi.fn().mockReturnValue({
-              limit: vi.fn().mockReturnValue({
-                single: vi.fn().mockReturnValue({
-                  data: mockTerminalData,
-                  error: mockTerminalError,
-                }),
-              }),
-            }),
-          }),
-          gte: vi.fn().mockReturnValue({
-            order: vi.fn().mockReturnValue({
-              limit: vi.fn().mockReturnValue({
-                data: mockTerminalData,
-                error: mockTerminalError,
-              }),
-            }),
-            // For calculatePublicUptime — just select('status').eq().gte()
-            data: mockTerminalData,
-            error: mockTerminalError,
-          }),
-        }),
-        order: vi.fn().mockReturnValue({
-          order: vi.fn().mockReturnValue({
-            data: mockTerminalData,
-            error: mockTerminalError,
-          }),
-        }),
-      })
-
-      return mockChain
-    },
+    from: () => buildRecursiveChain(),
   }),
 }))
 
@@ -147,7 +63,6 @@ import {
   subscribeToPublicMonitor,
   getOpenPublicIncident,
   createPublicIncident,
-  resolvePublicIncident,
 } from '@/lib/db/public-monitors'
 
 // ---------------------------------------------------------------------------

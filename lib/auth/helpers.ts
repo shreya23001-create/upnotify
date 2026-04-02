@@ -15,6 +15,8 @@ const PUBLIC_ROUTES: ReadonlyArray<string> = [
   '/acceptable-use',
   '/agency-agreement',
   '/blog',
+  '/about',
+  '/contact',
 ]
 
 export function isPublicRoute(pathname: string): boolean {
