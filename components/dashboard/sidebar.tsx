@@ -1,7 +1,7 @@
-import { UptrueLogo } from '@/components/ui/uptrue-logo'
 'use client'
 
 import Link from 'next/link'
+import { UptrueLogo } from '@/components/ui/uptrue-logo'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import { useWorkspace } from '@/components/providers/workspace-provider'
