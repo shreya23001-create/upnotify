@@ -47,7 +47,7 @@ export const helpTopics = [
   },
 ]
 
-export function HelpSidebar({ currentPath }: { currentPath: string }) {
+export function HelpSidebar({ currentPath }: { currentPath: string }): React.ReactElement {
   return (
     <nav className="help-sidebar" aria-label="Help topics navigation">
       <div className="help-sidebar-title">

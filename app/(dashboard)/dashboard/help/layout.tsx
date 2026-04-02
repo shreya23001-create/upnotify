@@ -5,6 +5,6 @@ export const metadata: Metadata = {
   description: 'Learn how to monitor your websites, set up alerts, create status pages, and manage your Uptrue account.',
 }
 
-export default function HelpLayout({ children }: { children: React.ReactNode }) {
+export default function HelpLayout({ children }: { children: React.ReactNode }): React.ReactElement {
   return <>{children}</>
 }

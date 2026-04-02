@@ -22,15 +22,16 @@ interface OnboardingRequest {
 }
 
 interface MonitorResultItem {
-  id: string
+  id?: string
   name: string
   type: string
-  target: string
+  target?: string
   status: string
-  responseTimeMs: number | null
-  statusCode: number | null
-  errorMessage: string | null
-  metadata: Record<string, unknown> | null
+  responseTimeMs?: number | null
+  statusCode?: number | null
+  errorMessage?: string | null
+  error?: string
+  metadata?: Record<string, unknown> | null
 }
 
 function isValidUrl(input: string): boolean {
@@ -102,6 +103,12 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
       if (!monitor) {
         logger.error('Failed to create onboarding monitor', { type: monitorReq.type })
+        results.push({
+          name: monitorReq.name,
+          type: monitorReq.type,
+          status: 'error',
+          error: `Failed to create ${monitorReq.type} monitor`,
+        })
         continue
       }
 

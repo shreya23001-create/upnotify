@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { HelpSidebar, helpTopics } from './help-sidebar'
 
-export default function HelpIndexPage() {
+export default function HelpIndexPage(): React.ReactElement {
   const [search, setSearch] = useState('')
   const pathname = usePathname()
 
