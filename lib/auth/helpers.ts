@@ -6,8 +6,6 @@
 const PUBLIC_ROUTES: ReadonlyArray<string> = [
   '/',
   '/auth/callback',
-  '/login',
-  '/signup',
   '/score',
   '/tracker',
   '/terms',
