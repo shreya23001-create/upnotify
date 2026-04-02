@@ -161,7 +161,7 @@ export default async function ScoreResultsPage({ params }: PageProps): Promise<R
 
       <nav className="score-nav">
         <Link href="/" className="score-nav-logo">
-          Uptrue
+          <img src="/logo.svg" alt="Uptrue" width={120} height={30} />
         </Link>
         <Link href="/login" className="btn btn-secondary btn-sm">
           Sign in

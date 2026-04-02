@@ -56,7 +56,7 @@ export const metadata: Metadata = {
       "Monitor uptime, performance and infrastructure across all your sites. 10 monitor types, AI-powered reports, public status pages, and multi-channel alerts.",
     images: [
       {
-        url: "/og-image.png",
+        url: "/og-image.svg",
         width: 1200,
         height: 630,
         alt: "Uptrue — Uptime Monitoring for Agencies & Teams",

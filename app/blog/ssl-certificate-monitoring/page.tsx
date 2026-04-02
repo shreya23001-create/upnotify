@@ -13,7 +13,7 @@ export const metadata: Metadata = {
       'Auto-renew sounds foolproof, but SSL certificates still fail in production every day. Learn why monitoring catches what automation misses.',
     url: 'https://uptrue.io/blog/ssl-certificate-monitoring',
     type: 'article',
-    images: [{ url: '/og-image.png', width: 1200, height: 630 }],
+    images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',

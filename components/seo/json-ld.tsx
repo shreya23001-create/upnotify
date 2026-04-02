@@ -20,7 +20,7 @@ export function OrganizationJsonLd(): React.ReactElement {
     name: 'Uptrue',
     legalName: 'Vision Software Solutions Limited',
     url: 'https://uptrue.io',
-    logo: 'https://uptrue.io/logo.png',
+    logo: 'https://uptrue.io/logo.svg',
     description:
       'Uptime, performance and infrastructure monitoring platform for agencies and teams.',
     address: {

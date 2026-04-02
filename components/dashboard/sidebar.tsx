@@ -67,7 +67,7 @@ export function Sidebar(): React.ReactElement {
             <span className="sidebar-logo-mark">U</span>
           ) : (
             <img
-              src="/logo-concept-1.svg"
+              src="/logo-light.svg"
               alt="Uptrue"
               width={130}
               height={32}

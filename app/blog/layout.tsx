@@ -24,7 +24,7 @@ export default function BlogLayout({ children }: { children: React.ReactNode }):
         <div className="blog-header-inner">
           <Link href="/" className="blog-logo" aria-label="Uptrue home">
             <img
-              src="/logo-concept-1.svg"
+              src="/logo.svg"
               alt="Uptrue"
               width={140}
               height={35}
@@ -49,7 +49,7 @@ export default function BlogLayout({ children }: { children: React.ReactNode }):
           <div className="blog-footer-grid">
             <div className="blog-footer-brand">
               <img
-                src="/logo-concept-1.svg"
+                src="/logo.svg"
                 alt="Uptrue"
                 width={120}
                 height={30}

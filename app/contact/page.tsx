@@ -52,7 +52,7 @@ export default function ContactPage(): React.ReactElement {
         <div className="landing-nav-inner">
           <Link href="/" className="landing-logo" aria-label="Uptrue home">
             <img
-              src="/logo-concept-1.svg"
+              src="/logo.svg"
               alt="Uptrue"
               width={140}
               height={35}
@@ -129,7 +129,7 @@ export default function ContactPage(): React.ReactElement {
           <div className="footer-grid">
             <div className="footer-brand">
               <img
-                src="/logo-concept-1.svg"
+                src="/logo.svg"
                 alt="Uptrue"
                 width={140}
                 height={35}

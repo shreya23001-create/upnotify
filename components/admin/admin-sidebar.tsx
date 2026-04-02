@@ -55,9 +55,8 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps): React.Reac
       <aside className={`admin-sidebar${isOpen ? ' admin-sidebar-open' : ''}`}>
         {/* Logo */}
         <div className="admin-sidebar-logo">
-          <Link href="/admin" onClick={onClose}>
-            <span className="admin-sidebar-logo-icon">U</span>
-            <span className="admin-sidebar-logo-text">Uptrue</span>
+          <Link href="/admin" onClick={onClose} style={{ display: 'flex', alignItems: 'center' }}>
+            <img src="/logo-light.svg" alt="Uptrue Admin" width={130} height={32} style={{ display: 'block' }} />
           </Link>
           <button
             className="admin-sidebar-close"

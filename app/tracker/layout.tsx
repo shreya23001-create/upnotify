@@ -13,7 +13,9 @@ export default function TrackerLayout({ children }: { children: React.ReactNode 
   return (
     <div className="tracker-layout">
       <header className="tracker-header">
-        <Link href="/" className="tracker-logo">Uptrue</Link>
+        <Link href="/" className="tracker-logo">
+          <img src="/logo.svg" alt="Uptrue" width={120} height={30} />
+        </Link>
         <nav className="tracker-nav">
           <Link href="/tracker">All Sites</Link>
           <a href="https://uptrue.io" target="_blank" rel="noopener noreferrer">Monitor Your Site</a>
