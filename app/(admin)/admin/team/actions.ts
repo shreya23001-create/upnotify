@@ -74,9 +74,14 @@ export async function updateAdminAction(formData: FormData): Promise<ActionResul
       return { success: false, error: 'Invalid role.' }
     }
 
+    // Parse permissions if provided
+    const permissionsRaw = formData.get('permissions') as string | null
+    const permissions = permissionsRaw ? JSON.parse(permissionsRaw) : undefined
+
     const updated = await updateAdminRole(id, {
       ...(role ? { role } : {}),
       is_active: isActive,
+      ...(permissions ? { permissions } : {}),
     })
 
     if (!updated) {

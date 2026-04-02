@@ -29,7 +29,7 @@ const ROLE_DEFAULTS: Record<string, AdminPermissions> = {
     plans: { read: true, write: true },
     tracker: { read: true, write: true },
     feature_flags: { read: true, write: false },
-    impersonate: false,
+    impersonate: true,
   },
   viewer: {
     users: { read: true, write: false },

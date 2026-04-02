@@ -6,6 +6,52 @@ import { DataTable, type Column } from '@/components/ui/data-table'
 import type { AdminRole } from '@/lib/types'
 import { addAdminAction, updateAdminAction } from '@/app/(admin)/admin/team/actions'
 
+interface AdminPermissions {
+  users: { read: boolean; write: boolean }
+  organisations: { read: boolean; write: boolean }
+  plans: { read: boolean; write: boolean }
+  tracker: { read: boolean; write: boolean }
+  feature_flags: { read: boolean; write: boolean }
+  impersonate: boolean
+}
+
+const DEFAULT_PERMISSIONS: AdminPermissions = {
+  users: { read: true, write: false },
+  organisations: { read: true, write: false },
+  plans: { read: true, write: false },
+  tracker: { read: true, write: false },
+  feature_flags: { read: true, write: false },
+  impersonate: false,
+}
+
+const MODULE_LABELS: Record<string, string> = {
+  users: 'Users',
+  organisations: 'Organisations',
+  plans: 'Plans & Pricing',
+  tracker: 'Public Tracker',
+  feature_flags: 'Feature Flags',
+}
+
+function parsePerms(json: unknown): AdminPermissions {
+  if (typeof json === 'object' && json !== null && !Array.isArray(json)) {
+    const obj = json as Record<string, unknown>
+    const result = { ...DEFAULT_PERMISSIONS }
+    for (const key of Object.keys(MODULE_LABELS)) {
+      const mod = obj[key]
+      if (typeof mod === 'object' && mod !== null) {
+        const m = mod as Record<string, boolean>
+        result[key as keyof Omit<AdminPermissions, 'impersonate'>] = {
+          read: Boolean(m.read),
+          write: Boolean(m.write),
+        }
+      }
+    }
+    result.impersonate = Boolean(obj.impersonate)
+    return result
+  }
+  return DEFAULT_PERMISSIONS
+}
+
 interface AdminTeamContentProps {
   adminRoles: AdminRole[]
   currentUserEmail: string
@@ -26,10 +72,50 @@ const ROLE_BADGE_CLASSES: Record<string, string> = {
 export function AdminTeamContent({ adminRoles, currentUserEmail }: AdminTeamContentProps): React.ReactElement {
   const [showAddForm, setShowAddForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
+  const [editPermsId, setEditPermsId] = useState<string | null>(null)
+  const [editPerms, setEditPerms] = useState<AdminPermissions>(DEFAULT_PERMISSIONS)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
+
+  function startEditPermissions(r: AdminRole): void {
+    setEditPermsId(r.id)
+    setEditPerms(parsePerms(r.permissions))
+    setEditingId(null)
+  }
+
+  function handlePermToggle(module: string, field: 'read' | 'write'): void {
+    setEditPerms(prev => {
+      const mod = prev[module as keyof Omit<AdminPermissions, 'impersonate'>]
+      if (!mod) return prev
+      return { ...prev, [module]: { ...mod, [field]: !mod[field] } }
+    })
+  }
+
+  function handleImpersonateToggle(): void {
+    setEditPerms(prev => ({ ...prev, impersonate: !prev.impersonate }))
+  }
+
+  function savePermissions(adminId: string): void {
+    setError(null)
+    setSuccess(null)
+    startTransition(async () => {
+      const formData = new FormData()
+      formData.set('id', adminId)
+      formData.set('role', adminRoles.find(r => r.id === adminId)?.role ?? 'viewer')
+      formData.set('is_active', String(adminRoles.find(r => r.id === adminId)?.is_active ?? true))
+      formData.set('permissions', JSON.stringify(editPerms))
+      const result = await updateAdminAction(formData)
+      if (result.success) {
+        setSuccess('Permissions saved.')
+        setEditPermsId(null)
+        router.refresh()
+      } else {
+        setError(result.error ?? 'Failed to save permissions.')
+      }
+    })
+  }
 
   const handleAdd = useCallback((formData: FormData): void => {
     setError(null)
@@ -151,7 +237,7 @@ export function AdminTeamContent({ adminRoles, currentUserEmail }: AdminTeamCont
       sortable: false,
       render: (r: AdminRole) => {
         // Cannot modify super admin
-        if (r.role === 'super_admin') return null
+        if (r.role === 'super_admin') return <span className="table-muted" style={{ fontSize: 12 }}>Full access</span>
         return (
           <div style={{ display: 'flex', gap: 6 }}>
             <button
@@ -161,6 +247,14 @@ export function AdminTeamContent({ adminRoles, currentUserEmail }: AdminTeamCont
               style={{ fontSize: 12, padding: '4px 10px' }}
             >
               {editingId === r.id ? 'Cancel' : 'Edit Role'}
+            </button>
+            <button
+              className="btn btn-sm btn-secondary"
+              onClick={() => startEditPermissions(r)}
+              disabled={isPending}
+              style={{ fontSize: 12, padding: '4px 10px' }}
+            >
+              Permissions
             </button>
             <button
               className={`btn btn-sm ${r.is_active ? 'btn-outline' : 'btn-primary'}`}
@@ -280,6 +374,87 @@ export function AdminTeamContent({ adminRoles, currentUserEmail }: AdminTeamCont
         filters={roleFilters}
         emptyMessage="No admin users configured."
       />
+
+      {/* Permissions Editor Panel */}
+      {editPermsId && (() => {
+        const admin = adminRoles.find(r => r.id === editPermsId)
+        if (!admin) return null
+        return (
+          <div className="card" style={{ marginTop: 20 }}>
+            <div className="card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div className="card-title">Permissions — {admin.display_name || admin.email}</div>
+              <button className="btn btn-sm btn-ghost" onClick={() => setEditPermsId(null)}>Close</button>
+            </div>
+            <div className="card-content">
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid var(--border-primary)' }}>
+                    <th style={{ textAlign: 'left', padding: '8px 12px', fontWeight: 600 }}>Module</th>
+                    <th style={{ textAlign: 'center', padding: '8px 12px', fontWeight: 600 }}>Can View</th>
+                    <th style={{ textAlign: 'center', padding: '8px 12px', fontWeight: 600 }}>Can Edit</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {Object.entries(MODULE_LABELS).map(([key, label]) => {
+                    const perm = editPerms[key as keyof Omit<AdminPermissions, 'impersonate'>]
+                    return (
+                      <tr key={key} style={{ borderBottom: '1px solid var(--border-primary)' }}>
+                        <td style={{ padding: '8px 12px' }}>{label}</td>
+                        <td style={{ textAlign: 'center', padding: '8px 12px' }}>
+                          <input
+                            type="checkbox"
+                            checked={perm?.read ?? false}
+                            onChange={() => handlePermToggle(key, 'read')}
+                            disabled={isPending}
+                          />
+                        </td>
+                        <td style={{ textAlign: 'center', padding: '8px 12px' }}>
+                          <input
+                            type="checkbox"
+                            checked={perm?.write ?? false}
+                            onChange={() => handlePermToggle(key, 'write')}
+                            disabled={isPending}
+                          />
+                        </td>
+                      </tr>
+                    )
+                  })}
+                  <tr style={{ borderBottom: '1px solid var(--border-primary)' }}>
+                    <td style={{ padding: '8px 12px', fontWeight: 500 }}>Impersonate Users</td>
+                    <td colSpan={2} style={{ textAlign: 'center', padding: '8px 12px' }}>
+                      <input
+                        type="checkbox"
+                        checked={editPerms.impersonate}
+                        onChange={handleImpersonateToggle}
+                        disabled={isPending}
+                      />
+                      <span style={{ marginLeft: 8, fontSize: 12, color: 'var(--text-muted)' }}>
+                        {editPerms.impersonate ? 'Enabled' : 'Disabled'}
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <div style={{ marginTop: 16, display: 'flex', gap: 8 }}>
+                <button
+                  className="btn btn-primary btn-sm"
+                  onClick={() => savePermissions(editPermsId)}
+                  disabled={isPending}
+                >
+                  {isPending ? 'Saving...' : 'Save Permissions'}
+                </button>
+                <button
+                  className="btn btn-secondary btn-sm"
+                  onClick={() => setEditPermsId(null)}
+                  disabled={isPending}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )
+      })()}
     </div>
   )
 }
