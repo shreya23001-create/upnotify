@@ -3,6 +3,7 @@ import Link from 'next/link'
 import {
   OrganizationJsonLd,
 } from '@/components/seo/json-ld'
+import { ContactForm } from '@/components/contact-form'
 
 export const metadata: Metadata = {
   title: 'Contact Uptrue — Get in Touch',
@@ -107,68 +108,7 @@ export default function ContactPage(): React.ReactElement {
           <p className="landing-section-subtitle">
             Fill out the form below and we will get back to you as soon as possible.
           </p>
-          <form
-            className="contact-form"
-            action="mailto:support@uptrue.io"
-            method="POST"
-            encType="text/plain"
-          >
-            <div className="contact-form-row">
-              <label htmlFor="contact-name" className="contact-label">Your Name</label>
-              <input
-                type="text"
-                id="contact-name"
-                name="name"
-                required
-                className="contact-input"
-                placeholder="Jane Smith"
-              />
-            </div>
-            <div className="contact-form-row">
-              <label htmlFor="contact-email" className="contact-label">Email Address</label>
-              <input
-                type="email"
-                id="contact-email"
-                name="email"
-                required
-                className="contact-input"
-                placeholder="jane@company.com"
-              />
-            </div>
-            <div className="contact-form-row">
-              <label htmlFor="contact-subject" className="contact-label">Subject</label>
-              <select
-                id="contact-subject"
-                name="subject"
-                required
-                className="contact-input"
-                defaultValue=""
-              >
-                <option value="" disabled>Select a subject</option>
-                <option value="General enquiry">General Enquiry</option>
-                <option value="Agency enquiry">Agency Enquiry</option>
-                <option value="Partnership">Partnership</option>
-                <option value="Billing">Billing</option>
-                <option value="Technical support">Technical Support</option>
-                <option value="Bug report">Bug Report</option>
-                <option value="Feature request">Feature Request</option>
-              </select>
-            </div>
-            <div className="contact-form-row">
-              <label htmlFor="contact-message" className="contact-label">Message</label>
-              <textarea
-                id="contact-message"
-                name="message"
-                required
-                className="contact-input contact-textarea"
-                placeholder="Tell us how we can help..."
-                rows={6}
-              />
-            </div>
-            <button type="submit" className="btn btn-primary btn-lg" style={{ width: '100%' }}>
-              Send Message
-            </button>
-          </form>
+          <ContactForm />
         </div>
       </section>
 

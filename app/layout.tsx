@@ -68,11 +68,14 @@ export const metadata: Metadata = {
     title: "Uptrue — Uptime Monitoring for Agencies & Teams",
     description:
       "Monitor uptime, performance and infrastructure across all your sites. 10 monitor types, AI-powered reports, public status pages, and multi-channel alerts.",
-    images: ["/og-image.png"],
+    images: ["/og-image.svg"],
   },
   icons: {
-    icon: "/favicon.ico",
-    apple: "/apple-touch-icon.png",
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "32x32" },
+    ],
+    apple: "/favicon.svg",
   },
   robots: {
     index: true,
