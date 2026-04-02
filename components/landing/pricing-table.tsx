@@ -1,5 +1,3 @@
-'use client'
-
 interface PlanFeature {
   text: string
   included: boolean
@@ -12,6 +10,7 @@ interface Plan {
   description: string
   features: PlanFeature[]
   cta: string
+  ctaHref: string
   highlighted: boolean
 }
 
@@ -22,70 +21,82 @@ const PLANS: Plan[] = [
     period: 'forever',
     description: 'Get started with basic monitoring',
     features: [
-      { text: '5 monitors', included: true },
-      { text: '5-minute check interval', included: true },
-      { text: 'Email alerts', included: true },
-      { text: '1 status page', included: true },
+      { text: '3 monitors', included: true },
+      { text: '10-minute check interval', included: true },
       { text: '7-day data retention', included: true },
-      { text: 'AI reports', included: false },
+      { text: 'Email alerts', included: true },
+      { text: 'Solo use only', included: true },
+      { text: 'Status pages', included: false },
       { text: 'Slack & Teams alerts', included: false },
+      { text: 'Webhooks', included: false },
+      { text: 'AI reports', included: false },
       { text: 'API access', included: false },
     ],
     cta: 'Start Free',
+    ctaHref: '/signup',
     highlighted: false,
   },
   {
-    name: 'Starter',
-    price: '\u00A319',
+    name: 'Lite',
+    price: '\u00A310',
+    period: '/year',
+    description: 'Affordable monitoring for small projects',
+    features: [
+      { text: '5 monitors', included: true },
+      { text: '1-minute check interval', included: true },
+      { text: '30-day data retention', included: true },
+      { text: 'Email alerts', included: true },
+      { text: '2 team members', included: true },
+      { text: '1 branded status page', included: true },
+      { text: 'Slack & Teams alerts', included: true },
+      { text: 'Webhooks', included: true },
+      { text: 'AI reports', included: false },
+      { text: 'API access', included: false },
+    ],
+    cta: 'Get Started \u2014 \u00A310/yr',
+    ctaHref: '/signup',
+    highlighted: false,
+  },
+  {
+    name: 'Builder',
+    price: '\u00A315',
     period: '/month',
-    description: 'For growing teams and projects',
+    description: 'For growing teams and serious projects',
     features: [
       { text: '25 monitors', included: true },
       { text: '1-minute check interval', included: true },
-      { text: 'Email & Slack alerts', included: true },
-      { text: '5 status pages', included: true },
       { text: '90-day data retention', included: true },
+      { text: 'Email alerts', included: true },
+      { text: '10 team members', included: true },
+      { text: '5 custom domain status pages', included: true },
+      { text: 'Slack & Teams alerts', included: true },
+      { text: 'Webhooks', included: true },
       { text: 'AI reports (5/month)', included: true },
-      { text: 'Webhook alerts', included: false },
       { text: 'API access', included: false },
     ],
-    cta: 'Start Trial',
-    highlighted: false,
-  },
-  {
-    name: 'Pro',
-    price: '\u00A349',
-    period: '/month',
-    description: 'Full power for serious monitoring',
-    features: [
-      { text: '100 monitors', included: true },
-      { text: '30-second check interval', included: true },
-      { text: 'All alert channels', included: true },
-      { text: 'Unlimited status pages', included: true },
-      { text: '1-year data retention', included: true },
-      { text: 'Unlimited AI reports', included: true },
-      { text: 'Webhook + HMAC signing', included: true },
-      { text: 'Full API access', included: true },
-    ],
-    cta: 'Start Trial',
+    cta: 'Start 14-Day Trial',
+    ctaHref: '/signup',
     highlighted: true,
   },
   {
-    name: 'Agency',
-    price: '\u00A3149',
-    period: 'one-time',
-    description: 'White-label monitoring for agencies',
+    name: 'Scale',
+    price: '\u00A339',
+    period: '/month',
+    description: 'Full power for teams that need everything',
     features: [
-      { text: 'Unlimited monitors', included: true },
+      { text: '100 monitors', included: true },
       { text: '30-second check interval', included: true },
-      { text: 'All alert channels', included: true },
-      { text: 'Unlimited status pages', included: true },
       { text: '1-year data retention', included: true },
+      { text: 'Email alerts', included: true },
+      { text: '20 team members', included: true },
+      { text: 'Unlimited status pages', included: true },
+      { text: 'Slack & Teams alerts', included: true },
+      { text: 'Webhooks', included: true },
       { text: 'Unlimited AI reports', included: true },
-      { text: 'White-label branding', included: true },
-      { text: '75/25 revenue sharing', included: true },
+      { text: 'Full API access', included: true },
     ],
-    cta: 'Get Started',
+    cta: 'Start 14-Day Trial',
+    ctaHref: '/signup',
     highlighted: false,
   },
 ]
@@ -129,7 +140,7 @@ export default function PricingTable(): React.ReactElement {
                 ))}
               </ul>
               <a
-                href="/signup"
+                href={plan.ctaHref}
                 className={`btn btn-full ${plan.highlighted ? 'btn-primary' : 'btn-secondary'}`}
               >
                 {plan.cta}

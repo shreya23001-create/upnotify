@@ -27,6 +27,8 @@ export type AdminPermission = Database['public']['Tables']['admin_permissions'][
 export type FeatureFlag = Database['public']['Tables']['feature_flags']['Row']
 export type FeatureFlagUsage = Database['public']['Tables']['feature_flag_usage']['Row']
 export type AgencyTag = Database['public']['Tables']['agency_tags']['Row']
+export type CreditRule = Database['public']['Tables']['credit_rules']['Row']
+export type UserCredit = Database['public']['Tables']['user_credits']['Row']
 
 // Re-export Database type for Supabase client generics
 export type { Database }

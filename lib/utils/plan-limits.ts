@@ -3,6 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 interface PlanLimits {
   monitors: number | null // null = unlimited (usage-based)
   workspaces: number | null
+  maxTeamMembers: number
   hasApiAccess: boolean
   hasAiPredictive: boolean
   hasStatusPageCustomDomain: boolean
@@ -13,19 +14,21 @@ interface PlanLimits {
 
 const UPGRADE_NUDGE_THRESHOLD = 15
 
-/** Usage-based defaults when no subscription exists */
-const USAGE_BASED_DEFAULTS: PlanLimits = {
-  monitors: null,
+/** Free tier defaults when no subscription exists */
+const FREE_DEFAULTS: PlanLimits = {
+  monitors: 3,
   workspaces: 1,
+  maxTeamMembers: 0,
   hasApiAccess: false,
   hasAiPredictive: false,
   hasStatusPageCustomDomain: false,
   hasWhiteLabel: false,
   hasVoiceCalls: false,
-  checkIntervalSeconds: 300,
+  checkIntervalSeconds: 600,
 }
 
-/** Fetch plan limits for an org based on its active subscription */
+/** Fetch plan limits for an org based on its active subscription.
+ *  Reads from the plans table (single source of truth). */
 export async function getPlanLimits(orgId: string): Promise<PlanLimits> {
   const supabase = createAdminClient()
 
@@ -37,20 +40,21 @@ export async function getPlanLimits(orgId: string): Promise<PlanLimits> {
     .single()
 
   if (!sub || !sub.plans) {
-    return USAGE_BASED_DEFAULTS
+    return FREE_DEFAULTS
   }
 
   const plan = sub.plans as Record<string, unknown>
   return {
     monitors: (plan.monitor_limit as number | null) ?? null,
     workspaces: (plan.client_workspace_limit as number | null) ?? null,
+    maxTeamMembers: (plan.max_team_members as number) ?? 0,
     hasApiAccess: (plan.has_api_access as boolean) ?? false,
     hasAiPredictive: (plan.has_ai_predictive as boolean) ?? false,
     hasStatusPageCustomDomain:
       (plan.has_status_page_custom_domain as boolean) ?? false,
     hasWhiteLabel: (plan.has_white_label as boolean) ?? false,
     hasVoiceCalls: (plan.has_voice_calls as boolean) ?? false,
-    checkIntervalSeconds: (plan.check_interval_seconds as number) ?? 300,
+    checkIntervalSeconds: (plan.check_interval_seconds as number) ?? 600,
   }
 }
 
@@ -116,4 +120,27 @@ export async function checkFeatureAccess(
 ): Promise<boolean> {
   const limits = await getPlanLimits(orgId)
   return limits[feature]
+}
+
+/** Check if the org can add another team member */
+export async function checkTeamMemberLimit(orgId: string): Promise<{
+  allowed: boolean
+  currentCount: number
+  limit: number
+}> {
+  const supabase = createAdminClient()
+  const limits = await getPlanLimits(orgId)
+
+  const { count } = await supabase
+    .from('users')
+    .select('id', { count: 'exact', head: true })
+    .eq('org_id', orgId)
+
+  const currentCount = count ?? 0
+  const limit = limits.maxTeamMembers
+  // limit of 0 means solo account (owner only, no additional members)
+  // We count all users including owner, so allowed if currentCount < limit + 1 (owner)
+  const allowed = limit === 0 ? currentCount <= 1 : currentCount < limit + 1
+
+  return { allowed, currentCount, limit }
 }

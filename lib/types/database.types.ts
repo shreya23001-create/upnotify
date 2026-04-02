@@ -879,11 +879,16 @@ export type Database = {
           has_white_label: boolean
           id: string
           is_visible: boolean
+          max_team_members: number
           monitor_limit: number | null
           name: string
           onboarding_fee_gbp: number
           price_annual_gbp: number | null
+          price_annual_inr: number | null
+          price_annual_usd: number | null
           price_monthly_gbp: number
+          price_monthly_inr: number
+          price_monthly_usd: number
           slug: string
           stripe_price_id_annual: string | null
           stripe_price_id_monthly: string | null
@@ -903,11 +908,16 @@ export type Database = {
           has_white_label?: boolean
           id?: string
           is_visible?: boolean
+          max_team_members?: number
           monitor_limit?: number | null
           name: string
           onboarding_fee_gbp?: number
           price_annual_gbp?: number | null
+          price_annual_inr?: number | null
+          price_annual_usd?: number | null
           price_monthly_gbp?: number
+          price_monthly_inr?: number
+          price_monthly_usd?: number
           slug: string
           stripe_price_id_annual?: string | null
           stripe_price_id_monthly?: string | null
@@ -927,17 +937,97 @@ export type Database = {
           has_white_label?: boolean
           id?: string
           is_visible?: boolean
+          max_team_members?: number
           monitor_limit?: number | null
           name?: string
           onboarding_fee_gbp?: number
           price_annual_gbp?: number | null
+          price_annual_inr?: number | null
+          price_annual_usd?: number | null
           price_monthly_gbp?: number
+          price_monthly_inr?: number
+          price_monthly_usd?: number
           slug?: string
           stripe_price_id_annual?: string | null
           stripe_price_id_monthly?: string | null
           type?: string
           updated_at?: string
           voice_call_monthly_limit?: number
+        }
+        Relationships: []
+      }
+      credit_rules: {
+        Row: {
+          id: string
+          rule_key: string
+          display_name: string
+          credit_amount_pence: number
+          credit_type: string
+          max_per_user: number
+          max_credit_per_month_pence: number | null
+          is_active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          rule_key: string
+          display_name: string
+          credit_amount_pence: number
+          credit_type: string
+          max_per_user: number
+          max_credit_per_month_pence?: number | null
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          rule_key?: string
+          display_name?: string
+          credit_amount_pence?: number
+          credit_type?: string
+          max_per_user?: number
+          max_credit_per_month_pence?: number | null
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_credits: {
+        Row: {
+          id: string
+          user_id: string
+          org_id: string
+          rule_key: string
+          amount_pence: number
+          earned_at: string
+          expires_at: string | null
+          applied: boolean
+          applied_at: string | null
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          org_id: string
+          rule_key: string
+          amount_pence: number
+          earned_at?: string
+          expires_at?: string | null
+          applied?: boolean
+          applied_at?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          org_id?: string
+          rule_key?: string
+          amount_pence?: number
+          earned_at?: string
+          expires_at?: string | null
+          applied?: boolean
+          applied_at?: string | null
         }
         Relationships: []
       }

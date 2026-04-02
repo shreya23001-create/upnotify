@@ -52,14 +52,14 @@ const FEATURES = [
     title: 'Smart Alerting',
     subtitle: 'Multi-channel',
     description:
-      'Email, Slack, Microsoft Teams, and webhooks with HMAC-SHA256 signing. Never miss a critical event.',
+      'Email, Slack, Microsoft Teams, and webhooks with secure webhook signatures. Never miss a critical event.',
   },
   {
     icon: '\u{1F3F7}\uFE0F',
     title: 'Agency White-Label',
     subtitle: 'Your brand, our engine',
     description:
-      'Full white-label for agencies. Custom branding, GTM injection, and revenue sharing built in.',
+      'Full white-label for agencies. Custom branding, your own analytics on client pages, and revenue sharing built in.',
   },
   {
     icon: '\u{1F6E1}\uFE0F',
@@ -104,8 +104,14 @@ export default function LandingPage(): React.ReactElement {
           ================================================================ */}
       <nav className="landing-nav">
         <div className="landing-nav-inner">
-          <Link href="/" className="landing-logo">
-            Uptrue
+          <Link href="/" className="landing-logo" aria-label="Uptrue home">
+            <img
+              src="/logo-concept-1.svg"
+              alt="Uptrue"
+              width={140}
+              height={35}
+              className="landing-logo-img"
+            />
           </Link>
           <div className="landing-nav-links">
             <a href="#features">Features</a>
@@ -221,15 +227,8 @@ export default function LandingPage(): React.ReactElement {
       <section className="landing-social-proof">
         <div className="landing-container">
           <p className="social-proof-text">
-            Trusted by agencies and teams worldwide
+            Trusted by developers and agencies worldwide
           </p>
-          <div className="social-proof-logos">
-            <span className="social-proof-placeholder">Your Logo</span>
-            <span className="social-proof-placeholder">Your Logo</span>
-            <span className="social-proof-placeholder">Your Logo</span>
-            <span className="social-proof-placeholder">Your Logo</span>
-            <span className="social-proof-placeholder">Your Logo</span>
-          </div>
         </div>
       </section>
 
@@ -291,14 +290,17 @@ export default function LandingPage(): React.ReactElement {
         <div className="landing-container">
           <div className="agency-grid">
             <div className="agency-content">
-              <span className="agency-label">For Agencies</span>
+              <div className="agency-label-row">
+                <span className="agency-label">Built for Agencies</span>
+                <span className="agency-coming-soon-badge">Coming Soon</span>
+              </div>
               <h2 className="agency-title">
                 Monitor hundreds of client sites under your brand
               </h2>
               <p className="agency-description">
-                Uptrue was built for agencies managing dozens — or hundreds — of
-                client websites. White-label everything, bill your own clients,
-                and keep 25% of the revenue.
+                White-label everything, manage multi-client workspaces, and
+                unlock revenue sharing. Built from the ground up for agencies
+                managing dozens — or hundreds — of client websites.
               </p>
               <ul className="agency-features">
                 <li>
@@ -311,23 +313,22 @@ export default function LandingPage(): React.ReactElement {
                 </li>
                 <li>
                   <span className="agency-check">{'\u2713'}</span>
-                  75/25 revenue sharing via Stripe Connect
+                  Revenue sharing via Stripe Connect
                 </li>
                 <li>
                   <span className="agency-check">{'\u2713'}</span>
-                  Custom GTM, GA4, and tracking per client
+                  Your own analytics on every client page
                 </li>
                 <li>
                   <span className="agency-check">{'\u2713'}</span>
                   AI reports branded with your agency name
                 </li>
-                <li>
-                  <span className="agency-check">{'\u2713'}</span>
-                  One-time fee of {'\u00A3'}149 — no recurring charges
-                </li>
               </ul>
-              <a href="/signup" className="btn btn-primary btn-lg">
-                Start Your Agency Account
+              <a
+                href="/signup?plan=agency-waitlist"
+                className="btn btn-primary btn-lg"
+              >
+                Join the Waitlist for Early Access
               </a>
             </div>
             <div className="agency-visual">
@@ -391,7 +392,13 @@ export default function LandingPage(): React.ReactElement {
         <div className="landing-container">
           <div className="footer-grid">
             <div className="footer-brand">
-              <span className="landing-logo">Uptrue</span>
+              <img
+                src="/logo-concept-1.svg"
+                alt="Uptrue"
+                width={140}
+                height={35}
+                className="landing-logo-img"
+              />
               <p className="footer-tagline">
                 Uptime, performance &amp; infrastructure monitoring for agencies
                 and teams.

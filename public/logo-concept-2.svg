@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 50" width="200" height="50">
+  <!-- Concept 2: Pulse/Heartbeat monitor line — monitoring + alive -->
+  <defs>
+    <linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#10b981"/>
+      <stop offset="100%" style="stop-color:#3b82f6"/>
+    </linearGradient>
+  </defs>
+  <!-- Rounded square with heartbeat line -->
+  <rect x="2" y="7" width="36" height="36" rx="8" fill="#0f172a"/>
+  <polyline points="8,25 14,25 17,15 20,35 23,20 26,25 32,25"
+    fill="none" stroke="url(#g2)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Green dot (alive indicator) -->
+  <circle cx="34" cy="11" r="4" fill="#10b981"/>
+  <!-- Text -->
+  <text x="46" y="34" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="700" fill="#0f172a" letter-spacing="-0.5">
+    Uptrue
+  </text>
+</svg>

@@ -1,7 +1,8 @@
 import { getAllOrganisations, getAllUsers, getFeatureFlags, getPlans } from '@/lib/db/admin'
 import { AdminContent } from '@/components/admin/admin-content'
+import Link from 'next/link'
 
-export default async function AdminPage() {
+export default async function AdminPage(): Promise<React.ReactElement> {
   const [organisations, users, featureFlags, plans] = await Promise.all([
     getAllOrganisations(), getAllUsers(), getFeatureFlags(), getPlans(),
   ])
@@ -13,6 +14,9 @@ export default async function AdminPage() {
         <div className="card"><div className="card-content-compact"><div className="stat-label">Total Users</div><div className="stat-value">{users.length}</div></div></div>
         <div className="card"><div className="card-content-compact"><div className="stat-label">Organisations</div><div className="stat-value">{organisations.length}</div></div></div>
         <div className="card"><div className="card-content-compact"><div className="stat-label">Feature Flags</div><div className="stat-value">{featureFlags.length}</div></div></div>
+      </div>
+      <div style={{ marginBottom: 24 }}>
+        <Link href="/admin/plans" className="btn btn-secondary">Plans &amp; Pricing</Link>
       </div>
       <AdminContent users={users} organisations={organisations} featureFlags={featureFlags} plans={plans} />
     </div>
