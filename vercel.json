@@ -3,6 +3,10 @@
     {
       "path": "/api/cron/check-runner",
       "schedule": "0 0 * * *"
+    },
+    {
+      "path": "/api/cron/public-checks",
+      "schedule": "*/5 * * * *"
     }
   ]
 }

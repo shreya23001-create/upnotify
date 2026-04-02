@@ -1424,6 +1424,156 @@ export type Database = {
           },
         ]
       }
+      public_monitors: {
+        Row: {
+          id: string
+          domain: string
+          display_name: string
+          category: string
+          check_interval_seconds: number
+          is_active: boolean
+          last_checked_at: string | null
+          last_status: string | null
+          last_response_time_ms: number | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          domain: string
+          display_name: string
+          category?: string
+          check_interval_seconds?: number
+          is_active?: boolean
+          last_checked_at?: string | null
+          last_status?: string | null
+          last_response_time_ms?: number | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          domain?: string
+          display_name?: string
+          category?: string
+          check_interval_seconds?: number
+          is_active?: boolean
+          last_checked_at?: string | null
+          last_status?: string | null
+          last_response_time_ms?: number | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      public_check_results: {
+        Row: {
+          id: string
+          monitor_id: string
+          status: string
+          response_time_ms: number | null
+          status_code: number | null
+          error_message: string | null
+          checked_at: string
+        }
+        Insert: {
+          id?: string
+          monitor_id: string
+          status: string
+          response_time_ms?: number | null
+          status_code?: number | null
+          error_message?: string | null
+          checked_at?: string
+        }
+        Update: {
+          id?: string
+          monitor_id?: string
+          status?: string
+          response_time_ms?: number | null
+          status_code?: number | null
+          error_message?: string | null
+          checked_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_check_results_monitor_id_fkey"
+            columns: ["monitor_id"]
+            isOneToOne: false
+            referencedRelation: "public_monitors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      public_incidents: {
+        Row: {
+          id: string
+          monitor_id: string
+          started_at: string
+          resolved_at: string | null
+          cause: string | null
+          status_code: number | null
+        }
+        Insert: {
+          id?: string
+          monitor_id: string
+          started_at?: string
+          resolved_at?: string | null
+          cause?: string | null
+          status_code?: number | null
+        }
+        Update: {
+          id?: string
+          monitor_id?: string
+          started_at?: string
+          resolved_at?: string | null
+          cause?: string | null
+          status_code?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_incidents_monitor_id_fkey"
+            columns: ["monitor_id"]
+            isOneToOne: false
+            referencedRelation: "public_monitors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      public_alert_subscribers: {
+        Row: {
+          id: string
+          monitor_id: string
+          email: string
+          verified: boolean
+          verification_token: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          monitor_id: string
+          email: string
+          verified?: boolean
+          verification_token?: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          monitor_id?: string
+          email?: string
+          verified?: boolean
+          verification_token?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_alert_subscribers_monitor_id_fkey"
+            columns: ["monitor_id"]
+            isOneToOne: false
+            referencedRelation: "public_monitors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

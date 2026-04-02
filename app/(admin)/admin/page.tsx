@@ -15,8 +15,9 @@ export default async function AdminPage(): Promise<React.ReactElement> {
         <div className="card"><div className="card-content-compact"><div className="stat-label">Organisations</div><div className="stat-value">{organisations.length}</div></div></div>
         <div className="card"><div className="card-content-compact"><div className="stat-label">Feature Flags</div><div className="stat-value">{featureFlags.length}</div></div></div>
       </div>
-      <div style={{ marginBottom: 24 }}>
+      <div style={{ marginBottom: 24, display: 'flex', gap: 12, flexWrap: 'wrap' }}>
         <Link href="/admin/plans" className="btn btn-secondary">Plans &amp; Pricing</Link>
+        <Link href="/admin/tracker" className="btn btn-secondary">Public Tracker</Link>
       </div>
       <AdminContent users={users} organisations={organisations} featureFlags={featureFlags} plans={plans} />
     </div>
