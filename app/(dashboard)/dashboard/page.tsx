@@ -9,9 +9,10 @@ import { RecentIncidents } from '@/components/dashboard/recent-incidents'
 import { OnboardingChecklist } from '@/components/dashboard/onboarding-checklist'
 import { PausedMonitors } from '@/components/dashboard/paused-monitors'
 import { DisabledAlerts } from '@/components/dashboard/disabled-alerts'
+import { DashboardCharts } from '@/components/dashboard/dashboard-charts'
 import { redirect } from 'next/navigation'
 
-export default async function DashboardPage() {
+export default async function DashboardPage(): Promise<React.ReactElement> {
   const user = await getCurrentUser()
   if (!user) redirect('/login')
 
@@ -35,6 +36,8 @@ export default async function DashboardPage() {
     <div>
       <h1 className="page-title" style={{ marginBottom: 24 }}>Dashboard</h1>
       <StatsCards stats={stats} />
+
+      <DashboardCharts stats={stats} incidents={incidents} />
 
       {(pausedMonitors.length > 0 || disabledChannels.length > 0) && (
         <div className="grid-2" style={{ marginBottom: 24 }}>

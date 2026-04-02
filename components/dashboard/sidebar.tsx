@@ -6,62 +6,122 @@ import { useState } from 'react'
 import { useWorkspace } from '@/components/providers/workspace-provider'
 import { useAuth } from '@/components/providers/auth-provider'
 import {
-  IconDashboard, IconActivity, IconGlobe, IconFileText, IconBell,
+  IconDashboard, IconActivity, IconGlobe, IconBell,
   IconBuilding, IconSettings, IconShield, IconChevronLeft, IconChevronRight,
+  IconHelpCircle, IconTrendingUp,
 } from '@/components/icons'
 
-const navItems = [
+interface NavSection {
+  title: string
+  items: NavItem[]
+}
+
+interface NavItem {
+  href: string
+  label: string
+  icon: React.ComponentType<{ size?: number }>
+}
+
+const mainNavItems: NavItem[] = [
   { href: '/dashboard', label: 'Dashboard', icon: IconDashboard },
   { href: '/dashboard/monitors', label: 'Monitors', icon: IconActivity },
-  { href: '/dashboard/status-pages', label: 'Status Pages', icon: IconGlobe },
-  { href: '/dashboard/reports', label: 'Reports', icon: IconFileText },
   { href: '/dashboard/alerts', label: 'Alerts', icon: IconBell },
-  { href: '/dashboard/settings', label: 'Settings', icon: IconSettings },
+  { href: '/dashboard/status-pages', label: 'Status Pages', icon: IconGlobe },
+  { href: '/dashboard/reports', label: 'Reports', icon: IconTrendingUp },
 ]
 
-export function Sidebar() {
+const secondaryNavItems: NavItem[] = [
+  { href: '/dashboard/settings', label: 'Settings', icon: IconSettings },
+  { href: '/dashboard/help', label: 'Help', icon: IconHelpCircle },
+]
+
+export function Sidebar(): React.ReactElement {
   const pathname = usePathname()
   const { isAgency } = useWorkspace()
   const { user } = useAuth()
   const [collapsed, setCollapsed] = useState(false)
 
+  function isActive(href: string): boolean {
+    if (href === '/dashboard') return pathname === '/dashboard'
+    return pathname.startsWith(href)
+  }
+
+  const sections: NavSection[] = []
+
+  /* Main navigation section */
+  const mainItems: NavItem[] = []
+  if (isAgency) {
+    mainItems.push({ href: '/dashboard/clients', label: 'Clients', icon: IconBuilding })
+  }
+  mainItems.push(...mainNavItems)
+  sections.push({ title: 'MAIN', items: mainItems })
+
+  /* Secondary section */
+  sections.push({ title: 'SUPPORT', items: secondaryNavItems })
+
   return (
     <aside className={collapsed ? 'sidebar sidebar-collapsed' : 'sidebar'}>
       <div className="sidebar-logo">
-        <Link href="/dashboard">{collapsed ? 'U' : 'Uptrue'}</Link>
+        <Link href="/dashboard" className="sidebar-logo-link">
+          {collapsed ? (
+            <span className="sidebar-logo-mark">U</span>
+          ) : (
+            <img
+              src="/logo-concept-1.svg"
+              alt="Uptrue"
+              width={130}
+              height={32}
+              className="sidebar-logo-img"
+            />
+          )}
+        </Link>
       </div>
+
       <nav className="sidebar-nav">
-        {isAgency && (
-          <SidebarLink
-            href="/dashboard/clients"
-            label="Clients"
-            icon={IconBuilding}
-            isActive={pathname.startsWith('/dashboard/clients')}
-            collapsed={collapsed}
-          />
-        )}
-        {navItems.map((item) => (
-          <SidebarLink
-            key={item.href}
-            href={item.href}
-            label={item.label}
-            icon={item.icon}
-            isActive={item.href === '/dashboard' ? pathname === '/dashboard' : pathname.startsWith(item.href)}
-            collapsed={collapsed}
-          />
+        {sections.map((section, sIdx) => (
+          <div key={section.title} className="sidebar-section">
+            {!collapsed && sIdx > 0 && <div className="sidebar-divider" />}
+            {!collapsed && (
+              <div className="sidebar-section-title">{section.title}</div>
+            )}
+            {collapsed && sIdx > 0 && <div className="sidebar-divider" />}
+            {section.items.map((item) => (
+              <SidebarLink
+                key={item.href}
+                href={item.href}
+                label={item.label}
+                icon={item.icon}
+                isActive={isActive(item.href)}
+                collapsed={collapsed}
+              />
+            ))}
+          </div>
         ))}
+
         {user?.is_super_admin && (
-          <SidebarLink
-            href="/admin"
-            label="Admin"
-            icon={IconShield}
-            isActive={pathname.startsWith('/admin')}
-            collapsed={collapsed}
-          />
+          <>
+            {!collapsed && <div className="sidebar-divider" />}
+            {collapsed && <div className="sidebar-divider" />}
+            {!collapsed && (
+              <div className="sidebar-section-title">ADMIN</div>
+            )}
+            <SidebarLink
+              href="/admin"
+              label="Admin"
+              icon={IconShield}
+              isActive={pathname.startsWith('/admin')}
+              collapsed={collapsed}
+            />
+          </>
         )}
       </nav>
+
       <div className="sidebar-collapse-btn-wrapper">
-        <button className="sidebar-collapse-btn" onClick={() => setCollapsed(!collapsed)} title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}>
+        <button
+          className="sidebar-collapse-btn"
+          onClick={() => setCollapsed(!collapsed)}
+          title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        >
           {collapsed ? <IconChevronRight size={16} /> : <IconChevronLeft size={16} />}
         </button>
       </div>
@@ -72,12 +132,22 @@ export function Sidebar() {
 function SidebarLink({
   href, label, icon: Icon, isActive, collapsed,
 }: {
-  href: string; label: string; icon: React.ComponentType<{ size?: number }>; isActive: boolean; collapsed: boolean
-}) {
+  href: string
+  label: string
+  icon: React.ComponentType<{ size?: number }>
+  isActive: boolean
+  collapsed: boolean
+}): React.ReactElement {
   return (
-    <Link href={href} className={`sidebar-link${isActive ? ' active' : ''}`} title={collapsed ? label : undefined}>
-      <Icon size={18} />
-      {!collapsed && <span>{label}</span>}
+    <Link
+      href={href}
+      className={`sidebar-link${isActive ? ' active' : ''}`}
+      title={collapsed ? label : undefined}
+    >
+      <span className="sidebar-link-icon">
+        <Icon size={18} />
+      </span>
+      {!collapsed && <span className="sidebar-link-label">{label}</span>}
     </Link>
   )
 }

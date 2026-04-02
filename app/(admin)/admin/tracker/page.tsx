@@ -1,6 +1,5 @@
 import { getAllPublicMonitors } from '@/lib/db/public-monitors'
 import { TrackerManager } from '@/components/admin/tracker-manager'
-import Link from 'next/link'
 
 export default async function AdminTrackerPage(): Promise<React.ReactElement> {
   const monitors = await getAllPublicMonitors()
@@ -10,14 +9,13 @@ export default async function AdminTrackerPage(): Promise<React.ReactElement> {
 
   return (
     <div>
-      <div className="card-header-row" style={{ marginBottom: 24 }}>
+      <div className="admin-page-header">
         <div>
-          <h1 className="page-title" style={{ marginBottom: 4 }}>Public Tracker</h1>
-          <p style={{ fontSize: 14, color: 'var(--text-muted)', margin: 0 }}>
+          <h1 className="admin-page-title">Public Tracker</h1>
+          <p className="admin-page-subtitle">
             Manage publicly tracked websites. These appear on /tracker for SEO and lead generation.
           </p>
         </div>
-        <Link href="/admin" className="btn btn-secondary btn-sm">Back to Admin</Link>
       </div>
 
       <div className="grid-3" style={{ marginBottom: 24 }}>
