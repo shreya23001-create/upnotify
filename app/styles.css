@@ -1759,6 +1759,11 @@ html.dark .landing-cta { background: linear-gradient(135deg, #1a1d27 0%, #242736
 .chart-svg { width: 100%; height: auto; }
 .chart-axis-label { font-size: 10px; fill: var(--text-muted); font-family: system-ui, -apple-system, sans-serif; }
 .chart-empty { padding: 48px 24px; text-align: center; color: var(--text-muted); font-size: 14px; border: 2px dashed var(--border-primary); border-radius: 12px; background: var(--bg-muted); }
+.chart-empty-state { padding: 40px 24px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px; min-height: 200px; justify-content: center; }
+.chart-empty-icon { font-size: 36px; opacity: 0.5; margin-bottom: 4px; }
+.chart-empty-title { font-size: 15px; font-weight: 600; color: var(--text-primary); margin: 0; }
+.chart-empty-message { font-size: 13px; color: var(--text-muted); max-width: 280px; margin: 0 0 8px 0; line-height: 1.5; }
+.chart-empty-state .btn { margin-top: 4px; }
 
 /* Donut chart */
 .donut-chart-wrapper { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; justify-content: center; }

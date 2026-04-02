@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { LineChart } from '@/components/ui/line-chart'
 import { DonutChart } from '@/components/ui/donut-chart'
 import { BarChart } from '@/components/ui/bar-chart'
@@ -18,39 +19,57 @@ interface IncidentLike {
   created_at?: string | null
 }
 
+interface CheckResultLike {
+  status: string
+  response_time_ms?: number | null
+  checked_at: string
+}
+
 interface DashboardChartsProps {
   stats: MonitorStats
   incidents: IncidentLike[]
+  checkResults?: CheckResultLike[]
 }
 
-/** Generate demo uptime data for the last 30 days */
-function generateUptimeData(): { label: string; value: number }[] {
-  const data: { label: string; value: number }[] = []
-  const now = new Date()
-  for (let i = 29; i >= 0; i--) {
-    const date = new Date(now)
-    date.setDate(date.getDate() - i)
-    const label = `${date.getDate()}/${date.getMonth() + 1}`
-    /* Simulate realistic uptime: 98.5% to 100% range */
-    const value = 98.5 + Math.random() * 1.5
-    data.push({ label, value: Math.round(value * 100) / 100 })
+/** Group check results by day and calculate daily uptime % */
+function calculateDailyUptime(results: CheckResultLike[]): { label: string; value: number }[] {
+  if (results.length === 0) return []
+
+  const dayMap: Record<string, { total: number; up: number }> = {}
+
+  for (const r of results) {
+    const date = new Date(r.checked_at)
+    const key = `${date.getDate()}/${date.getMonth() + 1}`
+    if (!dayMap[key]) dayMap[key] = { total: 0, up: 0 }
+    dayMap[key].total++
+    if (r.status === 'up') dayMap[key].up++
   }
-  return data
+
+  return Object.entries(dayMap).map(([label, counts]) => ({
+    label,
+    value: Math.round((counts.up / counts.total) * 10000) / 100,
+  }))
 }
 
-/** Generate demo response time data for the last 30 days */
-function generateResponseTimeData(): { label: string; value: number }[] {
-  const data: { label: string; value: number }[] = []
-  const now = new Date()
-  for (let i = 29; i >= 0; i--) {
-    const date = new Date(now)
-    date.setDate(date.getDate() - i)
-    const label = `${date.getDate()}/${date.getMonth() + 1}`
-    /* Simulate realistic response times: 120ms to 350ms */
-    const value = 120 + Math.random() * 230
-    data.push({ label, value: Math.round(value) })
+/** Group check results by day and calculate avg response time */
+function calculateDailyResponseTime(results: CheckResultLike[]): { label: string; value: number }[] {
+  if (results.length === 0) return []
+
+  const dayMap: Record<string, { total: number; sum: number }> = {}
+
+  for (const r of results) {
+    if (!r.response_time_ms) continue
+    const date = new Date(r.checked_at)
+    const key = `${date.getDate()}/${date.getMonth() + 1}`
+    if (!dayMap[key]) dayMap[key] = { total: 0, sum: 0 }
+    dayMap[key].total++
+    dayMap[key].sum += r.response_time_ms
   }
-  return data
+
+  return Object.entries(dayMap).map(([label, counts]) => ({
+    label,
+    value: Math.round(counts.sum / counts.total),
+  }))
 }
 
 /** Count incidents by severity */
@@ -66,9 +85,29 @@ function countIncidentsBySeverity(incidents: IncidentLike[]): { p1: number; p2: 
   return counts
 }
 
-export function DashboardCharts({ stats, incidents }: DashboardChartsProps): React.ReactElement {
-  const uptimeData = generateUptimeData()
-  const responseTimeData = generateResponseTimeData()
+function EmptyChartState({ title, message, cta, href }: {
+  title: string
+  message: string
+  cta: string
+  href: string
+}): React.ReactElement {
+  return (
+    <div className="chart-empty-state">
+      <div className="chart-empty-icon">📊</div>
+      <h4 className="chart-empty-title">{title}</h4>
+      <p className="chart-empty-message">{message}</p>
+      <Link href={href} className="btn btn-primary btn-sm">{cta}</Link>
+    </div>
+  )
+}
+
+export function DashboardCharts({ stats, incidents, checkResults = [] }: DashboardChartsProps): React.ReactElement {
+  const hasMonitors = stats.total > 0
+  const hasCheckData = checkResults.length > 0
+  const hasIncidents = incidents.length > 0
+
+  const uptimeData = hasCheckData ? calculateDailyUptime(checkResults) : []
+  const responseTimeData = hasCheckData ? calculateDailyResponseTime(checkResults) : []
   const incidentCounts = countIncidentsBySeverity(incidents)
 
   const donutSegments = [
@@ -95,18 +134,27 @@ export function DashboardCharts({ stats, incidents }: DashboardChartsProps): Rea
               <IconTrendingUp size={18} />
               <span>Uptime Overview</span>
             </div>
-            <span className="chart-card-period">Last 30 days</span>
+            {hasCheckData && <span className="chart-card-period">Last 30 days</span>}
           </div>
           <div className="chart-card-body">
-            <LineChart
-              data={uptimeData}
-              color="#22c55e"
-              gradientId="uptimeGrad"
-              yLabel="%"
-              yMin={97}
-              yMax={100}
-              formatValue={(v: number): string => `${v.toFixed(1)}%`}
-            />
+            {hasCheckData && uptimeData.length > 0 ? (
+              <LineChart
+                data={uptimeData}
+                color="#22c55e"
+                gradientId="uptimeGrad"
+                yLabel="%"
+                yMin={97}
+                yMax={100}
+                formatValue={(v: number): string => `${v.toFixed(1)}%`}
+              />
+            ) : (
+              <EmptyChartState
+                title="No uptime data yet"
+                message="Add a monitor and we'll start tracking uptime. Your first chart will appear within minutes."
+                cta="Add Your First Monitor"
+                href="/dashboard/monitors/new"
+              />
+            )}
           </div>
         </div>
 
@@ -116,16 +164,25 @@ export function DashboardCharts({ stats, incidents }: DashboardChartsProps): Rea
               <IconActivity size={18} />
               <span>Response Time</span>
             </div>
-            <span className="chart-card-period">Last 30 days</span>
+            {hasCheckData && <span className="chart-card-period">Last 30 days</span>}
           </div>
           <div className="chart-card-body">
-            <LineChart
-              data={responseTimeData}
-              color="#3b82f6"
-              gradientId="responseGrad"
-              yLabel="ms"
-              formatValue={(v: number): string => `${Math.round(v)}ms`}
-            />
+            {hasCheckData && responseTimeData.length > 0 ? (
+              <LineChart
+                data={responseTimeData}
+                color="#3b82f6"
+                gradientId="responseGrad"
+                yLabel="ms"
+                formatValue={(v: number): string => `${Math.round(v)}ms`}
+              />
+            ) : (
+              <EmptyChartState
+                title="No response time data yet"
+                message="Once your monitors run their first checks, response time trends will show up here."
+                cta="Add a Monitor"
+                href="/dashboard/monitors/new"
+              />
+            )}
           </div>
         </div>
       </div>
@@ -140,7 +197,16 @@ export function DashboardCharts({ stats, incidents }: DashboardChartsProps): Rea
             </div>
           </div>
           <div className="chart-card-body chart-card-body-centered">
-            <DonutChart segments={donutSegments} />
+            {hasIncidents ? (
+              <DonutChart segments={donutSegments} />
+            ) : (
+              <EmptyChartState
+                title="No incidents recorded"
+                message="Good news — no downtime detected yet. When incidents occur, you'll see the severity breakdown here."
+                cta="Set Up Alert Channels"
+                href="/dashboard/alerts/new"
+              />
+            )}
           </div>
         </div>
 
@@ -152,7 +218,16 @@ export function DashboardCharts({ stats, incidents }: DashboardChartsProps): Rea
             </div>
           </div>
           <div className="chart-card-body">
-            <BarChart bars={statusBars} maxValue={stats.total || undefined} />
+            {hasMonitors ? (
+              <BarChart bars={statusBars} maxValue={stats.total || undefined} />
+            ) : (
+              <EmptyChartState
+                title="No monitors yet"
+                message="Your monitor health overview will appear here once you start monitoring. It takes 30 seconds to set up."
+                cta="Create Your First Monitor"
+                href="/dashboard/monitors/new"
+              />
+            )}
           </div>
         </div>
       </div>
