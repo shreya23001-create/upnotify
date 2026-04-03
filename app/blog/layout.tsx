@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import type { Metadata } from 'next'
 import { PublicNav } from '@/components/ui/public-nav'
 import { PublicFooter } from '@/components/ui/public-footer'
