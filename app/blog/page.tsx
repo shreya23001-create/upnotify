@@ -139,6 +139,33 @@ const BLOG_POSTS: BlogPostMeta[] = [
     readTime: '14 min read',
     category: 'WordPress',
   },
+  {
+    slug: 'wordpress-403-forbidden',
+    title: 'WordPress 403 Forbidden Error: Why Your Pages Are Blocked and How to Fix It',
+    excerpt:
+      'Your server is actively refusing to serve your pages — but you might not know because the block can be IP-specific. Learn what causes 403 errors and how HTTP monitoring catches them instantly.',
+    date: '2 May 2026',
+    readTime: '14 min read',
+    category: 'WordPress',
+  },
+  {
+    slug: 'wordpress-japanese-keyword-hack',
+    title: 'Japanese Keyword Hack on WordPress: How Hackers Hijack Your SEO and You Don\'t Even Know',
+    excerpt:
+      'Thousands of spam pages in Japanese appear in Google under your domain — but you cannot see them from wp-admin. Learn how the hack works, how to clean it, and how keyword monitoring catches what cloaking hides.',
+    date: '3 May 2026',
+    readTime: '15 min read',
+    category: 'WordPress',
+  },
+  {
+    slug: 'wordpress-malware-redirect',
+    title: 'WordPress Malware Redirect: Why Your Visitors Are Being Sent to Spam Sites',
+    excerpt:
+      'Your visitors are being redirected to spam sites — but only on mobile, only from Google, and only on the first visit. Learn how conditional redirect hacks work and how HTTP monitoring detects them automatically.',
+    date: '4 May 2026',
+    readTime: '15 min read',
+    category: 'WordPress',
+  },
 ]
 
 const POSTS_PER_PAGE = 6

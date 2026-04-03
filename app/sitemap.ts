@@ -237,6 +237,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'monthly',
       priority: 0.8,
     },
+    {
+      url: 'https://uptrue.io/blog/wordpress-403-forbidden',
+      lastModified: new Date('2026-05-02'),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: 'https://uptrue.io/blog/wordpress-japanese-keyword-hack',
+      lastModified: new Date('2026-05-03'),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: 'https://uptrue.io/blog/wordpress-malware-redirect',
+      lastModified: new Date('2026-05-04'),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
   ]
 
   // Dynamic pages from database
