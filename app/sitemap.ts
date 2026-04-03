@@ -149,7 +149,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
     {
       url: 'https://uptrue.io/blog',
-      lastModified: new Date('2026-04-18'),
+      lastModified: new Date('2026-05-01'),
       changeFrequency: 'weekly',
       priority: 0.8,
     },
@@ -182,6 +182,60 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date('2026-04-18'),
       changeFrequency: 'monthly',
       priority: 0.7,
+    },
+    {
+      url: 'https://uptrue.io/blog/wordpress-database-connection-error',
+      lastModified: new Date('2026-04-22'),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: 'https://uptrue.io/blog/wordpress-contact-form-not-sending',
+      lastModified: new Date('2026-04-23'),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: 'https://uptrue.io/blog/wordpress-white-screen-of-death',
+      lastModified: new Date('2026-04-24'),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: 'https://uptrue.io/blog/wordpress-critical-error',
+      lastModified: new Date('2026-04-26'),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: 'https://uptrue.io/blog/wordpress-too-many-redirects',
+      lastModified: new Date('2026-04-27'),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: 'https://uptrue.io/blog/wordpress-php-memory-exhausted',
+      lastModified: new Date('2026-04-28'),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: 'https://uptrue.io/blog/wordpress-redirect-loop',
+      lastModified: new Date('2026-04-29'),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: 'https://uptrue.io/blog/wordpress-recovery-mode',
+      lastModified: new Date('2026-04-30'),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: 'https://uptrue.io/blog/wp-mail-smtp-not-working',
+      lastModified: new Date('2026-05-01'),
+      changeFrequency: 'monthly',
+      priority: 0.8,
     },
   ]
 

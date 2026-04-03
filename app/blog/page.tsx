@@ -58,6 +58,87 @@ const BLOG_POSTS: BlogPostMeta[] = [
     readTime: '11 min read',
     category: 'Ecommerce',
   },
+  {
+    slug: 'wordpress-database-connection-error',
+    title: 'Error Establishing a Database Connection in WordPress: Complete Fix and Monitoring Guide',
+    excerpt:
+      'The scariest page your WordPress site can show. Learn what causes the database connection error, how to fix each cause, and how to monitor for it so you never discover it from a customer again.',
+    date: '22 April 2026',
+    readTime: '14 min read',
+    category: 'WordPress',
+  },
+  {
+    slug: 'wordpress-contact-form-not-sending',
+    title: 'Contact Form 7 Not Sending Emails: Your Leads Are Disappearing and You Don\'t Know',
+    excerpt:
+      'Contact Form 7 can silently stop sending emails while still showing a success message. Your leads vanish and you have no idea. Here is why it happens and how to catch it.',
+    date: '23 April 2026',
+    readTime: '13 min read',
+    category: 'WordPress',
+  },
+  {
+    slug: 'wordpress-white-screen-of-death',
+    title: 'WordPress White Screen of Death: How to Detect It Before Your Visitors Do',
+    excerpt:
+      'The WSOD shows a blank page instead of your website — and most monitoring tools report it as "up." Learn what causes it, how to fix it, and how keyword monitoring catches what HTTP checks miss.',
+    date: '24 April 2026',
+    readTime: '13 min read',
+    category: 'WordPress',
+  },
+  {
+    slug: 'wordpress-critical-error',
+    title: 'There Has Been a Critical Error on This Website: What It Means and How to Fix It',
+    excerpt:
+      'WordPress 5.2 replaced the White Screen of Death with a critical error message — but its built-in recovery email is unreliable. Learn what triggers it, how to fix it, and how keyword monitoring catches it automatically.',
+    date: '26 April 2026',
+    readTime: '14 min read',
+    category: 'WordPress',
+  },
+  {
+    slug: 'wordpress-too-many-redirects',
+    title: 'WordPress Too Many Redirects: Fix ERR_TOO_MANY_REDIRECTS and Prevent It Forever',
+    excerpt:
+      'The redirect loop locks you out of your entire site — including wp-admin. Learn what causes it (SSL stacking, Cloudflare Flexible SSL, .htaccess conflicts) and how HTTP monitoring detects it automatically.',
+    date: '27 April 2026',
+    readTime: '14 min read',
+    category: 'WordPress',
+  },
+  {
+    slug: 'wordpress-php-memory-exhausted',
+    title: 'PHP Fatal Error: Allowed Memory Size Exhausted in WordPress — Complete Fix Guide',
+    excerpt:
+      'The PHP memory exhausted error crashes your site with a white screen or 500 error. Learn what causes it, four ways to fix it, and how to monitor for the crashes it causes.',
+    date: '28 April 2026',
+    readTime: '13 min read',
+    category: 'WordPress',
+  },
+  {
+    slug: 'wordpress-redirect-loop',
+    title: 'WordPress Login Redirect Loop: Why wp-admin Keeps Sending You Back to the Login Page',
+    excerpt:
+      'You enter the correct password, click Log In, and land right back on the same login screen. No error message. No explanation. Learn what causes the wp-admin redirect loop and how to fix it.',
+    date: '29 April 2026',
+    readTime: '13 min read',
+    category: 'WordPress',
+  },
+  {
+    slug: 'wordpress-recovery-mode',
+    title: 'WordPress Recovery Mode: What Triggers It, What It Means, and How to Respond',
+    excerpt:
+      'WordPress recovery mode is supposed to email you when a fatal error crashes your site. In practice, that email almost never arrives. Learn what triggers it, what your visitors see, and how to monitor for it externally.',
+    date: '30 April 2026',
+    readTime: '13 min read',
+    category: 'WordPress',
+  },
+  {
+    slug: 'wp-mail-smtp-not-working',
+    title: 'WP Mail SMTP Not Sending Emails: Why Your WordPress Site Is Silently Broken',
+    excerpt:
+      'WP Mail SMTP can stop sending emails without any visible error. Contact form submissions vanish, order confirmations never arrive, and you have no idea. Learn what causes it and how to detect it.',
+    date: '1 May 2026',
+    readTime: '14 min read',
+    category: 'WordPress',
+  },
 ]
 
 const POSTS_PER_PAGE = 6
