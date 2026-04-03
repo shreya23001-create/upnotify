@@ -245,6 +245,20 @@ export async function acceptTeamInvite(
     }
   }
 
+  // Block if user already belongs to any organisation (one user = one org)
+  const { data: existingUser } = await supabase
+    .from('users')
+    .select('id, org_id')
+    .eq('id', userId)
+    .single()
+
+  if (existingUser?.org_id && existingUser.org_id !== invite.org_id) {
+    return {
+      success: false,
+      error: 'You already belong to another organisation. Please leave that organisation first before accepting this invite.',
+    }
+  }
+
   // Update the user's org_id and role
   const { error: updateError } = await supabase
     .from('users')

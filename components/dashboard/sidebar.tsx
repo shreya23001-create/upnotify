@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { UptrueLogo } from '@/components/ui/uptrue-logo'
 import { usePathname } from 'next/navigation'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useWorkspace } from '@/components/providers/workspace-provider'
 import { useAuth } from '@/components/providers/auth-provider'
 import {
@@ -21,6 +21,7 @@ interface NavItem {
   href: string
   label: string
   icon: React.ComponentType<{ size?: number }>
+  badge?: number
 }
 
 const mainNavItems: NavItem[] = [
@@ -43,6 +44,33 @@ export function Sidebar(): React.ReactElement {
   const { isAgency } = useWorkspace()
   const { user } = useAuth()
   const [collapsed, setCollapsed] = useState(false)
+  const [openIncidentCount, setOpenIncidentCount] = useState(0)
+
+  useEffect(() => {
+    let cancelled = false
+
+    async function fetchCount(): Promise<void> {
+      try {
+        const res = await fetch('/api/v1/incidents/count')
+        if (!res.ok) return
+        const data = await res.json() as { success: boolean; count: number }
+        if (!cancelled && data.success) {
+          setOpenIncidentCount(data.count)
+        }
+      } catch {
+        // Silently ignore — badge just won't show
+      }
+    }
+
+    fetchCount()
+    // Refresh count every 60 seconds
+    const interval = setInterval(fetchCount, 60_000)
+
+    return () => {
+      cancelled = true
+      clearInterval(interval)
+    }
+  }, [])
 
   function isActive(href: string): boolean {
     if (href === '/dashboard') return pathname === '/dashboard'
@@ -56,7 +84,14 @@ export function Sidebar(): React.ReactElement {
   if (isAgency) {
     mainItems.push({ href: '/dashboard/clients', label: 'Clients', icon: IconBuilding })
   }
-  mainItems.push(...mainNavItems)
+  // Inject open incident badge count onto the Alerts nav item
+  const itemsWithBadges = mainNavItems.map(item => {
+    if (item.href === '/dashboard/alerts' && openIncidentCount > 0) {
+      return { ...item, badge: openIncidentCount }
+    }
+    return item
+  })
+  mainItems.push(...itemsWithBadges)
   sections.push({ title: 'MAIN', items: mainItems })
 
   /* Secondary section */
@@ -90,6 +125,7 @@ export function Sidebar(): React.ReactElement {
                 icon={item.icon}
                 isActive={isActive(item.href)}
                 collapsed={collapsed}
+                badge={item.badge}
               />
             ))}
           </div>
@@ -141,13 +177,14 @@ export function Sidebar(): React.ReactElement {
 }
 
 function SidebarLink({
-  href, label, icon: Icon, isActive, collapsed,
+  href, label, icon: Icon, isActive, collapsed, badge,
 }: {
   href: string
   label: string
   icon: React.ComponentType<{ size?: number }>
   isActive: boolean
   collapsed: boolean
+  badge?: number
 }): React.ReactElement {
   return (
     <Link
@@ -155,10 +192,16 @@ function SidebarLink({
       className={`sidebar-link${isActive ? ' active' : ''}`}
       title={collapsed ? label : undefined}
     >
-      <span className="sidebar-link-icon">
+      <span className="sidebar-link-icon" style={{ position: 'relative' }}>
         <Icon size={18} />
+        {collapsed && badge !== undefined && badge > 0 && (
+          <span className="sidebar-link-badge-dot" />
+        )}
       </span>
       {!collapsed && <span className="sidebar-link-label">{label}</span>}
+      {!collapsed && badge !== undefined && badge > 0 && (
+        <span className="sidebar-link-badge">{badge > 99 ? '99+' : badge}</span>
+      )}
     </Link>
   )
 }

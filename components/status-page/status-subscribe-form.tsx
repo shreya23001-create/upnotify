@@ -4,6 +4,29 @@ import { useState, useTransition } from 'react'
 
 type SubscribeMode = 'email' | 'slack' | 'teams' | 'webhook'
 
+function ExpandableHelp({ title, children }: { title: string; children: React.ReactNode }): React.ReactElement {
+  const [open, setOpen] = useState(false)
+  return (
+    <div className="status-webhook-info" style={{ marginTop: 12 }}>
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        style={{
+          background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+          display: 'flex', alignItems: 'center', gap: 6, width: '100%',
+          fontWeight: 600, fontSize: 13, color: 'var(--text-primary)',
+        }}
+      >
+        <span style={{ transform: open ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform 0.15s', display: 'inline-block' }}>
+          {'\u25B6'}
+        </span>
+        {title}
+      </button>
+      {open && <div style={{ marginTop: 10 }}>{children}</div>}
+    </div>
+  )
+}
+
 const modes: { key: SubscribeMode; label: string; placeholder: string; inputType: string }[] = [
   { key: 'email', label: '📧 Email', placeholder: 'your@email.com', inputType: 'email' },
   { key: 'slack', label: '💬 Slack', placeholder: 'https://hooks.slack.com/services/...', inputType: 'url' },
@@ -113,25 +136,45 @@ export function StatusSubscribeForm({ statusPageId }: { statusPageId: string }) 
         </div>
 
         {mode === 'slack' && (
-          <div className="status-webhook-info">
-            <p><strong>How to get your Slack webhook URL:</strong></p>
-            <ol style={{ paddingLeft: 20, lineHeight: 1.8 }}>
-              <li>Go to <a href="https://api.slack.com/apps" target="_blank" rel="noopener noreferrer" style={{ color: '#667eea' }}>api.slack.com/apps</a> → Create New App</li>
-              <li>Enable <strong>Incoming Webhooks</strong></li>
-              <li>Add webhook to your channel and copy the URL</li>
+          <ExpandableHelp title="How to get your Slack webhook URL">
+            <ol style={{ paddingLeft: 20, lineHeight: 2, fontSize: 13 }}>
+              <li>Go to <a href="https://api.slack.com/apps" target="_blank" rel="noopener noreferrer" style={{ color: '#667eea' }}>api.slack.com/apps</a> and click <strong>Create New App</strong></li>
+              <li>Choose <strong>From scratch</strong>, name it (e.g. &quot;Uptrue Status&quot;), and select your workspace</li>
+              <li>In the left sidebar, click <strong>Incoming Webhooks</strong></li>
+              <li>Toggle <strong>Activate Incoming Webhooks</strong> to On</li>
+              <li>Click <strong>Add New Webhook to Workspace</strong> at the bottom</li>
+              <li>Select the channel where you want status updates posted</li>
+              <li>Copy the webhook URL (starts with <code>https://hooks.slack.com/services/...</code>)</li>
+              <li>Paste it into the field above</li>
             </ol>
-          </div>
+            <p style={{ marginTop: 8, fontSize: 12, color: 'var(--text-muted)' }}>
+              Official docs:{' '}
+              <a href="https://api.slack.com/messaging/webhooks" target="_blank" rel="noopener noreferrer" style={{ color: '#667eea' }}>
+                api.slack.com/messaging/webhooks
+              </a>
+            </p>
+          </ExpandableHelp>
         )}
 
         {mode === 'teams' && (
-          <div className="status-webhook-info">
-            <p><strong>How to get your Teams webhook URL:</strong></p>
-            <ol style={{ paddingLeft: 20, lineHeight: 1.8 }}>
-              <li>In Teams, go to your channel → <strong>Workflows</strong></li>
-              <li>Search for &quot;Post to a channel when a webhook request is received&quot;</li>
-              <li>Complete the setup and copy the URL</li>
+          <ExpandableHelp title="How to get your Microsoft Teams webhook URL">
+            <ol style={{ paddingLeft: 20, lineHeight: 2, fontSize: 13 }}>
+              <li>Open <strong>Microsoft Teams</strong> and go to the channel where you want status updates</li>
+              <li>Click the <strong>...</strong> (more options) next to the channel name</li>
+              <li>Select <strong>Connectors</strong> (or <strong>Workflows</strong> in newer versions)</li>
+              <li>Search for <strong>Incoming Webhook</strong> and click <strong>Configure</strong></li>
+              <li>Give it a name (e.g. &quot;Uptrue Status&quot;) and optionally upload an icon</li>
+              <li>Click <strong>Create</strong></li>
+              <li>Copy the webhook URL that is generated</li>
+              <li>Paste it into the field above</li>
             </ol>
-          </div>
+            <p style={{ marginTop: 8, fontSize: 12, color: 'var(--text-muted)' }}>
+              Official docs:{' '}
+              <a href="https://learn.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/how-to/add-incoming-webhook" target="_blank" rel="noopener noreferrer" style={{ color: '#667eea' }}>
+                Microsoft Teams Incoming Webhook guide
+              </a>
+            </p>
+          </ExpandableHelp>
         )}
 
         {mode === 'webhook' && (

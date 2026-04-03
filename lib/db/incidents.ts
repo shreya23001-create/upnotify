@@ -25,6 +25,21 @@ export async function getIncidentsByWorkspace(
   return data ?? []
 }
 
+export async function getOpenIncidentCount(orgId: string): Promise<number> {
+  const supabase = await createClient()
+  const { count, error } = await supabase
+    .from('incidents')
+    .select('id', { count: 'exact', head: true })
+    .eq('org_id', orgId)
+    .neq('status', 'resolved')
+
+  if (error) {
+    logger.error('Failed to get open incident count', { error: error.message })
+    return 0
+  }
+  return count ?? 0
+}
+
 export async function getOpenIncidents(orgId: string): Promise<Incident[]> {
   const supabase = await createClient()
   const { data, error } = await supabase
