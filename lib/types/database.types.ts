@@ -1118,6 +1118,12 @@ export type Database = {
           },
         ]
       }
+      keyword_suggestions: {
+        Row: { id: string; keyword: string; category: string; type: string; url_pattern: string | null; description: string | null; is_active: boolean; display_order: number; created_at: string; updated_at: string }
+        Insert: { id?: string; keyword: string; category: string; type?: string; url_pattern?: string | null; description?: string | null; is_active?: boolean; display_order?: number; created_at?: string; updated_at?: string }
+        Update: { id?: string; keyword?: string; category?: string; type?: string; url_pattern?: string | null; description?: string | null; is_active?: boolean; display_order?: number; created_at?: string; updated_at?: string }
+        Relationships: []
+      }
       competitor_monitors: {
         Row: {
           id: string

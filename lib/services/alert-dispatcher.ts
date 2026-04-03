@@ -15,6 +15,52 @@ interface AlertChannelConfig {
   teamsWebhookUrl?: string
 }
 
+interface KeywordMonitorConfig {
+  positiveKeywords?: string[]
+  negativeKeywords?: string[]
+  keyword?: string
+  shouldExist?: boolean
+}
+
+/**
+ * Builds keyword-specific context for alert messages.
+ * Returns a string like: "Missing: 'Place Order', 'Secure Payment'. Found: 'error'"
+ * Returns empty string for non-keyword monitors.
+ */
+function buildKeywordAlertContext(monitor: Monitor): string {
+  if (monitor.type !== 'keyword') return ''
+
+  const monitorConfig = monitor.config as KeywordMonitorConfig | undefined
+  if (!monitorConfig) return ''
+
+  const parts: string[] = []
+
+  // Resolve positive keywords (backward compat)
+  let positiveKeywords: string[] = []
+  if (Array.isArray(monitorConfig.positiveKeywords) && monitorConfig.positiveKeywords.length > 0) {
+    positiveKeywords = monitorConfig.positiveKeywords
+  } else if (monitorConfig.keyword && monitorConfig.shouldExist !== false) {
+    positiveKeywords = [monitorConfig.keyword]
+  }
+
+  // Resolve negative keywords (backward compat)
+  let negativeKeywords: string[] = []
+  if (Array.isArray(monitorConfig.negativeKeywords) && monitorConfig.negativeKeywords.length > 0) {
+    negativeKeywords = monitorConfig.negativeKeywords
+  } else if (monitorConfig.keyword && monitorConfig.shouldExist === false) {
+    negativeKeywords = [monitorConfig.keyword]
+  }
+
+  if (positiveKeywords.length > 0) {
+    parts.push(`Watching for: ${positiveKeywords.map(k => `'${k}'`).join(', ')}`)
+  }
+  if (negativeKeywords.length > 0) {
+    parts.push(`Blocking: ${negativeKeywords.map(k => `'${k}'`).join(', ')}`)
+  }
+
+  return parts.join('. ')
+}
+
 export async function dispatchAlerts(incident: Incident, monitor: Monitor): Promise<void> {
   const supabase = createAdminClient()
 
@@ -44,6 +90,9 @@ export async function dispatchAlerts(incident: Incident, monitor: Monitor): Prom
   const config = getConfig()
   const monitorUrl = `${config.app.url}/dashboard/monitors/${monitor.id}`
 
+  // Build keyword-specific context for the alert message
+  const keywordContext = buildKeywordAlertContext(monitor)
+
   // Dispatch to each channel in parallel
   const results = await Promise.allSettled(
     matchingChannels.map(async (channel: AlertChannel) => {
@@ -56,6 +105,7 @@ export async function dispatchAlerts(incident: Incident, monitor: Monitor): Prom
         `Severity: ${incident.severity}\n` +
         `Status: ${incident.status}\n` +
         `Target: ${monitor.target}\n` +
+        (keywordContext ? `${keywordContext}\n` : '') +
         `Time: ${new Date().toISOString()}\n` +
         `Details: ${monitorUrl}`
 

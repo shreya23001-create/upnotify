@@ -86,9 +86,12 @@ export default function MonitorsPage(): React.ReactElement {
                 misconfiguration.
               </li>
               <li>
-                <strong>Keyword</strong> -- Loads your page and searches for a specific word or
-                phrase. If the keyword disappears, something has probably gone wrong with your
-                content or backend.
+                <strong>Keyword</strong> -- Loads your page and checks for words or phrases
+                that should (or should not) be there. You can set <em>positive keywords</em>
+                (must exist on the page) and <em>negative keywords</em> (must not exist). If
+                any positive keyword disappears or any negative keyword appears, Uptrue alerts
+                you immediately. Great for catching broken checkouts, injected spam, error
+                pages, and content changes.
               </li>
               <li>
                 <strong>Port</strong> -- Checks whether a specific port (like 3306 for MySQL or
@@ -161,6 +164,63 @@ export default function MonitorsPage(): React.ReactElement {
               You can pause and resume monitors from the dashboard or the monitor detail page.
               Paused monitors do not count towards your plan limit.
             </p>
+          </section>
+
+          <section className="help-section">
+            <h2 className="help-section-title">Keyword monitoring in depth</h2>
+            <p>
+              The keyword monitor is one of the most powerful tools in Uptrue. Instead of just
+              checking if a page loads, it checks <em>what</em> is on the page. Here is how to
+              set it up properly.
+            </p>
+
+            <h3 style={{ fontSize: 16, fontWeight: 700, marginTop: 20, marginBottom: 8 }}>Positive keywords (must exist)</h3>
+            <p>
+              These are words or phrases that should always be on the page. If any of them
+              disappear, Uptrue treats it as a failure and alerts you.
+            </p>
+            <ul className="help-list">
+              <li><strong>Checkout page:</strong> &quot;Place Order&quot;, &quot;Secure Payment&quot;, &quot;Add to Cart&quot;</li>
+              <li><strong>Login page:</strong> &quot;Sign In&quot;, &quot;Password&quot;</li>
+              <li><strong>Status page:</strong> &quot;operational&quot;, &quot;healthy&quot;</li>
+            </ul>
+
+            <h3 style={{ fontSize: 16, fontWeight: 700, marginTop: 20, marginBottom: 8 }}>Negative keywords (must not exist)</h3>
+            <p>
+              These are words that should never appear on the page. If any of them show up,
+              something has gone wrong. Common examples:
+            </p>
+            <ul className="help-list">
+              <li><strong>Error indicators:</strong> &quot;fatal error&quot;, &quot;server error&quot;, &quot;database error&quot;</li>
+              <li><strong>Spam injection:</strong> &quot;viagra&quot;, &quot;casino&quot; (signs your site has been hacked)</li>
+              <li><strong>Stock issues:</strong> &quot;out of stock&quot;, &quot;unavailable&quot;</li>
+            </ul>
+
+            <h3 style={{ fontSize: 16, fontWeight: 700, marginTop: 20, marginBottom: 8 }}>Smart suggestions</h3>
+            <p>
+              When you enter a URL, Uptrue automatically suggests relevant keywords based on
+              the page type. For example, a checkout page will suggest &quot;Place Order&quot; as a
+              positive keyword and &quot;error&quot; as a negative keyword. Click any suggestion to add
+              it, or type your own.
+            </p>
+
+            <h3 style={{ fontSize: 16, fontWeight: 700, marginTop: 20, marginBottom: 8 }}>Important: use the full page URL</h3>
+            <p>
+              Unlike HTTP monitors where you enter just a domain, keyword monitors need the
+              full page URL. For example, use <code>https://yourshop.com/checkout</code> instead
+              of just <code>yourshop.com</code>. The keywords are checked against the specific
+              page content at that URL.
+            </p>
+
+            <h3 style={{ fontSize: 16, fontWeight: 700, marginTop: 20, marginBottom: 8 }}>Example: monitoring a checkout page</h3>
+            <ol className="help-steps">
+              <li>Create a new keyword monitor</li>
+              <li>Enter the full checkout URL: <code>https://myshop.com/checkout</code></li>
+              <li>Add positive keywords: &quot;Place Order&quot;, &quot;Checkout&quot;, &quot;Secure Payment&quot;</li>
+              <li>Add negative keywords: &quot;error&quot;, &quot;failed&quot;, &quot;out of stock&quot;</li>
+              <li>Set check interval to 1 minute and severity to P1 (Critical)</li>
+              <li>Uptrue will alert you immediately if the checkout breaks or shows errors</li>
+            </ol>
           </section>
 
           <div className="help-next-links">

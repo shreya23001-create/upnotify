@@ -1,8 +1,10 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState, useTransition, useMemo } from 'react'
 import Link from 'next/link'
 import { createMonitorAction } from '@/app/(dashboard)/dashboard/monitors/actions'
+import { KeywordTagInput } from './keyword-tag-input'
+import { getKeywordSuggestions } from '@/lib/utils/keyword-suggestions'
 
 const monitorTypes = [
   { value: 'http', label: 'HTTP/HTTPS Uptime' },
@@ -28,11 +30,23 @@ const intervals = [
 
 export function CreateMonitorForm(): React.ReactElement {
   const [type, setType] = useState('http')
+  const [target, setTarget] = useState('')
+  const [positiveKeywords, setPositiveKeywords] = useState<string[]>([])
+  const [negativeKeywords, setNegativeKeywords] = useState<string[]>([])
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 
+  const suggestions = useMemo(() => getKeywordSuggestions(target), [target])
+
   function handleSubmit(formData: FormData): void {
     setError(null)
+
+    // Inject keyword arrays into form data as JSON
+    if (type === 'keyword') {
+      formData.set('positiveKeywords', JSON.stringify(positiveKeywords))
+      formData.set('negativeKeywords', JSON.stringify(negativeKeywords))
+    }
+
     startTransition(async () => {
       const result = await createMonitorAction(formData)
       if (result?.error) {
@@ -71,17 +85,37 @@ export function CreateMonitorForm(): React.ReactElement {
 
       <div className="form-group">
         <label className="form-label" htmlFor="target">
-          {type === 'port' ? 'Host (e.g. example.com:3306)' : type === 'heartbeat' ? 'Monitor Name (no target needed)' : 'Target URL or Domain'}
+          {type === 'keyword'
+            ? 'Page URL to Monitor'
+            : type === 'port'
+              ? 'Host (e.g. example.com:3306)'
+              : type === 'heartbeat'
+                ? 'Monitor Name (no target needed)'
+                : 'Target URL or Domain'}
         </label>
-        <input className="form-input" id="target" name="target" required placeholder={
-          type === 'http' || type === 'ssl' || type === 'keyword' || type === 'api' || type === 'competitor' || type === 'ping'
-            ? 'https://example.com'
-            : type === 'dns' || type === 'domain'
-              ? 'example.com'
-              : type === 'port'
-                ? 'example.com:3306'
-                : 'my-cron-job'
-        } disabled={isPending} />
+        <input
+          className="form-input"
+          id="target"
+          name="target"
+          required
+          placeholder={
+            type === 'keyword'
+              ? 'https://yoursite.com/checkout'
+              : type === 'http' || type === 'ssl' || type === 'api' || type === 'competitor' || type === 'ping'
+                ? 'https://example.com'
+                : type === 'dns' || type === 'domain'
+                  ? 'example.com'
+                  : type === 'port'
+                    ? 'example.com:3306'
+                    : 'my-cron-job'
+          }
+          disabled={isPending}
+          value={target}
+          onChange={e => setTarget(e.target.value)}
+        />
+        {type === 'keyword' && (
+          <span className="form-helper-text">Enter the full page URL, not just the domain</span>
+        )}
       </div>
 
       <div className="form-group">
@@ -94,26 +128,36 @@ export function CreateMonitorForm(): React.ReactElement {
       <div className="form-group">
         <label className="form-label" htmlFor="severity">Severity</label>
         <select className="form-select" id="severity" name="severity" disabled={isPending}>
-          <option value="P1">P1 — Critical</option>
-          <option value="P2" selected>P2 — High</option>
-          <option value="P3">P3 — Medium</option>
-          <option value="P4">P4 — Low</option>
+          <option value="P1">P1 -- Critical</option>
+          <option value="P2" selected>P2 -- High</option>
+          <option value="P3">P3 -- Medium</option>
+          <option value="P4">P4 -- Low</option>
         </select>
       </div>
 
       {type === 'keyword' && (
         <>
-          <div className="form-group">
-            <label className="form-label" htmlFor="keyword">Keyword to Search</label>
-            <input className="form-input" id="keyword" name="keyword" placeholder="Expected text on page" disabled={isPending} />
-          </div>
-          <div className="form-group">
-            <label className="form-label" htmlFor="shouldExist">Condition</label>
-            <select className="form-select" id="shouldExist" name="shouldExist" disabled={isPending}>
-              <option value="true">Alert if keyword is MISSING</option>
-              <option value="false">Alert if keyword is FOUND</option>
-            </select>
-          </div>
+          <KeywordTagInput
+            label="Keywords that MUST exist on the page"
+            helperText="If any of these disappear, we will alert you"
+            keywords={positiveKeywords}
+            onChange={setPositiveKeywords}
+            variant="positive"
+            disabled={isPending}
+            placeholder="Type a keyword and press Enter"
+            suggestions={suggestions.positive}
+          />
+
+          <KeywordTagInput
+            label="Keywords that must NOT appear on the page"
+            helperText="If any of these appear, we will alert you (e.g. error messages, spam)"
+            keywords={negativeKeywords}
+            onChange={setNegativeKeywords}
+            variant="negative"
+            disabled={isPending}
+            placeholder="Type a keyword and press Enter"
+            suggestions={suggestions.negative}
+          />
         </>
       )}
 

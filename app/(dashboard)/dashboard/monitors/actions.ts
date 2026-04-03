@@ -43,8 +43,24 @@ export async function createMonitorAction(formData: FormData): Promise<{ error?:
   const config: Record<string, unknown> = {}
 
   if (type === 'keyword') {
-    config.keyword = formData.get('keyword') as string
-    config.shouldExist = formData.get('shouldExist') !== 'false'
+    const positiveStr = formData.get('positiveKeywords') as string
+    const negativeStr = formData.get('negativeKeywords') as string
+    try {
+      config.positiveKeywords = positiveStr ? JSON.parse(positiveStr) : []
+    } catch {
+      config.positiveKeywords = []
+    }
+    try {
+      config.negativeKeywords = negativeStr ? JSON.parse(negativeStr) : []
+    } catch {
+      config.negativeKeywords = []
+    }
+    // Validate that at least one keyword is provided
+    const posArr = config.positiveKeywords as string[]
+    const negArr = config.negativeKeywords as string[]
+    if (posArr.length === 0 && negArr.length === 0) {
+      return { error: 'Please add at least one positive or negative keyword' }
+    }
   }
 
   if (type === 'port') {
@@ -103,7 +119,12 @@ export async function createMonitorAfterPaymentAction(formData: FormData): Promi
   if (!name || !type || !target) return { error: 'Missing monitor data' }
 
   const config: Record<string, unknown> = {}
-  if (type === 'keyword') { config.keyword = formData.get('keyword') as string; config.shouldExist = formData.get('shouldExist') !== 'false' }
+  if (type === 'keyword') {
+    const positiveStr = formData.get('positiveKeywords') as string
+    const negativeStr = formData.get('negativeKeywords') as string
+    try { config.positiveKeywords = positiveStr ? JSON.parse(positiveStr) : [] } catch { config.positiveKeywords = [] }
+    try { config.negativeKeywords = negativeStr ? JSON.parse(negativeStr) : [] } catch { config.negativeKeywords = [] }
+  }
   if (type === 'port') { config.port = parseInt(formData.get('port') as string || '80', 10) }
   if (type === 'heartbeat') { config.expectedIntervalSeconds = parseInt(formData.get('expectedInterval') as string || '300', 10) }
   if (type === 'api') { config.method = formData.get('method') as string || 'GET' }
@@ -142,8 +163,23 @@ export async function updateMonitorAction(monitorId: string, formData: FormData)
   const type = formData.get('type') as string
 
   if (type === 'keyword') {
-    config.keyword = formData.get('keyword') as string
-    config.shouldExist = formData.get('shouldExist') !== 'false'
+    const positiveStr = formData.get('positiveKeywords') as string
+    const negativeStr = formData.get('negativeKeywords') as string
+    try {
+      config.positiveKeywords = positiveStr ? JSON.parse(positiveStr) : []
+    } catch {
+      config.positiveKeywords = []
+    }
+    try {
+      config.negativeKeywords = negativeStr ? JSON.parse(negativeStr) : []
+    } catch {
+      config.negativeKeywords = []
+    }
+    const posArr = config.positiveKeywords as string[]
+    const negArr = config.negativeKeywords as string[]
+    if (posArr.length === 0 && negArr.length === 0) {
+      return { error: 'Please add at least one positive or negative keyword' }
+    }
   }
   if (type === 'port') {
     config.port = parseInt(formData.get('port') as string || '80', 10)

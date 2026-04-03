@@ -138,11 +138,17 @@ export async function GET(request: Request): Promise<NextResponse> {
           if (confirmation.status === 'down') {
             const existingIncident = await getOpenIncidentForMonitor(monitor.id)
             if (!existingIncident) {
+              // Build incident title with keyword details if applicable
+              let incidentTitle = `${monitor.name} is down`
+              if (monitor.type === 'keyword' && confirmation.errorMessage) {
+                incidentTitle = `${monitor.name} — ${confirmation.errorMessage}`
+              }
+
               const newIncident = await createIncident({
                 org_id: monitor.org_id,
                 workspace_id: monitor.workspace_id,
                 monitor_id: monitor.id,
-                title: `${monitor.name} is down`,
+                title: incidentTitle,
                 severity: monitor.severity,
               })
               logger.warn('Monitor confirmed down, incident created', { monitorId: monitor.id, name: monitor.name })

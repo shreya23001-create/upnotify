@@ -12,9 +12,12 @@ export interface CheckerConfig {
   headers?: Record<string, string>
   body?: string
   expectedStatus?: number
-  // Keyword
+  // Keyword — legacy (single keyword)
   keyword?: string
   shouldExist?: boolean
+  // Keyword — new (multiple keywords)
+  positiveKeywords?: string[]
+  negativeKeywords?: string[]
   // Port
   port?: number
   // API assertions

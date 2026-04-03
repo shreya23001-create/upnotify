@@ -1,8 +1,10 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState, useTransition, useMemo } from 'react'
 import { updateMonitorAction } from '@/app/(dashboard)/dashboard/monitors/actions'
 import { MonitorTypeIcon } from './monitor-type-icon'
+import { KeywordTagInput } from './keyword-tag-input'
+import { getKeywordSuggestions } from '@/lib/utils/keyword-suggestions'
 import type { Monitor } from '@/lib/types'
 
 const intervals = [
@@ -17,6 +19,8 @@ const intervals = [
 interface MonitorConfig {
   keyword?: string
   shouldExist?: boolean
+  positiveKeywords?: string[]
+  negativeKeywords?: string[]
   port?: number
   expectedIntervalSeconds?: number
   method?: string
@@ -24,14 +28,48 @@ interface MonitorConfig {
   body?: string
 }
 
-export function EditMonitorForm({ monitor }: { monitor: Monitor }) {
+/**
+ * Resolve legacy single-keyword config into arrays for the new UI.
+ */
+function resolveKeywordConfig(config: MonitorConfig): { positive: string[]; negative: string[] } {
+  let positive: string[] = []
+  let negative: string[] = []
+
+  if (Array.isArray(config.positiveKeywords) && config.positiveKeywords.length > 0) {
+    positive = config.positiveKeywords
+  } else if (config.keyword && config.shouldExist !== false) {
+    positive = [config.keyword]
+  }
+
+  if (Array.isArray(config.negativeKeywords) && config.negativeKeywords.length > 0) {
+    negative = config.negativeKeywords
+  } else if (config.keyword && config.shouldExist === false) {
+    negative = [config.keyword]
+  }
+
+  return { positive, negative }
+}
+
+export function EditMonitorForm({ monitor }: { monitor: Monitor }): React.ReactElement {
   const config = monitor.config as MonitorConfig
+  const resolved = resolveKeywordConfig(config)
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
+  const [target, setTarget] = useState(monitor.target)
+  const [positiveKeywords, setPositiveKeywords] = useState<string[]>(resolved.positive)
+  const [negativeKeywords, setNegativeKeywords] = useState<string[]>(resolved.negative)
+
+  const suggestions = useMemo(() => getKeywordSuggestions(target), [target])
 
   function handleSubmit(formData: FormData): void {
     setError(null)
     formData.set('type', monitor.type)
+
+    if (monitor.type === 'keyword') {
+      formData.set('positiveKeywords', JSON.stringify(positiveKeywords))
+      formData.set('negativeKeywords', JSON.stringify(negativeKeywords))
+    }
+
     startTransition(async () => {
       const result = await updateMonitorAction(monitor.id, formData)
       if (result?.error) setError(result.error)
@@ -56,8 +94,21 @@ export function EditMonitorForm({ monitor }: { monitor: Monitor }) {
       </div>
 
       <div className="form-group">
-        <label className="form-label" htmlFor="target">Target</label>
-        <input className="form-input" id="target" name="target" required defaultValue={monitor.target} disabled={isPending} />
+        <label className="form-label" htmlFor="target">
+          {monitor.type === 'keyword' ? 'Page URL to Monitor' : 'Target'}
+        </label>
+        <input
+          className="form-input"
+          id="target"
+          name="target"
+          required
+          value={target}
+          onChange={e => setTarget(e.target.value)}
+          disabled={isPending}
+        />
+        {monitor.type === 'keyword' && (
+          <span className="form-helper-text">Enter the full page URL, not just the domain</span>
+        )}
       </div>
 
       <div className="form-group">
@@ -70,26 +121,36 @@ export function EditMonitorForm({ monitor }: { monitor: Monitor }) {
       <div className="form-group">
         <label className="form-label" htmlFor="severity">Severity</label>
         <select className="form-select" id="severity" name="severity" defaultValue={monitor.severity} disabled={isPending}>
-          <option value="P1">P1 — Critical</option>
-          <option value="P2">P2 — High</option>
-          <option value="P3">P3 — Medium</option>
-          <option value="P4">P4 — Low</option>
+          <option value="P1">P1 -- Critical</option>
+          <option value="P2">P2 -- High</option>
+          <option value="P3">P3 -- Medium</option>
+          <option value="P4">P4 -- Low</option>
         </select>
       </div>
 
       {monitor.type === 'keyword' && (
         <>
-          <div className="form-group">
-            <label className="form-label" htmlFor="keyword">Keyword</label>
-            <input className="form-input" id="keyword" name="keyword" defaultValue={config.keyword || ''} disabled={isPending} />
-          </div>
-          <div className="form-group">
-            <label className="form-label" htmlFor="shouldExist">Condition</label>
-            <select className="form-select" id="shouldExist" name="shouldExist" defaultValue={config.shouldExist !== false ? 'true' : 'false'} disabled={isPending}>
-              <option value="true">Alert if keyword is MISSING</option>
-              <option value="false">Alert if keyword is FOUND</option>
-            </select>
-          </div>
+          <KeywordTagInput
+            label="Keywords that MUST exist on the page"
+            helperText="If any of these disappear, we will alert you"
+            keywords={positiveKeywords}
+            onChange={setPositiveKeywords}
+            variant="positive"
+            disabled={isPending}
+            placeholder="Type a keyword and press Enter"
+            suggestions={suggestions.positive}
+          />
+
+          <KeywordTagInput
+            label="Keywords that must NOT appear on the page"
+            helperText="If any of these appear, we will alert you (e.g. error messages, spam)"
+            keywords={negativeKeywords}
+            onChange={setNegativeKeywords}
+            variant="negative"
+            disabled={isPending}
+            placeholder="Type a keyword and press Enter"
+            suggestions={suggestions.negative}
+          />
         </>
       )}
 
