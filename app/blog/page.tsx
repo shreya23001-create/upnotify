@@ -274,6 +274,33 @@ const BLOG_POSTS: BlogPostMeta[] = [
     readTime: '14 min read',
     category: 'WordPress',
   },
+  {
+    slug: 'wordfence-blocking-traffic',
+    title: 'Wordfence Blocking Real Users: When Your Security Plugin Becomes Your Biggest Problem',
+    excerpt:
+      'Wordfence can silently block legitimate visitors, paying customers, and even Googlebot through aggressive rate limiting, country blocking, and learning mode misconfiguration. Your site is technically up but unreachable for real users. Learn what causes it and how multi-location HTTP monitoring detects blocked traffic.',
+    date: '17 May 2026',
+    readTime: '15 min read',
+    category: 'WordPress',
+  },
+  {
+    slug: 'wordpress-brute-force-attack',
+    title: 'WordPress Brute Force Attack Slowing Your Site: How Thousands of Login Attempts Cause Downtime',
+    excerpt:
+      'WordPress brute force attacks flood wp-login.php and xmlrpc.php with thousands of login attempts, exhausting CPU, memory, and PHP workers until your site crashes. Learn what causes the performance impact and how HTTP monitoring catches response time spikes from active attacks.',
+    date: '18 May 2026',
+    readTime: '15 min read',
+    category: 'WordPress',
+  },
+  {
+    slug: 'yoast-seo-sitemap-404',
+    title: 'Yoast SEO Sitemap Returning 404: How This Quietly Tanks Your Google Rankings',
+    excerpt:
+      'Your Yoast SEO sitemap can return a 404 due to broken permalinks, .htaccess rewrite conflicts, and plugin conflicts. Google cannot find your pages, crawl budget is wasted, and rankings silently decline. Learn what causes it and how HTTP monitoring on /sitemap_index.xml catches it instantly.',
+    date: '19 May 2026',
+    readTime: '14 min read',
+    category: 'WordPress',
+  },
 ]
 
 const POSTS_PER_PAGE = 6
