@@ -31,7 +31,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/admin/team', label: 'Admin Team', icon: IconShield },
   { href: '/admin/blog', label: 'Blog', icon: IconEdit, disabled: true, badge: 'Soon' },
   { href: '/admin/emails', label: 'Email & Nurture', icon: IconMail, disabled: true, badge: 'Soon' },
-  { href: '/admin/settings', label: 'Settings', icon: IconSettings, disabled: true, badge: 'Soon' },
+  { href: '/admin/settings', label: 'Settings', icon: IconSettings },
 ]
 
 function isActive(pathname: string, href: string): boolean {

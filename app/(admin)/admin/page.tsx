@@ -74,6 +74,10 @@ export default async function AdminDashboardPage(): Promise<React.ReactElement> 
             <span className="admin-quick-link-label">Public Tracker</span>
             <span className="admin-quick-link-desc">Manage publicly tracked sites for SEO</span>
           </Link>
+          <Link href="/admin/settings" className="admin-quick-link">
+            <span className="admin-quick-link-label">Settings</span>
+            <span className="admin-quick-link-desc">Trusted logos, landing page content</span>
+          </Link>
         </div>
       </div>
     </div>

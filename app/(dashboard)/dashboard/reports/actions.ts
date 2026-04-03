@@ -20,6 +20,7 @@ export async function generateReportAction(formData: FormData): Promise<{ error?
   if (!workspace) return { error: 'No workspace found' }
 
   const type = (formData.get('type') as string) || 'on_demand'
+  const reportType = (formData.get('report_type') as string) || 'uptime'
   const periodStart = formData.get('period_start') as string
   const periodEnd = formData.get('period_end') as string
 
@@ -30,7 +31,8 @@ export async function generateReportAction(formData: FormData): Promise<{ error?
     workspace.id,
     new Date(periodStart).toISOString(),
     new Date(periodEnd).toISOString(),
-    type as 'monthly' | 'custom' | 'on_demand'
+    type as 'monthly' | 'custom' | 'on_demand',
+    reportType as 'uptime' | 'performance' | 'incident' | 'sla'
   )
 
   if (!report) return { error: 'Failed to generate report. Make sure you have monitors with check data.' }

@@ -11,6 +11,7 @@ import {
 import { FAQ_ITEMS } from '@/lib/constants/faq'
 import { PublicNav } from '@/components/ui/public-nav'
 import { PublicFooter } from '@/components/ui/public-footer'
+import { TrustedLogos } from '@/components/landing/trusted-logos'
 
 export const metadata: Metadata = {
   title: 'Uptrue — Uptime Monitoring for Agencies & Teams',
@@ -33,35 +34,7 @@ const FEATURES = [
     title: 'Uptime Monitoring',
     subtitle: '10 monitor types',
     description:
-      'HTTP, SSL, DNS, keyword, domain, port, ping, API endpoint, heartbeat, and page detection. Every angle covered.',
-  },
-  {
-    icon: '\u{1F9E0}',
-    title: 'AI-Powered Reports',
-    subtitle: 'Claude AI analysis',
-    description:
-      'Executive summaries that turn raw monitoring data into actionable insights. Share with clients in one click.',
-  },
-  {
-    icon: '\u{1F4CA}',
-    title: 'Public Status Pages',
-    subtitle: 'Branded & real-time',
-    description:
-      'Give your customers transparency. Automatic incident updates, uptime bars, and subscription notifications.',
-  },
-  {
-    icon: '\u{1F514}',
-    title: 'Smart Alerting',
-    subtitle: 'Multi-channel',
-    description:
-      'Email, Slack, Microsoft Teams, and webhooks with secure webhook signatures. Never miss a critical event.',
-  },
-  {
-    icon: '\u{1F3F7}\uFE0F',
-    title: 'Agency White-Label',
-    subtitle: 'Your brand, our engine',
-    description:
-      'Full white-label for agencies. Custom branding, your own analytics on client pages, and revenue sharing built in.',
+      'HTTP, SSL, DNS, keyword, domain, port, ping, API endpoint, heartbeat, and competitor tracking. Every angle covered.',
   },
   {
     icon: '\u{1F6E1}\uFE0F',
@@ -71,8 +44,43 @@ const FEATURES = [
       'Every downtime alert is verified from a second region before firing. No more 3am wake-ups for nothing.',
   },
   {
+    icon: '\u{1F514}',
+    title: 'Multi-Channel Alerts',
+    subtitle: 'Email, Slack, Teams & more',
+    description:
+      'Email, Slack, Microsoft Teams, and webhooks with HMAC-signed payloads. Route alerts to the right people instantly.',
+  },
+  {
+    icon: '\u{1F4CA}',
+    title: 'Public Status Pages',
+    subtitle: 'Branded & real-time',
+    description:
+      'Give your customers transparency. Automatic incident updates, uptime bars, and subscription notifications.',
+  },
+  {
+    icon: '\u{1F9E0}',
+    title: 'AI-Powered Reports',
+    subtitle: 'Claude AI analysis',
+    description:
+      'Uptime, performance, incident, and SLA reports with AI-generated executive summaries. Share with clients in one click.',
+  },
+  {
+    icon: '\u{2B50}',
+    title: 'Uptrue Score',
+    subtitle: 'Free site health check',
+    description:
+      'Score any website on uptime, SSL, DNS, performance, and security. Instant results, no signup required.',
+  },
+  {
+    icon: '\u{1F310}',
+    title: 'Public Tracker',
+    subtitle: 'Free uptime profiles',
+    description:
+      'Every tracked site gets a public profile with real-time status, uptime history, and embeddable badge — free for everyone.',
+  },
+  {
     icon: '\u{1F3C1}',
-    title: 'Competitor Tracking',
+    title: 'Competitor Intelligence',
     subtitle: 'Benchmark your uptime',
     description:
       'Monitor competitor websites and compare uptime side by side. Know when they go down and prove your reliability edge.',
@@ -90,6 +98,20 @@ const FEATURES = [
     subtitle: 'Show off your reliability',
     description:
       'The most reliable websites ranked by real uptime data. Opt in your monitors and earn trust from visitors.',
+  },
+  {
+    icon: '\u{1F3F7}\uFE0F',
+    title: 'Badge & Credits Program',
+    subtitle: 'Earn while you monitor',
+    description:
+      'Embed a badge on your site, refer friends, write reviews, or report bugs. Earn up to \u00A310/month off your subscription.',
+  },
+  {
+    icon: '\u{1F3F7}\uFE0F',
+    title: 'Agency White-Label',
+    subtitle: 'Your brand, our engine',
+    description:
+      'Full white-label for agencies. Custom branding, your own analytics on client pages, and revenue sharing built in.',
   },
 ]
 
@@ -234,6 +256,7 @@ export default function LandingPage(): React.ReactElement {
           <p className="social-proof-text">
             Trusted by developers and agencies worldwide
           </p>
+          <TrustedLogos />
         </div>
       </section>
 

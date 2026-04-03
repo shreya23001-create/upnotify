@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import { generateReportAction } from '@/app/(dashboard)/dashboard/reports/actions'
 
-export function GenerateReportForm() {
+export function GenerateReportForm(): React.ReactElement {
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 
@@ -31,13 +31,29 @@ export function GenerateReportForm() {
         </div>
       )}
 
-      <div className="form-group">
-        <label className="form-label">Report Type</label>
-        <select className="form-select" name="type" disabled={isPending}>
-          <option value="on_demand">On Demand</option>
-          <option value="monthly">Monthly</option>
-          <option value="custom">Custom</option>
-        </select>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+        <div className="form-group">
+          <label className="form-label">Schedule Type</label>
+          <select className="form-select" name="type" disabled={isPending}>
+            <option value="on_demand">On Demand</option>
+            <option value="monthly">Monthly</option>
+            <option value="custom">Custom</option>
+          </select>
+        </div>
+
+        <div className="form-group">
+          <label className="form-label">Report Type</label>
+          <select className="form-select" name="report_type" disabled={isPending}>
+            <option value="uptime">Uptime Report</option>
+            <option value="performance">Performance Report</option>
+            <option value="incident">Incident Report</option>
+            <option value="sla">SLA Compliance Report</option>
+          </select>
+          <span className="form-hint">
+            {/* Description updates based on selection would need JS; keep static hint */}
+            Uptime: monthly uptime % and incidents. Performance: response time trends. Incident: full timeline. SLA: compliance vs target.
+          </span>
+        </div>
       </div>
 
       <div className="form-group">

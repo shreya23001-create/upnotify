@@ -19,6 +19,7 @@ interface MonitorMetrics {
 }
 
 interface ReportData {
+  reportType: 'uptime' | 'performance' | 'incident' | 'sla'
   overallUptime: number
   totalMonitors: number
   totalIncidents: number
@@ -33,7 +34,8 @@ export async function generateReport(
   workspaceId: string,
   periodStart: string,
   periodEnd: string,
-  type: 'monthly' | 'custom' | 'on_demand'
+  type: 'monthly' | 'custom' | 'on_demand',
+  reportType: 'uptime' | 'performance' | 'incident' | 'sla' = 'uptime'
 ): Promise<Report | null> {
   const supabase = createAdminClient()
 
@@ -143,6 +145,7 @@ export async function generateReport(
     : null
 
   const reportData: ReportData = {
+    reportType,
     overallUptime,
     totalMonitors: monitors.length,
     totalIncidents,

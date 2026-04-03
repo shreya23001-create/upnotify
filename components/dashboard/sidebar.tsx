@@ -112,6 +112,20 @@ export function Sidebar(): React.ReactElement {
         )}
       </nav>
 
+      {/* Credits promo — only for Free/Lite users */}
+      {!collapsed && !user?.is_super_admin && (
+        <div className="sidebar-credits-promo">
+          <div className="sidebar-credits-promo-icon">{'\uD83D\uDCB0'}</div>
+          <div className="sidebar-credits-promo-text">
+            <strong>Earn Credits</strong>
+            <span>Get up to {'\u00A3'}10/mo off your plan</span>
+          </div>
+          <Link href="/dashboard/settings" className="sidebar-credits-promo-link">
+            Learn how {'\u2192'}
+          </Link>
+        </div>
+      )}
+
       <div className="sidebar-collapse-btn-wrapper">
         <button
           className="sidebar-collapse-btn"

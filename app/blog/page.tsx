@@ -1,18 +1,7 @@
-import type { Metadata } from 'next'
-import Link from 'next/link'
+'use client'
 
-export const metadata: Metadata = {
-  title: 'Blog — Website Monitoring Guides & Insights',
-  description:
-    'Practical guides on website monitoring, uptime, SSL certificates, status pages, and competitive analysis. Written by the Uptrue team for developers, agencies, and site owners.',
-  alternates: { canonical: 'https://uptrue.io/blog' },
-  openGraph: {
-    title: 'Uptrue Blog — Website Monitoring Guides & Insights',
-    description:
-      'Practical guides on website monitoring, uptime, SSL certificates, status pages, and competitive analysis.',
-    url: 'https://uptrue.io/blog',
-  },
-}
+import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 
 interface BlogPostMeta {
   slug: string
@@ -71,7 +60,17 @@ const BLOG_POSTS: BlogPostMeta[] = [
   },
 ]
 
+const POSTS_PER_PAGE = 6
+
 export default function BlogIndexPage(): React.ReactElement {
+  const searchParams = useSearchParams()
+  const pageParam = searchParams.get('page')
+  const currentPage = Math.max(1, parseInt(pageParam ?? '1', 10) || 1)
+  const totalPages = Math.max(1, Math.ceil(BLOG_POSTS.length / POSTS_PER_PAGE))
+  const safePage = Math.min(currentPage, totalPages)
+  const startIdx = (safePage - 1) * POSTS_PER_PAGE
+  const visiblePosts = BLOG_POSTS.slice(startIdx, startIdx + POSTS_PER_PAGE)
+
   return (
     <div className="blog-index">
       <div className="blog-index-header">
@@ -82,7 +81,7 @@ export default function BlogIndexPage(): React.ReactElement {
       </div>
 
       <div className="blog-posts-grid">
-        {BLOG_POSTS.map((post) => (
+        {visiblePosts.map((post) => (
           <Link href={`/blog/${post.slug}`} key={post.slug} className="blog-post-card">
             <div className="blog-post-card-body">
               <span className="blog-post-category">{post.category}</span>
@@ -97,6 +96,30 @@ export default function BlogIndexPage(): React.ReactElement {
           </Link>
         ))}
       </div>
+
+      {totalPages > 1 && (
+        <div className="blog-pagination">
+          {safePage > 1 ? (
+            <Link href={`/blog?page=${safePage - 1}`} className="btn btn-secondary btn-sm">
+              {'\u2190'} Newer Posts
+            </Link>
+          ) : (
+            <span />
+          )}
+
+          <span className="blog-pagination-info">
+            Page {safePage} of {totalPages}
+          </span>
+
+          {safePage < totalPages ? (
+            <Link href={`/blog?page=${safePage + 1}`} className="btn btn-secondary btn-sm">
+              Older Posts {'\u2192'}
+            </Link>
+          ) : (
+            <span />
+          )}
+        </div>
+      )}
     </div>
   )
 }

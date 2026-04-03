@@ -2173,3 +2173,320 @@ html.dark .credit-balance-banner { background: rgba(5, 150, 105, 0.1); border-co
   .referral-link-row { flex-direction: column; }
   .referral-link-row .btn { width: 100%; }
 }
+
+/* ==========================================================================
+   Blog Pagination
+   ========================================================================== */
+
+.blog-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 32px 0 16px;
+  margin-top: 16px;
+  border-top: 1px solid var(--border-light);
+}
+
+.blog-pagination-info {
+  font-size: 14px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* ==========================================================================
+   Footer Trust Badges & Company Info
+   ========================================================================== */
+
+.footer-company-info {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 8px;
+  line-height: 1.5;
+}
+
+.footer-trust-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.footer-trust-badge {
+  font-size: 12px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ==========================================================================
+   Public Page (Credits, Referrals, etc.)
+   ========================================================================== */
+
+.public-page { min-height: 100vh; }
+.public-page-main { padding-bottom: 80px; }
+.public-page-container { max-width: 860px; margin: 0 auto; padding: 0 24px; }
+.public-page-header { text-align: center; margin-bottom: 48px; }
+.public-page-title { font-size: 36px; font-weight: 800; color: var(--text-primary); margin-bottom: 12px; }
+.public-page-subtitle { font-size: 18px; color: var(--text-secondary); max-width: 600px; margin: 0 auto; line-height: 1.6; }
+
+.section-heading {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+}
+
+/* Credits page */
+.credits-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 48px;
+}
+
+.credits-step {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  padding: 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  border-radius: 12px;
+}
+
+.credits-step-number {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.credits-step-content h3 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.credits-step-content p { font-size: 14px; color: var(--text-secondary); }
+
+.credits-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 16px;
+  margin-bottom: 48px;
+}
+
+.credits-card {
+  display: flex;
+  gap: 16px;
+  padding: 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+}
+
+.credits-card-icon { font-size: 28px; flex-shrink: 0; }
+.credits-card-header { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 6px; }
+.credits-card-title { font-size: 16px; font-weight: 600; }
+.credits-card-amount { font-size: 14px; font-weight: 700; color: #059669; white-space: nowrap; }
+.credits-card-description { font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 8px; }
+.credits-card-frequency { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+
+.credits-cap-notice { margin-bottom: 48px; }
+.credits-cap-card {
+  padding: 20px;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 12px;
+}
+.credits-cap-card h3 { font-size: 16px; font-weight: 700; color: #92400e; margin-bottom: 8px; }
+.credits-cap-card p { font-size: 14px; color: #78350f; line-height: 1.6; }
+
+html.dark .credits-cap-card { background: #422006; border-color: #713f12; }
+html.dark .credits-cap-card h3 { color: #fbbf24; }
+html.dark .credits-cap-card p { color: #fcd34d; }
+
+.credits-cta, .referral-cta {
+  text-align: center;
+  padding: 48px 0 0;
+}
+.credits-cta h2, .referral-cta h2 { font-size: 26px; font-weight: 800; margin-bottom: 8px; }
+.credits-cta p, .referral-cta p { font-size: 16px; color: var(--text-secondary); margin-bottom: 20px; }
+
+/* Referrals page */
+.referral-hero-badge {
+  display: inline-block;
+  padding: 6px 16px;
+  background: var(--accent-gradient);
+  color: #fff;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.referral-details { margin-bottom: 48px; }
+.referral-details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.referral-detail-card {
+  padding: 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+}
+.referral-detail-card h3 { font-size: 14px; color: var(--text-secondary); margin-bottom: 8px; }
+.referral-detail-amount { font-size: 28px; font-weight: 800; color: var(--accent); margin-bottom: 8px; }
+.referral-detail-card p:last-child { font-size: 13px; color: var(--text-muted); }
+
+.referral-rules { margin-bottom: 48px; }
+.referral-rules-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.referral-rules-list li {
+  padding: 10px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+.referral-rules-list li::before {
+  content: '\2022 ';
+  color: var(--accent);
+  font-weight: 700;
+  margin-right: 6px;
+}
+
+/* ==========================================================================
+   Sidebar Credits Promo
+   ========================================================================== */
+
+.sidebar-credits-promo {
+  margin: 8px 12px;
+  padding: 12px;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(6, 182, 212, 0.08));
+  border: 1px solid rgba(59, 130, 246, 0.15);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sidebar-credits-promo-icon { font-size: 18px; }
+.sidebar-credits-promo-text { display: flex; flex-direction: column; gap: 1px; }
+.sidebar-credits-promo-text strong { font-size: 13px; color: var(--text-primary); }
+.sidebar-credits-promo-text span { font-size: 12px; color: var(--text-muted); }
+.sidebar-credits-promo-link {
+  font-size: 12px;
+  color: var(--accent);
+  font-weight: 500;
+  margin-top: 4px;
+}
+.sidebar-credits-promo-link:hover { text-decoration: underline; }
+
+/* ==========================================================================
+   Trusted Logos on Landing
+   ========================================================================== */
+
+.trusted-logos-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.trusted-logo-img {
+  max-height: 32px;
+  max-width: 100px;
+  object-fit: contain;
+  opacity: 0.5;
+  filter: grayscale(100%);
+  transition: opacity 0.2s, filter 0.2s;
+}
+.trusted-logo-img:hover {
+  opacity: 0.9;
+  filter: grayscale(0%);
+}
+
+/* ==========================================================================
+   Report Sections (Performance, Incident, SLA)
+   ========================================================================== */
+
+.report-section {
+  margin-top: 24px;
+  padding: 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  border-radius: 12px;
+}
+
+.report-section-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.report-stat-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.report-stat-box {
+  flex: 1;
+  padding: 16px;
+  background: var(--bg-muted);
+  border-radius: 10px;
+  text-align: center;
+}
+
+.report-stat-value {
+  display: block;
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.report-stat-label {
+  display: block;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.form-hint {
+  display: block;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+/* ==========================================================================
+   Responsive — Public pages
+   ========================================================================== */
+
+@media (max-width: 640px) {
+  .public-page-title { font-size: 28px; }
+  .public-page-subtitle { font-size: 16px; }
+  .credits-grid { grid-template-columns: 1fr; }
+  .referral-details-grid { grid-template-columns: 1fr; }
+  .report-stat-row { flex-direction: column; }
+}
