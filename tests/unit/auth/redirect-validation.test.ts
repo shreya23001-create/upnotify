@@ -8,6 +8,22 @@ vi.mock('@/lib/utils/logger', () => ({
   logger: { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() },
 }))
 
+vi.mock('@/lib/utils/config', () => ({
+  getConfig: () => ({
+    supabase: { url: 'http://localhost:54321', anonKey: 'test-anon-key' },
+    app: { url: 'http://localhost:3000' },
+    admin: { emails: [] },
+    analytics: { gaMeasurementId: '' },
+  }),
+  getServerConfig: () => ({
+    supabase: { serviceRoleKey: 'test-service-key' },
+    stripe: { secretKey: 'sk_test_xxx', webhookSecret: 'whsec_test' },
+    resend: { apiKey: '', fromEmail: 'test@test.com', fromName: 'Test' },
+    anthropic: { apiKey: 'test-key' },
+    cron: { secret: 'test-cron-secret' },
+  }),
+}))
+
 vi.mock('@/lib/utils/rate-limiter', () => ({
   checkRateLimit: () => ({ allowed: true, remaining: 9, resetAt: Date.now() + 60000 }),
   AUTH_RATE_LIMIT: { maxRequests: 10, windowMs: 900000 },
@@ -18,8 +34,30 @@ vi.mock('@/lib/supabase/server', () => ({
   createClient: () => Promise.resolve({
     auth: {
       exchangeCodeForSession: mockExchangeCode,
+      getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'user-1', email: 'test@test.com', created_at: new Date().toISOString() } } }),
     },
+    from: () => ({
+      select: () => ({ eq: () => ({ single: () => ({ data: null, error: null }) }) }),
+    }),
   }),
+}))
+
+vi.mock('@/lib/supabase/admin', () => ({
+  createAdminClient: () => ({
+    from: () => ({
+      select: () => ({ eq: () => ({ single: () => ({ data: null, error: null }), eq: () => ({ single: () => ({ data: null, error: null }) }) }), order: () => ({ data: [], error: null }) }),
+      insert: () => ({ select: () => ({ single: () => ({ data: { id: 'sub-1' }, error: null }) }) }),
+      update: () => ({ eq: () => ({ data: null, error: null }) }),
+    }),
+  }),
+}))
+
+vi.mock('@/lib/db/subscriptions', () => ({
+  createTrialSubscription: vi.fn().mockResolvedValue({ success: true }),
+}))
+
+vi.mock('@/lib/db/referrals', () => ({
+  recordReferralSignup: vi.fn().mockResolvedValue(undefined),
 }))
 
 // Mock next/server — NextResponse.redirect and NextResponse.json

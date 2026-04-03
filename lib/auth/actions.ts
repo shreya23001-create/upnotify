@@ -14,6 +14,7 @@ export async function signInWithEmail(
 ): Promise<{ error?: string }> {
   const email = formData.get('email') as string | null
   const origin = formData.get('origin') as string | null
+  const ref = formData.get('ref') as string | null
 
   if (!email) {
     return { error: 'Email is required' }
@@ -21,10 +22,13 @@ export async function signInWithEmail(
 
   const supabase = await createClient()
   const baseUrl = origin || getConfig().app.url
+  const callbackUrl = ref
+    ? `${baseUrl}/auth/callback?ref=${encodeURIComponent(ref)}`
+    : `${baseUrl}/auth/callback`
 
   const { error } = await supabase.auth.signInWithOtp({
     email,
-    options: { emailRedirectTo: `${baseUrl}/auth/callback` },
+    options: { emailRedirectTo: callbackUrl },
   })
 
   if (error) {
@@ -38,17 +42,21 @@ export async function signInWithEmail(
 /**
  * Start a Google OAuth flow and return the redirect URL.
  * The caller (client component) must redirect the browser.
+ * Accepts optional referral code to pass through to callback.
  */
-export async function signInWithGoogle(origin: string): Promise<{
+export async function signInWithGoogle(origin: string, ref?: string): Promise<{
   url?: string
   error?: string
 }> {
   const supabase = await createClient()
   const baseUrl = origin || getConfig().app.url
+  const callbackUrl = ref
+    ? `${baseUrl}/auth/callback?ref=${encodeURIComponent(ref)}`
+    : `${baseUrl}/auth/callback`
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
-    options: { redirectTo: `${baseUrl}/auth/callback` },
+    options: { redirectTo: callbackUrl },
   })
 
   if (error || !data.url) {

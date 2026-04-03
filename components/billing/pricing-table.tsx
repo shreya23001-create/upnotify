@@ -11,6 +11,7 @@ interface PlanFeatureDisplay {
 interface Props {
   plans: Plan[]
   currentPlanSlug?: string
+  creditBalancePence?: number
 }
 
 function getPlanFeatures(plan: Plan): PlanFeatureDisplay[] {
@@ -53,7 +54,7 @@ function getPlanFeatures(plan: Plan): PlanFeatureDisplay[] {
   return features
 }
 
-function getPlanPrice(plan: Plan): { amount: string; period: string; note?: string } {
+function getPlanPrice(plan: Plan, isAnnual: boolean): { amount: string; period: string; note?: string } {
   const monthlyPence = plan.price_monthly_gbp
   const annualPence = plan.price_annual_gbp
 
@@ -72,6 +73,17 @@ function getPlanPrice(plan: Plan): { amount: string; period: string; note?: stri
     }
   }
 
+  if (isAnnual && annualPence && annualPence > 0) {
+    const annualGbp = annualPence / 100
+    const monthlyEquiv = Math.round((annualPence / 12)) / 100
+    const monthlySavings = Math.round(((monthlyPence * 12 - annualPence) / (monthlyPence * 12)) * 100)
+    return {
+      amount: `\u00A3${monthlyEquiv.toFixed(2)}`,
+      period: '/mo',
+      note: `\u00A3${annualGbp}/year \u2014 save ${monthlySavings}%`,
+    }
+  }
+
   const monthlyGbp = monthlyPence / 100
   return { amount: `\u00A3${monthlyGbp}`, period: '/month' }
 }
@@ -83,9 +95,10 @@ function getPlanCta(plan: Plan, isCurrent: boolean, isHigherTier: boolean): stri
   return 'Downgrade'
 }
 
-export function PricingTable({ plans, currentPlanSlug }: Props): React.ReactElement {
+export function PricingTable({ plans, currentPlanSlug, creditBalancePence = 0 }: Props): React.ReactElement {
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
+  const [isAnnual, setIsAnnual] = useState(true)
 
   const directPlans = plans.filter(p => p.type === 'direct')
 
@@ -118,8 +131,33 @@ export function PricingTable({ plans, currentPlanSlug }: Props): React.ReactElem
     })
   }
 
+  const creditGbp = (creditBalancePence / 100).toFixed(2)
+
   return (
     <div>
+      {/* Annual / Monthly toggle */}
+      <div className="billing-toggle-wrapper">
+        <button
+          className={`billing-toggle-btn${!isAnnual ? ' billing-toggle-active' : ''}`}
+          onClick={() => setIsAnnual(false)}
+        >
+          Monthly
+        </button>
+        <button
+          className={`billing-toggle-btn${isAnnual ? ' billing-toggle-active' : ''}`}
+          onClick={() => setIsAnnual(true)}
+        >
+          Annual
+          <span className="billing-toggle-save">Save 20%</span>
+        </button>
+      </div>
+
+      {creditBalancePence > 0 && (
+        <div className="credit-balance-banner">
+          Your credits: <strong>{'\u00A3'}{creditGbp}</strong> will be applied to your next bill
+        </div>
+      )}
+
       {error && (
         <div className="form-error" style={{ marginBottom: 16, padding: 12, textAlign: 'center' }}>
           {error}
@@ -130,11 +168,12 @@ export function PricingTable({ plans, currentPlanSlug }: Props): React.ReactElem
           const isCurrent = plan.slug === currentPlanSlug || (plan.slug === 'free' && !currentPlanSlug)
           const isHigherTier = index > effectiveCurrentIndex
           const isFree = plan.price_monthly_gbp === 0 && (!plan.price_annual_gbp || plan.price_annual_gbp === 0)
-          const price = getPlanPrice(plan)
+          const price = getPlanPrice(plan, isAnnual)
           const features = getPlanFeatures(plan)
           const ctaText = getPlanCta(plan, isCurrent, isHigherTier)
           const isPopular = plan.slug === 'builder'
           const hasAnnual = plan.price_annual_gbp && plan.price_annual_gbp > 0 && plan.price_monthly_gbp > 0
+          const billingCycle = isAnnual && hasAnnual ? 'annual' : 'monthly'
 
           return (
             <div
@@ -176,25 +215,13 @@ export function PricingTable({ plans, currentPlanSlug }: Props): React.ReactElem
                   Free Plan
                 </button>
               ) : isHigherTier ? (
-                <div style={{ display: 'flex', gap: 8, marginTop: 'auto' }}>
-                  <button
-                    className="btn btn-primary btn-full"
-                    onClick={() => handleSubscribe(plan.slug, hasAnnual ? 'annual' : 'monthly')}
-                    disabled={isPending}
-                  >
-                    {isPending ? 'Loading...' : ctaText}
-                    {hasAnnual ? '' : ''}
-                  </button>
-                  {hasAnnual && (
-                    <button
-                      className="btn btn-secondary btn-full"
-                      onClick={() => handleSubscribe(plan.slug, 'monthly')}
-                      disabled={isPending}
-                    >
-                      Monthly
-                    </button>
-                  )}
-                </div>
+                <button
+                  className="btn btn-primary btn-full"
+                  onClick={() => handleSubscribe(plan.slug, billingCycle)}
+                  disabled={isPending}
+                >
+                  {isPending ? 'Loading...' : ctaText}
+                </button>
               ) : (
                 <button className="btn btn-secondary btn-full" disabled style={{ opacity: 0.6 }}>
                   {ctaText}

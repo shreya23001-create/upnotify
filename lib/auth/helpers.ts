@@ -8,6 +8,8 @@ const PUBLIC_ROUTES: ReadonlyArray<string> = [
   '/auth/callback',
   '/score',
   '/tracker',
+  '/leaderboard',
+  '/tools',
   '/terms',
   '/privacy',
   '/cookies',
@@ -25,9 +27,12 @@ export function isPublicRoute(pathname: string): boolean {
   if (pathname.startsWith('/score/')) return true
   if (pathname.startsWith('/tracker/')) return true
   if (pathname.startsWith('/blog/')) return true
+  if (pathname.startsWith('/tools/')) return true
   if (pathname.startsWith('/api/badge/')) return true
   if (pathname.startsWith('/api/v1/tracker/')) return true
+  if (pathname.startsWith('/api/tools/')) return true
   if (pathname.startsWith('/invite/')) return true
+  if (pathname.startsWith('/r/')) return true
   return false
 }
 

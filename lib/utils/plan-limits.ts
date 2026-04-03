@@ -3,6 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 interface PlanLimits {
   monitors: number | null // null = unlimited (agency plans)
   workspaces: number | null
+  competitors: number
   maxTeamMembers: number
   hasApiAccess: boolean
   hasAiPredictive: boolean
@@ -18,6 +19,7 @@ const UPGRADE_NUDGE_THRESHOLD = 15
 const FREE_DEFAULTS: PlanLimits = {
   monitors: 3,
   workspaces: 1,
+  competitors: 3,
   maxTeamMembers: 0,
   hasApiAccess: false,
   hasAiPredictive: false,
@@ -27,26 +29,12 @@ const FREE_DEFAULTS: PlanLimits = {
   checkIntervalSeconds: 600,
 }
 
-/** Fetch plan limits for an org based on its active subscription.
- *  Reads from the plans table (single source of truth). */
-export async function getPlanLimits(orgId: string): Promise<PlanLimits> {
-  const supabase = createAdminClient()
-
-  const { data: sub } = await supabase
-    .from('subscriptions')
-    .select('*, plans(*)')
-    .eq('org_id', orgId)
-    .eq('status', 'active')
-    .single()
-
-  if (!sub || !sub.plans) {
-    return FREE_DEFAULTS
-  }
-
-  const plan = sub.plans as Record<string, unknown>
+/** Extract plan limits from a raw plan record */
+function extractLimits(plan: Record<string, unknown>): PlanLimits {
   return {
     monitors: (plan.monitor_limit as number | null) ?? null,
     workspaces: (plan.client_workspace_limit as number | null) ?? null,
+    competitors: (plan.competitor_limit as number) ?? 3,
     maxTeamMembers: (plan.max_team_members as number) ?? 0,
     hasApiAccess: (plan.has_api_access as boolean) ?? false,
     hasAiPredictive: (plan.has_ai_predictive as boolean) ?? false,
@@ -56,6 +44,44 @@ export async function getPlanLimits(orgId: string): Promise<PlanLimits> {
     hasVoiceCalls: (plan.has_voice_calls as boolean) ?? false,
     checkIntervalSeconds: (plan.check_interval_seconds as number) ?? 600,
   }
+}
+
+/** Fetch plan limits for an org based on its active or trialing subscription.
+ *  Reads from the plans table (single source of truth).
+ *  Trialing subscriptions get the trial plan's limits until trial_ends_at. */
+export async function getPlanLimits(orgId: string): Promise<PlanLimits> {
+  const supabase = createAdminClient()
+
+  // Check for active subscription first
+  const { data: sub } = await supabase
+    .from('subscriptions')
+    .select('*, plans(*)')
+    .eq('org_id', orgId)
+    .eq('status', 'active')
+    .single()
+
+  if (sub && sub.plans) {
+    return extractLimits(sub.plans as Record<string, unknown>)
+  }
+
+  // Fall back to trialing subscription
+  const { data: trialSub } = await supabase
+    .from('subscriptions')
+    .select('*, plans(*)')
+    .eq('org_id', orgId)
+    .eq('status', 'trialing')
+    .single()
+
+  if (trialSub && trialSub.plans) {
+    const trialEnd = trialSub.trial_ends_at
+      ? new Date(trialSub.trial_ends_at)
+      : null
+    if (trialEnd && trialEnd > new Date()) {
+      return extractLimits(trialSub.plans as Record<string, unknown>)
+    }
+  }
+
+  return FREE_DEFAULTS
 }
 
 /**
@@ -120,6 +146,27 @@ export async function checkFeatureAccess(
 ): Promise<boolean> {
   const limits = await getPlanLimits(orgId)
   return limits[feature]
+}
+
+/** Check if the org can add another competitor monitor */
+export async function checkCompetitorLimit(orgId: string): Promise<{
+  allowed: boolean
+  currentCount: number
+  limit: number
+}> {
+  const supabase = createAdminClient()
+  const limits = await getPlanLimits(orgId)
+
+  const { count } = await supabase
+    .from('competitor_monitors')
+    .select('id', { count: 'exact', head: true })
+    .eq('org_id', orgId)
+
+  const currentCount = count ?? 0
+  const limit = limits.competitors
+  const allowed = currentCount < limit
+
+  return { allowed, currentCount, limit }
 }
 
 /** Check if the org can add another team member */

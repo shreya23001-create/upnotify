@@ -41,21 +41,32 @@ export function CurrentPlan({ plan, subscription }: Props) {
           <div>
             <div className="stat-label">Current Plan</div>
             <div style={{ fontSize: 20, fontWeight: 700, marginBottom: 4 }}>{plan.name}</div>
-            <span className={`badge ${subscription.status === 'active' ? 'badge-success' : 'badge-danger'}`}>
-              {subscription.status}
+            <span className={`badge ${subscription.status === 'active' ? 'badge-success' : subscription.status === 'trialing' ? 'badge-warning' : 'badge-danger'}`}>
+              {subscription.status === 'trialing' ? 'Trial' : subscription.status}
             </span>
             <span style={{ marginLeft: 8, fontSize: 14, color: '#94a3b8', textTransform: 'capitalize' }}>
               {subscription.billing_cycle}
             </span>
-            {subscription.current_period_end && (
+            {subscription.status === 'trialing' && subscription.trial_ends_at && (
+              <p style={{ fontSize: 13, color: '#f59e0b', marginTop: 8, fontWeight: 500 }}>
+                Trial ends: {new Date(subscription.trial_ends_at).toLocaleDateString()}
+              </p>
+            )}
+            {subscription.status !== 'trialing' && subscription.current_period_end && (
               <p style={{ fontSize: 13, color: '#94a3b8', marginTop: 8 }}>
                 Next billing: {new Date(subscription.current_period_end).toLocaleDateString()}
               </p>
             )}
           </div>
-          <button className="btn btn-secondary" onClick={handleManage} disabled={isPending}>
-            {isPending ? 'Loading...' : 'Manage Subscription'}
-          </button>
+          {subscription.status === 'trialing' ? (
+            <span style={{ fontSize: 13, color: '#f59e0b', fontWeight: 600 }}>
+              Upgrade to keep these features
+            </span>
+          ) : (
+            <button className="btn btn-secondary" onClick={handleManage} disabled={isPending}>
+              {isPending ? 'Loading...' : 'Manage Subscription'}
+            </button>
+          )}
         </div>
       </div>
     </div>

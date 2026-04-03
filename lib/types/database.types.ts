@@ -1067,6 +1067,104 @@ export type Database = {
         }
         Relationships: []
       }
+      referrals: {
+        Row: {
+          id: string
+          referrer_id: string
+          referrer_org_id: string
+          referred_id: string | null
+          referred_org_id: string | null
+          referral_code: string
+          status: string
+          created_at: string
+          completed_at: string | null
+        }
+        Insert: {
+          id?: string
+          referrer_id: string
+          referrer_org_id: string
+          referred_id?: string | null
+          referred_org_id?: string | null
+          referral_code: string
+          status?: string
+          created_at?: string
+          completed_at?: string | null
+        }
+        Update: {
+          id?: string
+          referrer_id?: string
+          referrer_org_id?: string
+          referred_id?: string | null
+          referred_org_id?: string | null
+          referral_code?: string
+          status?: string
+          created_at?: string
+          completed_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referrals_referrer_id_fkey"
+            columns: ["referrer_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referrals_referred_id_fkey"
+            columns: ["referred_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      competitor_monitors: {
+        Row: {
+          id: string
+          org_id: string
+          domain: string
+          display_name: string
+          last_status: string | null
+          last_response_time_ms: number | null
+          last_checked_at: string | null
+          uptime_30d: number | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          org_id: string
+          domain: string
+          display_name: string
+          last_status?: string | null
+          last_response_time_ms?: number | null
+          last_checked_at?: string | null
+          uptime_30d?: number | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          org_id?: string
+          domain?: string
+          display_name?: string
+          last_status?: string | null
+          last_response_time_ms?: number | null
+          last_checked_at?: string | null
+          uptime_30d?: number | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "competitor_monitors_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reports: {
         Row: {
           ai_summary: string | null
@@ -1275,6 +1373,7 @@ export type Database = {
           plan_id: string
           status: string
           stripe_subscription_id: string | null
+          trial_ends_at: string | null
           updated_at: string
         }
         Insert: {
@@ -1288,6 +1387,7 @@ export type Database = {
           plan_id: string
           status?: string
           stripe_subscription_id?: string | null
+          trial_ends_at?: string | null
           updated_at?: string
         }
         Update: {
@@ -1301,6 +1401,7 @@ export type Database = {
           plan_id?: string
           status?: string
           stripe_subscription_id?: string | null
+          trial_ends_at?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -1328,6 +1429,7 @@ export type Database = {
           id: string
           is_super_admin: boolean
           org_id: string
+          referral_code: string | null
           role: string
           updated_at: string
           workspace_id: string | null
@@ -1339,6 +1441,7 @@ export type Database = {
           id: string
           is_super_admin?: boolean
           org_id: string
+          referral_code?: string | null
           role?: string
           updated_at?: string
           workspace_id?: string | null
@@ -1350,6 +1453,7 @@ export type Database = {
           id?: string
           is_super_admin?: boolean
           org_id?: string
+          referral_code?: string | null
           role?: string
           updated_at?: string
           workspace_id?: string | null

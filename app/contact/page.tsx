@@ -1,10 +1,10 @@
-import { UptrueLogo } from '@/components/ui/uptrue-logo'
 import type { Metadata } from 'next'
-import Link from 'next/link'
 import {
   OrganizationJsonLd,
 } from '@/components/seo/json-ld'
 import { ContactForm } from '@/components/contact-form'
+import { PublicNav } from '@/components/ui/public-nav'
+import { PublicFooter } from '@/components/ui/public-footer'
 
 export const metadata: Metadata = {
   title: 'Contact Uptrue — Get in Touch',
@@ -49,24 +49,7 @@ export default function ContactPage(): React.ReactElement {
       <OrganizationJsonLd />
 
       {/* Navigation */}
-      <nav className="landing-nav">
-        <div className="landing-nav-inner">
-          <Link href="/" className="landing-logo" aria-label="Uptrue home">
-            <UptrueLogo />
-          </Link>
-          <div className="landing-nav-links">
-            <Link href="/#features">Features</Link>
-            <Link href="/#pricing">Pricing</Link>
-            <Link href="/blog">Blog</Link>
-            <Link href="/about">About</Link>
-            <Link href="/contact">Contact</Link>
-          </div>
-          <div className="landing-nav-actions">
-            <Link href="/login" className="btn btn-ghost">Log in</Link>
-            <Link href="/signup" className="btn btn-primary">Start Free</Link>
-          </div>
-        </div>
-      </nav>
+      <PublicNav />
 
       {/* Hero */}
       <section className="about-hero">
@@ -119,46 +102,7 @@ export default function ContactPage(): React.ReactElement {
       </section>
 
       {/* Footer */}
-      <footer className="landing-footer">
-        <div className="landing-container">
-          <div className="footer-grid">
-            <div className="footer-brand">
-              <UptrueLogo />
-              <p className="footer-tagline">
-                Uptime, performance &amp; infrastructure monitoring for agencies
-                and teams.
-              </p>
-            </div>
-            <div className="footer-col">
-              <h4 className="footer-col-title">Product</h4>
-              <Link href="/#features">Features</Link>
-              <Link href="/#pricing">Pricing</Link>
-              <Link href="/blog">Blog</Link>
-              <Link href="/status">Status</Link>
-            </div>
-            <div className="footer-col">
-              <h4 className="footer-col-title">Company</h4>
-              <Link href="/about">About</Link>
-              <Link href="/contact">Contact</Link>
-            </div>
-            <div className="footer-col">
-              <h4 className="footer-col-title">Legal</h4>
-              <Link href="/terms">Terms of Service</Link>
-              <Link href="/privacy">Privacy Policy</Link>
-              <Link href="/cookies">Cookie Policy</Link>
-              <Link href="/dpa">Data Processing Agreement</Link>
-              <Link href="/acceptable-use">Acceptable Use Policy</Link>
-              <Link href="/agency-agreement">Agency Agreement</Link>
-            </div>
-          </div>
-          <div className="footer-bottom">
-            <p>
-              {'\u00A9'} {new Date().getFullYear()} Vision Software Solutions
-              Limited. All rights reserved.
-            </p>
-          </div>
-        </div>
-      </footer>
+      <PublicFooter />
     </div>
   )
 }

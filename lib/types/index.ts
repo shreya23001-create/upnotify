@@ -30,6 +30,7 @@ export type FeatureFlagUsage = Database['public']['Tables']['feature_flag_usage'
 export type AgencyTag = Database['public']['Tables']['agency_tags']['Row']
 export type CreditRule = Database['public']['Tables']['credit_rules']['Row']
 export type UserCredit = Database['public']['Tables']['user_credits']['Row']
+export type Referral = Database['public']['Tables']['referrals']['Row']
 
 // Re-export Database type for Supabase client generics
 export type { Database }

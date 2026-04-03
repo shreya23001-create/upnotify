@@ -5,18 +5,34 @@ import type { Subscription, Invoice, Plan } from '@/lib/types'
 
 export async function getSubscription(orgId: string): Promise<Subscription | null> {
   const supabase = await createClient()
-  const { data, error } = await supabase
+
+  // Try active first
+  const { data: active, error: activeErr } = await supabase
     .from('subscriptions')
     .select('*')
     .eq('org_id', orgId)
     .eq('status', 'active')
     .single()
 
-  if (error) {
-    logger.error('Failed to get subscription', { error: error.message })
-    return null
+  if (active) return active
+
+  // Fall back to trialing
+  const { data: trialing, error: trialErr } = await supabase
+    .from('subscriptions')
+    .select('*')
+    .eq('org_id', orgId)
+    .eq('status', 'trialing')
+    .single()
+
+  if (trialing) return trialing
+
+  if (activeErr && activeErr.code !== 'PGRST116') {
+    logger.error('Failed to get subscription', { error: activeErr.message })
   }
-  return data
+  if (trialErr && trialErr.code !== 'PGRST116') {
+    logger.error('Failed to get trial subscription', { error: trialErr.message })
+  }
+  return null
 }
 
 export async function getInvoices(orgId: string): Promise<Invoice[]> {
@@ -68,18 +84,91 @@ export async function getSubscriptionWithPlan(
   orgId: string
 ): Promise<{ subscription: Subscription; plan: Plan } | null> {
   const supabase = createAdminClient()
-  const { data, error } = await supabase
+
+  // Try active first
+  const { data: active } = await supabase
     .from('subscriptions')
     .select('*, plans(*)')
     .eq('org_id', orgId)
     .eq('status', 'active')
     .single()
 
-  if (error || !data) return null
-  return {
-    subscription: data as unknown as Subscription,
-    plan: (data as Record<string, unknown>).plans as unknown as Plan,
+  if (active && (active as Record<string, unknown>).plans) {
+    return {
+      subscription: active as unknown as Subscription,
+      plan: (active as Record<string, unknown>).plans as unknown as Plan,
+    }
   }
+
+  // Fall back to trialing
+  const { data: trialing } = await supabase
+    .from('subscriptions')
+    .select('*, plans(*)')
+    .eq('org_id', orgId)
+    .eq('status', 'trialing')
+    .single()
+
+  if (trialing && (trialing as Record<string, unknown>).plans) {
+    return {
+      subscription: trialing as unknown as Subscription,
+      plan: (trialing as Record<string, unknown>).plans as unknown as Plan,
+    }
+  }
+
+  return null
+}
+
+/**
+ * Create a 14-day reverse trial subscription for a new user.
+ * Assigns the Builder plan with 'trialing' status and trial_ends_at set to 14 days from now.
+ */
+export async function createTrialSubscription(orgId: string): Promise<Subscription | null> {
+  const supabase = createAdminClient()
+
+  // Check if org already has any subscription
+  const { count } = await supabase
+    .from('subscriptions')
+    .select('id', { count: 'exact', head: true })
+    .eq('org_id', orgId)
+
+  if ((count ?? 0) > 0) {
+    return null // Already has a subscription — skip
+  }
+
+  // Get the builder plan
+  const { data: builderPlan, error: planError } = await supabase
+    .from('plans')
+    .select('id')
+    .eq('slug', 'builder')
+    .single()
+
+  if (planError || !builderPlan) {
+    logger.error('Failed to find builder plan for trial', { error: planError?.message })
+    return null
+  }
+
+  const now = new Date()
+  const trialEnd = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000)
+
+  const { data, error } = await supabase
+    .from('subscriptions')
+    .insert({
+      org_id: orgId,
+      plan_id: builderPlan.id,
+      status: 'trialing',
+      billing_cycle: 'monthly',
+      trial_ends_at: trialEnd.toISOString(),
+      current_period_start: now.toISOString(),
+      current_period_end: trialEnd.toISOString(),
+    })
+    .select()
+    .single()
+
+  if (error) {
+    logger.error('Failed to create trial subscription', { orgId, error: error.message })
+    return null
+  }
+  return data
 }
 
 export async function createSubscriptionRecord(record: {

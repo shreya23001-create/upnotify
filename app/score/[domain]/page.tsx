@@ -8,7 +8,8 @@ import Link from 'next/link'
 import { calculateScore } from '@/lib/services/score'
 import type { ScoreResult, CategoryScore, CheckItem } from '@/lib/services/score'
 import { ScoreForm } from '@/components/score/score-form'
-import { UptrueLogo } from '@/components/ui/uptrue-logo'
+import { PublicNav } from '@/components/ui/public-nav'
+import { PublicFooter } from '@/components/ui/public-footer'
 
 export const revalidate = 3600
 
@@ -160,14 +161,7 @@ export default async function ScoreResultsPage({ params }: PageProps): Promise<R
     <div className="score-results-page">
       {result && <JsonLd result={result} />}
 
-      <nav className="score-nav">
-        <Link href="/" className="score-nav-logo">
-          <UptrueLogo />
-        </Link>
-        <Link href="/login" className="btn btn-secondary btn-sm">
-          Sign in
-        </Link>
-      </nav>
+      <PublicNav />
 
       <div className="score-results-header">
         <h1 className="score-results-title">
@@ -263,11 +257,7 @@ export default async function ScoreResultsPage({ params }: PageProps): Promise<R
         </p>
       </div>
 
-      <div className="score-hero-footer">
-        <p>
-          Powered by <Link href="/">Uptrue</Link> — Uptime monitoring for agencies and teams.
-        </p>
-      </div>
+      <PublicFooter />
     </div>
   )
 }

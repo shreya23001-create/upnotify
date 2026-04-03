@@ -3,10 +3,12 @@
 import { useState, useCallback } from 'react'
 import { DataTable, type Column, type BulkAction } from '@/components/ui/data-table'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
-import type { Organisation, User, Subscription, Invoice, ApiKey, Plan } from '@/lib/types'
+import type { Organisation, User, Subscription, Invoice, ApiKey, Plan, UserCredit, CreditRule, Referral } from '@/lib/types'
 import { CurrentPlan } from '@/components/billing/current-plan'
 import { PricingTable } from '@/components/billing/pricing-table'
 import { InvoiceList } from '@/components/billing/invoice-list'
+import { CreditsSection } from '@/components/billing/credits-section'
+import { ReferralSection } from '@/components/billing/referral-section'
 import { CompanyDetailsForm } from '@/components/dashboard/settings/company-details-form'
 import { OrgSettingsForm } from '@/components/dashboard/settings/org-settings-form'
 import { LogoUpload } from '@/components/ui/logo-upload'
@@ -25,6 +27,11 @@ interface SettingsContentProps {
   teamMemberLimit: number
   teamMemberCount: number
   canInvite: boolean
+  credits: UserCredit[]
+  creditBalance: number
+  creditRules: CreditRule[]
+  referralCode: string | null
+  referrals: Referral[]
 }
 
 export function SettingsContent({
@@ -40,6 +47,11 @@ export function SettingsContent({
   teamMemberLimit,
   teamMemberCount,
   canInvite,
+  credits,
+  creditBalance,
+  creditRules,
+  referralCode,
+  referrals,
 }: SettingsContentProps): React.ReactElement {
   const [tab, setTab] = useState('organisation')
   const [revokeIds, setRevokeIds] = useState<string[]>([])
@@ -154,7 +166,7 @@ export function SettingsContent({
     <>
     <div>
       <div className="tabs-list">
-        {['organisation', 'team', 'billing', 'company', 'api-keys'].map((t) => (
+        {['organisation', 'team', 'billing', 'credits', 'referrals', 'company', 'api-keys'].map((t) => (
           <button key={t} className={`tab-trigger${tab === t ? ' active' : ''}`} onClick={() => setTab(t)}>
             {t === 'api-keys' ? 'API Keys' : t.charAt(0).toUpperCase() + t.slice(1)}
           </button>
@@ -195,9 +207,17 @@ export function SettingsContent({
       {tab === 'billing' && (
         <div className="space-y">
           <CurrentPlan plan={currentPlan} subscription={subscription} />
-          <PricingTable plans={plans} currentPlanSlug={currentPlan?.slug} />
+          <PricingTable plans={plans} currentPlanSlug={currentPlan?.slug} creditBalancePence={creditBalance} />
           <InvoiceList invoices={invoices} />
         </div>
+      )}
+
+      {tab === 'credits' && (
+        <CreditsSection credits={credits} creditRules={creditRules} balancePence={creditBalance} />
+      )}
+
+      {tab === 'referrals' && (
+        <ReferralSection referralCode={referralCode} referrals={referrals} />
       )}
 
       {tab === 'company' && (

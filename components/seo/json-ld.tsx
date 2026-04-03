@@ -49,7 +49,7 @@ export function SoftwareApplicationJsonLd(): React.ReactElement {
     operatingSystem: 'Web',
     url: 'https://uptrue.io',
     description:
-      'Uptime, performance and infrastructure monitoring for agencies and teams. 10 monitor types, AI-powered reports, public status pages, and multi-channel alerts.',
+      'Uptime, performance and infrastructure monitoring for agencies and teams. 10 monitor types, AI-powered reports, public status pages, multi-channel alerts, competitor tracking, free SSL checker and uptime calculator, and a public uptime leaderboard.',
     offers: [
       {
         '@type': 'Offer',

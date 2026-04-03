@@ -10,6 +10,7 @@ import {
   FaqPageJsonLd,
 } from '@/components/seo/json-ld'
 import { FAQ_ITEMS } from '@/lib/constants/faq'
+import { PublicFooter } from '@/components/ui/public-footer'
 
 export const metadata: Metadata = {
   title: 'Uptrue — Uptime Monitoring for Agencies & Teams',
@@ -69,6 +70,27 @@ const FEATURES = [
     description:
       'Every downtime alert is verified from a second region before firing. No more 3am wake-ups for nothing.',
   },
+  {
+    icon: '\u{1F3C1}',
+    title: 'Competitor Tracking',
+    subtitle: 'Benchmark your uptime',
+    description:
+      'Monitor competitor websites and compare uptime side by side. Know when they go down and prove your reliability edge.',
+  },
+  {
+    icon: '\u{1F9F0}',
+    title: 'Free SSL & Uptime Tools',
+    subtitle: 'No signup required',
+    description:
+      'Check any SSL certificate, calculate SLA downtime budgets, or score your site health — all free, instantly.',
+  },
+  {
+    icon: '\u{1F3C6}',
+    title: 'Public Uptime Leaderboard',
+    subtitle: 'Show off your reliability',
+    description:
+      'The most reliable websites ranked by real uptime data. Opt in your monitors and earn trust from visitors.',
+  },
 ]
 
 const STEPS = [
@@ -110,9 +132,11 @@ export default function LandingPage(): React.ReactElement {
           </Link>
           <div className="landing-nav-links">
             <a href="#features">Features</a>
-            <a href="#how-it-works">How It Works</a>
             <a href="#pricing">Pricing</a>
-            <a href="#faq">FAQ</a>
+            <Link href="/score">Score <span className="free-badge">FREE</span></Link>
+            <Link href="/tracker">Tracker <span className="free-badge">FREE</span></Link>
+            <Link href="/tools">Tools <span className="free-badge">FREE</span></Link>
+            <Link href="/leaderboard">Leaderboard</Link>
             <Link href="/blog">Blog</Link>
           </div>
           <div className="landing-nav-actions">
@@ -153,6 +177,14 @@ export default function LandingPage(): React.ReactElement {
               <a href="#how-it-works" className="btn btn-secondary btn-lg">
                 See How It Works
               </a>
+            </div>
+            <div className="hero-secondary-actions">
+              <Link href="/score" className="btn btn-ghost btn-sm">
+                Score Your Site Free
+              </Link>
+              <Link href="/tools" className="btn btn-ghost btn-sm">
+                Free Tools
+              </Link>
             </div>
             <div className="hero-trust">
               <div className="hero-trust-item">
@@ -384,47 +416,7 @@ export default function LandingPage(): React.ReactElement {
       {/* ================================================================
           Footer
           ================================================================ */}
-      <footer className="landing-footer">
-        <div className="landing-container">
-          <div className="footer-grid">
-            <div className="footer-brand">
-              <UptrueLogo />
-              <p className="footer-tagline">
-                Uptime, performance &amp; infrastructure monitoring for agencies
-                and teams.
-              </p>
-            </div>
-            <div className="footer-col">
-              <h4 className="footer-col-title">Product</h4>
-              <a href="#features">Features</a>
-              <a href="#pricing">Pricing</a>
-              <a href="#faq">FAQ</a>
-              <Link href="/status">Status</Link>
-              <Link href="/blog">Blog</Link>
-            </div>
-            <div className="footer-col">
-              <h4 className="footer-col-title">Legal</h4>
-              <a href="/terms">Terms of Service</a>
-              <a href="/privacy">Privacy Policy</a>
-              <a href="/cookies">Cookie Policy</a>
-              <a href="/dpa">Data Processing Agreement</a>
-              <a href="/acceptable-use">Acceptable Use Policy</a>
-              <a href="/agency-agreement">Agency Agreement</a>
-            </div>
-            <div className="footer-col">
-              <h4 className="footer-col-title">Company</h4>
-              <Link href="/about">About</Link>
-              <Link href="/contact">Contact</Link>
-            </div>
-          </div>
-          <div className="footer-bottom">
-            <p>
-              {'\u00A9'} {new Date().getFullYear()} Vision Software Solutions
-              Limited. All rights reserved.
-            </p>
-          </div>
-        </div>
-      </footer>
+      <PublicFooter />
     </div>
   )
 }

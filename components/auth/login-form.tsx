@@ -8,9 +8,18 @@ export function LoginForm({ mode = 'login' }: { mode?: 'login' | 'signup' }) {
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 
+  /** Extract referral code from URL query params if present */
+  function getRefCode(): string | null {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    return params.get('ref')
+  }
+
   function handleEmailSubmit(formData: FormData): void {
     setError(null)
     formData.set('origin', window.location.origin)
+    const ref = getRefCode()
+    if (ref) formData.set('ref', ref)
     startTransition(async () => {
       const result = await signInWithEmail(formData)
       if (result.error) {
@@ -23,8 +32,9 @@ export function LoginForm({ mode = 'login' }: { mode?: 'login' | 'signup' }) {
 
   function handleGoogleClick(): void {
     setError(null)
+    const ref = getRefCode()
     startTransition(async () => {
-      const result = await signInWithGoogle(window.location.origin)
+      const result = await signInWithGoogle(window.location.origin, ref ?? undefined)
       if (result.error) {
         setError(result.error)
       } else if (result.url) {

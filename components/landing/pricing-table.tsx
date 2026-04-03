@@ -1,12 +1,19 @@
+'use client'
+
+import { useState } from 'react'
+
 interface PlanFeature {
   text: string
   included: boolean
 }
 
-interface Plan {
+interface LandingPlan {
   name: string
-  price: string
-  period: string
+  monthlyPrice: string
+  annualPrice: string
+  monthlyPeriod: string
+  annualPeriod: string
+  annualNote?: string
   description: string
   features: PlanFeature[]
   cta: string
@@ -14,11 +21,13 @@ interface Plan {
   highlighted: boolean
 }
 
-const PLANS: Plan[] = [
+const PLANS: LandingPlan[] = [
   {
     name: 'Free',
-    price: '\u00A30',
-    period: 'forever',
+    monthlyPrice: '\u00A30',
+    annualPrice: '\u00A30',
+    monthlyPeriod: 'forever',
+    annualPeriod: 'forever',
     description: 'Get started with basic monitoring',
     features: [
       { text: '3 monitors', included: true },
@@ -38,8 +47,10 @@ const PLANS: Plan[] = [
   },
   {
     name: 'Lite',
-    price: '\u00A310',
-    period: '/year',
+    monthlyPrice: '\u00A310',
+    annualPrice: '\u00A310',
+    monthlyPeriod: '/year',
+    annualPeriod: '/year',
     description: 'Affordable monitoring for small projects',
     features: [
       { text: '5 monitors', included: true },
@@ -59,8 +70,11 @@ const PLANS: Plan[] = [
   },
   {
     name: 'Builder',
-    price: '\u00A315',
-    period: '/month',
+    monthlyPrice: '\u00A315',
+    annualPrice: '\u00A312',
+    monthlyPeriod: '/month',
+    annualPeriod: '/mo',
+    annualNote: '\u00A3144/year \u2014 save 20%',
     description: 'For growing teams and serious projects',
     features: [
       { text: '25 monitors', included: true },
@@ -80,8 +94,11 @@ const PLANS: Plan[] = [
   },
   {
     name: 'Scale',
-    price: '\u00A339',
-    period: '/month',
+    monthlyPrice: '\u00A339',
+    annualPrice: '\u00A331.17',
+    monthlyPeriod: '/month',
+    annualPeriod: '/mo',
+    annualNote: '\u00A3374/year \u2014 save 20%',
     description: 'Full power for teams that need everything',
     features: [
       { text: '100 monitors', included: true },
@@ -102,6 +119,8 @@ const PLANS: Plan[] = [
 ]
 
 export default function PricingTable(): React.ReactElement {
+  const [isAnnual, setIsAnnual] = useState(true)
+
   return (
     <section className="landing-section landing-pricing" id="pricing">
       <div className="landing-container">
@@ -109,44 +128,68 @@ export default function PricingTable(): React.ReactElement {
         <p className="landing-section-subtitle">
           Start free. Scale as you grow. No hidden fees.
         </p>
+
+        {/* Annual / Monthly toggle */}
+        <div className="billing-toggle-wrapper">
+          <button
+            className={`billing-toggle-btn${!isAnnual ? ' billing-toggle-active' : ''}`}
+            onClick={() => setIsAnnual(false)}
+          >
+            Monthly
+          </button>
+          <button
+            className={`billing-toggle-btn${isAnnual ? ' billing-toggle-active' : ''}`}
+            onClick={() => setIsAnnual(true)}
+          >
+            Annual
+            <span className="billing-toggle-save">Save 20%</span>
+          </button>
+        </div>
+
         <div className="pricing-grid">
-          {PLANS.map((plan) => (
-            <div
-              key={plan.name}
-              className={`pricing-card ${plan.highlighted ? 'pricing-card-highlighted' : ''}`}
-            >
-              {plan.highlighted && (
-                <div className="pricing-badge">Most Popular</div>
-              )}
-              <div className="pricing-card-header">
-                <h3 className="pricing-plan-name">{plan.name}</h3>
-                <div className="pricing-price">
-                  <span className="pricing-amount">{plan.price}</span>
-                  <span className="pricing-period">{plan.period}</span>
-                </div>
-                <p className="pricing-description">{plan.description}</p>
-              </div>
-              <ul className="pricing-features">
-                {plan.features.map((feature, index) => (
-                  <li
-                    key={index}
-                    className={`pricing-feature ${!feature.included ? 'pricing-feature-disabled' : ''}`}
-                  >
-                    <span className="pricing-feature-icon">
-                      {feature.included ? '\u2713' : '\u2014'}
-                    </span>
-                    {feature.text}
-                  </li>
-                ))}
-              </ul>
-              <a
-                href={plan.ctaHref}
-                className={`btn btn-full ${plan.highlighted ? 'btn-primary' : 'btn-secondary'}`}
+          {PLANS.map((plan) => {
+            const price = isAnnual ? plan.annualPrice : plan.monthlyPrice
+            const period = isAnnual ? plan.annualPeriod : plan.monthlyPeriod
+            const note = isAnnual ? plan.annualNote : undefined
+
+            return (
+              <div
+                key={plan.name}
+                className={`pricing-card ${plan.highlighted ? 'pricing-card-highlighted' : ''}`}
               >
-                {plan.cta}
-              </a>
-            </div>
-          ))}
+                {plan.highlighted && (
+                  <div className="pricing-badge">Most Popular</div>
+                )}
+                <div className="pricing-card-header">
+                  <h3 className="pricing-plan-name">{plan.name}</h3>
+                  <div className="pricing-price">
+                    <span className="pricing-amount">{price}</span>
+                    <span className="pricing-period">{period}</span>
+                  </div>
+                  <p className="pricing-description">{note || plan.description}</p>
+                </div>
+                <ul className="pricing-features">
+                  {plan.features.map((feature, index) => (
+                    <li
+                      key={index}
+                      className={`pricing-feature ${!feature.included ? 'pricing-feature-disabled' : ''}`}
+                    >
+                      <span className="pricing-feature-icon">
+                        {feature.included ? '\u2713' : '\u2014'}
+                      </span>
+                      {feature.text}
+                    </li>
+                  ))}
+                </ul>
+                <a
+                  href={plan.ctaHref}
+                  className={`btn btn-full ${plan.highlighted ? 'btn-primary' : 'btn-secondary'}`}
+                >
+                  {plan.cta}
+                </a>
+              </div>
+            )
+          })}
         </div>
       </div>
     </section>

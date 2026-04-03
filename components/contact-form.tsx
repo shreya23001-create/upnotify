@@ -30,8 +30,6 @@ export function ContactForm(): React.ReactElement {
           <option value="Agency enquiry">Agency Enquiry</option>
           <option value="Partnership">Partnership</option>
           <option value="Billing">Billing</option>
-          <option value="Technical support">Technical Support</option>
-          <option value="Bug report">Bug Report</option>
           <option value="Feature request">Feature Request</option>
         </select>
       </div>

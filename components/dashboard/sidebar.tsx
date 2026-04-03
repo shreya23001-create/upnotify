@@ -9,7 +9,7 @@ import { useAuth } from '@/components/providers/auth-provider'
 import {
   IconDashboard, IconActivity, IconGlobe, IconBell,
   IconBuilding, IconSettings, IconShield, IconChevronLeft, IconChevronRight,
-  IconHelpCircle, IconTrendingUp,
+  IconHelpCircle, IconTrendingUp, IconTarget,
 } from '@/components/icons'
 
 interface NavSection {
@@ -29,6 +29,7 @@ const mainNavItems: NavItem[] = [
   { href: '/dashboard/alerts', label: 'Alerts', icon: IconBell },
   { href: '/dashboard/status-pages', label: 'Status Pages', icon: IconGlobe },
   { href: '/dashboard/reports', label: 'Reports', icon: IconTrendingUp },
+  { href: '/dashboard/competitors', label: 'Competitors', icon: IconTarget },
 ]
 
 const secondaryNavItems: NavItem[] = [

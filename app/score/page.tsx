@@ -4,9 +4,9 @@
  */
 
 import type { Metadata } from 'next'
-import Link from 'next/link'
 import { ScoreForm } from '@/components/score/score-form'
-import { UptrueLogo } from '@/components/ui/uptrue-logo'
+import { PublicNav } from '@/components/ui/public-nav'
+import { PublicFooter } from '@/components/ui/public-footer'
 
 export const metadata: Metadata = {
   title: 'Free Website Health Score',
@@ -18,14 +18,7 @@ export const metadata: Metadata = {
 export default function ScorePage(): React.ReactElement {
   return (
     <div className="score-hero">
-      <nav className="score-nav">
-        <Link href="/" className="score-nav-logo">
-          <UptrueLogo />
-        </Link>
-        <Link href="/login" className="btn btn-secondary btn-sm">
-          Sign in
-        </Link>
-      </nav>
+      <PublicNav />
 
       <div className="score-hero-content">
         <div className="score-hero-badge">Free tool</div>
@@ -63,11 +56,7 @@ export default function ScorePage(): React.ReactElement {
         </div>
       </div>
 
-      <div className="score-hero-footer">
-        <p>
-          Powered by <Link href="/">Uptrue</Link> — Uptime monitoring for agencies and teams.
-        </p>
-      </div>
+      <PublicFooter />
     </div>
   )
 }

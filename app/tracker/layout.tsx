@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
-import { UptrueLogo } from '@/components/ui/uptrue-logo'
+import { PublicNav } from '@/components/ui/public-nav'
+import { PublicFooter } from '@/components/ui/public-footer'
 
 export const metadata: Metadata = {
   title: {
@@ -13,25 +13,11 @@ export const metadata: Metadata = {
 export default function TrackerLayout({ children }: { children: React.ReactNode }): React.ReactElement {
   return (
     <div className="tracker-layout">
-      <header className="tracker-header">
-        <Link href="/" className="tracker-logo">
-          <UptrueLogo />
-        </Link>
-        <nav className="tracker-nav">
-          <Link href="/tracker">All Sites</Link>
-          <a href="https://uptrue.io" target="_blank" rel="noopener noreferrer">Monitor Your Site</a>
-        </nav>
-      </header>
-      <main className="tracker-main">
+      <PublicNav />
+      <main className="tracker-main" style={{ paddingTop: 80 }}>
         {children}
       </main>
-      <footer className="tracker-footer">
-        <p>Powered by <a href="https://uptrue.io" target="_blank" rel="noopener noreferrer">Uptrue</a> — Professional uptime monitoring for agencies and businesses.</p>
-        <p className="tracker-footer-links">
-          <a href="/terms">Terms</a>
-          <a href="/privacy">Privacy</a>
-        </p>
-      </footer>
+      <PublicFooter />
     </div>
   )
 }
