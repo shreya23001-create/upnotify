@@ -1420,6 +1420,55 @@ html.dark .landing-cta { background: linear-gradient(135deg, #1a1d27 0%, #242736
 .tracker-faq-question { font-size: 15px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; }
 .tracker-faq-answer { font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
 
+/* About section */
+.tracker-about-section { background: var(--bg-card); border: 1px solid var(--border-primary); border-radius: 12px; padding: 20px; margin-bottom: 24px; }
+.tracker-about-description { font-size: 15px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; }
+.tracker-about-meta { display: flex; gap: 24px; flex-wrap: wrap; padding-top: 16px; border-top: 1px solid var(--border-primary); }
+.tracker-about-meta-item { display: flex; flex-direction: column; gap: 2px; }
+.tracker-about-meta-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
+.tracker-about-meta-value { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+
+/* Common downtime reasons section */
+.tracker-reasons-section { background: var(--bg-card); border: 1px solid var(--border-primary); border-radius: 12px; padding: 20px; margin-bottom: 24px; }
+.tracker-reasons-intro { font-size: 14px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 14px; }
+.tracker-reasons-list { list-style: none; padding: 0; margin: 0 0 14px 0; display: flex; flex-direction: column; gap: 10px; }
+.tracker-reasons-item { font-size: 14px; color: var(--text-primary); padding: 10px 14px; background: var(--bg-primary); border-radius: 8px; border: 1px solid var(--border-primary); line-height: 1.5; position: relative; padding-left: 32px; }
+.tracker-reasons-item::before { content: ''; position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 6px; height: 6px; background: var(--color-warning, #f59e0b); border-radius: 50%; }
+.tracker-reasons-footer { font-size: 13px; color: var(--text-muted); }
+
+/* What to do section */
+.tracker-whatdo-section { background: var(--bg-card); border: 1px solid var(--border-primary); border-radius: 12px; padding: 20px; margin-bottom: 24px; }
+.tracker-whatdo-steps { display: flex; flex-direction: column; gap: 16px; }
+.tracker-whatdo-step { display: flex; gap: 14px; align-items: flex-start; }
+.tracker-whatdo-step-num { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; min-width: 28px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 13px; font-weight: 700; }
+.tracker-whatdo-step strong { font-size: 14px; font-weight: 600; color: var(--text-primary); display: block; margin-bottom: 4px; }
+.tracker-whatdo-step p { font-size: 14px; color: var(--text-secondary); line-height: 1.6; margin: 0; }
+
+/* Impact section */
+.tracker-impact-section { background: var(--bg-card); border: 1px solid var(--border-primary); border-radius: 12px; padding: 20px; margin-bottom: 24px; }
+.tracker-impact-intro { font-size: 14px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 14px; }
+.tracker-impact-list { list-style: none; padding: 0; margin: 0 0 14px 0; display: flex; flex-direction: column; gap: 8px; }
+.tracker-impact-item { font-size: 14px; color: var(--text-primary); padding: 10px 14px 10px 32px; background: rgba(239, 68, 68, 0.03); border-radius: 8px; border: 1px solid rgba(239, 68, 68, 0.08); line-height: 1.5; position: relative; }
+.tracker-impact-item::before { content: ''; position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 6px; height: 6px; background: var(--color-danger, #ef4444); border-radius: 50%; }
+.tracker-impact-footer { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+
+/* Related sites section */
+.tracker-related-section { background: var(--bg-card); border: 1px solid var(--border-primary); border-radius: 12px; padding: 20px; margin-bottom: 24px; }
+.tracker-related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
+.tracker-related-card { display: flex; flex-direction: column; gap: 2px; padding: 14px; background: var(--bg-primary); border: 1px solid var(--border-primary); border-radius: 8px; text-decoration: none; transition: border-color 0.15s, box-shadow 0.15s; }
+.tracker-related-card:hover { border-color: var(--accent); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+.tracker-related-name { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+.tracker-related-domain { font-size: 12px; color: var(--text-muted); }
+
+/* CTA buttons row */
+.tracker-cta-buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.tracker-cta-secondary { display: inline-block; padding: 10px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; color: var(--accent); background: transparent; border: 2px solid var(--accent); text-decoration: none; transition: background 0.15s, color 0.15s; }
+.tracker-cta-secondary:hover { background: var(--accent); color: #fff; }
+
+/* Shared link style for tracker content */
+.tracker-link { color: var(--accent); font-weight: 500; text-decoration: none; }
+.tracker-link:hover { text-decoration: underline; }
+
 @media (max-width: 768px) {
   .tracker-main { padding: 20px 16px; }
   .tracker-hero-title { font-size: 24px; }
@@ -1432,6 +1481,9 @@ html.dark .landing-cta { background: linear-gradient(135deg, #1a1d27 0%, #242736
   .tracker-category-pill { padding: 5px 12px; font-size: 12px; }
   .tracker-pagination { gap: 10px; }
   .tracker-pagination-btn { padding: 6px 14px; font-size: 13px; }
+  .tracker-about-meta { flex-direction: column; gap: 12px; }
+  .tracker-related-grid { grid-template-columns: repeat(2, 1fr); }
+  .tracker-cta-buttons { flex-direction: column; align-items: center; }
 }
 
 /* ==========================================================================
