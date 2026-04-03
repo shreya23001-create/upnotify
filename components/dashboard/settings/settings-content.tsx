@@ -52,8 +52,9 @@ export function SettingsContent({
     setRevokeIds([])
   }, [])
 
-  const handleMemberAdded = useCallback((newMember: User): void => {
-    setTeamMembers((prev) => [...prev, newMember])
+  const handleInviteSent = useCallback((): void => {
+    // Invites are managed separately — no need to update team members list here.
+    // The team-invite-form component fetches its own invites list.
   }, [])
 
   const executeRemoveMember = useCallback(async (): Promise<void> => {
@@ -178,7 +179,7 @@ export function SettingsContent({
                 canInvite={canInvite}
                 teamMemberLimit={teamMemberLimit}
                 teamMemberCount={teamMemberCount}
-                onMemberAdded={handleMemberAdded}
+                onInviteSent={handleInviteSent}
               />
             )}
             <DataTable

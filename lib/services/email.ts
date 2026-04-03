@@ -384,6 +384,46 @@ export function getEmailRateStatus(): { sent: number; limit: number; remaining: 
 }
 
 // ---------------------------------------------------------------------------
+// Team invite email
+// ---------------------------------------------------------------------------
+
+interface TeamInviteEmailParams {
+  to: string
+  orgName: string
+  inviterName: string
+  role: string
+  acceptUrl: string
+}
+
+/**
+ * Sends an email inviting someone to join an organisation on Uptrue.
+ */
+export async function sendTeamInviteEmail(params: TeamInviteEmailParams): Promise<EmailResult> {
+  const subject = `You've been invited to join ${params.orgName} on Uptrue`
+
+  const html = baseTemplate(`
+    <h2 style="margin:0 0 8px;font-size:18px;color:#111827;">You&rsquo;ve been invited!</h2>
+    <p style="margin:0 0 20px;font-size:14px;color:#6b7280;line-height:1.6;">
+      ${escapeHtml(params.inviterName)} has invited you to join
+      <strong>${escapeHtml(params.orgName)}</strong> on Uptrue as a
+      <strong>${escapeHtml(params.role)}</strong>.
+    </p>
+
+    <p style="margin:0 0 8px;font-size:14px;color:#6b7280;">
+      Click the button below to accept the invite and join the team.
+    </p>
+
+    ${actionButton('Accept Invite', params.acceptUrl)}
+
+    <p style="margin:24px 0 0;font-size:12px;color:#9ca3af;line-height:1.5;">
+      This invite expires in 7 days. If you did not expect this email, you can safely ignore it.
+    </p>
+  `)
+
+  return sendEmail(params.to, subject, html)
+}
+
+// ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 

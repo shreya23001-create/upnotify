@@ -1661,6 +1661,53 @@ export type Database = {
         }
         Relationships: []
       }
+      team_invites: {
+        Row: {
+          id: string
+          org_id: string
+          email: string
+          role: string
+          invited_by: string
+          token: string
+          status: string
+          created_at: string
+          expires_at: string
+          accepted_at: string | null
+        }
+        Insert: {
+          id?: string
+          org_id: string
+          email: string
+          role?: string
+          invited_by: string
+          token?: string
+          status?: string
+          created_at?: string
+          expires_at?: string
+          accepted_at?: string | null
+        }
+        Update: {
+          id?: string
+          org_id?: string
+          email?: string
+          role?: string
+          invited_by?: string
+          token?: string
+          status?: string
+          created_at?: string
+          expires_at?: string
+          accepted_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_invites_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

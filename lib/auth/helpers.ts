@@ -27,6 +27,7 @@ export function isPublicRoute(pathname: string): boolean {
   if (pathname.startsWith('/blog/')) return true
   if (pathname.startsWith('/api/badge/')) return true
   if (pathname.startsWith('/api/v1/tracker/')) return true
+  if (pathname.startsWith('/invite/')) return true
   return false
 }
 
