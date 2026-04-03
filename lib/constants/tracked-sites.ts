@@ -83,4 +83,68 @@ export const TRACKED_SITES: TrackedSiteSeed[] = [
   { domain: 'openai.com', display_name: 'OpenAI', category: 'AI' },
   { domain: 'anthropic.com', display_name: 'Anthropic', category: 'AI' },
   { domain: 'huggingface.co', display_name: 'Hugging Face', category: 'AI' },
+  { domain: 'midjourney.com', display_name: 'Midjourney', category: 'AI' },
+  { domain: 'stability.ai', display_name: 'Stability AI', category: 'AI' },
+  { domain: 'perplexity.ai', display_name: 'Perplexity', category: 'AI' },
+
+  // Gaming
+  { domain: 'store.steampowered.com', display_name: 'Steam', category: 'Gaming' },
+  { domain: 'epicgames.com', display_name: 'Epic Games', category: 'Gaming' },
+  { domain: 'roblox.com', display_name: 'Roblox', category: 'Gaming' },
+  { domain: 'playstation.com', display_name: 'PlayStation', category: 'Gaming' },
+  { domain: 'xbox.com', display_name: 'Xbox', category: 'Gaming' },
+  { domain: 'twitch.tv', display_name: 'Twitch', category: 'Gaming' },
+  { domain: 'ea.com', display_name: 'EA', category: 'Gaming' },
+
+  // Finance & Crypto
+  { domain: 'wise.com', display_name: 'Wise', category: 'Finance' },
+  { domain: 'revolut.com', display_name: 'Revolut', category: 'Finance' },
+  { domain: 'coinbase.com', display_name: 'Coinbase', category: 'Finance' },
+  { domain: 'binance.com', display_name: 'Binance', category: 'Finance' },
+  { domain: 'robinhood.com', display_name: 'Robinhood', category: 'Finance' },
+
+  // CMS & Website Builders
+  { domain: 'wordpress.com', display_name: 'WordPress.com', category: 'CMS' },
+  { domain: 'wix.com', display_name: 'Wix', category: 'CMS' },
+  { domain: 'squarespace.com', display_name: 'Squarespace', category: 'CMS' },
+  { domain: 'webflow.com', display_name: 'Webflow', category: 'CMS' },
+  { domain: 'ghost.org', display_name: 'Ghost', category: 'CMS' },
+
+  // Education
+  { domain: 'coursera.org', display_name: 'Coursera', category: 'Education' },
+  { domain: 'udemy.com', display_name: 'Udemy', category: 'Education' },
+  { domain: 'duolingo.com', display_name: 'Duolingo', category: 'Education' },
+  { domain: 'khanacademy.org', display_name: 'Khan Academy', category: 'Education' },
+
+  // Music & Audio
+  { domain: 'spotify.com', display_name: 'Spotify', category: 'Music' },
+  { domain: 'soundcloud.com', display_name: 'SoundCloud', category: 'Music' },
+  { domain: 'music.apple.com', display_name: 'Apple Music', category: 'Music' },
+
+  // Food & Delivery
+  { domain: 'ubereats.com', display_name: 'Uber Eats', category: 'Food & Delivery' },
+  { domain: 'deliveroo.com', display_name: 'Deliveroo', category: 'Food & Delivery' },
+  { domain: 'doordash.com', display_name: 'DoorDash', category: 'Food & Delivery' },
+  { domain: 'justeat.com', display_name: 'Just Eat', category: 'Food & Delivery' },
+
+  // Travel
+  { domain: 'booking.com', display_name: 'Booking.com', category: 'Travel' },
+  { domain: 'airbnb.com', display_name: 'Airbnb', category: 'Travel' },
+  { domain: 'expedia.com', display_name: 'Expedia', category: 'Travel' },
+
+  // SaaS / Business Tools
+  { domain: 'hubspot.com', display_name: 'HubSpot', category: 'SaaS' },
+  { domain: 'salesforce.com', display_name: 'Salesforce', category: 'SaaS' },
+  { domain: 'zendesk.com', display_name: 'Zendesk', category: 'SaaS' },
+  { domain: 'intercom.com', display_name: 'Intercom', category: 'SaaS' },
+  { domain: 'freshdesk.com', display_name: 'Freshdesk', category: 'SaaS' },
+  { domain: 'monday.com', display_name: 'Monday.com', category: 'SaaS' },
+  { domain: 'airtable.com', display_name: 'Airtable', category: 'SaaS' },
+  { domain: 'jira.atlassian.com', display_name: 'Jira', category: 'SaaS' },
+  { domain: 'confluence.atlassian.com', display_name: 'Confluence', category: 'SaaS' },
+
+  // Security & VPN
+  { domain: 'nordvpn.com', display_name: 'NordVPN', category: 'Security' },
+  { domain: '1password.com', display_name: '1Password', category: 'Security' },
+  { domain: 'lastpass.com', display_name: 'LastPass', category: 'Security' },
 ]
