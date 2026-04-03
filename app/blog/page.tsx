@@ -220,6 +220,33 @@ const BLOG_POSTS: BlogPostMeta[] = [
     readTime: '14 min read',
     category: 'WordPress',
   },
+  {
+    slug: 'wp-rocket-cache-issues',
+    title: 'WP Rocket Cache Serving Stale Pages: Why Your Updates Aren\'t Showing to Visitors',
+    excerpt:
+      'You updated the page an hour ago but visitors still see old content. Object cache conflicts, CDN cache layering, and preload bot timing all cause WP Rocket to serve stale pages. Learn what causes it and how keyword monitoring checks what real visitors see.',
+    date: '11 May 2026',
+    readTime: '14 min read',
+    category: 'WordPress',
+  },
+  {
+    slug: 'wordpress-site-hacked',
+    title: 'WordPress Site Defaced: How Hackers Replace Your Homepage and How to Detect It Instantly',
+    excerpt:
+      'Hackers can replace your homepage with their own message while your uptime monitor says the site is fine. Admin credential compromise, vulnerable plugins, and theme file injection are the attack vectors. Learn how to detect defacement in 60 seconds with keyword monitoring.',
+    date: '12 May 2026',
+    readTime: '15 min read',
+    category: 'WordPress',
+  },
+  {
+    slug: 'updraftplus-backup-failed',
+    title: 'UpdraftPlus Backup Failed: When Your Safety Net Has a Hole in It',
+    excerpt:
+      'UpdraftPlus can silently stop backing up your site for months. Disk space exhaustion from partial backups, PHP timeouts, and expired remote storage credentials are the most common causes. Learn what makes backups fail and how HTTP monitoring catches the 500 errors that follow.',
+    date: '13 May 2026',
+    readTime: '14 min read',
+    category: 'WordPress',
+  },
 ]
 
 const POSTS_PER_PAGE = 6
