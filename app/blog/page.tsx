@@ -193,6 +193,33 @@ const BLOG_POSTS: BlogPostMeta[] = [
     readTime: '14 min read',
     category: 'WordPress',
   },
+  {
+    slug: 'elementor-not-loading',
+    title: 'Elementor Not Loading After Update? Fix the White Screen Before You Lose Traffic',
+    excerpt:
+      'Elementor can break after a WordPress, PHP, or plugin update — showing a white screen, missing widgets, or a 500 error. Learn what causes it and how HTTP and keyword monitoring catches broken pages automatically.',
+    date: '8 May 2026',
+    readTime: '14 min read',
+    category: 'WordPress',
+  },
+  {
+    slug: 'wordpress-htaccess-error',
+    title: 'WordPress .htaccess File Corrupted: How a Single File Takes Down Your Entire Site',
+    excerpt:
+      'A single misplaced character in .htaccess returns a 500 Internal Server Error on every page. Learn what causes corruption, how to regenerate the file, and how HTTP monitoring catches it instantly.',
+    date: '9 May 2026',
+    readTime: '14 min read',
+    category: 'WordPress',
+  },
+  {
+    slug: 'wordpress-permalinks-not-working',
+    title: 'WordPress Permalink Changes Breaking All URLs: How to Prevent SEO Disaster',
+    excerpt:
+      'Changing your permalink structure breaks every URL on your site. Every indexed page returns 404, every backlink leads nowhere, and Google starts deranking you within days. Learn how to fix it and how monitoring multiple pages catches widespread 404s.',
+    date: '10 May 2026',
+    readTime: '14 min read',
+    category: 'WordPress',
+  },
 ]
 
 const POSTS_PER_PAGE = 6
