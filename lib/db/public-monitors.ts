@@ -82,6 +82,122 @@ export async function getActivePublicMonitors(): Promise<PublicMonitor[]> {
   return (data ?? []) as unknown as PublicMonitor[]
 }
 
+export interface PaginatedPublicMonitors {
+  monitors: PublicMonitor[]
+  total: number
+  page: number
+  pageSize: number
+  totalPages: number
+}
+
+export async function getActivePublicMonitorsPaginated(options: {
+  page: number
+  pageSize: number
+  category?: string
+}): Promise<PaginatedPublicMonitors> {
+  const supabase = createAdminClient()
+  const { page, pageSize, category } = options
+  const offset = (page - 1) * pageSize
+
+  let countQuery = supabase
+    .from('public_monitors')
+    .select('id', { count: 'exact', head: true })
+    .eq('is_active', true)
+
+  let dataQuery = supabase
+    .from('public_monitors')
+    .select('*')
+    .eq('is_active', true)
+    .order('category', { ascending: true })
+    .order('display_name', { ascending: true })
+    .range(offset, offset + pageSize - 1)
+
+  if (category && category !== 'all') {
+    countQuery = countQuery.ilike('category', category)
+    dataQuery = dataQuery.ilike('category', category)
+  }
+
+  const [countResult, dataResult] = await Promise.all([countQuery, dataQuery])
+
+  if (countResult.error) {
+    logger.error('Failed to count public monitors', { error: countResult.error.message })
+  }
+  if (dataResult.error) {
+    logger.error('Failed to get paginated public monitors', { error: dataResult.error.message })
+  }
+
+  const total = countResult.count ?? 0
+  const monitors = (dataResult.data ?? []) as unknown as PublicMonitor[]
+
+  return {
+    monitors,
+    total,
+    page,
+    pageSize,
+    totalPages: Math.max(1, Math.ceil(total / pageSize)),
+  }
+}
+
+export async function getPublicMonitorCategories(): Promise<string[]> {
+  const supabase = createAdminClient()
+  const { data, error } = await supabase
+    .from('public_monitors')
+    .select('category')
+    .eq('is_active', true)
+
+  if (error) {
+    logger.error('Failed to get public monitor categories', { error: error.message })
+    return []
+  }
+
+  const categories = new Set<string>()
+  for (const row of (data ?? []) as Array<{ category: string }>) {
+    if (row.category) categories.add(row.category)
+  }
+  return Array.from(categories).sort()
+}
+
+export async function getPublicMonitorIncidentCount(monitorId: string, days: number = 30): Promise<number> {
+  const supabase = createAdminClient()
+  const since = new Date()
+  since.setDate(since.getDate() - days)
+
+  const { count, error } = await supabase
+    .from('public_incidents')
+    .select('id', { count: 'exact', head: true })
+    .eq('monitor_id', monitorId)
+    .gte('started_at', since.toISOString())
+
+  if (error) {
+    logger.error('Failed to count public incidents', { error: error.message })
+    return 0
+  }
+  return count ?? 0
+}
+
+export async function getPublicMonitorAvgResponseTime(monitorId: string, days: number = 30): Promise<number | null> {
+  const supabase = createAdminClient()
+  const since = new Date()
+  since.setDate(since.getDate() - days)
+
+  const { data, error } = await supabase
+    .from('public_check_results')
+    .select('response_time_ms')
+    .eq('monitor_id', monitorId)
+    .eq('status', 'up')
+    .gte('checked_at', since.toISOString())
+    .not('response_time_ms', 'is', null)
+
+  if (error || !data || data.length === 0) return null
+
+  const times = data
+    .map(r => (r as { response_time_ms: number | null }).response_time_ms)
+    .filter((t): t is number => t !== null)
+
+  if (times.length === 0) return null
+  return Math.round(times.reduce((sum, t) => sum + t, 0) / times.length)
+}
+
 export async function getPublicMonitorByDomain(domain: string): Promise<PublicMonitor | null> {
   const supabase = createAdminClient()
   const { data, error } = await supabase

@@ -1,0 +1,169 @@
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Service Level Agreement — Uptrue',
+  description:
+    'Uptrue platform SLA: 99.9% uptime target, how we measure availability, service credits, exclusions, and how to file a claim.',
+  alternates: { canonical: 'https://uptrue.io/sla' },
+}
+
+export default function SLAPage(): React.ReactElement {
+  return (
+    <>
+      <h1>Service Level Agreement</h1>
+      <p className="legal-updated">Last updated: April 2026</p>
+
+      <p>
+        This Service Level Agreement (&quot;SLA&quot;) describes the availability commitment for the
+        Uptrue monitoring platform operated by Vision Software Solutions Limited. This SLA applies to
+        paid plans only and is subject to the terms and exclusions below.
+      </p>
+      <p>
+        <strong>Important:</strong> This is the SLA for the Uptrue platform itself &mdash; not for the
+        websites and services you monitor using Uptrue. We commit to keeping Uptrue available so that
+        your monitoring runs reliably.
+      </p>
+
+      <h2>1. Uptime Target</h2>
+      <p>
+        Uptrue targets <strong>99.9% platform availability</strong> per calendar month for all paid
+        plans. This means no more than approximately 43 minutes of unscheduled downtime per month.
+      </p>
+
+      <h2>2. How We Measure Availability</h2>
+      <p>Availability is calculated as follows:</p>
+      <p>
+        <code>
+          Monthly Uptime % = ((Total Minutes in Month &minus; Downtime Minutes) / Total Minutes in
+          Month) &times; 100
+        </code>
+      </p>
+      <p>
+        <strong>Downtime</strong> is defined as any period of 5 or more consecutive minutes during
+        which the Uptrue platform is unable to receive check results, process alerts, or serve the
+        dashboard to authenticated users, as measured by our internal monitoring systems.
+      </p>
+      <p>
+        Brief intermittent errors lasting less than 5 consecutive minutes are not counted as downtime.
+      </p>
+
+      <h2>3. Service Credits</h2>
+      <p>
+        If Uptrue fails to meet the 99.9% uptime target in any calendar month, affected customers on
+        paid plans may request service credits as follows:
+      </p>
+      <table className="legal-table">
+        <thead>
+          <tr>
+            <th>Monthly Uptime %</th>
+            <th>Service Credit</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>99.0% &ndash; 99.9%</td>
+            <td>10% of that month&apos;s fee</td>
+          </tr>
+          <tr>
+            <td>95.0% &ndash; 99.0%</td>
+            <td>25% of that month&apos;s fee</td>
+          </tr>
+          <tr>
+            <td>Below 95.0%</td>
+            <td>50% of that month&apos;s fee</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        Service credits are issued as <strong>account credits</strong> applied to future invoices.
+        Credits are not redeemable as cash refunds. The maximum credit for any single month is capped
+        at 100% of that month&apos;s subscription fee.
+      </p>
+
+      <h2>4. How to Claim Credits</h2>
+      <p>To request a service credit:</p>
+      <ol>
+        <li>
+          Email <a href="mailto:support@uptrue.io">support@uptrue.io</a> within{' '}
+          <strong>30 days</strong> of the end of the month in which the downtime occurred.
+        </li>
+        <li>
+          Include your account email, the dates and approximate times of the downtime you
+          experienced, and a brief description of the impact.
+        </li>
+        <li>
+          We will verify the claim against our internal monitoring records and respond within 10
+          business days.
+        </li>
+      </ol>
+      <p>
+        If the claim is validated, the credit will be applied to your next billing cycle.
+      </p>
+
+      <h2>5. Exclusions</h2>
+      <p>This SLA does <strong>not</strong> apply to downtime caused by:</p>
+      <ul>
+        <li>
+          <strong>Scheduled maintenance:</strong> Planned maintenance announced at least 48 hours in
+          advance via our status page and email notifications.
+        </li>
+        <li>
+          <strong>Force majeure:</strong> Events beyond our reasonable control, including natural
+          disasters, war, terrorism, pandemics, government actions, power failures, or widespread
+          internet outages.
+        </li>
+        <li>
+          <strong>Third-party failures:</strong> Outages or degradation in third-party infrastructure
+          providers (including Vercel, Supabase, Stripe, or DNS providers) that are outside our
+          direct control.
+        </li>
+        <li>
+          <strong>Customer-caused issues:</strong> Downtime resulting from your equipment, software,
+          network, or configuration, including exceeding API rate limits.
+        </li>
+        <li>
+          <strong>Abuse or violation:</strong> Suspension or termination of your account due to
+          violation of our <a href="/terms">Terms of Service</a> or{' '}
+          <a href="/acceptable-use">Acceptable Use Policy</a>.
+        </li>
+        <li>
+          <strong>Beta or preview features:</strong> Any feature explicitly labelled as beta, preview,
+          or experimental.
+        </li>
+      </ul>
+
+      <h2>6. Free Plans</h2>
+      <p>
+        This SLA and the service credit mechanism apply to <strong>paid plans only</strong>. Free plan
+        users benefit from the same infrastructure and our best-effort availability, but are not
+        eligible for service credits.
+      </p>
+
+      <h2>7. Sole Remedy</h2>
+      <p>
+        Service credits as described in this SLA are your sole and exclusive remedy for any failure by
+        Uptrue to meet the availability target. This SLA does not modify or replace any other provision
+        of our <a href="/terms">Terms of Service</a>.
+      </p>
+
+      <h2>8. Changes to This SLA</h2>
+      <p>
+        We may update this SLA from time to time. Material changes will be communicated via email at
+        least 30 days before taking effect. Continued use of the Service after changes take effect
+        constitutes acceptance of the revised SLA.
+      </p>
+
+      <h2>9. Contact</h2>
+      <p>For SLA enquiries or credit claims, contact us at:</p>
+      <ul>
+        <li>
+          <strong>Email:</strong> <a href="mailto:support@uptrue.io">support@uptrue.io</a>
+        </li>
+        <li>
+          <strong>Post:</strong> Vision Software Solutions Limited, C/O Benison Solvers Limited,
+          1000 Great West Road, Brentford, United Kingdom, TW8 9DW
+        </li>
+      </ul>
+    </>
+  )
+}

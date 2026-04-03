@@ -42,6 +42,12 @@ export function PublicFooter(): React.ReactElement {
             <Link href="/cookies">Cookie Policy</Link>
             <Link href="/dpa">Data Processing Agreement</Link>
             <Link href="/acceptable-use">Acceptable Use Policy</Link>
+            <Link href="/refund-policy">Refund Policy</Link>
+            <Link href="/gdpr">GDPR Compliance</Link>
+            <Link href="/ai-disclaimer">AI Disclaimer</Link>
+            <Link href="/sla">SLA</Link>
+            <Link href="/subprocessors">Sub-processors</Link>
+            <Link href="/security">Security</Link>
           </div>
           <div className="footer-col">
             <h4 className="footer-col-title">Company</h4>

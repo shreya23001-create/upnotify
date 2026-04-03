@@ -703,6 +703,8 @@ html.dark .data-table-bulk-bar span { color: #93c5fd; }
 
 /* Report AI card highlight */
 .report-ai-card .card { border-left: 4px solid var(--accent); }
+.ai-disclaimer-notice { margin-top: 16px; padding: 10px 14px; border-radius: 8px; font-size: 12px; line-height: 1.6; color: var(--text-muted); background: var(--bg-muted, rgba(0,0,0,0.03)); border: 1px solid var(--border-primary); }
+.ai-disclaimer-notice a { color: var(--accent); text-decoration: underline; }
 
 /* Pricing cards */
 .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 24px 0; }
@@ -1396,6 +1398,28 @@ html.dark .landing-cta { background: linear-gradient(135deg, #1a1d27 0%, #242736
 
 .tracker-disclaimer { font-size: 12px; color: var(--text-muted); text-align: center; padding: 20px; line-height: 1.6; }
 
+/* Category filter pills */
+.tracker-category-filter { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; padding: 0 4px; }
+.tracker-category-pill { display: inline-block; padding: 6px 16px; border-radius: 100px; font-size: 13px; font-weight: 500; color: var(--text-secondary); background: var(--bg-card); border: 1px solid var(--border-primary); cursor: pointer; transition: all 0.15s; text-decoration: none; }
+.tracker-category-pill:hover { color: var(--text-primary); border-color: var(--accent); }
+.tracker-category-pill-active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.tracker-category-pill-active:hover { color: #fff; opacity: 0.9; }
+
+/* Pagination */
+.tracker-pagination { display: flex; align-items: center; justify-content: center; gap: 16px; padding: 24px 0; margin-top: 16px; }
+.tracker-pagination-btn { display: inline-block; padding: 8px 20px; border-radius: 8px; font-size: 14px; font-weight: 500; color: var(--accent); background: var(--bg-card); border: 1px solid var(--border-primary); cursor: pointer; transition: all 0.15s; text-decoration: none; }
+.tracker-pagination-btn:hover { border-color: var(--accent); background: rgba(59,130,246,0.05); }
+.tracker-pagination-btn-disabled { color: var(--text-muted); cursor: not-allowed; opacity: 0.5; }
+.tracker-pagination-btn-disabled:hover { border-color: var(--border-primary); background: var(--bg-card); }
+.tracker-pagination-info { font-size: 14px; font-weight: 500; color: var(--text-secondary); }
+
+/* FAQ section */
+.tracker-faq-section { background: var(--bg-card); border: 1px solid var(--border-primary); border-radius: 12px; padding: 20px; margin-bottom: 24px; }
+.tracker-faq-item { padding: 16px 0; border-bottom: 1px solid var(--border-primary); }
+.tracker-faq-item:last-child { border-bottom: none; padding-bottom: 0; }
+.tracker-faq-question { font-size: 15px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; }
+.tracker-faq-answer { font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
+
 @media (max-width: 768px) {
   .tracker-main { padding: 20px 16px; }
   .tracker-hero-title { font-size: 24px; }
@@ -1404,6 +1428,10 @@ html.dark .landing-cta { background: linear-gradient(135deg, #1a1d27 0%, #242736
   .tracker-status-banner { flex-direction: column; text-align: left; }
   .tracker-status-banner-right { text-align: left; }
   .tracker-subscribe-row { flex-direction: column; }
+  .tracker-category-filter { gap: 6px; }
+  .tracker-category-pill { padding: 5px 12px; font-size: 12px; }
+  .tracker-pagination { gap: 10px; }
+  .tracker-pagination-btn { padding: 6px 14px; font-size: 13px; }
 }
 
 /* ==========================================================================

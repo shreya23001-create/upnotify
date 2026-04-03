@@ -58,6 +58,42 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.2,
     },
     {
+      url: 'https://uptrue.io/refund-policy',
+      lastModified: new Date('2026-04-01'),
+      changeFrequency: 'yearly',
+      priority: 0.3,
+    },
+    {
+      url: 'https://uptrue.io/gdpr',
+      lastModified: new Date('2026-04-01'),
+      changeFrequency: 'yearly',
+      priority: 0.3,
+    },
+    {
+      url: 'https://uptrue.io/ai-disclaimer',
+      lastModified: new Date('2026-04-01'),
+      changeFrequency: 'yearly',
+      priority: 0.2,
+    },
+    {
+      url: 'https://uptrue.io/sla',
+      lastModified: new Date('2026-04-01'),
+      changeFrequency: 'yearly',
+      priority: 0.3,
+    },
+    {
+      url: 'https://uptrue.io/subprocessors',
+      lastModified: new Date('2026-04-01'),
+      changeFrequency: 'monthly',
+      priority: 0.2,
+    },
+    {
+      url: 'https://uptrue.io/security',
+      lastModified: new Date('2026-04-01'),
+      changeFrequency: 'yearly',
+      priority: 0.4,
+    },
+    {
       url: 'https://uptrue.io/about',
       lastModified: new Date('2026-04-01'),
       changeFrequency: 'monthly',

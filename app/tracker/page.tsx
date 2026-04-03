@@ -1,17 +1,24 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { getActivePublicMonitors } from '@/lib/db/public-monitors'
+import {
+  getActivePublicMonitorsPaginated,
+  getPublicMonitorCategories,
+} from '@/lib/db/public-monitors'
 import type { PublicMonitor } from '@/lib/db/public-monitors'
+
+const PAGE_SIZE = 20
 
 export const revalidate = 60
 
 export const metadata: Metadata = {
   title: 'Is It Down? Live Website Status Tracker | Uptrue',
-  description: 'Check if popular websites are down right now. Real-time uptime monitoring for Google, Facebook, GitHub, AWS, and 50+ more services.',
+  description:
+    'Check if popular websites are down right now. Real-time uptime monitoring for Google, Facebook, GitHub, AWS, and 50+ more services.',
   alternates: { canonical: 'https://uptrue.io/tracker' },
   openGraph: {
     title: 'Is It Down? Live Website Status Tracker | Uptrue',
-    description: 'Real-time uptime monitoring for popular websites and services.',
+    description:
+      'Real-time uptime monitoring for popular websites and services.',
     url: 'https://uptrue.io/tracker',
     type: 'website',
   },
@@ -47,9 +54,34 @@ function groupByCategory(monitors: PublicMonitor[]): Record<string, PublicMonito
   return groups
 }
 
-export default async function TrackerDirectoryPage(): Promise<React.ReactElement> {
-  const monitors = await getActivePublicMonitors()
-  const downMonitors = monitors.filter(m => m.last_status === 'down')
+function buildPaginationHref(page: number, category: string | undefined): string {
+  const params = new URLSearchParams()
+  if (category && category !== 'all') params.set('category', category)
+  if (page > 1) params.set('page', String(page))
+  const qs = params.toString()
+  return qs ? `/tracker?${qs}` : '/tracker'
+}
+
+export default async function TrackerDirectoryPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string; category?: string }>
+}): Promise<React.ReactElement> {
+  const resolvedParams = await searchParams
+  const currentPage = Math.max(1, Number(resolvedParams.page) || 1)
+  const selectedCategory = resolvedParams.category || undefined
+
+  const [paginatedResult, allCategories] = await Promise.all([
+    getActivePublicMonitorsPaginated({
+      page: currentPage,
+      pageSize: PAGE_SIZE,
+      category: selectedCategory,
+    }),
+    getPublicMonitorCategories(),
+  ])
+
+  const { monitors, total, totalPages } = paginatedResult
+  const downMonitors = monitors.filter((m) => m.last_status === 'down')
   const grouped = groupByCategory(monitors)
   const categoryNames = Object.keys(grouped).sort()
 
@@ -58,23 +90,54 @@ export default async function TrackerDirectoryPage(): Promise<React.ReactElement
       <div className="tracker-hero">
         <h1 className="tracker-hero-title">Website Status Tracker</h1>
         <p className="tracker-hero-subtitle">
-          Real-time uptime monitoring for {monitors.length} popular websites and services.
+          Real-time uptime monitoring for {total} popular websites and services.
         </p>
+      </div>
+
+      {/* Category filter */}
+      <div className="tracker-category-filter">
+        <Link
+          href={buildPaginationHref(1, undefined)}
+          className={`tracker-category-pill${!selectedCategory || selectedCategory === 'all' ? ' tracker-category-pill-active' : ''}`}
+        >
+          All
+        </Link>
+        {allCategories.map((cat) => (
+          <Link
+            key={cat}
+            href={buildPaginationHref(1, cat)}
+            className={`tracker-category-pill${selectedCategory === cat ? ' tracker-category-pill-active' : ''}`}
+          >
+            {cat}
+          </Link>
+        ))}
       </div>
 
       {downMonitors.length > 0 && (
         <div className="tracker-section tracker-down-section">
-          <h2 className="tracker-section-title tracker-down-title">Currently Down</h2>
+          <h2 className="tracker-section-title tracker-down-title">
+            Currently Down
+          </h2>
           <div className="tracker-grid">
-            {downMonitors.map(m => (
-              <Link key={m.id} href={`/tracker/${m.domain}`} className="tracker-card tracker-card-down">
+            {downMonitors.map((m) => (
+              <Link
+                key={m.id}
+                href={`/tracker/${m.domain}`}
+                className="tracker-card tracker-card-down"
+              >
                 <div className="tracker-card-header">
-                  <span className="tracker-status-dot" style={{ background: getStatusColor(m.last_status) }} />
+                  <span
+                    className="tracker-status-dot"
+                    style={{ background: getStatusColor(m.last_status) }}
+                  />
                   <span className="tracker-card-name">{m.display_name}</span>
                 </div>
                 <div className="tracker-card-meta">
                   <span className="tracker-card-domain">{m.domain}</span>
-                  <span className="tracker-card-status" style={{ color: getStatusColor(m.last_status) }}>
+                  <span
+                    className="tracker-card-status"
+                    style={{ color: getStatusColor(m.last_status) }}
+                  >
                     {getStatusLabel(m.last_status)}
                   </span>
                 </div>
@@ -84,22 +147,34 @@ export default async function TrackerDirectoryPage(): Promise<React.ReactElement
         </div>
       )}
 
-      {categoryNames.map(category => (
+      {categoryNames.map((category) => (
         <div key={category} className="tracker-section">
           <h2 className="tracker-section-title">{category}</h2>
           <div className="tracker-grid">
-            {grouped[category].map(m => (
-              <Link key={m.id} href={`/tracker/${m.domain}`} className="tracker-card">
+            {grouped[category].map((m) => (
+              <Link
+                key={m.id}
+                href={`/tracker/${m.domain}`}
+                className="tracker-card"
+              >
                 <div className="tracker-card-header">
-                  <span className="tracker-status-dot" style={{ background: getStatusColor(m.last_status) }} />
+                  <span
+                    className="tracker-status-dot"
+                    style={{ background: getStatusColor(m.last_status) }}
+                  />
                   <span className="tracker-card-name">{m.display_name}</span>
                 </div>
                 <div className="tracker-card-meta">
                   <span className="tracker-card-domain">{m.domain}</span>
-                  <span className="tracker-card-response">{formatResponseTime(m.last_response_time_ms)}</span>
+                  <span className="tracker-card-response">
+                    {formatResponseTime(m.last_response_time_ms)}
+                  </span>
                 </div>
                 <div className="tracker-card-footer">
-                  <span className="tracker-card-status" style={{ color: getStatusColor(m.last_status) }}>
+                  <span
+                    className="tracker-card-status"
+                    style={{ color: getStatusColor(m.last_status) }}
+                  >
                     {getStatusLabel(m.last_status)}
                   </span>
                 </div>
@@ -115,10 +190,49 @@ export default async function TrackerDirectoryPage(): Promise<React.ReactElement
         </div>
       )}
 
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="tracker-pagination">
+          {currentPage > 1 ? (
+            <Link
+              href={buildPaginationHref(currentPage - 1, selectedCategory)}
+              className="tracker-pagination-btn"
+            >
+              Previous
+            </Link>
+          ) : (
+            <span className="tracker-pagination-btn tracker-pagination-btn-disabled">
+              Previous
+            </span>
+          )}
+
+          <span className="tracker-pagination-info">
+            Page {currentPage} of {totalPages}
+          </span>
+
+          {currentPage < totalPages ? (
+            <Link
+              href={buildPaginationHref(currentPage + 1, selectedCategory)}
+              className="tracker-pagination-btn"
+            >
+              Next
+            </Link>
+          ) : (
+            <span className="tracker-pagination-btn tracker-pagination-btn-disabled">
+              Next
+            </span>
+          )}
+        </div>
+      )}
+
       <div className="tracker-cta-section">
         <h2>Monitor Your Own Website</h2>
-        <p>Get instant alerts when your site goes down. Free plan available.</p>
-        <a href="https://uptrue.io" className="btn btn-primary">Start Monitoring Free</a>
+        <p>
+          Get instant alerts when your site goes down. Free plan available.
+        </p>
+        <a href="https://uptrue.io" className="btn btn-primary">
+          Start Monitoring Free
+        </a>
       </div>
     </div>
   )
