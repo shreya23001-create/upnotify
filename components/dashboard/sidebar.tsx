@@ -121,7 +121,7 @@ export function Sidebar(): React.ReactElement {
             <strong>Earn Credits</strong>
             <span>Get up to {'\u00A3'}10/mo off your plan</span>
           </div>
-          <Link href="/dashboard/settings" className="sidebar-credits-promo-link">
+          <Link href="/dashboard/settings?tab=referrals" className="sidebar-credits-promo-link">
             Learn how {'\u2192'}
           </Link>
         </div>

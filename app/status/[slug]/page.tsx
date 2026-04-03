@@ -54,6 +54,18 @@ export default async function PublicStatusPage({
   if (!statusPage) notFound()
 
   const supabase = createAdminClient()
+
+  // Fetch org logo if available
+  let orgLogoUrl: string | null = null
+  if (statusPage.org_id) {
+    const { data: org } = await supabase
+      .from('organisations')
+      .select('logo_url')
+      .eq('id', statusPage.org_id)
+      .single()
+    orgLogoUrl = org?.logo_url ?? null
+  }
+
   const monitorIds = (statusPage.monitor_ids || []) as string[]
 
   let monitors: Monitor[] = []
@@ -87,6 +99,16 @@ export default async function PublicStatusPage({
   return (
     <div className="status-page">
       <div className="status-page-header">
+        {orgLogoUrl && (
+          <div className="status-page-logo">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={orgLogoUrl}
+              alt={`${statusPage.name} logo`}
+              className="status-page-logo-img"
+            />
+          </div>
+        )}
         <h1 className="status-page-title">{statusPage.name}</h1>
         <p className="status-last-updated">Last updated: {new Date().toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' })}</p>
       </div>

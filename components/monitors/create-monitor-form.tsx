@@ -59,11 +59,14 @@ export function CreateMonitorForm(): React.ReactElement {
     <form action={handleSubmit}>
       {error && (
         <div className="form-error">
+          {error.includes('Monitor limit reached') && (
+            <span style={{ marginRight: 6, fontSize: 16 }}>{'\u26A0\uFE0F'}</span>
+          )}
           {error}
           {error.includes('Monitor limit reached') && (
             <>
               {' '}
-              <Link href="/dashboard/settings" style={{ color: 'var(--accent, #06b6d4)', textDecoration: 'underline', fontWeight: 600 }}>
+              <Link href="/dashboard/settings?tab=billing" style={{ color: 'var(--accent, #06b6d4)', textDecoration: 'underline', fontWeight: 600 }}>
                 Upgrade your plan
               </Link>
             </>

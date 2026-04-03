@@ -35,8 +35,29 @@ export const shortTextSchema = z
 
 export const statusPageSubscribeSchema = z.object({
   statusPageId: uuidSchema,
-  email: emailSchema,
-})
+  email: emailSchema.optional(),
+  webhookUrl: urlSchema.optional(),
+  type: z.enum(['slack', 'teams']).optional(),
+}).refine(
+  (data) => data.email || data.webhookUrl,
+  { message: 'Either email or webhookUrl is required' },
+).refine(
+  (data) => {
+    if (data.type === 'slack' && data.webhookUrl) {
+      return data.webhookUrl.startsWith('https://hooks.slack.com/') || data.webhookUrl.startsWith('https://hooks.workos.com/')
+    }
+    return true
+  },
+  { message: 'Must be a valid Slack webhook URL (https://hooks.slack.com/...)' },
+).refine(
+  (data) => {
+    if (data.type === 'teams' && data.webhookUrl) {
+      return data.webhookUrl.includes('webhook.office.com') || data.webhookUrl.includes('logic.azure.com') || data.webhookUrl.includes('office365.com')
+    }
+    return true
+  },
+  { message: 'Must be a valid Microsoft Teams webhook URL' },
+)
 
 export type StatusPageSubscribeInput = z.infer<typeof statusPageSubscribeSchema>
 

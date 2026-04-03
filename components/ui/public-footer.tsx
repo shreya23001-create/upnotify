@@ -58,14 +58,14 @@ export function PublicFooter(): React.ReactElement {
             <Link href="/security">Security</Link>
           </div>
           <div className="footer-col">
-            <h4 className="footer-col-title">Community</h4>
-            <Link href="/credits">Community Credits</Link>
-            <Link href="/referrals">Referral Program</Link>
-          </div>
-          <div className="footer-col">
             <h4 className="footer-col-title">Company</h4>
             <Link href="/about">About</Link>
             <Link href="/contact">Contact</Link>
+          </div>
+          <div className="footer-col">
+            <h4 className="footer-col-title">Community</h4>
+            <Link href="/credits">Community Credits</Link>
+            <Link href="/referrals">Referral Program</Link>
           </div>
         </div>
         <div className="footer-bottom">

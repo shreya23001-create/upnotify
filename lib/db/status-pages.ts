@@ -89,6 +89,29 @@ export async function subscribeToStatusPage(statusPageId: string, email: string)
   return { success: true }
 }
 
+export async function subscribeWebhookToStatusPage(
+  statusPageId: string,
+  webhookUrl: string,
+  webhookType: string,
+): Promise<{ success: boolean; error?: string }> {
+  const supabase = createAdminClient()
+  const token = crypto.randomUUID()
+  // Store webhook subscriptions using a prefixed email field
+  // Format: "webhook:<type>:<url>" — distinguishes from email subscribers
+  const encodedEmail = `webhook:${webhookType}:${webhookUrl}`
+  const { error } = await supabase.from('status_page_subscribers').insert({
+    status_page_id: statusPageId,
+    email: encodedEmail,
+    confirmation_token: token,
+  })
+  if (error) {
+    if (error.code === '23505') return { success: false, error: 'Already subscribed' }
+    logger.error('Failed to subscribe webhook', { error: error.message })
+    return { success: false, error: 'Failed to subscribe' }
+  }
+  return { success: true }
+}
+
 export async function unsubscribeFromStatusPage(token: string): Promise<boolean> {
   const supabase = createAdminClient()
   const { error } = await supabase.from('status_page_subscribers').delete().eq('unsubscribe_token', token)

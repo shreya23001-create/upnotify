@@ -158,7 +158,8 @@ export default async function ScoreResultsPage({ params }: PageProps): Promise<R
   }
 
   return (
-    <div className="score-results-page">
+    <div className="score-results-wrapper">
+      <div className="score-results-page">
       {result && <JsonLd result={result} />}
 
       <PublicNav />
@@ -255,6 +256,8 @@ export default async function ScoreResultsPage({ params }: PageProps): Promise<R
           advice. Results may vary between scans due to network conditions, caching, and server
           configuration. Uptrue is not responsible for any decisions made based on this score.
         </p>
+      </div>
+
       </div>
 
       <PublicFooter />

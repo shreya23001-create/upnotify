@@ -87,6 +87,22 @@ export function BadgeEmbed({ monitorId }: BadgeEmbedProps): React.ReactNode {
           </div>
         </div>
 
+        {/* Embed instructions */}
+        <div className="badge-embed-instructions">
+          <span className="badge-embed-preview-label">How to embed</span>
+          <ol className="badge-embed-steps">
+            <li><strong>Step 1:</strong> Copy the HTML code below</li>
+            <li><strong>Step 2:</strong> Paste it into your website&apos;s footer or sidebar HTML</li>
+            <li><strong>Step 3:</strong> The badge will automatically show your current uptime status</li>
+          </ol>
+          <p className="badge-embed-help-link">
+            Need help? See our{' '}
+            <a href="/help/badges" target="_blank" rel="noopener noreferrer">
+              badge embedding guide
+            </a>
+          </p>
+        </div>
+
         {/* Embed code */}
         <div className="badge-embed-code-section">
           <span className="badge-embed-preview-label">HTML Embed Code</span>
