@@ -25,7 +25,7 @@ export function TrialBanner({ trialEndsAt, planName }: TrialBannerProps): React.
         You&apos;re on a 14-day {planName} trial.{' '}
         <strong>{daysRemaining} day{daysRemaining !== 1 ? 's' : ''} remaining.</strong>
       </span>
-      <Link href="/dashboard/settings" className="btn btn-sm btn-primary trial-banner-cta">
+      <Link href="/dashboard/settings?tab=billing" className="btn btn-sm btn-primary trial-banner-cta">
         Upgrade Now
       </Link>
     </div>

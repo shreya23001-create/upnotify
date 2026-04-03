@@ -32,7 +32,7 @@ export function ConnectInstructions({
         {!hasApiKey && (
           <div className="compete-connect-warning">
             <strong>API key required.</strong> You need an API key to authenticate webhook requests.{' '}
-            <Link href="/dashboard/settings" className="compete-link">
+            <Link href="/dashboard/settings?tab=billing" className="compete-link">
               Generate one in Settings
             </Link>
           </div>

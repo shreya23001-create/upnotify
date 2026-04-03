@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { DataTable, type Column, type BulkAction } from '@/components/ui/data-table'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import type { Organisation, User, Subscription, Invoice, ApiKey, Plan, UserCredit, CreditRule, Referral } from '@/lib/types'
@@ -53,7 +54,9 @@ export function SettingsContent({
   referralCode,
   referrals,
 }: SettingsContentProps): React.ReactElement {
-  const [tab, setTab] = useState('organisation')
+  const searchParams = useSearchParams()
+  const initialTab = searchParams.get('tab') || 'organisation'
+  const [tab, setTab] = useState(initialTab)
   const [revokeIds, setRevokeIds] = useState<string[]>([])
   const [teamMembers, setTeamMembers] = useState<User[]>(members)
   const [removeTarget, setRemoveTarget] = useState<string | null>(null)

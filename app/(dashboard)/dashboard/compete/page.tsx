@@ -47,7 +47,7 @@ export default async function CompetePage(): Promise<React.ReactElement> {
             <li>Webhook integration with WooCommerce, Shopify, BigCommerce</li>
             <li>Price change alerts via email, Slack, or webhook</li>
           </ul>
-          <Link href="/dashboard/settings" className="btn btn-primary compete-upgrade-btn">
+          <Link href="/dashboard/settings?tab=billing" className="btn btn-primary compete-upgrade-btn">
             Upgrade Your Plan
           </Link>
         </div>
