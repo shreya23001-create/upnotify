@@ -931,14 +931,18 @@ export type Database = {
           type: string
           updated_at: string
           voice_call_monthly_limit: number
+          has_compete: boolean
+          compete_product_limit: number
         }
         Insert: {
           check_interval_seconds?: number
           client_workspace_limit?: number | null
+          compete_product_limit?: number
           created_at?: string
           data_retention_days?: number | null
           has_ai_predictive?: boolean
           has_api_access?: boolean
+          has_compete?: boolean
           has_status_page_custom_domain?: boolean
           has_voice_calls?: boolean
           has_white_label?: boolean
@@ -964,10 +968,12 @@ export type Database = {
         Update: {
           check_interval_seconds?: number
           client_workspace_limit?: number | null
+          compete_product_limit?: number
           created_at?: string
           data_retention_days?: number | null
           has_ai_predictive?: boolean
           has_api_access?: boolean
+          has_compete?: boolean
           has_status_page_custom_domain?: boolean
           has_voice_calls?: boolean
           has_white_label?: boolean
@@ -1814,6 +1820,211 @@ export type Database = {
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ecom_product_groups: {
+        Row: {
+          id: string
+          org_id: string
+          name: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          org_id: string
+          name: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          org_id?: string
+          name?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ecom_product_groups_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ecom_products: {
+        Row: {
+          id: string
+          org_id: string
+          product_group_id: string | null
+          name: string
+          url: string
+          domain: string
+          is_own_product: boolean
+          extraction_method: string
+          css_selector: string | null
+          check_interval_minutes: number
+          last_price: number | null
+          last_currency: string
+          last_stock_status: string | null
+          last_checked_at: string | null
+          is_active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          org_id: string
+          product_group_id?: string | null
+          name: string
+          url: string
+          domain: string
+          is_own_product?: boolean
+          extraction_method?: string
+          css_selector?: string | null
+          check_interval_minutes?: number
+          last_price?: number | null
+          last_currency?: string
+          last_stock_status?: string | null
+          last_checked_at?: string | null
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          org_id?: string
+          product_group_id?: string | null
+          name?: string
+          url?: string
+          domain?: string
+          is_own_product?: boolean
+          extraction_method?: string
+          css_selector?: string | null
+          check_interval_minutes?: number
+          last_price?: number | null
+          last_currency?: string
+          last_stock_status?: string | null
+          last_checked_at?: string | null
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ecom_products_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ecom_products_product_group_id_fkey"
+            columns: ["product_group_id"]
+            isOneToOne: false
+            referencedRelation: "ecom_product_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ecom_price_history: {
+        Row: {
+          id: string
+          product_id: string
+          org_id: string
+          price: number
+          currency: string
+          stock_status: string | null
+          extraction_method: string | null
+          confidence: number | null
+          raw_extracted_value: string | null
+          checked_at: string
+        }
+        Insert: {
+          id?: string
+          product_id: string
+          org_id: string
+          price: number
+          currency?: string
+          stock_status?: string | null
+          extraction_method?: string | null
+          confidence?: number | null
+          raw_extracted_value?: string | null
+          checked_at?: string
+        }
+        Update: {
+          id?: string
+          product_id?: string
+          org_id?: string
+          price?: number
+          currency?: string
+          stock_status?: string | null
+          extraction_method?: string | null
+          confidence?: number | null
+          raw_extracted_value?: string | null
+          checked_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ecom_price_history_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "ecom_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ecom_pricing_rules: {
+        Row: {
+          id: string
+          org_id: string
+          product_group_id: string | null
+          rule_name: string
+          rule_type: string
+          condition: Json
+          action_type: string
+          webhook_url: string | null
+          is_active: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          org_id: string
+          product_group_id?: string | null
+          rule_name: string
+          rule_type: string
+          condition: Json
+          action_type?: string
+          webhook_url?: string | null
+          is_active?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          org_id?: string
+          product_group_id?: string | null
+          rule_name?: string
+          rule_type?: string
+          condition?: Json
+          action_type?: string
+          webhook_url?: string | null
+          is_active?: boolean
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ecom_pricing_rules_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ecom_pricing_rules_product_group_id_fkey"
+            columns: ["product_group_id"]
+            isOneToOne: false
+            referencedRelation: "ecom_product_groups"
             referencedColumns: ["id"]
           },
         ]

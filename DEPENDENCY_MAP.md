@@ -22,7 +22,9 @@
 | `services/alert-dispatcher.ts` | ALL alert channels, check runner |
 | `services/email.ts` | ALL emails — alerts, nurture, team invites |
 | `services/stripe.ts` | Billing, checkout, webhook, portal |
-| `utils/plan-limits.ts` | Monitors, workspaces, team invite, billing UI |
+| `utils/plan-limits.ts` | Monitors, workspaces, team invite, billing UI, Compete access |
+| `db/ecom-products.ts` | Compete dashboard, compete API routes, compete webhook |
+| `services/price-extraction.ts` | Compete extract API route |
 | `auth/helpers.ts` | Route protection — public vs protected vs admin |
 | `proxy.ts` | ALL routing, auth redirects, admin access |
 | `types/database.types.ts` | ALL DB queries — type errors everywhere |
@@ -43,7 +45,10 @@
 - `lib/checkers/*` (individual checker implementations)
 - `lib/services/score.ts` (isolated feature)
 - `lib/services/ai.ts` (not critical yet)
+- `lib/services/price-extraction.ts` (Compete feature — isolated)
+- `lib/db/ecom-products.ts` (Compete data layer — isolated)
 - UI components in `/components` (visual only)
+- UI components in `/components/compete` (Compete feature UI — isolated)
 
 ---
 
@@ -154,6 +159,11 @@
 - **Used by:** Competitors dashboard page, competitors API route
 - **Impact:** Competitor monitoring feature broken (isolated)
 
+### db/ecom-products.ts
+- **Depends on:** supabase/server, supabase/admin, logger
+- **Used by:** Compete dashboard page, compete API routes, compete webhook
+- **Impact:** Compete feature broken (isolated)
+
 ### db/leaderboard.ts
 - **Depends on:** supabase/admin, logger, public_monitors, public_check_results
 - **Used by:** Leaderboard public page
@@ -190,6 +200,11 @@
 - **Depends on:** config.ts, supabase/admin, logger
 - **Used by:** billing checkout, stripe webhook
 - **Impact:** Billing broken
+
+### services/price-extraction.ts → fetch + HTML parsing
+- **Depends on:** logger
+- **Used by:** Compete extract API, Compete products API
+- **Impact:** Compete price extraction broken (isolated)
 
 ### services/score.ts → checkers
 - **Depends on:** checkers/http, ssl, dns, security-headers

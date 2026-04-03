@@ -32,5 +32,10 @@ export type CreditRule = Database['public']['Tables']['credit_rules']['Row']
 export type UserCredit = Database['public']['Tables']['user_credits']['Row']
 export type Referral = Database['public']['Tables']['referrals']['Row']
 
+export type EcomProductGroup = Database['public']['Tables']['ecom_product_groups']['Row']
+export type EcomProduct = Database['public']['Tables']['ecom_products']['Row']
+export type EcomPriceHistory = Database['public']['Tables']['ecom_price_history']['Row']
+export type EcomPricingRule = Database['public']['Tables']['ecom_pricing_rules']['Row']
+
 // Re-export Database type for Supabase client generics
 export type { Database }

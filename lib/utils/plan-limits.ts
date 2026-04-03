@@ -10,6 +10,8 @@ interface PlanLimits {
   hasStatusPageCustomDomain: boolean
   hasWhiteLabel: boolean
   hasVoiceCalls: boolean
+  hasCompete: boolean
+  competeProductLimit: number
   checkIntervalSeconds: number
 }
 
@@ -26,6 +28,8 @@ const FREE_DEFAULTS: PlanLimits = {
   hasStatusPageCustomDomain: false,
   hasWhiteLabel: false,
   hasVoiceCalls: false,
+  hasCompete: false,
+  competeProductLimit: 0,
   checkIntervalSeconds: 600,
 }
 
@@ -42,6 +46,8 @@ function extractLimits(plan: Record<string, unknown>): PlanLimits {
       (plan.has_status_page_custom_domain as boolean) ?? false,
     hasWhiteLabel: (plan.has_white_label as boolean) ?? false,
     hasVoiceCalls: (plan.has_voice_calls as boolean) ?? false,
+    hasCompete: (plan.has_compete as boolean) ?? false,
+    competeProductLimit: (plan.compete_product_limit as number) ?? 0,
     checkIntervalSeconds: (plan.check_interval_seconds as number) ?? 600,
   }
 }
@@ -142,10 +148,42 @@ export async function checkFeatureAccess(
     | 'hasStatusPageCustomDomain'
     | 'hasWhiteLabel'
     | 'hasVoiceCalls'
+    | 'hasCompete'
   >
 ): Promise<boolean> {
   const limits = await getPlanLimits(orgId)
   return limits[feature]
+}
+
+/** Check if the org has Compete access (paid plans with add-on) */
+export async function checkCompeteAccess(orgId: string): Promise<boolean> {
+  const limits = await getPlanLimits(orgId)
+  return limits.hasCompete
+}
+
+/** Check if the org can add another Compete product */
+export async function checkCompeteProductLimit(orgId: string): Promise<{
+  allowed: boolean
+  currentCount: number
+  limit: number
+}> {
+  const supabase = createAdminClient()
+  const limits = await getPlanLimits(orgId)
+
+  if (!limits.hasCompete) {
+    return { allowed: false, currentCount: 0, limit: 0 }
+  }
+
+  const { count } = await supabase
+    .from('ecom_products')
+    .select('id', { count: 'exact', head: true })
+    .eq('org_id', orgId)
+
+  const currentCount = count ?? 0
+  const limit = limits.competeProductLimit
+  const allowed = currentCount < limit
+
+  return { allowed, currentCount, limit }
 }
 
 /** Check if the org can add another competitor monitor */
