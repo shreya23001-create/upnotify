@@ -5,6 +5,7 @@ import { logger } from '@/lib/utils/logger'
 import { checkRateLimit, AUTH_RATE_LIMIT } from '@/lib/utils/rate-limiter'
 import { createTrialSubscription } from '@/lib/db/subscriptions'
 import { recordReferralSignup } from '@/lib/db/referrals'
+import { acceptTeamInvite } from '@/lib/db/team'
 
 /**
  * Validates that a redirect path is safe (relative, no open-redirect vectors).
@@ -62,27 +63,81 @@ export async function GET(request: Request): Promise<NextResponse> {
     const { data: { user } } = await supabase.auth.getUser()
 
     if (user) {
+      const adminClient = createAdminClient()
+      const userEmail = user.email ?? ''
+
       // Check if this is a new user (created within the last 60 seconds)
       const createdAt = new Date(user.created_at)
       const isNewUser = Date.now() - createdAt.getTime() < 60_000
 
+      // Check for pending team invites for this email
+      const { data: pendingInvites } = await adminClient
+        .from('team_invites')
+        .select('id, token, org_id')
+        .eq('email', userEmail.toLowerCase())
+        .eq('status', 'pending')
+        .gte('expires_at', new Date().toISOString())
+        .limit(1)
+
+      const pendingInvite = pendingInvites?.[0] ?? null
+
       if (isNewUser) {
-        // Look up the user record to get org_id
-        const adminClient = createAdminClient()
-        const { data: dbUser } = await adminClient
-          .from('users')
-          .select('id, org_id')
-          .eq('id', user.id)
-          .single()
-
-        if (dbUser) {
-          // Create 14-day Builder trial (reverse trial)
-          await createTrialSubscription(dbUser.org_id)
-
-          // Record referral if ref code present
-          if (refCode && refCode.length > 0) {
-            await recordReferralSignup(refCode, dbUser.id, dbUser.org_id)
+        if (pendingInvite) {
+          // New user with pending invite: accept the invite to join the existing org
+          // instead of creating a standalone org. The DB trigger already created
+          // a new org for this user, so we need to accept the invite which will
+          // move them to the correct org.
+          const acceptResult = await acceptTeamInvite(
+            pendingInvite.token,
+            user.id,
+            userEmail
+          )
+          if (acceptResult.success) {
+            logger.info('New user auto-joined org via pending invite', {
+              userId: user.id,
+              orgId: pendingInvite.org_id,
+            })
+          } else {
+            logger.warn('Failed to auto-accept invite for new user', {
+              userId: user.id,
+              error: acceptResult.error,
+            })
           }
+        } else {
+          // New user with no invite: create trial subscription
+          const { data: dbUser } = await adminClient
+            .from('users')
+            .select('id, org_id')
+            .eq('id', user.id)
+            .single()
+
+          if (dbUser) {
+            // Create 14-day Builder trial (reverse trial)
+            await createTrialSubscription(dbUser.org_id)
+
+            // Record referral if ref code present
+            if (refCode && refCode.length > 0) {
+              await recordReferralSignup(refCode, dbUser.id, dbUser.org_id)
+            }
+          }
+        }
+      } else if (pendingInvite) {
+        // Existing user with pending invite: auto-accept on login
+        const acceptResult = await acceptTeamInvite(
+          pendingInvite.token,
+          user.id,
+          userEmail
+        )
+        if (acceptResult.success) {
+          logger.info('Existing user auto-joined org via pending invite', {
+            userId: user.id,
+            orgId: pendingInvite.org_id,
+          })
+        } else {
+          logger.warn('Failed to auto-accept invite for existing user', {
+            userId: user.id,
+            error: acceptResult.error,
+          })
         }
       }
     }

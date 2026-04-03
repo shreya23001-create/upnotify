@@ -42,18 +42,38 @@ vi.mock('@/lib/supabase/server', () => ({
   }),
 }))
 
-vi.mock('@/lib/supabase/admin', () => ({
-  createAdminClient: () => ({
-    from: () => ({
-      select: () => ({ eq: () => ({ single: () => ({ data: null, error: null }), eq: () => ({ single: () => ({ data: null, error: null }) }) }), order: () => ({ data: [], error: null }) }),
-      insert: () => ({ select: () => ({ single: () => ({ data: { id: 'sub-1' }, error: null }) }) }),
-      update: () => ({ eq: () => ({ data: null, error: null }) }),
+vi.mock('@/lib/supabase/admin', () => {
+  function buildChain(): Record<string, unknown> {
+    const terminal = { data: null, error: null }
+    const chain: Record<string, unknown> = {
+      ...terminal,
+      select: () => chain,
+      insert: () => chain,
+      update: () => chain,
+      delete: () => chain,
+      eq: () => chain,
+      gte: () => chain,
+      lte: () => chain,
+      order: () => chain,
+      limit: () => chain,
+      single: () => terminal,
+    }
+    return chain
+  }
+  return {
+    createAdminClient: () => ({
+      from: () => buildChain(),
     }),
-  }),
-}))
+  }
+})
 
 vi.mock('@/lib/db/subscriptions', () => ({
   createTrialSubscription: vi.fn().mockResolvedValue({ success: true }),
+}))
+
+vi.mock('@/lib/db/team', () => ({
+  acceptTeamInvite: vi.fn().mockResolvedValue({ success: true }),
+  getInviteByToken: vi.fn().mockResolvedValue(null),
 }))
 
 vi.mock('@/lib/db/referrals', () => ({

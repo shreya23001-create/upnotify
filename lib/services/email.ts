@@ -137,8 +137,8 @@ export async function sendEmail(
   const client = getResendClient()
 
   if (!client) {
-    logger.info('Email send skipped (no API key)', { to, subject })
-    return { success: true }
+    logger.warn('Email send skipped — RESEND_API_KEY is not configured. Set the RESEND_API_KEY environment variable to enable email delivery.', { to, subject })
+    return { success: false, error: 'Email not sent — RESEND_API_KEY is not configured' }
   }
 
   const rateCheck = incrementAndCheckRate()

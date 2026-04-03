@@ -31,10 +31,12 @@ export async function POST(request: Request): Promise<NextResponse> {
       )
     }
 
+    const requestOrigin = new URL(request.url).origin
     const config = getConfig()
+    const appUrl = requestOrigin || config.app.url
     const url = await createPortalSession(
       org.stripe_customer_id,
-      config.app.url
+      appUrl
     )
 
     return NextResponse.json({ url })

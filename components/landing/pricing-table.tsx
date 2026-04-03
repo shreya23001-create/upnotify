@@ -20,7 +20,6 @@ interface LandingPlan {
   cta: string
   ctaHref: string
   highlighted: boolean
-  annualOnly?: boolean
 }
 
 const PLANS: LandingPlan[] = [
@@ -49,11 +48,11 @@ const PLANS: LandingPlan[] = [
   },
   {
     name: 'Lite',
-    monthlyPrice: '83p',
+    monthlyPrice: '\u00A31',
     annualPrice: '\u00A310',
-    monthlyPeriod: '/mo',
+    monthlyPeriod: '/month',
     annualPeriod: '/year',
-    monthlyNote: 'Billed annually at \u00A310/yr',
+    monthlyNote: 'Or save with annual \u2014 \u00A310/yr',
     annualNote: 'Just 83p per month',
     description: 'Affordable monitoring for small projects',
     features: [
@@ -68,10 +67,9 @@ const PLANS: LandingPlan[] = [
       { text: 'AI reports', included: false },
       { text: 'API access', included: false },
     ],
-    cta: 'Get Started \u2014 \u00A310/yr',
+    cta: 'Get Started',
     ctaHref: '/signup',
     highlighted: false,
-    annualOnly: true,
   },
   {
     name: 'Builder',
@@ -168,11 +166,6 @@ export default function PricingTable(): React.ReactElement {
                 <div className="pricing-card-header">
                   <h3 className="pricing-plan-name">
                     {plan.name}
-                    {plan.annualOnly && (
-                      <span style={{ fontSize: 11, fontWeight: 500, color: 'var(--text-muted)', marginLeft: 6 }}>
-                        Annual only
-                      </span>
-                    )}
                   </h3>
                   <div className="pricing-price">
                     <span className="pricing-amount">{price}</span>

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { DataTable, type Column, type BulkAction } from '@/components/ui/data-table'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { deleteAlertChannelAction, toggleAlertChannelAction, bulkDeleteAlertChannelsAction, bulkEnableAlertChannelsAction, bulkDisableAlertChannelsAction } from '@/app/(dashboard)/dashboard/alerts/actions'
+import { useToast } from '@/components/ui/toast'
 import type { AlertChannel } from '@/lib/types'
 
 const typeLabels: Record<string, string> = {
@@ -43,6 +44,29 @@ interface PendingConfirm {
 export function AlertChannelsTable({ channels }: { channels: AlertChannel[] }) {
   const [isPending, startTransition] = useTransition()
   const [pendingConfirm, setPendingConfirm] = useState<PendingConfirm | null>(null)
+  const [testingChannelId, setTestingChannelId] = useState<string | null>(null)
+  const toast = useToast()
+
+  async function handleTestAlert(channelId: string): Promise<void> {
+    setTestingChannelId(channelId)
+    try {
+      const res = await fetch('/api/v1/alerts/test', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ channelId }),
+      })
+      const data: { success?: boolean; error?: string; message?: string } = await res.json()
+      if (res.ok && data.success) {
+        toast.addToast(data.message || 'Test alert sent successfully.', 'success')
+      } else {
+        toast.addToast(data.error || 'Failed to send test alert.', 'error')
+      }
+    } catch {
+      toast.addToast('Failed to send test alert. Check your connection.', 'error')
+    } finally {
+      setTestingChannelId(null)
+    }
+  }
 
   function handleToggle(id: string, currentlyEnabled: boolean): void {
     startTransition(async () => {
@@ -155,6 +179,13 @@ export function AlertChannelsTable({ channels }: { channels: AlertChannel[] }) {
       searchable: false,
       render: (ch) => (
         <span style={{ display: 'flex', gap: 8 }}>
+          <button
+            className="btn btn-sm btn-secondary"
+            onClick={() => handleTestAlert(ch.id)}
+            disabled={testingChannelId === ch.id}
+          >
+            {testingChannelId === ch.id ? 'Sending...' : 'Test'}
+          </button>
           <Link href={`/dashboard/alerts/${ch.id}`} className="btn btn-sm btn-secondary">
             Edit
           </Link>

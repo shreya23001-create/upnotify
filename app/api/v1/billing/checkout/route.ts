@@ -70,7 +70,12 @@ export async function POST(request: Request): Promise<NextResponse> {
         ? 'one_time'
         : ((billingCycle || 'monthly') as 'monthly' | 'annual')
 
+    // Use the request origin so the Stripe redirect returns the user to the
+    // same domain they started from. This prevents cookie/session loss when
+    // config.app.url differs from the actual domain (e.g. Vercel preview).
+    const requestOrigin = new URL(request.url).origin
     const config = getConfig()
+    const appUrl = requestOrigin || config.app.url
     const url = await createCheckoutSession(
       org.id,
       user.email,
@@ -79,7 +84,7 @@ export async function POST(request: Request): Promise<NextResponse> {
       plan.name,
       amount,
       cycle,
-      config.app.url
+      appUrl
     )
 
     return NextResponse.json({ url })

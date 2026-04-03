@@ -62,7 +62,7 @@ function getPlanPrice(plan: Plan, isAnnual: boolean): { amount: string; period: 
     return { amount: '\u00A30', period: 'forever' }
   }
 
-  // Annual-only plan (like Lite at GBP10/yr)
+  // Annual-only plan (no monthly price set, only annual)
   if (monthlyPence === 0 && annualPence && annualPence > 0) {
     const annualGbp = annualPence / 100
     const monthlyEquiv = Math.round((annualPence / 12)) / 100

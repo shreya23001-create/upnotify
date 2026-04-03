@@ -5,6 +5,7 @@ import { getRecentIncidents } from '@/lib/db/incidents'
 import { getAlertChannelsByOrg } from '@/lib/db/alerts'
 import { getStatusPagesByWorkspace } from '@/lib/db/status-pages'
 import { getWorkspacesByOrg } from '@/lib/db/workspaces'
+import { getRecentCheckResultsByOrg } from '@/lib/db/check-results'
 import { StatsCards } from '@/components/dashboard/stats-cards'
 import { RecentIncidents } from '@/components/dashboard/recent-incidents'
 import { OnboardingChecklist } from '@/components/dashboard/onboarding-checklist'
@@ -21,11 +22,12 @@ export default async function DashboardPage(): Promise<React.ReactElement> {
   const user = await getCurrentUser()
   if (!user) redirect('/login')
 
-  const [stats, incidents, alertChannels, workspaces] = await Promise.all([
+  const [stats, incidents, alertChannels, workspaces, checkResults] = await Promise.all([
     getMonitorStats(user.org_id),
     getRecentIncidents(user.org_id, 5),
     getAlertChannelsByOrg(user.org_id),
     getWorkspacesByOrg(user.org_id),
+    getRecentCheckResultsByOrg(user.org_id, 30),
   ])
 
   const defaultWorkspace = workspaces[0]
@@ -47,7 +49,7 @@ export default async function DashboardPage(): Promise<React.ReactElement> {
 
       <StatsCards stats={stats} />
 
-      <DashboardCharts stats={stats} incidents={incidents} />
+      <DashboardCharts stats={stats} incidents={incidents} checkResults={checkResults} />
 
       {(pausedMonitors.length > 0 || disabledChannels.length > 0) && (
         <div className="grid-2" style={{ marginBottom: 24 }}>
