@@ -137,30 +137,54 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ]
 
-  let statusPages: MetadataRoute.Sitemap = []
+  // Dynamic pages from database
+  let dynamicPages: MetadataRoute.Sitemap = []
 
   try {
     const supabase = createAdminClient()
-    const { data, error } = await supabase
+
+    // Published status pages
+    const { data: statusData, error: statusError } = await supabase
       .from('status_pages')
       .select('slug, updated_at')
       .eq('is_published', true)
 
-    if (error) {
-      logger.error('Sitemap: failed to fetch public status pages', { error: error.message })
-    } else if (data) {
-      statusPages = (data as StatusPageRow[]).map((page) => ({
-        url: `https://uptrue.io/status/${page.slug}`,
-        lastModified: page.updated_at ? new Date(page.updated_at) : new Date(),
-        changeFrequency: 'hourly' as const,
-        priority: 0.7,
-      }))
+    if (statusError) {
+      logger.error('Sitemap: failed to fetch status pages', { error: statusError.message })
+    } else if (statusData) {
+      dynamicPages.push(
+        ...(statusData as StatusPageRow[]).map((page) => ({
+          url: `https://uptrue.io/status/${page.slug}`,
+          lastModified: page.updated_at ? new Date(page.updated_at) : new Date(),
+          changeFrequency: 'hourly' as const,
+          priority: 0.7,
+        }))
+      )
+    }
+
+    // Active public tracker sites
+    const { data: trackerData, error: trackerError } = await supabase
+      .from('public_monitors')
+      .select('domain, updated_at')
+      .eq('is_active', true)
+
+    if (trackerError) {
+      logger.error('Sitemap: failed to fetch tracker sites', { error: trackerError.message })
+    } else if (trackerData) {
+      dynamicPages.push(
+        ...(trackerData as { domain: string; updated_at: string | null }[]).map((site) => ({
+          url: `https://uptrue.io/tracker/${site.domain}`,
+          lastModified: site.updated_at ? new Date(site.updated_at) : new Date(),
+          changeFrequency: 'hourly' as const,
+          priority: 0.6,
+        }))
+      )
     }
   } catch (err) {
-    logger.error('Sitemap: unexpected error fetching status pages', {
+    logger.error('Sitemap: unexpected error', {
       error: err instanceof Error ? err.message : String(err),
     })
   }
 
-  return [...staticPages, ...statusPages]
+  return [...staticPages, ...dynamicPages]
 }
