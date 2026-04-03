@@ -166,6 +166,33 @@ const BLOG_POSTS: BlogPostMeta[] = [
     readTime: '15 min read',
     category: 'WordPress',
   },
+  {
+    slug: 'wordpress-504-gateway-timeout',
+    title: '504 Gateway Timeout on WordPress: Why Your Pages Take Forever and Then Fail',
+    excerpt:
+      'Your page loads for 60 seconds and then fails. The 504 is the final stage of a performance problem that has been building for weeks. Learn what causes it and how response time monitoring catches the slowdown before it becomes an outage.',
+    date: '5 May 2026',
+    readTime: '14 min read',
+    category: 'WordPress',
+  },
+  {
+    slug: 'wordpress-pharma-hack',
+    title: 'WordPress Pharma Hack: Hidden Viagra Links in Your Site That Only Google Sees',
+    excerpt:
+      'Hidden pharmaceutical spam is injected directly into your existing pages — invisible to you but fully visible to Google. Learn how the pharma hack works, how to clean it, and how keyword monitoring catches what your eyes cannot see.',
+    date: '6 May 2026',
+    readTime: '15 min read',
+    category: 'WordPress',
+  },
+  {
+    slug: 'wordpress-cron-not-working',
+    title: 'WordPress wp-cron Not Firing: Why Scheduled Posts, Emails, and Backups Silently Stop',
+    excerpt:
+      'WordPress cron depends on traffic to fire. On low-traffic sites, scheduled posts publish late, backups stop running, and emails never send. Learn why wp-cron fails and how heartbeat monitoring keeps it firing on schedule.',
+    date: '7 May 2026',
+    readTime: '14 min read',
+    category: 'WordPress',
+  },
 ]
 
 const POSTS_PER_PAGE = 6
