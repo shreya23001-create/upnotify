@@ -98,7 +98,52 @@ export function GenerateReportForm(): React.ReactElement {
         </div>
       </div>
 
-      <button type="submit" className="btn btn-primary" disabled={isPending} style={{ marginTop: 8 }}>
+      {/* Delivery Options */}
+      <div className="form-group" style={{ marginTop: 16 }}>
+        <label className="form-label">Deliver Report</label>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, cursor: 'pointer' }}>
+            <input type="radio" name="delivery" value="dashboard" defaultChecked disabled={isPending} />
+            <span>View in dashboard only</span>
+          </label>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, cursor: 'pointer' }}>
+            <input type="radio" name="delivery" value="email" disabled={isPending} />
+            <span>Send to email</span>
+          </label>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, cursor: 'pointer' }}>
+            <input type="radio" name="delivery" value="webhook" disabled={isPending} />
+            <span>Send via webhook</span>
+          </label>
+        </div>
+      </div>
+
+      {/* Email recipients (shown when email delivery selected) */}
+      <div className="form-group" id="email-delivery-fields" style={{ marginTop: 8 }}>
+        <label className="form-label">Email Recipients</label>
+        <input
+          className="form-input"
+          name="delivery_emails"
+          type="text"
+          placeholder="email1@example.com, email2@example.com"
+          disabled={isPending}
+        />
+        <span className="form-hint">Comma-separated email addresses. Leave blank to send to your own email.</span>
+      </div>
+
+      {/* Webhook URL (shown when webhook delivery selected) */}
+      <div className="form-group" style={{ marginTop: 8 }}>
+        <label className="form-label">Webhook URL</label>
+        <input
+          className="form-input"
+          name="delivery_webhook"
+          type="url"
+          placeholder="https://hooks.slack.com/services/..."
+          disabled={isPending}
+        />
+        <span className="form-hint">Report will be sent as JSON POST with HMAC signature. Works with Slack, Teams, or any webhook receiver.</span>
+      </div>
+
+      <button type="submit" className="btn btn-primary" disabled={isPending} style={{ marginTop: 12 }}>
         {isPending ? 'Generating Report...' : 'Generate Report'}
       </button>
     </form>

@@ -23,6 +23,9 @@ export async function generateReportAction(formData: FormData): Promise<{ error?
   const reportType = (formData.get('report_type') as string) || 'uptime'
   const periodStart = formData.get('period_start') as string
   const periodEnd = formData.get('period_end') as string
+  const delivery = (formData.get('delivery') as string) || 'dashboard'
+  const deliveryEmails = (formData.get('delivery_emails') as string) || ''
+  const deliveryWebhook = (formData.get('delivery_webhook') as string) || ''
 
   if (!periodStart || !periodEnd) return { error: 'Period start and end are required' }
 
@@ -37,7 +40,48 @@ export async function generateReportAction(formData: FormData): Promise<{ error?
 
   if (!report) return { error: 'Failed to generate report. Make sure you have monitors with check data.' }
 
-  logger.info('Report generated via UI', { reportId: report.id })
+  // Handle delivery
+  if (delivery === 'email' && deliveryEmails.trim()) {
+    const emails = deliveryEmails.split(',').map(e => e.trim()).filter(Boolean)
+    if (emails.length > 0) {
+      try {
+        const { sendEmail } = await import('@/lib/services/email')
+        for (const email of emails) {
+          await sendEmail(
+            email,
+            `Uptrue ${reportType.charAt(0).toUpperCase() + reportType.slice(1)} Report — ${periodStart} to ${periodEnd}`,
+            `Your ${reportType} report is ready. View it at: ${process.env.NEXT_PUBLIC_APP_URL || 'https://uptrue.io'}/dashboard/reports/${report.id}`
+          )
+        }
+        logger.info('Report delivered via email', { reportId: report.id, recipients: emails.length })
+      } catch (err) {
+        logger.error('Failed to email report', { error: err instanceof Error ? err.message : 'Unknown' })
+      }
+    }
+  } else if (delivery === 'webhook' && deliveryWebhook.trim()) {
+    try {
+      const payload = {
+        event: 'report.generated',
+        reportId: report.id,
+        reportType,
+        periodStart,
+        periodEnd,
+        orgId: user.org_id,
+        generatedAt: new Date().toISOString(),
+        viewUrl: `${process.env.NEXT_PUBLIC_APP_URL || 'https://uptrue.io'}/dashboard/reports/${report.id}`,
+      }
+      await fetch(deliveryWebhook.trim(), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+      logger.info('Report delivered via webhook', { reportId: report.id, webhook: deliveryWebhook })
+    } catch (err) {
+      logger.error('Failed to send report webhook', { error: err instanceof Error ? err.message : 'Unknown' })
+    }
+  }
+
+  logger.info('Report generated via UI', { reportId: report.id, delivery })
   redirect(`/dashboard/reports/${report.id}`)
 }
 
