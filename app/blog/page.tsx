@@ -247,6 +247,33 @@ const BLOG_POSTS: BlogPostMeta[] = [
     readTime: '14 min read',
     category: 'WordPress',
   },
+  {
+    slug: 'wordpress-slow-ttfb',
+    title: 'WordPress TTFB Over 3 Seconds: Why Your Site Feels Dead Even When It\'s Technically Up',
+    excerpt:
+      'A WordPress site with Time to First Byte over 3 seconds feels broken to visitors even when uptime monitors say it is fine. Slow database queries, missing object cache, bloated plugins, and cheap hosting all cause high TTFB. Learn what drives TTFB up and how HTTP monitoring tracks it on every check.',
+    date: '14 May 2026',
+    readTime: '14 min read',
+    category: 'WordPress',
+  },
+  {
+    slug: 'wordpress-javascript-errors',
+    title: 'JavaScript Errors Breaking WordPress Page Functionality: When Your Site Is Up But Broken',
+    excerpt:
+      'JavaScript errors on WordPress can break forms, buttons, sliders, and navigation while the page still loads and returns 200 OK. jQuery conflicts, plugin JS errors, and minification breaking code cause invisible functionality failures. Learn what causes them and how keyword monitoring catches broken pages.',
+    date: '15 May 2026',
+    readTime: '14 min read',
+    category: 'WordPress',
+  },
+  {
+    slug: 'gravity-forms-not-working',
+    title: 'Gravity Forms Conditional Logic Not Working: Why Your Forms Are Broken After Update',
+    excerpt:
+      'Gravity Forms conditional logic can silently break after updates due to jQuery conflicts, JavaScript minification, PHP 8.x compatibility issues, and payment integration failures. Fields that should show or hide stop responding. Learn what causes it and how keyword monitoring catches broken forms.',
+    date: '16 May 2026',
+    readTime: '14 min read',
+    category: 'WordPress',
+  },
 ]
 
 const POSTS_PER_PAGE = 6
