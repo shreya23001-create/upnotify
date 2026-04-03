@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -56,8 +57,8 @@ export default function AgencyPartnerAgreementPage(): React.ReactElement {
       <h2>2. Fees and Revenue Share</h2>
       <h3>2.1 Setup Fee</h3>
       <p>
-        The Agency shall pay a one-time setup fee of &pound;149 (one hundred and forty-nine pounds
-        sterling) to activate the Agency plan. This fee is non-refundable. Payment is processed
+        The Agency shall pay a one-time setup fee to activate the Agency plan, as published on
+        our <Link href="/#pricing">pricing page</Link>. This fee is non-refundable. Payment is processed
         through Stripe at the time of activation.
       </p>
       <h3>2.2 Revenue Share Model</h3>

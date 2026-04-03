@@ -22,16 +22,16 @@ export function PublicFooter(): React.ReactElement {
             <Link href="/#features">Features</Link>
             <Link href="/#pricing">Pricing</Link>
             <Link href="/score">
-              Score <span className="free-badge">FREE</span>
+              Score <sup className="nav-free-tag">Free</sup>
             </Link>
             <Link href="/tracker">
-              Tracker <span className="free-badge">FREE</span>
+              Tracker <sup className="nav-free-tag">Free</sup>
             </Link>
             <Link href="/leaderboard">
-              Leaderboard <span className="free-badge">FREE</span>
+              Leaderboard <sup className="nav-free-tag">Free</sup>
             </Link>
             <Link href="/tools">
-              Tools <span className="free-badge">FREE</span>
+              Tools <sup className="nav-free-tag">Free</sup>
             </Link>
             <Link href="/blog">Blog</Link>
           </div>

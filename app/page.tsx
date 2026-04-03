@@ -1,4 +1,3 @@
-import { UptrueLogo } from '@/components/ui/uptrue-logo'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import PricingTable from '@/components/landing/pricing-table'
@@ -10,6 +9,7 @@ import {
   FaqPageJsonLd,
 } from '@/components/seo/json-ld'
 import { FAQ_ITEMS } from '@/lib/constants/faq'
+import { PublicNav } from '@/components/ui/public-nav'
 import { PublicFooter } from '@/components/ui/public-footer'
 
 export const metadata: Metadata = {
@@ -125,30 +125,7 @@ export default function LandingPage(): React.ReactElement {
       {/* ================================================================
           Navigation
           ================================================================ */}
-      <nav className="landing-nav">
-        <div className="landing-nav-inner">
-          <Link href="/" className="landing-logo" aria-label="Uptrue home">
-            <UptrueLogo />
-          </Link>
-          <div className="landing-nav-links">
-            <a href="#features">Features</a>
-            <a href="#pricing">Pricing</a>
-            <Link href="/score">Score <span className="free-badge">FREE</span></Link>
-            <Link href="/tracker">Tracker <span className="free-badge">FREE</span></Link>
-            <Link href="/tools">Tools <span className="free-badge">FREE</span></Link>
-            <Link href="/leaderboard">Leaderboard</Link>
-            <Link href="/blog">Blog</Link>
-          </div>
-          <div className="landing-nav-actions">
-            <a href="/login" className="btn btn-ghost">
-              Log in
-            </a>
-            <a href="/signup" className="btn btn-primary">
-              Start Free
-            </a>
-          </div>
-        </div>
-      </nav>
+      <PublicNav />
 
       {/* ================================================================
           Hero
@@ -353,7 +330,7 @@ export default function LandingPage(): React.ReactElement {
                 </li>
               </ul>
               <a
-                href="/signup?plan=agency-waitlist"
+                href="mailto:agencies@uptrue.io?subject=Agency%20Waitlist%20%E2%80%94%20Early%20Access"
                 className="btn btn-primary btn-lg"
               >
                 Join the Waitlist for Early Access

@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { getCurrentUser } from '@/lib/db/users'
 import { getMonitorStats, getMonitorsByWorkspace } from '@/lib/db/monitors'
 import { getRecentIncidents } from '@/lib/db/incidents'
@@ -11,6 +12,10 @@ import { PausedMonitors } from '@/components/dashboard/paused-monitors'
 import { DisabledAlerts } from '@/components/dashboard/disabled-alerts'
 import { DashboardCharts } from '@/components/dashboard/dashboard-charts'
 import { redirect } from 'next/navigation'
+
+export const metadata: Metadata = {
+  title: 'Dashboard',
+}
 
 export default async function DashboardPage(): Promise<React.ReactElement> {
   const user = await getCurrentUser()

@@ -13,12 +13,14 @@ interface LandingPlan {
   annualPrice: string
   monthlyPeriod: string
   annualPeriod: string
+  monthlyNote?: string
   annualNote?: string
   description: string
   features: PlanFeature[]
   cta: string
   ctaHref: string
   highlighted: boolean
+  annualOnly?: boolean
 }
 
 const PLANS: LandingPlan[] = [
@@ -47,10 +49,12 @@ const PLANS: LandingPlan[] = [
   },
   {
     name: 'Lite',
-    monthlyPrice: '\u00A310',
+    monthlyPrice: '83p',
     annualPrice: '\u00A310',
-    monthlyPeriod: '/year',
+    monthlyPeriod: '/mo',
     annualPeriod: '/year',
+    monthlyNote: 'Billed annually at \u00A310/yr',
+    annualNote: 'Just 83p per month',
     description: 'Affordable monitoring for small projects',
     features: [
       { text: '5 monitors', included: true },
@@ -67,6 +71,7 @@ const PLANS: LandingPlan[] = [
     cta: 'Get Started \u2014 \u00A310/yr',
     ctaHref: '/signup',
     highlighted: false,
+    annualOnly: true,
   },
   {
     name: 'Builder',
@@ -150,7 +155,7 @@ export default function PricingTable(): React.ReactElement {
           {PLANS.map((plan) => {
             const price = isAnnual ? plan.annualPrice : plan.monthlyPrice
             const period = isAnnual ? plan.annualPeriod : plan.monthlyPeriod
-            const note = isAnnual ? plan.annualNote : undefined
+            const note = isAnnual ? plan.annualNote : plan.monthlyNote
 
             return (
               <div
@@ -161,7 +166,14 @@ export default function PricingTable(): React.ReactElement {
                   <div className="pricing-badge">Most Popular</div>
                 )}
                 <div className="pricing-card-header">
-                  <h3 className="pricing-plan-name">{plan.name}</h3>
+                  <h3 className="pricing-plan-name">
+                    {plan.name}
+                    {plan.annualOnly && (
+                      <span style={{ fontSize: 11, fontWeight: 500, color: 'var(--text-muted)', marginLeft: 6 }}>
+                        Annual only
+                      </span>
+                    )}
+                  </h3>
                   <div className="pricing-price">
                     <span className="pricing-amount">{price}</span>
                     <span className="pricing-period">{period}</span>

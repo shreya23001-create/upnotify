@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import Link from 'next/link'
 import { createMonitorAction } from '@/app/(dashboard)/dashboard/monitors/actions'
 
 const monitorTypes = [
@@ -42,7 +43,19 @@ export function CreateMonitorForm(): React.ReactElement {
 
   return (
     <form action={handleSubmit}>
-      {error && <div className="form-error">{error}</div>}
+      {error && (
+        <div className="form-error">
+          {error}
+          {error.includes('Monitor limit reached') && (
+            <>
+              {' '}
+              <Link href="/dashboard/settings" style={{ color: 'var(--accent, #06b6d4)', textDecoration: 'underline', fontWeight: 600 }}>
+                Upgrade your plan
+              </Link>
+            </>
+          )}
+        </div>
+      )}
 
       <div className="form-group">
         <label className="form-label" htmlFor="name">Monitor Name</label>

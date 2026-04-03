@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -85,46 +86,11 @@ export default function TermsOfServicePage(): React.ReactElement {
 
       <h2>3. Subscription Plans and Billing</h2>
       <h3>3.1 Plans</h3>
-      <p>Uptrue offers the following subscription tiers:</p>
-      <table>
-        <thead>
-          <tr>
-            <th>Plan</th>
-            <th>Price</th>
-            <th>Billing</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Free</td>
-            <td>&pound;0</td>
-            <td>Forever</td>
-          </tr>
-          <tr>
-            <td>Lite</td>
-            <td>&pound;10 per year</td>
-            <td>Annual</td>
-          </tr>
-          <tr>
-            <td>Builder</td>
-            <td>&pound;15 per month</td>
-            <td>Monthly</td>
-          </tr>
-          <tr>
-            <td>Scale</td>
-            <td>&pound;39 per month</td>
-            <td>Monthly</td>
-          </tr>
-          <tr>
-            <td>Agency</td>
-            <td>&pound;149 one-time setup fee</td>
-            <td>One-time + revenue share</td>
-          </tr>
-        </tbody>
-      </table>
       <p>
+        Uptrue offers multiple subscription tiers including free and paid options.
         Feature availability, monitor limits, check intervals, and alert channel access vary by plan.
-        Current plan details are available on our pricing page at uptrue.io/pricing.
+        For current pricing and plan details, please visit our{' '}
+        <Link href="/#pricing">pricing page</Link>.
       </p>
       <h3>3.2 Payment</h3>
       <p>

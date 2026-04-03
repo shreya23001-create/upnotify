@@ -323,9 +323,9 @@ export default function UptimeMonitoringAgenciesPage(): React.ReactElement {
             Multi-tenant workspaces, white-label branding, per-client alerting, and AI-powered
             reports. Uptrue is the monitoring platform agencies have been asking for.
           </p>
-          <Link href="/signup?plan=agency-waitlist" className="btn btn-primary btn-lg">
+          <a href="mailto:agencies@uptrue.io?subject=Agency%20Waitlist%20%E2%80%94%20Early%20Access" className="btn btn-primary btn-lg">
             Join the Agency Waitlist
-          </Link>
+          </a>
         </div>
 
         <h2>What to look for when evaluating tools</h2>

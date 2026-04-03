@@ -168,7 +168,7 @@ html.dark {
    Auth Pages
    ========================================================================== */
 
-.auth-container { display: flex; min-height: 100vh; align-items: center; justify-content: center; background: linear-gradient(135deg, #f8f9fc 0%, #e8ecf4 100%); padding: 16px; }
+.auth-container { display: flex; min-height: 60vh; align-items: center; justify-content: center; background: linear-gradient(135deg, #f8f9fc 0%, #e8ecf4 100%); padding: 48px 16px; }
 .auth-wrapper { width: 100%; max-width: 440px; }
 .auth-card { background: var(--bg-card); border-radius: 16px; border: 1px solid var(--border-primary); padding: 40px; box-shadow: 0 4px 24px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04); }
 .auth-title { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 6px; color: var(--text-primary); letter-spacing: -0.5px; }
@@ -1209,7 +1209,8 @@ html.dark .landing-cta { background: linear-gradient(135deg, #1a1d27 0%, #242736
 
 /* ---------- Free Badge ---------- */
 
-.free-badge { background: #06b6d4; color: white; font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 700; text-transform: uppercase; margin-left: 4px; display: inline-block; vertical-align: middle; line-height: 1.4; letter-spacing: 0.3px; }
+.free-badge { background: none; color: var(--accent, #06b6d4); font-size: 9px; padding: 0; border-radius: 0; font-weight: 600; text-transform: uppercase; margin-left: 2px; display: inline; vertical-align: super; line-height: 1; letter-spacing: 0.3px; }
+.nav-free-tag { font-size: 9px; font-weight: 600; text-transform: uppercase; color: var(--accent, #06b6d4); vertical-align: super; line-height: 1; letter-spacing: 0.3px; }
 
 /* ---------- Footer ---------- */
 

@@ -13,7 +13,7 @@ const FAQ_SCHEMA = {
       name: 'How much does Uptrue cost?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Uptrue has four plans: Free (no cost, 3 monitors), Lite (10 pounds per year, 5 monitors), Builder (15 pounds per month, 25 monitors), and Scale (39 pounds per month, 100 monitors). Annual billing saves 20 percent on Builder and Scale.',
+        text: 'Uptrue has four plans: Free, Lite, Builder, and Scale. For current pricing and limits, visit our pricing page at uptrue.io/#pricing.',
       },
     },
     {
@@ -63,31 +63,12 @@ export default function BillingPage(): React.ReactElement {
           <section className="help-section">
             <h2 className="help-section-title">The four plans</h2>
 
-            <h3 className="help-subsection-title">Free -- forever</h3>
             <p>
-              3 monitors, 10-minute check intervals, 7-day data retention, and email alerts.
-              Perfect for a personal project or a quick proof of concept. No credit card required.
-            </p>
-
-            <h3 className="help-subsection-title">Lite -- &pound;10 per year</h3>
-            <p>
-              5 monitors, 1-minute checks, 30-day retention, all alert channels (email, Slack,
-              Teams, webhooks), 1 branded status page, and 2 team members. That works out to
-              less than a pound a month -- a no-brainer for a small site or side project.
-            </p>
-
-            <h3 className="help-subsection-title">Builder -- &pound;15 per month</h3>
-            <p>
-              25 monitors, 1-minute checks, 90-day retention, 5 custom-domain status pages,
-              10 team members, and 5 AI-powered reports per month. Built for growing teams and
-              serious projects.
-            </p>
-
-            <h3 className="help-subsection-title">Scale -- &pound;39 per month</h3>
-            <p>
-              100 monitors, 30-second checks, 1-year retention, unlimited status pages, 20 team
-              members, unlimited AI reports, and full API access. Everything Uptrue offers, no
-              limits.
+              Uptrue has four plans: <strong>Free</strong>, <strong>Lite</strong>,{' '}
+              <strong>Builder</strong>, and <strong>Scale</strong>. Each plan offers different
+              monitor limits, check intervals, data retention, alert channels, and team member
+              capacity. For current pricing and full feature comparisons, see the{' '}
+              <Link href="/#pricing">pricing page</Link>.
             </p>
           </section>
 

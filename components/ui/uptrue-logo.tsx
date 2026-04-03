@@ -4,9 +4,11 @@ interface LogoProps {
   height?: number
 }
 
-/** Uptrue logo — inline SVG, works everywhere, no external file dependency */
+/** Uptrue logo — inline SVG, works everywhere, no external file dependency.
+ *  Text uses currentColor so it inherits from the parent CSS color,
+ *  which auto-switches between light and dark themes via var(--text-primary). */
 export function UptrueLogo({ variant = 'dark', width = 140, height = 35 }: LogoProps): React.ReactElement {
-  const textColor = variant === 'light' ? '#ffffff' : '#0f172a'
+  const textColor = variant === 'light' ? '#ffffff' : 'currentColor'
 
   return (
     <svg

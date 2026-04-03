@@ -138,7 +138,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ]
 
   // Dynamic pages from database
-  let dynamicPages: MetadataRoute.Sitemap = []
+  const dynamicPages: MetadataRoute.Sitemap = []
 
   try {
     const supabase = createAdminClient()
