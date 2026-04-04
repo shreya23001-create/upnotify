@@ -86,6 +86,13 @@ const FEATURES = [
       'Monitor competitor websites and compare uptime side by side. Know when they go down and prove your reliability edge.',
   },
   {
+    icon: '\u{1F4B0}',
+    title: 'Uptrue Compete',
+    subtitle: 'Price & stock tracking',
+    description:
+      'Track competitor prices, detect stock changes, and get alerts when prices drop. Automatic extraction from any ecommerce site — no code needed.',
+  },
+  {
     icon: '\u{1F9F0}',
     title: 'Free SSL & Uptime Tools',
     subtitle: 'No signup required',
