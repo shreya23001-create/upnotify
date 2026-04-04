@@ -13,6 +13,7 @@ import { getServerConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
 
 export const dynamic = 'force-dynamic'
+export const maxDuration = 60 // seconds — Vercel Hobby allows up to 60s for API routes
 export const maxDuration = 60
 
 function sleep(ms: number): Promise<void> {
@@ -83,20 +84,29 @@ export async function GET(request: Request): Promise<NextResponse> {
     const monitors = await getActivePublicMonitors()
     logger.info('Public check runner started', { monitors: monitors.length })
 
-    // Phase 1: Run ALL first checks in parallel
-    const firstChecks = await Promise.allSettled(
-      monitors.map(async (monitor): Promise<FirstCheckResult> => {
-        const result = await runHttpCheck(monitor)
-        await writePublicCheckResult({
-          monitor_id: monitor.id,
-          status: result.status,
-          response_time_ms: result.responseTimeMs,
-          status_code: result.statusCode,
-          error_message: result.errorMessage,
+    // Phase 1: Run checks in batches of 10 to avoid timeout
+    const BATCH_SIZE = 10
+    const allResults: PromiseSettledResult<FirstCheckResult>[] = []
+
+    for (let i = 0; i < monitors.length; i += BATCH_SIZE) {
+      const batch = monitors.slice(i, i + BATCH_SIZE)
+      const batchResults = await Promise.allSettled(
+        batch.map(async (monitor): Promise<FirstCheckResult> => {
+          const result = await runHttpCheck(monitor)
+          await writePublicCheckResult({
+            monitor_id: monitor.id,
+            status: result.status,
+            response_time_ms: result.responseTimeMs,
+            status_code: result.statusCode,
+            error_message: result.errorMessage,
+          })
+          return { monitor, result }
         })
-        return { monitor, result }
-      })
-    )
+      )
+      allResults.push(...batchResults)
+    }
+
+    const firstChecks = allResults
 
     // Separate into up and down
     const upResults: FirstCheckResult[] = []
