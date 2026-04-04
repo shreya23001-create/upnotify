@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import PricingTable from '@/components/landing/pricing-table'
+import CompetePricing from '@/components/landing/compete-pricing'
 import Faq from '@/components/landing/faq'
 import {
   OrganizationJsonLd,
@@ -317,6 +318,7 @@ export default function LandingPage(): React.ReactElement {
           Pricing
           ================================================================ */}
       <PricingTable />
+      <CompetePricing />
 
       {/* ================================================================
           Agency Section

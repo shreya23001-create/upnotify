@@ -37,18 +37,19 @@ export default async function CompetePage(): Promise<React.ReactElement> {
           </div>
           <h2 className="compete-upgrade-title">Price Intelligence for Your Products</h2>
           <p className="compete-upgrade-description">
-            Compete is available on Builder and Scale plans. Track competitor prices, monitor stock
-            availability, and get real-time alerts when competitors change their pricing.
+            Compete is a separate add-on available with any paid monitoring plan.
+            Track competitor prices, monitor stock availability, and get real-time alerts.
           </p>
           <ul className="compete-upgrade-features">
-            <li>Track up to 1,000 products across competitors</li>
+            <li>Plans from {'\u00A3'}9/month (10 products) to {'\u00A3'}99/month (2,500 products)</li>
             <li>Automatic price extraction from any ecommerce site</li>
             <li>Real-time stock availability monitoring</li>
             <li>Webhook integration with WooCommerce, Shopify, BigCommerce</li>
             <li>Price change alerts via email, Slack, or webhook</li>
+            <li>Buy additional products in bundles of 5 or 10</li>
           </ul>
           <Link href="/dashboard/settings?tab=billing" className="btn btn-primary compete-upgrade-btn">
-            Upgrade Your Plan
+            Add Compete to Your Plan
           </Link>
         </div>
       </div>

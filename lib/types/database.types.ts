@@ -931,18 +931,14 @@ export type Database = {
           type: string
           updated_at: string
           voice_call_monthly_limit: number
-          has_compete: boolean
-          compete_product_limit: number
         }
         Insert: {
           check_interval_seconds?: number
           client_workspace_limit?: number | null
-          compete_product_limit?: number
           created_at?: string
           data_retention_days?: number | null
           has_ai_predictive?: boolean
           has_api_access?: boolean
-          has_compete?: boolean
           has_status_page_custom_domain?: boolean
           has_voice_calls?: boolean
           has_white_label?: boolean
@@ -968,12 +964,10 @@ export type Database = {
         Update: {
           check_interval_seconds?: number
           client_workspace_limit?: number | null
-          compete_product_limit?: number
           created_at?: string
           data_retention_days?: number | null
           has_ai_predictive?: boolean
           has_api_access?: boolean
-          has_compete?: boolean
           has_status_page_custom_domain?: boolean
           has_voice_calls?: boolean
           has_white_label?: boolean
@@ -2102,6 +2096,98 @@ export type Database = {
           review_notes?: string | null
           reviewed_by?: string | null
           reviewed_at?: string | null
+        }
+        Relationships: []
+      }
+      compete_plans: {
+        Row: {
+          id: string
+          name: string
+          slug: string
+          description: string | null
+          product_limit: number
+          price_monthly_pence: number
+          price_yearly_pence: number | null
+          has_yearly_discount: boolean
+          extra_product_price_pence: number
+          extra_product_bundle_sizes: number[]
+          max_extra_products: number
+          nudge_to_slug: string | null
+          stripe_product_id: string | null
+          stripe_monthly_price_id: string | null
+          stripe_yearly_price_id: string | null
+          is_active: boolean
+          sort_order: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          slug: string
+          description?: string | null
+          product_limit?: number
+          price_monthly_pence?: number
+          price_yearly_pence?: number | null
+          has_yearly_discount?: boolean
+          extra_product_price_pence?: number
+          extra_product_bundle_sizes?: number[]
+          max_extra_products?: number
+          nudge_to_slug?: string | null
+          stripe_product_id?: string | null
+          stripe_monthly_price_id?: string | null
+          stripe_yearly_price_id?: string | null
+          is_active?: boolean
+          sort_order?: number
+        }
+        Update: Partial<{
+          name: string
+          description: string | null
+          product_limit: number
+          price_monthly_pence: number
+          price_yearly_pence: number | null
+          has_yearly_discount: boolean
+          extra_product_price_pence: number
+          max_extra_products: number
+          is_active: boolean
+          stripe_product_id: string | null
+          stripe_monthly_price_id: string | null
+          stripe_yearly_price_id: string | null
+        }>
+        Relationships: []
+      }
+      compete_subscriptions: {
+        Row: {
+          id: string
+          org_id: string
+          compete_plan_id: string
+          stripe_subscription_id: string | null
+          status: string
+          billing_cycle: string
+          extra_products_purchased: number
+          stripe_extra_price_id: string | null
+          current_period_start: string | null
+          current_period_end: string | null
+          canceled_at: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          org_id: string
+          compete_plan_id: string
+          stripe_subscription_id?: string | null
+          status?: string
+          billing_cycle?: string
+          extra_products_purchased?: number
+          stripe_extra_price_id?: string | null
+          current_period_start?: string | null
+          current_period_end?: string | null
+        }
+        Update: {
+          status?: string
+          extra_products_purchased?: number
+          current_period_start?: string | null
+          current_period_end?: string | null
+          canceled_at?: string | null
         }
         Relationships: []
       }

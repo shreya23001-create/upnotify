@@ -3289,3 +3289,10 @@ html.dark .compete-success-msg { color: #6ee7b7; }
 .credit-submit-status-pending { background: #fef3c7; color: #92400e; }
 .credit-submit-status-approved { background: #dcfce7; color: #166534; }
 .credit-submit-status-rejected { background: #fef2f2; color: #991b1b; }
+
+/* ========== Compete Pricing ========== */
+.landing-compete-pricing { background: var(--bg-secondary, #f8fafc); }
+.compete-pricing-header { text-align: center; margin-bottom: 32px; }
+.compete-pricing-badge { display: inline-block; background: var(--accent-gradient); color: #fff; font-size: 12px; font-weight: 700; padding: 4px 14px; border-radius: 20px; margin-bottom: 12px; letter-spacing: 0.5px; text-transform: uppercase; }
+.compete-pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; max-width: 1000px; margin: 0 auto; }
+@media (max-width: 768px) { .compete-pricing-grid { grid-template-columns: 1fr; max-width: 400px; } }

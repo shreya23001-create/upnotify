@@ -10,8 +10,6 @@ interface PlanLimits {
   hasStatusPageCustomDomain: boolean
   hasWhiteLabel: boolean
   hasVoiceCalls: boolean
-  hasCompete: boolean
-  competeProductLimit: number
   checkIntervalSeconds: number
 }
 
@@ -28,8 +26,6 @@ const FREE_DEFAULTS: PlanLimits = {
   hasStatusPageCustomDomain: false,
   hasWhiteLabel: false,
   hasVoiceCalls: false,
-  hasCompete: false,
-  competeProductLimit: 0,
   checkIntervalSeconds: 600,
 }
 
@@ -46,8 +42,6 @@ function extractLimits(plan: Record<string, unknown>): PlanLimits {
       (plan.has_status_page_custom_domain as boolean) ?? false,
     hasWhiteLabel: (plan.has_white_label as boolean) ?? false,
     hasVoiceCalls: (plan.has_voice_calls as boolean) ?? false,
-    hasCompete: (plan.has_compete as boolean) ?? false,
-    competeProductLimit: (plan.compete_product_limit as number) ?? 0,
     checkIntervalSeconds: (plan.check_interval_seconds as number) ?? 600,
   }
 }
@@ -148,31 +142,61 @@ export async function checkFeatureAccess(
     | 'hasStatusPageCustomDomain'
     | 'hasWhiteLabel'
     | 'hasVoiceCalls'
-    | 'hasCompete'
   >
 ): Promise<boolean> {
   const limits = await getPlanLimits(orgId)
   return limits[feature]
 }
 
-/** Check if the org has Compete access (paid plans with add-on) */
+/** Check if the org has Compete access via a separate Compete add-on subscription */
 export async function checkCompeteAccess(orgId: string): Promise<boolean> {
-  const limits = await getPlanLimits(orgId)
-  return limits.hasCompete
+  const supabase = createAdminClient()
+
+  const { data } = await supabase
+    .from('compete_subscriptions')
+    .select('id')
+    .eq('org_id', orgId)
+    .eq('status', 'active')
+    .limit(1)
+    .single()
+
+  return !!data
 }
 
-/** Check if the org can add another Compete product */
+/** Check if the org can add another Compete product (based on Compete add-on subscription) */
 export async function checkCompeteProductLimit(orgId: string): Promise<{
   allowed: boolean
   currentCount: number
   limit: number
+  nudgeToSlug: string | null
 }> {
   const supabase = createAdminClient()
-  const limits = await getPlanLimits(orgId)
 
-  if (!limits.hasCompete) {
-    return { allowed: false, currentCount: 0, limit: 0 }
+  const { data: sub } = await supabase
+    .from('compete_subscriptions')
+    .select('*')
+    .eq('org_id', orgId)
+    .eq('status', 'active')
+    .single()
+
+  if (!sub) {
+    return { allowed: false, currentCount: 0, limit: 0, nudgeToSlug: null }
   }
+
+  const { data: plan } = await supabase
+    .from('compete_plans')
+    .select('*')
+    .eq('id', sub.compete_plan_id)
+    .single()
+
+  if (!plan) {
+    return { allowed: false, currentCount: 0, limit: 0, nudgeToSlug: null }
+  }
+
+  const baseLimit = (plan.product_limit as number) ?? 0
+  const extraPurchased = (sub.extra_products_purchased as number) ?? 0
+  const totalLimit = baseLimit + extraPurchased
+  const nudgeToSlug = (plan.nudge_to_slug as string) ?? null
 
   const { count } = await supabase
     .from('ecom_products')
@@ -180,10 +204,9 @@ export async function checkCompeteProductLimit(orgId: string): Promise<{
     .eq('org_id', orgId)
 
   const currentCount = count ?? 0
-  const limit = limits.competeProductLimit
-  const allowed = currentCount < limit
+  const allowed = currentCount < totalLimit
 
-  return { allowed, currentCount, limit }
+  return { allowed, currentCount, limit: totalLimit, nudgeToSlug }
 }
 
 /** Check if the org can add another competitor monitor */
