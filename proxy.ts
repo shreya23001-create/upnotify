@@ -35,6 +35,19 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
+  // Check if user is deactivated
+  if (pathname !== '/deactivated') {
+    const { data: userData } = await supabase
+      .from('users')
+      .select('is_active')
+      .eq('id', user.id)
+      .single()
+
+    if (userData && userData.is_active === false) {
+      return NextResponse.redirect(new URL('/deactivated', request.url))
+    }
+  }
+
   // Admin routes: verify admin access via env whitelist OR admin_roles table
   if (isAdminRoute(pathname)) {
     const adminEmailsRaw = process.env.ADMIN_EMAILS || ''

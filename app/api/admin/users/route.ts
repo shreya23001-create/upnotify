@@ -41,6 +41,9 @@ export async function PATCH(request: Request): Promise<NextResponse> {
       return NextResponse.json({ error: `Failed to deactivate: ${error.message}` }, { status: 500 })
     }
 
+    // Sign the user out of all sessions (forces re-auth, which will hit the deactivated check)
+    await supabase.auth.admin.signOut(body.userId, 'global')
+
     await writeAuditLog({
       orgId: null as unknown as string,
       userId: adminUserId,
