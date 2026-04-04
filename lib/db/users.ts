@@ -56,17 +56,35 @@ export async function getCurrentUser(): Promise<ImpersonatedUser | null> {
   }
 
   // Normal flow — no impersonation
+  // Try RLS-scoped client first, fall back to admin client if RLS blocks
+  // (happens after accepting a team invite — org_id changed via admin client
+  //  but Supabase session RLS functions still return old org_id)
   const { data, error } = await supabase
     .from('users')
     .select('*')
     .eq('id', authUser.id)
     .single()
 
+  if (data) return data
+
+  // RLS blocked — use admin client
   if (error) {
-    logger.error('Failed to get current user', { error: error.message })
-    return null
+    logger.warn('RLS blocked user fetch, using admin client fallback', { userId: authUser.id, error: error.message })
+    const adminClient = createAdminClient()
+    const { data: adminData, error: adminError } = await adminClient
+      .from('users')
+      .select('*')
+      .eq('id', authUser.id)
+      .single()
+
+    if (adminError) {
+      logger.error('Failed to get current user (admin fallback)', { error: adminError.message })
+      return null
+    }
+    return adminData
   }
-  return data
+
+  return null
 }
 
 export async function getUserProfile(): Promise<{ user: ImpersonatedUser; organisation: Organisation; isImpersonating: boolean } | null> {
