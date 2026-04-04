@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getCurrentUser } from '@/lib/db/users'
 import { getCurrentOrganisation } from '@/lib/db/organisations'
-import { createCheckoutSession } from '@/lib/services/stripe'
+import { getStripe, ensureStripeCustomer } from '@/lib/services/stripe'
 import { getPlanBySlug } from '@/lib/db/subscriptions'
 import { getConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
@@ -77,8 +77,7 @@ export async function POST(request: Request): Promise<NextResponse> {
 
     const config = getConfig()
     const appUrl = config.app.url
-    const stripe = (await import('@/lib/services/stripe')).getStripe()
-    const { ensureStripeCustomer } = await import('@/lib/services/stripe')
+    const stripe = getStripe()
     const customerId = await ensureStripeCustomer(org.id, user.email, org.name)
 
     const session = await stripe.checkout.sessions.create({
@@ -104,8 +103,9 @@ export async function POST(request: Request): Promise<NextResponse> {
     logger.error('Checkout error', {
       error: error instanceof Error ? error.message : 'Unknown',
     })
+    const errorMsg = error instanceof Error ? error.message : 'Unknown'
     return NextResponse.json(
-      { error: 'Failed to create checkout session' },
+      { error: `Failed to create checkout session: ${errorMsg}` },
       { status: 500 }
     )
   }
