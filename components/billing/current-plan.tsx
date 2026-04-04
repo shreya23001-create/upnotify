@@ -42,17 +42,12 @@ export function CurrentPlan({ plan, subscription }: Props) {
             <div className="stat-label">Current Plan</div>
             <div style={{ fontSize: 20, fontWeight: 700, marginBottom: 4 }}>{plan.name}</div>
             <span className={`badge ${subscription.status === 'active' ? 'badge-success' : subscription.status === 'trialing' ? 'badge-warning' : 'badge-danger'}`}>
-              {subscription.status === 'trialing' ? 'Trial' : subscription.status}
+              {subscription.status}
             </span>
             <span style={{ marginLeft: 8, fontSize: 14, color: '#94a3b8', textTransform: 'capitalize' }}>
               {subscription.billing_cycle}
             </span>
-            {subscription.status === 'trialing' && subscription.trial_ends_at && (
-              <p style={{ fontSize: 13, color: '#f59e0b', marginTop: 8, fontWeight: 500 }}>
-                Trial ends: {new Date(subscription.trial_ends_at).toLocaleDateString()}
-              </p>
-            )}
-            {subscription.status !== 'trialing' && subscription.current_period_end && (
+            {subscription.current_period_end && (
               <p style={{ fontSize: 13, color: '#94a3b8', marginTop: 8 }}>
                 Next billing: {new Date(subscription.current_period_end).toLocaleDateString()}
               </p>
