@@ -2096,6 +2096,49 @@ export type Database = {
         Update: {}
         Relationships: []
       }
+      email_templates: {
+        Row: {
+          id: string
+          template_key: string
+          name: string
+          subject: string
+          body_text: string
+          body_html: string | null
+          is_active: boolean
+          category: string
+          variables: Json
+          send_count: number
+          last_sent_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          template_key: string
+          name: string
+          subject: string
+          body_text: string
+          body_html?: string | null
+          is_active?: boolean
+          category?: string
+          variables?: Json
+          send_count?: number
+          last_sent_at?: string | null
+        }
+        Update: {
+          name?: string
+          subject?: string
+          body_text?: string
+          body_html?: string | null
+          is_active?: boolean
+          category?: string
+          variables?: Json
+          send_count?: number
+          last_sent_at?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_messages: {
         Row: {
           id: string

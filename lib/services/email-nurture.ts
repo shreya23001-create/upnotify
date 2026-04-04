@@ -5,6 +5,11 @@ import {
   getEmailPreferences,
   getOrgMonitorStats,
 } from '@/lib/db/email-nurture'
+import {
+  getEmailTemplateByKey,
+  incrementEmailTemplateSendCount,
+  type EmailTemplate,
+} from '@/lib/db/email-templates'
 import { getServerConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
 
@@ -152,6 +157,44 @@ async function canSendEmail(
 }
 
 // ---------------------------------------------------------------------------
+// DB template helpers — check DB first, fall back to hardcoded
+// ---------------------------------------------------------------------------
+
+interface DbTemplateResult {
+  found: boolean
+  active: boolean
+  template: EmailTemplate | null
+}
+
+async function getDbTemplate(templateKey: string): Promise<DbTemplateResult> {
+  try {
+    const template = await getEmailTemplateByKey(templateKey)
+    if (!template) return { found: false, active: true, template: null }
+    if (!template.is_active) return { found: true, active: false, template: null }
+    return { found: true, active: true, template }
+  } catch {
+    // If DB is unavailable, fall back to hardcoded
+    return { found: false, active: true, template: null }
+  }
+}
+
+function replaceVariables(text: string, vars: Record<string, string>): string {
+  let result = text
+  for (const [key, value] of Object.entries(vars)) {
+    result = result.replace(new RegExp(`\\{\\{${key}\\}\\}`, 'g'), value)
+  }
+  return result
+}
+
+async function recordSendWithDbTracking(userId: string, emailKey: string): Promise<void> {
+  await recordEmailSend(userId, emailKey)
+  // Fire and forget — don't block on send count update
+  incrementEmailTemplateSendCount(emailKey).catch(() => {
+    // Silently ignore — non-critical
+  })
+}
+
+// ---------------------------------------------------------------------------
 // Email #1: Welcome
 // ---------------------------------------------------------------------------
 
@@ -170,7 +213,26 @@ export async function sendWelcomeEmail(
   const appUrl = getAppUrl()
   const firstName = userName.split(' ')[0] || 'there'
 
-  const html = nurtureBaseTemplate(`
+  // Check DB template first
+  const dbResult = await getDbTemplate(EMAIL_KEYS.WELCOME)
+  if (dbResult.found && !dbResult.active) {
+    return { success: true, skipped: true, reason: 'template_inactive' }
+  }
+
+  let subject: string
+  let html: string
+
+  if (dbResult.template) {
+    const vars: Record<string, string> = {
+      first_name: escapeHtml(firstName),
+      app_url: escapeHtml(appUrl),
+      cta_button: ctaButton('Add Your First Monitor \u2192', `${appUrl}/dashboard`),
+    }
+    subject = replaceVariables(dbResult.template.subject, vars)
+    html = nurtureBaseTemplate(replaceVariables(dbResult.template.body_html, vars), userId)
+  } else {
+    subject = 'Your first monitor is 30 seconds away'
+    html = nurtureBaseTemplate(`
     <h1 style="margin:0 0 16px;font-size:22px;color:#111827;font-weight:700;">Welcome to Uptrue, ${escapeHtml(firstName)}!</h1>
     <p style="margin:0 0 16px;font-size:15px;color:#374151;line-height:1.6;">
       Your account is ready. Setting up your first monitor takes about 30 seconds &mdash;
@@ -191,15 +253,12 @@ export async function sendWelcomeEmail(
     </p>
     ${ctaButton('Add Your First Monitor \u2192', `${appUrl}/dashboard`)}
   `, userId)
+  }
 
-  const result = await sendEmail(
-    userEmail,
-    'Your first monitor is 30 seconds away',
-    html
-  )
+  const result = await sendEmail(userEmail, subject, html)
 
   if (result.success) {
-    await recordEmailSend(userId, config.key)
+    await recordSendWithDbTracking(userId, config.key)
     logger.info('Welcome email sent', { userId })
   }
 
@@ -232,11 +291,31 @@ export async function sendTrialEndingEmail(
   const firstName = userName.split(' ')[0] || 'there'
 
   const urgencyWord = daysLeft === 0 ? 'today' : `in ${daysLeft} day${daysLeft === 1 ? '' : 's'}`
-  const subject = daysLeft === 0
-    ? 'Your Builder trial ends today'
-    : `Your Builder trial ends in ${daysLeft} days`
 
-  const html = nurtureBaseTemplate(`
+  // Check DB template first
+  const dbResult = await getDbTemplate(emailKey)
+  if (dbResult.found && !dbResult.active) {
+    return { success: true, skipped: true, reason: 'template_inactive' }
+  }
+
+  let subject: string
+  let html: string
+
+  if (dbResult.template) {
+    const vars: Record<string, string> = {
+      first_name: escapeHtml(firstName),
+      app_url: escapeHtml(appUrl),
+      days_left: String(daysLeft),
+      cta_button: ctaButton('Compare Plans \u2192', `${appUrl}/dashboard/settings`),
+    }
+    subject = replaceVariables(dbResult.template.subject, vars)
+    html = nurtureBaseTemplate(replaceVariables(dbResult.template.body_html, vars), userId)
+  } else {
+    subject = daysLeft === 0
+      ? 'Your Builder trial ends today'
+      : `Your Builder trial ends in ${daysLeft} days`
+
+    html = nurtureBaseTemplate(`
     <h1 style="margin:0 0 16px;font-size:22px;color:#111827;font-weight:700;">
       ${escapeHtml(firstName)}, your trial ends ${escapeHtml(urgencyWord)}
     </h1>
@@ -283,11 +362,12 @@ export async function sendTrialEndingEmail(
     </p>
     ${ctaButton('Compare Plans \u2192', `${appUrl}/dashboard/settings`)}
   `, userId)
+  }
 
   const result = await sendEmail(userEmail, subject, html)
 
   if (result.success) {
-    await recordEmailSend(userId, config.key)
+    await recordSendWithDbTracking(userId, config.key)
     logger.info('Trial ending email sent', { userId, daysLeft })
   }
 
@@ -313,7 +393,26 @@ export async function sendWelcomeToFreeEmail(
   const appUrl = getAppUrl()
   const firstName = userName.split(' ')[0] || 'there'
 
-  const html = nurtureBaseTemplate(`
+  // Check DB template first
+  const dbResult = await getDbTemplate(EMAIL_KEYS.WELCOME_TO_FREE)
+  if (dbResult.found && !dbResult.active) {
+    return { success: true, skipped: true, reason: 'template_inactive' }
+  }
+
+  let subject: string
+  let html: string
+
+  if (dbResult.template) {
+    const vars: Record<string, string> = {
+      first_name: escapeHtml(firstName),
+      app_url: escapeHtml(appUrl),
+      cta_button: ctaButton('Upgrade Your Plan \u2192', `${appUrl}/dashboard/settings`),
+    }
+    subject = replaceVariables(dbResult.template.subject, vars)
+    html = nurtureBaseTemplate(replaceVariables(dbResult.template.body_html, vars), userId)
+  } else {
+    subject = "You're on Free \u2014 here's what you've got"
+    html = nurtureBaseTemplate(`
     <h1 style="margin:0 0 16px;font-size:22px;color:#111827;font-weight:700;">
       You're on the Free plan now, ${escapeHtml(firstName)}
     </h1>
@@ -336,15 +435,12 @@ export async function sendWelcomeToFreeEmail(
     </p>
     ${ctaButton('Upgrade Your Plan \u2192', `${appUrl}/dashboard/settings`)}
   `, userId)
+  }
 
-  const result = await sendEmail(
-    userEmail,
-    "You're on Free \u2014 here's what you've got",
-    html
-  )
+  const result = await sendEmail(userEmail, subject, html)
 
   if (result.success) {
-    await recordEmailSend(userId, config.key)
+    await recordSendWithDbTracking(userId, config.key)
     logger.info('Welcome to free email sent', { userId })
   }
 
@@ -384,47 +480,63 @@ export async function sendMonthlyDigest(
   const monthName = now.toLocaleString('en-GB', { month: 'long', year: 'numeric' })
 
   const totalChecksFormatted = stats.totalChecks.toLocaleString('en-GB')
-  const subject = `${monthName} report: ${totalChecksFormatted} checks, ${stats.uptimePercent}% uptime`
 
-  const html = nurtureBaseTemplate(`
+  // Build performance note
+  const performanceNote = stats.uptimePercent >= 99.9
+    ? `<p style="margin:0 0 16px;font-size:14px;color:#16a34a;line-height:1.6;font-weight:500;">Excellent! Your infrastructure maintained ${stats.uptimePercent}% uptime this month.</p>`
+    : stats.uptimePercent >= 99
+      ? `<p style="margin:0 0 16px;font-size:14px;color:#f59e0b;line-height:1.6;font-weight:500;">Good performance. Consider reviewing the ${stats.incidentCount} incident${stats.incidentCount === 1 ? '' : 's'} that occurred.</p>`
+      : `<p style="margin:0 0 16px;font-size:14px;color:#dc2626;line-height:1.6;font-weight:500;">Your uptime was below 99% this month. We recommend reviewing your incidents and monitor configuration.</p>`
+
+  // Build stats table
+  const statsTable = `<table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;margin-bottom:24px;border-collapse:collapse;">
+    <tr>${statCell('Monitors', String(stats.totalMonitors))}${statCell('Total Checks', totalChecksFormatted)}</tr>
+    <tr>${statCell('Uptime', `${stats.uptimePercent}%`)}${statCell('Incidents', String(stats.incidentCount))}</tr>
+    </table>`
+
+  // Check DB template first
+  const dbResult = await getDbTemplate(EMAIL_KEYS.MONTHLY_DIGEST)
+  if (dbResult.found && !dbResult.active) {
+    return { success: true, skipped: true, reason: 'template_inactive' }
+  }
+
+  let subject: string
+  let html: string
+
+  if (dbResult.template) {
+    const vars: Record<string, string> = {
+      first_name: escapeHtml(firstName),
+      app_url: escapeHtml(appUrl),
+      month_name: escapeHtml(monthName),
+      total_monitors: String(stats.totalMonitors),
+      total_checks: totalChecksFormatted,
+      uptime_percent: String(stats.uptimePercent),
+      incident_count: String(stats.incidentCount),
+      stats_table: statsTable,
+      performance_note: performanceNote,
+      cta_button: ctaButton('View Dashboard \u2192', `${appUrl}/dashboard`),
+    }
+    subject = replaceVariables(dbResult.template.subject, vars)
+    html = nurtureBaseTemplate(replaceVariables(dbResult.template.body_html, vars), userId)
+  } else {
+    subject = `${monthName} report: ${totalChecksFormatted} checks, ${stats.uptimePercent}% uptime`
+    html = nurtureBaseTemplate(`
     <h1 style="margin:0 0 8px;font-size:22px;color:#111827;font-weight:700;">
       Your ${escapeHtml(monthName)} Report
     </h1>
     <p style="margin:0 0 24px;font-size:15px;color:#6b7280;line-height:1.6;">
       Hi ${escapeHtml(firstName)}, here's how your infrastructure performed this month.
     </p>
-
-    <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;margin-bottom:24px;border-collapse:collapse;">
-    <tr>
-      ${statCell('Monitors', String(stats.totalMonitors))}
-      ${statCell('Total Checks', totalChecksFormatted)}
-    </tr>
-    <tr>
-      ${statCell('Uptime', `${stats.uptimePercent}%`)}
-      ${statCell('Incidents', String(stats.incidentCount))}
-    </tr>
-    </table>
-
-    ${stats.uptimePercent >= 99.9
-      ? `<p style="margin:0 0 16px;font-size:14px;color:#16a34a;line-height:1.6;font-weight:500;">
-          Excellent! Your infrastructure maintained ${stats.uptimePercent}% uptime this month.
-        </p>`
-      : stats.uptimePercent >= 99
-        ? `<p style="margin:0 0 16px;font-size:14px;color:#f59e0b;line-height:1.6;font-weight:500;">
-            Good performance. Consider reviewing the ${stats.incidentCount} incident${stats.incidentCount === 1 ? '' : 's'} that occurred.
-          </p>`
-        : `<p style="margin:0 0 16px;font-size:14px;color:#dc2626;line-height:1.6;font-weight:500;">
-            Your uptime was below 99% this month. We recommend reviewing your incidents and monitor configuration.
-          </p>`
-    }
-
+    ${statsTable}
+    ${performanceNote}
     ${ctaButton('View Dashboard \u2192', `${appUrl}/dashboard`)}
   `, userId)
+  }
 
   const result = await sendEmail(userEmail, subject, html)
 
   if (result.success) {
-    await recordEmailSend(userId, emailKey)
+    await recordSendWithDbTracking(userId, emailKey)
     logger.info('Monthly digest sent', { userId, month: monthKey })
   }
 
