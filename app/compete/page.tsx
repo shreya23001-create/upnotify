@@ -548,7 +548,7 @@ export default function CompeteLandingPage(): React.ReactElement {
                 </li>
               </ul>
               <a href="/signup" className="btn btn-primary btn-lg">
-                Start Your Free Trial
+                Get Started Free
               </a>
             </div>
             <div className="agency-visual">
@@ -874,7 +874,7 @@ export default function CompeteLandingPage(): React.ReactElement {
             Start tracking competitor prices today
           </h2>
           <p className="cta-subtitle">
-            Add Compete to any paid monitoring plan. No credit card required for your monitoring trial.
+            Add Compete to any paid monitoring plan. Start with our Free monitoring plan, upgrade anytime.
           </p>
           <a href="/signup" className="btn btn-primary btn-lg">
             Start Tracking

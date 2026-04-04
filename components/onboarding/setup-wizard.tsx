@@ -457,7 +457,7 @@ export function SetupWizard({ onComplete }: SetupWizardProps): React.ReactElemen
               </div>
 
               <p className="wizard-trial-note">
-                You&apos;re on a 14-day Builder trial — explore all features free.
+                You&apos;re on the Free plan. Upgrade anytime from Settings &gt; Billing.
               </p>
 
               <div className="wizard-actions">

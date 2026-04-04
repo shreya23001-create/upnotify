@@ -9,7 +9,7 @@ import { Sidebar } from '@/components/dashboard/sidebar'
 import { Header } from '@/components/dashboard/header'
 import { EnvironmentBanner } from '@/components/dashboard/environment-banner'
 import { ImpersonationBanner } from '@/components/admin/impersonation-banner'
-import { TrialBanner } from '@/components/dashboard/trial-banner'
+// Trial removed — no free trials, we have Free + low-cost Lite plan instead
 import { Breadcrumbs } from '@/components/ui/breadcrumbs'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -24,9 +24,6 @@ export default async function DashboardLayout({ children }: { children: React.Re
     getSubscriptionWithPlan(organisation.id),
   ])
 
-  const isTrialing = subWithPlan?.subscription?.status === 'trialing'
-  const trialEndsAt = subWithPlan?.subscription?.trial_ends_at ?? null
-
   return (
     <Providers user={user} organisation={organisation} workspaces={workspaces}>
       <div className="app-shell">
@@ -35,9 +32,6 @@ export default async function DashboardLayout({ children }: { children: React.Re
           {isImpersonating && <ImpersonationBanner userEmail={user.email} />}
           <Header />
           <EnvironmentBanner />
-          {isTrialing && trialEndsAt && subWithPlan?.plan && (
-            <TrialBanner trialEndsAt={trialEndsAt} planName={subWithPlan.plan.name} />
-          )}
           <Breadcrumbs />
           <main className="main-content">{children}</main>
         </div>
