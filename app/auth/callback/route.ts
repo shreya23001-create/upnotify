@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
 import { checkRateLimit, AUTH_RATE_LIMIT } from '@/lib/utils/rate-limiter'
-import { createTrialSubscription } from '@/lib/db/subscriptions'
+// Trial removed — users start on Free plan
 import { recordReferralSignup } from '@/lib/db/referrals'
 import { acceptTeamInvite } from '@/lib/db/team'
 
@@ -104,7 +104,7 @@ export async function GET(request: Request): Promise<NextResponse> {
             })
           }
         } else {
-          // New user with no invite: create trial subscription
+          // New user with no invite: start on Free plan (no trial)
           const { data: dbUser } = await adminClient
             .from('users')
             .select('id, org_id')
@@ -112,8 +112,7 @@ export async function GET(request: Request): Promise<NextResponse> {
             .single()
 
           if (dbUser) {
-            // Create 14-day Builder trial (reverse trial)
-            await createTrialSubscription(dbUser.org_id)
+            // No trial subscription created — user starts on Free plan
 
             // Record referral if ref code present
             if (refCode && refCode.length > 0) {
