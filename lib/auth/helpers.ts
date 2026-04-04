@@ -19,6 +19,7 @@ const PUBLIC_ROUTES: ReadonlyArray<string> = [
   '/refund-policy',
   '/gdpr',
   '/ai-disclaimer',
+  '/automated-pricing-policy',
   '/sla',
   '/subprocessors',
   '/security',

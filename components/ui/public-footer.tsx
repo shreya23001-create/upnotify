@@ -53,6 +53,7 @@ export function PublicFooter(): React.ReactElement {
             <Link href="/refund-policy">Refund Policy</Link>
             <Link href="/gdpr">GDPR Compliance</Link>
             <Link href="/ai-disclaimer">AI Disclaimer</Link>
+            <Link href="/automated-pricing-policy">Automated Pricing Policy</Link>
             <Link href="/sla">SLA</Link>
             <Link href="/subprocessors">Sub-processors</Link>
             <Link href="/security">Security</Link>

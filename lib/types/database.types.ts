@@ -1981,6 +1981,24 @@ export type Database = {
           webhook_url: string | null
           is_active: boolean
           created_at: string
+          watch_product_id: string | null
+          my_product_id: string | null
+          trigger_type: string
+          trigger_threshold_pct: number
+          response_action: string
+          response_adjust_pct: number
+          response_adjust_direction: string
+          safety_min_price_pence: number | null
+          safety_max_price_pence: number | null
+          safety_max_change_pct: number
+          safety_max_changes_per_day: number
+          auto_update_enabled: boolean
+          auto_update_confirmed_at: string | null
+          webhook_secret: string | null
+          alert_channels: Json
+          last_triggered_at: string | null
+          trigger_count: number
+          updated_at: string
         }
         Insert: {
           id?: string
@@ -1993,18 +2011,42 @@ export type Database = {
           webhook_url?: string | null
           is_active?: boolean
           created_at?: string
+          watch_product_id?: string | null
+          my_product_id?: string | null
+          trigger_type?: string
+          trigger_threshold_pct?: number
+          response_action?: string
+          response_adjust_pct?: number
+          response_adjust_direction?: string
+          safety_min_price_pence?: number | null
+          safety_max_price_pence?: number | null
+          safety_max_change_pct?: number
+          safety_max_changes_per_day?: number
+          auto_update_enabled?: boolean
+          auto_update_confirmed_at?: string | null
+          webhook_secret?: string | null
+          alert_channels?: Json
         }
         Update: {
-          id?: string
-          org_id?: string
-          product_group_id?: string | null
           rule_name?: string
-          rule_type?: string
-          condition?: Json
-          action_type?: string
+          trigger_type?: string
+          trigger_threshold_pct?: number
+          response_action?: string
+          response_adjust_pct?: number
+          response_adjust_direction?: string
+          safety_min_price_pence?: number | null
+          safety_max_price_pence?: number | null
+          safety_max_change_pct?: number
+          safety_max_changes_per_day?: number
+          auto_update_enabled?: boolean
+          auto_update_confirmed_at?: string | null
           webhook_url?: string | null
+          webhook_secret?: string | null
+          alert_channels?: Json
           is_active?: boolean
-          created_at?: string
+          last_triggered_at?: string | null
+          trigger_count?: number
+          updated_at?: string
         }
         Relationships: [
           {
@@ -2022,6 +2064,37 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      pricing_rule_executions: {
+        Row: {
+          id: string
+          org_id: string
+          rule_id: string
+          watch_product_id: string | null
+          old_price_pence: number | null
+          new_price_pence: number | null
+          competitor_price_pence: number | null
+          action_taken: string
+          webhook_response_code: number | null
+          webhook_response_body: string | null
+          details: Json
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          org_id: string
+          rule_id: string
+          watch_product_id?: string | null
+          old_price_pence?: number | null
+          new_price_pence?: number | null
+          competitor_price_pence?: number | null
+          action_taken: string
+          webhook_response_code?: number | null
+          webhook_response_body?: string | null
+          details?: Json
+        }
+        Update: {}
+        Relationships: []
       }
       user_messages: {
         Row: {
