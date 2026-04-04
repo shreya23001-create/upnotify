@@ -75,11 +75,11 @@ export async function POST(request: Request): Promise<NextResponse> {
       )
     }
 
-    const requestOrigin = new URL(request.url).origin
-    const config = getConfig()
-    const appUrl = config.app.url !== 'http://localhost:3000' ? config.app.url : requestOrigin
+    const appUrl = new URL(request.url).origin
     const stripe = getStripe()
     const customerId = await ensureStripeCustomer(org.id, user.email, org.name)
+
+    logger.info('Creating checkout session', { appUrl, stripePriceId, customerId, orgId: org.id, planSlug: plan.slug })
 
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
