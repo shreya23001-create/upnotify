@@ -33,6 +33,8 @@ function formatTimeAgo(dateStr: string | null): string {
   return `${Math.floor(hours / 24)}d ago`
 }
 
+const PAGE_SIZE = 25
+
 export function TrackerManager({ monitors }: TrackerManagerProps): React.ReactElement {
   const [showAdd, setShowAdd] = useState(false)
   const [editing, setEditing] = useState<EditingMonitor>(null)
@@ -41,6 +43,7 @@ export function TrackerManager({ monitors }: TrackerManagerProps): React.ReactEl
   const [success, setSuccess] = useState<string | null>(null)
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
   const [filter, setFilter] = useState('')
+  const [page, setPage] = useState(1)
 
   const clearMessages = useCallback((): void => {
     setError(null)
@@ -102,6 +105,15 @@ export function TrackerManager({ monitors }: TrackerManagerProps): React.ReactEl
       )
     : monitors
 
+  const totalPages = Math.ceil(filteredMonitors.length / PAGE_SIZE)
+  const paginatedMonitors = filteredMonitors.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
+
+  // Reset to page 1 when filter changes
+  const handleFilterChange = (value: string): void => {
+    setFilter(value)
+    setPage(1)
+  }
+
   return (
     <div>
       {error && <div className="form-error">{error}</div>}
@@ -113,7 +125,7 @@ export function TrackerManager({ monitors }: TrackerManagerProps): React.ReactEl
           className="form-input"
           placeholder="Filter by domain, name, or category..."
           value={filter}
-          onChange={(e) => setFilter(e.target.value)}
+          onChange={(e) => handleFilterChange(e.target.value)}
           style={{ maxWidth: 320 }}
         />
         <button
@@ -170,7 +182,7 @@ export function TrackerManager({ monitors }: TrackerManagerProps): React.ReactEl
             </tr>
           </thead>
           <tbody>
-            {filteredMonitors.map(m => (
+            {paginatedMonitors.map(m => (
               <tr key={m.id}>
                 <td>
                   <span style={{ fontWeight: 600 }}>{m.display_name}</span>
@@ -247,7 +259,7 @@ export function TrackerManager({ monitors }: TrackerManagerProps): React.ReactEl
                 </td>
               </tr>
             ))}
-            {filteredMonitors.length === 0 && (
+            {paginatedMonitors.length === 0 && (
               <tr>
                 <td colSpan={7} style={{ textAlign: 'center', color: 'var(--text-muted)', padding: 32 }}>
                   {filter ? 'No sites match your filter.' : 'No tracked sites yet. Add one above.'}
@@ -257,6 +269,34 @@ export function TrackerManager({ monitors }: TrackerManagerProps): React.ReactEl
           </tbody>
         </table>
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 16, fontSize: 13 }}>
+          <span style={{ color: 'var(--text-muted)' }}>
+            Showing {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filteredMonitors.length)} of {filteredMonitors.length} sites
+          </span>
+          <div style={{ display: 'flex', gap: 6 }}>
+            <button
+              className="btn btn-secondary btn-sm"
+              disabled={page <= 1}
+              onClick={() => setPage(p => p - 1)}
+            >
+              Previous
+            </button>
+            <span style={{ padding: '6px 12px', color: 'var(--text-secondary)' }}>
+              Page {page} of {totalPages}
+            </span>
+            <button
+              className="btn btn-secondary btn-sm"
+              disabled={page >= totalPages}
+              onClick={() => setPage(p => p + 1)}
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Edit Modal */}
       {editing && (

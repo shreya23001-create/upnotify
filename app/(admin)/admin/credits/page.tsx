@@ -15,7 +15,8 @@ interface Submission {
   reviewed_at: string | null
   credit_amount_pence: number
   created_at: string
-  users?: { email: string; full_name: string | null }
+  user_email?: string
+  user_name?: string
 }
 
 interface Stats {
@@ -164,7 +165,7 @@ export default function AdminCreditsPage(): React.ReactElement {
                   {filtered.map((s) => (
                     <tr key={s.id}>
                       <td>
-                        <div style={{ fontSize: 13 }}>{(s as unknown as Record<string, unknown>).users ? ((s as unknown as Record<string, unknown>).users as { email: string }).email : s.user_id.slice(0, 8)}</div>
+                        <div style={{ fontSize: 13 }}>{s.user_email ?? s.user_id.slice(0, 8)}</div>
                       </td>
                       <td>
                         <span className="badge badge-outline">{formatType(s.credit_type)}</span>

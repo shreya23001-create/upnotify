@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react'
 import type { Plan, CreditRule } from '@/lib/types'
+import type { CompetePlan } from '@/lib/db/compete-plans'
 import {
   updatePlanAction,
   togglePlanVisibilityAction,
@@ -13,6 +14,7 @@ interface PlansManagerProps {
   plans: Plan[]
   creditRules: CreditRule[]
   subscriberCounts: Record<string, number>
+  competePlans: CompetePlan[]
 }
 
 type EditingPlan = Plan | null
@@ -24,8 +26,8 @@ function formatCurrency(pence: number | null | undefined, symbol: string): strin
   return `${symbol}${(pence / 100).toFixed(2)}`
 }
 
-export function PlansManager({ plans, creditRules, subscriberCounts }: PlansManagerProps): React.ReactElement {
-  const [tab, setTab] = useState<'plans' | 'credits'>('plans')
+export function PlansManager({ plans, creditRules, subscriberCounts, competePlans }: PlansManagerProps): React.ReactElement {
+  const [tab, setTab] = useState<'plans' | 'compete' | 'credits'>('plans')
   const [editingPlan, setEditingPlan] = useState<EditingPlan>(null)
   const [editingRule, setEditingRule] = useState<EditingCreditRule>(null)
   const [saving, setSaving] = useState(false)
@@ -94,6 +96,12 @@ export function PlansManager({ plans, creditRules, subscriberCounts }: PlansMana
           onClick={() => { setTab('plans'); clearMessages() }}
         >
           Plans ({plans.length})
+        </button>
+        <button
+          className={`tab-trigger${tab === 'compete' ? ' active' : ''}`}
+          onClick={() => { setTab('compete'); clearMessages() }}
+        >
+          Compete Add-on ({competePlans.length})
         </button>
         <button
           className={`tab-trigger${tab === 'credits' ? ' active' : ''}`}
@@ -199,6 +207,64 @@ export function PlansManager({ plans, creditRules, subscriberCounts }: PlansMana
               </table>
             </div>
           </div>
+        </div>
+      )}
+
+      {tab === 'compete' && (
+        <div>
+          <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 16 }}>
+            Compete is a separate add-on. Users purchase it alongside their base monitoring plan.
+          </p>
+          <div className="plans-table-wrapper">
+            <table className="plans-table">
+              <thead>
+                <tr>
+                  <th>Plan</th>
+                  <th>Slug</th>
+                  <th>Monthly</th>
+                  <th>Yearly</th>
+                  <th>Products</th>
+                  <th>Max Extra</th>
+                  <th>Extra Price</th>
+                  <th>Nudge To</th>
+                  <th>Stripe Product</th>
+                  <th>Active</th>
+                </tr>
+              </thead>
+              <tbody>
+                {competePlans.map((cp) => (
+                  <tr key={cp.id}>
+                    <td style={{ fontWeight: 600 }}>{cp.name}</td>
+                    <td><code style={{ fontSize: 11 }}>{cp.slug}</code></td>
+                    <td>{formatCurrency(cp.price_monthly_pence, '\u00A3')}</td>
+                    <td>{cp.has_yearly_discount ? formatCurrency(cp.price_yearly_pence, '\u00A3') : '\u2014'}</td>
+                    <td>{cp.product_limit.toLocaleString()}</td>
+                    <td>{cp.max_extra_products}</td>
+                    <td>{formatCurrency(cp.extra_product_price_pence, '\u00A3')}/ea</td>
+                    <td>{cp.nudge_to_slug ?? '\u2014'}</td>
+                    <td>
+                      {cp.stripe_product_id ? (
+                        <span className="badge badge-success" title={cp.stripe_product_id}>Connected</span>
+                      ) : (
+                        <span className="badge badge-danger">Not Set</span>
+                      )}
+                    </td>
+                    <td>
+                      {cp.is_active ? (
+                        <span className="badge badge-success">Active</span>
+                      ) : (
+                        <span className="badge badge-outline">Hidden</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 12 }}>
+            To edit Compete plans, update the <code>compete_plans</code> table in Supabase directly.
+            Admin editing UI coming soon.
+          </p>
         </div>
       )}
 

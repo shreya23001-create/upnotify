@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createSubmission, getUserSubmissions } from '@/lib/db/credit-submissions'
 import { getCurrentUser } from '@/lib/db/users'
+import { sendAlertEmail } from '@/lib/services/email'
+import { getServerConfig } from '@/lib/utils/config'
+import { logger } from '@/lib/utils/logger'
 
 export const dynamic = 'force-dynamic'
 
@@ -68,6 +71,25 @@ export async function POST(request: Request): Promise<NextResponse> {
 
   if (!submission) {
     return NextResponse.json({ error: 'Failed to create submission' }, { status: 500 })
+  }
+
+  // Notify admin via email
+  try {
+    const config = getServerConfig()
+    const adminEmails = (process.env.ADMIN_EMAILS || '').split(',').map(e => e.trim()).filter(Boolean)
+    const creditType = body.creditType.replace(/_/g, ' ')
+
+    for (const adminEmail of adminEmails) {
+      await sendAlertEmail({
+        to: adminEmail,
+        subject: `[Uptrue] New credit submission: ${creditType}`,
+        body: `A user has submitted a credit request.\n\nType: ${creditType}\nUser: ${user.email}\nURL: ${body.submissionUrl || 'N/A'}\nAmount: \u00A3${(creditAmount / 100).toFixed(2)}\n\nReview it at: ${config.app.url}/admin/credits`,
+      })
+    }
+  } catch (err) {
+    logger.warn('Failed to send admin credit notification email', {
+      error: err instanceof Error ? err.message : 'Unknown',
+    })
   }
 
   return NextResponse.json({ success: true, submission })

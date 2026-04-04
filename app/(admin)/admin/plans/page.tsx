@@ -1,12 +1,14 @@
 import { getAllPlans, getSubscriberCountsByPlan } from '@/lib/db/plans'
 import { getAllCreditRules } from '@/lib/db/credit-rules'
+import { getAllCompetePlansAdmin } from '@/lib/db/compete-plans'
 import { PlansManager } from '@/components/admin/plans-manager'
 
 export default async function AdminPlansPage(): Promise<React.ReactElement> {
-  const [plans, creditRules, subscriberCounts] = await Promise.all([
+  const [plans, creditRules, subscriberCounts, competePlans] = await Promise.all([
     getAllPlans(),
     getAllCreditRules(),
     getSubscriberCountsByPlan(),
+    getAllCompetePlansAdmin(),
   ])
 
   return (
@@ -27,6 +29,7 @@ export default async function AdminPlansPage(): Promise<React.ReactElement> {
         plans={plans}
         creditRules={creditRules}
         subscriberCounts={subscriberCounts}
+        competePlans={competePlans}
       />
     </div>
   )

@@ -12,7 +12,8 @@ export default async function AdminFeatureFlagsPage(): Promise<React.ReactElemen
         <div>
           <h1 className="admin-page-title">Feature Flags</h1>
           <p className="admin-page-subtitle">
-            Toggle features on and off across the platform.
+            Control which features are visible to users. Turn features on or off instantly without
+            deploying code — useful for gradual rollouts, maintenance, or disabling broken features.
           </p>
         </div>
         <div className="admin-page-header-stat">

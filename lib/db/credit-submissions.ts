@@ -58,30 +58,48 @@ export async function createSubmission(params: {
 
 // ---------- Admin functions ----------
 
-export async function getAllPendingSubmissions(): Promise<CreditSubmission[]> {
+async function enrichWithUserEmails(submissions: CreditSubmission[]): Promise<(CreditSubmission & { user_email?: string; user_name?: string })[]> {
+  if (submissions.length === 0) return []
+  const supabase = createAdminClient()
+
+  const userIds = [...new Set(submissions.map(s => s.user_id))]
+  const { data: users } = await supabase
+    .from('users')
+    .select('id, email, full_name')
+    .in('id', userIds)
+
+  const userMap = new Map((users ?? []).map(u => [u.id, u]))
+
+  return submissions.map(s => {
+    const user = userMap.get(s.user_id)
+    return { ...s, user_email: user?.email ?? undefined, user_name: user?.full_name ?? undefined }
+  })
+}
+
+export async function getAllPendingSubmissions(): Promise<(CreditSubmission & { user_email?: string; user_name?: string })[]> {
   const supabase = createAdminClient()
 
   const { data, error } = await supabase
     .from('credit_submissions')
-    .select('*, users!inner(email, full_name)')
+    .select('*')
     .eq('status', 'pending')
     .order('created_at', { ascending: true })
 
   if (error) return []
-  return (data ?? []) as CreditSubmission[]
+  return enrichWithUserEmails((data ?? []) as CreditSubmission[])
 }
 
-export async function getAllSubmissions(limit = 100): Promise<CreditSubmission[]> {
+export async function getAllSubmissions(limit = 100): Promise<(CreditSubmission & { user_email?: string; user_name?: string })[]> {
   const supabase = createAdminClient()
 
   const { data, error } = await supabase
     .from('credit_submissions')
-    .select('*, users!inner(email, full_name)')
+    .select('*')
     .order('created_at', { ascending: false })
     .limit(limit)
 
   if (error) return []
-  return (data ?? []) as CreditSubmission[]
+  return enrichWithUserEmails((data ?? []) as CreditSubmission[])
 }
 
 export async function getSubmissionStats(): Promise<{

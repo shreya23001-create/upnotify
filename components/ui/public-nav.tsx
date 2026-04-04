@@ -30,6 +30,7 @@ export function PublicNav(): React.ReactElement {
           <Link href="/score">Score <sup className="nav-free-tag">Free</sup></Link>
           <Link href="/tracker">Tracker <sup className="nav-free-tag">Free</sup></Link>
           <Link href="/tools">Tools <sup className="nav-free-tag">Free</sup></Link>
+          <Link href="/compete">Compete</Link>
           <Link href="/leaderboard">Leaderboard</Link>
           <Link href="/blog">Blog</Link>
         </div>

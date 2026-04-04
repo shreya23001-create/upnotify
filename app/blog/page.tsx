@@ -400,6 +400,51 @@ const BLOG_POSTS: BlogPostMeta[] = [
     readTime: '11 min read',
     category: 'Guide',
   },
+  {
+    slug: 'cheap-hosting-hidden-costs',
+    title: 'Why Cheap Hosting Is the Most Expensive Mistake You Can Make',
+    excerpt:
+      'Shared hosting overselling, CPU throttling, noisy neighbours, and the hidden costs of downtime. That 3 pound per month hosting plan is costing you thousands in lost revenue, damaged SEO, and customers who never come back.',
+    date: '12 March 2026',
+    readTime: '13 min read',
+    category: 'Hosting',
+  },
+  {
+    slug: 'budget-hosting-outages',
+    title: 'GoDaddy Down Again? Why Budget Hosts Have the Most Outages',
+    excerpt:
+      'GoDaddy, Bluehost, and HostGator dominate shared hosting — and hosting forums. Real complaints from real users reveal a pattern of overselling, poor support, and outages that never make the news.',
+    date: '16 March 2026',
+    readTime: '14 min read',
+    category: 'Hosting',
+  },
+  {
+    slug: 'hosting-wont-tell-you-slow',
+    title: 'Your Hosting Provider Won\'t Tell You When Your Site Is Slow',
+    excerpt:
+      'Your hosting provider monitors their server, not your website. TTFB spikes, shared resource contention, and CPU throttling happen silently. The only way to know what your visitors experience is external monitoring.',
+    date: '22 March 2026',
+    readTime: '13 min read',
+    category: 'Hosting',
+  },
+  {
+    slug: 'server-migration-checklist',
+    title: 'Server Migration Checklist: How to Move Hosts Without Losing Your Site',
+    excerpt:
+      'DNS propagation, SSL certificate transfer, database migration, email continuity, and monitoring during the switch. The complete step-by-step checklist for moving hosting providers without downtime or data loss.',
+    date: '28 March 2026',
+    readTime: '15 min read',
+    category: 'Hosting',
+  },
+  {
+    slug: 'cdn-vs-better-hosting',
+    title: 'CDN vs Better Hosting: What Actually Makes Your Site Faster?',
+    excerpt:
+      'Someone says "just add Cloudflare." Someone else says "upgrade your hosting." They solve different problems. Learn when a CDN helps, when you need better hosting, and how to diagnose which one your site actually needs.',
+    date: '2 April 2026',
+    readTime: '14 min read',
+    category: 'Hosting',
+  },
 ]
 
 const POSTS_PER_PAGE = 6
