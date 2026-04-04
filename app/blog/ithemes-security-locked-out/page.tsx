@@ -77,7 +77,7 @@ export default function IthemesSecurityLockedOutPage(): React.ReactElement {
       <header className="blog-article-header">
         <div className="blog-article-meta-top">
           <span className="blog-post-category">WordPress</span>
-          <span>220 March 2026</span>
+          <span>3 April 2026</span>
           <span>15 min read</span>
         </div>
         <h1 className="blog-article-title">iThemes Security Locked Me Out of WordPress: How to Regain Access and Prevent It</h1>

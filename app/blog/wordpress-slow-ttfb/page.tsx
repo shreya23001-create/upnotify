@@ -77,7 +77,7 @@ export default function WordPressSlowTtfbPage(): React.ReactElement {
       <header className="blog-article-header">
         <div className="blog-article-meta-top">
           <span className="blog-post-category">WordPress</span>
-          <span>123 March 2026</span>
+          <span>1 April 2026</span>
           <span>14 min read</span>
         </div>
         <h1 className="blog-article-title">WordPress TTFB Over 3 Seconds: Why Your Site Feels Dead Even When It&apos;s Technically Up</h1>

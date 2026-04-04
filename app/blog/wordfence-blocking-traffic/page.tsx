@@ -77,7 +77,7 @@ export default function WordfenceBlockingTrafficPage(): React.ReactElement {
       <header className="blog-article-header">
         <div className="blog-article-meta-top">
           <span className="blog-post-category">WordPress</span>
-          <span>126 March 2026</span>
+          <span>2 April 2026</span>
           <span>15 min read</span>
         </div>
         <h1 className="blog-article-title">Wordfence Blocking Real Users: When Your Security Plugin Becomes Your Biggest Problem</h1>

@@ -77,7 +77,7 @@ export default function UpdraftPlusBackupFailedPage(): React.ReactElement {
       <header className="blog-article-header">
         <div className="blog-article-meta-top">
           <span className="blog-post-category">WordPress</span>
-          <span>122 March 2026</span>
+          <span>1 April 2026</span>
           <span>14 min read</span>
         </div>
         <h1 className="blog-article-title">UpdraftPlus Backup Failed: When Your Safety Net Has a Hole in It</h1>

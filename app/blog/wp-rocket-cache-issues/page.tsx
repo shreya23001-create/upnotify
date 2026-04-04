@@ -77,7 +77,7 @@ export default function WpRocketCacheIssuesPage(): React.ReactElement {
       <header className="blog-article-header">
         <div className="blog-article-meta-top">
           <span className="blog-post-category">WordPress</span>
-          <span>120 March 2026</span>
+          <span>30 March 2026</span>
           <span>14 min read</span>
         </div>
         <h1 className="blog-article-title">WP Rocket Cache Serving Stale Pages: Why Your Updates Aren&apos;t Showing to Visitors</h1>

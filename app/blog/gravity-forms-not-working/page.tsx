@@ -77,7 +77,7 @@ export default function GravityFormsNotWorkingPage(): React.ReactElement {
       <header className="blog-article-header">
         <div className="blog-article-meta-top">
           <span className="blog-post-category">WordPress</span>
-          <span>125 March 2026</span>
+          <span>2 April 2026</span>
           <span>14 min read</span>
         </div>
         <h1 className="blog-article-title">Gravity Forms Conditional Logic Not Working: Why Your Forms Are Broken After Update</h1>

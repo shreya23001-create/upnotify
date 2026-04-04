@@ -77,7 +77,7 @@ export default function WordPressRedirectLoopPage(): React.ReactElement {
       <header className="blog-article-header">
         <div className="blog-article-meta-top">
           <span className="blog-post-category">WordPress</span>
-          <span>27 March 2026</span>
+          <span>18 March 2026</span>
           <span>13 min read</span>
         </div>
         <h1 className="blog-article-title">WordPress Login Redirect Loop: Why wp-admin Keeps Sending You Back to the Login Page</h1>

@@ -77,7 +77,7 @@ export default function YoastSeoSitemap404Page(): React.ReactElement {
       <header className="blog-article-header">
         <div className="blog-article-meta-top">
           <span className="blog-post-category">WordPress</span>
-          <span>128 March 2026</span>
+          <span>3 April 2026</span>
           <span>14 min read</span>
         </div>
         <h1 className="blog-article-title">Yoast SEO Sitemap Returning 404: How This Quietly Tanks Your Google Rankings</h1>

@@ -77,7 +77,7 @@ export default function WordPressBruteForceAttackPage(): React.ReactElement {
       <header className="blog-article-header">
         <div className="blog-article-meta-top">
           <span className="blog-post-category">WordPress</span>
-          <span>127 March 2026</span>
+          <span>3 April 2026</span>
           <span>15 min read</span>
         </div>
         <h1 className="blog-article-title">WordPress Brute Force Attack Slowing Your Site: How Thousands of Login Attempts Cause Downtime</h1>

@@ -77,7 +77,7 @@ export default function WordPressXmlrpcAttackPage(): React.ReactElement {
       <header className="blog-article-header">
         <div className="blog-article-meta-top">
           <span className="blog-post-category">WordPress</span>
-          <span>223 March 2026</span>
+          <span>4 April 2026</span>
           <span>15 min read</span>
         </div>
         <h1 className="blog-article-title">WordPress XML-RPC Brute Force Attack: How Hackers Slow Down Your Site Without You Knowing</h1>

@@ -77,7 +77,7 @@ export default function WordPressSharedHostingSlowPage(): React.ReactElement {
       <header className="blog-article-header">
         <div className="blog-article-meta-top">
           <span className="blog-post-category">WordPress</span>
-          <span>220 March 2026</span>
+          <span>3 April 2026</span>
           <span>14 min read</span>
         </div>
         <h1 className="blog-article-title">WordPress Site Down on Shared Hosting: Why CPU Limits Are Throttling Your Site</h1>

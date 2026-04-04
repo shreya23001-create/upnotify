@@ -77,7 +77,7 @@ export default function WordPressMixedContentPage(): React.ReactElement {
       <header className="blog-article-header">
         <div className="blog-article-meta-top">
           <span className="blog-post-category">WordPress</span>
-          <span>222 March 2026</span>
+          <span>4 April 2026</span>
           <span>14 min read</span>
         </div>
         <h1 className="blog-article-title">WordPress Mixed Content Errors: Why Your Site Shows &quot;Not Secure&quot; After Installing SSL</h1>

@@ -77,7 +77,7 @@ export default function WordPressDatabaseConnectionErrorPage(): React.ReactEleme
       <header className="blog-article-header">
         <div className="blog-article-meta-top">
           <span className="blog-post-category">WordPress</span>
-          <span>25 March 2026</span>
+          <span>11 March 2026</span>
           <span>14 min read</span>
         </div>
         <h1 className="blog-article-title">Error Establishing a Database Connection in WordPress: Complete Fix and Monitoring Guide</h1>
