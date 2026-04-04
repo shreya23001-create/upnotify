@@ -42,10 +42,12 @@ export async function check(monitor: Monitor): Promise<CheckerResult> {
         // Check for chain issues (incomplete chain, self-signed intermediate, etc.)
         if (!authorized && authError) {
           let chainMessage = 'Certificate chain issue'
-          if (authError.includes('unable to verify the first certificate') || authError.includes('unable to get local issuer certificate')) {
+          if (authError.includes('unable to verify the first certificate') || authError.includes('unable to get local issuer certificate') || authError.includes('UNABLE_TO_VERIFY_LEAF_SIGNATURE')) {
             chainMessage = 'Incomplete certificate chain — intermediate CA certificate is missing'
-          } else if (authError.includes('self-signed')) {
+          } else if (authError.includes('self-signed') || authError.includes('DEPTH_ZERO_SELF_SIGNED_CERT')) {
             chainMessage = 'Self-signed certificate — not trusted by browsers'
+          } else if (authError.includes('CERT_HAS_EXPIRED')) {
+            chainMessage = 'SSL certificate has expired'
           }
 
           // Still report cert details but mark as degraded (cert exists but chain broken)

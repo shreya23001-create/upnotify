@@ -86,10 +86,12 @@ function checkSsl(hostname: string): Promise<SslCheckResponse> {
         // Build chain warning if applicable
         let chainWarning: string | undefined
         if (!authorized && authError) {
-          if (authError.includes('unable to verify the first certificate') || authError.includes('unable to get local issuer certificate')) {
-            chainWarning = 'Incomplete certificate chain — intermediate CA certificate is missing. Contact the site administrator.'
-          } else if (authError.includes('self-signed')) {
+          if (authError.includes('unable to verify the first certificate') || authError.includes('unable to get local issuer certificate') || authError.includes('UNABLE_TO_VERIFY_LEAF_SIGNATURE')) {
+            chainWarning = 'Incomplete certificate chain — the server is not sending the intermediate CA certificate. Browsers may show a security warning.'
+          } else if (authError.includes('self-signed') || authError.includes('DEPTH_ZERO_SELF_SIGNED_CERT')) {
             chainWarning = 'Self-signed certificate — not trusted by browsers.'
+          } else if (authError.includes('CERT_HAS_EXPIRED')) {
+            chainWarning = 'SSL certificate has expired.'
           } else {
             chainWarning = `Certificate chain issue: ${authError}`
           }

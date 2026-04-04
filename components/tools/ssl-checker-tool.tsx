@@ -25,7 +25,7 @@ function getRemedies(result: SslResult): string[] {
   const remedies: string[] = []
   const err = (result.errorMessage || '').toLowerCase()
 
-  if (err.includes('incomplete certificate chain') || err.includes('intermediate')) {
+  if (err.includes('incomplete certificate chain') || err.includes('intermediate') || err.includes('unable_to_verify_leaf') || err.includes('leaf_signature')) {
     remedies.push('The server is not sending the full certificate chain. Ask your hosting provider or system administrator to install the intermediate CA certificate.')
     remedies.push('If you use Apache, add the intermediate cert to SSLCertificateChainFile. For Nginx, concatenate it with your certificate file.')
     remedies.push('Test your chain at ssllabs.com/ssltest to confirm the fix.')
