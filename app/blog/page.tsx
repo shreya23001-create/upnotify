@@ -328,6 +328,33 @@ const BLOG_POSTS: BlogPostMeta[] = [
     readTime: '15 min read',
     category: 'WordPress',
   },
+  {
+    slug: 'wordpress-mixed-content',
+    title: 'WordPress Mixed Content Errors: Why Your Site Shows \'Not Secure\' After Installing SSL',
+    excerpt:
+      'You installed an SSL certificate but your browser still shows "Not Secure." Hardcoded HTTP URLs in your database, plugin assets loading over HTTP, CDN misconfigurations, and images with absolute HTTP paths all cause mixed content errors. Learn how to find and fix every source.',
+    date: '23 May 2026',
+    readTime: '14 min read',
+    category: 'WordPress',
+  },
+  {
+    slug: 'wordpress-xmlrpc-attack',
+    title: 'WordPress XML-RPC Brute Force Attack: How Hackers Slow Down Your Site Without You Knowing',
+    excerpt:
+      'WordPress xmlrpc.php allows attackers to try hundreds of passwords in a single request using system.multicall. Your site slows to a crawl while uptime monitors say it is fine. Learn how XML-RPC attacks work and how to disable xmlrpc.php properly.',
+    date: '24 May 2026',
+    readTime: '15 min read',
+    category: 'WordPress',
+  },
+  {
+    slug: 'wordpress-core-web-vitals',
+    title: 'WordPress Core Web Vitals Failing: How LCP, FID, and CLS Failures Hurt Your Traffic',
+    excerpt:
+      'Your WordPress site is failing Core Web Vitals — LCP over 2.5 seconds, poor FID from heavy plugins, and CLS from ads and lazy loading. Google uses these metrics for ranking. Learn what causes each failure, how to fix them, and how HTTP monitoring tracks TTFB.',
+    date: '25 May 2026',
+    readTime: '15 min read',
+    category: 'WordPress',
+  },
 ]
 
 const POSTS_PER_PAGE = 6
