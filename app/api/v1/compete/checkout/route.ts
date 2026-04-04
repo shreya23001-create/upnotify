@@ -15,6 +15,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
     }
 
+    if ('_impersonatedBy' in user && user._impersonatedBy) {
+      return NextResponse.json({ error: 'Payment changes are not allowed during impersonation.' }, { status: 403 })
+    }
+
     // Check user has a paid base plan (not free)
     const baseSub = await getSubscriptionWithPlan(user.org_id)
     if (!baseSub?.subscription || baseSub.subscription.status !== 'active') {

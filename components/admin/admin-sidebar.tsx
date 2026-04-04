@@ -32,6 +32,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/admin/messages', label: 'Messages', icon: IconBell },
   { href: '/admin/credits', label: 'Credit Approvals', icon: IconTag },
   { href: '/admin/agency-waitlist', label: 'Agency Waitlist', icon: IconUsers },
+  { href: '/admin/revenue', label: 'Revenue', icon: IconCreditCard },
   { href: '/admin/system', label: 'System Health', icon: IconActivity },
   { href: '/admin/audit-log', label: 'Audit Log', icon: IconFileText },
   { href: '/admin/team', label: 'Admin Team', icon: IconShield },

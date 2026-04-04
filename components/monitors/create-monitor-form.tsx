@@ -202,10 +202,32 @@ export function CreateMonitorForm(): React.ReactElement {
       )}
 
       {type === 'heartbeat' && (
-        <div className="form-group">
-          <label className="form-label" htmlFor="expectedInterval">Expected Ping Interval (seconds)</label>
-          <input className="form-input" id="expectedInterval" name="expectedInterval" type="number" defaultValue="300" disabled={isPending} />
-        </div>
+        <>
+          <div style={{ background: 'var(--bg-secondary, #f0f4ff)', border: '1px solid var(--border-primary)', borderRadius: 10, padding: 16, marginBottom: 16 }}>
+            <h4 style={{ fontSize: 14, fontWeight: 700, marginBottom: 8 }}>How Heartbeat Monitoring Works</h4>
+            <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.7, marginBottom: 10 }}>
+              Unlike other monitors where Uptrue checks your server, heartbeat monitoring works the other way around:
+              <strong> your server sends a ping to Uptrue</strong> at regular intervals. If we stop receiving pings, we alert you.
+            </p>
+            <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.7, marginBottom: 10 }}>
+              <strong>Setup steps:</strong>
+            </p>
+            <ol style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.8, paddingLeft: 18, marginBottom: 10 }}>
+              <li>Create this monitor and note the <strong>Monitor ID</strong> from the monitor detail page</li>
+              <li>Add a cron job or scheduled task on your server that calls the heartbeat URL</li>
+              <li>Example cron (every 5 minutes): <code style={{ background: 'var(--bg-card)', padding: '2px 6px', borderRadius: 4, fontSize: 12 }}>*/5 * * * * curl -s https://uptrue.io/api/v1/heartbeat/YOUR_MONITOR_ID</code></li>
+              <li>Uptrue alerts you if it stops receiving pings</li>
+            </ol>
+            <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+              Ideal for: cron jobs, backup scripts, batch processes, scheduled tasks, queue workers.
+            </p>
+          </div>
+          <div className="form-group">
+            <label className="form-label" htmlFor="expectedInterval">Expected Ping Interval (seconds)</label>
+            <input className="form-input" id="expectedInterval" name="expectedInterval" type="number" defaultValue="300" disabled={isPending} />
+            <span className="form-helper-text">How often your server will ping us. We alert if no ping received within 2x this interval.</span>
+          </div>
+        </>
       )}
 
       {type === 'api' && (

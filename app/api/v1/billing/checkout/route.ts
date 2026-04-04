@@ -26,6 +26,11 @@ export async function POST(request: Request): Promise<NextResponse> {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    // Block payment changes during impersonation
+    if ('_impersonatedBy' in user && user._impersonatedBy) {
+      return NextResponse.json({ error: 'Payment changes are not allowed during impersonation.' }, { status: 403 })
+    }
+
     const org = await getCurrentOrganisation()
     if (!org) {
       return NextResponse.json(
