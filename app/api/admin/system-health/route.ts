@@ -63,10 +63,16 @@ export async function GET(): Promise<NextResponse> {
     .limit(1)
     .single()
 
+  const { data: lastNurtureEmail } = await supabase
+    .from('email_sends')
+    .select('sent_at')
+    .order('sent_at', { ascending: false })
+    .limit(1)
+    .single()
+
   const { data: lastPublicCheck } = await supabase
-    .from('check_results')
+    .from('public_check_results')
     .select('checked_at')
-    .is('org_id', null)
     .order('checked_at', { ascending: false })
     .limit(1)
     .single()
@@ -91,8 +97,8 @@ export async function GET(): Promise<NextResponse> {
         status: cronStatus(lastPublicCheck?.checked_at ?? null, 10),
       },
       nurtureEmails: {
-        lastRun: null, // Would need email_sends table check
-        status: 'unknown',
+        lastRun: lastNurtureEmail?.sent_at ?? null,
+        status: cronStatus(lastNurtureEmail?.sent_at ?? null, 1500), // daily = 1440 min
       },
     },
     monitors: {

@@ -73,6 +73,13 @@ async function handleCheckoutCompleted(
         .single()
 
       if (plan) {
+        // Cancel any existing base subscription for this org (upgrade/change scenario)
+        await supabase
+          .from('subscriptions')
+          .update({ status: 'canceled', canceled_at: new Date().toISOString() })
+          .eq('org_id', orgId)
+          .eq('status', 'active')
+
         const subResponse = await getStripe().subscriptions.retrieve(
           session.subscription as string
         )

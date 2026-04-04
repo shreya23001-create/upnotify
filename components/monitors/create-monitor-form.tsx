@@ -213,9 +213,9 @@ export function CreateMonitorForm(): React.ReactElement {
               <strong>Setup steps:</strong>
             </p>
             <ol style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.8, paddingLeft: 18, marginBottom: 10 }}>
-              <li>Create this monitor and note the <strong>Monitor ID</strong> from the monitor detail page</li>
-              <li>Add a cron job or scheduled task on your server that calls the heartbeat URL</li>
-              <li>Example cron (every 5 minutes): <code style={{ background: 'var(--bg-card)', padding: '2px 6px', borderRadius: 4, fontSize: 12 }}>*/5 * * * * curl -s https://uptrue.io/api/v1/heartbeat/YOUR_MONITOR_ID</code></li>
+              <li>Create this monitor first — your unique <strong>heartbeat URL</strong> will appear on the monitor detail page after creation</li>
+              <li>Copy that URL and add a cron job on your server that calls it at regular intervals</li>
+              <li>Example cron (every 5 minutes): <code style={{ background: 'var(--bg-card)', padding: '2px 6px', borderRadius: 4, fontSize: 12 }}>*/5 * * * * curl -s YOUR_HEARTBEAT_URL</code></li>
               <li>Uptrue alerts you if it stops receiving pings</li>
             </ol>
             <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>
