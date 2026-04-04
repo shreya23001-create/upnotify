@@ -68,8 +68,8 @@ export default function WordPressSharedHostingSlowPage(): React.ReactElement {
           description: 'Why shared hosting silently throttles your WordPress site during traffic spikes, how the noisy neighbour effect works, and how response time monitoring catches slowdowns.',
           author: { '@type': 'Organization', name: 'Uptrue' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
-          datePublished: '2026-05-21',
-          dateModified: '2026-05-21',
+          datePublished: '2026-04-03',
+          dateModified: '2026-04-03',
           url: 'https://uptrue.io/blog/wordpress-shared-hosting-slow',
         }}
       />
@@ -77,7 +77,7 @@ export default function WordPressSharedHostingSlowPage(): React.ReactElement {
       <header className="blog-article-header">
         <div className="blog-article-meta-top">
           <span className="blog-post-category">WordPress</span>
-          <span>21 May 2026</span>
+          <span>220 March 2026</span>
           <span>14 min read</span>
         </div>
         <h1 className="blog-article-title">WordPress Site Down on Shared Hosting: Why CPU Limits Are Throttling Your Site</h1>

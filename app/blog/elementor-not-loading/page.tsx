@@ -68,8 +68,8 @@ export default function ElementorNotLoadingPage(): React.ReactElement {
           description: 'Why Elementor breaks after updates, how to fix it, and how HTTP and keyword monitoring catches broken pages automatically.',
           author: { '@type': 'Organization', name: 'Uptrue' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
-          datePublished: '2026-05-08',
-          dateModified: '2026-05-08',
+          datePublished: '2026-03-27',
+          dateModified: '2026-03-27',
           url: 'https://uptrue.io/blog/elementor-not-loading',
         }}
       />
@@ -77,7 +77,7 @@ export default function ElementorNotLoadingPage(): React.ReactElement {
       <header className="blog-article-header">
         <div className="blog-article-meta-top">
           <span className="blog-post-category">WordPress</span>
-          <span>8 May 2026</span>
+          <span>27 March 2026</span>
           <span>14 min read</span>
         </div>
         <h1 className="blog-article-title">Elementor Not Loading After Update? Fix the White Screen Before You Lose Traffic</h1>

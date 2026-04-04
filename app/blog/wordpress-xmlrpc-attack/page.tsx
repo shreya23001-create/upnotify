@@ -68,8 +68,8 @@ export default function WordPressXmlrpcAttackPage(): React.ReactElement {
           description: 'How attackers exploit xmlrpc.php system.multicall for amplified brute force attacks, why your site slows down, and how HTTP monitoring catches the response time spike.',
           author: { '@type': 'Organization', name: 'Uptrue' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
-          datePublished: '2026-05-24',
-          dateModified: '2026-05-24',
+          datePublished: '2026-04-04',
+          dateModified: '2026-04-04',
           url: 'https://uptrue.io/blog/wordpress-xmlrpc-attack',
         }}
       />
@@ -77,7 +77,7 @@ export default function WordPressXmlrpcAttackPage(): React.ReactElement {
       <header className="blog-article-header">
         <div className="blog-article-meta-top">
           <span className="blog-post-category">WordPress</span>
-          <span>24 May 2026</span>
+          <span>223 March 2026</span>
           <span>15 min read</span>
         </div>
         <h1 className="blog-article-title">WordPress XML-RPC Brute Force Attack: How Hackers Slow Down Your Site Without You Knowing</h1>

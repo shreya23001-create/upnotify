@@ -68,8 +68,8 @@ export default function WordPressMaintenanceModePage(): React.ReactElement {
           description: 'What causes WordPress to get stuck in maintenance mode, how to fix it in seconds, and how keyword monitoring detects it automatically.',
           author: { '@type': 'Organization', name: 'Uptrue' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
-          datePublished: '2026-05-03',
-          dateModified: '2026-05-03',
+          datePublished: '2026-03-22',
+          dateModified: '2026-03-22',
           url: 'https://uptrue.io/blog/wordpress-maintenance-mode',
         }}
       />
@@ -77,7 +77,7 @@ export default function WordPressMaintenanceModePage(): React.ReactElement {
       <header className="blog-article-header">
         <div className="blog-article-meta-top">
           <span className="blog-post-category">WordPress</span>
-          <span>3 May 2026</span>
+          <span>22 March 2026</span>
           <span>13 min read</span>
         </div>
         <h1 className="blog-article-title">WordPress Stuck in Maintenance Mode: How to Fix It and Never Get Stuck Again</h1>

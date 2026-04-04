@@ -68,8 +68,8 @@ export default function YoastSeoSitemap404Page(): React.ReactElement {
           description: 'What causes Yoast SEO sitemap 404 errors, how to fix broken permalinks and rewrite rules, and how HTTP monitoring catches the problem before rankings decline.',
           author: { '@type': 'Organization', name: 'Uptrue' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
-          datePublished: '2026-05-19',
-          dateModified: '2026-05-19',
+          datePublished: '2026-04-03',
+          dateModified: '2026-04-03',
           url: 'https://uptrue.io/blog/yoast-seo-sitemap-404',
         }}
       />
@@ -77,7 +77,7 @@ export default function YoastSeoSitemap404Page(): React.ReactElement {
       <header className="blog-article-header">
         <div className="blog-article-meta-top">
           <span className="blog-post-category">WordPress</span>
-          <span>19 May 2026</span>
+          <span>128 March 2026</span>
           <span>14 min read</span>
         </div>
         <h1 className="blog-article-title">Yoast SEO Sitemap Returning 404: How This Quietly Tanks Your Google Rankings</h1>

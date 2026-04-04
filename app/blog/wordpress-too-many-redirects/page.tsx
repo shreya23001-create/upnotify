@@ -68,8 +68,8 @@ export default function WordPressTooManyRedirectsPage(): React.ReactElement {
           description: 'What causes WordPress redirect loops, how to fix each cause step by step, and how to set up monitoring that catches redirect loops automatically.',
           author: { '@type': 'Organization', name: 'Uptrue' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
-          datePublished: '2026-04-27',
-          dateModified: '2026-04-27',
+          datePublished: '2026-03-15',
+          dateModified: '2026-03-15',
           url: 'https://uptrue.io/blog/wordpress-too-many-redirects',
         }}
       />
@@ -77,7 +77,7 @@ export default function WordPressTooManyRedirectsPage(): React.ReactElement {
       <header className="blog-article-header">
         <div className="blog-article-meta-top">
           <span className="blog-post-category">WordPress</span>
-          <span>27 April 2026</span>
+          <span>15 March 2026</span>
           <span>14 min read</span>
         </div>
         <h1 className="blog-article-title">WordPress Too Many Redirects: Fix ERR_TOO_MANY_REDIRECTS and Prevent It Forever</h1>

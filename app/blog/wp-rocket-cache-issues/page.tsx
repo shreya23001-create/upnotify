@@ -68,8 +68,8 @@ export default function WpRocketCacheIssuesPage(): React.ReactElement {
           description: 'What causes WP Rocket to serve stale cached pages, how to fix each cause, and how keyword monitoring verifies that visitors see your latest content.',
           author: { '@type': 'Organization', name: 'Uptrue' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
-          datePublished: '2026-05-11',
-          dateModified: '2026-05-11',
+          datePublished: '2026-03-30',
+          dateModified: '2026-03-30',
           url: 'https://uptrue.io/blog/wp-rocket-cache-issues',
         }}
       />
@@ -77,7 +77,7 @@ export default function WpRocketCacheIssuesPage(): React.ReactElement {
       <header className="blog-article-header">
         <div className="blog-article-meta-top">
           <span className="blog-post-category">WordPress</span>
-          <span>11 May 2026</span>
+          <span>120 March 2026</span>
           <span>14 min read</span>
         </div>
         <h1 className="blog-article-title">WP Rocket Cache Serving Stale Pages: Why Your Updates Aren&apos;t Showing to Visitors</h1>

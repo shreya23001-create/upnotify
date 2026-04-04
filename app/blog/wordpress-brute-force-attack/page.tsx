@@ -68,8 +68,8 @@ export default function WordPressBruteForceAttackPage(): React.ReactElement {
           description: 'What causes WordPress brute force attacks to crash your site, how to harden against them, and how HTTP monitoring catches the response time spike before the crash.',
           author: { '@type': 'Organization', name: 'Uptrue' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
-          datePublished: '2026-05-18',
-          dateModified: '2026-05-18',
+          datePublished: '2026-04-03',
+          dateModified: '2026-04-03',
           url: 'https://uptrue.io/blog/wordpress-brute-force-attack',
         }}
       />
@@ -77,7 +77,7 @@ export default function WordPressBruteForceAttackPage(): React.ReactElement {
       <header className="blog-article-header">
         <div className="blog-article-meta-top">
           <span className="blog-post-category">WordPress</span>
-          <span>18 May 2026</span>
+          <span>127 March 2026</span>
           <span>15 min read</span>
         </div>
         <h1 className="blog-article-title">WordPress Brute Force Attack Slowing Your Site: How Thousands of Login Attempts Cause Downtime</h1>

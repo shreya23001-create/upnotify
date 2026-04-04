@@ -68,8 +68,8 @@ export default function WordPressWhiteScreenOfDeathPage(): React.ReactElement {
           description: 'What causes the WordPress WSOD, how to fix it, and how to set up keyword monitoring that detects a blank page in under 60 seconds.',
           author: { '@type': 'Organization', name: 'Uptrue' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
-          datePublished: '2026-04-24',
-          dateModified: '2026-04-24',
+          datePublished: '2026-03-13',
+          dateModified: '2026-03-13',
           url: 'https://uptrue.io/blog/wordpress-white-screen-of-death',
         }}
       />
@@ -77,7 +77,7 @@ export default function WordPressWhiteScreenOfDeathPage(): React.ReactElement {
       <header className="blog-article-header">
         <div className="blog-article-meta-top">
           <span className="blog-post-category">WordPress</span>
-          <span>24 April 2026</span>
+          <span>13 March 2026</span>
           <span>13 min read</span>
         </div>
         <h1 className="blog-article-title">WordPress White Screen of Death: How to Detect It Before Your Visitors Do</h1>

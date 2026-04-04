@@ -63,8 +63,8 @@ export default function CompetitorAnalysisEcommercePage(): React.ReactElement {
           description: 'What to track, which tools help, and how to turn competitive intelligence into a business advantage.',
           author: { '@type': 'Organization', name: 'Uptrue' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
-          datePublished: '2026-04-18',
-          dateModified: '2026-04-18',
+          datePublished: '2026-03-10',
+          dateModified: '2026-03-10',
           url: 'https://uptrue.io/blog/competitor-analysis-ecommerce',
         }}
       />
@@ -72,7 +72,7 @@ export default function CompetitorAnalysisEcommercePage(): React.ReactElement {
       <header className="blog-article-header">
         <div className="blog-article-meta-top">
           <span className="blog-post-category">Ecommerce</span>
-          <span>18 April 2026</span>
+          <span>10 March 2026</span>
           <span>11 min read</span>
         </div>
         <h1 className="blog-article-title">Website Competitor Analysis Tools for Ecommerce in 2026</h1>

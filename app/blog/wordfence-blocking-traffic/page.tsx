@@ -68,8 +68,8 @@ export default function WordfenceBlockingTrafficPage(): React.ReactElement {
           description: 'What causes Wordfence to block legitimate traffic, how aggressive settings catch real customers, and how multi-location HTTP monitoring detects blocked visitors.',
           author: { '@type': 'Organization', name: 'Uptrue' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
-          datePublished: '2026-05-17',
-          dateModified: '2026-05-17',
+          datePublished: '2026-04-02',
+          dateModified: '2026-04-02',
           url: 'https://uptrue.io/blog/wordfence-blocking-traffic',
         }}
       />
@@ -77,7 +77,7 @@ export default function WordfenceBlockingTrafficPage(): React.ReactElement {
       <header className="blog-article-header">
         <div className="blog-article-meta-top">
           <span className="blog-post-category">WordPress</span>
-          <span>17 May 2026</span>
+          <span>126 March 2026</span>
           <span>15 min read</span>
         </div>
         <h1 className="blog-article-title">Wordfence Blocking Real Users: When Your Security Plugin Becomes Your Biggest Problem</h1>

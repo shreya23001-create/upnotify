@@ -68,8 +68,8 @@ export default function WordPressCronNotWorkingPage(): React.ReactElement {
           description: 'Why WordPress wp-cron relies on traffic, what breaks when it stops firing, and how heartbeat monitoring keeps scheduled tasks running reliably.',
           author: { '@type': 'Organization', name: 'Uptrue' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
-          datePublished: '2026-05-07',
-          dateModified: '2026-05-07',
+          datePublished: '2026-03-26',
+          dateModified: '2026-03-26',
           url: 'https://uptrue.io/blog/wordpress-cron-not-working',
         }}
       />
@@ -77,7 +77,7 @@ export default function WordPressCronNotWorkingPage(): React.ReactElement {
       <header className="blog-article-header">
         <div className="blog-article-meta-top">
           <span className="blog-post-category">WordPress</span>
-          <span>7 May 2026</span>
+          <span>26 March 2026</span>
           <span>14 min read</span>
         </div>
         <h1 className="blog-article-title">WordPress wp-cron Not Firing: Why Scheduled Posts, Emails, and Backups Silently Stop</h1>

@@ -68,8 +68,8 @@ export default function WordPressSSLExpiredPage(): React.ReactElement {
           description: 'Why Let\'s Encrypt auto-renew fails silently, what visitors see when SSL expires, and how SSL monitoring warns you weeks before it happens.',
           author: { '@type': 'Organization', name: 'Uptrue' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
-          datePublished: '2026-05-20',
-          dateModified: '2026-05-20',
+          datePublished: '2026-04-03',
+          dateModified: '2026-04-03',
           url: 'https://uptrue.io/blog/wordpress-ssl-expired',
         }}
       />
@@ -77,7 +77,7 @@ export default function WordPressSSLExpiredPage(): React.ReactElement {
       <header className="blog-article-header">
         <div className="blog-article-meta-top">
           <span className="blog-post-category">WordPress</span>
-          <span>20 May 2026</span>
+          <span>3 April 2026</span>
           <span>14 min read</span>
         </div>
         <h1 className="blog-article-title">WordPress SSL Certificate Expired? Here&apos;s How to Never Let It Happen Again</h1>

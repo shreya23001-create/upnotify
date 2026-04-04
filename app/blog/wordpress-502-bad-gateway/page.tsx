@@ -68,8 +68,8 @@ export default function WordPress502BadGatewayPage(): React.ReactElement {
           description: 'What causes 502 Bad Gateway errors on WordPress, how to fix each cause, and how HTTP monitoring catches them instantly.',
           author: { '@type': 'Organization', name: 'Uptrue' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
-          datePublished: '2026-05-04',
-          dateModified: '2026-05-04',
+          datePublished: '2026-03-23',
+          dateModified: '2026-03-23',
           url: 'https://uptrue.io/blog/wordpress-502-bad-gateway',
         }}
       />
@@ -77,7 +77,7 @@ export default function WordPress502BadGatewayPage(): React.ReactElement {
       <header className="blog-article-header">
         <div className="blog-article-meta-top">
           <span className="blog-post-category">WordPress</span>
-          <span>4 May 2026</span>
+          <span>23 March 2026</span>
           <span>14 min read</span>
         </div>
         <h1 className="blog-article-title">502 Bad Gateway on WordPress: What It Means and How to Fix It Fast</h1>

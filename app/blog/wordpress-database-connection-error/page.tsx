@@ -68,8 +68,8 @@ export default function WordPressDatabaseConnectionErrorPage(): React.ReactEleme
           description: 'What causes the WordPress database connection error, how to fix each cause, and how to set up monitoring so you catch it before your visitors do.',
           author: { '@type': 'Organization', name: 'Uptrue' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
-          datePublished: '2026-04-22',
-          dateModified: '2026-04-22',
+          datePublished: '2026-03-11',
+          dateModified: '2026-03-11',
           url: 'https://uptrue.io/blog/wordpress-database-connection-error',
         }}
       />
@@ -77,7 +77,7 @@ export default function WordPressDatabaseConnectionErrorPage(): React.ReactEleme
       <header className="blog-article-header">
         <div className="blog-article-meta-top">
           <span className="blog-post-category">WordPress</span>
-          <span>22 April 2026</span>
+          <span>25 March 2026</span>
           <span>14 min read</span>
         </div>
         <h1 className="blog-article-title">Error Establishing a Database Connection in WordPress: Complete Fix and Monitoring Guide</h1>

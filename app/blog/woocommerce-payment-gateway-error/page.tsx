@@ -68,8 +68,8 @@ export default function WooCommercePaymentGatewayErrorPage(): React.ReactElement
           description: 'What causes WooCommerce payment gateway failures, how API credential expiry and TLS mismatches silently break payments, and how HTTP and keyword monitoring catches checkout failures.',
           author: { '@type': 'Organization', name: 'Uptrue' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
-          datePublished: '2026-05-22',
-          dateModified: '2026-05-22',
+          datePublished: '2026-04-03',
+          dateModified: '2026-04-03',
           url: 'https://uptrue.io/blog/woocommerce-payment-gateway-error',
         }}
       />
@@ -77,7 +77,7 @@ export default function WooCommercePaymentGatewayErrorPage(): React.ReactElement
       <header className="blog-article-header">
         <div className="blog-article-meta-top">
           <span className="blog-post-category">WordPress</span>
-          <span>22 May 2026</span>
+          <span>221 March 2026</span>
           <span>15 min read</span>
         </div>
         <h1 className="blog-article-title">WooCommerce Payment Gateway Error: Why Stripe, PayPal, and Square Randomly Stop Working</h1>

@@ -68,8 +68,8 @@ export default function GravityFormsNotWorkingPage(): React.ReactElement {
           description: 'What causes Gravity Forms conditional logic failures, how jQuery conflicts and minification break form functionality, and how keyword monitoring catches broken forms.',
           author: { '@type': 'Organization', name: 'Uptrue' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
-          datePublished: '2026-05-16',
-          dateModified: '2026-05-16',
+          datePublished: '2026-04-02',
+          dateModified: '2026-04-02',
           url: 'https://uptrue.io/blog/gravity-forms-not-working',
         }}
       />
@@ -77,7 +77,7 @@ export default function GravityFormsNotWorkingPage(): React.ReactElement {
       <header className="blog-article-header">
         <div className="blog-article-meta-top">
           <span className="blog-post-category">WordPress</span>
-          <span>16 May 2026</span>
+          <span>125 March 2026</span>
           <span>14 min read</span>
         </div>
         <h1 className="blog-article-title">Gravity Forms Conditional Logic Not Working: Why Your Forms Are Broken After Update</h1>

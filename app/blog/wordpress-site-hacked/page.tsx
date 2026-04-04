@@ -68,8 +68,8 @@ export default function WordPressSiteHackedPage(): React.ReactElement {
           description: 'How WordPress defacement attacks work, how to recover, and how keyword monitoring catches the attack before your customers see a hacker\'s message.',
           author: { '@type': 'Organization', name: 'Uptrue' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
-          datePublished: '2026-05-12',
-          dateModified: '2026-05-12',
+          datePublished: '2026-03-31',
+          dateModified: '2026-03-31',
           url: 'https://uptrue.io/blog/wordpress-site-hacked',
         }}
       />
@@ -77,7 +77,7 @@ export default function WordPressSiteHackedPage(): React.ReactElement {
       <header className="blog-article-header">
         <div className="blog-article-meta-top">
           <span className="blog-post-category">WordPress</span>
-          <span>12 May 2026</span>
+          <span>121 March 2026</span>
           <span>15 min read</span>
         </div>
         <h1 className="blog-article-title">WordPress Site Defaced: How Hackers Replace Your Homepage and How to Detect It Instantly</h1>

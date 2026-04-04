@@ -68,8 +68,8 @@ export default function WordPressJapaneseKeywordHackPage(): React.ReactElement {
           description: 'How the Japanese keyword hack works, why you cannot see it from wp-admin, how to clean your site, and how keyword monitoring detects Japanese characters on English pages.',
           author: { '@type': 'Organization', name: 'Uptrue' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
-          datePublished: '2026-05-03',
-          dateModified: '2026-05-03',
+          datePublished: '2026-03-22',
+          dateModified: '2026-03-22',
           url: 'https://uptrue.io/blog/wordpress-japanese-keyword-hack',
         }}
       />
@@ -77,7 +77,7 @@ export default function WordPressJapaneseKeywordHackPage(): React.ReactElement {
       <header className="blog-article-header">
         <div className="blog-article-meta-top">
           <span className="blog-post-category">WordPress</span>
-          <span>3 May 2026</span>
+          <span>22 March 2026</span>
           <span>15 min read</span>
         </div>
         <h1 className="blog-article-title">Japanese Keyword Hack on WordPress: How Hackers Hijack Your SEO and You Don&apos;t Even Know</h1>

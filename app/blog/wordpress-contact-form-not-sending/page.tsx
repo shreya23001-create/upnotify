@@ -68,8 +68,8 @@ export default function WordPressContactFormNotSendingPage(): React.ReactElement
           description: 'Why Contact Form 7 stops sending emails, how to fix it, and how to set up monitoring so you catch broken forms before you lose leads.',
           author: { '@type': 'Organization', name: 'Uptrue' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
-          datePublished: '2026-04-23',
-          dateModified: '2026-04-23',
+          datePublished: '2026-03-12',
+          dateModified: '2026-03-12',
           url: 'https://uptrue.io/blog/wordpress-contact-form-not-sending',
         }}
       />
@@ -77,7 +77,7 @@ export default function WordPressContactFormNotSendingPage(): React.ReactElement
       <header className="blog-article-header">
         <div className="blog-article-meta-top">
           <span className="blog-post-category">WordPress</span>
-          <span>23 April 2026</span>
+          <span>12 March 2026</span>
           <span>13 min read</span>
         </div>
         <h1 className="blog-article-title">Contact Form 7 Not Sending Emails: Your Leads Are Disappearing and You Don&apos;t Know</h1>

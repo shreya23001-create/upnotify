@@ -68,8 +68,8 @@ export default function WordPressCriticalErrorPage(): React.ReactElement {
           description: 'What causes the WordPress critical error, how to fix it step by step, and how to set up keyword monitoring that detects it automatically.',
           author: { '@type': 'Organization', name: 'Uptrue' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
-          datePublished: '2026-04-26',
-          dateModified: '2026-04-26',
+          datePublished: '2026-03-14',
+          dateModified: '2026-03-14',
           url: 'https://uptrue.io/blog/wordpress-critical-error',
         }}
       />
@@ -77,7 +77,7 @@ export default function WordPressCriticalErrorPage(): React.ReactElement {
       <header className="blog-article-header">
         <div className="blog-article-meta-top">
           <span className="blog-post-category">WordPress</span>
-          <span>26 April 2026</span>
+          <span>14 March 2026</span>
           <span>14 min read</span>
         </div>
         <h1 className="blog-article-title">There Has Been a Critical Error on This Website: What It Means and How to Fix It</h1>

@@ -68,8 +68,8 @@ export default function WordPressCoreWebVitalsPage(): React.ReactElement {
           description: 'Why WordPress sites fail Core Web Vitals, how to fix each metric, and how Uptrue HTTP monitoring tracks TTFB as the server component of LCP.',
           author: { '@type': 'Organization', name: 'Uptrue' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
-          datePublished: '2026-05-25',
-          dateModified: '2026-05-25',
+          datePublished: '2026-04-04',
+          dateModified: '2026-04-04',
           url: 'https://uptrue.io/blog/wordpress-core-web-vitals',
         }}
       />
@@ -77,7 +77,7 @@ export default function WordPressCoreWebVitalsPage(): React.ReactElement {
       <header className="blog-article-header">
         <div className="blog-article-meta-top">
           <span className="blog-post-category">WordPress</span>
-          <span>25 May 2026</span>
+          <span>224 March 2026</span>
           <span>15 min read</span>
         </div>
         <h1 className="blog-article-title">WordPress Core Web Vitals Failing: How LCP, FID, and CLS Failures Hurt Your Traffic</h1>

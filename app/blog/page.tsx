@@ -18,7 +18,7 @@ const BLOG_POSTS: BlogPostMeta[] = [
     title: 'Website Monitoring in 2026: The Complete Guide',
     excerpt:
       'Everything you need to know about monitoring your website — from basic uptime checks to advanced performance tracking. Learn why monitoring matters and how to pick the right tool for your needs.',
-    date: '2 April 2026',
+    date: '5 March 2026',
     readTime: '12 min read',
     category: 'Guide',
   },
@@ -27,7 +27,7 @@ const BLOG_POSTS: BlogPostMeta[] = [
     title: 'How to Create a Public Status Page for Your Website (Free)',
     excerpt:
       'Your customers deserve to know when something is wrong. Learn what status pages are, why they build trust, and how to set one up in under five minutes — without writing any code.',
-    date: '5 April 2026',
+    date: '6 March 2026',
     readTime: '10 min read',
     category: 'Guide',
   },
@@ -36,7 +36,7 @@ const BLOG_POSTS: BlogPostMeta[] = [
     title: 'Uptime Monitoring for Agencies: Managing 100+ Client Sites',
     excerpt:
       'Generic monitoring tools were built for one-site teams. If you are an agency managing dozens or hundreds of client websites, you need a different approach entirely.',
-    date: '9 April 2026',
+    date: '7 March 2026',
     readTime: '11 min read',
     category: 'Agency',
   },
@@ -45,7 +45,7 @@ const BLOG_POSTS: BlogPostMeta[] = [
     title: 'SSL Certificate Monitoring: Why Auto-Renew Isn\'t Enough',
     excerpt:
       'Auto-renew sounds foolproof, but SSL certificates still fail in production every single day. Here is why it happens, what goes wrong, and how monitoring catches what automation misses.',
-    date: '14 April 2026',
+    date: '8 March 2026',
     readTime: '10 min read',
     category: 'Security',
   },
@@ -54,7 +54,7 @@ const BLOG_POSTS: BlogPostMeta[] = [
     title: 'Website Competitor Analysis Tools for Ecommerce in 2026',
     excerpt:
       'Your competitors\' website performance directly affects your bottom line. Learn what to track, which tools actually help, and how to turn competitive intelligence into a business advantage.',
-    date: '18 April 2026',
+    date: '10 March 2026',
     readTime: '11 min read',
     category: 'Ecommerce',
   },
@@ -63,7 +63,7 @@ const BLOG_POSTS: BlogPostMeta[] = [
     title: 'Error Establishing a Database Connection in WordPress: Complete Fix and Monitoring Guide',
     excerpt:
       'The scariest page your WordPress site can show. Learn what causes the database connection error, how to fix each cause, and how to monitor for it so you never discover it from a customer again.',
-    date: '22 April 2026',
+    date: '11 March 2026',
     readTime: '14 min read',
     category: 'WordPress',
   },
@@ -72,7 +72,7 @@ const BLOG_POSTS: BlogPostMeta[] = [
     title: 'Contact Form 7 Not Sending Emails: Your Leads Are Disappearing and You Don\'t Know',
     excerpt:
       'Contact Form 7 can silently stop sending emails while still showing a success message. Your leads vanish and you have no idea. Here is why it happens and how to catch it.',
-    date: '23 April 2026',
+    date: '12 March 2026',
     readTime: '13 min read',
     category: 'WordPress',
   },
@@ -81,7 +81,7 @@ const BLOG_POSTS: BlogPostMeta[] = [
     title: 'WordPress White Screen of Death: How to Detect It Before Your Visitors Do',
     excerpt:
       'The WSOD shows a blank page instead of your website — and most monitoring tools report it as "up." Learn what causes it, how to fix it, and how keyword monitoring catches what HTTP checks miss.',
-    date: '24 April 2026',
+    date: '13 March 2026',
     readTime: '13 min read',
     category: 'WordPress',
   },
@@ -90,7 +90,7 @@ const BLOG_POSTS: BlogPostMeta[] = [
     title: 'There Has Been a Critical Error on This Website: What It Means and How to Fix It',
     excerpt:
       'WordPress 5.2 replaced the White Screen of Death with a critical error message — but its built-in recovery email is unreliable. Learn what triggers it, how to fix it, and how keyword monitoring catches it automatically.',
-    date: '26 April 2026',
+    date: '14 March 2026',
     readTime: '14 min read',
     category: 'WordPress',
   },
@@ -99,7 +99,7 @@ const BLOG_POSTS: BlogPostMeta[] = [
     title: 'WordPress Too Many Redirects: Fix ERR_TOO_MANY_REDIRECTS and Prevent It Forever',
     excerpt:
       'The redirect loop locks you out of your entire site — including wp-admin. Learn what causes it (SSL stacking, Cloudflare Flexible SSL, .htaccess conflicts) and how HTTP monitoring detects it automatically.',
-    date: '27 April 2026',
+    date: '15 March 2026',
     readTime: '14 min read',
     category: 'WordPress',
   },
@@ -108,7 +108,7 @@ const BLOG_POSTS: BlogPostMeta[] = [
     title: 'PHP Fatal Error: Allowed Memory Size Exhausted in WordPress — Complete Fix Guide',
     excerpt:
       'The PHP memory exhausted error crashes your site with a white screen or 500 error. Learn what causes it, four ways to fix it, and how to monitor for the crashes it causes.',
-    date: '28 April 2026',
+    date: '17 March 2026',
     readTime: '13 min read',
     category: 'WordPress',
   },
@@ -117,7 +117,7 @@ const BLOG_POSTS: BlogPostMeta[] = [
     title: 'WordPress Login Redirect Loop: Why wp-admin Keeps Sending You Back to the Login Page',
     excerpt:
       'You enter the correct password, click Log In, and land right back on the same login screen. No error message. No explanation. Learn what causes the wp-admin redirect loop and how to fix it.',
-    date: '29 April 2026',
+    date: '18 March 2026',
     readTime: '13 min read',
     category: 'WordPress',
   },
@@ -126,7 +126,7 @@ const BLOG_POSTS: BlogPostMeta[] = [
     title: 'WordPress Recovery Mode: What Triggers It, What It Means, and How to Respond',
     excerpt:
       'WordPress recovery mode is supposed to email you when a fatal error crashes your site. In practice, that email almost never arrives. Learn what triggers it, what your visitors see, and how to monitor for it externally.',
-    date: '30 April 2026',
+    date: '19 March 2026',
     readTime: '13 min read',
     category: 'WordPress',
   },
@@ -135,7 +135,7 @@ const BLOG_POSTS: BlogPostMeta[] = [
     title: 'WP Mail SMTP Not Sending Emails: Why Your WordPress Site Is Silently Broken',
     excerpt:
       'WP Mail SMTP can stop sending emails without any visible error. Contact form submissions vanish, order confirmations never arrive, and you have no idea. Learn what causes it and how to detect it.',
-    date: '1 May 2026',
+    date: '20 March 2026',
     readTime: '14 min read',
     category: 'WordPress',
   },
@@ -144,7 +144,7 @@ const BLOG_POSTS: BlogPostMeta[] = [
     title: 'WordPress 403 Forbidden Error: Why Your Pages Are Blocked and How to Fix It',
     excerpt:
       'Your server is actively refusing to serve your pages — but you might not know because the block can be IP-specific. Learn what causes 403 errors and how HTTP monitoring catches them instantly.',
-    date: '2 May 2026',
+    date: '21 March 2026',
     readTime: '14 min read',
     category: 'WordPress',
   },
@@ -153,7 +153,7 @@ const BLOG_POSTS: BlogPostMeta[] = [
     title: 'Japanese Keyword Hack on WordPress: How Hackers Hijack Your SEO and You Don\'t Even Know',
     excerpt:
       'Thousands of spam pages in Japanese appear in Google under your domain — but you cannot see them from wp-admin. Learn how the hack works, how to clean it, and how keyword monitoring catches what cloaking hides.',
-    date: '3 May 2026',
+    date: '22 March 2026',
     readTime: '15 min read',
     category: 'WordPress',
   },
@@ -162,7 +162,7 @@ const BLOG_POSTS: BlogPostMeta[] = [
     title: 'WordPress Malware Redirect: Why Your Visitors Are Being Sent to Spam Sites',
     excerpt:
       'Your visitors are being redirected to spam sites — but only on mobile, only from Google, and only on the first visit. Learn how conditional redirect hacks work and how HTTP monitoring detects them automatically.',
-    date: '4 May 2026',
+    date: '23 March 2026',
     readTime: '15 min read',
     category: 'WordPress',
   },
@@ -171,7 +171,7 @@ const BLOG_POSTS: BlogPostMeta[] = [
     title: '504 Gateway Timeout on WordPress: Why Your Pages Take Forever and Then Fail',
     excerpt:
       'Your page loads for 60 seconds and then fails. The 504 is the final stage of a performance problem that has been building for weeks. Learn what causes it and how response time monitoring catches the slowdown before it becomes an outage.',
-    date: '5 May 2026',
+    date: '24 March 2026',
     readTime: '14 min read',
     category: 'WordPress',
   },
@@ -180,7 +180,7 @@ const BLOG_POSTS: BlogPostMeta[] = [
     title: 'WordPress Pharma Hack: Hidden Viagra Links in Your Site That Only Google Sees',
     excerpt:
       'Hidden pharmaceutical spam is injected directly into your existing pages — invisible to you but fully visible to Google. Learn how the pharma hack works, how to clean it, and how keyword monitoring catches what your eyes cannot see.',
-    date: '6 May 2026',
+    date: '25 March 2026',
     readTime: '15 min read',
     category: 'WordPress',
   },
@@ -189,7 +189,7 @@ const BLOG_POSTS: BlogPostMeta[] = [
     title: 'WordPress wp-cron Not Firing: Why Scheduled Posts, Emails, and Backups Silently Stop',
     excerpt:
       'WordPress cron depends on traffic to fire. On low-traffic sites, scheduled posts publish late, backups stop running, and emails never send. Learn why wp-cron fails and how heartbeat monitoring keeps it firing on schedule.',
-    date: '7 May 2026',
+    date: '26 March 2026',
     readTime: '14 min read',
     category: 'WordPress',
   },
@@ -198,7 +198,7 @@ const BLOG_POSTS: BlogPostMeta[] = [
     title: 'Elementor Not Loading After Update? Fix the White Screen Before You Lose Traffic',
     excerpt:
       'Elementor can break after a WordPress, PHP, or plugin update — showing a white screen, missing widgets, or a 500 error. Learn what causes it and how HTTP and keyword monitoring catches broken pages automatically.',
-    date: '8 May 2026',
+    date: '27 March 2026',
     readTime: '14 min read',
     category: 'WordPress',
   },
@@ -207,7 +207,7 @@ const BLOG_POSTS: BlogPostMeta[] = [
     title: 'WordPress .htaccess File Corrupted: How a Single File Takes Down Your Entire Site',
     excerpt:
       'A single misplaced character in .htaccess returns a 500 Internal Server Error on every page. Learn what causes corruption, how to regenerate the file, and how HTTP monitoring catches it instantly.',
-    date: '9 May 2026',
+    date: '28 March 2026',
     readTime: '14 min read',
     category: 'WordPress',
   },
@@ -216,7 +216,7 @@ const BLOG_POSTS: BlogPostMeta[] = [
     title: 'WordPress Permalink Changes Breaking All URLs: How to Prevent SEO Disaster',
     excerpt:
       'Changing your permalink structure breaks every URL on your site. Every indexed page returns 404, every backlink leads nowhere, and Google starts deranking you within days. Learn how to fix it and how monitoring multiple pages catches widespread 404s.',
-    date: '10 May 2026',
+    date: '29 March 2026',
     readTime: '14 min read',
     category: 'WordPress',
   },
@@ -225,7 +225,7 @@ const BLOG_POSTS: BlogPostMeta[] = [
     title: 'WP Rocket Cache Serving Stale Pages: Why Your Updates Aren\'t Showing to Visitors',
     excerpt:
       'You updated the page an hour ago but visitors still see old content. Object cache conflicts, CDN cache layering, and preload bot timing all cause WP Rocket to serve stale pages. Learn what causes it and how keyword monitoring checks what real visitors see.',
-    date: '11 May 2026',
+    date: '30 March 2026',
     readTime: '14 min read',
     category: 'WordPress',
   },
@@ -234,7 +234,7 @@ const BLOG_POSTS: BlogPostMeta[] = [
     title: 'WordPress Site Defaced: How Hackers Replace Your Homepage and How to Detect It Instantly',
     excerpt:
       'Hackers can replace your homepage with their own message while your uptime monitor says the site is fine. Admin credential compromise, vulnerable plugins, and theme file injection are the attack vectors. Learn how to detect defacement in 60 seconds with keyword monitoring.',
-    date: '12 May 2026',
+    date: '31 March 2026',
     readTime: '15 min read',
     category: 'WordPress',
   },
@@ -243,7 +243,7 @@ const BLOG_POSTS: BlogPostMeta[] = [
     title: 'UpdraftPlus Backup Failed: When Your Safety Net Has a Hole in It',
     excerpt:
       'UpdraftPlus can silently stop backing up your site for months. Disk space exhaustion from partial backups, PHP timeouts, and expired remote storage credentials are the most common causes. Learn what makes backups fail and how HTTP monitoring catches the 500 errors that follow.',
-    date: '13 May 2026',
+    date: '1 April 2026',
     readTime: '14 min read',
     category: 'WordPress',
   },
@@ -252,7 +252,7 @@ const BLOG_POSTS: BlogPostMeta[] = [
     title: 'WordPress TTFB Over 3 Seconds: Why Your Site Feels Dead Even When It\'s Technically Up',
     excerpt:
       'A WordPress site with Time to First Byte over 3 seconds feels broken to visitors even when uptime monitors say it is fine. Slow database queries, missing object cache, bloated plugins, and cheap hosting all cause high TTFB. Learn what drives TTFB up and how HTTP monitoring tracks it on every check.',
-    date: '14 May 2026',
+    date: '1 April 2026',
     readTime: '14 min read',
     category: 'WordPress',
   },
@@ -261,7 +261,7 @@ const BLOG_POSTS: BlogPostMeta[] = [
     title: 'JavaScript Errors Breaking WordPress Page Functionality: When Your Site Is Up But Broken',
     excerpt:
       'JavaScript errors on WordPress can break forms, buttons, sliders, and navigation while the page still loads and returns 200 OK. jQuery conflicts, plugin JS errors, and minification breaking code cause invisible functionality failures. Learn what causes them and how keyword monitoring catches broken pages.',
-    date: '15 May 2026',
+    date: '2 April 2026',
     readTime: '14 min read',
     category: 'WordPress',
   },
@@ -270,7 +270,7 @@ const BLOG_POSTS: BlogPostMeta[] = [
     title: 'Gravity Forms Conditional Logic Not Working: Why Your Forms Are Broken After Update',
     excerpt:
       'Gravity Forms conditional logic can silently break after updates due to jQuery conflicts, JavaScript minification, PHP 8.x compatibility issues, and payment integration failures. Fields that should show or hide stop responding. Learn what causes it and how keyword monitoring catches broken forms.',
-    date: '16 May 2026',
+    date: '2 April 2026',
     readTime: '14 min read',
     category: 'WordPress',
   },
@@ -279,7 +279,7 @@ const BLOG_POSTS: BlogPostMeta[] = [
     title: 'Wordfence Blocking Real Users: When Your Security Plugin Becomes Your Biggest Problem',
     excerpt:
       'Wordfence can silently block legitimate visitors, paying customers, and even Googlebot through aggressive rate limiting, country blocking, and learning mode misconfiguration. Your site is technically up but unreachable for real users. Learn what causes it and how multi-location HTTP monitoring detects blocked traffic.',
-    date: '17 May 2026',
+    date: '2 April 2026',
     readTime: '15 min read',
     category: 'WordPress',
   },
@@ -288,7 +288,7 @@ const BLOG_POSTS: BlogPostMeta[] = [
     title: 'WordPress Brute Force Attack Slowing Your Site: How Thousands of Login Attempts Cause Downtime',
     excerpt:
       'WordPress brute force attacks flood wp-login.php and xmlrpc.php with thousands of login attempts, exhausting CPU, memory, and PHP workers until your site crashes. Learn what causes the performance impact and how HTTP monitoring catches response time spikes from active attacks.',
-    date: '18 May 2026',
+    date: '3 April 2026',
     readTime: '15 min read',
     category: 'WordPress',
   },
@@ -297,7 +297,7 @@ const BLOG_POSTS: BlogPostMeta[] = [
     title: 'Yoast SEO Sitemap Returning 404: How This Quietly Tanks Your Google Rankings',
     excerpt:
       'Your Yoast SEO sitemap can return a 404 due to broken permalinks, .htaccess rewrite conflicts, and plugin conflicts. Google cannot find your pages, crawl budget is wasted, and rankings silently decline. Learn what causes it and how HTTP monitoring on /sitemap_index.xml catches it instantly.',
-    date: '19 May 2026',
+    date: '3 April 2026',
     readTime: '14 min read',
     category: 'WordPress',
   },
@@ -306,7 +306,7 @@ const BLOG_POSTS: BlogPostMeta[] = [
     title: 'WordPress SSL Certificate Expired? Here\'s How to Never Let It Happen Again',
     excerpt:
       'Let\'s Encrypt auto-renew fails silently more often than you think. DNS changes, server misconfigurations, and hosting migrations all break automatic renewal. Learn what happens when your SSL expires and how SSL monitoring warns you 30, 14, and 7 days before expiry.',
-    date: '20 May 2026',
+    date: '3 April 2026',
     readTime: '14 min read',
     category: 'WordPress',
   },
@@ -315,7 +315,7 @@ const BLOG_POSTS: BlogPostMeta[] = [
     title: 'WordPress Site Down on Shared Hosting: Why CPU Limits Are Throttling Your Site',
     excerpt:
       'Shared hosting providers silently throttle your WordPress site when you hit CPU limits. Traffic spikes, noisy neighbours, and resource suspensions cause slowdowns and outages you never see coming. Learn how HTTP monitoring catches the throttling.',
-    date: '21 May 2026',
+    date: '3 April 2026',
     readTime: '14 min read',
     category: 'WordPress',
   },
@@ -324,7 +324,7 @@ const BLOG_POSTS: BlogPostMeta[] = [
     title: 'WordPress Auto-Update Broke My Site: How to Recover and Prevent It From Happening Again',
     excerpt:
       'WordPress auto-updates can break your site silently — theme incompatibility, PHP version mismatch, and file permission errors during update all cause white screens, critical errors, and 500 errors. Learn how to recover and how HTTP monitoring catches the break within 60 seconds.',
-    date: '22 May 2026',
+    date: '3 April 2026',
     readTime: '15 min read',
     category: 'WordPress',
   },
@@ -333,7 +333,7 @@ const BLOG_POSTS: BlogPostMeta[] = [
     title: 'WordPress Mixed Content Errors: Why Your Site Shows \'Not Secure\' After Installing SSL',
     excerpt:
       'You installed an SSL certificate but your browser still shows "Not Secure." Hardcoded HTTP URLs in your database, plugin assets loading over HTTP, CDN misconfigurations, and images with absolute HTTP paths all cause mixed content errors. Learn how to find and fix every source.',
-    date: '23 May 2026',
+    date: '4 April 2026',
     readTime: '14 min read',
     category: 'WordPress',
   },
@@ -342,7 +342,7 @@ const BLOG_POSTS: BlogPostMeta[] = [
     title: 'WordPress XML-RPC Brute Force Attack: How Hackers Slow Down Your Site Without You Knowing',
     excerpt:
       'WordPress xmlrpc.php allows attackers to try hundreds of passwords in a single request using system.multicall. Your site slows to a crawl while uptime monitors say it is fine. Learn how XML-RPC attacks work and how to disable xmlrpc.php properly.',
-    date: '24 May 2026',
+    date: '4 April 2026',
     readTime: '15 min read',
     category: 'WordPress',
   },
@@ -351,7 +351,7 @@ const BLOG_POSTS: BlogPostMeta[] = [
     title: 'WordPress Core Web Vitals Failing: How LCP, FID, and CLS Failures Hurt Your Traffic',
     excerpt:
       'Your WordPress site is failing Core Web Vitals — LCP over 2.5 seconds, poor FID from heavy plugins, and CLS from ads and lazy loading. Google uses these metrics for ranking. Learn what causes each failure, how to fix them, and how HTTP monitoring tracks TTFB.',
-    date: '25 May 2026',
+    date: '4 April 2026',
     readTime: '15 min read',
     category: 'WordPress',
   },

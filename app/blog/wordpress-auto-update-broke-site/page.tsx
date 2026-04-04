@@ -68,8 +68,8 @@ export default function WordPressAutoUpdateBrokeSitePage(): React.ReactElement {
           description: 'Why WordPress auto-updates break sites, how to recover from a failed update, and how HTTP monitoring catches the break within 60 seconds.',
           author: { '@type': 'Organization', name: 'Uptrue' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
-          datePublished: '2026-05-22',
-          dateModified: '2026-05-22',
+          datePublished: '2026-04-03',
+          dateModified: '2026-04-03',
           url: 'https://uptrue.io/blog/wordpress-auto-update-broke-site',
         }}
       />
@@ -77,7 +77,7 @@ export default function WordPressAutoUpdateBrokeSitePage(): React.ReactElement {
       <header className="blog-article-header">
         <div className="blog-article-meta-top">
           <span className="blog-post-category">WordPress</span>
-          <span>22 May 2026</span>
+          <span>221 March 2026</span>
           <span>15 min read</span>
         </div>
         <h1 className="blog-article-title">WordPress Auto-Update Broke My Site: How to Recover and Prevent It From Happening Again</h1>

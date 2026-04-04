@@ -68,8 +68,8 @@ export default function WooCommerceCheckoutNotWorkingPage(): React.ReactElement 
           description: 'What causes WooCommerce checkout failures, how to fix each one, and how to set up keyword monitoring that detects checkout problems automatically.',
           author: { '@type': 'Organization', name: 'Uptrue' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
-          datePublished: '2026-05-02',
-          dateModified: '2026-05-02',
+          datePublished: '2026-03-21',
+          dateModified: '2026-03-21',
           url: 'https://uptrue.io/blog/woocommerce-checkout-not-working',
         }}
       />
@@ -77,7 +77,7 @@ export default function WooCommerceCheckoutNotWorkingPage(): React.ReactElement 
       <header className="blog-article-header">
         <div className="blog-article-meta-top">
           <span className="blog-post-category">WordPress</span>
-          <span>2 May 2026</span>
+          <span>21 March 2026</span>
           <span>14 min read</span>
         </div>
         <h1 className="blog-article-title">WooCommerce Checkout Not Working? Here&apos;s Why Your Store Is Losing Sales Right Now</h1>

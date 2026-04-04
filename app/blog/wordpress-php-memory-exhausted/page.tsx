@@ -68,8 +68,8 @@ export default function WordPressPhpMemoryExhaustedPage(): React.ReactElement {
           description: 'What causes the PHP memory limit exhausted error in WordPress, four ways to fix it, and how to monitor for the 500 errors and white screens it causes.',
           author: { '@type': 'Organization', name: 'Uptrue' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
-          datePublished: '2026-04-28',
-          dateModified: '2026-04-28',
+          datePublished: '2026-03-17',
+          dateModified: '2026-03-17',
           url: 'https://uptrue.io/blog/wordpress-php-memory-exhausted',
         }}
       />
@@ -77,7 +77,7 @@ export default function WordPressPhpMemoryExhaustedPage(): React.ReactElement {
       <header className="blog-article-header">
         <div className="blog-article-meta-top">
           <span className="blog-post-category">WordPress</span>
-          <span>28 April 2026</span>
+          <span>17 March 2026</span>
           <span>13 min read</span>
         </div>
         <h1 className="blog-article-title">PHP Fatal Error: Allowed Memory Size Exhausted in WordPress — Complete Fix Guide</h1>

@@ -63,8 +63,8 @@ export default function WebsiteMonitoringGuidePage(): React.ReactElement {
           description: 'Everything you need to know about website monitoring — types of checks, why it matters, how to choose a tool, and how to get started.',
           author: { '@type': 'Organization', name: 'Uptrue' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
-          datePublished: '2026-04-02',
-          dateModified: '2026-04-02',
+          datePublished: '2026-03-05',
+          dateModified: '2026-03-05',
           url: 'https://uptrue.io/blog/website-monitoring-guide',
         }}
       />
@@ -72,7 +72,7 @@ export default function WebsiteMonitoringGuidePage(): React.ReactElement {
       <header className="blog-article-header">
         <div className="blog-article-meta-top">
           <span className="blog-post-category">Guide</span>
-          <span>2 April 2026</span>
+          <span>5 March 2026</span>
           <span>12 min read</span>
         </div>
         <h1 className="blog-article-title">Website Monitoring in 2026: The Complete Guide</h1>

@@ -68,8 +68,8 @@ export default function WordPressPharmaHackPage(): React.ReactElement {
           description: 'How the WordPress pharma hack works, why you cannot see the injected content, how to clean it, and how keyword monitoring detects pharmaceutical spam on your pages.',
           author: { '@type': 'Organization', name: 'Uptrue' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
-          datePublished: '2026-05-06',
-          dateModified: '2026-05-06',
+          datePublished: '2026-03-25',
+          dateModified: '2026-03-25',
           url: 'https://uptrue.io/blog/wordpress-pharma-hack',
         }}
       />
@@ -77,7 +77,7 @@ export default function WordPressPharmaHackPage(): React.ReactElement {
       <header className="blog-article-header">
         <div className="blog-article-meta-top">
           <span className="blog-post-category">WordPress</span>
-          <span>6 May 2026</span>
+          <span>25 March 2026</span>
           <span>15 min read</span>
         </div>
         <h1 className="blog-article-title">WordPress Pharma Hack: Hidden Viagra Links in Your Site That Only Google Sees</h1>

@@ -68,8 +68,8 @@ export default function WpmlFourOhFourErrorsPage(): React.ReactElement {
           description: 'What causes WPML to break translated URLs, how language prefix conflicts and slug corruption produce 404 errors, and how HTTP monitoring catches broken language versions automatically.',
           author: { '@type': 'Organization', name: 'Uptrue' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
-          datePublished: '2026-05-20',
-          dateModified: '2026-05-20',
+          datePublished: '2026-04-03',
+          dateModified: '2026-04-03',
           url: 'https://uptrue.io/blog/wordpress-wpml-404-errors',
         }}
       />
@@ -77,7 +77,7 @@ export default function WpmlFourOhFourErrorsPage(): React.ReactElement {
       <header className="blog-article-header">
         <div className="blog-article-meta-top">
           <span className="blog-post-category">WordPress</span>
-          <span>20 May 2026</span>
+          <span>3 April 2026</span>
           <span>15 min read</span>
         </div>
         <h1 className="blog-article-title">WPML Breaking URLs After Update: How Multilingual Plugins Cause 404 Errors Across Your Site</h1>

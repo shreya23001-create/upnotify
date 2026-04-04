@@ -63,8 +63,8 @@ export default function SslCertificateMonitoringPage(): React.ReactElement {
           description: 'Why auto-renew fails and how SSL monitoring catches what automation misses.',
           author: { '@type': 'Organization', name: 'Uptrue' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
-          datePublished: '2026-04-14',
-          dateModified: '2026-04-14',
+          datePublished: '2026-03-08',
+          dateModified: '2026-03-08',
           url: 'https://uptrue.io/blog/ssl-certificate-monitoring',
         }}
       />
@@ -72,7 +72,7 @@ export default function SslCertificateMonitoringPage(): React.ReactElement {
       <header className="blog-article-header">
         <div className="blog-article-meta-top">
           <span className="blog-post-category">Security</span>
-          <span>14 April 2026</span>
+          <span>8 March 2026</span>
           <span>10 min read</span>
         </div>
         <h1 className="blog-article-title">SSL Certificate Monitoring: Why Auto-Renew Isn&apos;t Enough</h1>

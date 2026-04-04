@@ -68,8 +68,8 @@ export default function WordPressMixedContentPage(): React.ReactElement {
           description: 'Why your WordPress site still shows "Not Secure" after installing SSL, how to find and fix every mixed content source, and how Uptrue monitoring catches insecure elements automatically.',
           author: { '@type': 'Organization', name: 'Uptrue' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
-          datePublished: '2026-05-23',
-          dateModified: '2026-05-23',
+          datePublished: '2026-04-04',
+          dateModified: '2026-04-04',
           url: 'https://uptrue.io/blog/wordpress-mixed-content',
         }}
       />
@@ -77,7 +77,7 @@ export default function WordPressMixedContentPage(): React.ReactElement {
       <header className="blog-article-header">
         <div className="blog-article-meta-top">
           <span className="blog-post-category">WordPress</span>
-          <span>23 May 2026</span>
+          <span>222 March 2026</span>
           <span>14 min read</span>
         </div>
         <h1 className="blog-article-title">WordPress Mixed Content Errors: Why Your Site Shows &quot;Not Secure&quot; After Installing SSL</h1>

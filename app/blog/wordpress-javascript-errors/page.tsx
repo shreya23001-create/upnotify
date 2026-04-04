@@ -68,8 +68,8 @@ export default function WordPressJavascriptErrorsPage(): React.ReactElement {
           description: 'How JavaScript errors silently break WordPress forms, buttons, and navigation, and how keyword monitoring detects broken functionality automatically.',
           author: { '@type': 'Organization', name: 'Uptrue' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
-          datePublished: '2026-05-15',
-          dateModified: '2026-05-15',
+          datePublished: '2026-04-02',
+          dateModified: '2026-04-02',
           url: 'https://uptrue.io/blog/wordpress-javascript-errors',
         }}
       />
@@ -77,7 +77,7 @@ export default function WordPressJavascriptErrorsPage(): React.ReactElement {
       <header className="blog-article-header">
         <div className="blog-article-meta-top">
           <span className="blog-post-category">WordPress</span>
-          <span>15 May 2026</span>
+          <span>124 March 2026</span>
           <span>14 min read</span>
         </div>
         <h1 className="blog-article-title">JavaScript Errors Breaking WordPress Page Functionality: When Your Site Is Up But Broken</h1>

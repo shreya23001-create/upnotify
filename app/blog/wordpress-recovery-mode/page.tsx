@@ -68,8 +68,8 @@ export default function WordPressRecoveryModePage(): React.ReactElement {
           description: 'What triggers WordPress recovery mode, why the recovery email is unreliable, and how keyword monitoring detects the errors that cause it.',
           author: { '@type': 'Organization', name: 'Uptrue' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
-          datePublished: '2026-04-30',
-          dateModified: '2026-04-30',
+          datePublished: '2026-03-19',
+          dateModified: '2026-03-19',
           url: 'https://uptrue.io/blog/wordpress-recovery-mode',
         }}
       />
@@ -77,7 +77,7 @@ export default function WordPressRecoveryModePage(): React.ReactElement {
       <header className="blog-article-header">
         <div className="blog-article-meta-top">
           <span className="blog-post-category">WordPress</span>
-          <span>30 April 2026</span>
+          <span>19 March 2026</span>
           <span>13 min read</span>
         </div>
         <h1 className="blog-article-title">WordPress Recovery Mode: What Triggers It, What It Means, and How to Respond</h1>

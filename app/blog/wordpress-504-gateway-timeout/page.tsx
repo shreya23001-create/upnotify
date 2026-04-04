@@ -68,8 +68,8 @@ export default function WordPress504GatewayTimeoutPage(): React.ReactElement {
           description: 'What causes 504 Gateway Timeout on WordPress, how to fix each cause, and how HTTP monitoring detects them and tracks response time degradation.',
           author: { '@type': 'Organization', name: 'Uptrue' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
-          datePublished: '2026-05-05',
-          dateModified: '2026-05-05',
+          datePublished: '2026-03-24',
+          dateModified: '2026-03-24',
           url: 'https://uptrue.io/blog/wordpress-504-gateway-timeout',
         }}
       />
@@ -77,7 +77,7 @@ export default function WordPress504GatewayTimeoutPage(): React.ReactElement {
       <header className="blog-article-header">
         <div className="blog-article-meta-top">
           <span className="blog-post-category">WordPress</span>
-          <span>5 May 2026</span>
+          <span>24 March 2026</span>
           <span>14 min read</span>
         </div>
         <h1 className="blog-article-title">504 Gateway Timeout on WordPress: Why Your Pages Take Forever and Then Fail</h1>

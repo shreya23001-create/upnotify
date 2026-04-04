@@ -63,8 +63,8 @@ export default function UptimeMonitoringAgenciesPage(): React.ReactElement {
           description: 'What agencies actually need to monitor hundreds of client websites at scale.',
           author: { '@type': 'Organization', name: 'Uptrue' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
-          datePublished: '2026-04-09',
-          dateModified: '2026-04-09',
+          datePublished: '2026-03-07',
+          dateModified: '2026-03-07',
           url: 'https://uptrue.io/blog/uptime-monitoring-agencies',
         }}
       />
@@ -72,7 +72,7 @@ export default function UptimeMonitoringAgenciesPage(): React.ReactElement {
       <header className="blog-article-header">
         <div className="blog-article-meta-top">
           <span className="blog-post-category">Agency</span>
-          <span>9 April 2026</span>
+          <span>7 March 2026</span>
           <span>11 min read</span>
         </div>
         <h1 className="blog-article-title">Uptime Monitoring for Agencies: Managing 100+ Client Sites</h1>

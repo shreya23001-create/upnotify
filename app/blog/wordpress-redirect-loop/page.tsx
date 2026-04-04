@@ -68,8 +68,8 @@ export default function WordPressRedirectLoopPage(): React.ReactElement {
           description: 'What causes the WordPress login redirect loop, how to fix cookie issues and URL mismatches, and how HTTP monitoring detects redirect loops automatically.',
           author: { '@type': 'Organization', name: 'Uptrue' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
-          datePublished: '2026-04-29',
-          dateModified: '2026-04-29',
+          datePublished: '2026-03-18',
+          dateModified: '2026-03-18',
           url: 'https://uptrue.io/blog/wordpress-redirect-loop',
         }}
       />
@@ -77,7 +77,7 @@ export default function WordPressRedirectLoopPage(): React.ReactElement {
       <header className="blog-article-header">
         <div className="blog-article-meta-top">
           <span className="blog-post-category">WordPress</span>
-          <span>29 April 2026</span>
+          <span>27 March 2026</span>
           <span>13 min read</span>
         </div>
         <h1 className="blog-article-title">WordPress Login Redirect Loop: Why wp-admin Keeps Sending You Back to the Login Page</h1>

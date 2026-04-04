@@ -63,8 +63,8 @@ export default function PublicStatusPageGuidePage(): React.ReactElement {
           description: 'Learn what public status pages are, why customers expect them, and how to set one up for free.',
           author: { '@type': 'Organization', name: 'Uptrue' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
-          datePublished: '2026-04-05',
-          dateModified: '2026-04-05',
+          datePublished: '2026-03-06',
+          dateModified: '2026-03-06',
           url: 'https://uptrue.io/blog/public-status-page-guide',
         }}
       />
@@ -72,7 +72,7 @@ export default function PublicStatusPageGuidePage(): React.ReactElement {
       <header className="blog-article-header">
         <div className="blog-article-meta-top">
           <span className="blog-post-category">Guide</span>
-          <span>5 April 2026</span>
+          <span>6 March 2026</span>
           <span>10 min read</span>
         </div>
         <h1 className="blog-article-title">How to Create a Public Status Page for Your Website (Free)</h1>
