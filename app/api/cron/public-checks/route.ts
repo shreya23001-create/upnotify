@@ -80,11 +80,18 @@ export async function GET(request: Request): Promise<NextResponse> {
   }
 
   try {
-    const monitors = await getActivePublicMonitors()
-    logger.info('Public check runner started', { monitors: monitors.length })
+    const allMonitors = await getActivePublicMonitors()
 
-    // Phase 1: Run checks in batches of 10 to avoid timeout
-    const BATCH_SIZE = 10
+    // In non-production, only check 15 random sites to avoid timeout on Hobby plan
+    const isProduction = process.env.VERCEL_ENV === 'production'
+    const monitors = isProduction
+      ? allMonitors
+      : allMonitors.sort(() => Math.random() - 0.5).slice(0, 15)
+
+    logger.info('Public check runner started', { total: allMonitors.length, checking: monitors.length, isProduction })
+
+    // Run checks in batches of 5 to avoid timeout
+    const BATCH_SIZE = 5
     const allResults: PromiseSettledResult<FirstCheckResult>[] = []
 
     for (let i = 0; i < monitors.length; i += BATCH_SIZE) {
