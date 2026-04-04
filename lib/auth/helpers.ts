@@ -28,6 +28,7 @@ const PUBLIC_ROUTES: ReadonlyArray<string> = [
   '/contact',
   '/credits',
   '/referrals',
+  '/compete',
 ]
 
 export function isPublicRoute(pathname: string): boolean {
@@ -42,6 +43,7 @@ export function isPublicRoute(pathname: string): boolean {
   if (pathname.startsWith('/api/v1/tracker/')) return true
   if (pathname.startsWith('/api/tools/')) return true
   if (pathname.startsWith('/api/webhooks/')) return true
+  if (pathname.startsWith('/api/v1/agency-waitlist')) return true
   if (pathname.startsWith('/invite/')) return true
   if (pathname.startsWith('/r/')) return true
   return false

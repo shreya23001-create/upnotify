@@ -451,6 +451,26 @@ export function PlansManager({ plans, creditRules, subscriberCounts, competePlan
                 </label>
               </div>
 
+              <h3 className="plans-section-title">Enforcement Summary</h3>
+              <div style={{ background: 'var(--bg-secondary, #f8fafc)', borderRadius: 10, padding: 16, fontSize: 13, lineHeight: 1.8 }}>
+                <p><strong>What is enforced by this plan:</strong></p>
+                <ul style={{ paddingLeft: 18, color: 'var(--text-secondary)' }}>
+                  <li>Monitor limit: <strong>{editingPlan.monitor_limit ?? 'Unlimited'}</strong> — checked on monitor creation</li>
+                  <li>Check interval: <strong>{editingPlan.check_interval_seconds}s minimum</strong> — enforced on create + edit</li>
+                  <li>Team members: <strong>{editingPlan.max_team_members === 0 ? 'Solo only' : `${editingPlan.max_team_members} members`}</strong> — checked on invite</li>
+                  <li>Workspaces: <strong>{editingPlan.client_workspace_limit ?? 'Unlimited'}</strong> — checked on workspace creation</li>
+                  <li>Data retention: <strong>{editingPlan.data_retention_days ? `${editingPlan.data_retention_days} days` : 'Unlimited'}</strong> — applied on queries</li>
+                  <li>API access: <strong>{editingPlan.has_api_access ? 'Yes' : 'No'}</strong> — checked on API key creation</li>
+                  <li>Status page custom domain: <strong>{editingPlan.has_status_page_custom_domain ? 'Yes' : 'No'}</strong></li>
+                  <li>White label: <strong>{editingPlan.has_white_label ? 'Yes' : 'No'}</strong></li>
+                  <li>Voice calls: <strong>{editingPlan.has_voice_calls ? `Yes (${editingPlan.voice_call_monthly_limit}/mo)` : 'No'}</strong></li>
+                  <li>Compete: <strong>Separate add-on</strong> — managed in Compete tab</li>
+                </ul>
+                <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 8 }}>
+                  All limits are enforced server-side via <code>lib/utils/plan-limits.ts</code>. Changes here update the single source of truth.
+                </p>
+              </div>
+
               <h3 className="plans-section-title">Stripe</h3>
               <div className="plans-form-grid">
                 <div className="form-group">

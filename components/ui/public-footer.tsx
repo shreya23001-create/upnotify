@@ -41,6 +41,7 @@ export function PublicFooter(): React.ReactElement {
             <Link href="/tools">
               Tools <sup className="nav-free-tag">Free</sup>
             </Link>
+            <Link href="/compete">Compete</Link>
             <Link href="/blog">Blog</Link>
           </div>
           <div className="footer-col">

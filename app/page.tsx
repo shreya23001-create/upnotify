@@ -13,6 +13,7 @@ import { FAQ_ITEMS } from '@/lib/constants/faq'
 import { PublicNav } from '@/components/ui/public-nav'
 import { PublicFooter } from '@/components/ui/public-footer'
 import { TrustedLogos } from '@/components/landing/trusted-logos'
+import { AgencyWaitlistCta } from '@/components/landing/agency-waitlist-cta'
 
 export const metadata: Metadata = {
   title: 'Uptrue — Uptime Monitoring for Agencies & Teams',
@@ -361,12 +362,7 @@ export default function LandingPage(): React.ReactElement {
                   AI reports branded with your agency name
                 </li>
               </ul>
-              <a
-                href="mailto:agencies@uptrue.io?subject=Agency%20Waitlist%20%E2%80%94%20Early%20Access"
-                className="btn btn-primary btn-lg"
-              >
-                Join the Waitlist for Early Access
-              </a>
+              <AgencyWaitlistCta />
             </div>
             <div className="agency-visual">
               <div className="agency-mock">

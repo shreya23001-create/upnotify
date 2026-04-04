@@ -2096,6 +2096,50 @@ export type Database = {
         Update: {}
         Relationships: []
       }
+      agency_waitlist: {
+        Row: {
+          id: string
+          name: string
+          email: string
+          phone: string | null
+          country: string | null
+          city: string | null
+          business_name: string
+          website: string | null
+          num_clients: number | null
+          status: string
+          ai_report: Json | null
+          ai_score: number | null
+          notes: string | null
+          reviewed_by: string | null
+          reviewed_at: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          email: string
+          phone?: string | null
+          country?: string | null
+          city?: string | null
+          business_name: string
+          website?: string | null
+          num_clients?: number | null
+          status?: string
+          ai_report?: Json | null
+          ai_score?: number | null
+          notes?: string | null
+        }
+        Update: {
+          status?: string
+          ai_report?: Json | null
+          ai_score?: number | null
+          notes?: string | null
+          reviewed_by?: string | null
+          reviewed_at?: string | null
+        }
+        Relationships: []
+      }
       email_templates: {
         Row: {
           id: string
