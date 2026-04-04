@@ -166,71 +166,57 @@ export function AdminUsersContent({ users, organisations, plans }: AdminUsersCon
       searchable: false,
       sortable: false,
       render: (u) => {
-        if (u.is_super_admin) return null
+        if (u.is_super_admin) return <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Super Admin</span>
         const isDeactivated = (u as unknown as Record<string, unknown>).is_active === false
         const userName = u.full_name ?? u.email
 
         return (
-          <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
             <button
-              className="btn btn-sm btn-outline"
+              className="btn btn-sm btn-primary"
               onClick={() => handleImpersonate(u.id)}
               disabled={impersonatingId === u.id}
-              style={{ fontSize: 11, padding: '3px 8px' }}
+              style={{ fontSize: 11, padding: '4px 10px' }}
             >
-              {impersonatingId === u.id ? '...' : 'View'}
+              {impersonatingId === u.id ? '...' : 'Mimic'}
             </button>
 
-            {/* Plan change dropdown */}
             <select
               className="form-select"
-              style={{ fontSize: 11, padding: '3px 6px', width: 'auto', minWidth: 80 }}
+              style={{ fontSize: 11, padding: '4px 8px', width: 'auto', minWidth: 100, color: 'var(--text-secondary)' }}
               defaultValue=""
               onChange={(e) => {
-                const planId = e.target.value
-                if (!planId) return
-                const plan = plans.find(p => p.id === planId)
-                setConfirmAction({
-                  type: 'change_plan',
-                  userId: u.id,
-                  userName,
-                  planId,
-                  planName: plan?.name ?? 'Unknown',
-                })
+                const action = e.target.value
+                if (!action) return
                 e.target.value = ''
+
+                if (action === 'deactivate') {
+                  setConfirmAction({ type: 'deactivate', userId: u.id, userName })
+                } else if (action === 'activate') {
+                  setConfirmAction({ type: 'activate', userId: u.id, userName })
+                } else if (action === 'delete') {
+                  setConfirmAction({ type: 'delete', userId: u.id, userName })
+                } else if (action.startsWith('plan:')) {
+                  const planId = action.slice(5)
+                  const plan = plans.find(p => p.id === planId)
+                  setConfirmAction({ type: 'change_plan', userId: u.id, userName, planId, planName: plan?.name ?? 'Unknown' })
+                }
               }}
             >
-              <option value="">Change Plan</option>
-              {plans.filter(p => p.is_visible).map(p => (
-                <option key={p.id} value={p.id}>{p.name}</option>
-              ))}
+              <option value="">More...</option>
+              <optgroup label="Change Plan">
+                {plans.filter(p => p.is_visible).map(p => (
+                  <option key={p.id} value={`plan:${p.id}`}>{p.name}</option>
+                ))}
+              </optgroup>
+              <optgroup label="Account">
+                {isDeactivated
+                  ? <option value="activate">Activate</option>
+                  : <option value="deactivate">Deactivate</option>
+                }
+                <option value="delete" style={{ color: '#dc2626' }}>Delete permanently</option>
+              </optgroup>
             </select>
-
-            {isDeactivated ? (
-              <button
-                className="btn btn-sm"
-                style={{ fontSize: 11, padding: '3px 8px', background: '#dcfce7', color: '#166534', border: '1px solid #bbf7d0' }}
-                onClick={() => setConfirmAction({ type: 'activate', userId: u.id, userName })}
-              >
-                Activate
-              </button>
-            ) : (
-              <button
-                className="btn btn-sm"
-                style={{ fontSize: 11, padding: '3px 8px', background: '#fef3c7', color: '#92400e', border: '1px solid #fde68a' }}
-                onClick={() => setConfirmAction({ type: 'deactivate', userId: u.id, userName })}
-              >
-                Deactivate
-              </button>
-            )}
-
-            <button
-              className="btn btn-sm"
-              style={{ fontSize: 11, padding: '3px 8px', background: '#fef2f2', color: '#dc2626', border: '1px solid #fca5a5' }}
-              onClick={() => setConfirmAction({ type: 'delete', userId: u.id, userName })}
-            >
-              Delete
-            </button>
           </div>
         )
       },
