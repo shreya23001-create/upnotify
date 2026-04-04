@@ -13,7 +13,6 @@ import { getServerConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
 
 export const dynamic = 'force-dynamic'
-export const maxDuration = 60 // seconds — Vercel Hobby allows up to 60s for API routes
 export const maxDuration = 60
 
 function sleep(ms: number): Promise<void> {
