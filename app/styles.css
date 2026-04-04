@@ -3302,3 +3302,28 @@ html.dark .compete-success-msg { color: #6ee7b7; }
 .compete-pricing-badge { display: inline-block; background: var(--accent-gradient); color: #fff; font-size: 12px; font-weight: 700; padding: 4px 14px; border-radius: 20px; margin-bottom: 12px; letter-spacing: 0.5px; text-transform: uppercase; }
 .compete-pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; max-width: 1000px; margin: 0 auto; }
 @media (max-width: 768px) { .compete-pricing-grid { grid-template-columns: 1fr; max-width: 400px; } }
+
+/* ========== Incidents Page ========== */
+.incidents-tabs { display: flex; gap: 4px; margin-bottom: 20px; background: var(--bg-muted, #f1f5f9); padding: 4px; border-radius: 10px; width: fit-content; }
+.incidents-tab { padding: 8px 18px; border: none; background: transparent; border-radius: 8px; font-size: 13px; font-weight: 600; color: var(--text-muted, #64748b); cursor: pointer; transition: all 0.2s; }
+.incidents-tab:hover { color: var(--text-primary, #1e293b); }
+.incidents-tab-active { background: var(--bg-card, #fff); color: var(--text-primary, #1e293b); box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.incident-title { font-weight: 600; color: var(--text-primary); }
+.incident-monitor-id { font-size: 12px; font-family: monospace; color: var(--text-muted); }
+.incident-actions { display: flex; flex-direction: column; gap: 8px; }
+.incident-status-select { height: 32px; padding: 0 10px; border: 1.5px solid var(--border-input, #e2e8f0); border-radius: 8px; font-size: 12px; font-weight: 500; background: var(--bg-input, #fff); color: var(--text-primary); cursor: pointer; transition: all 0.2s; }
+.incident-status-select:hover { border-color: #cbd5e1; }
+.incident-status-select:disabled { opacity: 0.5; cursor: not-allowed; }
+.incident-resolve-form { display: flex; flex-direction: column; gap: 8px; min-width: 220px; }
+.incident-resolve-textarea { width: 100%; padding: 8px 10px; border: 1.5px solid var(--border-input, #e2e8f0); border-radius: 8px; font-size: 13px; font-family: inherit; resize: vertical; background: var(--bg-input, #fff); color: var(--text-primary); }
+.incident-resolve-textarea:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+.incident-resolve-buttons { display: flex; gap: 8px; }
+.table-cell-muted { font-size: 13px; color: var(--text-muted, #64748b); }
+.table-wrapper { overflow-x: auto; border: 1px solid var(--border-primary, #e2e8f0); border-radius: 12px; background: var(--bg-card, #fff); }
+
+/* ========== Admin Monitoring Overview ========== */
+.admin-monitoring-overview { }
+.admin-stat-card-clickable { transition: all 0.2s; }
+.admin-stat-card-clickable:hover { border-color: var(--accent, #3b82f6); box-shadow: 0 2px 8px rgba(59,130,246,0.08); }
+.admin-stat-card-selected { border-color: var(--accent, #3b82f6) !important; box-shadow: 0 0 0 2px rgba(59,130,246,0.15); }
+.monitor-name-cell { font-weight: 600; color: var(--text-primary); }

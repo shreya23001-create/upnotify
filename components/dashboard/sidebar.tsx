@@ -28,6 +28,7 @@ const mainNavItems: NavItem[] = [
   { href: '/dashboard', label: 'Dashboard', icon: IconDashboard },
   { href: '/dashboard/monitors', label: 'Monitors', icon: IconActivity },
   { href: '/dashboard/alerts', label: 'Alerts', icon: IconAlertTriangle },
+  { href: '/dashboard/incidents', label: 'Incidents', icon: IconAlertTriangle },
   { href: '/dashboard/status-pages', label: 'Status Pages', icon: IconGlobe },
   { href: '/dashboard/reports', label: 'Reports', icon: IconTrendingUp },
   { href: '/dashboard/competitors', label: 'Competitors', icon: IconTarget },
@@ -84,9 +85,9 @@ export function Sidebar(): React.ReactElement {
   if (isAgency) {
     mainItems.push({ href: '/dashboard/clients', label: 'Clients', icon: IconBuilding })
   }
-  // Inject open incident badge count onto the Alerts nav item
+  // Inject open incident badge count onto Alerts and Incidents nav items
   const itemsWithBadges = mainNavItems.map(item => {
-    if (item.href === '/dashboard/alerts' && openIncidentCount > 0) {
+    if ((item.href === '/dashboard/alerts' || item.href === '/dashboard/incidents') && openIncidentCount > 0) {
       return { ...item, badge: openIncidentCount }
     }
     return item

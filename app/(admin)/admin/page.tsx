@@ -1,6 +1,7 @@
 import { getAllOrganisations, getAllUsers, getFeatureFlags, getPlans } from '@/lib/db/admin'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getSubmissionStats } from '@/lib/db/credit-submissions'
+import { MonitoringOverview } from '@/components/admin/monitoring-overview'
 import Link from 'next/link'
 
 async function getAdminMetrics(): Promise<{
@@ -165,6 +166,9 @@ export default async function AdminDashboardPage(): Promise<React.ReactElement> 
           </Link>
         </div>
       </div>
+
+      {/* Monitoring Overview — all monitors across all orgs */}
+      <MonitoringOverview />
     </div>
   )
 }
