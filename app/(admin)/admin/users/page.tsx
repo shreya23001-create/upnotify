@@ -1,10 +1,11 @@
-import { getAllUsers, getAllOrganisations } from '@/lib/db/admin'
+import { getAllUsers, getAllOrganisations, getPlans } from '@/lib/db/admin'
 import { AdminUsersContent } from '@/components/admin/admin-users-content'
 
 export default async function AdminUsersPage(): Promise<React.ReactElement> {
-  const [users, organisations] = await Promise.all([
+  const [users, organisations, plans] = await Promise.all([
     getAllUsers(),
     getAllOrganisations(),
+    getPlans(),
   ])
 
   return (
@@ -13,7 +14,7 @@ export default async function AdminUsersPage(): Promise<React.ReactElement> {
         <div>
           <h1 className="admin-page-title">Users</h1>
           <p className="admin-page-subtitle">
-            Manage all platform users. View details, manage roles, and impersonate users for debugging.
+            Manage all users. Delete, deactivate, change plans, or impersonate for debugging.
           </p>
         </div>
         <div className="admin-page-header-stat">
@@ -21,7 +22,7 @@ export default async function AdminUsersPage(): Promise<React.ReactElement> {
           <span className="admin-page-header-stat-label">total users</span>
         </div>
       </div>
-      <AdminUsersContent users={users} organisations={organisations} />
+      <AdminUsersContent users={users} organisations={organisations} plans={plans} />
     </div>
   )
 }
