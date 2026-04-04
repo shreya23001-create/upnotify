@@ -10,8 +10,10 @@ export async function check(monitor: Monitor): Promise<CheckerResult> {
 
   return new Promise<CheckerResult>((resolve) => {
     const socket = tls.connect(
-      { host: hostname, port: 443, servername: hostname, timeout: monitor.timeout_ms },
+      { host: hostname, port: 443, servername: hostname, timeout: monitor.timeout_ms, rejectUnauthorized: false },
       () => {
+        const authorized = socket.authorized
+        const authError = String(socket.authorizationError || '')
         const cert = socket.getPeerCertificate()
         socket.end()
         const responseTimeMs = Date.now() - start
@@ -27,12 +29,33 @@ export async function check(monitor: Monitor): Promise<CheckerResult> {
           (expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
         )
 
-        const metadata = {
+        const metadata: Record<string, unknown> = {
           daysUntilExpiry,
           issuer: cert.issuer?.O || 'Unknown',
           validFrom: cert.valid_from,
           validTo: cert.valid_to,
           subject: cert.subject?.CN || hostname,
+          chainValid: authorized,
+          chainError: authError || null,
+        }
+
+        // Check for chain issues (incomplete chain, self-signed intermediate, etc.)
+        if (!authorized && authError) {
+          let chainMessage = 'Certificate chain issue'
+          if (authError.includes('unable to verify the first certificate') || authError.includes('unable to get local issuer certificate')) {
+            chainMessage = 'Incomplete certificate chain — intermediate CA certificate is missing'
+          } else if (authError.includes('self-signed')) {
+            chainMessage = 'Self-signed certificate — not trusted by browsers'
+          }
+
+          // Still report cert details but mark as degraded (cert exists but chain broken)
+          resolve({
+            status: 'degraded',
+            responseTimeMs,
+            errorMessage: chainMessage,
+            metadata,
+          })
+          return
         }
 
         if (daysUntilExpiry < 0) {
@@ -59,10 +82,27 @@ export async function check(monitor: Monitor): Promise<CheckerResult> {
 
     socket.on('error', (err) => {
       socket.destroy()
+      const raw = err.message || 'Unknown SSL error'
+
+      // Translate common OpenSSL errors into user-friendly messages
+      let errorMessage = raw
+      if (raw.includes('unable to verify the first certificate') || raw.includes('unable to get local issuer certificate')) {
+        errorMessage = 'Incomplete certificate chain — the server is not sending the intermediate CA certificate. Contact the site administrator to fix their SSL configuration.'
+      } else if (raw.includes('certificate has expired')) {
+        errorMessage = 'SSL certificate has expired.'
+      } else if (raw.includes('self-signed certificate')) {
+        errorMessage = 'Self-signed certificate detected — not trusted by browsers.'
+      } else if (raw.includes('ECONNREFUSED')) {
+        errorMessage = 'Connection refused on port 443 — HTTPS may not be configured.'
+      } else if (raw.includes('ENOTFOUND')) {
+        errorMessage = 'Domain not found — DNS resolution failed.'
+      }
+
       resolve({
         status: 'down',
         responseTimeMs: Date.now() - start,
-        errorMessage: err.message,
+        errorMessage,
+        metadata: { rawError: raw },
       })
     })
 
