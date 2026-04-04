@@ -38,7 +38,7 @@ export async function POST(request: Request): Promise<NextResponse> {
 
   const { anthropic: anthropicConfig } = getServerConfig()
   if (!anthropicConfig.apiKey) {
-    return NextResponse.json({ error: 'AI service not configured' }, { status: 503 })
+    return NextResponse.json({ error: 'ANTHROPIC_API_KEY is not set. Add it to your Vercel environment variables.' }, { status: 503 })
   }
 
   const client = new Anthropic({ apiKey: anthropicConfig.apiKey })
@@ -130,7 +130,8 @@ Be realistic and practical. If information is missing, note it as a weakness and
 
     return NextResponse.json({ success: true, report, score })
   } catch (error) {
-    logger.error('AI report generation failed', { error: String(error) })
-    return NextResponse.json({ error: 'AI report generation failed' }, { status: 500 })
+    const errorMsg = error instanceof Error ? error.message : String(error)
+    logger.error('AI report generation failed', { error: errorMsg })
+    return NextResponse.json({ error: `AI report generation failed: ${errorMsg}` }, { status: 500 })
   }
 }
