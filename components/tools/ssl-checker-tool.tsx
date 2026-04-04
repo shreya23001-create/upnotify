@@ -21,6 +21,43 @@ function getExpiryStatus(days: number): { label: string; color: string; classNam
   return { label: 'Healthy', color: 'var(--color-success, #22c55e)', className: 'ssl-status-healthy' }
 }
 
+function getRemedies(result: SslResult): string[] {
+  const remedies: string[] = []
+  const err = (result.errorMessage || '').toLowerCase()
+
+  if (err.includes('incomplete certificate chain') || err.includes('intermediate')) {
+    remedies.push('The server is not sending the full certificate chain. Ask your hosting provider or system administrator to install the intermediate CA certificate.')
+    remedies.push('If you use Apache, add the intermediate cert to SSLCertificateChainFile. For Nginx, concatenate it with your certificate file.')
+    remedies.push('Test your chain at ssllabs.com/ssltest to confirm the fix.')
+  } else if (err.includes('self-signed')) {
+    remedies.push('Self-signed certificates are not trusted by browsers and will show security warnings to visitors.')
+    remedies.push('Replace with a certificate from a trusted CA. Free options include Let\'s Encrypt (certbot) or Cloudflare.')
+    remedies.push('If this is an internal/development server, you can add the certificate to your local trust store.')
+  } else if (err.includes('expired')) {
+    remedies.push('Your SSL certificate has expired. Renew it immediately through your certificate provider.')
+    remedies.push('If using Let\'s Encrypt, run: sudo certbot renew --force-renewal')
+    remedies.push('Set up auto-renewal with a cron job to prevent this in future: 0 3 * * * certbot renew --quiet')
+  } else if (err.includes('connection refused') || err.includes('ECONNREFUSED')) {
+    remedies.push('Port 443 (HTTPS) is not accepting connections. Check that your web server is running and listening on port 443.')
+    remedies.push('Verify your firewall allows inbound traffic on port 443.')
+    remedies.push('If using a load balancer, ensure SSL termination is configured correctly.')
+  } else if (err.includes('not found') || err.includes('ENOTFOUND')) {
+    remedies.push('The domain could not be resolved. Check your DNS records are correctly configured.')
+    remedies.push('Verify the domain is spelled correctly and the DNS has propagated (can take up to 48 hours for new domains).')
+  } else if (err.includes('timeout')) {
+    remedies.push('The SSL connection timed out. The server may be overloaded or unreachable.')
+    remedies.push('Check if the server is up and responding on port 443.')
+    remedies.push('If behind a CDN like Cloudflare, ensure SSL mode is set to Full or Full (Strict).')
+  }
+
+  if (result.valid && result.daysUntilExpiry > 0 && result.daysUntilExpiry <= 30) {
+    remedies.push(`Your certificate expires in ${result.daysUntilExpiry} days. Renew it now to avoid downtime.`)
+    remedies.push('Set up automated monitoring with Uptrue to get alerted before expiry.')
+  }
+
+  return remedies
+}
+
 export function SslCheckerTool(): React.ReactElement {
   const [domain, setDomain] = useState('')
   const [loading, setLoading] = useState(false)
@@ -90,8 +127,24 @@ export function SslCheckerTool(): React.ReactElement {
         <div className="ssl-checker-results">
           {result.errorMessage ? (
             <div className="card ssl-result-card ssl-result-error">
-              <h3>SSL Check Failed</h3>
+              <h3>SSL Issue Detected</h3>
               <p>{result.errorMessage}</p>
+
+              {getRemedies(result).length > 0 && (
+                <div className="ssl-remedies">
+                  <h4>Possible Remedies</h4>
+                  <ul>
+                    {getRemedies(result).map((remedy, i) => (
+                      <li key={i}>{remedy}</li>
+                    ))}
+                  </ul>
+                  <p className="ssl-disclaimer">
+                    These suggestions are for informational purposes only. We recommend consulting
+                    a qualified technical professional before making changes to your server configuration.
+                    Uptrue accepts no responsibility for any actions taken based on these suggestions.
+                  </p>
+                </div>
+              )}
             </div>
           ) : (
             <>
@@ -142,6 +195,25 @@ export function SslCheckerTool(): React.ReactElement {
                   <span className="ssl-detail-value">{result.responseTimeMs}ms</span>
                 </div>
               </div>
+
+              {/* Show remedies for expiring certs */}
+              {getRemedies(result).length > 0 && (
+                <div className="card ssl-result-card" style={{ marginTop: 16 }}>
+                  <div className="ssl-remedies">
+                    <h4>Recommendations</h4>
+                    <ul>
+                      {getRemedies(result).map((remedy, i) => (
+                        <li key={i}>{remedy}</li>
+                      ))}
+                    </ul>
+                    <p className="ssl-disclaimer">
+                      These suggestions are for informational purposes only. We recommend consulting
+                      a qualified technical professional before making changes to your server configuration.
+                      Uptrue accepts no responsibility for any actions taken based on these suggestions.
+                    </p>
+                  </div>
+                </div>
+              )}
             </>
           )}
         </div>

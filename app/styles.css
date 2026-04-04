@@ -2165,6 +2165,12 @@ html.dark .landing-cta { background: linear-gradient(135deg, #1a1d27 0%, #242736
 .ssl-result-error { padding: 24px; background: rgba(239, 68, 68, 0.05); border-color: rgba(239, 68, 68, 0.2); }
 .ssl-result-error h3 { color: var(--color-danger, #ef4444); margin-bottom: 8px; }
 .ssl-result-error p { color: var(--text-secondary); }
+.ssl-remedies { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-primary); }
+.ssl-remedies h4 { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 10px; }
+.ssl-remedies ul { list-style: none; padding: 0; margin: 0 0 12px; display: flex; flex-direction: column; gap: 8px; }
+.ssl-remedies li { font-size: 13px; color: var(--text-secondary); line-height: 1.6; padding-left: 20px; position: relative; }
+.ssl-remedies li::before { content: '\2192'; position: absolute; left: 0; color: var(--color-primary, #3b82f6); }
+.ssl-disclaimer { font-size: 11px; color: var(--text-muted); font-style: italic; line-height: 1.5; margin-top: 12px; padding: 8px 12px; background: var(--bg-secondary, #f8fafc); border-radius: 6px; }
 
 @media (max-width: 768px) {
   .ssl-checker-input-row { flex-direction: column; }
