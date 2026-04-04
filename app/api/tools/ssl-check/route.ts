@@ -53,10 +53,12 @@ function checkSsl(hostname: string): Promise<SslCheckResponse> {
 
   return new Promise<SslCheckResponse>((resolve) => {
     const socket = tls.connect(
-      { host: hostname, port: 443, servername: hostname, timeout: 10000 },
+      { host: hostname, port: 443, servername: hostname, timeout: 10000, rejectUnauthorized: false },
       () => {
         const cert = socket.getPeerCertificate()
         const protocol = socket.getProtocol() || 'Unknown'
+        const authorized = socket.authorized
+        const authError = String(socket.authorizationError || '')
         socket.end()
         const responseTimeMs = Date.now() - start
 
@@ -81,8 +83,20 @@ function checkSsl(hostname: string): Promise<SslCheckResponse> {
           (expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
         )
 
+        // Build chain warning if applicable
+        let chainWarning: string | undefined
+        if (!authorized && authError) {
+          if (authError.includes('unable to verify the first certificate') || authError.includes('unable to get local issuer certificate')) {
+            chainWarning = 'Incomplete certificate chain — intermediate CA certificate is missing. Contact the site administrator.'
+          } else if (authError.includes('self-signed')) {
+            chainWarning = 'Self-signed certificate — not trusted by browsers.'
+          } else {
+            chainWarning = `Certificate chain issue: ${authError}`
+          }
+        }
+
         resolve({
-          valid: daysUntilExpiry > 0,
+          valid: daysUntilExpiry > 0 && authorized,
           issuer: String(cert.issuer?.O || cert.issuer?.CN || 'Unknown'),
           subject: String(cert.subject?.CN || hostname),
           validFrom: cert.valid_from,
@@ -90,12 +104,27 @@ function checkSsl(hostname: string): Promise<SslCheckResponse> {
           daysUntilExpiry,
           protocol,
           responseTimeMs,
+          errorMessage: chainWarning,
         })
       }
     )
 
     socket.on('error', (err) => {
       socket.destroy()
+      const raw = err.message || 'Unknown SSL error'
+      let errorMessage = raw
+      if (raw.includes('unable to verify the first certificate') || raw.includes('unable to get local issuer certificate')) {
+        errorMessage = 'Incomplete certificate chain — the server is not sending the intermediate CA certificate.'
+      } else if (raw.includes('certificate has expired')) {
+        errorMessage = 'SSL certificate has expired.'
+      } else if (raw.includes('self-signed')) {
+        errorMessage = 'Self-signed certificate — not trusted by browsers.'
+      } else if (raw.includes('ECONNREFUSED')) {
+        errorMessage = 'Connection refused on port 443 — HTTPS may not be configured.'
+      } else if (raw.includes('ENOTFOUND')) {
+        errorMessage = 'Domain not found — DNS resolution failed.'
+      }
+
       resolve({
         valid: false,
         issuer: 'Unknown',
@@ -105,7 +134,7 @@ function checkSsl(hostname: string): Promise<SslCheckResponse> {
         daysUntilExpiry: 0,
         protocol: 'Unknown',
         responseTimeMs: Date.now() - start,
-        errorMessage: err.message,
+        errorMessage,
       })
     })
 
