@@ -149,8 +149,9 @@ export function AdminUsersContent({ users, organisations, plans }: AdminUsersCon
       label: 'Role',
       render: (u) => (
         <span>
-          <span className={`badge ${u.role === 'deactivated' ? 'badge-danger' : 'badge-outline'}`} style={{ textTransform: 'capitalize' }}>{u.role}</span>
+          <span className="badge badge-outline" style={{ textTransform: 'capitalize' }}>{u.role}</span>
           {u.is_super_admin && <span className="badge badge-danger" style={{ marginLeft: 4 }}>Super</span>}
+          {(u as unknown as Record<string, unknown>).is_active === false && <span className="badge badge-danger" style={{ marginLeft: 4 }}>Inactive</span>}
         </span>
       ),
     },
@@ -166,7 +167,7 @@ export function AdminUsersContent({ users, organisations, plans }: AdminUsersCon
       sortable: false,
       render: (u) => {
         if (u.is_super_admin) return null
-        const isDeactivated = u.role === 'deactivated'
+        const isDeactivated = (u as unknown as Record<string, unknown>).is_active === false
         const userName = u.full_name ?? u.email
 
         return (

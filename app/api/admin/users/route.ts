@@ -32,14 +32,13 @@ export async function PATCH(request: Request): Promise<NextResponse> {
   const supabase = createAdminClient()
 
   if (body.action === 'deactivate') {
-    // Deactivate: set a flag (we'll use role = 'deactivated')
     const { error } = await supabase
       .from('users')
-      .update({ role: 'deactivated' })
+      .update({ is_active: false })
       .eq('id', body.userId)
 
     if (error) {
-      return NextResponse.json({ error: 'Failed to deactivate user' }, { status: 500 })
+      return NextResponse.json({ error: `Failed to deactivate: ${error.message}` }, { status: 500 })
     }
 
     await writeAuditLog({
@@ -57,11 +56,11 @@ export async function PATCH(request: Request): Promise<NextResponse> {
   if (body.action === 'activate') {
     const { error } = await supabase
       .from('users')
-      .update({ role: 'admin' })
+      .update({ is_active: true })
       .eq('id', body.userId)
 
     if (error) {
-      return NextResponse.json({ error: 'Failed to activate user' }, { status: 500 })
+      return NextResponse.json({ error: `Failed to activate: ${error.message}` }, { status: 500 })
     }
 
     await writeAuditLog({

@@ -1433,6 +1433,7 @@ export type Database = {
           email: string
           full_name: string | null
           id: string
+          is_active: boolean
           is_super_admin: boolean
           org_id: string
           original_org_id: string | null
@@ -1446,6 +1447,7 @@ export type Database = {
           email: string
           full_name?: string | null
           id: string
+          is_active?: boolean
           is_super_admin?: boolean
           org_id: string
           original_org_id?: string | null
@@ -1459,6 +1461,7 @@ export type Database = {
           email?: string
           full_name?: string | null
           id?: string
+          is_active?: boolean
           is_super_admin?: boolean
           org_id?: string
           original_org_id?: string | null
