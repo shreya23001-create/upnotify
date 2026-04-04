@@ -245,19 +245,15 @@ export async function acceptTeamInvite(
     }
   }
 
-  // Block if user already belongs to any organisation (one user = one org)
+  // Check if user already exists
   const { data: existingUser } = await supabase
     .from('users')
     .select('id, org_id')
     .eq('id', userId)
     .single()
 
-  if (existingUser?.org_id && existingUser.org_id !== invite.org_id) {
-    return {
-      success: false,
-      error: 'You already belong to another organisation. Please leave that organisation first before accepting this invite.',
-    }
-  }
+  // If user belongs to a different org, switch them to the new org
+  // This allows org switching via invite acceptance
 
   // Update the user's org_id and role
   const { error: updateError } = await supabase
@@ -267,6 +263,21 @@ export async function acceptTeamInvite(
       role: invite.role,
     })
     .eq('id', userId)
+
+  // Update workspace to the default workspace of the new org
+  const { data: defaultWorkspace } = await supabase
+    .from('workspaces')
+    .select('id')
+    .eq('org_id', invite.org_id)
+    .limit(1)
+    .single()
+
+  if (defaultWorkspace) {
+    await supabase
+      .from('users')
+      .update({ workspace_id: defaultWorkspace.id })
+      .eq('id', userId)
+  }
 
   if (updateError) {
     logger.error('Failed to update user org during invite accept', {
