@@ -93,16 +93,33 @@ export async function getUserProfile(): Promise<{ user: ImpersonatedUser; organi
     return { user, organisation, isImpersonating: true }
   }
 
-  // Normal flow
+  // Normal flow — try user client first, fall back to admin client if RLS blocks
+  // (can happen right after accepting a team invite — session may not reflect new org yet)
   const supabase = await createClient()
-  const { data: organisation, error: orgError } = await supabase
+  let organisation: Organisation | null = null
+
+  const { data: orgData, error: orgError } = await supabase
     .from('organisations')
     .select('*')
     .eq('id', user.org_id)
     .single()
 
-  if (orgError || !organisation) {
-    logger.error('Failed to get user organisation', { error: orgError?.message })
+  if (orgData) {
+    organisation = orgData
+  } else {
+    // RLS may block — use admin client as fallback
+    logger.warn('RLS blocked org fetch, using admin client', { orgId: user.org_id, error: orgError?.message })
+    const adminClient = createAdminClient()
+    const { data: adminOrgData } = await adminClient
+      .from('organisations')
+      .select('*')
+      .eq('id', user.org_id)
+      .single()
+    organisation = adminOrgData
+  }
+
+  if (!organisation) {
+    logger.error('Failed to get user organisation', { orgId: user.org_id })
     return null
   }
 
