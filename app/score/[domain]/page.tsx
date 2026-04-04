@@ -208,7 +208,10 @@ export default async function ScoreResultsPage({ params }: PageProps): Promise<R
           </div>
 
           <div className="score-badge-section">
-            <h3>Embed this score</h3>
+            <h3>Embed this score on your website</h3>
+            <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 12, lineHeight: 1.6 }}>
+              Show visitors your site health score. The badge updates automatically whenever your score changes.
+            </p>
             <div className="score-badge-preview">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -218,9 +221,26 @@ export default async function ScoreResultsPage({ params }: PageProps): Promise<R
                 height="28"
               />
             </div>
+            <div style={{ marginTop: 12, marginBottom: 8 }}>
+              <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>Copy and paste this HTML into your website:</span>
+            </div>
             <code className="score-badge-code">
               {`<a href="https://uptrue.io/score/${encodeURIComponent(result.domain)}"><img src="https://uptrue.io/api/badge/score/${encodeURIComponent(result.domain)}" alt="Uptrue Score" /></a>`}
             </code>
+            <div style={{ marginTop: 12, fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.7 }}>
+              <strong>How to add it:</strong>
+              <ol style={{ paddingLeft: 18, marginTop: 6 }}>
+                <li>Copy the code above</li>
+                <li>Open your website editor (WordPress, Shopify, Wix, or plain HTML)</li>
+                <li>Paste it in your footer, sidebar, or any HTML block where you want the badge</li>
+                <li>Save and publish &mdash; the badge will appear immediately</li>
+              </ol>
+              <p style={{ marginTop: 8 }}>
+                <strong>WordPress?</strong> Add a Custom HTML widget or block and paste the code.{' '}
+                <strong>Shopify?</strong> Edit your theme and paste in the footer section.{' '}
+                The badge is a simple image link &mdash; it works everywhere HTML is supported.
+              </p>
+            </div>
           </div>
 
           <div className="score-categories-grid">
