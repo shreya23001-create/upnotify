@@ -4,8 +4,11 @@ import Link from 'next/link'
 import { getCurrentUser } from '@/lib/db/users'
 import { getProductsByOrg, getProductGroups } from '@/lib/db/ecom-products'
 import { checkCompeteAccess, checkCompeteProductLimit } from '@/lib/utils/plan-limits'
+import { getActiveCompetePlans } from '@/lib/db/compete-plans'
+import { getSubscriptionWithPlan } from '@/lib/db/subscriptions'
 import { CompeteProductTable } from '@/components/compete/product-table'
 import { AddProductForm } from '@/components/compete/add-product-form'
+import { CompetePlanSelector } from '@/components/compete/compete-plan-selector'
 
 export const metadata: Metadata = {
   title: 'Compete — Price Monitoring',
@@ -18,6 +21,12 @@ export default async function CompetePage(): Promise<React.ReactElement> {
   const hasAccess = await checkCompeteAccess(user.org_id)
 
   if (!hasAccess) {
+    const [competePlans, baseSub] = await Promise.all([
+      getActiveCompetePlans(),
+      getSubscriptionWithPlan(user.org_id),
+    ])
+    const hasPaidBasePlan = baseSub?.subscription?.status === 'active'
+
     return (
       <div>
         <div className="page-header">
@@ -28,30 +37,7 @@ export default async function CompetePage(): Promise<React.ReactElement> {
             </p>
           </div>
         </div>
-        <div className="compete-upgrade-cta">
-          <div className="compete-upgrade-icon">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
-              <polyline points="17 6 23 6 23 12" />
-            </svg>
-          </div>
-          <h2 className="compete-upgrade-title">Price Intelligence for Your Products</h2>
-          <p className="compete-upgrade-description">
-            Compete is a separate add-on available with any paid monitoring plan.
-            Track competitor prices, monitor stock availability, and get real-time alerts.
-          </p>
-          <ul className="compete-upgrade-features">
-            <li>Plans from {'\u00A3'}9/month (10 products) to {'\u00A3'}99/month (2,500 products)</li>
-            <li>Automatic price extraction from any ecommerce site</li>
-            <li>Real-time stock availability monitoring</li>
-            <li>Webhook integration with WooCommerce, Shopify, BigCommerce</li>
-            <li>Price change alerts via email, Slack, or webhook</li>
-            <li>Buy additional products in bundles of 5 or 10</li>
-          </ul>
-          <Link href="/dashboard/settings?tab=billing" className="btn btn-primary compete-upgrade-btn">
-            Add Compete to Your Plan
-          </Link>
-        </div>
+        <CompetePlanSelector plans={competePlans} hasPaidBasePlan={hasPaidBasePlan ?? false} />
       </div>
     )
   }
