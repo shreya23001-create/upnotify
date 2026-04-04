@@ -355,6 +355,51 @@ const BLOG_POSTS: BlogPostMeta[] = [
     readTime: '15 min read',
     category: 'WordPress',
   },
+  {
+    slug: 'monitor-wordpress-free',
+    title: 'How to Monitor Your WordPress Site for Free in 2026',
+    excerpt:
+      'Your WordPress site could be down right now and you would not know. Learn how to set up free monitoring covering uptime, SSL, performance, and keyword checks — in under five minutes.',
+    date: '10 March 2026',
+    readTime: '12 min read',
+    category: 'WordPress',
+  },
+  {
+    slug: 'website-downtime-warning-signs',
+    title: '10 Warning Signs Your Website Is About to Go Down',
+    excerpt:
+      'Websites rarely crash without warning. Slow TTFB, expiring SSL certificates, rising error rates, and disk space exhaustion are all red flags. Here are the 10 signs that downtime is coming — and how to catch them early.',
+    date: '18 March 2026',
+    readTime: '13 min read',
+    category: 'Guide',
+  },
+  {
+    slug: 'what-is-uptime-monitoring',
+    title: 'What Is Uptime Monitoring and Why Every Website Needs It',
+    excerpt:
+      'Uptime monitoring checks your website every 60 seconds and alerts you when it goes down. Learn what it is, how it works, why your hosting guarantee is not enough, and how to set it up for free.',
+    date: '25 March 2026',
+    readTime: '11 min read',
+    category: 'Guide',
+  },
+  {
+    slug: 'dns-monitoring-explained',
+    title: 'DNS Monitoring Explained: Why Your Domain Records Matter More Than You Think',
+    excerpt:
+      'Your DNS records control where your website and email point. When they change — accidentally or maliciously — everything breaks. Learn what DNS monitoring catches and why it is essential.',
+    date: '30 March 2026',
+    readTime: '12 min read',
+    category: 'Guide',
+  },
+  {
+    slug: 'free-status-page-saas',
+    title: 'How to Set Up a Free Public Status Page for Your SaaS',
+    excerpt:
+      'When your service goes down, customers have two options: panic and email you, or check your status page. Learn why every SaaS needs one and how to set it up for free in five minutes.',
+    date: '3 April 2026',
+    readTime: '11 min read',
+    category: 'Guide',
+  },
 ]
 
 const POSTS_PER_PAGE = 6
