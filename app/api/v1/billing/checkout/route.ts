@@ -62,35 +62,42 @@ export async function POST(request: Request): Promise<NextResponse> {
       )
     }
 
-    // Determine the correct amount based on billing cycle and plan type
-    const amount =
-      billingCycle === 'annual' && plan.price_annual_gbp
-        ? plan.price_annual_gbp
-        : plan.onboarding_fee_gbp > 0
-          ? plan.onboarding_fee_gbp
-          : plan.price_monthly_gbp
+    // Use the pre-configured Stripe price IDs from the DB
+    const stripePriceId = billingCycle === 'annual' && plan.stripe_price_id_annual
+      ? plan.stripe_price_id_annual
+      : plan.stripe_price_id_monthly
 
-    const cycle: 'monthly' | 'annual' | 'one_time' =
-      plan.onboarding_fee_gbp > 0
-        ? 'one_time'
-        : ((billingCycle || 'monthly') as 'monthly' | 'annual')
+    if (!stripePriceId) {
+      logger.error('No Stripe price ID configured for plan', { planSlug, billingCycle })
+      return NextResponse.json(
+        { error: 'Stripe pricing not configured for this plan. Please contact support.' },
+        { status: 500 }
+      )
+    }
 
-    // Use the request origin so the Stripe redirect returns the user to the
-    // same domain they started from. This prevents cookie/session loss when
-    // config.app.url differs from the actual domain (e.g. Vercel preview).
-    const requestOrigin = new URL(request.url).origin
     const config = getConfig()
-    const appUrl = requestOrigin || config.app.url
-    const url = await createCheckoutSession(
-      org.id,
-      user.email,
-      org.name,
-      plan.slug,
-      plan.name,
-      amount,
-      cycle,
-      appUrl
-    )
+    const appUrl = config.app.url
+    const stripe = (await import('@/lib/services/stripe')).getStripe()
+    const { ensureStripeCustomer } = await import('@/lib/services/stripe')
+    const customerId = await ensureStripeCustomer(org.id, user.email, org.name)
+
+    const session = await stripe.checkout.sessions.create({
+      customer: customerId,
+      mode: 'subscription',
+      line_items: [{ price: stripePriceId, quantity: 1 }],
+      metadata: { org_id: org.id, plan_slug: plan.slug },
+      subscription_data: {
+        metadata: { org_id: org.id, plan_slug: plan.slug },
+      },
+      success_url: `${appUrl}/dashboard/settings?billing=success`,
+      cancel_url: `${appUrl}/dashboard/settings?billing=canceled`,
+    })
+
+    if (!session.url) {
+      return NextResponse.json({ error: 'Failed to create checkout' }, { status: 500 })
+    }
+
+    const url = session.url
 
     return NextResponse.json({ url })
   } catch (error) {
