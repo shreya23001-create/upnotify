@@ -75,8 +75,9 @@ export async function POST(request: Request): Promise<NextResponse> {
       )
     }
 
+    const requestOrigin = new URL(request.url).origin
     const config = getConfig()
-    const appUrl = config.app.url
+    const appUrl = config.app.url !== 'http://localhost:3000' ? config.app.url : requestOrigin
     const stripe = getStripe()
     const customerId = await ensureStripeCustomer(org.id, user.email, org.name)
 
