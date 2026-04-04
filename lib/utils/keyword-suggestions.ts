@@ -11,6 +11,9 @@ export function getKeywordSuggestions(url: string): KeywordSuggestions {
   const suggestions: KeywordSuggestions = { positive: [], negative: [] }
 
   if (!url || url.trim().length === 0) {
+    // Default suggestions shown before URL is entered
+    suggestions.positive = ['Welcome', 'Home', 'Sign In', 'Contact']
+    suggestions.negative = ['fatal error', 'server error', '503', 'database error', 'maintenance mode', 'not found', 'hacked', 'viagra', 'casino']
     return suggestions
   }
 

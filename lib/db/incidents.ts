@@ -72,6 +72,50 @@ export async function getRecentIncidents(orgId: string, limit: number = 10): Pro
   return data ?? []
 }
 
+export async function updateIncidentStatus(
+  incidentId: string,
+  orgId: string,
+  status: 'investigating' | 'identified' | 'monitoring' | 'resolved',
+  message?: string
+): Promise<boolean> {
+  const supabase = await createClient()
+
+  const updateData: Record<string, unknown> = { status }
+
+  if (status === 'resolved') {
+    updateData.resolved_at = new Date().toISOString()
+  }
+
+  if (message) {
+    updateData.root_cause = message
+  }
+
+  const { error } = await supabase
+    .from('incidents')
+    .update(updateData)
+    .eq('id', incidentId)
+    .eq('org_id', orgId)
+
+  if (error) {
+    logger.error('Failed to update incident status', { error: error.message })
+    return false
+  }
+  return true
+}
+
+export async function getAllIncidentsByOrg(orgId: string, limit = 50): Promise<Incident[]> {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('incidents')
+    .select('*')
+    .eq('org_id', orgId)
+    .order('started_at', { ascending: false })
+    .limit(limit)
+
+  if (error) return []
+  return data ?? []
+}
+
 // --- Admin client functions (for cron jobs and background tasks) ---
 
 export async function createIncident(data: {

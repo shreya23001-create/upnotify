@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition, useMemo } from 'react'
+import { useState, useTransition, useMemo, useEffect } from 'react'
 import Link from 'next/link'
 import { createMonitorAction } from '@/app/(dashboard)/dashboard/monitors/actions'
 import { KeywordTagInput } from './keyword-tag-input'
@@ -36,7 +36,37 @@ export function CreateMonitorForm(): React.ReactElement {
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 
-  const suggestions = useMemo(() => getKeywordSuggestions(target), [target])
+  const localSuggestions = useMemo(() => getKeywordSuggestions(target), [target])
+  const [dbSuggestions, setDbSuggestions] = useState<{ positive: string[]; negative: string[] }>({ positive: [], negative: [] })
+
+  // Fetch DB suggestions when type is keyword and target changes
+  useEffect(() => {
+    if (type !== 'keyword') return
+    const url = target.trim()
+    async function fetchDbSuggestions(): Promise<void> {
+      try {
+        const params = url ? `?url=${encodeURIComponent(url)}` : ''
+        const res = await fetch(`/api/v1/keyword-suggestions${params}`)
+        if (res.ok) {
+          const data = await res.json() as { positive: { keyword: string }[]; negative: { keyword: string }[] }
+          setDbSuggestions({
+            positive: data.positive.map(s => s.keyword),
+            negative: data.negative.map(s => s.keyword),
+          })
+        }
+      } catch {
+        // Silently ignore
+      }
+    }
+    fetchDbSuggestions()
+  }, [type, target])
+
+  // Merge local + DB suggestions (deduplicated)
+  const suggestions = useMemo(() => {
+    const pos = [...new Set([...localSuggestions.positive, ...dbSuggestions.positive])]
+    const neg = [...new Set([...localSuggestions.negative, ...dbSuggestions.negative])]
+    return { positive: pos, negative: neg }
+  }, [localSuggestions, dbSuggestions])
 
   function handleSubmit(formData: FormData): void {
     setError(null)
