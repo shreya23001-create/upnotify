@@ -13,41 +13,92 @@ async function handleCheckoutCompleted(
 ): Promise<void> {
   const supabase = createAdminClient()
   const orgId = session.metadata?.org_id
-  const planSlug = session.metadata?.plan_slug
+  const checkoutType = session.metadata?.type
 
-  if (orgId && planSlug && session.subscription) {
-    const { data: plan } = await supabase
-      .from('plans')
-      .select('id')
-      .eq('slug', planSlug)
-      .single()
+  // Handle Compete add-on checkout
+  if (checkoutType === 'compete_addon') {
+    const competePlanSlug = session.metadata?.compete_plan_slug
+    if (orgId && competePlanSlug && session.subscription) {
+      const { data: competePlan } = await supabase
+        .from('compete_plans')
+        .select('id')
+        .eq('slug', competePlanSlug)
+        .single()
 
-    if (plan) {
-      const subResponse = await getStripe().subscriptions.retrieve(
-        session.subscription as string
-      )
-      const sub = 'data' in subResponse ? subResponse.data : subResponse
-      const subObj = sub as unknown as { items: { data: Array<{ price?: { recurring?: { interval?: string } } }> }; current_period_start: number; current_period_end: number }
-      await supabase.from('subscriptions').insert({
-        org_id: orgId,
-        plan_id: plan.id,
-        stripe_subscription_id: session.subscription as string,
-        status: 'active',
-        billing_cycle:
-          subObj.items.data[0]?.price?.recurring?.interval === 'year'
-            ? 'annual'
-            : 'monthly',
-        current_period_start: new Date(
-          subObj.current_period_start * 1000
-        ).toISOString(),
-        current_period_end: new Date(
-          subObj.current_period_end * 1000
-        ).toISOString(),
-      })
-      logger.info('Subscription created from checkout', {
-        orgId,
-        planSlug,
-      })
+      if (competePlan) {
+        const subResponse = await getStripe().subscriptions.retrieve(
+          session.subscription as string
+        )
+        const sub = 'data' in subResponse ? subResponse.data : subResponse
+        const subObj = sub as unknown as { items: { data: Array<{ price?: { recurring?: { interval?: string } } }> }; current_period_start: number; current_period_end: number }
+
+        // Cancel any existing compete subscription for this org
+        await supabase
+          .from('compete_subscriptions')
+          .update({ status: 'canceled', canceled_at: new Date().toISOString() })
+          .eq('org_id', orgId)
+          .eq('status', 'active')
+
+        await supabase.from('compete_subscriptions').insert({
+          org_id: orgId,
+          compete_plan_id: competePlan.id,
+          stripe_subscription_id: session.subscription as string,
+          status: 'active',
+          billing_cycle:
+            subObj.items.data[0]?.price?.recurring?.interval === 'year'
+              ? 'annual'
+              : 'monthly',
+          current_period_start: new Date(
+            subObj.current_period_start * 1000
+          ).toISOString(),
+          current_period_end: new Date(
+            subObj.current_period_end * 1000
+          ).toISOString(),
+        })
+        logger.info('Compete subscription created from checkout', {
+          orgId,
+          competePlanSlug,
+        })
+      }
+    }
+  } else {
+    // Handle base plan checkout
+    const planSlug = session.metadata?.plan_slug
+
+    if (orgId && planSlug && session.subscription) {
+      const { data: plan } = await supabase
+        .from('plans')
+        .select('id')
+        .eq('slug', planSlug)
+        .single()
+
+      if (plan) {
+        const subResponse = await getStripe().subscriptions.retrieve(
+          session.subscription as string
+        )
+        const sub = 'data' in subResponse ? subResponse.data : subResponse
+        const subObj = sub as unknown as { items: { data: Array<{ price?: { recurring?: { interval?: string } } }> }; current_period_start: number; current_period_end: number }
+        await supabase.from('subscriptions').insert({
+          org_id: orgId,
+          plan_id: plan.id,
+          stripe_subscription_id: session.subscription as string,
+          status: 'active',
+          billing_cycle:
+            subObj.items.data[0]?.price?.recurring?.interval === 'year'
+              ? 'annual'
+              : 'monthly',
+          current_period_start: new Date(
+            subObj.current_period_start * 1000
+          ).toISOString(),
+          current_period_end: new Date(
+            subObj.current_period_end * 1000
+          ).toISOString(),
+        })
+        logger.info('Subscription created from checkout', {
+          orgId,
+          planSlug,
+        })
+      }
     }
   }
 
@@ -139,20 +190,29 @@ async function handleSubscriptionUpdated(
     canceled: 'canceled',
   }
 
+  const updateData = {
+    status: statusMap[sub.status as string] ?? 'incomplete',
+    current_period_start: new Date(
+      (sub.current_period_start as number) * 1000
+    ).toISOString(),
+    current_period_end: new Date(
+      (sub.current_period_end as number) * 1000
+    ).toISOString(),
+    canceled_at: sub.canceled_at
+      ? new Date((sub.canceled_at as number) * 1000).toISOString()
+      : null,
+  }
+
+  // Update base subscription
   await supabase
     .from('subscriptions')
-    .update({
-      status: statusMap[sub.status as string] ?? 'incomplete',
-      current_period_start: new Date(
-        (sub.current_period_start as number) * 1000
-      ).toISOString(),
-      current_period_end: new Date(
-        (sub.current_period_end as number) * 1000
-      ).toISOString(),
-      canceled_at: sub.canceled_at
-        ? new Date((sub.canceled_at as number) * 1000).toISOString()
-        : null,
-    })
+    .update(updateData)
+    .eq('stripe_subscription_id', sub.id as string)
+
+  // Also update compete subscription if it matches
+  await supabase
+    .from('compete_subscriptions')
+    .update(updateData)
     .eq('stripe_subscription_id', sub.id as string)
 }
 
@@ -161,13 +221,21 @@ async function handleSubscriptionDeleted(
 ): Promise<void> {
   const supabase = createAdminClient()
   const sub = subObj as unknown as Record<string, unknown>
+  const cancelData = {
+    status: 'canceled',
+    canceled_at: new Date().toISOString(),
+  }
 
+  // Cancel base subscription
   await supabase
     .from('subscriptions')
-    .update({
-      status: 'canceled',
-      canceled_at: new Date().toISOString(),
-    })
+    .update(cancelData)
+    .eq('stripe_subscription_id', sub.id as string)
+
+  // Also cancel compete subscription if it matches
+  await supabase
+    .from('compete_subscriptions')
+    .update(cancelData)
     .eq('stripe_subscription_id', sub.id as string)
 
   logger.info('Subscription canceled', { subscriptionId: sub.id })
