@@ -19,6 +19,19 @@ export interface PriceExtractionResult {
   confidence: number
   rawExtractedValue: string | null
   error?: string
+  // Sale/discount detection
+  originalPrice: number | null
+  isOnSale: boolean
+  discountPct: number | null
+  // Related products (cross-sell/upsell)
+  relatedProducts: RelatedProduct[]
+}
+
+export interface RelatedProduct {
+  name: string
+  url: string | null
+  price: number | null
+  currency: string
 }
 
 const FETCH_TIMEOUT_MS = 15000
@@ -62,7 +75,7 @@ export async function extractPrice(
     }
 
     return failureResult('No price data found on page')
-  } catch (err) {
+  } catch (err: unknown) {
     const errorMessage = err instanceof Error ? err.message : String(err)
     logger.error('Price extraction failed', { url, error: errorMessage })
     return failureResult(errorMessage)
@@ -185,6 +198,57 @@ function extractProductFromJsonLd(
 
     const price = parsePrice(rawPrice)
     if (price !== null) {
+      // Detect sale: check for highPrice vs lowPrice, or priceValidUntil
+      let originalPrice: number | null = null
+      let isOnSale = false
+      let discountPct: number | null = null
+
+      for (const offer of offerList) {
+        // Check if there's a higher price (original/list price)
+        const highPrice = parsePrice(String(offer.highPrice ?? ''))
+        if (highPrice !== null && highPrice > price) {
+          originalPrice = highPrice
+          isOnSale = true
+          discountPct = Math.round(((highPrice - price) / highPrice) * 100)
+        }
+
+        // Some sites use priceValidUntil to indicate sale end date
+        if (offer.priceValidUntil) {
+          isOnSale = true
+        }
+
+        // Schema.org sale price pattern
+        const salePrice = parsePrice(String(offer.salePrice ?? ''))
+        if (salePrice !== null && salePrice < price) {
+          // salePrice is lower than listed price — sale detected
+          originalPrice = price
+          isOnSale = true
+          discountPct = Math.round(((price - salePrice) / price) * 100)
+        }
+      }
+
+      // Extract related products (isRelatedTo, isSimilarTo)
+      const relatedProducts: RelatedProduct[] = []
+      const relatedKeys = ['isRelatedTo', 'isSimilarTo', 'isAccessoryOrSparePartFor']
+      for (const key of relatedKeys) {
+        const related = item[key]
+        if (related) {
+          const relatedList = Array.isArray(related) ? related : [related]
+          for (const rel of relatedList as Record<string, unknown>[]) {
+            if (rel && typeof rel === 'object' && rel.name) {
+              relatedProducts.push({
+                name: String(rel.name),
+                url: typeof rel.url === 'string' ? rel.url : null,
+                price: parsePrice(String((rel as Record<string, unknown>).offers
+                  ? ((rel as Record<string, unknown>).offers as Record<string, unknown>).price ?? ''
+                  : '')),
+                currency,
+              })
+            }
+          }
+        }
+      }
+
       return {
         success: true,
         price,
@@ -194,6 +258,10 @@ function extractProductFromJsonLd(
         extractionMethod: 'json-ld',
         confidence: 0.95,
         rawExtractedValue: rawPrice,
+        originalPrice,
+        isOnSale,
+        discountPct,
+        relatedProducts: relatedProducts.slice(0, 10),
       }
     }
   }
@@ -262,6 +330,10 @@ function extractFromOpenGraph(html: string): PriceExtractionResult {
         extractionMethod: 'meta-tags',
         confidence: 0.80,
         rawExtractedValue: rawPrice,
+        originalPrice: null,
+        isOnSale: false,
+        discountPct: null,
+        relatedProducts: [],
       }
     }
   }
@@ -316,6 +388,10 @@ function extractFromMicrodata(html: string): PriceExtractionResult {
         extractionMethod: 'microdata',
         confidence: 0.70,
         rawExtractedValue: rawPrice,
+        originalPrice: null,
+        isOnSale: false,
+        discountPct: null,
+        relatedProducts: [],
       }
     }
   }
@@ -377,6 +453,10 @@ function extractFromCssSelector(
           extractionMethod: 'css-selector',
           confidence: 0.60,
           rawExtractedValue: rawValue,
+          originalPrice: null,
+          isOnSale: false,
+          discountPct: null,
+          relatedProducts: [],
         }
       }
     }
@@ -429,6 +509,10 @@ function failureResult(error: string): PriceExtractionResult {
     confidence: 0,
     rawExtractedValue: null,
     error,
+    originalPrice: null,
+    isOnSale: false,
+    discountPct: null,
+    relatedProducts: [],
   }
 }
 
