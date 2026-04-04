@@ -148,6 +148,9 @@ export function AdminBlogContent({ posts }: AdminBlogContentProps): React.ReactE
                     <span className={getStatusBadgeClass(post.status)}>
                       {post.status}
                     </span>
+                    {post.content && typeof post.content === 'object' && (post.content as Record<string, unknown>).type === 'static' && (
+                      <span className="badge badge-warning" style={{ marginLeft: 4, fontSize: 10 }}>Static</span>
+                    )}
                   </td>
                   <td style={{ fontSize: '0.875rem' }}>{formatDate(post.published_at)}</td>
                   <td style={{ fontSize: '0.875rem' }}>{formatDate(post.created_at)}</td>
