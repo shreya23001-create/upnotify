@@ -55,12 +55,10 @@ export function getConfig(): PublicConfig {
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? ''
-  // Use VERCEL_URL for preview deployments, NEXT_PUBLIC_APP_URL for production, localhost for dev
-  const vercelUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : ''
-  const isPreview = process.env.VERCEL_ENV === 'preview'
-  const appUrl = isPreview && vercelUrl
-    ? vercelUrl
-    : process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+  // Always use NEXT_PUBLIC_APP_URL — never the auto-generated Vercel preview URL
+  // Dev: NEXT_PUBLIC_APP_URL = https://dev.uptrue.io
+  // Prod: NEXT_PUBLIC_APP_URL = https://uptrue.io
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
   const adminEmails = process.env.ADMIN_EMAILS || ''
   const gaMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? ''
 
