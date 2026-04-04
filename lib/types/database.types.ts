@@ -2029,6 +2029,114 @@ export type Database = {
           },
         ]
       }
+      user_messages: {
+        Row: {
+          id: string
+          org_id: string | null
+          user_id: string
+          title: string
+          body: string
+          type: string
+          category: string
+          is_read: boolean
+          read_at: string | null
+          action_url: string | null
+          action_label: string | null
+          created_at: string
+          expires_at: string | null
+          metadata: Record<string, unknown>
+        }
+        Insert: {
+          id?: string
+          org_id?: string | null
+          user_id: string
+          title: string
+          body: string
+          type?: string
+          category?: string
+          is_read?: boolean
+          read_at?: string | null
+          action_url?: string | null
+          action_label?: string | null
+          created_at?: string
+          expires_at?: string | null
+          metadata?: Record<string, unknown>
+        }
+        Update: {
+          is_read?: boolean
+          read_at?: string | null
+        }
+        Relationships: []
+      }
+      credit_submissions: {
+        Row: {
+          id: string
+          org_id: string
+          user_id: string
+          credit_type: string
+          submission_url: string | null
+          evidence_text: string | null
+          status: string
+          review_notes: string | null
+          reviewed_by: string | null
+          reviewed_at: string | null
+          credit_amount_pence: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          org_id: string
+          user_id: string
+          credit_type: string
+          submission_url?: string | null
+          evidence_text?: string | null
+          status?: string
+          review_notes?: string | null
+          reviewed_by?: string | null
+          reviewed_at?: string | null
+          credit_amount_pence?: number
+          created_at?: string
+        }
+        Update: {
+          status?: string
+          review_notes?: string | null
+          reviewed_by?: string | null
+          reviewed_at?: string | null
+        }
+        Relationships: []
+      }
+      admin_broadcasts: {
+        Row: {
+          id: string
+          title: string
+          body: string
+          type: string
+          category: string
+          audience: string
+          sent_by: string
+          sent_at: string
+          recipient_count: number
+          action_url: string | null
+          action_label: string | null
+        }
+        Insert: {
+          id?: string
+          title: string
+          body: string
+          type?: string
+          category?: string
+          audience: string
+          sent_by: string
+          sent_at?: string
+          recipient_count?: number
+          action_url?: string | null
+          action_label?: string | null
+        }
+        Update: {
+          recipient_count?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

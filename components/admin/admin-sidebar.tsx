@@ -6,6 +6,7 @@ import { UptrueLogo } from '@/components/ui/uptrue-logo'
 import {
   IconDashboard, IconUsers, IconBuilding, IconCreditCard,
   IconGlobe, IconToggle, IconEdit, IconMail, IconSettings, IconX, IconShield,
+  IconBell, IconTag,
 } from '@/components/icons'
 
 interface AdminSidebarProps {
@@ -28,6 +29,8 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/admin/plans', label: 'Plans & Pricing', icon: IconCreditCard },
   { href: '/admin/tracker', label: 'Public Tracker', icon: IconGlobe },
   { href: '/admin/feature-flags', label: 'Feature Flags', icon: IconToggle },
+  { href: '/admin/messages', label: 'Messages', icon: IconBell },
+  { href: '/admin/credits', label: 'Credit Approvals', icon: IconTag },
   { href: '/admin/team', label: 'Admin Team', icon: IconShield },
   { href: '/admin/blog', label: 'Blog', icon: IconEdit, disabled: true, badge: 'Soon' },
   { href: '/admin/emails', label: 'Email & Nurture', icon: IconMail, disabled: true, badge: 'Soon' },

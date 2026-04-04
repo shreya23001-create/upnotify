@@ -10,6 +10,7 @@ import { checkTeamMemberLimit } from '@/lib/utils/plan-limits'
 import { sendTeamInviteEmail } from '@/lib/services/email'
 import { writeAuditLog } from '@/lib/db/audit'
 import { getServerConfig } from '@/lib/utils/config'
+import { sendUserMessage } from '@/lib/db/user-messages'
 import { logger } from '@/lib/utils/logger'
 
 interface InviteRequestBody {
@@ -134,6 +135,25 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       role,
       acceptUrl,
     })
+
+    // Send in-app notification if user already exists
+    const { data: existingUser } = await supabase
+      .from('users')
+      .select('id')
+      .ilike('email', trimmedEmail)
+      .single()
+
+    if (existingUser) {
+      await sendUserMessage({
+        userId: existingUser.id,
+        title: `Team Invite from ${orgName}`,
+        body: `${inviterName} has invited you to join ${orgName} as a ${role}. Click below to accept.`,
+        type: 'info',
+        category: 'general',
+        actionUrl: acceptUrl,
+        actionLabel: 'Accept Invite',
+      })
+    }
 
     // Audit log
     await writeAuditLog({

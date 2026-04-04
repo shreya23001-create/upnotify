@@ -8,6 +8,7 @@ import { WorkspaceSwitcher } from './workspace-switcher'
 import { IconSettings, IconLogOut, IconUser } from '@/components/icons'
 import { MobileSidebar } from './mobile-sidebar'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
+import { MessagesBell } from './messages-bell'
 
 export function Header() {
   const { user, signOut } = useAuth()
@@ -35,6 +36,7 @@ export function Header() {
       <span className="header-org">{organisation?.name}</span>
       <WorkspaceSwitcher />
       <ThemeToggle />
+      <MessagesBell />
       <div className="header-user" ref={dropdownRef}>
         <div className="header-avatar" onClick={() => setDropdownOpen(!dropdownOpen)}>
           {organisation?.logo_url ? (

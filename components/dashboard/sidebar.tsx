@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react'
 import { useWorkspace } from '@/components/providers/workspace-provider'
 import { useAuth } from '@/components/providers/auth-provider'
 import {
-  IconDashboard, IconActivity, IconGlobe, IconBell,
+  IconDashboard, IconActivity, IconGlobe, IconAlertTriangle,
   IconBuilding, IconSettings, IconShield, IconChevronLeft, IconChevronRight,
   IconHelpCircle, IconTrendingUp, IconTarget, IconBarChart,
 } from '@/components/icons'
@@ -27,7 +27,7 @@ interface NavItem {
 const mainNavItems: NavItem[] = [
   { href: '/dashboard', label: 'Dashboard', icon: IconDashboard },
   { href: '/dashboard/monitors', label: 'Monitors', icon: IconActivity },
-  { href: '/dashboard/alerts', label: 'Alerts', icon: IconBell },
+  { href: '/dashboard/alerts', label: 'Alerts', icon: IconAlertTriangle },
   { href: '/dashboard/status-pages', label: 'Status Pages', icon: IconGlobe },
   { href: '/dashboard/reports', label: 'Reports', icon: IconTrendingUp },
   { href: '/dashboard/competitors', label: 'Competitors', icon: IconTarget },
