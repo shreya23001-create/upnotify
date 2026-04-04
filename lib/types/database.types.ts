@@ -1435,6 +1435,7 @@ export type Database = {
           id: string
           is_super_admin: boolean
           org_id: string
+          original_org_id: string | null
           referral_code: string | null
           role: string
           updated_at: string
@@ -1447,6 +1448,7 @@ export type Database = {
           id: string
           is_super_admin?: boolean
           org_id: string
+          original_org_id?: string | null
           referral_code?: string | null
           role?: string
           updated_at?: string
@@ -1459,6 +1461,7 @@ export type Database = {
           id?: string
           is_super_admin?: boolean
           org_id?: string
+          original_org_id?: string | null
           referral_code?: string | null
           role?: string
           updated_at?: string

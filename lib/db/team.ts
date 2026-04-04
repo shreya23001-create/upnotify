@@ -252,8 +252,22 @@ export async function acceptTeamInvite(
     .eq('id', userId)
     .single()
 
-  // If user belongs to a different org, switch them to the new org
-  // This allows org switching via invite acceptance
+  // Save original org before switching (so user can switch back later)
+  if (existingUser?.org_id && existingUser.org_id !== invite.org_id) {
+    // Only set original_org_id if not already set (first switch)
+    const { data: userData } = await supabase
+      .from('users')
+      .select('original_org_id')
+      .eq('id', userId)
+      .single()
+
+    if (!userData?.original_org_id) {
+      await supabase
+        .from('users')
+        .update({ original_org_id: existingUser.org_id })
+        .eq('id', userId)
+    }
+  }
 
   // Update the user's org_id and role
   const { error: updateError } = await supabase
