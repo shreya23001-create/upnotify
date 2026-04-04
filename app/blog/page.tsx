@@ -301,6 +301,33 @@ const BLOG_POSTS: BlogPostMeta[] = [
     readTime: '14 min read',
     category: 'WordPress',
   },
+  {
+    slug: 'wordpress-ssl-expired',
+    title: 'WordPress SSL Certificate Expired? Here\'s How to Never Let It Happen Again',
+    excerpt:
+      'Let\'s Encrypt auto-renew fails silently more often than you think. DNS changes, server misconfigurations, and hosting migrations all break automatic renewal. Learn what happens when your SSL expires and how SSL monitoring warns you 30, 14, and 7 days before expiry.',
+    date: '20 May 2026',
+    readTime: '14 min read',
+    category: 'WordPress',
+  },
+  {
+    slug: 'wordpress-shared-hosting-slow',
+    title: 'WordPress Site Down on Shared Hosting: Why CPU Limits Are Throttling Your Site',
+    excerpt:
+      'Shared hosting providers silently throttle your WordPress site when you hit CPU limits. Traffic spikes, noisy neighbours, and resource suspensions cause slowdowns and outages you never see coming. Learn how HTTP monitoring catches the throttling.',
+    date: '21 May 2026',
+    readTime: '14 min read',
+    category: 'WordPress',
+  },
+  {
+    slug: 'wordpress-auto-update-broke-site',
+    title: 'WordPress Auto-Update Broke My Site: How to Recover and Prevent It From Happening Again',
+    excerpt:
+      'WordPress auto-updates can break your site silently — theme incompatibility, PHP version mismatch, and file permission errors during update all cause white screens, critical errors, and 500 errors. Learn how to recover and how HTTP monitoring catches the break within 60 seconds.',
+    date: '22 May 2026',
+    readTime: '15 min read',
+    category: 'WordPress',
+  },
 ]
 
 const POSTS_PER_PAGE = 6

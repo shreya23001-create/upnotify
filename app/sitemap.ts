@@ -345,6 +345,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'monthly',
       priority: 0.8,
     },
+    {
+      url: 'https://uptrue.io/blog/wordpress-ssl-expired',
+      lastModified: new Date('2026-05-20'),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: 'https://uptrue.io/blog/wordpress-shared-hosting-slow',
+      lastModified: new Date('2026-05-21'),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: 'https://uptrue.io/blog/wordpress-auto-update-broke-site',
+      lastModified: new Date('2026-05-22'),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
   ]
 
   // Dynamic pages from database
