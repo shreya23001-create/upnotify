@@ -15,6 +15,7 @@ interface Props {
 }
 
 function getPlanFeatures(plan: Plan): PlanFeatureDisplay[] {
+  const p = plan as unknown as Record<string, unknown>
   const features: PlanFeatureDisplay[] = []
 
   features.push({
@@ -27,28 +28,36 @@ function getPlanFeatures(plan: Plan): PlanFeatureDisplay[] {
       : `${plan.check_interval_seconds}-second check interval`,
     included: true,
   })
-  features.push({
-    text: plan.client_workspace_limit
-      ? `${plan.client_workspace_limit} workspace${plan.client_workspace_limit > 1 ? 's' : ''}`
-      : 'Unlimited workspaces',
-    included: true,
-  })
-  features.push({ text: 'Email alerts', included: true })
 
-  const teamLimit = (plan as Record<string, unknown>).max_team_members as number | undefined
+  const teamLimit = p.max_team_members as number | undefined
   if (teamLimit && teamLimit > 0) {
     features.push({ text: `${teamLimit} team members`, included: true })
   } else {
     features.push({ text: 'Solo use only', included: true })
   }
 
-  features.push({
-    text: plan.has_status_page_custom_domain ? 'Custom domain status pages' : 'Status pages',
-    included: Boolean(plan.has_status_page_custom_domain || (plan as Record<string, unknown>).has_status_pages),
-  })
-  features.push({ text: 'Slack & Teams alerts', included: Boolean((plan as Record<string, unknown>).has_slack_teams) || plan.has_api_access })
-  features.push({ text: 'Webhooks', included: Boolean((plan as Record<string, unknown>).has_webhooks) || plan.has_api_access })
-  features.push({ text: 'AI reports', included: plan.has_ai_predictive })
+  features.push({ text: 'Email alerts', included: Boolean(p.has_email_alerts ?? true) })
+  features.push({ text: 'Slack & Teams alerts', included: Boolean(p.has_slack_teams) })
+  features.push({ text: 'Webhooks', included: Boolean(p.has_webhooks) })
+
+  // Status pages
+  const statusPageLimit = p.status_page_limit as number | undefined
+  if (plan.has_status_page_custom_domain) {
+    features.push({ text: statusPageLimit ? `${statusPageLimit} custom domain status pages` : 'Unlimited status pages', included: true })
+  } else if (p.has_status_pages) {
+    features.push({ text: statusPageLimit ? `${statusPageLimit} status page${statusPageLimit > 1 ? 's' : ''}` : 'Status pages', included: true })
+  } else {
+    features.push({ text: 'Status pages', included: false })
+  }
+
+  // AI reports
+  const aiLimit = p.ai_report_limit as number | undefined
+  if (plan.has_ai_predictive || (aiLimit && aiLimit > 0)) {
+    features.push({ text: aiLimit ? `AI reports (${aiLimit}/month)` : 'Unlimited AI reports', included: true })
+  } else {
+    features.push({ text: 'AI reports', included: false })
+  }
+
   features.push({ text: 'API access', included: plan.has_api_access })
 
   return features
@@ -75,17 +84,16 @@ function getPlanPrice(plan: Plan, isAnnual: boolean): { amount: string; period: 
 
   if (isAnnual && annualPence && annualPence > 0) {
     const annualGbp = annualPence / 100
-    const monthlyEquiv = Math.round((annualPence / 12)) / 100
-    const monthlySavings = Math.round(((monthlyPence * 12 - annualPence) / (monthlyPence * 12)) * 100)
+    const savings = Math.round(((monthlyPence * 12 - annualPence) / (monthlyPence * 12)) * 100)
     return {
-      amount: `\u00A3${monthlyEquiv.toFixed(2)}`,
-      period: '/mo',
-      note: `\u00A3${annualGbp}/year \u2014 save ${monthlySavings}%`,
+      amount: `\u00A3${annualGbp.toFixed(2)}`,
+      period: '/year',
+      note: savings > 0 ? `Save ${savings}% vs monthly` : undefined,
     }
   }
 
   const monthlyGbp = monthlyPence / 100
-  return { amount: `\u00A3${monthlyGbp}`, period: '/month' }
+  return { amount: `\u00A3${monthlyGbp.toFixed(2)}`, period: '/month' }
 }
 
 function getPlanCta(plan: Plan, isCurrent: boolean, isHigherTier: boolean): string {

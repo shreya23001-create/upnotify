@@ -182,27 +182,37 @@ export function PlansManager({ plans, creditRules, subscriberCounts, competePlan
                   <tr>
                     <th>Plan</th>
                     <th>API Access</th>
-                    <th>AI Predictive</th>
+                    <th>Email</th>
+                    <th>Slack/Teams</th>
+                    <th>Webhooks</th>
+                    <th>Status Pages</th>
                     <th>Custom Domain</th>
+                    <th>AI Reports</th>
+                    <th>API</th>
                     <th>White Label</th>
-                    <th>Voice Calls</th>
-                    <th>Voice Limit</th>
                     <th>Retention</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {plans.map((plan) => (
+                  {plans.map((plan) => {
+                    const p = plan as unknown as Record<string, unknown>
+                    const yes = <span className="badge badge-success">Yes</span>
+                    const no = <span className="badge badge-outline">No</span>
+                    return (
                     <tr key={plan.id}>
                       <td style={{ fontWeight: 600 }}>{plan.name}</td>
-                      <td>{plan.has_api_access ? <span className="badge badge-success">Yes</span> : <span className="badge badge-outline">No</span>}</td>
-                      <td>{plan.has_ai_predictive ? <span className="badge badge-success">Yes</span> : <span className="badge badge-outline">No</span>}</td>
-                      <td>{plan.has_status_page_custom_domain ? <span className="badge badge-success">Yes</span> : <span className="badge badge-outline">No</span>}</td>
-                      <td>{plan.has_white_label ? <span className="badge badge-success">Yes</span> : <span className="badge badge-outline">No</span>}</td>
-                      <td>{plan.has_voice_calls ? <span className="badge badge-success">Yes</span> : <span className="badge badge-outline">No</span>}</td>
-                      <td>{plan.voice_call_monthly_limit}</td>
+                      <td>{p.has_email_alerts !== false ? yes : no}</td>
+                      <td>{p.has_slack_teams ? yes : no}</td>
+                      <td>{p.has_webhooks ? yes : no}</td>
+                      <td>{p.has_status_pages ? (p.status_page_limit ? `${p.status_page_limit}` : 'Unlimited') : no}</td>
+                      <td>{plan.has_status_page_custom_domain ? yes : no}</td>
+                      <td>{plan.has_ai_predictive || (p.ai_report_limit as number) > 0 ? (p.ai_report_limit ? `${p.ai_report_limit}/mo` : 'Unlimited') : no}</td>
+                      <td>{plan.has_api_access ? yes : no}</td>
+                      <td>{plan.has_white_label ? yes : no}</td>
                       <td>{plan.data_retention_days ? `${plan.data_retention_days}d` : 'Unlimited'}</td>
                     </tr>
-                  ))}
+                    )
+                  })}
                 </tbody>
               </table>
             </div>
@@ -420,19 +430,39 @@ export function PlansManager({ plans, creditRules, subscriberCounts, competePlan
               <h3 className="plans-section-title">Features</h3>
               <div className="plans-features-grid">
                 <label className="plans-checkbox-label">
-                  <input type="hidden" name="has_api_access" value="false" />
-                  <input type="checkbox" name="has_api_access" value="true" defaultChecked={editingPlan.has_api_access} />
-                  <span>API Access</span>
+                  <input type="hidden" name="has_email_alerts" value="false" />
+                  <input type="checkbox" name="has_email_alerts" value="true" defaultChecked={(editingPlan as unknown as Record<string, unknown>).has_email_alerts !== false} />
+                  <span>Email Alerts</span>
                 </label>
                 <label className="plans-checkbox-label">
-                  <input type="hidden" name="has_ai_predictive" value="false" />
-                  <input type="checkbox" name="has_ai_predictive" value="true" defaultChecked={editingPlan.has_ai_predictive} />
-                  <span>AI Predictive</span>
+                  <input type="hidden" name="has_slack_teams" value="false" />
+                  <input type="checkbox" name="has_slack_teams" value="true" defaultChecked={Boolean((editingPlan as unknown as Record<string, unknown>).has_slack_teams)} />
+                  <span>Slack &amp; Teams Alerts</span>
+                </label>
+                <label className="plans-checkbox-label">
+                  <input type="hidden" name="has_webhooks" value="false" />
+                  <input type="checkbox" name="has_webhooks" value="true" defaultChecked={Boolean((editingPlan as unknown as Record<string, unknown>).has_webhooks)} />
+                  <span>Webhooks</span>
+                </label>
+                <label className="plans-checkbox-label">
+                  <input type="hidden" name="has_status_pages" value="false" />
+                  <input type="checkbox" name="has_status_pages" value="true" defaultChecked={Boolean((editingPlan as unknown as Record<string, unknown>).has_status_pages)} />
+                  <span>Status Pages</span>
                 </label>
                 <label className="plans-checkbox-label">
                   <input type="hidden" name="has_status_page_custom_domain" value="false" />
                   <input type="checkbox" name="has_status_page_custom_domain" value="true" defaultChecked={editingPlan.has_status_page_custom_domain} />
                   <span>Custom Domain Status Pages</span>
+                </label>
+                <label className="plans-checkbox-label">
+                  <input type="hidden" name="has_ai_predictive" value="false" />
+                  <input type="checkbox" name="has_ai_predictive" value="true" defaultChecked={editingPlan.has_ai_predictive} />
+                  <span>AI Reports</span>
+                </label>
+                <label className="plans-checkbox-label">
+                  <input type="hidden" name="has_api_access" value="false" />
+                  <input type="checkbox" name="has_api_access" value="true" defaultChecked={editingPlan.has_api_access} />
+                  <span>API Access</span>
                 </label>
                 <label className="plans-checkbox-label">
                   <input type="hidden" name="has_white_label" value="false" />
@@ -449,6 +479,20 @@ export function PlansManager({ plans, creditRules, subscriberCounts, competePlan
                   <input type="checkbox" name="is_visible" value="true" defaultChecked={editingPlan.is_visible} />
                   <span>Visible to Users</span>
                 </label>
+
+              <h3 className="plans-section-title">Limits</h3>
+              <div className="plans-form-grid">
+                <div className="form-group">
+                  <label className="form-label">Status Page Limit</label>
+                  <input className="form-input" name="status_page_limit" type="number" defaultValue={(editingPlan as unknown as Record<string, unknown>).status_page_limit as number ?? 0} min={0} />
+                  <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>0 = unlimited</span>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">AI Reports/Month</label>
+                  <input className="form-input" name="ai_report_limit" type="number" defaultValue={(editingPlan as unknown as Record<string, unknown>).ai_report_limit as number ?? 0} min={0} />
+                  <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>0 = unlimited</span>
+                </div>
+              </div>
               </div>
 
               <h3 className="plans-section-title">Enforcement Summary</h3>

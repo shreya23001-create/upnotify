@@ -931,6 +931,12 @@ export type Database = {
           type: string
           updated_at: string
           voice_call_monthly_limit: number
+          has_email_alerts: boolean
+          has_slack_teams: boolean
+          has_webhooks: boolean
+          has_status_pages: boolean
+          status_page_limit: number
+          ai_report_limit: number
         }
         Insert: {
           check_interval_seconds?: number
@@ -939,9 +945,15 @@ export type Database = {
           data_retention_days?: number | null
           has_ai_predictive?: boolean
           has_api_access?: boolean
+          has_email_alerts?: boolean
+          has_slack_teams?: boolean
+          has_webhooks?: boolean
+          has_status_pages?: boolean
           has_status_page_custom_domain?: boolean
           has_voice_calls?: boolean
           has_white_label?: boolean
+          status_page_limit?: number
+          ai_report_limit?: number
           id?: string
           is_visible?: boolean
           max_team_members?: number
@@ -968,9 +980,15 @@ export type Database = {
           data_retention_days?: number | null
           has_ai_predictive?: boolean
           has_api_access?: boolean
+          has_email_alerts?: boolean
+          has_slack_teams?: boolean
+          has_webhooks?: boolean
+          has_status_pages?: boolean
           has_status_page_custom_domain?: boolean
           has_voice_calls?: boolean
           has_white_label?: boolean
+          status_page_limit?: number
+          ai_report_limit?: number
           id?: string
           is_visible?: boolean
           max_team_members?: number
