@@ -4,6 +4,7 @@
  */
 import { createAdminClient } from '@/lib/supabase/admin'
 import { sendUserMessage } from '@/lib/db/user-messages'
+import { sendAlertEmail } from '@/lib/services/email'
 import { getPlanLimits } from '@/lib/utils/plan-limits'
 import { logger } from '@/lib/utils/logger'
 
@@ -288,4 +289,310 @@ export async function notifyPlanChange(
     actionUrl: '/dashboard/settings?tab=billing',
     actionLabel: 'View Plan',
   })
+}
+
+// ---------------------------------------------------------------------------
+// 5. Pause subscription: stop monitoring, preserve data
+// ---------------------------------------------------------------------------
+
+export async function pauseSubscription(
+  orgId: string,
+  userId: string,
+  stripeSubscriptionId: string,
+  reason: string,
+  reasonDetail?: string,
+  planSlug?: string
+): Promise<{ success: boolean; error?: string; pauseUntil?: string }> {
+  const supabase = createAdminClient()
+
+  // Pause for 3 months
+  const pauseUntil = new Date(Date.now() + 90 * 86400000)
+
+  try {
+    // 1. Pause Stripe billing
+    const { getStripe } = await import('@/lib/services/stripe')
+    const stripe = getStripe()
+    await stripe.subscriptions.update(stripeSubscriptionId, {
+      pause_collection: {
+        behavior: 'void',
+        resumes_at: Math.floor(pauseUntil.getTime() / 1000),
+      },
+    })
+
+    // 2. Update subscription in DB
+    await supabase
+      .from('subscriptions')
+      .update({
+        status: 'paused',
+        paused_at: new Date().toISOString(),
+        pause_until: pauseUntil.toISOString(),
+        pause_reason: reason,
+      })
+      .eq('stripe_subscription_id', stripeSubscriptionId)
+
+    // 3. Pause all monitors
+    await supabase
+      .from('monitors')
+      .update({ is_paused: true })
+      .eq('org_id', orgId)
+      .eq('is_paused', false)
+
+    // 4. Disable all alert channels
+    await supabase
+      .from('alert_channels')
+      .update({ is_enabled: false })
+      .eq('org_id', orgId)
+      .eq('is_enabled', true)
+
+    // 5. Unpublish all status pages
+    await supabase
+      .from('status_pages')
+      .update({ is_published: false })
+      .eq('org_id', orgId)
+      .eq('is_published', true)
+
+    // 6. Log cancellation reason
+    await supabase.from('cancellation_log').insert({
+      org_id: orgId,
+      user_id: userId,
+      reason,
+      reason_detail: reasonDetail ?? null,
+      action_taken: 'paused',
+      plan_slug: planSlug ?? null,
+    })
+
+    // 7. Notify user
+    await sendUserMessage({
+      userId,
+      orgId,
+      title: 'Subscription paused',
+      body: `Your subscription has been paused until ${pauseUntil.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}. Your monitors are paused and no charges will be made. You can resume anytime from Settings > Billing.`,
+      type: 'info',
+      category: 'billing',
+      actionUrl: '/dashboard/settings?tab=billing',
+      actionLabel: 'Manage Subscription',
+    })
+
+    logger.info('Subscription paused', { orgId, pauseUntil: pauseUntil.toISOString() })
+    return { success: true, pauseUntil: pauseUntil.toISOString() }
+  } catch (err) {
+    logger.error('Failed to pause subscription', { orgId, error: err instanceof Error ? err.message : 'Unknown' })
+    return { success: false, error: err instanceof Error ? err.message : 'Failed to pause' }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 6. Cancel subscription: downgrade to Free
+// ---------------------------------------------------------------------------
+
+export async function cancelSubscription(
+  orgId: string,
+  userId: string,
+  stripeSubscriptionId: string,
+  reason: string,
+  reasonDetail?: string,
+  planSlug?: string
+): Promise<{ success: boolean; error?: string }> {
+  const supabase = createAdminClient()
+
+  try {
+    // 1. Cancel Stripe subscription
+    const { getStripe } = await import('@/lib/services/stripe')
+    const stripe = getStripe()
+    await stripe.subscriptions.cancel(stripeSubscriptionId)
+
+    // 2. Update subscription in DB
+    await supabase
+      .from('subscriptions')
+      .update({ status: 'canceled', canceled_at: new Date().toISOString() })
+      .eq('stripe_subscription_id', stripeSubscriptionId)
+
+    // 3. Enforce Free plan limits
+    await enforceDowngradeLimits(orgId, userId)
+
+    // 4. Log cancellation reason
+    await supabase.from('cancellation_log').insert({
+      org_id: orgId,
+      user_id: userId,
+      reason,
+      reason_detail: reasonDetail ?? null,
+      action_taken: 'canceled',
+      plan_slug: planSlug ?? null,
+    })
+
+    // 5. Notify user
+    await sendUserMessage({
+      userId,
+      orgId,
+      title: 'Subscription canceled',
+      body: 'Your subscription has been canceled. You are now on the Free plan. Your excess monitors have been paused and excess channels disabled. You can upgrade again anytime.',
+      type: 'warning',
+      category: 'billing',
+      actionUrl: '/dashboard/settings?tab=billing',
+      actionLabel: 'View Plans',
+    })
+
+    logger.info('Subscription canceled by user', { orgId, reason })
+    return { success: true }
+  } catch (err) {
+    logger.error('Failed to cancel subscription', { orgId, error: err instanceof Error ? err.message : 'Unknown' })
+    return { success: false, error: err instanceof Error ? err.message : 'Failed to cancel' }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 7. Resume paused subscription
+// ---------------------------------------------------------------------------
+
+export async function resumeSubscription(
+  orgId: string,
+  userId: string,
+  stripeSubscriptionId: string
+): Promise<{ success: boolean; error?: string }> {
+  const supabase = createAdminClient()
+
+  try {
+    // 1. Resume Stripe billing
+    const { getStripe } = await import('@/lib/services/stripe')
+    const stripe = getStripe()
+    await stripe.subscriptions.update(stripeSubscriptionId, {
+      pause_collection: '',
+    } as Record<string, unknown>)
+
+    // 2. Update subscription in DB
+    await supabase
+      .from('subscriptions')
+      .update({
+        status: 'active',
+        paused_at: null,
+        pause_until: null,
+        pause_reason: null,
+      })
+      .eq('stripe_subscription_id', stripeSubscriptionId)
+
+    // 3. Unpause all monitors
+    await supabase
+      .from('monitors')
+      .update({ is_paused: false })
+      .eq('org_id', orgId)
+      .eq('is_paused', true)
+
+    // 4. Re-enable alert channels
+    await supabase
+      .from('alert_channels')
+      .update({ is_enabled: true })
+      .eq('org_id', orgId)
+      .eq('is_enabled', false)
+
+    // 5. Republish status pages
+    await supabase
+      .from('status_pages')
+      .update({ is_published: true })
+      .eq('org_id', orgId)
+      .eq('is_published', false)
+
+    // 6. Notify user
+    await sendUserMessage({
+      userId,
+      orgId,
+      title: 'Subscription resumed!',
+      body: 'Welcome back! Your subscription is active again. All your monitors have been reactivated and your alert channels are live.',
+      type: 'success',
+      category: 'billing',
+      actionUrl: '/dashboard',
+      actionLabel: 'Go to Dashboard',
+    })
+
+    logger.info('Subscription resumed', { orgId })
+    return { success: true }
+  } catch (err) {
+    logger.error('Failed to resume subscription', { orgId, error: err instanceof Error ? err.message : 'Unknown' })
+    return { success: false, error: err instanceof Error ? err.message : 'Failed to resume' }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 8. Check for pause reminders (called by nurture cron daily)
+// ---------------------------------------------------------------------------
+
+export async function sendPauseReminders(): Promise<{ sent: number }> {
+  const supabase = createAdminClient()
+  let sent = 0
+
+  // Get all paused subscriptions with pause_until
+  const { data: pausedSubs } = await supabase
+    .from('subscriptions')
+    .select('org_id, pause_until, stripe_subscription_id')
+    .eq('status', 'paused')
+    .not('pause_until', 'is', null)
+
+  if (!pausedSubs) return { sent: 0 }
+
+  const now = Date.now()
+
+  for (const sub of pausedSubs) {
+    const resumeDate = new Date(sub.pause_until as string)
+    const daysUntil = Math.ceil((resumeDate.getTime() - now) / 86400000)
+
+    if (daysUntil !== 14 && daysUntil !== 3 && daysUntil !== 0) continue
+
+    // Find org owner
+    const { data: owner } = await supabase
+      .from('users')
+      .select('id, email')
+      .eq('org_id', sub.org_id)
+      .eq('role', 'admin')
+      .limit(1)
+      .single()
+
+    if (!owner) continue
+
+    const dateStr = resumeDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+
+    if (daysUntil === 14) {
+      await sendUserMessage({
+        userId: owner.id,
+        orgId: sub.org_id,
+        title: 'Your subscription resumes in 14 days',
+        body: `Your paused subscription will resume on ${dateStr}. Your monitors will be reactivated and billing will restart. If you don't want to continue, you can cancel before then.`,
+        type: 'info',
+        category: 'billing',
+        actionUrl: '/dashboard/settings?tab=billing',
+        actionLabel: 'Manage Subscription',
+      })
+      if (owner.email) {
+        await sendAlertEmail({
+          to: owner.email,
+          subject: '[Uptrue] Your subscription resumes in 14 days',
+          body: `Your paused subscription will resume on ${dateStr}. Your monitors will be reactivated and billing will restart.\n\nIf you don't want to continue, cancel from your billing settings before ${dateStr}.`,
+        })
+      }
+      sent++
+    } else if (daysUntil === 3) {
+      await sendUserMessage({
+        userId: owner.id,
+        orgId: sub.org_id,
+        title: 'Billing resumes in 3 days',
+        body: `Your subscription resumes on ${dateStr}. You will be charged on that date. Cancel now if you don't want to continue.`,
+        type: 'warning',
+        category: 'billing',
+        actionUrl: '/dashboard/settings?tab=billing',
+        actionLabel: 'Manage Subscription',
+      })
+      if (owner.email) {
+        await sendAlertEmail({
+          to: owner.email,
+          subject: '[Uptrue] Billing resumes in 3 days',
+          body: `Your subscription resumes on ${dateStr}. You will be charged on that date.\n\nCancel from your billing settings if you don't want to continue.`,
+        })
+      }
+      sent++
+    } else if (daysUntil === 0) {
+      // Auto-resume day — Stripe handles billing, we handle reactivation
+      await resumeSubscription(sub.org_id, owner.id, sub.stripe_subscription_id ?? '')
+      sent++
+    }
+  }
+
+  return { sent }
 }

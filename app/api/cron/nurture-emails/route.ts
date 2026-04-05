@@ -5,6 +5,7 @@ import {
   sendWelcomeToFreeEmail,
   sendMonthlyDigest,
 } from '@/lib/services/email-nurture'
+import { sendPauseReminders } from '@/lib/services/plan-enforcement'
 import { getEmailRateStatus } from '@/lib/services/email'
 import { getServerConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
@@ -146,7 +147,11 @@ export async function GET(request: Request): Promise<NextResponse> {
       errors: result.errors,
     })
 
-    return NextResponse.json({ ok: true, ...result })
+    // Send pause reminders (14d, 3d, day-of resume)
+    const pauseResult = await sendPauseReminders()
+    logger.info('Pause reminders sent', { count: pauseResult.sent })
+
+    return NextResponse.json({ ok: true, ...result, pauseReminders: pauseResult.sent })
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Unknown error'
     logger.error('Nurture cron error', { error: message })

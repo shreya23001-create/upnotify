@@ -1399,6 +1399,9 @@ export type Database = {
           stripe_subscription_id: string | null
           trial_ends_at: string | null
           updated_at: string
+          paused_at: string | null
+          pause_until: string | null
+          pause_reason: string | null
         }
         Insert: {
           billing_cycle?: string | null
@@ -1413,6 +1416,9 @@ export type Database = {
           stripe_subscription_id?: string | null
           trial_ends_at?: string | null
           updated_at?: string
+          paused_at?: string | null
+          pause_until?: string | null
+          pause_reason?: string | null
         }
         Update: {
           billing_cycle?: string | null
@@ -1427,6 +1433,9 @@ export type Database = {
           stripe_subscription_id?: string | null
           trial_ends_at?: string | null
           updated_at?: string
+          paused_at?: string | null
+          pause_until?: string | null
+          pause_reason?: string | null
         }
         Relationships: [
           {
@@ -2116,6 +2125,29 @@ export type Database = {
           webhook_response_code?: number | null
           webhook_response_body?: string | null
           details?: Json
+        }
+        Update: {}
+        Relationships: []
+      }
+      cancellation_log: {
+        Row: {
+          id: string
+          org_id: string
+          user_id: string
+          reason: string
+          reason_detail: string | null
+          action_taken: string
+          plan_slug: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          org_id: string
+          user_id: string
+          reason: string
+          reason_detail?: string | null
+          action_taken: string
+          plan_slug?: string | null
         }
         Update: {}
         Relationships: []
