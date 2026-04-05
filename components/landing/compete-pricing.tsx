@@ -1,80 +1,36 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
-interface CompeteAddonPlan {
+interface CompetePlanData {
   name: string
-  monthlyPrice: string
-  annualPrice: string | null
-  monthlyPeriod: string
-  annualPeriod: string | null
-  annualNote: string | null
-  description: string
-  productLimit: string
-  extraProducts: string
-  features: string[]
-  highlighted: boolean
+  slug: string
+  product_limit: number
+  price_monthly_pence: number
+  price_yearly_pence: number | null
+  has_yearly_discount: boolean
+  extra_product_price_pence: number
+  max_extra_products: number
+  is_active: boolean
 }
 
-const COMPETE_PLANS: CompeteAddonPlan[] = [
-  {
-    name: 'Starter',
-    monthlyPrice: '\u00A39',
-    annualPrice: '\u00A37.50',
-    monthlyPeriod: '/month',
-    annualPeriod: '/mo',
-    annualNote: '\u00A390/year \u2014 2 months free',
-    description: 'Start tracking competitor prices',
-    productLimit: '10 products',
-    extraProducts: '+\u00A31 per product (bundles of 5 or 10)',
-    features: [
-      'Automatic price extraction',
-      'Stock availability monitoring',
-      'Price change alerts',
-      'CSV export',
-    ],
-    highlighted: false,
-  },
-  {
-    name: 'Pro',
-    monthlyPrice: '\u00A329',
-    annualPrice: '\u00A324.17',
-    monthlyPeriod: '/month',
-    annualPeriod: '/mo',
-    annualNote: '\u00A3290/year \u2014 2 months free',
-    description: 'For serious competitive intelligence',
-    productLimit: '500 products',
-    extraProducts: '+\u00A31 per product (bundles of 5 or 10)',
-    features: [
-      'Everything in Starter',
-      'Webhook integrations',
-      'Price history charts',
-      'AI-powered price brief',
-    ],
-    highlighted: true,
-  },
-  {
-    name: 'Business',
-    monthlyPrice: '\u00A399',
-    annualPrice: null,
-    monthlyPeriod: '/month',
-    annualPeriod: null,
-    annualNote: null,
-    description: 'Enterprise-scale price tracking',
-    productLimit: '2,500 products',
-    extraProducts: '+\u00A31 per product (bundles of 5 or 10)',
-    features: [
-      'Everything in Pro',
-      'Priority support',
-      'Bulk product import',
-      'Custom check intervals',
-    ],
-    highlighted: false,
-  },
-]
+function fmt(pence: number): string {
+  const gbp = pence / 100
+  return `\u00A3${gbp % 1 === 0 ? gbp.toFixed(0) : gbp.toFixed(2)}`
+}
 
 export default function CompetePricing(): React.ReactElement {
   const [isAnnual, setIsAnnual] = useState(true)
+  const [plans, setPlans] = useState<CompetePlanData[]>([])
+
+  useEffect(() => {
+    fetch('/api/v1/compete/plans')
+      .then(r => r.json())
+      .then((data: { plans?: CompetePlanData[] }) => {
+        if (data.plans) setPlans(data.plans.filter(p => p.is_active))
+      })
+      .catch(() => {})
+  }, [])
 
   return (
     <section className="landing-section landing-compete-pricing" id="compete-pricing">
@@ -88,7 +44,6 @@ export default function CompetePricing(): React.ReactElement {
           </p>
         </div>
 
-        {/* Annual / Monthly toggle */}
         <div className="billing-toggle-wrapper">
           <button
             className={`billing-toggle-btn${!isAnnual ? ' billing-toggle-active' : ''}`}
@@ -106,18 +61,29 @@ export default function CompetePricing(): React.ReactElement {
         </div>
 
         <div className="compete-pricing-grid">
-          {COMPETE_PLANS.map((plan) => {
-            const showAnnual = isAnnual && plan.annualPrice
-            const price = showAnnual ? plan.annualPrice : plan.monthlyPrice
-            const period = showAnnual ? plan.annualPeriod : plan.monthlyPeriod
-            const note = showAnnual ? plan.annualNote : null
+          {plans.map((plan) => {
+            const showAnnual = isAnnual && plan.has_yearly_discount && plan.price_yearly_pence
+            const isHighlighted = plan.slug === 'compete-pro'
+
+            let price: string
+            let period: string
+            let note: string | undefined
+
+            if (showAnnual && plan.price_yearly_pence) {
+              price = fmt(plan.price_yearly_pence)
+              period = '/year'
+              note = '2 months free'
+            } else {
+              price = fmt(plan.price_monthly_pence)
+              period = '/month'
+            }
 
             return (
               <div
-                key={plan.name}
-                className={`pricing-card ${plan.highlighted ? 'pricing-card-highlighted' : ''}`}
+                key={plan.slug}
+                className={`pricing-card ${isHighlighted ? 'pricing-card-highlighted' : ''}`}
               >
-                {plan.highlighted && (
+                {isHighlighted && (
                   <div className="pricing-badge">Best Value</div>
                 )}
                 <div className="pricing-card-header">
@@ -126,28 +92,28 @@ export default function CompetePricing(): React.ReactElement {
                     <span className="pricing-amount">{price}</span>
                     <span className="pricing-period">{period}</span>
                   </div>
-                  <p className="pricing-description">{note || plan.description}</p>
+                  {note && <p className="pricing-description">{note}</p>}
                 </div>
 
                 <div style={{ padding: '0 24px', marginBottom: 12 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid var(--border-primary)' }}>
                     <span style={{ fontWeight: 600, fontSize: 14 }}>Products</span>
-                    <span style={{ fontWeight: 700, fontSize: 14, color: 'var(--color-primary)' }}>{plan.productLimit}</span>
+                    <span style={{ fontWeight: 700, fontSize: 14, color: 'var(--color-primary)' }}>{plan.product_limit.toLocaleString()}</span>
                   </div>
-                  <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 6 }}>{plan.extraProducts}</p>
+                  <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 6 }}>
+                    +{fmt(plan.extra_product_price_pence)} per extra product (bundles of 5 or 10)
+                  </p>
                 </div>
 
                 <ul className="pricing-features">
-                  {plan.features.map((feature, index) => (
-                    <li key={index} className="pricing-feature">
-                      <span className="pricing-feature-icon">{'\u2713'}</span>
-                      {feature}
-                    </li>
-                  ))}
+                  <li className="pricing-feature"><span className="pricing-feature-icon">{'\u2713'}</span>Automatic price extraction</li>
+                  <li className="pricing-feature"><span className="pricing-feature-icon">{'\u2713'}</span>Stock availability monitoring</li>
+                  <li className="pricing-feature"><span className="pricing-feature-icon">{'\u2713'}</span>Price change alerts</li>
+                  <li className="pricing-feature"><span className="pricing-feature-icon">{'\u2713'}</span>CSV export</li>
                 </ul>
                 <a
                   href="/signup"
-                  className={`btn btn-full ${plan.highlighted ? 'btn-primary' : 'btn-secondary'}`}
+                  className={`btn btn-full ${isHighlighted ? 'btn-primary' : 'btn-secondary'}`}
                 >
                   Add Compete
                 </a>

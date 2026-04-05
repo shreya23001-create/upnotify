@@ -41,7 +41,7 @@ export function CurrentPlan({ plan, subscription }: Props) {
           <div>
             <div className="stat-label">Current Plan</div>
             <div style={{ fontSize: 20, fontWeight: 700, marginBottom: 4 }}>{plan.name}</div>
-            <span className={`badge ${subscription.status === 'active' ? 'badge-success' : subscription.status === 'trialing' ? 'badge-warning' : 'badge-danger'}`}>
+            <span className={`badge ${subscription.status === 'active' ? 'badge-success' : 'badge-danger'}`}>
               {subscription.status}
             </span>
             <span style={{ marginLeft: 8, fontSize: 14, color: '#94a3b8', textTransform: 'capitalize' }}>
@@ -53,15 +53,9 @@ export function CurrentPlan({ plan, subscription }: Props) {
               </p>
             )}
           </div>
-          {subscription.status === 'trialing' ? (
-            <span style={{ fontSize: 13, color: '#f59e0b', fontWeight: 600 }}>
-              Upgrade to keep these features
-            </span>
-          ) : (
-            <button className="btn btn-secondary" onClick={handleManage} disabled={isPending}>
-              {isPending ? 'Loading...' : 'Manage Subscription'}
-            </button>
-          )}
+          <button className="btn btn-secondary" onClick={handleManage} disabled={isPending}>
+            {isPending ? 'Loading...' : 'Manage Subscription'}
+          </button>
         </div>
       </div>
     </div>

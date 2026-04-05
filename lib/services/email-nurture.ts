@@ -239,17 +239,16 @@ export async function sendWelcomeEmail(
       just enter a URL and we'll start watching it immediately.
     </p>
     <p style="margin:0 0 8px;font-size:15px;color:#374151;line-height:1.6;">
-      Here's what you get with your 14-day Builder trial:
+      Here's what you get on the Free plan:
     </p>
     <ul style="margin:0 0 16px;padding-left:20px;font-size:14px;color:#374151;line-height:1.8;">
-      <li><strong>10 monitors</strong> with 1-minute check intervals</li>
+      <li><strong>3 monitors</strong> with 10-minute check intervals</li>
       <li><strong>10 check types</strong> &mdash; HTTP, SSL, DNS, keyword, port, ping &amp; more</li>
-      <li><strong>Multi-channel alerts</strong> &mdash; email, Slack, Teams, webhooks</li>
-      <li><strong>Public status pages</strong> with custom branding</li>
-      <li><strong>AI-powered reports</strong> with executive summaries</li>
+      <li><strong>Email alerts</strong> when something goes wrong</li>
+      <li><strong>Free tools</strong> &mdash; SSL checker, uptime calculator, website score</li>
     </ul>
     <p style="margin:0;font-size:14px;color:#6b7280;line-height:1.6;">
-      No credit card required. After your trial, you'll move to our Free plan unless you upgrade.
+      Need more? Upgrade to Lite from just &pound;1/month for faster checks, Slack alerts, and status pages.
     </p>
     ${ctaButton('Add Your First Monitor \u2192', `${appUrl}/dashboard`)}
   `, userId)
@@ -431,7 +430,7 @@ export async function sendWelcomeToFreeEmail(
       You can upgrade anytime to restore all your monitors and unlock advanced features.
     </p>
     <p style="margin:0;font-size:14px;color:#6b7280;line-height:1.6;">
-      Plans start from just &pound;19/month.
+      Plans start from just &pound;1/month with Lite.
     </p>
     ${ctaButton('Upgrade Your Plan \u2192', `${appUrl}/dashboard/settings`)}
   `, userId)

@@ -521,14 +521,14 @@ export default function CompeteLandingPage(): React.ReactElement {
                 One missed price change can cost you thousands
               </h2>
               <p className="agency-description">
-                Track 500 products for {'\u00A3'}29/month. That is less than 6p per product.
+                Track competitor prices starting from just {'\u00A3'}9/month.
                 A single day of being overpriced on a high-traffic product can cost more
                 than a year of Uptrue Compete.
               </p>
               <ul className="agency-features">
                 <li>
                   <span className="agency-check">{'\u2713'}</span>
-                  500 products monitored for {'\u00A3'}29/month
+                  Plans from 10 to 2,500 products
                 </li>
                 <li>
                   <span className="agency-check">{'\u2713'}</span>

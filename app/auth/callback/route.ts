@@ -26,7 +26,7 @@ function isValidRedirectPath(path: string): boolean {
  * the dashboard (or whatever `next` query param specifies).
  *
  * Also handles:
- * - Reverse trial: creates a 14-day Builder trial for new users
+ * - New users start on Free plan (no trial)
  * - Referrals: records referral signup if ref param is present
  *
  * Rate limited: 10 requests per 15 minutes per IP.
