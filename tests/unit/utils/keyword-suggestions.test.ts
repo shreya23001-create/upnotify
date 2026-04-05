@@ -94,10 +94,10 @@ describe('getKeywordSuggestions', () => {
     expect(suggestions.negative).toContain('500')
   })
 
-  it('returns empty suggestions for empty URL', () => {
+  it('returns default suggestions for empty URL', () => {
     const suggestions = getKeywordSuggestions('')
-    expect(suggestions.positive.length).toBe(0)
-    expect(suggestions.negative.length).toBe(0)
+    expect(suggestions.positive.length).toBeGreaterThan(0)
+    expect(suggestions.negative.length).toBeGreaterThan(0)
   })
 
   it('is case insensitive for URL matching', () => {

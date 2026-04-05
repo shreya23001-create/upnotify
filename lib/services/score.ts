@@ -163,7 +163,7 @@ async function checkSSLSecurity(hostname: string): Promise<CategoryScore> {
 
   return new Promise<CategoryScore>((resolve) => {
     const socket = tls.connect(
-      { host: hostname, port: 443, servername: hostname, timeout: 10000 },
+      { host: hostname, port: 443, servername: hostname, timeout: 10000, rejectUnauthorized: false },
       () => {
         const cert = socket.getPeerCertificate()
         const protocol = socket.getProtocol()
