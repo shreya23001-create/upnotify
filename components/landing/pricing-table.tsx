@@ -1,128 +1,89 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
-interface PlanFeature {
-  text: string
-  included: boolean
-}
-
-interface LandingPlan {
+interface PlanData {
   name: string
-  monthlyPrice: string
-  annualPrice: string
-  monthlyPeriod: string
-  annualPeriod: string
-  monthlyNote?: string
-  annualNote?: string
-  description: string
-  features: PlanFeature[]
-  cta: string
-  ctaHref: string
-  highlighted: boolean
+  slug: string
+  price_monthly_gbp: number
+  price_annual_gbp: number | null
+  monitor_limit: number | null
+  check_interval_seconds: number
+  max_team_members: number
+  has_email_alerts: boolean
+  has_slack_teams: boolean
+  has_webhooks: boolean
+  has_status_pages: boolean
+  status_page_limit: number
+  has_status_page_custom_domain: boolean
+  has_ai_predictive: boolean
+  ai_report_limit: number
+  has_api_access: boolean
+  data_retention_days: number | null
+  is_visible: boolean
 }
 
-const PLANS: LandingPlan[] = [
-  {
-    name: 'Free',
-    monthlyPrice: '\u00A30',
-    annualPrice: '\u00A30',
-    monthlyPeriod: 'forever',
-    annualPeriod: 'forever',
-    description: 'Get started with basic monitoring',
-    features: [
-      { text: '3 monitors', included: true },
-      { text: '10-minute check interval', included: true },
-      { text: '7-day data retention', included: true },
-      { text: 'Email alerts', included: true },
-      { text: 'Solo use only', included: true },
-      { text: 'Status pages', included: false },
-      { text: 'Slack & Teams alerts', included: false },
-      { text: 'Webhooks', included: false },
-      { text: 'AI reports', included: false },
-      { text: 'API access', included: false },
-    ],
-    cta: 'Start Free',
-    ctaHref: '/signup',
-    highlighted: false,
-  },
-  {
-    name: 'Lite',
-    monthlyPrice: '\u00A31',
-    annualPrice: '\u00A310',
-    monthlyPeriod: '/month',
-    annualPeriod: '/year',
-    monthlyNote: 'Or save with annual \u2014 \u00A310/yr',
-    annualNote: 'Just 83p per month',
-    description: 'Affordable monitoring for small projects',
-    features: [
-      { text: '5 monitors', included: true },
-      { text: '1-minute check interval', included: true },
-      { text: '30-day data retention', included: true },
-      { text: 'Email alerts', included: true },
-      { text: '2 team members', included: true },
-      { text: '1 branded status page', included: true },
-      { text: 'Slack & Teams alerts', included: true },
-      { text: 'Webhooks', included: true },
-      { text: 'AI reports', included: false },
-      { text: 'API access', included: false },
-    ],
-    cta: 'Get Started',
-    ctaHref: '/signup',
-    highlighted: false,
-  },
-  {
-    name: 'Builder',
-    monthlyPrice: '\u00A315',
-    annualPrice: '\u00A312',
-    monthlyPeriod: '/month',
-    annualPeriod: '/mo',
-    annualNote: '\u00A3144/year \u2014 save 20%',
-    description: 'For growing teams and serious projects',
-    features: [
-      { text: '25 monitors', included: true },
-      { text: '1-minute check interval', included: true },
-      { text: '90-day data retention', included: true },
-      { text: 'Email alerts', included: true },
-      { text: '10 team members', included: true },
-      { text: '5 custom domain status pages', included: true },
-      { text: 'Slack & Teams alerts', included: true },
-      { text: 'Webhooks', included: true },
-      { text: 'AI reports (5/month)', included: true },
-      { text: 'API access', included: false },
-    ],
-    cta: 'Get Started',
-    ctaHref: '/signup',
-    highlighted: true,
-  },
-  {
-    name: 'Scale',
-    monthlyPrice: '\u00A339',
-    annualPrice: '\u00A331.17',
-    monthlyPeriod: '/month',
-    annualPeriod: '/mo',
-    annualNote: '\u00A3374/year \u2014 save 20%',
-    description: 'Full power for teams that need everything',
-    features: [
-      { text: '100 monitors', included: true },
-      { text: '30-second check interval', included: true },
-      { text: '1-year data retention', included: true },
-      { text: 'Email alerts', included: true },
-      { text: '20 team members', included: true },
-      { text: 'Unlimited status pages', included: true },
-      { text: 'Slack & Teams alerts', included: true },
-      { text: 'Webhooks', included: true },
-      { text: 'Unlimited AI reports', included: true },
-      { text: 'Full API access', included: true },
-    ],
-    cta: 'Get Started',
-    ctaHref: '/signup',
-    highlighted: false,
-  },
-]
+function formatInterval(seconds: number): string {
+  if (seconds >= 300) return `${seconds / 60}-minute check interval`
+  return `${seconds}-second check interval`
+}
+
+function formatRetention(days: number | null): string {
+  if (!days) return 'Unlimited data retention'
+  if (days >= 365) return `${Math.round(days / 365)}-year data retention`
+  return `${days}-day data retention`
+}
+
+function getFeatures(p: PlanData): { text: string; included: boolean }[] {
+  const features: { text: string; included: boolean }[] = []
+
+  features.push({ text: p.monitor_limit ? `${p.monitor_limit} monitors` : 'Unlimited monitors', included: true })
+  features.push({ text: formatInterval(p.check_interval_seconds), included: true })
+  features.push({ text: formatRetention(p.data_retention_days), included: true })
+  features.push({ text: 'Email alerts', included: p.has_email_alerts })
+
+  if (p.max_team_members > 0) {
+    features.push({ text: `${p.max_team_members} team members`, included: true })
+  } else {
+    features.push({ text: 'Solo use only', included: true })
+  }
+
+  if (p.has_status_page_custom_domain) {
+    features.push({ text: p.status_page_limit ? `${p.status_page_limit} custom domain status pages` : 'Unlimited status pages', included: true })
+  } else if (p.has_status_pages) {
+    features.push({ text: p.status_page_limit ? `${p.status_page_limit} status page${p.status_page_limit > 1 ? 's' : ''}` : 'Status pages', included: true })
+  } else {
+    features.push({ text: 'Status pages', included: false })
+  }
+
+  features.push({ text: 'Slack & Teams alerts', included: p.has_slack_teams })
+  features.push({ text: 'Webhooks', included: p.has_webhooks })
+
+  if (p.has_ai_predictive || p.ai_report_limit > 0) {
+    features.push({ text: p.ai_report_limit > 0 ? `AI reports (${p.ai_report_limit}/month)` : 'Unlimited AI reports', included: true })
+  } else {
+    features.push({ text: 'AI reports', included: false })
+  }
+
+  features.push({ text: p.has_api_access ? 'Full API access' : 'API access', included: p.has_api_access })
+
+  return features
+}
 
 export default function PricingTable(): React.ReactElement {
   const [isAnnual, setIsAnnual] = useState(true)
+  const [plans, setPlans] = useState<PlanData[]>([])
+
+  useEffect(() => {
+    fetch('/api/v1/plans')
+      .then(r => r.json())
+      .then((data: { plans?: PlanData[] }) => {
+        if (data.plans) setPlans(data.plans.filter(p => p.is_visible))
+      })
+      .catch(() => {})
+  }, [])
+
+  const highlightedSlug = 'builder'
 
   return (
     <section className="landing-section landing-pricing" id="pricing">
@@ -132,7 +93,6 @@ export default function PricingTable(): React.ReactElement {
           Start free. Scale as you grow. No hidden fees.
         </p>
 
-        {/* Annual / Monthly toggle */}
         <div className="billing-toggle-wrapper">
           <button
             className={`billing-toggle-btn${!isAnnual ? ' billing-toggle-active' : ''}`}
@@ -145,36 +105,57 @@ export default function PricingTable(): React.ReactElement {
             onClick={() => setIsAnnual(true)}
           >
             Annual
-            <span className="billing-toggle-save">Save 20%</span>
+            <span className="billing-toggle-save">Save up to 20%</span>
           </button>
         </div>
 
         <div className="pricing-grid">
-          {PLANS.map((plan) => {
-            const price = isAnnual ? plan.annualPrice : plan.monthlyPrice
-            const period = isAnnual ? plan.annualPeriod : plan.monthlyPeriod
-            const note = isAnnual ? plan.annualNote : plan.monthlyNote
+          {plans.map((plan) => {
+            const isFree = plan.price_monthly_gbp === 0 && (!plan.price_annual_gbp || plan.price_annual_gbp === 0)
+            const monthlyGbp = plan.price_monthly_gbp / 100
+            const annualGbp = plan.price_annual_gbp ? plan.price_annual_gbp / 100 : null
+
+            let price: string
+            let period: string
+            let note: string | undefined
+
+            if (isFree) {
+              price = '\u00A30'
+              period = 'forever'
+            } else if (isAnnual && annualGbp) {
+              price = `\u00A3${annualGbp.toFixed(annualGbp % 1 === 0 ? 0 : 2)}`
+              period = '/year'
+              const savings = Math.round(((monthlyGbp * 12 - annualGbp) / (monthlyGbp * 12)) * 100)
+              note = savings > 0 ? `Save ${savings}% vs monthly` : undefined
+            } else {
+              price = `\u00A3${monthlyGbp.toFixed(monthlyGbp % 1 === 0 ? 0 : 2)}`
+              period = '/month'
+              if (annualGbp) {
+                note = `Or \u00A3${annualGbp.toFixed(0)}/year`
+              }
+            }
+
+            const isHighlighted = plan.slug === highlightedSlug
+            const features = getFeatures(plan)
 
             return (
               <div
-                key={plan.name}
-                className={`pricing-card ${plan.highlighted ? 'pricing-card-highlighted' : ''}`}
+                key={plan.slug}
+                className={`pricing-card ${isHighlighted ? 'pricing-card-highlighted' : ''}`}
               >
-                {plan.highlighted && (
+                {isHighlighted && (
                   <div className="pricing-badge">Most Popular</div>
                 )}
                 <div className="pricing-card-header">
-                  <h3 className="pricing-plan-name">
-                    {plan.name}
-                  </h3>
+                  <h3 className="pricing-plan-name">{plan.name}</h3>
                   <div className="pricing-price">
                     <span className="pricing-amount">{price}</span>
                     <span className="pricing-period">{period}</span>
                   </div>
-                  <p className="pricing-description">{note || plan.description}</p>
+                  {note && <p className="pricing-description">{note}</p>}
                 </div>
                 <ul className="pricing-features">
-                  {plan.features.map((feature, index) => (
+                  {features.map((feature, index) => (
                     <li
                       key={index}
                       className={`pricing-feature ${!feature.included ? 'pricing-feature-disabled' : ''}`}
@@ -187,10 +168,10 @@ export default function PricingTable(): React.ReactElement {
                   ))}
                 </ul>
                 <a
-                  href={plan.ctaHref}
-                  className={`btn btn-full ${plan.highlighted ? 'btn-primary' : 'btn-secondary'}`}
+                  href={isFree ? '/signup' : '/signup'}
+                  className={`btn btn-full ${isHighlighted ? 'btn-primary' : 'btn-secondary'}`}
                 >
-                  {plan.cta}
+                  {isFree ? 'Start Free' : 'Get Started'}
                 </a>
               </div>
             )
