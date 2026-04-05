@@ -1,0 +1,291 @@
+/**
+ * Plan enforcement — handles downstream consequences of plan changes,
+ * user deactivation, and deletion. Every cause produces all required effects.
+ */
+import { createAdminClient } from '@/lib/supabase/admin'
+import { sendUserMessage } from '@/lib/db/user-messages'
+import { getPlanLimits } from '@/lib/utils/plan-limits'
+import { logger } from '@/lib/utils/logger'
+
+// ---------------------------------------------------------------------------
+// 1. Deactivation: pause all org monitors when no active users remain
+// ---------------------------------------------------------------------------
+
+export async function onUserDeactivated(userId: string): Promise<void> {
+  const supabase = createAdminClient()
+
+  // Get user's org
+  const { data: user } = await supabase
+    .from('users')
+    .select('org_id')
+    .eq('id', userId)
+    .single()
+
+  if (!user) return
+
+  // Check if any active users remain in this org
+  const { count: activeCount } = await supabase
+    .from('users')
+    .select('id', { count: 'exact', head: true })
+    .eq('org_id', user.org_id)
+    .eq('is_active', true)
+
+  if ((activeCount ?? 0) === 0) {
+    // No active users — pause all monitors for this org
+    const { data: monitors } = await supabase
+      .from('monitors')
+      .select('id')
+      .eq('org_id', user.org_id)
+      .eq('is_paused', false)
+
+    if (monitors && monitors.length > 0) {
+      await supabase
+        .from('monitors')
+        .update({ is_paused: true })
+        .eq('org_id', user.org_id)
+        .eq('is_paused', false)
+
+      logger.info('Paused all monitors for deactivated org', {
+        orgId: user.org_id,
+        monitorCount: monitors.length,
+      })
+    }
+  }
+}
+
+export async function onUserActivated(userId: string): Promise<void> {
+  const supabase = createAdminClient()
+
+  const { data: user } = await supabase
+    .from('users')
+    .select('org_id')
+    .eq('id', userId)
+    .single()
+
+  if (!user) return
+
+  // Unpause all monitors for this org (they were paused by deactivation)
+  await supabase
+    .from('monitors')
+    .update({ is_paused: false })
+    .eq('org_id', user.org_id)
+    .eq('is_paused', true)
+
+  logger.info('Unpaused monitors for reactivated org', { orgId: user.org_id })
+}
+
+// ---------------------------------------------------------------------------
+// 2. Downgrade enforcement: pause/unpublish resources exceeding new plan limits
+// ---------------------------------------------------------------------------
+
+export async function enforceDowngradeLimits(
+  orgId: string,
+  notifyUserId?: string
+): Promise<{ affected: string[] }> {
+  const supabase = createAdminClient()
+  const limits = await getPlanLimits(orgId)
+  const affected: string[] = []
+
+  // --- Monitors: pause newest ones beyond limit ---
+  if (limits.monitors !== null) {
+    const { data: monitors } = await supabase
+      .from('monitors')
+      .select('id, name')
+      .eq('org_id', orgId)
+      .eq('is_paused', false)
+      .order('created_at', { ascending: true })
+
+    if (monitors && monitors.length > limits.monitors) {
+      const toPause = monitors.slice(limits.monitors)
+      const pauseIds = toPause.map(m => m.id)
+
+      await supabase
+        .from('monitors')
+        .update({ is_paused: true })
+        .in('id', pauseIds)
+
+      const names = toPause.map(m => m.name).join(', ')
+      affected.push(`${toPause.length} monitor(s) paused: ${names}`)
+      logger.info('Downgrade: paused excess monitors', { orgId, count: toPause.length })
+    }
+  }
+
+  // --- Status pages: unpublish newest beyond limit ---
+  if (limits.statusPageLimit > 0) {
+    const { data: pages } = await supabase
+      .from('status_pages')
+      .select('id, name')
+      .eq('org_id', orgId)
+      .eq('is_published', true)
+      .order('created_at', { ascending: true })
+
+    if (pages && pages.length > limits.statusPageLimit) {
+      const toUnpublish = pages.slice(limits.statusPageLimit)
+      const unpubIds = toUnpublish.map(p => p.id)
+
+      await supabase
+        .from('status_pages')
+        .update({ is_published: false })
+        .in('id', unpubIds)
+
+      const names = toUnpublish.map(p => p.name).join(', ')
+      affected.push(`${toUnpublish.length} status page(s) unpublished: ${names}`)
+      logger.info('Downgrade: unpublished excess status pages', { orgId, count: toUnpublish.length })
+    }
+  } else if (!limits.hasStatusPages) {
+    // Plan doesn't include status pages at all — unpublish all
+    const { count } = await supabase
+      .from('status_pages')
+      .select('id', { count: 'exact', head: true })
+      .eq('org_id', orgId)
+      .eq('is_published', true)
+
+    if ((count ?? 0) > 0) {
+      await supabase
+        .from('status_pages')
+        .update({ is_published: false })
+        .eq('org_id', orgId)
+        .eq('is_published', true)
+
+      affected.push(`All status pages unpublished (not included in plan)`)
+    }
+  }
+
+  // --- Alert channels: disable types not in plan ---
+  if (!limits.hasSlackTeams) {
+    const { data: slackChannels } = await supabase
+      .from('alert_channels')
+      .select('id')
+      .eq('org_id', orgId)
+      .in('type', ['slack', 'teams'])
+      .eq('is_enabled', true)
+
+    if (slackChannels && slackChannels.length > 0) {
+      await supabase
+        .from('alert_channels')
+        .update({ is_enabled: false })
+        .in('id', slackChannels.map(c => c.id))
+
+      affected.push(`${slackChannels.length} Slack/Teams channel(s) disabled`)
+    }
+  }
+
+  if (!limits.hasWebhooks) {
+    const { data: webhookChannels } = await supabase
+      .from('alert_channels')
+      .select('id')
+      .eq('org_id', orgId)
+      .eq('type', 'webhook')
+      .eq('is_enabled', true)
+
+    if (webhookChannels && webhookChannels.length > 0) {
+      await supabase
+        .from('alert_channels')
+        .update({ is_enabled: false })
+        .in('id', webhookChannels.map(c => c.id))
+
+      affected.push(`${webhookChannels.length} webhook channel(s) disabled`)
+    }
+  }
+
+  // --- Notify user about changes ---
+  if (affected.length > 0 && notifyUserId) {
+    await sendUserMessage({
+      userId: notifyUserId,
+      orgId,
+      title: 'Plan limits adjusted',
+      body: `Your plan has changed. The following resources were affected:\n\n${affected.map(a => `• ${a}`).join('\n')}\n\nYou can upgrade your plan anytime to restore them.`,
+      type: 'warning',
+      category: 'billing',
+      actionUrl: '/dashboard/settings?tab=billing',
+      actionLabel: 'View Plans',
+    })
+  }
+
+  return { affected }
+}
+
+// ---------------------------------------------------------------------------
+// 3. Deletion: cancel Stripe subscriptions before cascade delete
+// ---------------------------------------------------------------------------
+
+export async function cancelStripeOnDeletion(orgId: string): Promise<void> {
+  const supabase = createAdminClient()
+
+  // Get org's stripe customer ID
+  const { data: org } = await supabase
+    .from('organisations')
+    .select('stripe_customer_id')
+    .eq('id', orgId)
+    .single()
+
+  if (!org?.stripe_customer_id) return
+
+  try {
+    const { getStripe } = await import('@/lib/services/stripe')
+    const stripe = getStripe()
+
+    // List all active subscriptions for this customer
+    const subscriptions = await stripe.subscriptions.list({
+      customer: org.stripe_customer_id,
+      status: 'active',
+    })
+
+    for (const sub of subscriptions.data) {
+      await stripe.subscriptions.cancel(sub.id)
+      logger.info('Canceled Stripe subscription on user deletion', { subId: sub.id, orgId })
+    }
+
+    // Also cancel trialing subscriptions
+    const trialSubs = await stripe.subscriptions.list({
+      customer: org.stripe_customer_id,
+      status: 'trialing',
+    })
+
+    for (const sub of trialSubs.data) {
+      await stripe.subscriptions.cancel(sub.id)
+    }
+  } catch (err) {
+    logger.error('Failed to cancel Stripe subscriptions on deletion', {
+      orgId,
+      error: err instanceof Error ? err.message : 'Unknown',
+    })
+    // Don't block deletion — log and continue
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 4. Plan change notification
+// ---------------------------------------------------------------------------
+
+export async function notifyPlanChange(
+  orgId: string,
+  planName: string,
+  direction: 'upgraded' | 'changed' | 'downgraded'
+): Promise<void> {
+  const supabase = createAdminClient()
+
+  // Find org owner to notify
+  const { data: owner } = await supabase
+    .from('users')
+    .select('id')
+    .eq('org_id', orgId)
+    .eq('role', 'admin')
+    .limit(1)
+    .single()
+
+  if (!owner) return
+
+  await sendUserMessage({
+    userId: owner.id,
+    orgId,
+    title: `Plan ${direction}: ${planName}`,
+    body: direction === 'downgraded'
+      ? `Your plan has been changed to ${planName}. Some features may have been adjusted to match your new plan limits.`
+      : `Your plan has been ${direction} to ${planName}. All new features are available immediately.`,
+    type: direction === 'downgraded' ? 'warning' : 'success',
+    category: 'billing',
+    actionUrl: '/dashboard/settings?tab=billing',
+    actionLabel: 'View Plan',
+  })
+}

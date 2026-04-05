@@ -4,6 +4,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
 import { getServerConfig } from '@/lib/utils/config'
 import { isProduction } from '@/lib/utils/environment'
+import { enforceDowngradeLimits, notifyPlanChange } from '@/lib/services/plan-enforcement'
 import type Stripe from 'stripe'
 
 export const dynamic = 'force-dynamic'
@@ -68,7 +69,7 @@ async function handleCheckoutCompleted(
     if (orgId && planSlug && session.subscription) {
       const { data: plan } = await supabase
         .from('plans')
-        .select('id')
+        .select('id, name')
         .eq('slug', planSlug)
         .single()
 
@@ -105,6 +106,12 @@ async function handleCheckoutCompleted(
           orgId,
           planSlug,
         })
+
+        // Consequence 1: enforce downgrade limits (in case of plan change)
+        await enforceDowngradeLimits(orgId)
+
+        // Consequence 2: notify user
+        await notifyPlanChange(orgId, plan.name ?? planSlug, 'upgraded')
       }
     }
   }

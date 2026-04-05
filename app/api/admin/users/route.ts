@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { deleteUserAccount } from '@/lib/db/gdpr'
 import { writeAuditLog } from '@/lib/db/audit'
+import { onUserDeactivated, onUserActivated, enforceDowngradeLimits, cancelStripeOnDeletion, notifyPlanChange } from '@/lib/services/plan-enforcement'
 import { logger } from '@/lib/utils/logger'
 
 export const dynamic = 'force-dynamic'
@@ -41,8 +42,11 @@ export async function PATCH(request: Request): Promise<NextResponse> {
       return NextResponse.json({ error: `Failed to deactivate: ${error.message}` }, { status: 500 })
     }
 
-    // Sign the user out of all sessions (forces re-auth, which will hit the deactivated check)
+    // Consequence 1: Sign the user out of all sessions
     await supabase.auth.admin.signOut(body.userId, 'global')
+
+    // Consequence 2: Pause org monitors if no active users remain
+    await onUserDeactivated(body.userId)
 
     await writeAuditLog({
       orgId: null as unknown as string,
@@ -65,6 +69,9 @@ export async function PATCH(request: Request): Promise<NextResponse> {
     if (error) {
       return NextResponse.json({ error: `Failed to activate: ${error.message}` }, { status: 500 })
     }
+
+    // Consequence: unpause monitors that were paused by deactivation
+    await onUserActivated(body.userId)
 
     await writeAuditLog({
       orgId: null as unknown as string,
@@ -116,16 +123,29 @@ export async function PATCH(request: Request): Promise<NextResponse> {
       return NextResponse.json({ error: 'Failed to change plan' }, { status: 500 })
     }
 
+    // Get plan name for notification
+    const { data: newPlan } = await supabase
+      .from('plans')
+      .select('name')
+      .eq('id', body.planId)
+      .single()
+
+    // Consequence 1: enforce downgrade limits (pauses excess monitors, disables channels, etc.)
+    const { affected } = await enforceDowngradeLimits(user.org_id, body.userId)
+
+    // Consequence 2: notify user about plan change
+    await notifyPlanChange(user.org_id, newPlan?.name ?? 'Unknown', affected.length > 0 ? 'downgraded' : 'changed')
+
     await writeAuditLog({
       orgId: user.org_id,
       userId: adminUserId,
       action: 'admin.plan_changed',
       resourceType: 'subscription',
       resourceId: body.userId,
-      metadata: { adminEmail, planId: body.planId },
+      metadata: { adminEmail, planId: body.planId, affected },
     })
 
-    return NextResponse.json({ success: true })
+    return NextResponse.json({ success: true, affected })
   }
 
   return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
@@ -168,6 +188,9 @@ export async function DELETE(request: Request): Promise<NextResponse> {
     if (!targetUser) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
+
+    // Consequence: cancel Stripe subscriptions before deleting data
+    await cancelStripeOnDeletion(targetUser.org_id)
 
     const result = await deleteUserAccount(userId, targetUser.org_id)
 

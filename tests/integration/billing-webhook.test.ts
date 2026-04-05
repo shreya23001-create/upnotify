@@ -7,6 +7,11 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 const mockConstructEvent = vi.fn()
 const mockSubscriptionsRetrieve = vi.fn()
 
+vi.mock('@/lib/services/plan-enforcement', () => ({
+  enforceDowngradeLimits: vi.fn().mockResolvedValue({ affected: [] }),
+  notifyPlanChange: vi.fn().mockResolvedValue(undefined),
+}))
+
 vi.mock('@/lib/services/stripe', () => ({
   getStripe: () => ({
     webhooks: {

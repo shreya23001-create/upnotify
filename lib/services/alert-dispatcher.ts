@@ -4,6 +4,7 @@ import { getConfig } from '@/lib/utils/config'
 import { sendAlertEmail } from './email'
 import { sendSlackAlert } from './slack'
 import { sendWebhookAlert } from './webhook'
+import { sendUserMessage } from '@/lib/db/user-messages'
 import type { Incident, Monitor, AlertChannel } from '@/lib/types'
 
 interface AlertChannelConfig {
@@ -242,6 +243,37 @@ export async function dispatchAlerts(incident: Incident, monitor: Monitor): Prom
   const sent = results.filter(r => r.status === 'fulfilled').length
   const failed = results.filter(r => r.status === 'rejected').length
   logger.info('Alert dispatch complete', { total: results.length, sent, failed, incidentId: incident.id })
+
+  // Consequence: send in-app message to org owner (always, regardless of channels)
+  try {
+    const isResolved = incident.status === 'resolved'
+    const { data: owner } = await supabase
+      .from('users')
+      .select('id')
+      .eq('org_id', incident.org_id)
+      .eq('role', 'admin')
+      .limit(1)
+      .single()
+
+    if (owner) {
+      await sendUserMessage({
+        userId: owner.id,
+        orgId: incident.org_id,
+        title: isResolved
+          ? `Recovered: ${monitor.name} is back up`
+          : `Down: ${monitor.name} is not responding`,
+        body: isResolved
+          ? `${monitor.name} (${monitor.target}) has recovered and is back online.`
+          : `${monitor.name} (${monitor.target}) is down. Severity: ${incident.severity}. Check your dashboard for details.`,
+        type: isResolved ? 'success' : 'error',
+        category: 'system',
+        actionUrl: `/dashboard/monitors/${monitor.id}`,
+        actionLabel: 'View Monitor',
+      })
+    }
+  } catch {
+    // Don't fail the alert flow if in-app message fails
+  }
 }
 
 export async function dispatchRecoveryAlerts(incident: Incident, monitor: Monitor): Promise<void> {
