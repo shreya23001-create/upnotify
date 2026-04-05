@@ -7,6 +7,7 @@ import { getCurrentUser } from '@/lib/db/users'
 import { getWorkspacesByOrg } from '@/lib/db/workspaces'
 import { logger } from '@/lib/utils/logger'
 import { impersonationGuard } from '@/lib/auth/impersonation-guard'
+import { checkStatusPageLimit } from '@/lib/utils/plan-limits'
 
 export async function createStatusPageAction(formData: FormData): Promise<{ error?: string }> {
   const guard = await impersonationGuard()
@@ -25,6 +26,15 @@ export async function createStatusPageAction(formData: FormData): Promise<{ erro
   const isPublished = formData.get('is_published') !== 'false'
 
   if (!name || !slug) return { error: 'Name and slug are required' }
+
+  // Enforce plan limits on status pages
+  const spLimit = await checkStatusPageLimit(user.org_id)
+  if (!spLimit.allowed) {
+    return { error: spLimit.limit === 0
+      ? 'Status pages are not available on your current plan. Upgrade to unlock this feature.'
+      : `Status page limit reached (${spLimit.currentCount}/${spLimit.limit}). Upgrade your plan for more.`
+    }
+  }
 
   const monitorIds = monitorIdsStr ? monitorIdsStr.split(',').filter(Boolean) : []
 

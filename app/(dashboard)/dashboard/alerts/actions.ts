@@ -3,6 +3,7 @@
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { createAlertChannel, updateAlertChannel, deleteAlertChannel, toggleAlertChannel, bulkDeleteAlertChannels, bulkUpdateAlertChannelStatus, getAlertChannelById } from '@/lib/db/alerts'
+import { checkAlertChannelAccess } from '@/lib/utils/plan-limits'
 import { getCurrentUser } from '@/lib/db/users'
 import { getWorkspacesByOrg } from '@/lib/db/workspaces'
 import { logger } from '@/lib/utils/logger'
@@ -22,6 +23,13 @@ export async function createAlertChannelAction(formData: FormData): Promise<{ er
   const type = formData.get('type') as string
 
   if (!name || !type) return { error: 'Name and type are required' }
+
+  // Enforce plan limits on alert channel type
+  const channelAllowed = await checkAlertChannelAccess(user.org_id, type)
+  if (!channelAllowed) {
+    const typeLabel = type === 'slack' ? 'Slack' : type === 'teams' ? 'Teams' : type === 'webhook' ? 'Webhook' : type
+    return { error: `${typeLabel} alerts are not available on your current plan. Upgrade to unlock this feature.` }
+  }
 
   const config: Record<string, unknown> = {}
 

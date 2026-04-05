@@ -35,6 +35,7 @@ export async function updatePlanAction(formData: FormData): Promise<ActionResult
     'monitor_limit', 'check_interval_seconds',
     'client_workspace_limit', 'max_team_members',
     'data_retention_days', 'voice_call_monthly_limit',
+    'status_page_limit', 'ai_report_limit',
   ] as const
   const nullableIntFields = ['price_annual_gbp', 'price_annual_usd', 'price_annual_inr', 'monitor_limit', 'client_workspace_limit', 'data_retention_days']
   for (const field of intFields) {
@@ -54,12 +55,14 @@ export async function updatePlanAction(formData: FormData): Promise<ActionResult
 
   const boolFields = [
     'has_api_access', 'has_ai_predictive',
-    'has_status_page_custom_domain', 'has_white_label',
-    'has_voice_calls', 'is_visible',
+    'has_email_alerts', 'has_slack_teams', 'has_webhooks',
+    'has_status_pages', 'has_status_page_custom_domain',
+    'has_white_label', 'has_voice_calls', 'is_visible',
   ] as const
   for (const field of boolFields) {
-    const value = formData.get(field)
-    updates[field] = value === 'true' || value === 'on'
+    // Hidden field sends "false", checkbox sends "true" — getAll returns both when checked
+    const values = formData.getAll(field)
+    updates[field] = values.includes('true')
   }
 
   const stripeFields = ['stripe_price_id_monthly', 'stripe_price_id_annual'] as const

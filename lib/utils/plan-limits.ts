@@ -5,9 +5,15 @@ interface PlanLimits {
   workspaces: number | null
   competitors: number
   maxTeamMembers: number
-  hasApiAccess: boolean
-  hasAiPredictive: boolean
+  hasEmailAlerts: boolean
+  hasSlackTeams: boolean
+  hasWebhooks: boolean
+  hasStatusPages: boolean
+  statusPageLimit: number
   hasStatusPageCustomDomain: boolean
+  hasAiPredictive: boolean
+  aiReportLimit: number
+  hasApiAccess: boolean
   hasWhiteLabel: boolean
   hasVoiceCalls: boolean
   checkIntervalSeconds: number
@@ -21,9 +27,15 @@ const FREE_DEFAULTS: PlanLimits = {
   workspaces: 1,
   competitors: 3,
   maxTeamMembers: 0,
-  hasApiAccess: false,
-  hasAiPredictive: false,
+  hasEmailAlerts: true,
+  hasSlackTeams: false,
+  hasWebhooks: false,
+  hasStatusPages: false,
+  statusPageLimit: 0,
   hasStatusPageCustomDomain: false,
+  hasAiPredictive: false,
+  aiReportLimit: 0,
+  hasApiAccess: false,
   hasWhiteLabel: false,
   hasVoiceCalls: false,
   checkIntervalSeconds: 600,
@@ -36,10 +48,15 @@ function extractLimits(plan: Record<string, unknown>): PlanLimits {
     workspaces: (plan.client_workspace_limit as number | null) ?? null,
     competitors: (plan.competitor_limit as number) ?? 3,
     maxTeamMembers: (plan.max_team_members as number) ?? 0,
-    hasApiAccess: (plan.has_api_access as boolean) ?? false,
+    hasEmailAlerts: (plan.has_email_alerts as boolean) ?? true,
+    hasSlackTeams: (plan.has_slack_teams as boolean) ?? false,
+    hasWebhooks: (plan.has_webhooks as boolean) ?? false,
+    hasStatusPages: (plan.has_status_pages as boolean) ?? false,
+    statusPageLimit: (plan.status_page_limit as number) ?? 0,
+    hasStatusPageCustomDomain: (plan.has_status_page_custom_domain as boolean) ?? false,
     hasAiPredictive: (plan.has_ai_predictive as boolean) ?? false,
-    hasStatusPageCustomDomain:
-      (plan.has_status_page_custom_domain as boolean) ?? false,
+    aiReportLimit: (plan.ai_report_limit as number) ?? 0,
+    hasApiAccess: (plan.has_api_access as boolean) ?? false,
     hasWhiteLabel: (plan.has_white_label as boolean) ?? false,
     hasVoiceCalls: (plan.has_voice_calls as boolean) ?? false,
     checkIntervalSeconds: (plan.check_interval_seconds as number) ?? 600,
@@ -137,15 +154,73 @@ export async function checkFeatureAccess(
   orgId: string,
   feature: keyof Pick<
     PlanLimits,
+    | 'hasEmailAlerts'
+    | 'hasSlackTeams'
+    | 'hasWebhooks'
+    | 'hasStatusPages'
+    | 'hasStatusPageCustomDomain'
     | 'hasApiAccess'
     | 'hasAiPredictive'
-    | 'hasStatusPageCustomDomain'
     | 'hasWhiteLabel'
     | 'hasVoiceCalls'
   >
 ): Promise<boolean> {
   const limits = await getPlanLimits(orgId)
   return limits[feature]
+}
+
+/** Check if the org can create another status page */
+export async function checkStatusPageLimit(orgId: string): Promise<{
+  allowed: boolean
+  currentCount: number
+  limit: number
+}> {
+  const supabase = createAdminClient()
+  const limits = await getPlanLimits(orgId)
+
+  if (!limits.hasStatusPages) return { allowed: false, currentCount: 0, limit: 0 }
+
+  const { count } = await supabase
+    .from('status_pages')
+    .select('id', { count: 'exact', head: true })
+    .eq('org_id', orgId)
+
+  const currentCount = count ?? 0
+  const limit = limits.statusPageLimit
+  const allowed = limit === 0 || currentCount < limit
+
+  return { allowed, currentCount, limit }
+}
+
+/** Check if the org can generate another AI report this month */
+export async function checkAiReportLimit(orgId: string): Promise<{
+  allowed: boolean
+  currentCount: number
+  limit: number
+}> {
+  const limits = await getPlanLimits(orgId)
+  if (!limits.hasAiPredictive && limits.aiReportLimit === 0) {
+    return { allowed: false, currentCount: 0, limit: 0 }
+  }
+  if (limits.aiReportLimit === 0) {
+    return { allowed: true, currentCount: 0, limit: 0 } // unlimited
+  }
+
+  // Count reports generated this month (would need a reports table query)
+  // For now, allow if the feature is enabled
+  return { allowed: true, currentCount: 0, limit: limits.aiReportLimit }
+}
+
+/** Check if an alert channel type is allowed for this org's plan */
+export async function checkAlertChannelAccess(orgId: string, channelType: string): Promise<boolean> {
+  const limits = await getPlanLimits(orgId)
+  switch (channelType) {
+    case 'email': return limits.hasEmailAlerts
+    case 'slack': return limits.hasSlackTeams
+    case 'teams': return limits.hasSlackTeams
+    case 'webhook': return limits.hasWebhooks
+    default: return false
+  }
 }
 
 /** Check if the org has Compete access via a separate Compete add-on subscription */
