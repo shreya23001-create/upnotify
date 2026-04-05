@@ -33,6 +33,14 @@ export const FAQ_ITEMS: FaqItem[] = [
     answer: 'Yes. The Free plan includes 3 monitors with 10-minute checks and email alerts. No credit card required to start. You can upgrade at any time as your needs grow.',
   },
   {
+    question: 'Can I cancel or pause my subscription?',
+    answer: 'Yes. You can cancel from Settings > Billing at any time. If cost is the concern, you can pause your subscription for up to 3 months — no charges, data preserved, resume anytime. We send reminders 14 and 3 days before billing resumes.',
+  },
+  {
+    question: 'What is Uptrue Compete?',
+    answer: 'Uptrue Compete is a separate add-on for tracking competitor prices and stock levels. It automatically extracts prices from any ecommerce site and alerts you to changes. Plans start from £9/month. You can set pricing rules to auto-update your own prices in response.',
+  },
+  {
     question: 'Where is my data stored?',
     answer: 'All data is stored in the EU (Frankfurt region) on Supabase infrastructure. We encrypt data at rest and in transit. Row-level security ensures complete data isolation between organisations.',
   },

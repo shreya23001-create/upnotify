@@ -55,14 +55,36 @@ export default function RefundPolicyPage(): React.ReactElement {
         prorated refunds are provided for unused days within a billing cycle.
       </p>
 
-      <h2>4. Payment Processing</h2>
+      <h2>4. Subscription Pause</h2>
+      <p>
+        If cost is a concern, you may choose to <strong>pause your subscription for up to 3 months</strong>{' '}
+        instead of canceling. During the pause period:
+      </p>
+      <ul>
+        <li>No charges will be made to your payment method</li>
+        <li>Your monitors will be paused (not deleted)</li>
+        <li>All your data, settings, and configuration will be preserved</li>
+        <li>You can resume your subscription at any time with one click</li>
+      </ul>
+      <p>
+        Your subscription will automatically resume after 3 months. We will send you reminder
+        notifications <strong>14 days</strong> and <strong>3 days</strong> before billing resumes,
+        giving you time to cancel if you do not wish to continue.
+      </p>
+      <p>
+        No refund is issued when pausing — billing simply stops for the pause period.
+        If you prefer a full cancellation instead, you may cancel at any time and your
+        account will revert to the Free plan.
+      </p>
+
+      <h2>5. Payment Processing</h2>
       <p>
         All payments are processed securely through <strong>Stripe</strong>. Uptrue does not store
         your credit card details. For payment disputes or failed charges, please refer to your Stripe
         receipt or contact our billing team.
       </p>
 
-      <h2>5. How to Request a Refund</h2>
+      <h2>6. How to Request a Refund</h2>
       <p>
         To request a refund (where eligible under this policy), please email us at{' '}
         <a href="mailto:billing@uptrue.io">billing@uptrue.io</a> with the following details:
@@ -79,7 +101,7 @@ export default function RefundPolicyPage(): React.ReactElement {
         depending on your bank or card issuer.
       </p>
 
-      <h2>6. Chargebacks</h2>
+      <h2>7. Chargebacks</h2>
       <p>
         If you have an issue with a charge, we strongly encourage you to{' '}
         <strong>contact us first</strong> at{' '}
@@ -93,7 +115,7 @@ export default function RefundPolicyPage(): React.ReactElement {
         termination.
       </p>
 
-      <h2>7. AppSumo Deals</h2>
+      <h2>8. AppSumo Deals</h2>
       <p>
         If you purchased Uptrue through AppSumo (or any third-party marketplace), refunds are governed
         by <strong>AppSumo&apos;s own refund policy</strong>, which typically provides a 60-day
@@ -101,14 +123,14 @@ export default function RefundPolicyPage(): React.ReactElement {
         marketplace purchases.
       </p>
 
-      <h2>8. Changes to This Policy</h2>
+      <h2>9. Changes to This Policy</h2>
       <p>
         We may update this Refund Policy from time to time. If we make material changes, we will
         notify you by email or by posting a notice on the Service at least 30 days before the changes
         take effect.
       </p>
 
-      <h2>9. Contact Us</h2>
+      <h2>10. Contact Us</h2>
       <p>If you have any questions about this Refund Policy, please contact us at:</p>
       <ul>
         <li>
