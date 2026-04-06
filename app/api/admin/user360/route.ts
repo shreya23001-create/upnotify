@@ -152,11 +152,15 @@ export async function GET(): Promise<NextResponse> {
     statusPagesByOrg.set(sp.org_id, (statusPagesByOrg.get(sp.org_id) ?? 0) + 1)
   }
 
-  // Build profile per user
+  // Build profile per user — exclude admin accounts from the list
+  const adminEmailSet = new Set(
+    (process.env.ADMIN_EMAILS || '').split(',').map(e => e.trim().toLowerCase()).filter(Boolean)
+  )
   type UserRow = { id: string; email: string; full_name: string | null; org_id: string; is_active: boolean; created_at: string }
   const profiles: User360Profile[] = []
 
   for (const u of (usersRaw ?? []) as UserRow[]) {
+    if (adminEmailSet.has(u.email.toLowerCase())) continue
     const sub = subByOrg.get(u.org_id)
     const invoiceData = invoicesByOrg.get(u.org_id) ?? { totalGbp: 0, count: 0, lastAt: null }
     const monitors = monitorsByOrg.get(u.org_id) ?? { total: 0, active: 0 }

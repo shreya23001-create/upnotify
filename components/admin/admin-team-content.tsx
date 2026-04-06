@@ -256,14 +256,16 @@ export function AdminTeamContent({ adminRoles, currentUserEmail }: AdminTeamCont
             >
               Permissions
             </button>
-            <button
-              className={`btn btn-sm ${r.is_active ? 'btn-outline' : 'btn-primary'}`}
-              onClick={() => handleToggleActive(r)}
-              disabled={isPending}
-              style={{ fontSize: 12, padding: '4px 10px' }}
-            >
-              {r.is_active ? 'Deactivate' : 'Activate'}
-            </button>
+            {r.role !== 'super_admin' && r.email !== currentUserEmail && (
+              <button
+                className={`btn btn-sm ${r.is_active ? 'btn-outline' : 'btn-primary'}`}
+                onClick={() => handleToggleActive(r)}
+                disabled={isPending}
+                style={{ fontSize: 12, padding: '4px 10px' }}
+              >
+                {r.is_active ? 'Deactivate' : 'Activate'}
+              </button>
+            )}
           </div>
         )
       },
