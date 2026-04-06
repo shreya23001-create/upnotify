@@ -39,11 +39,11 @@ function fmtAmount(pence: number, currency = 'gbp'): string {
 export default async function User360Page({
   searchParams,
 }: {
-  searchParams: Promise<{ org_id?: string; email?: string }>
+  searchParams: Promise<{ org_id?: string; email?: string; period?: string }>
 }): Promise<React.ReactElement> {
   if (!(await isAdmin())) redirect('/admin')
 
-  const { org_id, email } = await searchParams
+  const { org_id, email, period } = await searchParams
   const supabase = createAdminClient()
 
   // ── Resolve org from org_id or email lookup ──────────────────────────────
@@ -63,7 +63,7 @@ export default async function User360Page({
   const sixMonthsAgo = new Date()
   sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6)
 
-  const [orgResult, usersResult, subsResult, invoicesResult, monitorsResult, incidentsResult, statusPagesResult, alertChannelsResult, auditLogResult, checkResultsResult] =
+  const [orgResult, usersResult, subsResult, invoicesResult, monitorsResult, incidentsResult, statusPagesResult, alertChannelsResult, auditLogResult, checkResultsResult, competeSubResult, ecomProductsResult] =
     orgId
       ? await Promise.all([
           supabase.from('organisations').select('*').eq('id', orgId).single(),
@@ -76,8 +76,10 @@ export default async function User360Page({
           supabase.from('alert_channels').select('id, type, is_enabled').eq('org_id', orgId),
           supabase.from('audit_log').select('id, action, resource_type, resource_id, created_at, metadata, user_id').eq('org_id', orgId).order('created_at', { ascending: false }).limit(50),
           supabase.from('check_results').select('checked_at').eq('org_id', orgId).gte('checked_at', sixMonthsAgo.toISOString()).limit(200000),
+          supabase.from('compete_subscriptions').select('id, status, billing_cycle, current_period_end, extra_products_purchased, created_at, compete_plan_id').eq('org_id', orgId).eq('status', 'active').maybeSingle(),
+          supabase.from('ecom_products').select('id', { count: 'exact', head: true }).eq('org_id', orgId).eq('is_active', true),
         ])
-      : Array(10).fill({ data: null, error: null, count: null })
+      : Array(12).fill({ data: null, error: null, count: null })
 
   const org = orgResult.data as Record<string, unknown> | null
   const users = (usersResult.data ?? []) as Array<{ id: string; email: string; full_name: string | null; created_at: string; last_sign_in_at: string | null; is_super_admin: boolean }>
@@ -89,6 +91,19 @@ export default async function User360Page({
   const alertChannels = (alertChannelsResult.data ?? []) as Array<{ id: string; type: string; is_enabled: boolean }>
   const auditLog = (auditLogResult.data ?? []) as Array<{ id: string; action: string; resource_type: string | null; resource_id: string | null; created_at: string; metadata: Record<string, unknown> | null; user_id: string | null }>
   const rawChecks = (checkResultsResult.data ?? []) as Array<{ checked_at: string }>
+
+  type CompeteSubRow = { id: string; status: string; billing_cycle: string; current_period_end: string | null; extra_products_purchased: number; created_at: string; compete_plan_id: string }
+  const competeSub = competeSubResult.data as CompeteSubRow | null
+  const ecomProductCount = ecomProductsResult.count ?? 0
+
+  // Fetch compete plan details if there's an active compete subscription
+  type CompetePlanDetails = { name: string; slug: string; product_limit: number; price_monthly_pence: number; price_yearly_pence: number | null; has_yearly_discount: boolean }
+  let competePlan: CompetePlanDetails | null = null
+  if (competeSub?.compete_plan_id) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: cp } = await (supabase as unknown as any).from('compete_plans').select('name, slug, product_limit, price_monthly_pence, price_yearly_pence, has_yearly_discount').eq('id', competeSub.compete_plan_id).maybeSingle()
+    competePlan = (cp as CompetePlanDetails | null)
+  }
 
   const activeSub = subs.find(s => s.status === 'active')
   const activePlan = activeSub?.plans ?? null
@@ -165,6 +180,21 @@ export default async function User360Page({
   // ── Predictive Growth Chart ──────────────────────────────────────────────
   const planMonitorLimit = activePlan?.monitor_limit ?? null
 
+  // Determine history window based on period param
+  const earliestUser = users.length > 0 ? users.reduce((a, b) => a.created_at < b.created_at ? a : b) : null
+  const joinDate = earliestUser ? new Date(earliestUser.created_at) : new Date()
+  joinDate.setDate(1) // start of join month
+
+  const now = new Date()
+  now.setDate(1)
+  const monthsSinceJoin = Math.max(1,
+    (now.getFullYear() - joinDate.getFullYear()) * 12 + (now.getMonth() - joinDate.getMonth())
+  )
+
+  // period: 'all' = from join date, '6m' = 6 months, '12m' = 12 months (default)
+  const selectedPeriod = period === 'all' ? monthsSinceJoin : period === '6m' ? 6 : 12
+  const histMonthCount = Math.min(selectedPeriod, Math.max(selectedPeriod, 1))
+
   // Group existing monitors by month of creation
   const creationByMonth: Record<string, number> = {}
   for (const m of monitors) {
@@ -174,16 +204,16 @@ export default async function User360Page({
     }
   }
 
-  // Build 12 months array (oldest first)
+  // Build history month keys array (oldest first)
   const hist12Keys: string[] = []
-  for (let i = 11; i >= 0; i--) {
+  for (let i = histMonthCount - 1; i >= 0; i--) {
     const d = new Date()
     d.setDate(1)
     d.setMonth(d.getMonth() - i)
     hist12Keys.push(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`)
   }
 
-  // Anchor: monitors that predate our 12-month window
+  // Anchor: monitors that predate our window
   const oldMonitorCount = monitors.filter(m => m.created_at && m.created_at.slice(0, 7) < hist12Keys[0]).length
   type GrowthMonth = { key: string; label: string; newCount: number; runningTotal: number }
   const growthMonths: GrowthMonth[] = []
@@ -219,6 +249,16 @@ export default async function User360Page({
     })
   }
   const limitCrossMonth = planMonitorLimit !== null ? projectedMonths.find(m => m.exceedsLimit) : null
+
+  // ── Compete plan computations ────────────────────────────────────────────
+  const cp = competePlan as CompetePlanDetails | null
+  const competeMonthlyRevPence = competeSub && cp
+    ? (competeSub.billing_cycle === 'annual' && cp.price_yearly_pence
+        ? Math.round(cp.price_yearly_pence / 12)
+        : cp.price_monthly_pence)
+    : 0
+  const totalProductLimit = cp ? cp.product_limit + (competeSub?.extra_products_purchased ?? 0) : 0
+  const productUsagePct = totalProductLimit > 0 ? Math.round((ecomProductCount / totalProductLimit) * 100) : 0
 
   // SVG line chart helpers for growth chart
   const gcW = 580
@@ -438,9 +478,33 @@ export default async function User360Page({
 
           {/* Predictive Growth Chart */}
           <div className="card" style={{ padding: 20, marginBottom: 16 }}>
-            <h3 style={{ fontSize: 13, fontWeight: 700, marginBottom: 16, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-muted)' }}>
-              Monitor Growth &amp; Limit Forecast
-            </h3>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
+              <h3 style={{ fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-muted)', margin: 0 }}>
+                Monitor Growth &amp; Limit Forecast
+              </h3>
+              {/* Period filter — server-side navigation (links update URL) */}
+              <div style={{ display: 'flex', gap: 4 }}>
+                {([['6m', '6 months'], ['12m', '12 months'], ['all', `All time (${monthsSinceJoin}mo)`]] as const).map(([val, label]) => {
+                  const isActive = (period ?? '12m') === val
+                  const href = `?${new URLSearchParams({ ...(orgId ? { org_id: orgId } : {}), ...(email ? { email } : {}), period: val }).toString()}`
+                  return (
+                    <Link
+                      key={val}
+                      href={href}
+                      style={{
+                        fontSize: 12, padding: '4px 10px', borderRadius: 6, textDecoration: 'none',
+                        background: isActive ? 'var(--accent)' : 'var(--bg-secondary)',
+                        color: isActive ? 'white' : 'var(--text-muted)',
+                        fontWeight: isActive ? 700 : 400,
+                        border: '1px solid var(--border-light)',
+                      }}
+                    >
+                      {label}
+                    </Link>
+                  )
+                })}
+              </div>
+            </div>
 
             {/* KPI row */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 20 }}>
@@ -604,6 +668,79 @@ export default async function User360Page({
               </p>
             )}
           </div>
+
+          {/* Compete Plan Section — only shown if org has active compete subscription */}
+          {competeSub && cp && (
+              <div className="card" style={{ padding: 20, marginBottom: 16, borderLeft: '3px solid #8b5cf6' }}>
+                <h3 style={{ fontSize: 13, fontWeight: 700, marginBottom: 16, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#8b5cf6' }}>
+                  Compete Plan
+                </h3>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 12, marginBottom: 16 }}>
+                  {[
+                    { label: 'Plan', value: cp.name, sub: competeSub.billing_cycle, color: '#8b5cf6' },
+                    {
+                      label: 'Compete Revenue',
+                      value: fmtAmount(competeMonthlyRevPence),
+                      sub: competeSub.billing_cycle === 'annual' ? 'annual ÷ 12' : 'monthly',
+                      color: '#22c55e',
+                    },
+                    {
+                      label: 'Products Tracked',
+                      value: `${ecomProductCount} / ${totalProductLimit}`,
+                      sub: `${productUsagePct}% of limit`,
+                      color: productUsagePct > 80 ? '#ef4444' : 'var(--text-primary)',
+                    },
+                    {
+                      label: 'Extra Products',
+                      value: String(competeSub.extra_products_purchased),
+                      sub: competeSub.extra_products_purchased > 0 ? 'purchased' : 'none',
+                      color: 'var(--text-primary)',
+                    },
+                    {
+                      label: 'Combined MRR',
+                      value: fmtAmount(monthlyRevenuePence + competeMonthlyRevPence),
+                      sub: 'monitor + compete',
+                      color: '#22c55e',
+                    },
+                    {
+                      label: 'Period Ends',
+                      value: fmtDate(competeSub.current_period_end),
+                      sub: 'compete subscription',
+                      color: 'var(--text-muted)',
+                    },
+                  ].map(s => (
+                    <div key={s.label} style={{ background: 'var(--bg-secondary)', borderRadius: 10, padding: '12px 14px' }}>
+                      <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{s.label}</div>
+                      <div style={{ fontSize: 18, fontWeight: 800, color: s.color }}>{s.value}</div>
+                      <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>{s.sub}</div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Usage bar */}
+                <div style={{ marginTop: 8 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 4 }}>
+                    <span style={{ color: 'var(--text-muted)' }}>Product usage</span>
+                    <span style={{ fontWeight: 600 }}>{ecomProductCount} of {totalProductLimit} ({productUsagePct}%)</span>
+                  </div>
+                  <div style={{ height: 8, background: 'var(--border-primary)', borderRadius: 4 }}>
+                    <div style={{
+                      height: '100%',
+                      width: `${Math.min(100, productUsagePct)}%`,
+                      background: productUsagePct > 80 ? '#ef4444' : productUsagePct > 50 ? '#f59e0b' : '#8b5cf6',
+                      borderRadius: 4,
+                      transition: 'width 0.3s',
+                    }} />
+                  </div>
+                  {competeSub.extra_products_purchased > 0 && (
+                    <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 6 }}>
+                      Includes {competeSub.extra_products_purchased} extra products purchased on top of {cp.product_limit} base limit.
+                    </p>
+                  )}
+                </div>
+              </div>
+          )}
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
 

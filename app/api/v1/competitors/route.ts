@@ -12,17 +12,24 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }
 
     const body = await request.json()
-    const { domain, display_name } = body as { domain?: string; display_name?: string }
+    const { domain: rawDomain, display_name } = body as { domain?: string; display_name?: string }
 
-    if (!domain || typeof domain !== 'string' || domain.length < 3 || domain.length > 253) {
-      return NextResponse.json({ error: 'Invalid domain' }, { status: 400 })
+    if (!rawDomain || typeof rawDomain !== 'string' || rawDomain.trim().length === 0) {
+      return NextResponse.json({ error: 'Domain is required' }, { status: 400 })
     }
 
-    // Validate domain format
-    const domainRegex = /^[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]?\.[a-zA-Z]{2,}$/
-    const cleanDomain = domain.replace(/^www\./, '')
-    if (!domainRegex.test(cleanDomain)) {
-      return NextResponse.json({ error: 'Invalid domain format' }, { status: 400 })
+    // Extract hostname — accept full URLs (https://x.com/) or bare domains (x.com)
+    let cleanDomain: string
+    try {
+      const withProtocol = rawDomain.trim().startsWith('http') ? rawDomain.trim() : `https://${rawDomain.trim()}`
+      const parsed = new URL(withProtocol)
+      cleanDomain = parsed.hostname.toLowerCase().replace(/^www\./, '').replace(/\.$/, '')
+    } catch {
+      return NextResponse.json({ error: 'Could not parse domain. Use a format like: example.com' }, { status: 400 })
+    }
+
+    if (!cleanDomain || cleanDomain.length < 3 || cleanDomain.length > 253 || !cleanDomain.includes('.')) {
+      return NextResponse.json({ error: 'Invalid domain. Use a format like: example.com' }, { status: 400 })
     }
 
     // Check plan limit
@@ -34,6 +41,18 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       )
     }
 
+    // Check for duplicate before insert (friendlier error than a 500)
+    const { createAdminClient } = await import('@/lib/supabase/admin')
+    const adminDb = createAdminClient()
+    const { count: existCount } = await adminDb
+      .from('competitor_monitors')
+      .select('id', { count: 'exact', head: true })
+      .eq('org_id', user.org_id)
+      .eq('domain', cleanDomain)
+    if ((existCount ?? 0) > 0) {
+      return NextResponse.json({ error: `${cleanDomain} is already being monitored.` }, { status: 409 })
+    }
+
     const competitor = await createCompetitorMonitor({
       org_id: user.org_id,
       domain: cleanDomain,
@@ -43,7 +62,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     })
 
     if (!competitor) {
-      return NextResponse.json({ error: 'Failed to create competitor monitor' }, { status: 500 })
+      return NextResponse.json({ error: 'Failed to create competitor monitor. Please try again.' }, { status: 500 })
     }
 
     logger.info('Competitor monitor created', { orgId: user.org_id, domain: cleanDomain })

@@ -205,6 +205,11 @@ export function SettingsContent({
           <strong>Payment canceled.</strong> No charge was made. Your current plan remains unchanged.
         </div>
       )}
+      {billingResult === 'portal_return' && (
+        <div className="alert alert-success" style={{ marginBottom: 16 }}>
+          <strong>Changes saved.</strong> Your subscription changes are being processed by Stripe. This page may take a moment to reflect the latest status.
+        </div>
+      )}
 
       <div className="tabs-list">
         {['organisation', 'team', 'billing', 'credits', 'referrals', 'company', 'api-keys'].map((t) => (

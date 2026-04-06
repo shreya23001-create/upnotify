@@ -77,7 +77,7 @@ export function getConfig(): PublicConfig {
   // Always use NEXT_PUBLIC_APP_URL — never the auto-generated Vercel preview URL
   // Dev: NEXT_PUBLIC_APP_URL = https://dev.uptrue.io
   // Prod: NEXT_PUBLIC_APP_URL = https://uptrue.io
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+  const appUrl = (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000').trim()
   const adminEmails = process.env.ADMIN_EMAILS || ''
   const gaMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? ''
 

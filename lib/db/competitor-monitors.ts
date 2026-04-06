@@ -93,7 +93,7 @@ export async function createCompetitorMonitor(data: {
     .single()
 
   if (error) {
-    logger.error('Failed to create competitor monitor', { error: error.message, domain: data.domain })
+    logger.error('Failed to create competitor monitor', { error: error.message, code: error.code, domain: data.domain })
     return null
   }
   return monitor as unknown as CompetitorMonitor
