@@ -41,6 +41,7 @@ const NAV_GROUPS: NavGroup[] = [
     label: 'People',
     items: [
       { href: '/admin/users', label: 'Users', icon: IconUsers },
+      { href: '/admin/user360', label: 'User 360', icon: IconUsers },
       { href: '/admin/organisations', label: 'Organisations', icon: IconBuilding },
       { href: '/admin/agency-waitlist', label: 'Agency Waitlist', icon: IconUsers },
     ],
