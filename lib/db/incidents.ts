@@ -103,17 +103,24 @@ export async function updateIncidentStatus(
   return true
 }
 
-export async function getAllIncidentsByOrg(orgId: string, limit = 50): Promise<Incident[]> {
+export type IncidentWithMonitor = Incident & {
+  monitor_name?: string | null
+}
+
+export async function getAllIncidentsByOrg(orgId: string, limit = 50): Promise<IncidentWithMonitor[]> {
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('incidents')
-    .select('*')
+    .select('*, monitors(name)')
     .eq('org_id', orgId)
     .order('started_at', { ascending: false })
     .limit(limit)
 
   if (error) return []
-  return data ?? []
+  return (data ?? []).map(row => {
+    const { monitors, ...rest } = row as typeof row & { monitors: { name: string } | null }
+    return { ...rest, monitor_name: monitors?.name ?? null }
+  })
 }
 
 // --- Admin client functions (for cron jobs and background tasks) ---

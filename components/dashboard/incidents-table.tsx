@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import type { Incident } from '@/lib/types'
+import type { IncidentWithMonitor } from '@/lib/db/incidents'
 
 type TabFilter = 'open' | 'resolved' | 'all'
 
@@ -41,7 +41,7 @@ function formatDate(dateStr: string): string {
   })
 }
 
-export function IncidentsTable({ incidents }: { incidents: Incident[] }): React.ReactElement {
+export function IncidentsTable({ incidents }: { incidents: IncidentWithMonitor[] }): React.ReactElement {
   const [tab, setTab] = useState<TabFilter>('open')
   const [isPending, startTransition] = useTransition()
   const [updatingId, setUpdatingId] = useState<string | null>(null)
@@ -184,7 +184,15 @@ export function IncidentsTable({ incidents }: { incidents: Incident[] }): React.
                     <span className="incident-title">{inc.title}</span>
                   </td>
                   <td>
-                    <span className="incident-monitor-id">{inc.monitor_id.slice(0, 8)}...</span>
+                    {inc.monitor_name ? (
+                      <a href={`/dashboard/monitors/${inc.monitor_id}`} className="table-link">
+                        {inc.monitor_name}
+                      </a>
+                    ) : (
+                      <a href={`/dashboard/monitors/${inc.monitor_id}`} className="table-link table-cell-muted">
+                        {inc.monitor_id.slice(0, 8)}...
+                      </a>
+                    )}
                   </td>
                   <td>
                     <span

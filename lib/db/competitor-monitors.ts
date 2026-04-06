@@ -80,7 +80,7 @@ export async function createCompetitorMonitor(data: {
   domain: string
   display_name: string
 }): Promise<CompetitorMonitor | null> {
-  const supabase = await createClient()
+  const supabase = createAdminClient()
   const { data: monitor, error } = await supabase
     .from('competitor_monitors')
     .insert({

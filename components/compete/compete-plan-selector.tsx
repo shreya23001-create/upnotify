@@ -101,7 +101,7 @@ export function CompetePlanSelector({ plans, hasPaidBasePlan }: CompetePlanSelec
           <div style={{ color: '#ef4444', fontSize: 13, marginBottom: 16, textAlign: 'center' }}>{error}</div>
         )}
 
-        <div className="compete-pricing-grid" style={{ maxWidth: 900 }}>
+        <div className="compete-pricing-grid">
           {plans.map((plan) => {
             const showAnnual = isAnnual && plan.has_yearly_discount && plan.price_yearly_pence
             const monthlyPrice = plan.price_monthly_pence

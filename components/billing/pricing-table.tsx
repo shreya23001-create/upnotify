@@ -100,7 +100,7 @@ function getPlanCta(plan: Plan, isCurrent: boolean, isHigherTier: boolean): stri
   if (isCurrent) return 'Current Plan'
   if (plan.slug === 'free') return 'Current Plan'
   if (isHigherTier) return 'Upgrade'
-  return 'Downgrade'
+  return 'Switch Plan'
 }
 
 export function PricingTable({ plans, currentPlanSlug, creditBalancePence = 0 }: Props): React.ReactElement {
@@ -235,7 +235,19 @@ export function PricingTable({ plans, currentPlanSlug, creditBalancePence = 0 }:
               </ul>
 
               {isCurrent ? (
-                <div className="pricing-card-current-label">{'\u2713'} You&apos;re on this plan</div>
+                <div>
+                  <div className="pricing-card-current-label">{'\u2713'} You&apos;re on this plan</div>
+                  {!isFree && (
+                    <button
+                      className="btn btn-ghost btn-full"
+                      style={{ marginTop: 8, fontSize: 13, color: 'var(--text-muted)' }}
+                      onClick={handleOpenPortal}
+                      disabled={isPortalPending}
+                    >
+                      {isPortalPending ? 'Opening...' : 'Cancel subscription'}
+                    </button>
+                  )}
+                </div>
               ) : isFree ? (
                 <button className="btn btn-secondary btn-full" disabled>
                   Free Plan
@@ -248,16 +260,7 @@ export function PricingTable({ plans, currentPlanSlug, creditBalancePence = 0 }:
                 >
                   {isPending ? 'Loading...' : ctaText}
                 </button>
-              ) : (
-                <button
-                  className="btn btn-secondary btn-full"
-                  onClick={handleOpenPortal}
-                  disabled={isPortalPending}
-                  title="Opens Stripe billing portal to manage your subscription"
-                >
-                  {isPortalPending ? 'Opening...' : ctaText}
-                </button>
-              )}
+              ) : null}
             </div>
           )
         })}

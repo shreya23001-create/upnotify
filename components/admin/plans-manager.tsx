@@ -8,6 +8,7 @@ import {
   togglePlanVisibilityAction,
   updateCreditRuleAction,
   toggleCreditRuleActiveAction,
+  updateCompetePlanAction,
 } from '@/app/(admin)/admin/plans/actions'
 
 interface PlansManagerProps {
@@ -19,6 +20,7 @@ interface PlansManagerProps {
 
 type EditingPlan = Plan | null
 type EditingCreditRule = CreditRule | null
+type EditingCompetePlan = CompetePlan | null
 
 function formatCurrency(pence: number | null | undefined, symbol: string): string {
   if (pence === null || pence === undefined) return '—'
@@ -30,6 +32,7 @@ export function PlansManager({ plans, creditRules, subscriberCounts, competePlan
   const [tab, setTab] = useState<'plans' | 'compete' | 'credits'>('plans')
   const [editingPlan, setEditingPlan] = useState<EditingPlan>(null)
   const [editingRule, setEditingRule] = useState<EditingCreditRule>(null)
+  const [editingCompetePlan, setEditingCompetePlan] = useState<EditingCompetePlan>(null)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
@@ -82,6 +85,19 @@ export function PlansManager({ plans, creditRules, subscriberCounts, competePlan
     } else {
       setSuccess('Credit rule updated successfully')
       setEditingRule(null)
+    }
+  }, [clearMessages])
+
+  const handleSaveCompetePlan = useCallback(async (formData: FormData): Promise<void> => {
+    clearMessages()
+    setSaving(true)
+    const result = await updateCompetePlanAction(formData)
+    setSaving(false)
+    if (!result.success) {
+      setError(result.error ?? 'Failed to save compete plan')
+    } else {
+      setSuccess('Compete plan updated successfully')
+      setEditingCompetePlan(null)
     }
   }, [clearMessages])
 
@@ -237,43 +253,112 @@ export function PlansManager({ plans, creditRules, subscriberCounts, competePlan
                   <th>Max Extra</th>
                   <th>Extra Price</th>
                   <th>Nudge To</th>
-                  <th>Stripe Product</th>
+                  <th>Stripe Prices</th>
                   <th>Active</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {competePlans.map((cp) => (
-                  <tr key={cp.id}>
-                    <td style={{ fontWeight: 600 }}>{cp.name}</td>
-                    <td><code style={{ fontSize: 11 }}>{cp.slug}</code></td>
-                    <td>{formatCurrency(cp.price_monthly_pence, '\u00A3')}</td>
-                    <td>{cp.has_yearly_discount ? formatCurrency(cp.price_yearly_pence, '\u00A3') : '\u2014'}</td>
-                    <td>{cp.product_limit.toLocaleString()}</td>
-                    <td>{cp.max_extra_products}</td>
-                    <td>{formatCurrency(cp.extra_product_price_pence, '\u00A3')}/ea</td>
-                    <td>{cp.nudge_to_slug ?? '\u2014'}</td>
-                    <td>
-                      {cp.stripe_product_id ? (
-                        <span className="badge badge-success" title={cp.stripe_product_id}>Connected</span>
-                      ) : (
-                        <span className="badge badge-danger">Not Set</span>
-                      )}
-                    </td>
-                    <td>
-                      {cp.is_active ? (
-                        <span className="badge badge-success">Active</span>
-                      ) : (
-                        <span className="badge badge-outline">Hidden</span>
-                      )}
-                    </td>
-                  </tr>
+                  <>
+                    <tr key={cp.id}>
+                      <td style={{ fontWeight: 600 }}>{cp.name}</td>
+                      <td><code style={{ fontSize: 11 }}>{cp.slug}</code></td>
+                      <td>{formatCurrency(cp.price_monthly_pence, '\u00A3')}</td>
+                      <td>{cp.has_yearly_discount ? formatCurrency(cp.price_yearly_pence, '\u00A3') : '\u2014'}</td>
+                      <td>{cp.product_limit.toLocaleString()}</td>
+                      <td>{cp.max_extra_products}</td>
+                      <td>{formatCurrency(cp.extra_product_price_pence, '\u00A3')}/ea</td>
+                      <td>{cp.nudge_to_slug ?? '\u2014'}</td>
+                      <td>
+                        {cp.stripe_monthly_price_id ? (
+                          <span className="badge badge-success" title={cp.stripe_monthly_price_id}>Connected</span>
+                        ) : (
+                          <span className="badge badge-danger">Not Set</span>
+                        )}
+                      </td>
+                      <td>
+                        {cp.is_active ? (
+                          <span className="badge badge-success">Active</span>
+                        ) : (
+                          <span className="badge badge-outline">Hidden</span>
+                        )}
+                      </td>
+                      <td>
+                        <button
+                          className="btn btn-secondary btn-sm"
+                          onClick={() => { setEditingCompetePlan(editingCompetePlan?.id === cp.id ? null : cp); clearMessages() }}
+                        >
+                          {editingCompetePlan?.id === cp.id ? 'Cancel' : 'Edit'}
+                        </button>
+                      </td>
+                    </tr>
+                    {editingCompetePlan?.id === cp.id && (
+                      <tr key={`${cp.id}-edit`}>
+                        <td colSpan={11} style={{ padding: '16px', background: 'var(--bg-secondary)' }}>
+                          <form action={handleSaveCompetePlan} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
+                            <input type="hidden" name="id" value={cp.id} />
+                            <div>
+                              <label className="form-label" style={{ fontSize: 12 }}>Stripe Product ID</label>
+                              <input
+                                name="stripe_product_id"
+                                className="form-input"
+                                defaultValue={cp.stripe_product_id ?? ''}
+                                placeholder="prod_xxx"
+                                style={{ fontSize: 12 }}
+                              />
+                            </div>
+                            <div>
+                              <label className="form-label" style={{ fontSize: 12 }}>Stripe Monthly Price ID</label>
+                              <input
+                                name="stripe_monthly_price_id"
+                                className="form-input"
+                                defaultValue={cp.stripe_monthly_price_id ?? ''}
+                                placeholder="price_xxx"
+                                style={{ fontSize: 12 }}
+                              />
+                            </div>
+                            <div>
+                              <label className="form-label" style={{ fontSize: 12 }}>Stripe Yearly Price ID</label>
+                              <input
+                                name="stripe_yearly_price_id"
+                                className="form-input"
+                                defaultValue={cp.stripe_yearly_price_id ?? ''}
+                                placeholder="price_xxx (optional)"
+                                style={{ fontSize: 12 }}
+                              />
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                              <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13 }}>
+                                <input type="hidden" name="is_active" value="false" />
+                                <input
+                                  type="checkbox"
+                                  name="is_active"
+                                  value="true"
+                                  defaultChecked={cp.is_active}
+                                />
+                                Active
+                              </label>
+                            </div>
+                            <div style={{ gridColumn: 'span 2', display: 'flex', gap: 8, alignItems: 'flex-end' }}>
+                              <button type="submit" className="btn btn-primary btn-sm" disabled={saving}>
+                                {saving ? 'Saving...' : 'Save Changes'}
+                              </button>
+                              <button type="button" className="btn btn-ghost btn-sm" onClick={() => setEditingCompetePlan(null)}>
+                                Cancel
+                              </button>
+                            </div>
+                          </form>
+                        </td>
+                      </tr>
+                    )}
+                  </>
                 ))}
               </tbody>
             </table>
           </div>
           <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 12 }}>
-            To edit Compete plans, update the <code>compete_plans</code> table in Supabase directly.
-            Admin editing UI coming soon.
+            Click <strong>Edit</strong> on any plan to set its Stripe price IDs. Checkout will not work until prices are configured.
           </p>
         </div>
       )}

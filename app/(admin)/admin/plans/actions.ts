@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { getCurrentUser } from '@/lib/db/users'
 import { updatePlan, togglePlanActive } from '@/lib/db/plans'
 import { updateCreditRule, toggleCreditRuleActive } from '@/lib/db/credit-rules'
+import { updateCompetePlan } from '@/lib/db/compete-plans'
 import { logger } from '@/lib/utils/logger'
 
 interface ActionResult {
@@ -128,6 +129,36 @@ export async function updateCreditRuleAction(formData: FormData): Promise<Action
   if (!result) return { success: false, error: 'Failed to update credit rule' }
 
   logger.info('Admin: Credit rule updated', { ruleId: id })
+  revalidatePath('/admin/plans')
+  return { success: true }
+}
+
+/** Update a compete plan's Stripe IDs and active status */
+export async function updateCompetePlanAction(formData: FormData): Promise<ActionResult> {
+  const user = await getCurrentUser()
+  if (!user?.is_super_admin) return { success: false, error: 'Unauthorised' }
+
+  const id = formData.get('id') as string
+  if (!id) return { success: false, error: 'Compete plan ID is required' }
+
+  const updates: Parameters<typeof updateCompetePlan>[1] = {}
+
+  const stripeProductId = formData.get('stripe_product_id') as string | null
+  if (stripeProductId !== null) updates.stripe_product_id = stripeProductId || null
+
+  const stripeMonthlyPriceId = formData.get('stripe_monthly_price_id') as string | null
+  if (stripeMonthlyPriceId !== null) updates.stripe_monthly_price_id = stripeMonthlyPriceId || null
+
+  const stripeYearlyPriceId = formData.get('stripe_yearly_price_id') as string | null
+  if (stripeYearlyPriceId !== null) updates.stripe_yearly_price_id = stripeYearlyPriceId || null
+
+  const isActiveVal = formData.get('is_active')
+  if (isActiveVal !== null) updates.is_active = isActiveVal === 'true'
+
+  const result = await updateCompetePlan(id, updates)
+  if (!result) return { success: false, error: 'Failed to update compete plan' }
+
+  logger.info('Admin: Compete plan updated', { planId: id })
   revalidatePath('/admin/plans')
   return { success: true }
 }

@@ -4,6 +4,8 @@ import { getAllIncidentsByOrg } from '@/lib/db/incidents'
 import { IncidentsTable } from '@/components/dashboard/incidents-table'
 import type { Metadata } from 'next'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: 'Incidents',
 }
