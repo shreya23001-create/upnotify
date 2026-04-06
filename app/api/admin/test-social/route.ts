@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@/lib/auth/server'
+import { createClient } from '@/lib/supabase/server'
 import { getConfig } from '@/lib/utils/config'
 import { postOutageBlogToSocial } from '@/lib/services/social-poster'
 
 export async function POST(request: NextRequest) {
   // Admin only
-  const supabase = await createServerClient()
+  const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   const config = getConfig()
 
