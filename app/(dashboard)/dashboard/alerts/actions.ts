@@ -7,6 +7,7 @@ import { checkAlertChannelAccess } from '@/lib/utils/plan-limits'
 import { getCurrentUser } from '@/lib/db/users'
 import { getWorkspacesByOrg } from '@/lib/db/workspaces'
 import { logger } from '@/lib/utils/logger'
+import { devAuditLog } from '@/lib/db/audit'
 import { impersonationGuard } from '@/lib/auth/impersonation-guard'
 
 export async function createAlertChannelAction(formData: FormData): Promise<{ error?: string }> {
@@ -75,6 +76,7 @@ export async function createAlertChannelAction(formData: FormData): Promise<{ er
   if (!channel) return { error: 'Failed to create alert channel' }
 
   logger.info('Alert channel created', { channelId: channel.id, type, name })
+  await devAuditLog({ orgId: user.org_id, userId: user.id, action: 'alert_channel.created', resourceType: 'alert_channel', resourceId: channel.id, metadata: { type, name } })
   redirect('/dashboard/alerts')
 }
 
@@ -124,6 +126,7 @@ export async function updateAlertChannelAction(channelId: string, formData: Form
   if (!channel) return { error: 'Failed to update alert channel' }
 
   logger.info('Alert channel updated', { channelId })
+  await devAuditLog({ orgId: user.org_id, userId: user.id, action: 'alert_channel.updated', resourceType: 'alert_channel', resourceId: channelId })
   redirect('/dashboard/alerts')
 }
 
@@ -142,6 +145,7 @@ export async function deleteAlertChannelAction(channelId: string): Promise<{ err
 
   const success = await deleteAlertChannel(channelId)
   if (!success) return { error: 'Failed to delete alert channel' }
+  await devAuditLog({ orgId: user.org_id, userId: user.id, action: 'alert_channel.deleted', resourceType: 'alert_channel', resourceId: channelId })
   redirect('/dashboard/alerts')
 }
 
@@ -159,6 +163,7 @@ export async function toggleAlertChannelAction(channelId: string, enabled: boole
   }
 
   await toggleAlertChannel(channelId, enabled)
+  await devAuditLog({ orgId: user.org_id, userId: user.id, action: `alert_channel.${enabled ? 'enabled' : 'disabled'}`, resourceType: 'alert_channel', resourceId: channelId })
   redirect('/dashboard/alerts')
 }
 
@@ -173,6 +178,7 @@ export async function bulkDeleteAlertChannelsAction(ids: string[]): Promise<{ er
   if (!success) return { error: 'Failed to delete alert channels' }
 
   logger.info('Bulk deleted alert channels', { count: ids.length })
+  await devAuditLog({ orgId: user.org_id, userId: user.id, action: 'alert_channel.bulk_deleted', metadata: { count: ids.length } })
   revalidatePath('/dashboard/alerts')
   return {}
 }

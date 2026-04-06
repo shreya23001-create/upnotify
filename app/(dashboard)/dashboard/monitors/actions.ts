@@ -7,6 +7,7 @@ import { getCurrentUser } from '@/lib/db/users'
 import { getWorkspacesByOrg } from '@/lib/db/workspaces'
 import { checkMonitorLimit } from '@/lib/utils/plan-limits'
 import { logger } from '@/lib/utils/logger'
+import { devAuditLog } from '@/lib/db/audit'
 import { impersonationGuard } from '@/lib/auth/impersonation-guard'
 
 export async function createMonitorAction(formData: FormData): Promise<{ error?: string }> {
@@ -96,6 +97,7 @@ export async function createMonitorAction(formData: FormData): Promise<{ error?:
   }
 
   logger.info('Monitor created', { monitorId: monitor.id, name, type })
+  await devAuditLog({ orgId: user.org_id, userId: user.id, action: 'monitor.created', resourceType: 'monitor', resourceId: monitor.id, metadata: { name, type } })
   redirect('/dashboard/monitors')
 }
 
@@ -207,6 +209,7 @@ export async function updateMonitorAction(monitorId: string, formData: FormData)
   if (!monitor) return { error: 'Failed to update monitor' }
 
   logger.info('Monitor updated', { monitorId })
+  await devAuditLog({ orgId: user.org_id, userId: user.id, action: 'monitor.updated', resourceType: 'monitor', resourceId: monitorId, metadata: { name } })
   redirect(`/dashboard/monitors/${monitorId}`)
 }
 
@@ -225,6 +228,7 @@ export async function deleteMonitorAction(monitorId: string): Promise<{ error?: 
 
   const success = await deleteMonitor(monitorId)
   if (!success) return { error: 'Failed to delete monitor' }
+  await devAuditLog({ orgId: user.org_id, userId: user.id, action: 'monitor.deleted', resourceType: 'monitor', resourceId: monitorId })
   redirect('/dashboard/monitors')
 }
 
@@ -242,6 +246,7 @@ export async function pauseMonitorAction(monitorId: string): Promise<{ error?: s
   }
 
   await pauseMonitor(monitorId)
+  await devAuditLog({ orgId: user.org_id, userId: user.id, action: 'monitor.paused', resourceType: 'monitor', resourceId: monitorId })
   redirect(`/dashboard/monitors/${monitorId}`)
 }
 
@@ -259,6 +264,7 @@ export async function resumeMonitorAction(monitorId: string): Promise<{ error?: 
   }
 
   await resumeMonitor(monitorId)
+  await devAuditLog({ orgId: user.org_id, userId: user.id, action: 'monitor.resumed', resourceType: 'monitor', resourceId: monitorId })
   redirect(`/dashboard/monitors/${monitorId}`)
 }
 
@@ -273,6 +279,7 @@ export async function bulkDeleteMonitorsAction(ids: string[]): Promise<{ error?:
   if (!success) return { error: 'Failed to delete monitors' }
 
   logger.info('Bulk deleted monitors', { count: ids.length })
+  await devAuditLog({ orgId: user.org_id, userId: user.id, action: 'monitor.bulk_deleted', metadata: { count: ids.length } })
   revalidatePath('/dashboard/monitors')
   return {}
 }
@@ -288,6 +295,7 @@ export async function bulkPauseMonitorsAction(ids: string[]): Promise<{ error?: 
   if (!success) return { error: 'Failed to pause monitors' }
 
   logger.info('Bulk paused monitors', { count: ids.length })
+  await devAuditLog({ orgId: user.org_id, userId: user.id, action: 'monitor.bulk_paused', metadata: { count: ids.length } })
   revalidatePath('/dashboard/monitors')
   return {}
 }

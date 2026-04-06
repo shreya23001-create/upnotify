@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { logger } from '@/lib/utils/logger'
+import { getEnvironment } from '@/lib/utils/environment'
 import type { Json } from '@/lib/types/database.types'
 
 interface AuditLogInput {
@@ -11,6 +12,16 @@ interface AuditLogInput {
   ipAddress?: string
   userAgent?: string
   metadata?: Record<string, unknown>
+}
+
+/**
+ * Dev-only audit log writer. No-op in production until audit logging is
+ * fully validated and enabled. See production readiness checklist in CLAUDE.md.
+ * To enable in production: remove the environment guard below.
+ */
+export async function devAuditLog(input: AuditLogInput): Promise<void> {
+  if (getEnvironment() === 'production') return
+  await writeAuditLog(input)
 }
 
 export async function writeAuditLog(input: AuditLogInput): Promise<boolean> {

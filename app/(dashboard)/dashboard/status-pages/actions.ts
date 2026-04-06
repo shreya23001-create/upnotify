@@ -6,6 +6,7 @@ import { createStatusPage, updateStatusPage, deleteStatusPage, bulkDeleteStatusP
 import { getCurrentUser } from '@/lib/db/users'
 import { getWorkspacesByOrg } from '@/lib/db/workspaces'
 import { logger } from '@/lib/utils/logger'
+import { devAuditLog } from '@/lib/db/audit'
 import { impersonationGuard } from '@/lib/auth/impersonation-guard'
 import { checkStatusPageLimit } from '@/lib/utils/plan-limits'
 
@@ -50,6 +51,7 @@ export async function createStatusPageAction(formData: FormData): Promise<{ erro
   if (!page) return { error: 'Failed to create status page' }
 
   logger.info('Status page created', { pageId: page.id, slug })
+  await devAuditLog({ orgId: user.org_id, userId: user.id, action: 'status_page.created', resourceType: 'status_page', resourceId: page.id, metadata: { slug } })
   redirect('/dashboard/status-pages')
 }
 
@@ -85,6 +87,7 @@ export async function updateStatusPageAction(pageId: string, formData: FormData)
   if (!page) return { error: 'Failed to update status page' }
 
   logger.info('Status page updated', { pageId })
+  await devAuditLog({ orgId: user.org_id, userId: user.id, action: 'status_page.updated', resourceType: 'status_page', resourceId: pageId })
   redirect('/dashboard/status-pages')
 }
 
@@ -103,6 +106,7 @@ export async function deleteStatusPageAction(pageId: string): Promise<{ error?: 
 
   const success = await deleteStatusPage(pageId)
   if (!success) return { error: 'Failed to delete' }
+  await devAuditLog({ orgId: user.org_id, userId: user.id, action: 'status_page.deleted', resourceType: 'status_page', resourceId: pageId })
   redirect('/dashboard/status-pages')
 }
 
@@ -117,6 +121,7 @@ export async function bulkDeleteStatusPagesAction(ids: string[]): Promise<{ erro
   if (!success) return { error: 'Failed to delete status pages' }
 
   logger.info('Bulk deleted status pages', { count: ids.length })
+  await devAuditLog({ orgId: user.org_id, userId: user.id, action: 'status_page.bulk_deleted', metadata: { count: ids.length } })
   revalidatePath('/dashboard/status-pages')
   return {}
 }
@@ -132,6 +137,7 @@ export async function bulkPublishStatusPagesAction(ids: string[]): Promise<{ err
   if (!success) return { error: 'Failed to publish status pages' }
 
   logger.info('Bulk published status pages', { count: ids.length })
+  await devAuditLog({ orgId: user.org_id, userId: user.id, action: 'status_page.bulk_published', metadata: { count: ids.length } })
   revalidatePath('/dashboard/status-pages')
   return {}
 }
@@ -147,6 +153,7 @@ export async function bulkUnpublishStatusPagesAction(ids: string[]): Promise<{ e
   if (!success) return { error: 'Failed to unpublish status pages' }
 
   logger.info('Bulk unpublished status pages', { count: ids.length })
+  await devAuditLog({ orgId: user.org_id, userId: user.id, action: 'status_page.bulk_unpublished', metadata: { count: ids.length } })
   revalidatePath('/dashboard/status-pages')
   return {}
 }
