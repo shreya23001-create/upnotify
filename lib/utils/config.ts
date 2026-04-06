@@ -101,6 +101,9 @@ export function getConfig(): PublicConfig {
   return cachedPublicConfig
 }
 
+// No module-level cache for server config — Vercel serverless functions are
+// short-lived and env vars must be read fresh each cold start. Caching across
+// requests in the same instance is fine; stale cached empty values are not.
 let cachedServerConfig: ServerConfig | null = null
 
 export function getServerConfig(): ServerConfig {

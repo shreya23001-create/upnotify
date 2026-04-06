@@ -79,7 +79,7 @@ export async function POST(request: Request): Promise<NextResponse> {
   const approveUrl = `${app.url}/api/admin/blog-approve?token=${draft.approveToken}`
   const rejectUrl = `${app.url}/api/admin/blog-approve?token=${draft.rejectToken}`
 
-  await Promise.allSettled([
+  const [emailResult, telegramResult] = await Promise.allSettled([
     sendBlogApprovalEmail({
       to: adminEmail,
       blogTitle: draft.title,
@@ -102,6 +102,14 @@ export async function POST(request: Request): Promise<NextResponse> {
     }),
   ])
 
+  const emailOk = emailResult.status === 'fulfilled' && emailResult.value.success
+  const telegramOk = telegramResult.status === 'fulfilled' && telegramResult.value.success
+  const telegramError = telegramResult.status === 'rejected'
+    ? String(telegramResult.reason)
+    : telegramResult.status === 'fulfilled' && !telegramResult.value.success
+      ? telegramResult.value.error
+      : null
+
   return NextResponse.json({
     ok: true,
     blogPostId: draft.blogPostId,
@@ -110,5 +118,9 @@ export async function POST(request: Request): Promise<NextResponse> {
     sourcesFound: research.articles.length,
     hasOfficialStatus: !!research.officialStatus,
     approvalEmailSentTo: adminEmail,
+    notifications: {
+      email: emailOk ? 'sent' : 'failed',
+      telegram: telegramOk ? 'sent' : `failed: ${telegramError ?? 'unknown'}`,
+    },
   })
 }

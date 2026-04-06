@@ -61,7 +61,7 @@ async function triggerOutageBlog(
   const rejectUrl = `${app.url}/api/admin/blog-approve?token=${draft.rejectToken}`
 
   // Send both email and Telegram in parallel
-  await Promise.allSettled([
+  const [emailResult, telegramResult] = await Promise.allSettled([
     sendBlogApprovalEmail({
       to: adminEmail,
       blogTitle: draft.title,
@@ -83,6 +83,15 @@ async function triggerOutageBlog(
       rejectUrl,
     }),
   ])
+
+  if (emailResult.status === 'rejected' || (emailResult.status === 'fulfilled' && !emailResult.value.success)) {
+    const err = emailResult.status === 'rejected' ? emailResult.reason : emailResult.value.error
+    logger.error('Blog approval email failed', { error: err, blogPostId: draft.blogPostId })
+  }
+  if (telegramResult.status === 'rejected' || (telegramResult.status === 'fulfilled' && !telegramResult.value.success)) {
+    const err = telegramResult.status === 'rejected' ? telegramResult.reason : telegramResult.value.error
+    logger.error('Blog approval Telegram failed', { error: err, blogPostId: draft.blogPostId })
+  }
 
   logger.info('Blog approval notifications sent', {
     to: adminEmail,

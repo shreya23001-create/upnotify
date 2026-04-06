@@ -17,6 +17,34 @@ export interface BlogPostInput {
   author_id?: string | null
 }
 
+export interface PublishedBlogPostSummary {
+  id: string
+  title: string
+  slug: string
+  excerpt: string | null
+  category: string | null
+  tags: string[] | null
+  published_at: string | null
+  created_at: string
+}
+
+/** Get all published blog posts for public display — ordered by published_at descending */
+export async function getPublishedBlogPosts(): Promise<PublishedBlogPostSummary[]> {
+  const supabase = createAdminClient()
+  const { data, error } = await supabase
+    .from('blog_posts')
+    .select('id, title, slug, excerpt, category, tags, published_at, created_at')
+    .eq('status', 'published')
+    .order('published_at', { ascending: false })
+
+  if (error) {
+    logger.error('Failed to fetch published blog posts', { error: error.message })
+    return []
+  }
+
+  return (data ?? []) as PublishedBlogPostSummary[]
+}
+
 /** Get all blog posts for admin — no RLS filtering, ordered by newest first */
 export async function getAllBlogPostsAdmin(): Promise<BlogPost[]> {
   const supabase = createAdminClient()
