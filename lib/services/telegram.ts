@@ -128,7 +128,9 @@ interface BlogApprovalTelegramParams {
 }
 
 /**
- * Sends a blog approval request to Telegram with approve/reject links.
+ * Sends a blog approval request to Telegram with approve/reject links in the message body.
+ * Uses plain HTML links instead of inline keyboard buttons — keyboard url buttons can fail
+ * silently when query-string tokens are present.
  */
 export async function sendBlogApprovalTelegram(params: BlogApprovalTelegramParams): Promise<TelegramResult> {
   const config = getServerConfig()
@@ -140,27 +142,28 @@ export async function sendBlogApprovalTelegram(params: BlogApprovalTelegramParam
   }
 
   const sourcesLine = params.sourcesCount > 0
-    ? `\n📊 <b>Sources:</b> ${params.sourcesCount} found${params.hasOfficialStatus ? ' (incl. official status page)' : ''}`
+    ? `📊 <b>Sources:</b> ${params.sourcesCount} found${params.hasOfficialStatus ? ' (incl. official status page)' : ''}`
     : ''
 
-  const text = [
+  const lines = [
     `📝 <b>Blog ready for approval</b>`,
     ``,
     `<b>${escapeHtml(params.blogTitle)}</b>`,
     ``,
     `<i>${escapeHtml(params.excerpt)}</i>`,
-    sourcesLine,
-    ``,
-    `<i>Tap a button below to approve or reject. Links expire in 7 days.</i>`,
-  ].join('\n')
+  ]
 
-  return sendTelegramMessage(chatId, {
-    text,
-    inlineKeyboard: [[
-      { text: '✅ Approve & Publish', url: params.approveUrl },
-      { text: '❌ Reject', url: params.rejectUrl },
-    ]],
-  }, botToken)
+  if (sourcesLine) lines.push(``, sourcesLine)
+
+  lines.push(
+    ``,
+    `✅ <a href="${params.approveUrl}">Approve &amp; Publish</a>`,
+    `❌ <a href="${params.rejectUrl}">Reject</a>`,
+    ``,
+    `<i>Links expire in 7 days.</i>`,
+  )
+
+  return sendTelegramMessage(chatId, { text: lines.join('\n') }, botToken)
 }
 
 // ---------------------------------------------------------------------------
