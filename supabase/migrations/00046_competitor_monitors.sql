@@ -36,7 +36,15 @@ CREATE POLICY "competitor_monitors_org_delete"
   ON competitor_monitors FOR DELETE
   USING (org_id IN (SELECT org_id FROM users WHERE id = auth.uid()));
 
--- updated_at trigger
+-- updated_at trigger (inline function — update_updated_at_column may not exist in this DB)
+CREATE OR REPLACE FUNCTION set_competitor_monitors_updated_at()
+RETURNS TRIGGER LANGUAGE plpgsql AS $$
+BEGIN
+  NEW.updated_at = now();
+  RETURN NEW;
+END;
+$$;
+
 CREATE TRIGGER competitor_monitors_updated_at
   BEFORE UPDATE ON competitor_monitors
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+  FOR EACH ROW EXECUTE FUNCTION set_competitor_monitors_updated_at();
