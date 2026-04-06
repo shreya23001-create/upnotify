@@ -1,12 +1,13 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { UptrueLogo } from '@/components/ui/uptrue-logo'
 import {
   IconDashboard, IconUsers, IconBuilding, IconCreditCard,
   IconGlobe, IconToggle, IconEdit, IconMail, IconSettings, IconX, IconShield,
-  IconBell, IconTag, IconActivity, IconFileText,
+  IconBell, IconTag, IconActivity, IconFileText, IconChevronDown,
 } from '@/components/icons'
 
 interface AdminSidebarProps {
@@ -25,11 +26,13 @@ interface NavItem {
 interface NavGroup {
   label: string
   items: NavItem[]
+  defaultOpen?: boolean
 }
 
 const NAV_GROUPS: NavGroup[] = [
   {
     label: 'Overview',
+    defaultOpen: true,
     items: [
       { href: '/admin', label: 'Dashboard', icon: IconDashboard },
     ],
@@ -82,8 +85,24 @@ function isActive(pathname: string, href: string): boolean {
   return pathname.startsWith(href)
 }
 
+function groupHasActive(pathname: string, items: NavItem[]): boolean {
+  return items.some((item) => isActive(pathname, item.href))
+}
+
 export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps): React.ReactElement {
   const pathname = usePathname()
+
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>(() => {
+    const initial: Record<string, boolean> = {}
+    for (const group of NAV_GROUPS) {
+      initial[group.label] = group.defaultOpen === true || groupHasActive(pathname, group.items)
+    }
+    return initial
+  })
+
+  function toggleGroup(label: string): void {
+    setOpenGroups((prev) => ({ ...prev, [label]: !prev[label] }))
+  }
 
   return (
     <>
@@ -113,45 +132,65 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps): React.Reac
 
         {/* Navigation */}
         <nav className="admin-sidebar-nav">
-          {NAV_GROUPS.map((group) => (
-            <div key={group.label} className="admin-sidebar-group">
-              <div className="admin-sidebar-section-label">{group.label}</div>
-              {group.items.map((item) => {
-                const active = isActive(pathname, item.href)
-                const Icon = item.icon
+          {NAV_GROUPS.map((group) => {
+            const isGroupOpen = openGroups[group.label] ?? false
+            const hasActive = groupHasActive(pathname, group.items)
 
-                if (item.disabled) {
-                  return (
-                    <span
-                      key={item.href}
-                      className="admin-sidebar-item admin-sidebar-item-disabled"
-                    >
-                      <Icon size={18} className="admin-sidebar-item-icon" />
-                      <span className="admin-sidebar-item-label">{item.label}</span>
-                      {item.badge && (
-                        <span className="admin-sidebar-badge">{item.badge}</span>
-                      )}
-                    </span>
-                  )
-                }
+            return (
+              <div key={group.label} className="admin-sidebar-group">
+                <button
+                  className={`admin-sidebar-section-label${hasActive ? ' admin-sidebar-section-label-active' : ''}`}
+                  onClick={() => toggleGroup(group.label)}
+                  aria-expanded={isGroupOpen}
+                >
+                  <span>{group.label}</span>
+                  <IconChevronDown
+                    size={12}
+                    className={`admin-sidebar-chevron${isGroupOpen ? ' admin-sidebar-chevron-open' : ''}`}
+                  />
+                </button>
 
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={`admin-sidebar-item${active ? ' admin-sidebar-item-active' : ''}`}
-                    onClick={onClose}
-                  >
-                    <Icon size={18} className="admin-sidebar-item-icon" />
-                    <span className="admin-sidebar-item-label">{item.label}</span>
-                    {item.badge && (
-                      <span className="admin-sidebar-badge">{item.badge}</span>
-                    )}
-                  </Link>
-                )
-              })}
-            </div>
-          ))}
+                {isGroupOpen && (
+                  <div className="admin-sidebar-group-items">
+                    {group.items.map((item) => {
+                      const active = isActive(pathname, item.href)
+                      const Icon = item.icon
+
+                      if (item.disabled) {
+                        return (
+                          <span
+                            key={item.href}
+                            className="admin-sidebar-item admin-sidebar-item-disabled"
+                          >
+                            <Icon size={18} className="admin-sidebar-item-icon" />
+                            <span className="admin-sidebar-item-label">{item.label}</span>
+                            {item.badge && (
+                              <span className="admin-sidebar-badge">{item.badge}</span>
+                            )}
+                          </span>
+                        )
+                      }
+
+                      return (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          className={`admin-sidebar-item${active ? ' admin-sidebar-item-active' : ''}`}
+                          onClick={onClose}
+                        >
+                          <Icon size={18} className="admin-sidebar-item-icon" />
+                          <span className="admin-sidebar-item-label">{item.label}</span>
+                          {item.badge && (
+                            <span className="admin-sidebar-badge">{item.badge}</span>
+                          )}
+                        </Link>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+            )
+          })}
         </nav>
 
         {/* Footer */}
