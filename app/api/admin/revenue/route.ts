@@ -53,6 +53,7 @@ interface InvoiceRow {
   id: string
   org_id: string
   amount_gbp: number
+  currency: string
   status: string
   invoice_pdf_url: string | null
   period_start: string | null
@@ -72,6 +73,7 @@ interface EnrichedInvoice {
   orgName: string
   userEmail: string
   amount_gbp: number
+  currency: string
   status: string
   invoice_pdf_url: string | null
   period_start: string | null
@@ -170,15 +172,21 @@ export async function GET(request: Request): Promise<NextResponse> {
   }
 
   // -------------------------------------------------------------------------
-  // 4. Total count of paid invoices (all, not paginated — for totalRevenuePence)
+  // 4. Total paid invoices grouped by currency (for per-currency revenue cards)
   // -------------------------------------------------------------------------
   const { data: allPaidRaw } = await supabase
     .from('invoices')
-    .select('amount_gbp')
+    .select('amount_gbp, currency')
     .eq('status', 'paid')
 
-  const totalRevenuePence = ((allPaidRaw ?? []) as { amount_gbp: number }[])
-    .reduce((sum, i) => sum + Math.round((i.amount_gbp ?? 0) * 100), 0)
+  // Group total revenue by currency (amount already stored in smallest unit = no * 100)
+  const revenueByCurrency: Record<string, number> = {}
+  for (const inv of (allPaidRaw ?? []) as { amount_gbp: number; currency: string }[]) {
+    const cur = (inv.currency ?? 'gbp').toLowerCase()
+    revenueByCurrency[cur] = (revenueByCurrency[cur] ?? 0) + (inv.amount_gbp ?? 0)
+  }
+  // Total GBP revenue (for backwards compat — only GBP invoices)
+  const totalRevenuePence = revenueByCurrency['gbp'] ?? 0
 
   // -------------------------------------------------------------------------
   // 5. Paginated invoices with org + plan details
@@ -186,7 +194,7 @@ export async function GET(request: Request): Promise<NextResponse> {
   let invoiceQuery = supabase
     .from('invoices')
     .select(
-      'id, org_id, amount_gbp, status, invoice_pdf_url, period_start, period_end, created_at, subscription_id, organisations(name), subscriptions(billing_cycle, plans(name, slug))',
+      'id, org_id, amount_gbp, currency, status, invoice_pdf_url, period_start, period_end, created_at, subscription_id, organisations(name), subscriptions(billing_cycle, plans(name, slug))',
       { count: 'exact' }
     )
     .order(sortBy, { ascending })
@@ -208,6 +216,7 @@ export async function GET(request: Request): Promise<NextResponse> {
     orgName:         inv.organisations?.name ?? '',
     userEmail:       usersByOrgId.get(inv.org_id) ?? '',
     amount_gbp:      inv.amount_gbp,
+    currency:        (inv.currency ?? 'gbp').toLowerCase(),
     status:          inv.status,
     invoice_pdf_url: inv.invoice_pdf_url,
     period_start:    inv.period_start,
@@ -226,10 +235,11 @@ export async function GET(request: Request): Promise<NextResponse> {
   for (const sub of subs) {
     const plan = sub.plans
     if (!plan) continue
+    // price_annual_gbp and price_monthly_gbp are stored in pence (integer) — no * 100 needed
     const monthlyPence =
       sub.billing_cycle === 'annual' && plan.price_annual_gbp != null
-        ? Math.round((plan.price_annual_gbp / 12) * 100)
-        : Math.round(plan.price_monthly_gbp * 100)
+        ? Math.round(plan.price_annual_gbp / 12)
+        : plan.price_monthly_gbp
     baseMrrPence += monthlyPence
     if (!planBreakdown[plan.name]) planBreakdown[plan.name] = { count: 0, mrrPence: 0 }
     planBreakdown[plan.name].count++
@@ -268,6 +278,7 @@ export async function GET(request: Request): Promise<NextResponse> {
     planBreakdown,
     competeBreakdown,
     totalRevenuePence,
+    revenueByCurrency,
     activeSubscriptions:       subs.length,
     activeCompeteSubscriptions: competeSubs.length,
     invoices: enrichedInvoices,

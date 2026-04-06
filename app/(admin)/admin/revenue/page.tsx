@@ -9,6 +9,7 @@ interface EnrichedInvoice {
   orgName: string
   userEmail: string
   amount_gbp: number
+  currency: string
   status: string
   invoice_pdf_url: string | null
   period_start: string | null
@@ -23,6 +24,7 @@ interface RevenueData {
   planBreakdown: Record<string, { count: number; mrrPence: number }>
   competeBreakdown: Record<string, { count: number; mrrPence: number }>
   totalRevenuePence: number
+  revenueByCurrency: Record<string, number>
   activeSubscriptions: number
   activeCompeteSubscriptions: number
   invoices: EnrichedInvoice[]
@@ -31,6 +33,27 @@ interface RevenueData {
 
 function gbp(pence: number): string {
   return `£${(pence / 100).toFixed(2)}`
+}
+
+/** Format an amount (in smallest currency unit) for any currency */
+function formatAmount(smallestUnit: number, currency: string): string {
+  const amount = smallestUnit / 100
+  const cur = currency.toUpperCase()
+  // Currencies with no decimal places
+  const zeroDec = new Set(['JPY', 'KRW', 'VND', 'IDR', 'CLP', 'BIF', 'GNF', 'ISK', 'KMF', 'MGA', 'PYG', 'RWF', 'UGX', 'XAF', 'XOF'])
+  const displayAmount = zeroDec.has(cur) ? String(smallestUnit) : amount.toFixed(2)
+  const symbols: Record<string, string> = { GBP: '£', USD: '$', EUR: '€', INR: '₹', AUD: 'A$', CAD: 'C$', SGD: 'S$', AED: 'AED ' }
+  const symbol = symbols[cur] ?? `${cur} `
+  return `${symbol}${displayAmount}`
+}
+
+/** Currency label for display */
+function currencyLabel(code: string): string {
+  const labels: Record<string, string> = {
+    gbp: 'GBP (£)', usd: 'USD ($)', eur: 'EUR (€)', inr: 'INR (₹)',
+    aud: 'AUD (A$)', cad: 'CAD (C$)', sgd: 'SGD (S$)', aed: 'AED',
+  }
+  return labels[code.toLowerCase()] ?? code.toUpperCase()
 }
 
 function fmtDate(iso: string | null): string {
@@ -122,12 +145,12 @@ export default function AdminRevenuePage(): React.ReactElement {
       </div>
 
       {/* Top KPI stats */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 12, marginBottom: 24 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 12, marginBottom: 16 }}>
         {[
           { label: 'Total MRR', value: gbp(data?.mrr.totalPence ?? 0), color: 'var(--success)' },
           { label: 'Base Plan MRR', value: gbp(data?.mrr.basePence ?? 0), color: 'var(--accent)' },
           { label: 'Compete MRR', value: gbp(data?.mrr.competePence ?? 0), color: 'var(--accent)' },
-          { label: 'Total Revenue', value: gbp(data?.totalRevenuePence ?? 0), color: 'var(--success)' },
+          { label: 'GBP Revenue', value: gbp(data?.totalRevenuePence ?? 0), color: 'var(--success)' },
           { label: 'Active Subs', value: String(data?.activeSubscriptions ?? 0), color: 'var(--text-primary)' },
           { label: 'Compete Subs', value: String(data?.activeCompeteSubscriptions ?? 0), color: 'var(--text-primary)' },
         ].map(s => (
@@ -137,6 +160,23 @@ export default function AdminRevenuePage(): React.ReactElement {
           </div>
         ))}
       </div>
+
+      {/* Per-currency revenue cards (only shown when non-GBP payments exist) */}
+      {data?.revenueByCurrency && Object.keys(data.revenueByCurrency).length > 1 && (
+        <div style={{ marginBottom: 24 }}>
+          <h3 style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            Revenue by Currency
+          </h3>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+            {Object.entries(data.revenueByCurrency).map(([cur, amount]) => (
+              <div key={cur} className="card" style={{ padding: '12px 16px', minWidth: 140 }}>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, marginBottom: 4 }}>{currencyLabel(cur)}</div>
+                <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--success)' }}>{formatAmount(amount, cur)}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Plan breakdowns */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 24 }}>
@@ -265,7 +305,7 @@ export default function AdminRevenuePage(): React.ReactElement {
                         ) : <span style={{ color: 'var(--text-muted)' }}>—</span>}
                       </td>
                       <td style={{ fontWeight: 700, color: 'var(--success)', whiteSpace: 'nowrap' }}>
-                        £{inv.amount_gbp.toFixed(2)}
+                        {formatAmount(inv.amount_gbp, inv.currency ?? 'gbp')}
                       </td>
                       <td>
                         <span className={`badge ${inv.status === 'paid' ? 'badge-success' : inv.status === 'open' ? 'badge-warning' : 'badge-neutral'}`}>

@@ -105,6 +105,7 @@ function getPlanCta(plan: Plan, isCurrent: boolean, isHigherTier: boolean): stri
 
 export function PricingTable({ plans, currentPlanSlug, creditBalancePence = 0 }: Props): React.ReactElement {
   const [isPending, startTransition] = useTransition()
+  const [isPortalPending, startPortalTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
   const [isAnnual, setIsAnnual] = useState(true)
 
@@ -113,6 +114,23 @@ export function PricingTable({ plans, currentPlanSlug, creditBalancePence = 0 }:
   // Determine the index of the current plan for upgrade/downgrade logic
   const currentPlanIndex = directPlans.findIndex(p => p.slug === currentPlanSlug)
   const effectiveCurrentIndex = currentPlanIndex >= 0 ? currentPlanIndex : 0 // Free if no subscription
+
+  function handleOpenPortal(): void {
+    setError(null)
+    startPortalTransition(async () => {
+      try {
+        const res = await fetch('/api/v1/billing/portal', { method: 'POST' })
+        const data: { url?: string; error?: string } = await res.json()
+        if (data.url) {
+          window.location.href = data.url
+        } else {
+          setError(data.error || 'Could not open billing portal. Please try again.')
+        }
+      } catch {
+        setError('Something went wrong. Please check your connection and try again.')
+      }
+    })
+  }
 
   function handleSubscribe(planSlug: string, billingCycle: string): void {
     setError(null)
@@ -231,8 +249,13 @@ export function PricingTable({ plans, currentPlanSlug, creditBalancePence = 0 }:
                   {isPending ? 'Loading...' : ctaText}
                 </button>
               ) : (
-                <button className="btn btn-secondary btn-full" disabled style={{ opacity: 0.6 }}>
-                  {ctaText}
+                <button
+                  className="btn btn-secondary btn-full"
+                  onClick={handleOpenPortal}
+                  disabled={isPortalPending}
+                  title="Opens Stripe billing portal to manage your subscription"
+                >
+                  {isPortalPending ? 'Opening...' : ctaText}
                 </button>
               )}
             </div>

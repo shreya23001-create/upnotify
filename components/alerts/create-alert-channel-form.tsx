@@ -103,6 +103,16 @@ export function CreateAlertChannelForm() {
       {type === 'slack' && (
         <>
           <div className="form-group">
+            <div style={{ padding: '16px', background: '#f0f9ff', border: '1px solid #bae6fd', borderRadius: 8, marginBottom: 16 }}>
+              <p style={{ margin: '0 0 10px', fontSize: 13, fontWeight: 700, color: '#0369a1' }}>How to get your Slack Webhook URL</p>
+              <ol style={{ margin: 0, paddingLeft: 18, fontSize: 13, color: '#374151', lineHeight: 1.8 }}>
+                <li>Go to <strong>api.slack.com/apps</strong> and click <strong>Create New App</strong></li>
+                <li>Choose <strong>From scratch</strong>, name it (e.g. &ldquo;Uptrue Alerts&rdquo;), select your workspace</li>
+                <li>In the left menu, click <strong>Incoming Webhooks</strong> and toggle it <strong>On</strong></li>
+                <li>Click <strong>Add New Webhook to Workspace</strong> and choose the channel to post to</li>
+                <li>Copy the <strong>Webhook URL</strong> (starts with <code>https://hooks.slack.com/services/</code>) and paste it below</li>
+              </ol>
+            </div>
             <label className="form-label">Slack Webhook URL</label>
             <input
               className="form-input"
@@ -120,12 +130,29 @@ export function CreateAlertChannelForm() {
               placeholder="#alerts"
               disabled={isPending}
             />
+            <p style={{ fontSize: 12, color: '#94a3b8', marginTop: 6 }}>
+              Override the default channel. Leave blank to use the channel you selected when creating the webhook.
+            </p>
           </div>
         </>
       )}
 
       {type === 'teams' && (
         <div className="form-group">
+          <div style={{ padding: '16px', background: '#f0f9ff', border: '1px solid #bae6fd', borderRadius: 8, marginBottom: 16 }}>
+            <p style={{ margin: '0 0 10px', fontSize: 13, fontWeight: 700, color: '#0369a1' }}>How to get your Microsoft Teams Webhook URL</p>
+            <ol style={{ margin: 0, paddingLeft: 18, fontSize: 13, color: '#374151', lineHeight: 1.8 }}>
+              <li>Open Microsoft Teams and go to the <strong>channel</strong> where you want alerts</li>
+              <li>Click the <strong>&hellip; (More options)</strong> menu next to the channel name</li>
+              <li>Select <strong>Connectors</strong> (or <strong>Edit</strong> &rarr; <strong>Connectors</strong>)</li>
+              <li>Search for <strong>Incoming Webhook</strong> and click <strong>Add</strong> then <strong>Configure</strong></li>
+              <li>Give it a name (e.g. &ldquo;Uptrue&rdquo;), optionally upload an icon, then click <strong>Create</strong></li>
+              <li>Copy the <strong>Webhook URL</strong> shown and paste it below</li>
+            </ol>
+            <p style={{ margin: '10px 0 0', fontSize: 12, color: '#0369a1' }}>
+              <strong>Note:</strong> If you don&apos;t see Connectors, ask your Teams admin to enable the Incoming Webhook connector for your organisation.
+            </p>
+          </div>
           <label className="form-label">Teams Webhook URL</label>
           <input
             className="form-input"

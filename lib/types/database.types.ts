@@ -626,6 +626,7 @@ export type Database = {
       invoices: {
         Row: {
           amount_gbp: number
+          currency: string
           created_at: string
           id: string
           invoice_pdf_url: string | null
@@ -638,6 +639,7 @@ export type Database = {
         }
         Insert: {
           amount_gbp: number
+          currency?: string
           created_at?: string
           id?: string
           invoice_pdf_url?: string | null
@@ -650,6 +652,7 @@ export type Database = {
         }
         Update: {
           amount_gbp?: number
+          currency?: string
           created_at?: string
           id?: string
           invoice_pdf_url?: string | null

@@ -74,6 +74,37 @@ async function handleCheckoutCompleted(
         .single()
 
       if (plan) {
+        // Fetch old active subscriptions BEFORE canceling them in DB,
+        // so we can cancel them in Stripe too (prevents double-billing on upgrade)
+        const { data: oldSubs } = await supabase
+          .from('subscriptions')
+          .select('stripe_subscription_id')
+          .eq('org_id', orgId)
+          .eq('status', 'active')
+
+        // Cancel old Stripe subscriptions to stop double-billing
+        if (oldSubs && oldSubs.length > 0) {
+          for (const oldSub of oldSubs) {
+            const oldStripeId = oldSub.stripe_subscription_id as string | null
+            if (oldStripeId && oldStripeId !== (session.subscription as string)) {
+              try {
+                await getStripe().subscriptions.cancel(oldStripeId)
+                logger.info('Cancelled old Stripe subscription on upgrade', {
+                  oldStripeSubId: oldStripeId,
+                  newStripeSubId: session.subscription,
+                  orgId,
+                })
+              } catch (err) {
+                logger.error('Failed to cancel old Stripe subscription on upgrade', {
+                  oldStripeSubId: oldStripeId,
+                  orgId,
+                  error: err instanceof Error ? err.message : 'Unknown',
+                })
+              }
+            }
+          }
+        }
+
         // Cancel any existing base subscription for this org (upgrade/change scenario)
         await supabase
           .from('subscriptions')
@@ -157,6 +188,7 @@ async function handleInvoicePaid(
     subscription_id: subscriptionRecordId ?? null,
     stripe_invoice_id: invoice.id as string,
     amount_gbp: (invoice.amount_paid as number) ?? 0,
+    currency: ((invoice.currency as string) ?? 'gbp').toLowerCase(),
     status: 'paid',
     invoice_pdf_url: (invoice.invoice_pdf as string) ?? null,
     period_start: invoice.period_start

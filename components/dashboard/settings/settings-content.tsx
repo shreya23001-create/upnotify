@@ -14,6 +14,8 @@ import { CompanyDetailsForm } from '@/components/dashboard/settings/company-deta
 import { OrgSettingsForm } from '@/components/dashboard/settings/org-settings-form'
 import { LogoUpload } from '@/components/ui/logo-upload'
 import { TeamInviteForm } from '@/components/dashboard/settings/team-invite-form'
+import { CompetePlanSelector } from '@/components/compete/compete-plan-selector'
+import type { CompetePlan, CompeteSubscription } from '@/lib/db/compete-plans'
 
 interface SettingsContentProps {
   organisation: Organisation
@@ -33,6 +35,9 @@ interface SettingsContentProps {
   creditRules: CreditRule[]
   referralCode: string | null
   referrals: Referral[]
+  competePlans: CompetePlan[]
+  competeSubscription: CompeteSubscription | null
+  hasPaidBasePlan: boolean
 }
 
 export function SettingsContent({
@@ -53,6 +58,9 @@ export function SettingsContent({
   creditRules,
   referralCode,
   referrals,
+  competePlans,
+  competeSubscription,
+  hasPaidBasePlan,
 }: SettingsContentProps): React.ReactElement {
   const searchParams = useSearchParams()
   const initialTab = searchParams.get('tab') || 'organisation'
@@ -228,6 +236,43 @@ export function SettingsContent({
         <div className="space-y">
           <CurrentPlan plan={currentPlan} subscription={subscription} />
           <PricingTable plans={plans} currentPlanSlug={currentPlan?.slug} creditBalancePence={creditBalance} />
+
+          {/* Compete add-on section */}
+          <div className="card">
+            <div className="card-header">
+              <div className="card-title">Compete Add-on</div>
+              <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>
+                Track competitor prices and get alerts when they change. Billed separately.
+              </p>
+            </div>
+            <div className="card-content">
+              {competeSubscription ? (
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', background: 'var(--bg-secondary)', borderRadius: 8, marginBottom: 16 }}>
+                    <span style={{ fontSize: 20 }}>✓</span>
+                    <div>
+                      <div style={{ fontWeight: 700, fontSize: 15 }}>
+                        Compete {competeSubscription.compete_plans?.name ?? 'Active'}
+                      </div>
+                      <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 2 }}>
+                        {competeSubscription.billing_cycle === 'annual' ? 'Annual billing' : 'Monthly billing'}
+                        {competeSubscription.current_period_end && (
+                          <span> · Renews {new Date(competeSubscription.current_period_end).toLocaleDateString()}</span>
+                        )}
+                      </div>
+                    </div>
+                    <span className="badge badge-success" style={{ marginLeft: 'auto' }}>Active</span>
+                  </div>
+                  <a href="/dashboard/compete" className="btn btn-secondary btn-sm">
+                    Manage Compete
+                  </a>
+                </div>
+              ) : (
+                <CompetePlanSelector plans={competePlans} hasPaidBasePlan={hasPaidBasePlan} />
+              )}
+            </div>
+          </div>
+
           <InvoiceList invoices={invoices} />
         </div>
       )}
