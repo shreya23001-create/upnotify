@@ -10,8 +10,7 @@ import {
 import type { PublicMonitor } from '@/lib/db/public-monitors'
 import type { CheckerResult } from '@/lib/checkers/types'
 import { generateOutageBlogPost } from '@/lib/services/blog-generator'
-import { sendBlogApprovalEmail } from '@/lib/services/email'
-import { getServerConfig, getConfig } from '@/lib/utils/config'
+import { getServerConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
 
 export const dynamic = 'force-dynamic'
@@ -26,7 +25,7 @@ async function triggerOutageBlog(
   incidentId: string,
   confirmation: CheckerResult
 ): Promise<void> {
-  const draft = await generateOutageBlogPost({
+  const post = await generateOutageBlogPost({
     siteDisplayName: monitor.display_name,
     siteDomain: monitor.domain,
     siteCategory: monitor.category ?? 'other',
@@ -36,34 +35,14 @@ async function triggerOutageBlog(
     incidentId,
   })
 
-  if (!draft) {
-    logger.warn('Blog draft not generated for outage', { domain: monitor.domain, incidentId })
+  if (!post) {
+    logger.warn('Blog post not generated for outage', { domain: monitor.domain, incidentId })
     return
   }
 
-  const { app, admin } = getConfig()
-  const approveUrl = `${app.url}/api/admin/blog-approve?token=${draft.approveToken}`
-  const rejectUrl = `${app.url}/api/admin/blog-approve?token=${draft.rejectToken}`
-  const adminEmail = admin.emails[0]
-
-  if (!adminEmail) {
-    logger.warn('No admin email configured — blog approval email not sent', { blogPostId: draft.blogPostId })
-    return
-  }
-
-  await sendBlogApprovalEmail({
-    to: adminEmail,
-    blogTitle: draft.title,
-    blogSlug: draft.slug,
-    siteDisplayName: monitor.display_name,
-    excerpt: `${monitor.display_name} is experiencing an outage. Uptrue detected the issue and auto-generated this blog post.`,
-    approveUrl,
-    rejectUrl,
-  })
-
-  logger.info('Blog approval email sent', {
-    to: adminEmail,
-    blogPostId: draft.blogPostId,
+  logger.info('Outage blog auto-published', {
+    blogPostId: post.blogPostId,
+    slug: post.slug,
     domain: monitor.domain,
   })
 }

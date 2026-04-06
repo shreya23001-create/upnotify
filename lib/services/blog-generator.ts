@@ -1,6 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { createApprovalTokens } from '@/lib/db/blog-approval-tokens'
 import { getServerConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
 
@@ -22,8 +21,7 @@ interface GeneratedBlogDraft {
   blogPostId: string
   title: string
   slug: string
-  approveToken: string
-  rejectToken: string
+  excerpt: string
 }
 
 // ---------------------------------------------------------------------------
@@ -191,17 +189,20 @@ Format your response EXACTLY like this:
     },
   }
 
-  // Save as pending_approval
+  const postExcerpt = excerpt || `${ctx.siteDisplayName} is experiencing an outage. Uptrue detected the issue at ${detectedAt}.`
+
+  // Auto-publish immediately — no approval step
   const { data: post, error: insertError } = await supabase
     .from('blog_posts')
     .insert({
       title,
       slug,
       content,
-      excerpt: excerpt || `${ctx.siteDisplayName} is experiencing an outage. Uptrue detected the issue at ${detectedAt}.`,
+      excerpt: postExcerpt,
       category: 'outage',
       tags: ['outage', ctx.siteDisplayName.toLowerCase(), 'downtime', 'is-it-down'],
-      status: 'pending_approval',
+      status: 'published',
+      published_at: new Date().toISOString(),
       seo_title: seoTitle || title,
       seo_description: seoDescription || excerpt,
       auto_generated: true,
@@ -218,22 +219,12 @@ Format your response EXACTLY like this:
     return null
   }
 
-  logger.info('Auto-generated blog post saved', { id: post.id, slug: post.slug })
-
-  // Create approval tokens
-  const tokens = await createApprovalTokens(post.id)
-  if (!tokens) {
-    logger.error('Failed to create approval tokens — blog post saved but approval email cannot be sent', {
-      blogPostId: post.id,
-    })
-    return null
-  }
+  logger.info('Auto-generated blog post published', { id: post.id, slug: post.slug })
 
   return {
     blogPostId: post.id,
     title: post.title,
     slug: post.slug,
-    approveToken: tokens.approveToken,
-    rejectToken: tokens.rejectToken,
+    excerpt: postExcerpt,
   }
 }
