@@ -34,15 +34,18 @@ export function AlsoDownSection({ siteName, outagePost, downSites }: Props): Rea
 
       <div className="also-down-grid">
 
-        {/* Blog coverage card — only if a published post exists */}
+        {/* Blog coverage card — full width, only if a published post exists */}
         {outagePost && (
           <Link href={`/blog/${outagePost.slug}`} className="also-down-card also-down-card-blog">
-            <div className="also-down-card-badge">Our Coverage</div>
-            <div className="also-down-card-title">{outagePost.title}</div>
-            {outagePost.excerpt && (
-              <div className="also-down-card-excerpt">{outagePost.excerpt}</div>
-            )}
-            <div className="also-down-card-cta">Read post →</div>
+            <div className="also-down-blog-icon">📰</div>
+            <div className="also-down-blog-body">
+              <div className="also-down-card-badge">Our Coverage</div>
+              <div className="also-down-card-title">{outagePost.title}</div>
+              {outagePost.excerpt && (
+                <div className="also-down-card-excerpt">{outagePost.excerpt}</div>
+              )}
+            </div>
+            <div className="also-down-blog-arrow">→</div>
           </Link>
         )}
 
