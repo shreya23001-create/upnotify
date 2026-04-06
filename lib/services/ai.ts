@@ -98,7 +98,7 @@ ${incidentSection}
 Write the summary in plain English. Do not use markdown. Focus on actionable insights. Always use DD/MMM/YYYY dates and HH:MM times.`
 
     const message = await client.messages.create({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-sonnet-4-6',
       max_tokens: 500,
       messages: [{ role: 'user', content: prompt }],
     })
