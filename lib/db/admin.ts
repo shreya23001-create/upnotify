@@ -2,9 +2,16 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
 import type { Organisation, User, FeatureFlag, Plan } from '@/lib/types'
 
-export async function getAllOrganisations(search?: string): Promise<Organisation[]> {
+export interface OrgWithUsers extends Organisation {
+  users: { id: string; email: string; full_name: string | null; is_active: boolean }[]
+}
+
+export async function getAllOrganisations(search?: string): Promise<OrgWithUsers[]> {
   const supabase = createAdminClient()
-  let query = supabase.from('organisations').select('*').order('created_at', { ascending: false })
+  let query = supabase
+    .from('organisations')
+    .select('*, users(id, email, full_name, is_active)')
+    .order('created_at', { ascending: false })
   if (search) query = query.ilike('name', `%${search}%`)
 
   const { data, error } = await query
@@ -12,7 +19,7 @@ export async function getAllOrganisations(search?: string): Promise<Organisation
     logger.error('Admin: Failed to get organisations', { error: error.message })
     return []
   }
-  return data ?? []
+  return (data ?? []) as OrgWithUsers[]
 }
 
 export async function getAllUsers(search?: string): Promise<User[]> {

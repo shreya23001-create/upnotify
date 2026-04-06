@@ -1,5 +1,6 @@
 import { getAllOrganisations } from '@/lib/db/admin'
 import { AdminOrgsContent } from '@/components/admin/admin-orgs-content'
+export const dynamic = 'force-dynamic'
 
 export default async function AdminOrganisationsPage(): Promise<React.ReactElement> {
   const organisations = await getAllOrganisations()
