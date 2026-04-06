@@ -16,6 +16,7 @@ const typeLabels: Record<string, string> = {
   slack: '💬 Slack',
   teams: '👥 Microsoft Teams',
   webhook: '🔗 Webhook',
+  telegram: '📱 Telegram',
   whatsapp: '📱 WhatsApp',
   voice: '📞 Voice',
 }
@@ -27,6 +28,7 @@ interface ChannelConfig {
   teamsWebhookUrl?: string
   webhookUrl?: string
   webhookSecret?: string
+  telegramChatId?: string
 }
 
 export function EditAlertChannelForm({ channel }: { channel: AlertChannel }) {
@@ -94,6 +96,14 @@ export function EditAlertChannelForm({ channel }: { channel: AlertChannel }) {
         <div className="form-group">
           <label className="form-label">Teams Webhook URL</label>
           <input className="form-input" name="teamsWebhookUrl" required defaultValue={config.teamsWebhookUrl || ''} disabled={isPending} />
+        </div>
+      )}
+
+      {channel.type === 'telegram' && (
+        <div className="form-group">
+          <label className="form-label">Your Telegram Chat ID</label>
+          <input className="form-input" name="telegramChatId" required defaultValue={config.telegramChatId || ''} disabled={isPending} placeholder="e.g. 123456789" />
+          <p style={{ fontSize: 12, color: '#94a3b8', marginTop: 6 }}>Get your Chat ID from @userinfobot on Telegram.</p>
         </div>
       )}
 

@@ -55,6 +55,11 @@ export async function createAlertChannelAction(formData: FormData): Promise<{ er
     if (!config.webhookUrl) return { error: 'Webhook URL is required' }
   }
 
+  if (type === 'telegram') {
+    config.telegramChatId = formData.get('telegramChatId') as string
+    if (!config.telegramChatId) return { error: 'Telegram Chat ID is required' }
+  }
+
   const severityStr = formData.get('severity_filter') as string
   const severityFilter = severityStr ? severityStr.split(',') : ['P1', 'P2', 'P3', 'P4']
 
@@ -106,6 +111,10 @@ export async function updateAlertChannelAction(channelId: string, formData: Form
   if (type === 'webhook') {
     config.webhookUrl = formData.get('webhookUrl') as string
     config.webhookSecret = formData.get('webhookSecret') as string
+  }
+
+  if (type === 'telegram') {
+    config.telegramChatId = formData.get('telegramChatId') as string
   }
 
   const severityStr = formData.get('severity_filter') as string

@@ -8,6 +8,7 @@ const channelTypes = [
   { value: 'slack', label: '\u{1F4AC} Slack', description: 'Send alerts to a Slack channel via webhook' },
   { value: 'teams', label: '\u{1F465} Microsoft Teams', description: 'Send alerts to a Teams channel' },
   { value: 'webhook', label: '\u{1F517} Webhook', description: 'Send alerts to a custom URL with HMAC signing' },
+  { value: 'telegram', label: '\u{1F4F1} Telegram', description: 'Instant alerts via Telegram — free on all plans' },
 ]
 
 const severities = [
@@ -133,6 +134,32 @@ export function CreateAlertChannelForm() {
             placeholder="https://outlook.office.com/webhook/..."
             disabled={isPending}
           />
+        </div>
+      )}
+
+      {type === 'telegram' && (
+        <div className="form-group">
+          <div style={{ padding: '16px', background: '#f0f9ff', border: '1px solid #bae6fd', borderRadius: 8, marginBottom: 16 }}>
+            <p style={{ margin: '0 0 10px', fontSize: 13, fontWeight: 700, color: '#0369a1' }}>How to set up Telegram alerts</p>
+            <ol style={{ margin: 0, paddingLeft: 18, fontSize: 13, color: '#374151', lineHeight: 1.8 }}>
+              <li>Open Telegram and search for <strong>@uptrue_alerts_bot</strong></li>
+              <li>Send it any message (e.g. <em>&quot;hello&quot;</em>) to start the chat</li>
+              <li>Open <strong>@userinfobot</strong> in Telegram and send <strong>/start</strong></li>
+              <li>It will reply with your <strong>Chat ID</strong> (a number like <code>123456789</code>)</li>
+              <li>Paste your Chat ID below and save</li>
+            </ol>
+          </div>
+          <label className="form-label">Your Telegram Chat ID</label>
+          <input
+            className="form-input"
+            name="telegramChatId"
+            required
+            placeholder="e.g. 123456789"
+            disabled={isPending}
+          />
+          <p style={{ fontSize: 12, color: '#94a3b8', marginTop: 6 }}>
+            This is your personal Chat ID — not your username. Get it from @userinfobot.
+          </p>
         </div>
       )}
 

@@ -219,6 +219,7 @@ export async function checkAlertChannelAccess(orgId: string, channelType: string
     case 'slack': return limits.hasSlackTeams
     case 'teams': return limits.hasSlackTeams
     case 'webhook': return limits.hasWebhooks
+    case 'telegram': return true  // Free on all plans — zero cost to Uptrue
     default: return false
   }
 }

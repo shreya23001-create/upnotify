@@ -57,6 +57,91 @@ async function sendTelegramMessage(text: string): Promise<TelegramResult> {
 }
 
 // ---------------------------------------------------------------------------
+// Monitor alert notification (user-facing)
+// ---------------------------------------------------------------------------
+
+interface MonitorAlertTelegramParams {
+  chatId: string           // User's personal Telegram Chat ID
+  monitorName: string
+  monitorTarget: string
+  isResolved: boolean
+  severity?: string
+  downtimeDuration?: string  // e.g. "4 minutes 22 seconds" — only on recovery
+  monitorUrl: string
+}
+
+/**
+ * Sends a monitor down/recovery alert to a user's Telegram chat.
+ * Uses the Uptrue bot token but the user's own chat ID.
+ */
+export async function sendTelegramAlert(params: MonitorAlertTelegramParams): Promise<TelegramResult> {
+  const config = getServerConfig()
+  const { botToken } = config.telegram
+
+  if (!botToken) {
+    logger.warn('Telegram bot token not configured — skipping alert')
+    return { success: false, error: 'Telegram bot token not configured' }
+  }
+
+  const icon = params.isResolved ? '✅' : '🔴'
+  const status = params.isResolved ? 'Recovered' : 'Down'
+
+  const lines = [
+    `${icon} <b>${escapeHtml(status)}: ${escapeHtml(params.monitorName)}</b>`,
+    ``,
+    `<b>Target:</b> ${escapeHtml(params.monitorTarget)}`,
+  ]
+
+  if (!params.isResolved && params.severity) {
+    lines.push(`<b>Severity:</b> ${escapeHtml(params.severity)}`)
+  }
+
+  if (params.isResolved && params.downtimeDuration) {
+    lines.push(`<b>Downtime:</b> ${escapeHtml(params.downtimeDuration)}`)
+  }
+
+  lines.push(``)
+  lines.push(`<a href="${params.monitorUrl}">View Monitor →</a>`)
+
+  const text = lines.join('\n')
+
+  const url = `https://api.telegram.org/bot${botToken}/sendMessage`
+
+  try {
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), 8000)
+
+    const res = await fetch(url, {
+      method: 'POST',
+      signal: controller.signal,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: params.chatId,
+        text,
+        parse_mode: 'HTML',
+        disable_web_page_preview: true,
+      }),
+    })
+
+    clearTimeout(timeout)
+
+    const data = await res.json() as { ok: boolean; description?: string }
+
+    if (!data.ok) {
+      logger.error('Telegram alert failed', { chatId: params.chatId, error: data.description })
+      return { success: false, error: data.description ?? 'Unknown Telegram error' }
+    }
+
+    logger.info('Telegram alert sent', { chatId: params.chatId, monitor: params.monitorName })
+    return { success: true }
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : 'Unknown error'
+    logger.error('Telegram alert exception', { error: msg })
+    return { success: false, error: msg }
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Blog approval notification
 // ---------------------------------------------------------------------------
 

@@ -4,6 +4,7 @@ import { getConfig } from '@/lib/utils/config'
 import { sendAlertEmail } from './email'
 import { sendSlackAlert } from './slack'
 import { sendWebhookAlert } from './webhook'
+import { sendTelegramAlert } from './telegram'
 import { sendUserMessage } from '@/lib/db/user-messages'
 import type { Incident, Monitor, AlertChannel } from '@/lib/types'
 
@@ -14,6 +15,7 @@ interface AlertChannelConfig {
   slackChannel?: string
   webhookSecret?: string
   teamsWebhookUrl?: string
+  telegramChatId?: string
 }
 
 interface KeywordMonitorConfig {
@@ -211,6 +213,20 @@ export async function dispatchAlerts(incident: Incident, monitor: Monitor): Prom
                 },
                 timestamp: new Date().toISOString(),
               },
+            })
+            success = result.success
+            errorMessage = result.error
+            break
+          }
+
+          case 'telegram': {
+            const result = await sendTelegramAlert({
+              chatId: channelConfig.telegramChatId || '',
+              monitorName: monitor.name,
+              monitorTarget: monitor.target,
+              isResolved,
+              severity: incident.severity,
+              monitorUrl,
             })
             success = result.success
             errorMessage = result.error
