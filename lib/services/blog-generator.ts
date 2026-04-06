@@ -131,33 +131,34 @@ export async function generateOutageBlogPost(ctx: OutageContext): Promise<Genera
   const hasResearch = ctx.research?.hasRealData
   const researchBlock = hasResearch ? buildResearchContext(ctx.research!) : ''
 
-  const prompt = `You are a technical writer for Uptrue, an uptime monitoring platform.
-Write a blog post in the format of "Is [Site] Down?" that will rank on Google when people search for current outages.
+  const prompt = `You are a technical writer for Uptrue, an independent uptime monitoring platform.
+Write a blog post sharing Uptrue's perspective on a possible service issue we detected. The tone is calm, helpful, and informational — like a knowledgeable friend sharing what they're seeing, not a news reporter asserting facts. We are not in conflict with anyone.
 
 Site: ${ctx.siteDisplayName} (${ctx.siteDomain})
-Outage detected by Uptrue at: ${detectedAt}
-Error detected: ${errorDetail}
+Our monitors flagged a possible issue at: ${detectedAt}
+What our monitor saw: ${errorDetail}
 
-${hasResearch ? `REAL-TIME RESEARCH DATA (use this to write a more informed, accurate post):
-${researchBlock}` : 'No external research data available — write based on the detected error only.'}
+${hasResearch ? `WHAT WE FOUND WHEN WE LOOKED FURTHER (use this to enrich the post):
+${researchBlock}` : 'No additional research data — write based on what our monitor detected only.'}
 
-Write the post in Markdown. The post must:
-1. Open with a clear statement that Uptrue detected an outage for ${ctx.siteDisplayName}
-2. Include a "What We Know So Far" section — use the research data to explain the likely cause, affected services, and timeline. If the official status page has information, summarise it accurately.
-3. Include a "What Users Are Saying" section if there are social/Reddit mentions — summarise the user reports naturally (do NOT copy verbatim). Credit sources as inline links e.g. "reports on Reddit" or "posts on X".
-4. Include a "What to Do While ${ctx.siteDisplayName} Is Down" section with practical workarounds
-5. Include a "Monitor ${ctx.siteDisplayName} for Free" section with a natural call to action to sign up at https://uptrue.io — do NOT make it salesy, frame it as a helpful tool
-6. Close with a note that Uptrue will update the post as the situation develops
+Write the post in Markdown as Uptrue's honest opinion and observation. The post must:
+1. Open from Uptrue's perspective — "our monitors picked up what looks like an issue with ${ctx.siteDisplayName}" — frame the whole post as what we are seeing and what we think, not as reported fact. Use natural opinion language throughout: "it looks like", "from what we can see", "our monitors suggest", "it appears that", "based on what we're observing".
+2. Include a "What Our Monitors Are Showing" section — share what Uptrue detected (error type, time, what it could mean) in plain language. If the official status page has useful information, summarise it and link to it. If things are unclear, say so honestly — "we don't have a full picture yet".
+3. Include a "What People Are Saying" section if there are social/Reddit mentions — paraphrase naturally, do NOT copy verbatim. Credit generically: [reports on Reddit](url) or [posts on X](url). Do NOT include Reddit usernames, X/Twitter handles, or any personal identifiers whatsoever.
+4. Include a "What You Can Do in the Meantime" section with practical workarounds — helpful, not alarmist
+5. Include a "Keep an Eye on ${ctx.siteDisplayName} with Uptrue" section — a natural, low-key mention that Uptrue monitors services like this and readers can add their own for free at https://uptrue.io
+6. Close by noting that this is Uptrue's view based on what we detected at the time, that the situation may have already changed, and pointing readers to ${ctx.siteDisplayName}'s official status page for the authoritative update
 7. Be between 500–700 words
-8. Use a human, helpful tone — not robotic or marketing-heavy
+8. Warm, human tone — conversational, helpful, never alarmist or sensational
 9. Do NOT include a title at the top (it is added separately)
-10. If you cite a specific source, use Markdown link syntax: [source name](url)
-11. Do NOT fabricate facts — if research data is thin, say "details are still emerging"
+10. Cite sources with Markdown links: [source name](url)
+11. Do NOT fabricate anything. Do NOT include any personal usernames or social media handles.
+12. We have no connection to ${ctx.siteDisplayName} — mention this lightly and naturally if it fits ("as an independent monitoring service, all we can share is what our own checks detected")
 
 Also provide:
-- EXCERPT: One sentence (max 160 chars) summarising the post for Google
-- SEO_TITLE: (max 60 chars) e.g. "Is GitHub Down? ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })} Outage"
-- SEO_DESCRIPTION: (max 160 chars) for the meta description
+- EXCERPT: One sentence (max 160 chars) from Uptrue's perspective — e.g. "Our monitors picked up a possible issue with ${ctx.siteDisplayName} — here's what we're seeing."
+- SEO_TITLE: (max 60 chars) — opinion framing e.g. "Is GitHub Down? What Our Monitors Are Showing — ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}"
+- SEO_DESCRIPTION: (max 160 chars) — helpful, opinion-based framing
 
 Format your response EXACTLY like this:
 ---BODY---
@@ -214,8 +215,8 @@ Format your response EXACTLY like this:
     slug = `${baseSlug}-${Date.now()}`
   }
 
-  const title = seoTitle || `Is ${ctx.siteDisplayName} Down? ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })} Outage`
-  const postExcerpt = excerpt || `${ctx.siteDisplayName} is experiencing an outage. Uptrue detected the issue at ${detectedAt}.`
+  const title = seoTitle || `Is ${ctx.siteDisplayName} Down? What Our Monitors Are Showing — ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}`
+  const postExcerpt = excerpt || `Our monitors picked up a possible issue with ${ctx.siteDisplayName} at ${detectedAt}. Here's what we're seeing — check the official status page for the latest.`
 
   const content = {
     body,

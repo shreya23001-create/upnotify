@@ -203,6 +203,29 @@ export default async function DynamicBlogPost({ params }: { params: Promise<{ sl
         </div>
       </header>
 
+      {Boolean((post as unknown as Record<string, unknown>).auto_generated) && (
+        <div style={{
+          background: 'var(--bg-secondary, #f8f9fa)',
+          border: '1px solid var(--border, #e5e7eb)',
+          borderLeft: '4px solid var(--warning, #f59e0b)',
+          borderRadius: 6,
+          padding: '12px 16px',
+          margin: '24px 0',
+          fontSize: 13,
+          color: 'var(--text-muted, #6b7280)',
+          lineHeight: 1.6,
+        }}>
+          <strong style={{ color: 'var(--text, #111)', display: 'block', marginBottom: 4 }}>
+            Automated monitoring report
+          </strong>
+          This report was generated automatically by Uptrue when our monitoring system detected a possible issue.
+          Information may be incomplete or inaccurate — always check the official status page for confirmed updates.
+          Uptrue is an independent monitoring service and has no affiliation with the companies mentioned.
+          {' '}To request a correction or removal, email{' '}
+          <a href="mailto:reports@uptrue.io" style={{ color: 'var(--accent, #3b82f6)' }}>reports@uptrue.io</a>.
+        </div>
+      )}
+
       {midCta && (
         <div className="blog-cta-section" style={{ margin: '32px 0' }}>
           <h3>{midCta.heading}</h3>

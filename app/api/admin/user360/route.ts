@@ -35,7 +35,7 @@ export interface User360Profile {
   activeMonitorCount: number
   alertChannelCount: number
   statusPageCount: number
-  // Score (0–100) — calculated server-side
+  // Score (0–100) — calculated server-side (legacy, kept for sort compatibility)
   score: number
   scoreBreakdown: {
     spend: number      // 0–35
@@ -43,6 +43,10 @@ export interface User360Profile {
     plan: number       // 0–20
     tenure: number     // 0–20
   }
+  // Health score — cached from organisations table (refreshed by cron weekly)
+  healthScore: number | null
+  healthScoreLabel: string | null
+  healthScoreAt: string | null
 }
 
 function calcScore(profile: Omit<User360Profile, 'score' | 'scoreBreakdown'>): { score: number; scoreBreakdown: User360Profile['scoreBreakdown'] } {
@@ -89,7 +93,7 @@ export async function GET(): Promise<NextResponse> {
     { data: plansRaw },
   ] = await Promise.all([
     supabase.from('users').select('id, email, full_name, org_id, is_active, created_at').order('created_at', { ascending: false }),
-    supabase.from('organisations').select('id, name'),
+    supabase.from('organisations').select('id, name, health_score, health_score_label, health_score_at'),
     supabase.from('subscriptions').select('org_id, status, billing_cycle, current_period_end, plan_id, plans(name, slug)'),
     supabase.from('invoices').select('org_id, amount_gbp, status, created_at').eq('status', 'paid'),
     supabase.from('monitors').select('org_id, status'),
@@ -99,9 +103,10 @@ export async function GET(): Promise<NextResponse> {
   ])
 
   // Build lookup maps
-  const orgMap = new Map<string, string>()
-  for (const o of (orgsRaw ?? []) as { id: string; name: string }[]) {
-    orgMap.set(o.id, o.name)
+  type OrgRow = { id: string; name: string; health_score: number | null; health_score_label: string | null; health_score_at: string | null }
+  const orgMap = new Map<string, OrgRow>()
+  for (const o of (orgsRaw ?? []) as unknown as OrgRow[]) {
+    orgMap.set(o.id, o)
   }
 
   const planMap = new Map<string, { name: string; slug: string }>()
@@ -167,13 +172,14 @@ export async function GET(): Promise<NextResponse> {
 
     const planName = sub?.plans?.name ?? 'Free'
     const planSlug = sub?.plans?.slug ?? 'free'
+    const orgData = orgMap.get(u.org_id)
 
     const base: Omit<User360Profile, 'score' | 'scoreBreakdown'> = {
       userId: u.id,
       email: u.email,
       fullName: u.full_name,
       orgId: u.org_id,
-      orgName: orgMap.get(u.org_id) ?? '',
+      orgName: orgData?.name ?? '',
       isActive: u.is_active,
       joinedAt: u.created_at,
       planName,
@@ -188,6 +194,9 @@ export async function GET(): Promise<NextResponse> {
       activeMonitorCount: monitors.active,
       alertChannelCount: alertsByOrg.get(u.org_id) ?? 0,
       statusPageCount: statusPagesByOrg.get(u.org_id) ?? 0,
+      healthScore: orgData?.health_score ?? null,
+      healthScoreLabel: orgData?.health_score_label ?? null,
+      healthScoreAt: orgData?.health_score_at ?? null,
     }
 
     profiles.push({ ...base, ...calcScore(base) })

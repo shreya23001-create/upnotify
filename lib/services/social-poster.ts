@@ -89,7 +89,7 @@ async function postToX(post: OutageSocialPost): Promise<SocialPostResult> {
     return { success: false, platform: 'x', error: 'X API credentials not configured' }
   }
 
-  const tweetText = `🔴 Is ${post.siteDisplayName} down right now?\n\nUptrue detected an outage. Check the latest status:\n${post.blogUrl}\n\n#${post.siteDisplayName.replace(/\s+/g, '')} #outage #downtime`
+  const tweetText = `🔴 Is ${post.siteDisplayName} down right now?\n\nUptrue detected a possible issue. Check the latest status report:\n${post.blogUrl}\n\n#${post.siteDisplayName.replace(/\s+/g, '')} #outage #downtime`
 
   const url = 'https://api.twitter.com/2/tweets'
   const body = JSON.stringify({ text: tweetText })
@@ -145,13 +145,20 @@ async function postToLinkedIn(post: OutageSocialPost): Promise<SocialPostResult>
     return { success: false, platform: 'linkedin', error: 'LinkedIn credentials not configured' }
   }
 
-  const shareText = `🔴 ${post.siteDisplayName} is experiencing an outage.\n\nUptrue detected the issue and published a live status update:\n${post.blogUrl}\n\n#uptime #outage #${post.siteDisplayName.replace(/\s+/g, '')} #monitoring`
+  const shareText = `🔴 ${post.siteDisplayName} may be experiencing an issue.\n\nUptrue detected a possible disruption. See the latest status report:\n${post.blogUrl}\n\n#uptime #outage #${post.siteDisplayName.replace(/\s+/g, '')} #monitoring`
 
-  // NOTE: Currently posting as member (w_member_social) for testing.
-  // Before go-live: switch to organization posting (w_organization_social).
-  // See production checklist item: "LinkedIn — switch to company page posting"
+  // Use organisation posting when LINKEDIN_ORGANIZATION_ID is set (required for production).
+  // Falls back to member posting only if organizationId is missing — logs a warning.
+  const { organizationId } = config.linkedin
+  if (!organizationId) {
+    logger.warn('LINKEDIN_ORGANIZATION_ID not set — posting as member profile (not suitable for production)')
+  }
+  const authorUrn = organizationId
+    ? `urn:li:organization:${organizationId}`
+    : `urn:li:person:${memberId}`
+
   const payload = {
-    author: `urn:li:person:${memberId}`,
+    author: authorUrn,
     lifecycleState: 'PUBLISHED',
     specificContent: {
       'com.linkedin.ugc.ShareContent': {

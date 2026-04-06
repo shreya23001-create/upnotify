@@ -111,13 +111,88 @@ export default function AIDisclaimerPage(): React.ReactElement {
         <a href="/privacy">Privacy Policy</a> and <a href="/gdpr">GDPR Compliance</a> page.
       </p>
 
-      <h2>9. Contact Us</h2>
+      <h2>9. Automated Outage Detection Reports</h2>
+      <p>
+        Uptrue publishes <strong>automated monitoring reports</strong> when our systems detect a possible
+        issue with a publicly tracked website or service. These reports are:
+      </p>
+      <ul>
+        <li>Generated automatically using AI based on Uptrue&apos;s own monitoring data and publicly available sources</li>
+        <li>Reviewed and approved by a human administrator before publication</li>
+        <li>Written using cautious, hedged language (e.g. &ldquo;may be experiencing&rdquo;, &ldquo;possible issue&rdquo;) to reflect
+          that our detection is an indication, not a confirmed outage</li>
+        <li>Published as a matter of public interest — service availability directly affects users, businesses, and the public</li>
+      </ul>
+
+      <h3>9.1 Independence and No Affiliation</h3>
+      <p>
+        Uptrue is an <strong>independent monitoring service</strong>. We have no affiliation, partnership, or
+        commercial relationship with any company whose services we monitor or report on. Monitoring reports
+        do not imply endorsement, criticism, or any business relationship with the companies mentioned.
+      </p>
+
+      <h3>9.2 Accuracy and Sources</h3>
+      <p>
+        Automated reports draw on Uptrue&apos;s own detection data alongside publicly available sources
+        including official status pages, news publications, and social media posts. All external sources
+        are attributed with links. We do not fabricate information. Where facts are uncertain, reports
+        use explicit hedging (&ldquo;details are still emerging&rdquo;, &ldquo;reports suggest&rdquo;).
+      </p>
+      <p>
+        <strong>Uptrue does not guarantee the accuracy, completeness, or timeliness of automated monitoring
+        reports.</strong> The situation may have changed since the report was published. Always check the
+        relevant company&apos;s official status page for authoritative updates.
+      </p>
+
+      <h3>9.3 Public Interest and Legal Basis</h3>
+      <p>
+        Automated outage reports are published on a matter of public interest under{' '}
+        <strong>Section 4 of the UK Defamation Act 2013</strong>. Reporting on the availability of
+        publicly used digital services — and aggregating publicly available user reports — is a legitimate
+        activity that serves the public by providing timely, independent information about service disruptions
+        that affect many people.
+      </p>
+      <p>
+        All reports use honest, hedged language that represents Uptrue&apos;s genuine, reasonable belief
+        based on monitoring data at the time of detection. This approach is consistent with the honest
+        opinion defence under <strong>Section 3 of the UK Defamation Act 2013</strong>.
+      </p>
+
+      <h3>9.4 Corrections and Takedown Requests</h3>
+      <p>
+        We are committed to accuracy. If a monitoring report contains inaccurate information, we will
+        review and correct or remove it promptly. To request a correction or removal:
+      </p>
+      <ul>
+        <li>
+          <strong>Email:</strong> <a href="mailto:reports@uptrue.io">reports@uptrue.io</a>
+        </li>
+        <li>Include the URL of the report, the specific inaccuracy, and supporting evidence where possible</li>
+        <li>We aim to respond within <strong>2 business days</strong> and to action valid requests within <strong>5 business days</strong></li>
+      </ul>
+      <p>
+        Corrections are noted in the published report where appropriate. Reports found to be materially
+        inaccurate are removed without delay.
+      </p>
+
+      <h3>9.5 No Personal Data in Reports</h3>
+      <p>
+        Automated reports do not include Reddit usernames, X/Twitter handles, or any other personal
+        identifiers. Social media sources are referenced generically (e.g. &ldquo;users on Reddit&rdquo;,
+        &ldquo;posts on X&rdquo;). Report generation pipelines are designed to strip personal identifiers
+        before content is stored or published.
+      </p>
+
+      <h2>10. Contact Us</h2>
       <p>
         If you have questions or concerns about our use of AI, please contact us at:
       </p>
       <ul>
         <li>
           <strong>Email:</strong> <a href="mailto:support@uptrue.io">support@uptrue.io</a>
+        </li>
+        <li>
+          <strong>Monitoring report corrections:</strong> <a href="mailto:reports@uptrue.io">reports@uptrue.io</a>
         </li>
         <li>
           <strong>Post:</strong> Vision Software Solutions Limited, C/O Benison Solvers Limited,

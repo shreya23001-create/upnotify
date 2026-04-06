@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import type { User360Profile } from '@/app/api/admin/user360/route'
 
 interface Plan {
@@ -25,6 +26,24 @@ function ScoreBadge({ score }: { score: number }) {
         width: 36, height: 36, borderRadius: '50%', background: bg, color,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         fontSize: 13, fontWeight: 800, flexShrink: 0,
+      }}>{score}</div>
+      <span style={{ fontSize: 11, color, fontWeight: 600 }}>{label}</span>
+    </div>
+  )
+}
+
+function HealthBadge({ score, label }: { score: number; label: string }) {
+  const isHealthy = score >= 75
+  const isWatch = score >= 50 && score < 75
+  const isAtRisk = score >= 25 && score < 50
+  const color = isHealthy ? '#16a34a' : isWatch ? '#d97706' : isAtRisk ? '#ea580c' : '#dc2626'
+  const bg = isHealthy ? '#dcfce7' : isWatch ? '#fef3c7' : isAtRisk ? '#ffedd5' : '#fee2e2'
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+      <div style={{
+        width: 36, height: 36, borderRadius: '50%', background: bg, color,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        fontSize: 12, fontWeight: 800, flexShrink: 0,
       }}>{score}</div>
       <span style={{ fontSize: 11, color, fontWeight: 600 }}>{label}</span>
     </div>
@@ -103,6 +122,8 @@ export function AdminUsersContent(): React.ReactElement {
   const [impersonatingId, setImpersonatingId] = useState<string | null>(null)
   const [confirmAction, setConfirmAction] = useState<ConfirmAction | null>(null)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+  const [refreshingScores, setRefreshingScores] = useState(false)
+  const [scoresRefreshedAt, setScoresRefreshedAt] = useState<string | null>(null)
   const router = useRouter()
 
   useEffect(() => {
@@ -112,6 +133,9 @@ export function AdminUsersContent(): React.ReactElement {
         if (d.success) {
           setProfiles(d.profiles)
           setPlans(d.plans ?? [])
+          // Seed last-refreshed from any profile that has health score data
+          const sample = d.profiles.find(p => p.healthScoreAt)
+          if (sample?.healthScoreAt) setScoresRefreshedAt(sample.healthScoreAt)
         }
       })
       .catch(() => {})
@@ -223,6 +247,28 @@ export function AdminUsersContent(): React.ReactElement {
     setConfirmAction(null)
   }, [confirmAction, router])
 
+  const handleRefreshScores = useCallback(async () => {
+    setRefreshingScores(true)
+    setMessage(null)
+    try {
+      const res = await fetch('/api/cron/health-scores')
+      const data = await res.json() as { success?: boolean; processed?: number; at?: string; error?: string }
+      if (data.success) {
+        setScoresRefreshedAt(data.at ?? new Date().toISOString())
+        setMessage({ type: 'success', text: `Health scores refreshed for ${data.processed ?? 0} organisations.` })
+        // Reload profiles to show updated scores
+        const r2 = await fetch('/api/admin/user360')
+        const d2 = await r2.json() as { success: boolean; profiles: User360Profile[] }
+        if (d2.success) setProfiles(d2.profiles)
+      } else {
+        setMessage({ type: 'error', text: data.error ?? 'Failed to refresh scores' })
+      }
+    } catch {
+      setMessage({ type: 'error', text: 'Network error refreshing scores' })
+    }
+    setRefreshingScores(false)
+  }, [])
+
   const confirmMessages: Record<string, { title: string; message: string; variant: 'danger' | 'warning' }> = {
     delete: {
       title: 'Delete User Permanently',
@@ -282,6 +328,21 @@ export function AdminUsersContent(): React.ReactElement {
           <option value="inactive">Inactive only</option>
         </select>
         <span style={{ fontSize: 13, color: 'var(--text-muted)', marginLeft: 4 }}>{filtered.length} users</span>
+        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
+          {scoresRefreshedAt && (
+            <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+              Scores: {new Date(scoresRefreshedAt).toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
+            </span>
+          )}
+          <button
+            className="btn btn-secondary"
+            style={{ fontSize: 12, padding: '5px 12px' }}
+            onClick={() => void handleRefreshScores()}
+            disabled={refreshingScores}
+          >
+            {refreshingScores ? 'Refreshing…' : '↻ Refresh Scores'}
+          </button>
+        </div>
       </div>
 
       {message && (
@@ -298,7 +359,8 @@ export function AdminUsersContent(): React.ReactElement {
             <table className="table">
               <thead>
                 <tr>
-                  <th style={{ cursor: 'pointer', paddingLeft: 16 }} onClick={() => toggleSort('score')}>Score <SortIcon col="score" /></th>
+                  <th style={{ cursor: 'pointer', paddingLeft: 16 }} onClick={() => toggleSort('score')}>Eng. Score <SortIcon col="score" /></th>
+                  <th>Health</th>
                   <th style={{ cursor: 'pointer' }} onClick={() => toggleSort('email')}>User / Org <SortIcon col="email" /></th>
                   <th>Plan</th>
                   <th style={{ cursor: 'pointer' }} onClick={() => toggleSort('totalSpendGbp')}>Spend <SortIcon col="totalSpendGbp" /></th>
@@ -315,7 +377,21 @@ export function AdminUsersContent(): React.ReactElement {
                     <tr key={p.userId}>
                       <td style={{ paddingLeft: 16 }}><ScoreBadge score={p.score} /></td>
                       <td>
-                        <div style={{ fontSize: 13, fontWeight: 600 }}>{p.fullName ?? p.email}</div>
+                        {p.healthScore !== null && p.healthScoreLabel ? (
+                          <HealthBadge score={p.healthScore} label={p.healthScoreLabel} />
+                        ) : (
+                          <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>—</span>
+                        )}
+                      </td>
+                      <td>
+                        <div style={{ fontSize: 13, fontWeight: 600 }}>
+                          <Link
+                            href={`/admin/user360?email=${encodeURIComponent(p.email)}`}
+                            style={{ color: 'var(--accent)', textDecoration: 'none' }}
+                          >
+                            {p.fullName ?? p.email}
+                          </Link>
+                        </div>
                         <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{p.email}</div>
                         <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{p.orgName}</div>
                       </td>
@@ -364,7 +440,7 @@ export function AdminUsersContent(): React.ReactElement {
 
                     {expanded === p.userId && (
                       <tr key={`${p.userId}-detail`}>
-                        <td colSpan={9} style={{ padding: '20px 24px', background: 'var(--bg-secondary)', borderTop: '1px solid var(--border-light)' }}>
+                        <td colSpan={10} style={{ padding: '20px 24px', background: 'var(--bg-secondary)', borderTop: '1px solid var(--border-light)' }}>
                           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: 24 }}>
 
                             {/* Score breakdown */}
@@ -497,7 +573,7 @@ export function AdminUsersContent(): React.ReactElement {
 
                 {filtered.length === 0 && !loading && (
                   <tr>
-                    <td colSpan={9} style={{ textAlign: 'center', padding: 32, color: 'var(--text-muted)' }}>No users found.</td>
+                    <td colSpan={10} style={{ textAlign: 'center', padding: 32, color: 'var(--text-muted)' }}>No users found.</td>
                   </tr>
                 )}
               </tbody>

@@ -162,6 +162,78 @@ export default async function User360Page({
     return padL + i * groupW + Math.floor(groupW * 0.08)
   }
 
+  // ── Predictive Growth Chart ──────────────────────────────────────────────
+  const planMonitorLimit = activePlan?.monitor_limit ?? null
+
+  // Group existing monitors by month of creation
+  const creationByMonth: Record<string, number> = {}
+  for (const m of monitors) {
+    if (m.created_at) {
+      const key = m.created_at.slice(0, 7)
+      creationByMonth[key] = (creationByMonth[key] ?? 0) + 1
+    }
+  }
+
+  // Build 12 months array (oldest first)
+  const hist12Keys: string[] = []
+  for (let i = 11; i >= 0; i--) {
+    const d = new Date()
+    d.setDate(1)
+    d.setMonth(d.getMonth() - i)
+    hist12Keys.push(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`)
+  }
+
+  // Anchor: monitors that predate our 12-month window
+  const oldMonitorCount = monitors.filter(m => m.created_at && m.created_at.slice(0, 7) < hist12Keys[0]).length
+  type GrowthMonth = { key: string; label: string; newCount: number; runningTotal: number }
+  const growthMonths: GrowthMonth[] = []
+  let runningTotal = oldMonitorCount
+  for (const key of hist12Keys) {
+    const d = new Date(key + '-01')
+    const label = d.toLocaleString('en-GB', { month: 'short', year: '2-digit' })
+    const newCount = creationByMonth[key] ?? 0
+    runningTotal += newCount
+    growthMonths.push({ key, label, newCount, runningTotal })
+  }
+
+  // Linear regression: average monthly new monitors over last 3 months
+  const recentGrowthMonths = growthMonths.slice(-3)
+  const avgMonthlyGrowth = recentGrowthMonths.length > 0
+    ? recentGrowthMonths.reduce((s, m) => s + m.newCount, 0) / recentGrowthMonths.length
+    : 0
+
+  // Project 6 months forward
+  type ProjectedMonth = { key: string; label: string; projectedTotal: number; exceedsLimit: boolean }
+  const projectedMonths: ProjectedMonth[] = []
+  let projRunning = monitors.length // anchor at actual current count
+  for (let i = 1; i <= 6; i++) {
+    const d = new Date()
+    d.setDate(1)
+    d.setMonth(d.getMonth() + i)
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+    const label = d.toLocaleString('en-GB', { month: 'short', year: '2-digit' })
+    projRunning = Math.round(projRunning + avgMonthlyGrowth)
+    projectedMonths.push({
+      key, label, projectedTotal: projRunning,
+      exceedsLimit: planMonitorLimit !== null && projRunning > planMonitorLimit,
+    })
+  }
+  const limitCrossMonth = planMonitorLimit !== null ? projectedMonths.find(m => m.exceedsLimit) : null
+
+  // SVG line chart helpers for growth chart
+  const gcW = 580
+  const gcH = 160
+  const gcPadL = 36
+  const gcPadB = 30
+  const gcPadT = 16
+  const gcInnerW = gcW - gcPadL - 10
+  const gcInnerH = gcH - gcPadB - gcPadT
+  const allPoints = [...growthMonths.map(m => m.runningTotal), ...projectedMonths.map(m => m.projectedTotal), planMonitorLimit ?? 0]
+  const gcMaxVal = Math.max(...allPoints, 1)
+  const totalPoints = growthMonths.length + projectedMonths.length // 18 total
+  const gcPointX = (i: number) => gcPadL + Math.round((i / (totalPoints - 1)) * gcInnerW)
+  const gcPointY = (val: number) => gcPadT + gcInnerH - Math.round((val / gcMaxVal) * gcInnerH)
+
   return (
     <div>
       <div className="admin-page-header">
@@ -362,6 +434,175 @@ export default async function User360Page({
               Cost estimate based on {(costPerCheckMillipence / 10).toFixed(4)}p per check (Vercel invocation + DB write).
               Set <code>COST_PER_CHECK_MILLIPENCE</code> env var to adjust.
             </p>
+          </div>
+
+          {/* Predictive Growth Chart */}
+          <div className="card" style={{ padding: 20, marginBottom: 16 }}>
+            <h3 style={{ fontSize: 13, fontWeight: 700, marginBottom: 16, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-muted)' }}>
+              Monitor Growth &amp; Limit Forecast
+            </h3>
+
+            {/* KPI row */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 20 }}>
+              {[
+                {
+                  label: 'Current Monitors',
+                  value: String(monitors.length),
+                  sub: planMonitorLimit !== null ? `of ${planMonitorLimit} limit` : 'unlimited plan',
+                  color: planMonitorLimit !== null && monitors.length / planMonitorLimit > 0.8 ? '#ef4444' : 'var(--text-primary)',
+                },
+                {
+                  label: 'Avg Monthly Growth',
+                  value: avgMonthlyGrowth > 0 ? `+${avgMonthlyGrowth.toFixed(1)}` : '0',
+                  sub: 'monitors / month (3-mo avg)',
+                  color: avgMonthlyGrowth > 0 ? '#22c55e' : 'var(--text-muted)',
+                },
+                {
+                  label: 'In 6 Months',
+                  value: projectedMonths[5]
+                    ? String(projectedMonths[5].projectedTotal)
+                    : '—',
+                  sub: projectedMonths[5]?.exceedsLimit ? '⚠ over limit' : 'projected',
+                  color: projectedMonths[5]?.exceedsLimit ? '#ef4444' : 'var(--text-primary)',
+                },
+                {
+                  label: 'Limit Breach',
+                  value: limitCrossMonth ? limitCrossMonth.label : '—',
+                  sub: limitCrossMonth ? 'upgrade needed' : planMonitorLimit === null ? 'unlimited' : 'no breach forecast',
+                  color: limitCrossMonth ? '#ef4444' : '#22c55e',
+                },
+              ].map(s => (
+                <div key={s.label} style={{ background: 'var(--bg-secondary)', borderRadius: 10, padding: '12px 14px' }}>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{s.label}</div>
+                  <div style={{ fontSize: 20, fontWeight: 800, color: s.color }}>{s.value}</div>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>{s.sub}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Legend */}
+            <div style={{ display: 'flex', gap: 16, marginBottom: 8, fontSize: 11, color: 'var(--text-muted)' }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                <span style={{ width: 24, height: 3, background: '#3b82f6', display: 'inline-block', borderRadius: 2 }} /> Actual monitors
+              </span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                <span style={{ width: 24, height: 3, background: '#93c5fd', display: 'inline-block', borderRadius: 2, opacity: 0.7 }} /> Forecast (trend)
+              </span>
+              {planMonitorLimit !== null && (
+                <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                  <span style={{ width: 24, height: 3, background: '#ef4444', display: 'inline-block', borderRadius: 2 }} /> Plan limit
+                </span>
+              )}
+            </div>
+
+            {/* SVG line chart */}
+            <svg width="100%" viewBox={`0 0 ${gcW} ${gcH}`} style={{ overflow: 'visible', maxWidth: gcW }}>
+              {/* Gridlines */}
+              {[0, 0.25, 0.5, 0.75, 1].map(pct => {
+                const val = Math.round(gcMaxVal * pct)
+                const y = gcPointY(val)
+                return (
+                  <g key={pct}>
+                    <line x1={gcPadL} y1={y} x2={gcW - 10} y2={y}
+                      stroke="var(--border-light, #e2e8f0)" strokeWidth="1" strokeDasharray={pct === 0 ? '0' : '3,3'} />
+                    <text x={gcPadL - 4} y={y + 4} textAnchor="end" fontSize="9" fill="var(--text-muted, #94a3b8)">{val}</text>
+                  </g>
+                )
+              })}
+
+              {/* Plan limit line */}
+              {planMonitorLimit !== null && (
+                <>
+                  <line
+                    x1={gcPadL} y1={gcPointY(planMonitorLimit)}
+                    x2={gcW - 10} y2={gcPointY(planMonitorLimit)}
+                    stroke="#ef4444" strokeWidth="1.5" strokeDasharray="5,3" opacity="0.8"
+                  />
+                  <text x={gcW - 8} y={gcPointY(planMonitorLimit) - 4} textAnchor="end" fontSize="9" fill="#ef4444" fontWeight="600">
+                    limit ({planMonitorLimit})
+                  </text>
+                </>
+              )}
+
+              {/* Separator line between historical and projected */}
+              {growthMonths.length > 0 && (
+                <line
+                  x1={gcPointX(growthMonths.length - 1)} y1={gcPadT}
+                  x2={gcPointX(growthMonths.length - 1)} y2={gcPadT + gcInnerH}
+                  stroke="var(--border-light, #e2e8f0)" strokeWidth="1" strokeDasharray="4,2" opacity="0.7"
+                />
+              )}
+
+              {/* Historical area fill */}
+              {growthMonths.length > 1 && (() => {
+                const pts = growthMonths.map((m, i) => `${gcPointX(i)},${gcPointY(m.runningTotal)}`).join(' ')
+                const firstX = gcPointX(0)
+                const lastX = gcPointX(growthMonths.length - 1)
+                const baseY = gcPadT + gcInnerH
+                return (
+                  <polygon
+                    points={`${firstX},${baseY} ${pts} ${lastX},${baseY}`}
+                    fill="#3b82f6" opacity="0.08"
+                  />
+                )
+              })()}
+
+              {/* Historical line */}
+              {growthMonths.length > 1 && (
+                <polyline
+                  points={growthMonths.map((m, i) => `${gcPointX(i)},${gcPointY(m.runningTotal)}`).join(' ')}
+                  fill="none" stroke="#3b82f6" strokeWidth="2" strokeLinejoin="round"
+                />
+              )}
+
+              {/* Projected line (starts from last historical point) */}
+              {projectedMonths.length > 0 && growthMonths.length > 0 && (() => {
+                const lastHistIdx = growthMonths.length - 1
+                const lastHistVal = growthMonths[lastHistIdx].runningTotal
+                const projPts = [
+                  `${gcPointX(lastHistIdx)},${gcPointY(lastHistVal)}`,
+                  ...projectedMonths.map((m, i) => `${gcPointX(growthMonths.length + i)},${gcPointY(m.projectedTotal)}`),
+                ].join(' ')
+                return (
+                  <polyline
+                    points={projPts}
+                    fill="none" stroke="#93c5fd" strokeWidth="2" strokeDasharray="6,3" strokeLinejoin="round"
+                  />
+                )
+              })()}
+
+              {/* Historical dots */}
+              {growthMonths.map((m, i) => (
+                <circle key={m.key} cx={gcPointX(i)} cy={gcPointY(m.runningTotal)} r="3"
+                  fill="#3b82f6" />
+              ))}
+
+              {/* Projected dots — red if over limit */}
+              {projectedMonths.map((m, i) => (
+                <circle key={m.key} cx={gcPointX(growthMonths.length + i)} cy={gcPointY(m.projectedTotal)} r="3"
+                  fill={m.exceedsLimit ? '#ef4444' : '#93c5fd'} />
+              ))}
+
+              {/* X-axis labels — show every other month to avoid crowding */}
+              {[...growthMonths, ...projectedMonths].map((m, i) => {
+                if (i % 3 !== 0 && i !== growthMonths.length - 1 + projectedMonths.length) return null
+                const isProj = i >= growthMonths.length
+                return (
+                  <text key={m.key} x={gcPointX(i)} y={gcH - 4}
+                    textAnchor="middle" fontSize="9"
+                    fill={isProj ? '#93c5fd' : 'var(--text-muted, #94a3b8)'}
+                  >
+                    {m.label}
+                  </text>
+                )
+              })}
+            </svg>
+
+            {monitors.length === 0 && (
+              <p style={{ fontSize: 12, color: 'var(--text-muted)', textAlign: 'center', marginTop: 8 }}>
+                No monitors yet — growth chart will populate as monitors are added.
+              </p>
+            )}
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
