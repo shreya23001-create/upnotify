@@ -60,29 +60,37 @@ export default async function User360Page({
   }
 
   // ── Load all data in parallel ────────────────────────────────────────────
-  const [orgResult, usersResult, subsResult, invoicesResult, monitorsResult, incidentsResult] =
+  const [orgResult, usersResult, subsResult, invoicesResult, monitorsResult, incidentsResult, statusPagesResult, alertChannelsResult, auditLogResult] =
     orgId
       ? await Promise.all([
           supabase.from('organisations').select('*').eq('id', orgId).single(),
           supabase.from('users').select('id, email, full_name, created_at, last_sign_in_at, is_super_admin').eq('org_id', orgId),
-          supabase.from('subscriptions').select('id, status, billing_cycle, current_period_end, created_at, plans(name, slug, price_monthly_gbp)').eq('org_id', orgId).order('created_at', { ascending: false }),
+          supabase.from('subscriptions').select('id, status, billing_cycle, current_period_end, created_at, plans(name, slug, price_monthly_gbp, monitor_limit, check_interval_seconds, status_page_limit, has_slack_teams, has_webhooks, has_api_access, ai_report_limit, max_team_members)').eq('org_id', orgId).order('created_at', { ascending: false }),
           supabase.from('invoices').select('id, amount_gbp, currency, status, invoice_pdf_url, created_at, period_start').eq('org_id', orgId).order('created_at', { ascending: false }).limit(10),
           supabase.from('monitors').select('id, name, url, status, check_type, created_at').eq('org_id', orgId).order('created_at', { ascending: false }),
           supabase.from('incidents').select('id, started_at, resolved_at, cause').eq('org_id', orgId).order('started_at', { ascending: false }).limit(5),
+          supabase.from('status_pages').select('id, title, slug, is_published').eq('org_id', orgId),
+          supabase.from('alert_channels').select('id, type, is_enabled').eq('org_id', orgId),
+          supabase.from('audit_log').select('id, action, resource_type, resource_id, created_at, metadata, user_id').eq('org_id', orgId).order('created_at', { ascending: false }).limit(50),
         ])
-      : Array(6).fill({ data: null, error: null, count: null })
+      : Array(9).fill({ data: null, error: null, count: null })
 
   const org = orgResult.data as Record<string, unknown> | null
   const users = (usersResult.data ?? []) as Array<{ id: string; email: string; full_name: string | null; created_at: string; last_sign_in_at: string | null; is_super_admin: boolean }>
-  const subs = (subsResult.data ?? []) as Array<{ id: string; status: string; billing_cycle: string; current_period_end: string | null; created_at: string; plans: { name: string; slug: string; price_monthly_gbp: number } | null }>
+  const subs = (subsResult.data ?? []) as Array<{ id: string; status: string; billing_cycle: string; current_period_end: string | null; created_at: string; plans: { name: string; slug: string; price_monthly_gbp: number; monitor_limit: number | null; check_interval_seconds: number; status_page_limit: number | null; has_slack_teams: boolean; has_webhooks: boolean; has_api_access: boolean; ai_report_limit: number | null; max_team_members: number | null } | null }>
   const invoices = (invoicesResult.data ?? []) as Array<{ id: string; amount_gbp: number; currency: string; status: string; invoice_pdf_url: string | null; created_at: string; period_start: string | null }>
   const monitors = (monitorsResult.data ?? []) as Array<{ id: string; name: string; url: string; status: string; check_type: string; created_at: string }>
   const incidents = (incidentsResult.data ?? []) as Array<{ id: string; started_at: string; resolved_at: string | null; cause: string | null }>
+  const statusPages = (statusPagesResult.data ?? []) as Array<{ id: string; title: string; slug: string; is_published: boolean }>
+  const alertChannels = (alertChannelsResult.data ?? []) as Array<{ id: string; type: string; is_enabled: boolean }>
+  const auditLog = (auditLogResult.data ?? []) as Array<{ id: string; action: string; resource_type: string | null; resource_id: string | null; created_at: string; metadata: Record<string, unknown> | null; user_id: string | null }>
 
   const activeSub = subs.find(s => s.status === 'active')
+  const activePlan = activeSub?.plans ?? null
   const monitorUpCount = monitors.filter(m => m.status === 'up').length
   const monitorDownCount = monitors.filter(m => m.status === 'down').length
   const totalRevenue = invoices.filter(i => i.status === 'paid').reduce((sum, i) => sum + (i.amount_gbp ?? 0), 0)
+  const enabledChannelTypes = new Set(alertChannels.filter(c => c.is_enabled).map(c => c.type))
 
   return (
     <div>
@@ -298,6 +306,127 @@ export default async function User360Page({
                   ))}
                 </tbody>
               </table>
+            )}
+          </div>
+
+          {/* Plan Enforcement Panel */}
+          <div className="card" style={{ padding: 16, marginBottom: 16 }}>
+            <h3 style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-muted)' }}>
+              Plan Limits vs Actual Usage
+            </h3>
+            {!activePlan ? (
+              <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>Free plan — no subscription limits configured.</p>
+            ) : (
+              <table className="table">
+                <thead>
+                  <tr><th>Feature</th><th>Plan Limit</th><th>Actual Usage</th><th>Status</th></tr>
+                </thead>
+                <tbody>
+                  {[
+                    {
+                      feature: 'Monitors',
+                      limit: activePlan.monitor_limit ? String(activePlan.monitor_limit) : 'Unlimited',
+                      used: String(monitors.length),
+                      ok: !activePlan.monitor_limit || monitors.length <= activePlan.monitor_limit,
+                    },
+                    {
+                      feature: 'Check Interval',
+                      limit: activePlan.check_interval_seconds >= 60 ? `${activePlan.check_interval_seconds / 60} min` : `${activePlan.check_interval_seconds}s`,
+                      used: '—',
+                      ok: true,
+                    },
+                    {
+                      feature: 'Status Pages',
+                      limit: activePlan.status_page_limit ? String(activePlan.status_page_limit) : 'Unlimited',
+                      used: String(statusPages.length),
+                      ok: !activePlan.status_page_limit || statusPages.length <= activePlan.status_page_limit,
+                    },
+                    {
+                      feature: 'Slack / Teams Alerts',
+                      limit: activePlan.has_slack_teams ? 'Allowed' : 'Blocked',
+                      used: enabledChannelTypes.has('slack') || enabledChannelTypes.has('teams') ? 'Active' : 'Not used',
+                      ok: activePlan.has_slack_teams || (!enabledChannelTypes.has('slack') && !enabledChannelTypes.has('teams')),
+                    },
+                    {
+                      feature: 'Webhooks',
+                      limit: activePlan.has_webhooks ? 'Allowed' : 'Blocked',
+                      used: enabledChannelTypes.has('webhook') ? 'Active' : 'Not used',
+                      ok: activePlan.has_webhooks || !enabledChannelTypes.has('webhook'),
+                    },
+                    {
+                      feature: 'API Access',
+                      limit: activePlan.has_api_access ? 'Allowed' : 'Blocked',
+                      used: '—',
+                      ok: true,
+                    },
+                    {
+                      feature: 'AI Reports',
+                      limit: activePlan.ai_report_limit ? `${activePlan.ai_report_limit}/month` : 'Unlimited',
+                      used: '—',
+                      ok: true,
+                    },
+                    {
+                      feature: 'Team Members',
+                      limit: activePlan.max_team_members ? String(activePlan.max_team_members) : 'Unlimited',
+                      used: String(users.length),
+                      ok: !activePlan.max_team_members || users.length <= activePlan.max_team_members,
+                    },
+                  ].map(row => (
+                    <tr key={row.feature}>
+                      <td style={{ fontWeight: 500, fontSize: 13 }}>{row.feature}</td>
+                      <td style={{ fontSize: 13, color: 'var(--text-muted)' }}>{row.limit}</td>
+                      <td style={{ fontSize: 13, fontWeight: 600 }}>{row.used}</td>
+                      <td>
+                        <span className={`badge ${row.ok ? 'badge-success' : 'badge-danger'}`}>
+                          {row.ok ? 'OK' : 'OVER LIMIT'}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+
+          {/* Activity Log */}
+          <div className="card" style={{ padding: 16, marginBottom: 16 }}>
+            <h3 style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-muted)' }}>
+              Activity Log <span style={{ fontWeight: 400, fontSize: 11, color: 'var(--text-muted)' }}>(last 50 events)</span>
+            </h3>
+            {auditLog.length === 0 ? (
+              <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>No activity recorded yet.</p>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+                {auditLog.map((entry, i) => {
+                  const isAdmin = entry.action.startsWith('admin.')
+                  const isBilling = entry.action.includes('billing') || entry.action.includes('subscription') || entry.action.includes('plan')
+                  const isAuth = entry.action.includes('login') || entry.action.includes('logout') || entry.action.includes('imperson')
+                  const dotColor = isAdmin ? 'var(--color-warning, #f59e0b)' : isBilling ? 'var(--success)' : isAuth ? 'var(--accent)' : 'var(--text-muted)'
+                  return (
+                    <div key={entry.id} style={{ display: 'flex', gap: 12, padding: '8px 0', borderBottom: i < auditLog.length - 1 ? '1px solid var(--border-light)' : 'none' }}>
+                      <div style={{ width: 8, height: 8, borderRadius: '50%', background: dotColor, marginTop: 5, flexShrink: 0 }} />
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
+                          <span style={{ fontSize: 13, fontWeight: 600, fontFamily: 'monospace', color: isAdmin ? 'var(--color-warning, #f59e0b)' : 'var(--text-primary)' }}>
+                            {entry.action}
+                          </span>
+                          <span style={{ fontSize: 11, color: 'var(--text-muted)', whiteSpace: 'nowrap', flexShrink: 0 }}>{fmtDateTime(entry.created_at)}</span>
+                        </div>
+                        {entry.resource_type && (
+                          <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
+                            {entry.resource_type}{entry.resource_id ? ` · ${entry.resource_id.slice(0, 8)}…` : ''}
+                          </div>
+                        )}
+                        {entry.metadata && Object.keys(entry.metadata).length > 0 && (
+                          <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
+                            {Object.entries(entry.metadata).filter(([k]) => !['error'].includes(k)).map(([k, v]) => `${k}: ${String(v)}`).join(' · ')}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
             )}
           </div>
 
