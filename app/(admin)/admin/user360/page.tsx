@@ -70,7 +70,7 @@ export default async function User360Page({
           supabase.from('users').select('id, email, full_name, created_at, last_sign_in_at, is_super_admin').eq('org_id', orgId),
           supabase.from('subscriptions').select('id, status, billing_cycle, current_period_end, created_at, plans(name, slug, price_monthly_gbp, price_annual_gbp, monitor_limit, check_interval_seconds, status_page_limit, has_slack_teams, has_webhooks, has_api_access, ai_report_limit, max_team_members)').eq('org_id', orgId).order('created_at', { ascending: false }),
           supabase.from('invoices').select('id, amount_gbp, currency, status, invoice_pdf_url, created_at, period_start').eq('org_id', orgId).order('created_at', { ascending: false }).limit(10),
-          supabase.from('monitors').select('id, name, url, status, check_type, check_interval_seconds, is_paused, created_at').eq('org_id', orgId).order('created_at', { ascending: false }),
+          supabase.from('monitors').select('id, name, url, status, type, check_interval_seconds, is_paused, created_at').eq('org_id', orgId).order('created_at', { ascending: false }),
           supabase.from('incidents').select('id, started_at, resolved_at, cause').eq('org_id', orgId).order('started_at', { ascending: false }).limit(5),
           supabase.from('status_pages').select('id, title, slug, is_published').eq('org_id', orgId),
           supabase.from('alert_channels').select('id, type, is_enabled').eq('org_id', orgId),
@@ -83,7 +83,7 @@ export default async function User360Page({
   const users = (usersResult.data ?? []) as Array<{ id: string; email: string; full_name: string | null; created_at: string; last_sign_in_at: string | null; is_super_admin: boolean }>
   const subs = (subsResult.data ?? []) as Array<{ id: string; status: string; billing_cycle: string; current_period_end: string | null; created_at: string; plans: { name: string; slug: string; price_monthly_gbp: number; price_annual_gbp: number | null; monitor_limit: number | null; check_interval_seconds: number; status_page_limit: number | null; has_slack_teams: boolean; has_webhooks: boolean; has_api_access: boolean; ai_report_limit: number | null; max_team_members: number | null } | null }>
   const invoices = (invoicesResult.data ?? []) as Array<{ id: string; amount_gbp: number; currency: string; status: string; invoice_pdf_url: string | null; created_at: string; period_start: string | null }>
-  const monitors = (monitorsResult.data ?? []) as Array<{ id: string; name: string; url: string; status: string; check_type: string; check_interval_seconds: number; is_paused: boolean; created_at: string }>
+  const monitors = (monitorsResult.data ?? []) as Array<{ id: string; name: string; url: string; status: string; type: string; check_interval_seconds: number; is_paused: boolean; created_at: string }>
   const incidents = (incidentsResult.data ?? []) as Array<{ id: string; started_at: string; resolved_at: string | null; cause: string | null }>
   const statusPages = (statusPagesResult.data ?? []) as Array<{ id: string; title: string; slug: string; is_published: boolean }>
   const alertChannels = (alertChannelsResult.data ?? []) as Array<{ id: string; type: string; is_enabled: boolean }>
@@ -505,7 +505,7 @@ export default async function User360Page({
                     <tr key={m.id}>
                       <td style={{ fontWeight: 600, fontSize: 13 }}>{m.name}</td>
                       <td style={{ fontSize: 12, color: 'var(--text-muted)', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.url}</td>
-                      <td style={{ fontSize: 12 }}>{m.check_type}</td>
+                      <td style={{ fontSize: 12 }}>{m.type}</td>
                       <td>
                         <span className={`badge ${m.status === 'up' ? 'badge-success' : m.status === 'down' ? 'badge-danger' : 'badge-neutral'}`}>
                           {m.status}
