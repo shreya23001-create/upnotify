@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { getCurrentUser } from '@/lib/db/users'
 import { createCompetitorMonitor, deleteCompetitorMonitor } from '@/lib/db/competitor-monitors'
 import { checkCompetitorLimit } from '@/lib/utils/plan-limits'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
@@ -42,7 +43,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }
 
     // Check for duplicate before insert (friendlier error than a 500)
-    const { createAdminClient } = await import('@/lib/supabase/admin')
     const adminDb = createAdminClient()
     const { count: existCount } = await adminDb
       .from('competitor_monitors')

@@ -7,13 +7,14 @@ import { KeywordTagInput } from './keyword-tag-input'
 import { getKeywordSuggestions } from '@/lib/utils/keyword-suggestions'
 import type { Monitor } from '@/lib/types'
 
-const intervals = [
-  { value: '60', label: 'Every 1 minute' },
-  { value: '180', label: 'Every 3 minutes' },
-  { value: '300', label: 'Every 5 minutes' },
-  { value: '600', label: 'Every 10 minutes' },
-  { value: '1800', label: 'Every 30 minutes' },
-  { value: '3600', label: 'Every 1 hour' },
+const ALL_INTERVALS = [
+  { value: 30, label: 'Every 30 seconds' },
+  { value: 60, label: 'Every 1 minute' },
+  { value: 180, label: 'Every 3 minutes' },
+  { value: 300, label: 'Every 5 minutes' },
+  { value: 600, label: 'Every 10 minutes' },
+  { value: 1800, label: 'Every 30 minutes' },
+  { value: 3600, label: 'Every 1 hour' },
 ]
 
 interface MonitorConfig {
@@ -50,7 +51,8 @@ function resolveKeywordConfig(config: MonitorConfig): { positive: string[]; nega
   return { positive, negative }
 }
 
-export function EditMonitorForm({ monitor }: { monitor: Monitor }): React.ReactElement {
+export function EditMonitorForm({ monitor, minCheckInterval = 600 }: { monitor: Monitor; minCheckInterval?: number }): React.ReactElement {
+  const intervals = ALL_INTERVALS.filter(i => i.value >= minCheckInterval)
   const config = monitor.config as MonitorConfig
   const resolved = resolveKeywordConfig(config)
   const [error, setError] = useState<string | null>(null)
@@ -114,7 +116,7 @@ export function EditMonitorForm({ monitor }: { monitor: Monitor }): React.ReactE
       <div className="form-group">
         <label className="form-label" htmlFor="check_interval_seconds">Check Interval</label>
         <select className="form-select" id="check_interval_seconds" name="check_interval_seconds" defaultValue={String(monitor.check_interval_seconds)} disabled={isPending}>
-          {intervals.map(i => <option key={i.value} value={i.value}>{i.label}</option>)}
+          {intervals.map(i => <option key={i.value} value={String(i.value)}>{i.label}</option>)}
         </select>
       </div>
 

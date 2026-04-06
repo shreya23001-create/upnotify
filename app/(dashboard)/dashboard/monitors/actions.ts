@@ -5,7 +5,7 @@ import { revalidatePath } from 'next/cache'
 import { createMonitor, updateMonitor, deleteMonitor, pauseMonitor, resumeMonitor, bulkDeleteMonitors, bulkUpdateMonitorStatus, getMonitorById } from '@/lib/db/monitors'
 import { getCurrentUser } from '@/lib/db/users'
 import { getWorkspacesByOrg } from '@/lib/db/workspaces'
-import { checkMonitorLimit } from '@/lib/utils/plan-limits'
+import { checkMonitorLimit, getPlanLimits } from '@/lib/utils/plan-limits'
 import { logger } from '@/lib/utils/logger'
 import { devAuditLog } from '@/lib/db/audit'
 import { impersonationGuard } from '@/lib/auth/impersonation-guard'
@@ -22,7 +22,10 @@ export async function createMonitorAction(formData: FormData): Promise<{ error?:
   if (!workspace) return { error: 'No workspace found' }
 
   // Check plan limits
-  const limitCheck = await checkMonitorLimit(user.org_id)
+  const [limitCheck, planLimits] = await Promise.all([
+    checkMonitorLimit(user.org_id),
+    getPlanLimits(user.org_id),
+  ])
   if (!limitCheck.allowed) {
     return { error: `Monitor limit reached (${limitCheck.currentCount}/${limitCheck.limit}). Upgrade your plan to add more monitors.` }
   }
@@ -81,13 +84,20 @@ export async function createMonitorAction(formData: FormData): Promise<{ error?:
     config.body = formData.get('body') as string || undefined
   }
 
+  // Enforce plan minimum check interval
+  const requestedInterval = intervalStr ? parseInt(intervalStr, 10) : planLimits.checkIntervalSeconds
+  const minInterval = planLimits.checkIntervalSeconds
+  if (requestedInterval < minInterval) {
+    return { error: `Your plan requires a minimum check interval of ${minInterval >= 60 ? `${minInterval / 60} minute${minInterval > 60 ? 's' : ''}` : `${minInterval} seconds`}. Upgrade to check more frequently.` }
+  }
+
   const monitor = await createMonitor({
     org_id: user.org_id,
     workspace_id: workspace.id,
     name,
     type,
     target,
-    check_interval_seconds: intervalStr ? parseInt(intervalStr, 10) : 300,
+    check_interval_seconds: requestedInterval,
     severity,
     config,
   })
@@ -198,10 +208,22 @@ export async function updateMonitorAction(monitorId: string, formData: FormData)
     config.body = formData.get('body') as string || undefined
   }
 
+  // Enforce plan minimum check interval on update too
+  let updateInterval: number | undefined
+  if (intervalStr) {
+    const planLimitsForUpdate = await getPlanLimits(user.org_id)
+    const requested = parseInt(intervalStr, 10)
+    const minInt = planLimitsForUpdate.checkIntervalSeconds
+    if (requested < minInt) {
+      return { error: `Your plan requires a minimum check interval of ${minInt >= 60 ? `${minInt / 60} minute${minInt > 60 ? 's' : ''}` : `${minInt} seconds`}. Upgrade to check more frequently.` }
+    }
+    updateInterval = requested
+  }
+
   const monitor = await updateMonitor(monitorId, {
     name,
     target,
-    check_interval_seconds: intervalStr ? parseInt(intervalStr, 10) : undefined,
+    check_interval_seconds: updateInterval,
     severity: severity || undefined,
     config: Object.keys(config).length > 0 ? config : undefined,
   })

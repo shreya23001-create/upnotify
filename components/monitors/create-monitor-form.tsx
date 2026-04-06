@@ -19,16 +19,19 @@ const monitorTypes = [
   { value: 'competitor', label: 'Page Change Detection' },
 ]
 
-const intervals = [
-  { value: '60', label: 'Every 1 minute' },
-  { value: '180', label: 'Every 3 minutes' },
-  { value: '300', label: 'Every 5 minutes' },
-  { value: '600', label: 'Every 10 minutes' },
-  { value: '1800', label: 'Every 30 minutes' },
-  { value: '3600', label: 'Every 1 hour' },
+const ALL_INTERVALS = [
+  { value: 30, label: 'Every 30 seconds' },
+  { value: 60, label: 'Every 1 minute' },
+  { value: 180, label: 'Every 3 minutes' },
+  { value: 300, label: 'Every 5 minutes' },
+  { value: 600, label: 'Every 10 minutes' },
+  { value: 1800, label: 'Every 30 minutes' },
+  { value: 3600, label: 'Every 1 hour' },
 ]
 
-export function CreateMonitorForm(): React.ReactElement {
+export function CreateMonitorForm({ minCheckInterval = 600 }: { minCheckInterval?: number }): React.ReactElement {
+  // Only show intervals allowed by the plan
+  const intervals = ALL_INTERVALS.filter(i => i.value >= minCheckInterval)
   const [type, setType] = useState('http')
   const [target, setTarget] = useState('')
   const [positiveKeywords, setPositiveKeywords] = useState<string[]>([])
@@ -153,9 +156,23 @@ export function CreateMonitorForm(): React.ReactElement {
 
       <div className="form-group">
         <label className="form-label" htmlFor="check_interval_seconds">Check Interval</label>
-        <select className="form-select" id="check_interval_seconds" name="check_interval_seconds" disabled={isPending}>
-          {intervals.map(i => <option key={i.value} value={i.value}>{i.label}</option>)}
+        <select
+          className="form-select"
+          id="check_interval_seconds"
+          name="check_interval_seconds"
+          defaultValue={String(minCheckInterval)}
+          disabled={isPending}
+        >
+          {intervals.map(i => (
+            <option key={i.value} value={String(i.value)}>{i.label}</option>
+          ))}
         </select>
+        {minCheckInterval > 60 && (
+          <span className="form-helper-text">
+            Your plan supports a minimum of {minCheckInterval >= 60 ? `${minCheckInterval / 60} minute${minCheckInterval > 60 ? 's' : ''}` : `${minCheckInterval}s`} intervals.{' '}
+            <a href="/dashboard/settings?tab=billing" style={{ color: 'var(--accent)', textDecoration: 'underline' }}>Upgrade for faster checks.</a>
+          </span>
+        )}
       </div>
 
       <div className="form-group">
