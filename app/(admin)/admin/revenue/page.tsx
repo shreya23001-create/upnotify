@@ -291,7 +291,9 @@ export default function AdminRevenuePage(): React.ReactElement {
                     <tr key={inv.id}>
                       <td style={{ fontSize: 12, whiteSpace: 'nowrap' }}>{fmtDate(inv.created_at)}</td>
                       <td>
-                        <div style={{ fontSize: 13, fontWeight: 600 }}>{inv.orgName || '—'}</div>
+                        <a href={`/admin/user360?org_id=${inv.org_id}`} style={{ fontSize: 13, fontWeight: 600, color: 'var(--accent)', textDecoration: 'none' }}>
+                          {inv.orgName || '—'}
+                        </a>
                         <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{inv.userEmail || '—'}</div>
                       </td>
                       <td style={{ fontSize: 12 }}>

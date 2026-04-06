@@ -210,6 +210,13 @@ export async function GET(request: Request): Promise<NextResponse> {
   const total      = invoiceCount ?? 0
   const totalPages = Math.ceil(total / limit)
 
+  // Build org → plan lookup so invoices without a subscription_id (one-time, Lite annual)
+  // still show the org's current plan rather than "—"
+  const planByOrgId = new Map<string, { name: string; billing_cycle: string }>()
+  for (const sub of subs) {
+    if (sub.plans) planByOrgId.set(sub.org_id, { name: sub.plans.name, billing_cycle: sub.billing_cycle })
+  }
+
   const enrichedInvoices: EnrichedInvoice[] = invoices.map(inv => ({
     id:              inv.id,
     org_id:          inv.org_id,
@@ -222,8 +229,8 @@ export async function GET(request: Request): Promise<NextResponse> {
     period_start:    inv.period_start,
     period_end:      inv.period_end,
     created_at:      inv.created_at,
-    planName:        inv.subscriptions?.plans?.name ?? null,
-    billingCycle:    inv.subscriptions?.billing_cycle ?? null,
+    planName:        inv.subscriptions?.plans?.name ?? planByOrgId.get(inv.org_id)?.name ?? null,
+    billingCycle:    inv.subscriptions?.billing_cycle ?? planByOrgId.get(inv.org_id)?.billing_cycle ?? null,
   }))
 
   // -------------------------------------------------------------------------
