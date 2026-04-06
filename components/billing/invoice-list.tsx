@@ -16,13 +16,15 @@ export function InvoiceList({ invoices }: { invoices: Invoice[] }) {
         {i.status}
       </span>
     )},
-    { key: 'period_start', label: 'Period', render: (i) => (
-      <span className="table-muted">
-        {i.period_start ? new Date(i.period_start).toLocaleDateString() : '\u2014'}
-        {' \u2014 '}
-        {i.period_end ? new Date(i.period_end).toLocaleDateString() : '\u2014'}
-      </span>
-    )},
+    { key: 'period_start', label: 'Billing Period', render: (i) => {
+      if (!i.period_start || !i.period_end) return <span className="table-muted">{'\u2014'}</span>
+      const start = new Date(i.period_start)
+      const end = new Date(i.period_end)
+      const fmt = (d: Date) => d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+      // Same day = data not yet updated; just show the date without a range
+      if (start.toDateString() === end.toDateString()) return <span className="table-muted">{fmt(start)}</span>
+      return <span className="table-muted">{fmt(start)} → {fmt(end)}</span>
+    }},
     { key: 'invoice_pdf_url', label: '', sortable: false, searchable: false, render: (i) => (
       i.invoice_pdf_url ? (
         <a href={i.invoice_pdf_url} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-secondary">

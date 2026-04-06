@@ -174,6 +174,12 @@ async function handleInvoicePaid(
   const subId = (invoice.subscription as string | null) ?? null
   let subscriptionRecordId: string | undefined
 
+  // Fetch the Stripe subscription to get accurate billing period dates.
+  // invoice.period_start/end is the invoice-creation timestamp for new subs
+  // (both equal to "now"). The subscription's current_period_* is correct.
+  let periodStart: string | null = null
+  let periodEnd: string | null = null
+
   if (subId) {
     const { data } = await supabase
       .from('subscriptions')
@@ -181,6 +187,29 @@ async function handleInvoicePaid(
       .eq('stripe_subscription_id', subId)
       .single()
     subscriptionRecordId = data?.id
+
+    try {
+      const stripeSub = await getStripe().subscriptions.retrieve(subId)
+      const sub = stripeSub as unknown as { current_period_start: number; current_period_end: number }
+      periodStart = new Date(sub.current_period_start * 1000).toISOString()
+      periodEnd = new Date(sub.current_period_end * 1000).toISOString()
+    } catch {
+      // Fall back to invoice-level period if subscription retrieval fails
+      periodStart = invoice.period_start ? new Date((invoice.period_start as number) * 1000).toISOString() : null
+      periodEnd = invoice.period_end ? new Date((invoice.period_end as number) * 1000).toISOString() : null
+    }
+  }
+
+  // Avoid duplicate invoice records (Stripe may retry)
+  const { data: existing } = await supabase
+    .from('invoices')
+    .select('id')
+    .eq('stripe_invoice_id', invoice.id as string)
+    .maybeSingle()
+
+  if (existing) {
+    logger.info('Invoice already recorded, skipping', { invoiceId: invoice.id })
+    return
   }
 
   await supabase.from('invoices').insert({
@@ -191,12 +220,8 @@ async function handleInvoicePaid(
     currency: ((invoice.currency as string) ?? 'gbp').toLowerCase(),
     status: 'paid',
     invoice_pdf_url: (invoice.invoice_pdf as string) ?? null,
-    period_start: invoice.period_start
-      ? new Date((invoice.period_start as number) * 1000).toISOString()
-      : null,
-    period_end: invoice.period_end
-      ? new Date((invoice.period_end as number) * 1000).toISOString()
-      : null,
+    period_start: periodStart,
+    period_end: periodEnd,
   })
 
   logger.info('Invoice recorded', {

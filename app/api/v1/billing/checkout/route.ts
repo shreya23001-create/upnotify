@@ -79,6 +79,18 @@ export async function POST(request: Request): Promise<NextResponse> {
     const stripe = getStripe()
     const customerId = await ensureStripeCustomer(org.id, user.email, org.name)
 
+    // Cancel ALL existing Stripe subscriptions for this customer before creating a new one.
+    // This prevents accumulation when the webhook hasn't fired and the DB is out of sync.
+    try {
+      const existingSubs = await stripe.subscriptions.list({ customer: customerId, status: 'active', limit: 10 })
+      for (const sub of existingSubs.data) {
+        await stripe.subscriptions.cancel(sub.id)
+        logger.info('Cancelled existing Stripe subscription before new checkout', { subId: sub.id, customerId, orgId: org.id })
+      }
+    } catch (err) {
+      logger.warn('Failed to cancel existing Stripe subscriptions before checkout', { customerId, error: String(err) })
+    }
+
     logger.info('Creating checkout session', { appUrl, stripePriceId, customerId, orgId: org.id, planSlug: plan.slug })
 
     const session = await stripe.checkout.sessions.create({
