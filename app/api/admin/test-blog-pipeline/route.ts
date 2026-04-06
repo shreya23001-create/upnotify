@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { getConfig } from '@/lib/utils/config'
+import { getConfig, getServerConfig } from '@/lib/utils/config'
 import { researchOutage } from '@/lib/services/outage-researcher'
 import { generateOutageBlogPost } from '@/lib/services/blog-generator'
 import { sendBlogApprovalEmail } from '@/lib/services/email'
 import { sendBlogApprovalTelegram } from '@/lib/services/telegram'
+import Anthropic from '@anthropic-ai/sdk'
 
 /**
  * POST /api/admin/test-blog-pipeline
@@ -30,6 +31,25 @@ export async function POST(request: Request): Promise<NextResponse> {
   const body = await request.json().catch(() => ({})) as { siteName?: string; domain?: string }
   const siteName = body.siteName ?? 'GitHub'
   const domain = body.domain ?? 'github.com'
+
+  // Step 0: Verify Claude API key works
+  const serverConfig = getServerConfig()
+  if (!serverConfig.anthropic.apiKey) {
+    return NextResponse.json({ error: 'ANTHROPIC_API_KEY not set in environment' }, { status: 500 })
+  }
+  try {
+    const testClient = new Anthropic({ apiKey: serverConfig.anthropic.apiKey })
+    await testClient.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 10,
+      messages: [{ role: 'user', content: 'hi' }],
+    })
+  } catch (err) {
+    return NextResponse.json({
+      error: 'Claude API call failed',
+      detail: err instanceof Error ? err.message : String(err),
+    }, { status: 500 })
+  }
 
   // Use a unique fake incident ID so dedup doesn't block re-runs
   const fakeIncidentId = `test-${Date.now()}`
