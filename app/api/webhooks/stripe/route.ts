@@ -66,85 +66,82 @@ async function handleCheckoutCompleted(
     // Handle base plan checkout
     const planSlug = session.metadata?.plan_slug
 
-    if (orgId && planSlug && session.subscription) {
-      const { data: plan } = await supabase
-        .from('plans')
-        .select('id, name')
-        .eq('slug', planSlug)
-        .single()
+    logger.info('checkout.session.completed: base plan', {
+      orgId, planSlug,
+      subscriptionId: session.subscription,
+      sessionId: session.id,
+    })
 
-      if (plan) {
-        // Fetch old active subscriptions BEFORE canceling them in DB,
-        // so we can cancel them in Stripe too (prevents double-billing on upgrade)
-        const { data: oldSubs } = await supabase
-          .from('subscriptions')
-          .select('stripe_subscription_id')
-          .eq('org_id', orgId)
-          .eq('status', 'active')
+    if (!orgId) { logger.error('checkout: missing org_id in metadata', { sessionId: session.id }); return }
+    if (!planSlug) { logger.error('checkout: missing plan_slug in metadata', { sessionId: session.id }); return }
+    if (!session.subscription) { logger.error('checkout: missing subscription on session', { sessionId: session.id }); return }
 
-        // Cancel old Stripe subscriptions to stop double-billing
-        if (oldSubs && oldSubs.length > 0) {
-          for (const oldSub of oldSubs) {
-            const oldStripeId = oldSub.stripe_subscription_id as string | null
-            if (oldStripeId && oldStripeId !== (session.subscription as string)) {
-              try {
-                await getStripe().subscriptions.cancel(oldStripeId)
-                logger.info('Cancelled old Stripe subscription on upgrade', {
-                  oldStripeSubId: oldStripeId,
-                  newStripeSubId: session.subscription,
-                  orgId,
-                })
-              } catch (err) {
-                logger.error('Failed to cancel old Stripe subscription on upgrade', {
-                  oldStripeSubId: oldStripeId,
-                  orgId,
-                  error: err instanceof Error ? err.message : 'Unknown',
-                })
-              }
-            }
-          }
+    const { data: plan, error: planError } = await supabase
+      .from('plans')
+      .select('id, name')
+      .eq('slug', planSlug)
+      .single()
+
+    if (planError || !plan) {
+      logger.error('checkout: plan not found in DB', { planSlug, error: planError?.message })
+      return
+    }
+
+    logger.info('checkout: plan found', { planId: plan.id, planName: plan.name })
+
+    // Cancel old Stripe subscriptions to stop double-billing
+    const { data: oldSubs } = await supabase
+      .from('subscriptions')
+      .select('stripe_subscription_id')
+      .eq('org_id', orgId)
+      .eq('status', 'active')
+
+    for (const oldSub of (oldSubs ?? [])) {
+      const oldStripeId = oldSub.stripe_subscription_id as string | null
+      if (oldStripeId && oldStripeId !== (session.subscription as string)) {
+        try {
+          await getStripe().subscriptions.cancel(oldStripeId)
+          logger.info('checkout: cancelled old Stripe subscription', { oldStripeId, orgId })
+        } catch (err) {
+          logger.error('checkout: failed to cancel old Stripe sub', { oldStripeId, error: String(err) })
         }
-
-        // Cancel any existing base subscription for this org (upgrade/change scenario)
-        await supabase
-          .from('subscriptions')
-          .update({ status: 'canceled', canceled_at: new Date().toISOString() })
-          .eq('org_id', orgId)
-          .eq('status', 'active')
-
-        const subResponse = await getStripe().subscriptions.retrieve(
-          session.subscription as string
-        )
-        const sub = 'data' in subResponse ? subResponse.data : subResponse
-        const subObj = sub as unknown as { items: { data: Array<{ price?: { recurring?: { interval?: string } } }> }; current_period_start: number; current_period_end: number }
-        await supabase.from('subscriptions').insert({
-          org_id: orgId,
-          plan_id: plan.id,
-          stripe_subscription_id: session.subscription as string,
-          status: 'active',
-          billing_cycle:
-            subObj.items.data[0]?.price?.recurring?.interval === 'year'
-              ? 'annual'
-              : 'monthly',
-          current_period_start: new Date(
-            subObj.current_period_start * 1000
-          ).toISOString(),
-          current_period_end: new Date(
-            subObj.current_period_end * 1000
-          ).toISOString(),
-        })
-        logger.info('Subscription created from checkout', {
-          orgId,
-          planSlug,
-        })
-
-        // Consequence 1: enforce downgrade limits (in case of plan change)
-        await enforceDowngradeLimits(orgId)
-
-        // Consequence 2: notify user
-        await notifyPlanChange(orgId, plan.name ?? planSlug, 'upgraded')
       }
     }
+
+    // Cancel old DB subscription rows
+    await supabase
+      .from('subscriptions')
+      .update({ status: 'canceled', canceled_at: new Date().toISOString() })
+      .eq('org_id', orgId)
+      .eq('status', 'active')
+
+    // Retrieve the new Stripe subscription for period dates
+    const subResponse = await getStripe().subscriptions.retrieve(session.subscription as string)
+    const subObj = subResponse as unknown as { items: { data: Array<{ price?: { recurring?: { interval?: string } } }> }; current_period_start: number; current_period_end: number }
+
+    const insertPayload = {
+      org_id: orgId,
+      plan_id: plan.id,
+      stripe_subscription_id: session.subscription as string,
+      status: 'active',
+      billing_cycle: subObj.items.data[0]?.price?.recurring?.interval === 'year' ? 'annual' : 'monthly',
+      current_period_start: new Date(subObj.current_period_start * 1000).toISOString(),
+      current_period_end: new Date(subObj.current_period_end * 1000).toISOString(),
+    }
+
+    logger.info('checkout: inserting subscription', insertPayload)
+
+    const { error: insertError } = await supabase.from('subscriptions').insert(insertPayload)
+
+    if (insertError) {
+      logger.error('checkout: FAILED to insert subscription', { error: insertError.message, code: insertError.code, details: insertError.details })
+      return
+    }
+
+    logger.info('checkout: subscription inserted successfully', { orgId, planSlug })
+
+    await enforceDowngradeLimits(orgId)
+    await notifyPlanChange(orgId, plan.name ?? planSlug, 'upgraded')
   }
 
   // Ensure stripe_customer_id is stored on the org
