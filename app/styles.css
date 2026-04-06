@@ -1490,6 +1490,27 @@ html.dark .landing-cta { background: linear-gradient(135deg, #1a1d27 0%, #242736
 .tracker-impact-item::before { content: ''; position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 6px; height: 6px; background: var(--color-danger, #ef4444); border-radius: 50%; }
 .tracker-impact-footer { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
 
+/* Also Down Right Now section */
+.also-down-section { background: var(--bg-card); border: 1px solid var(--color-danger, #ef4444); border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+.also-down-heading { display: flex; align-items: center; gap: 10px; color: var(--color-danger, #ef4444) !important; }
+.also-down-pulse { width: 10px; height: 10px; border-radius: 50%; background: var(--color-danger, #ef4444); flex-shrink: 0; animation: also-down-pulse 1.5s ease-in-out infinite; }
+@keyframes also-down-pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(1.3); } }
+.also-down-subtitle { font-size: 14px; color: var(--text-secondary); margin: 0 0 20px; }
+.also-down-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+.also-down-card { display: flex; flex-direction: column; gap: 6px; padding: 16px; border-radius: 10px; border: 1px solid var(--border-primary); text-decoration: none; transition: border-color 0.15s, transform 0.15s; }
+.also-down-card:hover { transform: translateY(-2px); border-color: var(--accent); }
+.also-down-card-blog { background: linear-gradient(135deg, rgba(59,130,246,0.08) 0%, rgba(6,182,212,0.08) 100%); border-color: var(--accent); }
+.also-down-card-blog:hover { border-color: var(--accent); box-shadow: 0 4px 16px rgba(59,130,246,0.15); }
+.also-down-card-site { background: var(--bg-secondary); }
+.also-down-card-badge { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); background: rgba(59,130,246,0.12); border-radius: 4px; padding: 2px 8px; width: fit-content; }
+.also-down-card-title { font-size: 14px; font-weight: 600; color: var(--text-primary); line-height: 1.35; }
+.also-down-card-excerpt { font-size: 12px; color: var(--text-secondary); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.also-down-card-cta { font-size: 12px; font-weight: 600; color: var(--accent); margin-top: 4px; }
+.also-down-card-site-header { display: flex; align-items: center; gap: 6px; }
+.also-down-status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.also-down-status-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+.also-down-card-domain { font-size: 12px; color: var(--text-muted); }
+
 /* Related sites section */
 .tracker-related-section { background: var(--bg-card); border: 1px solid var(--border-primary); border-radius: 12px; padding: 20px; margin-bottom: 24px; }
 .tracker-related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }

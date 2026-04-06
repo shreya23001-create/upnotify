@@ -45,6 +45,35 @@ export async function getPublishedBlogPosts(): Promise<PublishedBlogPostSummary[
   return (data ?? []) as PublishedBlogPostSummary[]
 }
 
+/**
+ * Find the most recent published outage blog post for a specific site.
+ * Matches on tags (display name lowercased) — the blog generator always adds this.
+ * Returns null if no published post exists (drafts and pending_approval are excluded).
+ */
+export async function getPublishedOutageBlogForSite(
+  displayName: string
+): Promise<Pick<PublishedBlogPostSummary, 'id' | 'title' | 'slug' | 'excerpt' | 'published_at'> | null> {
+  const supabase = createAdminClient()
+  const tag = displayName.toLowerCase()
+
+  const { data, error } = await supabase
+    .from('blog_posts')
+    .select('id, title, slug, excerpt, published_at')
+    .eq('status', 'published')
+    .contains('tags', [tag])
+    .contains('tags', ['outage'])
+    .order('published_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  if (error) {
+    logger.error('Failed to fetch outage blog for site', { displayName, error: error.message })
+    return null
+  }
+
+  return data as Pick<PublishedBlogPostSummary, 'id' | 'title' | 'slug' | 'excerpt' | 'published_at'> | null
+}
+
 /** Get all blog posts for admin — no RLS filtering, ordered by newest first */
 export async function getAllBlogPostsAdmin(): Promise<BlogPost[]> {
   const supabase = createAdminClient()

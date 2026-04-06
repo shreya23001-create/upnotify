@@ -8,8 +8,11 @@ import {
   calculatePublicUptime,
   getPublicMonitorIncidentCount,
   getPublicMonitorAvgResponseTime,
+  getCurrentlyDownSites,
 } from '@/lib/db/public-monitors'
+import { getPublishedOutageBlogForSite } from '@/lib/db/blog-posts'
 import { TrackerSubscribeForm } from '@/components/tracker/tracker-subscribe-form'
+import { AlsoDownSection } from '@/components/tracker/also-down-section'
 import { TRACKED_SITES } from '@/lib/constants/tracked-sites'
 import {
   SITE_INFO,
@@ -234,7 +237,14 @@ export default async function TrackerDomainPage({
 
   if (!monitor) notFound()
 
-  const [checks, incidents, uptime30, uptime7, incidentCount30d, avgResponseTime] =
+  // Derive site info before data fetches — needed for conditional queries
+  const siteInfo = SITE_INFO[monitor.domain]
+  const siteName = siteInfo?.name ?? monitor.display_name
+  const siteCategory = siteInfo?.category ?? TRACKED_SITES.find((s) => s.domain === monitor.domain)?.category ?? 'General'
+
+  const isDown = monitor.last_status === 'down' || monitor.last_status === 'degraded'
+
+  const [checks, incidents, uptime30, uptime7, incidentCount30d, avgResponseTime, downSites, outagePost] =
     await Promise.all([
       getPublicCheckResults(monitor.id, 7),
       getPublicIncidents(monitor.id),
@@ -242,15 +252,14 @@ export default async function TrackerDomainPage({
       calculatePublicUptime(monitor.id, 7),
       getPublicMonitorIncidentCount(monitor.id, 30),
       getPublicMonitorAvgResponseTime(monitor.id, 30),
+      isDown ? getCurrentlyDownSites(decodedDomain, siteCategory, 7) : Promise.resolve([]),
+      isDown ? getPublishedOutageBlogForSite(siteName) : Promise.resolve(null),
     ])
 
   const uptimeBars = buildUptimeBars(checks, 60)
   const openIncidents = incidents.filter((i) => !i.resolved_at)
   const resolvedIncidents = incidents.filter((i) => i.resolved_at)
 
-  const siteInfo = SITE_INFO[monitor.domain]
-  const siteName = siteInfo?.name ?? monitor.display_name
-  const siteCategory = siteInfo?.category ?? TRACKED_SITES.find((s) => s.domain === monitor.domain)?.category ?? 'General'
   const downtimeReasons = CATEGORY_DOWNTIME_REASONS[siteCategory] ?? CATEGORY_DOWNTIME_REASONS['Cloud & Hosting'] ?? []
   const impactStatements = CATEGORY_IMPACT[siteCategory] ?? CATEGORY_IMPACT['Cloud & Hosting'] ?? []
   const relatedSites = getRelatedSites(monitor.domain, siteCategory, TRACKED_SITES)
@@ -587,6 +596,15 @@ export default async function TrackerDomainPage({
             Monitoring your own dependencies on services like {siteName} is essential. <Link href="/score" className="tracker-link">Check your website&apos;s health score</Link> to see how resilient your site is to third-party outages.
           </p>
         </div>
+      )}
+
+      {/* Also Down Right Now — only shown when site is down/degraded */}
+      {isDown && (
+        <AlsoDownSection
+          siteName={siteName}
+          outagePost={outagePost}
+          downSites={downSites}
+        />
       )}
 
       {/* Subscribe */}

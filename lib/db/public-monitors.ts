@@ -138,6 +138,40 @@ export async function getActivePublicMonitorsPaginated(options: {
   }
 }
 
+/**
+ * Get sites currently down or degraded, excluding a given domain.
+ * Same category sites are returned first, then others — up to `limit` total.
+ */
+export async function getCurrentlyDownSites(
+  excludeDomain: string,
+  category: string,
+  limit: number = 7
+): Promise<Pick<PublicMonitor, 'id' | 'domain' | 'display_name' | 'category' | 'last_status'>[]> {
+  const supabase = createAdminClient()
+
+  const { data, error } = await supabase
+    .from('public_monitors')
+    .select('id, domain, display_name, category, last_status')
+    .in('last_status', ['down', 'degraded'])
+    .eq('is_active', true)
+    .neq('domain', excludeDomain)
+    .order('category', { ascending: true })
+    .limit(50) // fetch a pool, sort in JS to put same-category first
+
+  if (error) {
+    logger.error('Failed to get currently down sites', { error: error.message })
+    return []
+  }
+
+  const rows = (data ?? []) as Pick<PublicMonitor, 'id' | 'domain' | 'display_name' | 'category' | 'last_status'>[]
+
+  // Same category first, then others
+  const sameCategory = rows.filter(r => r.category === category)
+  const others = rows.filter(r => r.category !== category)
+
+  return [...sameCategory, ...others].slice(0, limit)
+}
+
 export async function getPublicMonitorCategories(): Promise<string[]> {
   const supabase = createAdminClient()
   const { data, error } = await supabase
