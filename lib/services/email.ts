@@ -433,6 +433,8 @@ interface BlogApprovalEmailParams {
   blogSlug: string
   siteDisplayName: string
   excerpt: string
+  bodyMarkdown?: string   // Full blog body — rendered as plain text in email
+  sourcesCount?: number   // How many sources were used
   approveUrl: string
   rejectUrl: string
 }
@@ -444,19 +446,38 @@ interface BlogApprovalEmailParams {
 export async function sendBlogApprovalEmail(params: BlogApprovalEmailParams): Promise<EmailResult> {
   const subject = `Blog ready for approval: ${params.blogTitle}`
 
+  // Convert markdown body to basic HTML for email rendering
+  const bodyHtml = params.bodyMarkdown
+    ? params.bodyMarkdown
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        // Headings
+        .replace(/^### (.+)$/gm, '<h4 style="margin:20px 0 6px;font-size:14px;font-weight:700;color:#111827;">$1</h4>')
+        .replace(/^## (.+)$/gm, '<h3 style="margin:24px 0 8px;font-size:16px;font-weight:700;color:#111827;">$1</h3>')
+        .replace(/^# (.+)$/gm, '<h2 style="margin:24px 0 8px;font-size:18px;font-weight:700;color:#111827;">$1</h2>')
+        // Bold
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        // Inline links — unescape angle brackets first for URLs
+        .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" style="color:#3b82f6;">$1</a>')
+        // Bullet points
+        .replace(/^[-*] (.+)$/gm, '<li style="margin:4px 0;font-size:14px;color:#374151;line-height:1.6;">$1</li>')
+        // Wrap consecutive <li> in <ul>
+        .replace(/(<li[^>]*>.*<\/li>\n?)+/g, (m) => `<ul style="margin:8px 0;padding-left:20px;">${m}</ul>`)
+        // Paragraphs — double newline
+        .replace(/\n\n/g, '</p><p style="margin:0 0 14px;font-size:14px;color:#374151;line-height:1.7;">')
+    : ''
+
+  const sourcesNote = params.sourcesCount
+    ? `<p style="margin:0 0 20px;font-size:13px;color:#6b7280;">Research pulled from <strong>${params.sourcesCount} sources</strong> (official status page, Google News, Reddit, X).</p>`
+    : ''
+
   const html = baseTemplate(`
-    <h2 style="margin:0 0 8px;font-size:18px;color:#111827;">New Outage Blog Draft</h2>
+    <h2 style="margin:0 0 4px;font-size:18px;color:#111827;">New Outage Blog Draft</h2>
     <p style="margin:0 0 20px;font-size:14px;color:#6b7280;line-height:1.6;">
       Uptrue auto-generated a blog post about the <strong>${escapeHtml(params.siteDisplayName)}</strong> outage.
-      Review the excerpt below, then approve or reject.
+      Read the full post below, then approve or reject.
     </p>
 
-    <div style="margin:0 0 24px;padding:16px;background-color:#f9fafb;border-left:3px solid #3b82f6;border-radius:4px;">
-      <p style="margin:0 0 6px;font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;">Title</p>
-      <p style="margin:0 0 16px;font-size:15px;font-weight:600;color:#111827;">${escapeHtml(params.blogTitle)}</p>
-      <p style="margin:0 0 6px;font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;">Excerpt</p>
-      <p style="margin:0;font-size:14px;color:#374151;line-height:1.6;">${escapeHtml(params.excerpt)}</p>
-    </div>
+    ${sourcesNote}
 
     <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;margin-bottom:24px;">
       <tr>
@@ -473,9 +494,32 @@ export async function sendBlogApprovalEmail(params: BlogApprovalEmailParams): Pr
       </tr>
     </table>
 
+    <div style="margin:0 0 24px;padding:20px;background-color:#f9fafb;border:1px solid #e5e7eb;border-radius:6px;">
+      <p style="margin:0 0 4px;font-size:11px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:0.5px;">Title</p>
+      <p style="margin:0 0 16px;font-size:17px;font-weight:700;color:#111827;">${escapeHtml(params.blogTitle)}</p>
+      <p style="margin:0 0 4px;font-size:11px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:0.5px;">Meta excerpt</p>
+      <p style="margin:0 0 24px;font-size:13px;color:#6b7280;font-style:italic;">${escapeHtml(params.excerpt)}</p>
+      <hr style="margin:0 0 20px;border:none;border-top:1px solid #e5e7eb;">
+      <p style="margin:0 0 14px;font-size:14px;color:#374151;line-height:1.7;">${bodyHtml}</p>
+    </div>
+
+    <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;margin-bottom:16px;">
+      <tr>
+        <td style="padding-right:8px;">
+          <a href="${params.approveUrl}" style="display:block;padding:12px 0;background-color:#16a34a;color:#ffffff;font-size:15px;font-weight:600;text-decoration:none;border-radius:6px;text-align:center;">
+            ✓ Approve &amp; Publish
+          </a>
+        </td>
+        <td style="padding-left:8px;">
+          <a href="${params.rejectUrl}" style="display:block;padding:12px 0;background-color:#dc2626;color:#ffffff;font-size:15px;font-weight:600;text-decoration:none;border-radius:6px;text-align:center;">
+            ✗ Reject
+          </a>
+        </td>
+      </tr>
+    </table>
+
     <p style="margin:0;font-size:12px;color:#9ca3af;line-height:1.5;">
-      Approving will publish the post immediately and post to X and LinkedIn.<br>
-      Rejecting will delete the draft. These links expire in 7 days.
+      Approving publishes immediately. Rejecting deletes the draft. Links expire in 7 days.
     </p>
   `)
 

@@ -64,6 +64,8 @@ export async function POST(request: Request): Promise<NextResponse> {
     blogSlug: draft.slug,
     siteDisplayName: siteName,
     excerpt: draft.excerpt,
+    bodyMarkdown: draft.bodyMarkdown,
+    sourcesCount: draft.sourcesCount,
     approveUrl,
     rejectUrl,
   })

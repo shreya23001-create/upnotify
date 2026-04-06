@@ -25,6 +25,8 @@ export interface GeneratedBlogDraft {
   title: string
   slug: string
   excerpt: string
+  bodyMarkdown: string
+  sourcesCount: number
   approveToken: string
   rejectToken: string
 }
@@ -270,6 +272,8 @@ Format your response EXACTLY like this:
     title: post.title,
     slug: post.slug,
     excerpt: postExcerpt,
+    bodyMarkdown: body,
+    sourcesCount: ctx.research?.articles.length ?? 0,
     approveToken: tokens.approveToken,
     rejectToken: tokens.rejectToken,
   }
