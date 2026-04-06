@@ -12,6 +12,7 @@ import type { CheckerResult } from '@/lib/checkers/types'
 import { generateOutageBlogPost } from '@/lib/services/blog-generator'
 import { researchOutage } from '@/lib/services/outage-researcher'
 import { sendBlogApprovalEmail } from '@/lib/services/email'
+import { sendBlogApprovalTelegram } from '@/lib/services/telegram'
 import { getServerConfig, getConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
 
@@ -59,19 +60,31 @@ async function triggerOutageBlog(
   const approveUrl = `${app.url}/api/admin/blog-approve?token=${draft.approveToken}`
   const rejectUrl = `${app.url}/api/admin/blog-approve?token=${draft.rejectToken}`
 
-  await sendBlogApprovalEmail({
-    to: adminEmail,
-    blogTitle: draft.title,
-    blogSlug: draft.slug,
-    siteDisplayName: monitor.display_name,
-    excerpt: draft.excerpt,
-    bodyMarkdown: draft.bodyMarkdown,
-    sourcesCount: draft.sourcesCount,
-    approveUrl,
-    rejectUrl,
-  })
+  // Send both email and Telegram in parallel
+  await Promise.allSettled([
+    sendBlogApprovalEmail({
+      to: adminEmail,
+      blogTitle: draft.title,
+      blogSlug: draft.slug,
+      siteDisplayName: monitor.display_name,
+      excerpt: draft.excerpt,
+      bodyMarkdown: draft.bodyMarkdown,
+      sourcesCount: draft.sourcesCount,
+      approveUrl,
+      rejectUrl,
+    }),
+    sendBlogApprovalTelegram({
+      blogTitle: draft.title,
+      siteDisplayName: monitor.display_name,
+      excerpt: draft.excerpt,
+      sourcesCount: draft.sourcesCount,
+      hasOfficialStatus: !!research.officialStatus,
+      approveUrl,
+      rejectUrl,
+    }),
+  ])
 
-  logger.info('Blog approval email sent', {
+  logger.info('Blog approval notifications sent', {
     to: adminEmail,
     blogPostId: draft.blogPostId,
     domain: monitor.domain,

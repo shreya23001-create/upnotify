@@ -4,6 +4,7 @@ import { getConfig } from '@/lib/utils/config'
 import { researchOutage } from '@/lib/services/outage-researcher'
 import { generateOutageBlogPost } from '@/lib/services/blog-generator'
 import { sendBlogApprovalEmail } from '@/lib/services/email'
+import { sendBlogApprovalTelegram } from '@/lib/services/telegram'
 
 /**
  * POST /api/admin/test-blog-pipeline
@@ -58,17 +59,28 @@ export async function POST(request: Request): Promise<NextResponse> {
   const approveUrl = `${app.url}/api/admin/blog-approve?token=${draft.approveToken}`
   const rejectUrl = `${app.url}/api/admin/blog-approve?token=${draft.rejectToken}`
 
-  await sendBlogApprovalEmail({
-    to: adminEmail,
-    blogTitle: draft.title,
-    blogSlug: draft.slug,
-    siteDisplayName: siteName,
-    excerpt: draft.excerpt,
-    bodyMarkdown: draft.bodyMarkdown,
-    sourcesCount: draft.sourcesCount,
-    approveUrl,
-    rejectUrl,
-  })
+  await Promise.allSettled([
+    sendBlogApprovalEmail({
+      to: adminEmail,
+      blogTitle: draft.title,
+      blogSlug: draft.slug,
+      siteDisplayName: siteName,
+      excerpt: draft.excerpt,
+      bodyMarkdown: draft.bodyMarkdown,
+      sourcesCount: draft.sourcesCount,
+      approveUrl,
+      rejectUrl,
+    }),
+    sendBlogApprovalTelegram({
+      blogTitle: draft.title,
+      siteDisplayName: siteName,
+      excerpt: draft.excerpt,
+      sourcesCount: draft.sourcesCount,
+      hasOfficialStatus: !!research.officialStatus,
+      approveUrl,
+      rejectUrl,
+    }),
+  ])
 
   return NextResponse.json({
     ok: true,

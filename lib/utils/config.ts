@@ -51,6 +51,10 @@ interface ServerConfig extends PublicConfig {
     memberId: string        // temp: member posting; swap for organizationId before go-live
     organizationId: string  // go-live: requires w_organization_social scope + LinkedIn approval
   }
+  telegram: {
+    botToken: string
+    chatId: string
+  }
   blogApproval: {
     secret: string
   }
@@ -129,6 +133,8 @@ export function getServerConfig(): ServerConfig {
   const linkedinAccessToken = process.env.LINKEDIN_ACCESS_TOKEN ?? ''
   const linkedinMemberId = process.env.LINKEDIN_MEMBER_ID ?? ''
   const linkedinOrganizationId = process.env.LINKEDIN_ORGANIZATION_ID ?? ''
+  const telegramBotToken = process.env.TELEGRAM_BOT_TOKEN ?? ''
+  const telegramChatId = process.env.TELEGRAM_CHAT_ID ?? ''
   const blogApprovalSecret = process.env.BLOG_APPROVAL_SECRET ?? ''
 
   cachedServerConfig = {
@@ -163,6 +169,10 @@ export function getServerConfig(): ServerConfig {
       accessToken: linkedinAccessToken,
       memberId: linkedinMemberId,
       organizationId: linkedinOrganizationId,
+    },
+    telegram: {
+      botToken: telegramBotToken,
+      chatId: telegramChatId,
     },
     blogApproval: {
       secret: blogApprovalSecret,
