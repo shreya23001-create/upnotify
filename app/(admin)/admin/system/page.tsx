@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 
 interface SystemHealth {
   database: { status: string; latencyMs: number }
@@ -8,6 +8,9 @@ interface SystemHealth {
     checkRunner: { lastRun: string | null; status: string }
     publicChecks: { lastRun: string | null; status: string }
     nurtureEmails: { lastRun: string | null; status: string }
+    aoeQuotaManager: { lastRun: string | null; status: string }
+    aoeSiteDiscovery: { lastRun: string | null; status: string }
+    aoeOutreachEmailer: { lastRun: string | null; status: string }
   }
   monitors: { total: number; active: number; paused: number; inMaintenance: number }
   incidents: { open: number; resolvedToday: number }
@@ -34,6 +37,11 @@ function statusColor(status: string): string {
 export default function AdminSystemPage(): React.ReactElement {
   const [health, setHealth] = useState<SystemHealth | null>(null)
   const [loading, setLoading] = useState(true)
+  const [simMonitorId, setSimMonitorId] = useState('')
+  const [simAction, setSimAction] = useState<'both' | 'down' | 'recover'>('both')
+  const [simRunning, setSimRunning] = useState(false)
+  const [simResult, setSimResult] = useState<string | null>(null)
+  const simResultRef = useRef<HTMLDivElement>(null)
 
   const fetchHealth = useCallback(async (): Promise<void> => {
     try {
@@ -129,6 +137,73 @@ export default function AdminSystemPage(): React.ReactElement {
           <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>Fail Rate (24h)</div>
           <div style={{ fontSize: 22, fontWeight: 700, color: health.checks.failRate > 5 ? '#ef4444' : undefined }}>{health.checks.failRate.toFixed(1)}%</div>
         </div>
+      </div>
+
+      {/* Dev Simulation Panel */}
+      <div className="card" style={{ marginBottom: 16, border: '2px dashed #f59e0b' }}>
+        <div className="card-header" style={{ borderBottom: '1px solid #f59e0b20' }}>
+          <div className="card-title" style={{ color: '#f59e0b' }}>⚠ Dev Simulation</div>
+          <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>Create a real incident and fire real alerts — for testing only</div>
+        </div>
+        <div className="card-content" style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'flex-end' }}>
+          <div style={{ flex: '1 1 240px' }}>
+            <label style={{ display: 'block', fontSize: 12, marginBottom: 4, color: 'var(--text-muted)' }}>Monitor ID</label>
+            <input
+              type="text"
+              className="input"
+              placeholder="Paste a monitor UUID..."
+              value={simMonitorId}
+              onChange={(e) => setSimMonitorId(e.target.value)}
+              style={{ fontFamily: 'monospace', fontSize: 13 }}
+            />
+          </div>
+          <div style={{ flex: '0 0 auto' }}>
+            <label style={{ display: 'block', fontSize: 12, marginBottom: 4, color: 'var(--text-muted)' }}>Action</label>
+            <select
+              className="input"
+              value={simAction}
+              onChange={(e) => setSimAction(e.target.value as typeof simAction)}
+            >
+              <option value="both">Down → auto-recover (5s)</option>
+              <option value="down">Down only (no recovery)</option>
+              <option value="recover">Recover existing incident</option>
+            </select>
+          </div>
+          <button
+            className="btn btn-secondary"
+            style={{ borderColor: '#f59e0b', color: '#f59e0b' }}
+            disabled={!simMonitorId.trim() || simRunning}
+            onClick={async () => {
+              setSimRunning(true)
+              setSimResult(null)
+              try {
+                const res = await fetch('/api/admin/simulate-incident', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ monitorId: simMonitorId.trim(), action: simAction }),
+                })
+                const data = await res.json() as Record<string, unknown>
+                if (!res.ok) {
+                  setSimResult(`Error: ${String(data.error ?? 'Unknown error')}`)
+                } else {
+                  setSimResult(`Done. Incident created${data.resolved ? ' and resolved' : ''}. Check your alert channels.`)
+                }
+              } catch {
+                setSimResult('Network error — check console.')
+              } finally {
+                setSimRunning(false)
+                setTimeout(() => simResultRef.current?.scrollIntoView({ behavior: 'smooth' }), 100)
+              }
+            }}
+          >
+            {simRunning ? 'Running...' : 'Run Simulation'}
+          </button>
+        </div>
+        {simResult && (
+          <div ref={simResultRef} style={{ padding: '8px 16px 16px', fontSize: 13, color: simResult.startsWith('Error') ? '#ef4444' : '#22c55e' }}>
+            {simResult}
+          </div>
+        )}
       </div>
     </div>
   )

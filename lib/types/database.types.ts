@@ -334,6 +334,7 @@ export type Database = {
           seo_description: string | null
           seo_title: string | null
           slug: string
+          source_public_incident_id: string | null
           status: string
           tags: string[] | null
           title: string
@@ -351,6 +352,7 @@ export type Database = {
           seo_description?: string | null
           seo_title?: string | null
           slug: string
+          source_public_incident_id?: string | null
           status?: string
           tags?: string[] | null
           title: string
@@ -368,6 +370,7 @@ export type Database = {
           seo_description?: string | null
           seo_title?: string | null
           slug?: string
+          source_public_incident_id?: string | null
           status?: string
           tags?: string[] | null
           title?: string
@@ -2439,6 +2442,253 @@ export type Database = {
         }
         Relationships: []
       }
+      blog_approval_tokens: {
+        Row: {
+          id: string
+          blog_post_id: string
+          token: string
+          action: string
+          expires_at: string
+          used_at: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          blog_post_id: string
+          token?: string
+          action: string
+          expires_at?: string
+          used_at?: string | null
+          created_at?: string
+        }
+        Update: {
+          used_at?: string | null
+        }
+        Relationships: []
+      }
+      aoe_email_quota: {
+        Row: {
+          id: string
+          month: string
+          total_quota: number
+          marketing_sent: number
+          alert_sent: number
+          burst_sent: number
+          available_marketing: number
+          reserved_alerts: number
+          safety_buffer: number
+          hard_reserve: number
+          monitors_with_email: number
+          status_page_subs: number
+          status: string
+          calculated_at: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          month: string
+          total_quota?: number
+          marketing_sent?: number
+          alert_sent?: number
+          burst_sent?: number
+          available_marketing?: number
+          reserved_alerts?: number
+          safety_buffer?: number
+          hard_reserve?: number
+          monitors_with_email?: number
+          status_page_subs?: number
+          status?: string
+          calculated_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          total_quota?: number
+          marketing_sent?: number
+          alert_sent?: number
+          burst_sent?: number
+          available_marketing?: number
+          reserved_alerts?: number
+          safety_buffer?: number
+          hard_reserve?: number
+          monitors_with_email?: number
+          status_page_subs?: number
+          status?: string
+          calculated_at?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      aoe_site_discovery: {
+        Row: {
+          id: string
+          domain: string
+          email: string | null
+          email_source: string | null
+          platform: string | null
+          ssl_expiry_days: number | null
+          status: string
+          category: string | null
+          check_count: number
+          last_checked_at: string | null
+          ready_at: string | null
+          emailed_at: string | null
+          skip_reason: string | null
+          discovered_at: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          domain: string
+          email?: string | null
+          email_source?: string | null
+          platform?: string | null
+          ssl_expiry_days?: number | null
+          status?: string
+          category?: string | null
+          check_count?: number
+          last_checked_at?: string | null
+          ready_at?: string | null
+          emailed_at?: string | null
+          skip_reason?: string | null
+          discovered_at?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          email?: string | null
+          email_source?: string | null
+          platform?: string | null
+          ssl_expiry_days?: number | null
+          status?: string
+          category?: string | null
+          check_count?: number
+          last_checked_at?: string | null
+          ready_at?: string | null
+          emailed_at?: string | null
+          skip_reason?: string | null
+          updated_at?: string
+          [key: string]: unknown
+        }
+        Relationships: []
+      }
+      aoe_site_checks: {
+        Row: {
+          id: string
+          domain: string
+          check_number: number
+          response_time_ms: number | null
+          status_code: number | null
+          is_down: boolean
+          ssl_expiry_days: number | null
+          error_message: string | null
+          checked_at: string
+        }
+        Insert: {
+          id?: string
+          domain: string
+          check_number?: number
+          response_time_ms?: number | null
+          status_code?: number | null
+          is_down?: boolean
+          ssl_expiry_days?: number | null
+          error_message?: string | null
+          checked_at?: string
+        }
+        Update: {
+          response_time_ms?: number | null
+          status_code?: number | null
+          is_down?: boolean
+          ssl_expiry_days?: number | null
+          error_message?: string | null
+        }
+        Relationships: []
+      }
+      aoe_outreach_log: {
+        Row: {
+          id: string
+          domain: string
+          email_sent_to: string
+          email_source: string
+          campaign: string
+          platform: string | null
+          product: string
+          sent_at: string
+          resend_message_id: string | null
+          month: string
+          opened_at: string | null
+          clicked_at: string | null
+          opted_out: boolean
+          opted_out_at: string | null
+          converted: boolean
+          converted_at: string | null
+          converted_plan: string | null
+          bounced: boolean
+          spam_complaint: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          domain: string
+          email_sent_to: string
+          email_source: string
+          campaign: string
+          platform?: string | null
+          product: string
+          sent_at?: string
+          resend_message_id?: string | null
+          month: string
+          opened_at?: string | null
+          clicked_at?: string | null
+          opted_out?: boolean
+          opted_out_at?: string | null
+          converted?: boolean
+          converted_at?: string | null
+          converted_plan?: string | null
+          bounced?: boolean
+          spam_complaint?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          opened_at?: string | null
+          clicked_at?: string | null
+          opted_out?: boolean
+          opted_out_at?: string | null
+          converted?: boolean
+          converted_at?: string | null
+          converted_plan?: string | null
+          bounced?: boolean
+          spam_complaint?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      aoe_settings: {
+        Row: {
+          id: string
+          key: string
+          value: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          id?: string
+          key: string
+          value: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          value?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -2447,6 +2697,18 @@ export type Database = {
       is_super_admin: { Args: never; Returns: boolean }
       user_org_id: { Args: never; Returns: string }
       user_role: { Args: never; Returns: string }
+      aoe_increment_marketing_sent: {
+        Args: { p_month: string; p_count: number }
+        Returns: undefined
+      }
+      aoe_increment_alert_sent: {
+        Args: { p_month: string; p_count: number }
+        Returns: undefined
+      }
+      aoe_increment_burst_sent: {
+        Args: { p_month: string; p_count: number }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

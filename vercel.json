@@ -7,6 +7,30 @@
     {
       "path": "/api/cron/nurture-emails",
       "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/cron/aoe/quota-manager",
+      "schedule": "0 0 * * *"
+    },
+    {
+      "path": "/api/cron/aoe/site-discovery",
+      "schedule": "0 2 * * 0"
+    },
+    {
+      "path": "/api/cron/aoe/outreach-checker",
+      "schedule": "0 3 * * *"
+    },
+    {
+      "path": "/api/cron/aoe/outreach-emailer",
+      "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/cron/aoe/last-day-burst",
+      "schedule": "0 23 * * *"
+    },
+    {
+      "path": "/api/cron/aoe/daily-snapshot",
+      "schedule": "0 9 * * *"
     }
   ]
 }

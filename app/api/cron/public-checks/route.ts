@@ -9,11 +9,64 @@ import {
 } from '@/lib/db/public-monitors'
 import type { PublicMonitor } from '@/lib/db/public-monitors'
 import type { CheckerResult } from '@/lib/checkers/types'
-import { getServerConfig } from '@/lib/utils/config'
+import { generateOutageBlogPost } from '@/lib/services/blog-generator'
+import { sendBlogApprovalEmail } from '@/lib/services/email'
+import { getServerConfig, getConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60
+
+// ---------------------------------------------------------------------------
+// Outage blog trigger — runs async after incident creation
+// ---------------------------------------------------------------------------
+
+async function triggerOutageBlog(
+  monitor: PublicMonitor,
+  incidentId: string,
+  confirmation: CheckerResult
+): Promise<void> {
+  const draft = await generateOutageBlogPost({
+    siteDisplayName: monitor.display_name,
+    siteDomain: monitor.domain,
+    siteCategory: monitor.category ?? 'other',
+    errorMessage: confirmation.errorMessage ?? 'Site unreachable',
+    statusCode: confirmation.statusCode ?? null,
+    startedAt: new Date().toISOString(),
+    incidentId,
+  })
+
+  if (!draft) {
+    logger.warn('Blog draft not generated for outage', { domain: monitor.domain, incidentId })
+    return
+  }
+
+  const { app, admin } = getConfig()
+  const approveUrl = `${app.url}/api/admin/blog-approve?token=${draft.approveToken}`
+  const rejectUrl = `${app.url}/api/admin/blog-approve?token=${draft.rejectToken}`
+  const adminEmail = admin.emails[0]
+
+  if (!adminEmail) {
+    logger.warn('No admin email configured — blog approval email not sent', { blogPostId: draft.blogPostId })
+    return
+  }
+
+  await sendBlogApprovalEmail({
+    to: adminEmail,
+    blogTitle: draft.title,
+    blogSlug: draft.slug,
+    siteDisplayName: monitor.display_name,
+    excerpt: `${monitor.display_name} is experiencing an outage. Uptrue detected the issue and auto-generated this blog post.`,
+    approveUrl,
+    rejectUrl,
+  })
+
+  logger.info('Blog approval email sent', {
+    to: adminEmail,
+    blogPostId: draft.blogPostId,
+    domain: monitor.domain,
+  })
+}
 
 function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms))
@@ -168,12 +221,22 @@ export async function GET(request: Request): Promise<NextResponse> {
             // Two-confirmation: confirmed down
             const existingIncident = await getOpenPublicIncident(monitor.id)
             if (!existingIncident) {
-              await createPublicIncident({
+              const incident = await createPublicIncident({
                 monitor_id: monitor.id,
                 cause: confirmation.errorMessage ?? 'Site unreachable',
                 status_code: confirmation.statusCode,
               })
               logger.warn('Public monitor confirmed down', { domain: monitor.domain })
+
+              // Trigger auto blog generation (fire-and-forget — does not block cron)
+              if (incident) {
+                triggerOutageBlog(monitor, incident.id, confirmation).catch(err => {
+                  logger.error('Outage blog trigger failed', {
+                    domain: monitor.domain,
+                    error: err instanceof Error ? err.message : 'Unknown',
+                  })
+                })
+              }
             }
 
             await updatePublicMonitorStatus(monitor.id, {

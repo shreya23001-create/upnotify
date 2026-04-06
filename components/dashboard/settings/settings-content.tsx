@@ -58,14 +58,31 @@ export function SettingsContent({
   const initialTab = searchParams.get('tab') || 'organisation'
   const [tab, setTab] = useState(initialTab)
   const [revokeIds, setRevokeIds] = useState<string[]>([])
+  const [revokeError, setRevokeError] = useState<string | null>(null)
+  const [apiKeyList, setApiKeyList] = useState<ApiKey[]>(apiKeys)
   const [teamMembers, setTeamMembers] = useState<User[]>(members)
   const [removeTarget, setRemoveTarget] = useState<string | null>(null)
   const [removeError, setRemoveError] = useState<string | null>(null)
 
-  const executeRevoke = useCallback((): void => {
-    // TODO: implement actual revoke API call for revokeIds
-    setRevokeIds([])
-  }, [])
+  const executeRevoke = useCallback(async (): Promise<void> => {
+    setRevokeError(null)
+    try {
+      const res = await fetch('/api/v1/api-keys/revoke', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: revokeIds }),
+      })
+      const data: Record<string, unknown> = await res.json()
+      if (!res.ok) {
+        setRevokeError((data.error as string) || 'Failed to revoke API key(s).')
+        return
+      }
+      setApiKeyList((prev) => prev.filter((k) => !revokeIds.includes(k.id)))
+      setRevokeIds([])
+    } catch {
+      setRevokeError('Network error. Please try again.')
+    }
+  }, [revokeIds])
 
   const handleInviteSent = useCallback((): void => {
     // Invites are managed separately — no need to update team members list here.
@@ -248,9 +265,12 @@ export function SettingsContent({
         <div className="card">
           <div className="card-header card-header-row"><div className="card-title">API Keys</div><button className="btn btn-primary btn-sm" disabled>+ Create Key</button></div>
           <div className="card-content">
+            {revokeError && (
+              <div className="alert alert-error" style={{ marginBottom: 16 }}>{revokeError}</div>
+            )}
             <DataTable
               columns={apiKeyColumns}
-              data={apiKeys}
+              data={apiKeyList}
               searchPlaceholder="Search API keys..."
               bulkActions={apiKeyBulkActions}
               emptyMessage="No API keys created yet."
@@ -261,8 +281,8 @@ export function SettingsContent({
     </div>
       <ConfirmDialog
         isOpen={revokeIds.length > 0}
-        onConfirm={executeRevoke}
-        onCancel={() => setRevokeIds([])}
+        onConfirm={() => { void executeRevoke() }}
+        onCancel={() => { setRevokeIds([]); setRevokeError(null) }}
         title={revokeIds.length === 1 ? 'Revoke API Key' : `Revoke ${revokeIds.length} API Key(s)`}
         message={revokeIds.length === 1
           ? 'This API key will be permanently revoked. Any integrations using it will stop working immediately. This action cannot be undone.'

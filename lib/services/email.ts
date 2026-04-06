@@ -424,6 +424,65 @@ export async function sendTeamInviteEmail(params: TeamInviteEmailParams): Promis
 }
 
 // ---------------------------------------------------------------------------
+// Blog approval email
+// ---------------------------------------------------------------------------
+
+interface BlogApprovalEmailParams {
+  to: string
+  blogTitle: string
+  blogSlug: string
+  siteDisplayName: string
+  excerpt: string
+  approveUrl: string
+  rejectUrl: string
+}
+
+/**
+ * Sends an approval request email to the admin with approve/reject buttons.
+ * Opened in browser — clicking a button calls the approval endpoint.
+ */
+export async function sendBlogApprovalEmail(params: BlogApprovalEmailParams): Promise<EmailResult> {
+  const subject = `Blog ready for approval: ${params.blogTitle}`
+
+  const html = baseTemplate(`
+    <h2 style="margin:0 0 8px;font-size:18px;color:#111827;">New Outage Blog Draft</h2>
+    <p style="margin:0 0 20px;font-size:14px;color:#6b7280;line-height:1.6;">
+      Uptrue auto-generated a blog post about the <strong>${escapeHtml(params.siteDisplayName)}</strong> outage.
+      Review the excerpt below, then approve or reject.
+    </p>
+
+    <div style="margin:0 0 24px;padding:16px;background-color:#f9fafb;border-left:3px solid #3b82f6;border-radius:4px;">
+      <p style="margin:0 0 6px;font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;">Title</p>
+      <p style="margin:0 0 16px;font-size:15px;font-weight:600;color:#111827;">${escapeHtml(params.blogTitle)}</p>
+      <p style="margin:0 0 6px;font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;">Excerpt</p>
+      <p style="margin:0;font-size:14px;color:#374151;line-height:1.6;">${escapeHtml(params.excerpt)}</p>
+    </div>
+
+    <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;margin-bottom:24px;">
+      <tr>
+        <td style="padding-right:8px;">
+          <a href="${params.approveUrl}" style="display:block;padding:12px 0;background-color:#16a34a;color:#ffffff;font-size:15px;font-weight:600;text-decoration:none;border-radius:6px;text-align:center;">
+            ✓ Approve &amp; Publish
+          </a>
+        </td>
+        <td style="padding-left:8px;">
+          <a href="${params.rejectUrl}" style="display:block;padding:12px 0;background-color:#dc2626;color:#ffffff;font-size:15px;font-weight:600;text-decoration:none;border-radius:6px;text-align:center;">
+            ✗ Reject
+          </a>
+        </td>
+      </tr>
+    </table>
+
+    <p style="margin:0;font-size:12px;color:#9ca3af;line-height:1.5;">
+      Approving will publish the post immediately and post to X and LinkedIn.<br>
+      Rejecting will delete the draft. These links expire in 7 days.
+    </p>
+  `)
+
+  return sendEmail(params.to, subject, html)
+}
+
+// ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 

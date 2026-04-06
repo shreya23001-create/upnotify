@@ -6,6 +6,7 @@ import { checkRateLimit, AUTH_RATE_LIMIT } from '@/lib/utils/rate-limiter'
 // Trial removed — users start on Free plan
 import { recordReferralSignup } from '@/lib/db/referrals'
 import { acceptTeamInvite } from '@/lib/db/team'
+import { markConverted } from '@/lib/aoe/db/aoe-outreach-log'
 
 /**
  * Validates that a redirect path is safe (relative, no open-redirect vectors).
@@ -117,6 +118,14 @@ export async function GET(request: Request): Promise<NextResponse> {
             // Record referral if ref code present
             if (refCode && refCode.length > 0) {
               await recordReferralSignup(refCode, dbUser.id, dbUser.org_id)
+            }
+
+            // AOE conversion tracking — check if this domain was outreached
+            const emailDomain = userEmail.split('@')[1]
+            if (emailDomain) {
+              await markConverted(emailDomain, 'free').catch(() => {
+                // Non-blocking — conversion tracking failure must never break signup
+              })
             }
           }
         }

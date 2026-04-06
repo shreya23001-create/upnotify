@@ -39,6 +39,19 @@ interface ServerConfig extends PublicConfig {
   cron: {
     secret: string
   }
+  twitter: {
+    consumerKey: string
+    consumerSecret: string
+    accessToken: string
+    accessTokenSecret: string
+  }
+  linkedin: {
+    accessToken: string
+    organizationId: string
+  }
+  blogApproval: {
+    secret: string
+  }
 }
 
 /**
@@ -106,6 +119,13 @@ export function getServerConfig(): ServerConfig {
   const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET ?? ''
   const anthropicApiKey = process.env.ANTHROPIC_API_KEY ?? ''
   const cronSecret = process.env.CRON_SECRET ?? ''
+  const twitterConsumerKey = process.env.X_CONSUMER_KEY ?? ''
+  const twitterConsumerSecret = process.env.X_CONSUMER_SECRET ?? ''
+  const twitterAccessToken = process.env.X_ACCESS_TOKEN ?? ''
+  const twitterAccessTokenSecret = process.env.X_ACCESS_TOKEN_SECRET ?? ''
+  const linkedinAccessToken = process.env.LINKEDIN_ACCESS_TOKEN ?? ''
+  const linkedinOrganizationId = process.env.LINKEDIN_ORGANIZATION_ID ?? ''
+  const blogApprovalSecret = process.env.BLOG_APPROVAL_SECRET ?? ''
 
   cachedServerConfig = {
     ...publicConfig,
@@ -127,6 +147,19 @@ export function getServerConfig(): ServerConfig {
     },
     cron: {
       secret: cronSecret,
+    },
+    twitter: {
+      consumerKey: twitterConsumerKey,
+      consumerSecret: twitterConsumerSecret,
+      accessToken: twitterAccessToken,
+      accessTokenSecret: twitterAccessTokenSecret,
+    },
+    linkedin: {
+      accessToken: linkedinAccessToken,
+      organizationId: linkedinOrganizationId,
+    },
+    blogApproval: {
+      secret: blogApprovalSecret,
     },
   }
 

@@ -37,6 +37,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/admin/audit-log', label: 'Audit Log', icon: IconFileText },
   { href: '/admin/team', label: 'Admin Team', icon: IconShield },
   { href: '/admin/blog', label: 'Blog', icon: IconEdit },
+  { href: '/admin/aoe', label: 'AOE Outreach', icon: IconMail },
   { href: '/admin/emails', label: 'Email & Nurture', icon: IconMail },
   { href: '/admin/settings', label: 'Settings', icon: IconSettings },
 ]

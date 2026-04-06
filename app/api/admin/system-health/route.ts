@@ -77,6 +77,29 @@ export async function GET(): Promise<NextResponse> {
     .limit(1)
     .single()
 
+  // AOE cron timestamps
+  const [lastAoeQuota, lastAoeDiscovery, lastAoeEmailer] = await Promise.all([
+    supabase
+      .from('aoe_email_quota')
+      .select('calculated_at')
+      .not('calculated_at', 'is', null)
+      .order('calculated_at', { ascending: false })
+      .limit(1)
+      .single(),
+    supabase
+      .from('aoe_site_discovery')
+      .select('discovered_at')
+      .order('discovered_at', { ascending: false })
+      .limit(1)
+      .single(),
+    supabase
+      .from('aoe_outreach_log')
+      .select('sent_at')
+      .order('sent_at', { ascending: false })
+      .limit(1)
+      .single(),
+  ])
+
   function cronStatus(lastRun: string | null, maxGapMinutes: number): string {
     if (!lastRun) return 'never'
     const ageMinutes = (now - new Date(lastRun).getTime()) / 60000
@@ -99,6 +122,18 @@ export async function GET(): Promise<NextResponse> {
       nurtureEmails: {
         lastRun: lastNurtureEmail?.sent_at ?? null,
         status: cronStatus(lastNurtureEmail?.sent_at ?? null, 1500), // daily = 1440 min
+      },
+      aoeQuotaManager: {
+        lastRun: lastAoeQuota.data?.calculated_at ?? null,
+        status: cronStatus(lastAoeQuota.data?.calculated_at ?? null, 1500), // daily midnight
+      },
+      aoeSiteDiscovery: {
+        lastRun: lastAoeDiscovery.data?.discovered_at ?? null,
+        status: cronStatus(lastAoeDiscovery.data?.discovered_at ?? null, 10080), // weekly
+      },
+      aoeOutreachEmailer: {
+        lastRun: lastAoeEmailer.data?.sent_at ?? null,
+        status: cronStatus(lastAoeEmailer.data?.sent_at ?? null, 1500), // daily
       },
     },
     monitors: {

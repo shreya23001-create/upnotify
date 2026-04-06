@@ -445,6 +445,105 @@ const BLOG_POSTS: BlogPostMeta[] = [
     readTime: '14 min read',
     category: 'Hosting',
   },
+  {
+    slug: 'woocommerce-checkout-not-working',
+    title: "WooCommerce Checkout Not Working? Here's Why Your Store Is Losing Sales Right Now",
+    excerpt:
+      'WooCommerce checkout failures are silent revenue killers. Payment gateway errors, SSL issues, JavaScript conflicts, caching misconfigurations, and session problems all cause checkout to break while the rest of your store appears normal.',
+    date: '21 March 2026',
+    readTime: '14 min read',
+    category: 'Ecommerce',
+  },
+  {
+    slug: 'wordpress-maintenance-mode',
+    title: 'WordPress Stuck in Maintenance Mode: How to Fix It and Never Get Stuck Again',
+    excerpt:
+      'WordPress gets stuck in maintenance mode when an update fails mid-process — leaving a .maintenance file that shows "Briefly unavailable" to every visitor indefinitely. Learn how to fix it in 60 seconds.',
+    date: '22 March 2026',
+    readTime: '12 min read',
+    category: 'WordPress',
+  },
+  {
+    slug: 'wordpress-502-bad-gateway',
+    title: '502 Bad Gateway on WordPress: What It Means and How to Fix It Fast',
+    excerpt:
+      "A 502 Bad Gateway means your web server received an invalid response from an upstream server — typically PHP-FPM crashing, Nginx misconfiguration, or your host's load balancer timing out. Learn what causes each scenario.",
+    date: '23 March 2026',
+    readTime: '13 min read',
+    category: 'WordPress',
+  },
+  {
+    slug: 'wordpress-wpml-404-errors',
+    title: 'WPML Breaking URLs After Update: How Multilingual Plugins Cause 404 Errors Across Your Site',
+    excerpt:
+      'WPML updates can break URL structures across all your language versions simultaneously — 404 errors on every translated page, incorrect language redirects, and broken hreflang tags. Learn what triggers it and how to fix the full site damage.',
+    date: '3 April 2026',
+    readTime: '14 min read',
+    category: 'WordPress',
+  },
+  {
+    slug: 'ithemes-security-locked-out',
+    title: 'iThemes Security Locked Me Out of WordPress: How to Regain Access and Prevent It',
+    excerpt:
+      'iThemes Security can lock you out of your own WordPress site through aggressive brute force protection, IP banning, and two-factor authentication failures. Learn how to regain access via FTP or database and configure it to stop blocking legitimate users.',
+    date: '3 April 2026',
+    readTime: '13 min read',
+    category: 'WordPress',
+  },
+  {
+    slug: 'woocommerce-payment-gateway-error',
+    title: 'WooCommerce Payment Gateway Error: Why Stripe, PayPal, and Square Randomly Stop Working',
+    excerpt:
+      'Payment gateway errors in WooCommerce can be caused by expired API keys, SSL certificate issues, webhook failures, plugin conflicts, and gateway-side outages. Every failed transaction is lost revenue. Learn how to diagnose and fix each cause.',
+    date: '3 April 2026',
+    readTime: '14 min read',
+    category: 'Ecommerce',
+  },
+  {
+    slug: 'woocommerce-down',
+    title: 'WooCommerce Down? How to Diagnose and Fix a Broken WooCommerce Store',
+    excerpt:
+      'Your WooCommerce store is not working and every minute is lost revenue. This step-by-step guide covers plugin conflicts, database errors, PHP memory exhaustion, hosting failures, and payment gateway outages — with a clear path to diagnosing each one.',
+    date: '6 April 2026',
+    readTime: '15 min read',
+    category: 'Ecommerce',
+  },
+  {
+    slug: 'shopify-down',
+    title: 'Is Shopify Down? How to Check Shopify Status and Protect Your Store',
+    excerpt:
+      'Your Shopify store is not loading. Here is how to find out in 60 seconds whether it is a Shopify platform issue or something specific to your store — and what to do in either case.',
+    date: '6 April 2026',
+    readTime: '14 min read',
+    category: 'Ecommerce',
+  },
+  {
+    slug: 'website-response-time',
+    title: 'What Is a Good Website Response Time? (And How to Fix a Slow Server)',
+    excerpt:
+      'Under 200ms is excellent, under 800ms is acceptable, above 2 seconds is damaging. Learn what drives high TTFB, how to fix slow server response times, and how to monitor response time continuously.',
+    date: '6 April 2026',
+    readTime: '13 min read',
+    category: 'Performance',
+  },
+  {
+    slug: 'uptime-monitoring-tools',
+    title: 'Best Uptime Monitoring Tools in 2026: What to Look For',
+    excerpt:
+      'Not all uptime monitoring tools are created equal. Check frequency, multi-region checks, SSL monitoring, alert channels, status pages, and response time tracking all matter. Here is what separates tools that protect your business from ones that just add a green checkmark.',
+    date: '6 April 2026',
+    readTime: '13 min read',
+    category: 'Guide',
+  },
+  {
+    slug: 'ssl-certificate-expired',
+    title: 'SSL Certificate Expired: What It Means and How to Fix It in 10 Minutes',
+    excerpt:
+      'Visitors see "Your connection is not private" and leave immediately. Learn what the warning means, why certificates expire despite auto-renew, how to renew for free with Let\'s Encrypt or cPanel, and how to prevent it from ever happening again.',
+    date: '6 April 2026',
+    readTime: '12 min read',
+    category: 'Security',
+  },
 ]
 
 const POSTS_PER_PAGE = 6

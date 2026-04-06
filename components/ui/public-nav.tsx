@@ -1,22 +1,30 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { UptrueLogo } from '@/components/ui/uptrue-logo'
+import { createClient } from '@/lib/supabase/client'
 
 /**
  * PublicNav — consistent navigation for all public pages.
  * Layout: logo LEFT, nav links CENTER, login/signup RIGHT.
- * Client component so it can detect auth state via Supabase cookies
- * and show "Dashboard" instead of "Log in / Start Free" for logged-in users.
+ * Shows "Dashboard" for authenticated users, "Log in / Start Free" for guests.
  */
 export function PublicNav(): React.ReactElement {
-  const [isLoggedIn] = useState<boolean>(() => {
-    if (typeof document === 'undefined') return false
-    return document.cookie.split(';').some(
-      (c: string) => c.trim().startsWith('sb-') && c.includes('auth-token')
-    )
-  })
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false)
+
+  useEffect(() => {
+    const supabase = createClient()
+    // Check current session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsLoggedIn(!!session)
+    })
+    // Listen for auth state changes (login/logout while page is open)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsLoggedIn(!!session)
+    })
+    return () => { subscription.unsubscribe() }
+  }, [])
 
   return (
     <nav className="landing-nav">
