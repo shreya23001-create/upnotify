@@ -69,6 +69,12 @@ export function SettingsContent({
   const [revokeIds, setRevokeIds] = useState<string[]>([])
   const [revokeError, setRevokeError] = useState<string | null>(null)
   const [apiKeyList, setApiKeyList] = useState<ApiKey[]>(apiKeys)
+  const [showCreateForm, setShowCreateForm] = useState(false)
+  const [newKeyName, setNewKeyName] = useState('')
+  const [creatingKey, setCreatingKey] = useState(false)
+  const [createError, setCreateError] = useState<string | null>(null)
+  const [newKeyResult, setNewKeyResult] = useState<{ rawKey: string; name: string } | null>(null)
+  const [copiedKey, setCopiedKey] = useState(false)
   const [teamMembers, setTeamMembers] = useState<User[]>(members)
   const [removeTarget, setRemoveTarget] = useState<string | null>(null)
   const [removeError, setRemoveError] = useState<string | null>(null)
@@ -92,6 +98,39 @@ export function SettingsContent({
       setRevokeError('Network error. Please try again.')
     }
   }, [revokeIds])
+
+  const handleCreateKey = useCallback(async (): Promise<void> => {
+    if (!newKeyName.trim()) return
+    setCreatingKey(true)
+    setCreateError(null)
+    try {
+      const res = await fetch('/api/v1/api-keys', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: newKeyName.trim() }),
+      })
+      const data = await res.json() as Record<string, unknown>
+      if (!res.ok) {
+        setCreateError((data.error as string) || 'Failed to create key.')
+        return
+      }
+      setApiKeyList(prev => [data.key as ApiKey, ...prev])
+      setNewKeyResult({ rawKey: data.rawKey as string, name: newKeyName.trim() })
+      setNewKeyName('')
+      setShowCreateForm(false)
+    } catch {
+      setCreateError('Network error. Please try again.')
+    } finally {
+      setCreatingKey(false)
+    }
+  }, [newKeyName])
+
+  const handleCopyKey = useCallback((): void => {
+    if (!newKeyResult?.rawKey) return
+    void navigator.clipboard.writeText(newKeyResult.rawKey)
+    setCopiedKey(true)
+    setTimeout(() => setCopiedKey(false), 2000)
+  }, [newKeyResult])
 
   const handleInviteSent = useCallback((): void => {
     // Invites are managed separately — no need to update team members list here.
@@ -325,19 +364,89 @@ export function SettingsContent({
       )}
 
       {tab === 'api-keys' && (
-        <div className="card">
-          <div className="card-header card-header-row"><div className="card-title">API Keys</div><button className="btn btn-primary btn-sm" disabled>+ Create Key</button></div>
-          <div className="card-content">
-            {revokeError && (
-              <div className="alert alert-error" style={{ marginBottom: 16 }}>{revokeError}</div>
-            )}
-            <DataTable
-              columns={apiKeyColumns}
-              data={apiKeyList}
-              searchPlaceholder="Search API keys..."
-              bulkActions={apiKeyBulkActions}
-              emptyMessage="No API keys created yet."
-            />
+        <div>
+          {/* Show-once new key modal */}
+          {newKeyResult && (
+            <div className="api-key-reveal-overlay">
+              <div className="api-key-reveal-card">
+                <div className="api-key-reveal-icon">🔑</div>
+                <h3 className="api-key-reveal-title">Your new API key — copy it now</h3>
+                <p className="api-key-reveal-sub">
+                  This is the <strong>only time</strong> you will see the full key. Store it somewhere safe.
+                </p>
+                <div className="api-key-reveal-name">Key name: <strong>{newKeyResult.name}</strong></div>
+                <div className="api-key-raw-row">
+                  <code className="api-key-raw">{newKeyResult.rawKey}</code>
+                  <button
+                    className={`btn btn-sm ${copiedKey ? 'btn-success' : 'btn-secondary'}`}
+                    onClick={handleCopyKey}
+                    style={{ flexShrink: 0 }}
+                  >
+                    {copiedKey ? '✓ Copied' : 'Copy'}
+                  </button>
+                </div>
+                <button
+                  className="btn btn-primary btn-sm"
+                  style={{ marginTop: 16 }}
+                  onClick={() => { setNewKeyResult(null); setCopiedKey(false) }}
+                >
+                  I&apos;ve saved it — close
+                </button>
+              </div>
+            </div>
+          )}
+
+          <div className="card">
+            <div className="card-header card-header-row">
+              <div>
+                <div className="card-title">API Keys</div>
+                <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 2 }}>
+                  Used to authenticate with the Uptrue API and Compete webhooks. Keys are only shown once.
+                </p>
+              </div>
+              <button
+                className="btn btn-primary btn-sm"
+                onClick={() => { setShowCreateForm(f => !f); setCreateError(null) }}
+              >
+                {showCreateForm ? 'Cancel' : '+ Create Key'}
+              </button>
+            </div>
+            <div className="card-content">
+              {showCreateForm && (
+                <div className="api-key-create-form">
+                  <input
+                    className="form-input"
+                    placeholder="Key name (e.g. WooCommerce store, Zapier)"
+                    value={newKeyName}
+                    onChange={e => setNewKeyName(e.target.value)}
+                    maxLength={64}
+                    disabled={creatingKey}
+                    onKeyDown={e => { if (e.key === 'Enter') void handleCreateKey() }}
+                    autoFocus
+                  />
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => void handleCreateKey()}
+                    disabled={creatingKey || !newKeyName.trim()}
+                  >
+                    {creatingKey ? 'Creating...' : 'Create Key'}
+                  </button>
+                  {createError && (
+                    <div className="alert alert-error" style={{ marginTop: 8 }}>{createError}</div>
+                  )}
+                </div>
+              )}
+              {revokeError && (
+                <div className="alert alert-error" style={{ marginBottom: 16 }}>{revokeError}</div>
+              )}
+              <DataTable
+                columns={apiKeyColumns}
+                data={apiKeyList}
+                searchPlaceholder="Search API keys..."
+                bulkActions={apiKeyBulkActions}
+                emptyMessage="No API keys yet. Create one above to get started."
+              />
+            </div>
           </div>
         </div>
       )}

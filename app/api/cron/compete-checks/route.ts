@@ -32,7 +32,7 @@ export async function GET(request: Request): Promise<NextResponse> {
 
     const { data: products, error } = await supabase
       .from('ecom_products')
-      .select('id, org_id, url, name, css_selector, last_price, last_stock_status')
+      .select('id, org_id, url, name, css_selector, last_price, last_currency, last_stock_status')
       .eq('is_active', true)
       .or(`last_checked_at.is.null,last_checked_at.lt.${oneHourAgo}`)
       .order('last_checked_at', { ascending: true, nullsFirst: true })
@@ -85,11 +85,14 @@ export async function GET(request: Request): Promise<NextResponse> {
               confidence: result.confidence,
             })
 
-            // Update product record
+            // Update product record (archive current price as prev before overwriting)
             await supabase
               .from('ecom_products')
               .update({
+                prev_price: product.last_price ?? null,
+                prev_currency: (product as unknown as Record<string, unknown>).last_currency as string ?? 'GBP',
                 last_price: newPrice,
+                last_currency: result.currency,
                 last_stock_status: result.stockStatus,
                 last_checked_at: new Date().toISOString(),
               })

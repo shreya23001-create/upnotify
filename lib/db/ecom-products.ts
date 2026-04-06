@@ -262,10 +262,19 @@ export async function writePrice(
     return null
   }
 
-  // Update the product's last known price
+  // Fetch current price to archive as prev_price before overwriting
+  const { data: existingPrev } = await supabase
+    .from('ecom_products')
+    .select('last_price, last_currency')
+    .eq('id', productId)
+    .single()
+
+  // Update the product's last known price (save current as prev)
   const { error: updateError } = await supabase
     .from('ecom_products')
     .update({
+      prev_price: existingPrev?.last_price ?? null,
+      prev_currency: (existingPrev as unknown as Record<string, unknown>)?.last_currency as string ?? 'GBP',
       last_price: priceData.price,
       last_currency: priceData.currency,
       last_stock_status: priceData.stock_status ?? null,

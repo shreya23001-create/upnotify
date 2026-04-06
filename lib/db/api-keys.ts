@@ -21,11 +21,11 @@ function hashApiKey(rawKey: string): string {
  * Uses admin client because this runs in unauthenticated webhook context.
  */
 export async function validateApiKey(rawKey: string): Promise<ApiKey | null> {
-  if (!rawKey || rawKey.length < 8) {
+  if (!rawKey || rawKey.length < 12) {
     return null
   }
 
-  const prefix = rawKey.substring(0, 8)
+  const prefix = rawKey.substring(0, 12)
   const keyHash = hashApiKey(rawKey)
 
   const supabase = createAdminClient()
@@ -86,4 +86,41 @@ export async function revokeApiKey(keyId: string): Promise<boolean> {
     return false
   }
   return true
+}
+
+/**
+ * Generate a new API key for an org.
+ * Returns the raw key (shown ONCE to user) + the stored ApiKey record.
+ * Raw key format: utk_<64 hex chars>
+ * Stored: key_prefix (first 12 chars), key_hash (SHA-256 of full key)
+ */
+export async function createApiKey(params: {
+  orgId: string
+  name: string
+  scopes?: string[]
+}): Promise<{ key: ApiKey; rawKey: string } | null> {
+  const rawKey = `utk_${crypto.randomBytes(32).toString('hex')}`
+  const prefix = rawKey.substring(0, 12)
+  const keyHash = hashApiKey(rawKey)
+
+  const supabase = createAdminClient()
+  const { data, error } = await supabase
+    .from('api_keys')
+    .insert({
+      org_id: params.orgId,
+      name: params.name,
+      key_hash: keyHash,
+      key_prefix: prefix,
+      scopes: params.scopes ?? ['read', 'write'],
+      is_revoked: false,
+    })
+    .select()
+    .single()
+
+  if (error) {
+    logger.error('Failed to create API key', { error: error.message, orgId: params.orgId })
+    return null
+  }
+
+  return { key: data as ApiKey, rawKey }
 }

@@ -167,7 +167,25 @@ export function CompeteProductTable({
                     </span>
                   </td>
                   <td className="compete-price-cell">
-                    {formatPrice(product.last_price, product.last_currency)}
+                    {(() => {
+                      const p = product as unknown as Record<string, unknown>
+                      const prev = p.prev_price as number | null
+                      const curr = product.last_price
+                      const dir = curr !== null && prev !== null && Math.abs(curr - prev) > 0.001
+                        ? curr > prev ? 'up' : 'down' : null
+                      const pct = dir && prev && prev > 0 ? ((curr! - prev) / prev * 100) : null
+                      return (
+                        <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <span>{formatPrice(product.last_price, product.last_currency)}</span>
+                          {dir && (
+                            <span className={`compete-dir-badge compete-dir-${dir}`} title={pct !== null ? `${pct > 0 ? '+' : ''}${pct.toFixed(1)}% vs previous` : ''}>
+                              {dir === 'up' ? '▲' : '▼'}
+                              {pct !== null && <span style={{ fontSize: 10, marginLeft: 2 }}>{Math.abs(pct).toFixed(1)}%</span>}
+                            </span>
+                          )}
+                        </span>
+                      )
+                    })()}
                   </td>
                   <td>
                     <span className={getStockStatusClass(product.last_stock_status)}>

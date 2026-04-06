@@ -63,7 +63,7 @@ export default async function User360Page({
   const sixMonthsAgo = new Date()
   sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6)
 
-  const [orgResult, usersResult, subsResult, invoicesResult, monitorsResult, incidentsResult, statusPagesResult, alertChannelsResult, auditLogResult, checkResultsResult, competeSubResult, ecomProductsResult] =
+  const [orgResult, usersResult, subsResult, invoicesResult, monitorsResult, incidentsResult, statusPagesResult, alertChannelsResult, auditLogResult, checkResultsResult, competeSubResult, ecomProductsResult, apiKeysResult] =
     orgId
       ? await Promise.all([
           supabase.from('organisations').select('*').eq('id', orgId).single(),
@@ -78,8 +78,9 @@ export default async function User360Page({
           supabase.from('check_results').select('checked_at').eq('org_id', orgId).gte('checked_at', sixMonthsAgo.toISOString()).limit(200000),
           supabase.from('compete_subscriptions').select('id, status, billing_cycle, current_period_end, extra_products_purchased, created_at, compete_plan_id').eq('org_id', orgId).eq('status', 'active').maybeSingle(),
           supabase.from('ecom_products').select('id', { count: 'exact', head: true }).eq('org_id', orgId).eq('is_active', true),
+          supabase.from('api_keys').select('id, name, key_prefix, scopes, created_at, last_used_at, is_revoked').eq('org_id', orgId).eq('is_revoked', false).order('created_at', { ascending: false }),
         ])
-      : Array(12).fill({ data: null, error: null, count: null })
+      : Array(13).fill({ data: null, error: null, count: null })
 
   const org = orgResult.data as Record<string, unknown> | null
   const users = (usersResult.data ?? []) as Array<{ id: string; email: string; full_name: string | null; created_at: string; last_sign_in_at: string | null; is_super_admin: boolean }>
@@ -95,6 +96,9 @@ export default async function User360Page({
   type CompeteSubRow = { id: string; status: string; billing_cycle: string; current_period_end: string | null; extra_products_purchased: number; created_at: string; compete_plan_id: string }
   const competeSub = competeSubResult.data as CompeteSubRow | null
   const ecomProductCount = ecomProductsResult.count ?? 0
+
+  type ApiKeyRow = { id: string; name: string; key_prefix: string; scopes: string[]; created_at: string; last_used_at: string | null; is_revoked: boolean }
+  const orgApiKeys = (apiKeysResult?.data ?? []) as ApiKeyRow[]
 
   // Fetch compete plan details if there's an active compete subscription
   type CompetePlanDetails = { name: string; slug: string; product_limit: number; price_monthly_pence: number; price_yearly_pence: number | null; has_yearly_discount: boolean }
@@ -1017,6 +1021,57 @@ export default async function User360Page({
               </div>
             )}
           </div>
+
+          {/* API Keys */}
+          {orgId && (
+            <div className="card" style={{ padding: 16, marginBottom: 16 }}>
+              <h3 style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-muted)' }}>API Keys</h3>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 10, marginBottom: 16 }}>
+                <div className="card" style={{ padding: '12px 14px' }}>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Active Keys</div>
+                  <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-primary)' }}>{orgApiKeys.length}</div>
+                </div>
+                <div className="card" style={{ padding: '12px 14px' }}>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Last Used</div>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-primary)' }}>
+                    {orgApiKeys.some(k => k.last_used_at)
+                      ? fmtDateTime(orgApiKeys.filter(k => k.last_used_at).sort((a, b) => new Date(b.last_used_at!).getTime() - new Date(a.last_used_at!).getTime())[0]?.last_used_at)
+                      : 'Never used'}
+                  </div>
+                </div>
+              </div>
+              {orgApiKeys.length > 0 ? (
+                <div style={{ overflowX: 'auto' }}>
+                  <table className="table" style={{ fontSize: 13 }}>
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Prefix</th>
+                        <th>Scopes</th>
+                        <th>Created</th>
+                        <th>Last Used</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {orgApiKeys.map(k => (
+                        <tr key={k.id}>
+                          <td style={{ fontWeight: 500 }}>{k.name}</td>
+                          <td><code style={{ fontSize: 12, background: 'var(--bg-muted)', padding: '2px 6px', borderRadius: 4 }}>{k.key_prefix}...</code></td>
+                          <td><span className="badge badge-outline" style={{ fontSize: 11 }}>{k.scopes.join(', ')}</span></td>
+                          <td style={{ color: 'var(--text-muted)' }}>{fmtDate(k.created_at)}</td>
+                          <td style={{ color: k.last_used_at ? 'var(--text-primary)' : 'var(--text-muted)' }}>
+                            {k.last_used_at ? fmtDateTime(k.last_used_at) : 'Never'}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>No API keys created for this org.</p>
+              )}
+            </div>
+          )}
 
           {/* Quick actions */}
           <div className="card" style={{ padding: 16 }}>

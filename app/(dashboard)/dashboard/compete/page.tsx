@@ -61,11 +61,27 @@ export default async function CompetePage(): Promise<React.ReactElement> {
           </p>
         </div>
         <div className="page-header-actions">
-          <Link href="/dashboard/compete/connect" className="btn btn-ghost">
+          <Link href="/dashboard/compete/connect" className="btn btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
             Connect Store
           </Link>
         </div>
       </div>
+
+      {products.length === 0 && (
+        <div className="compete-connect-banner">
+          <div className="compete-connect-banner-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          </div>
+          <div className="compete-connect-banner-body">
+            <div className="compete-connect-banner-title">Connect your store to auto-sync prices</div>
+            <div className="compete-connect-banner-sub">Send price updates automatically from WooCommerce, Shopify, BigCommerce or any platform via webhook.</div>
+          </div>
+          <Link href="/dashboard/compete/connect" className="btn btn-primary btn-sm">
+            Connect Store →
+          </Link>
+        </div>
+      )}
 
       {/* Quick stats */}
       <div className="compete-stats-row">
