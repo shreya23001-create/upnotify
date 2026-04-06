@@ -189,5 +189,7 @@ export async function GET(): Promise<NextResponse> {
     profiles.push({ ...base, ...calcScore(base) })
   }
 
-  return NextResponse.json({ success: true, profiles })
+  const plans = (plansRaw ?? []) as { id: string; name: string; slug: string }[]
+
+  return NextResponse.json({ success: true, profiles, plans })
 }
