@@ -232,6 +232,10 @@ Format your response EXACTLY like this:
     sources: ctx.research?.articles.map(a => ({ title: a.title, url: a.url, source: a.source })) ?? [],
   }
 
+  // Only use incidentId as FK if it's a real UUID (not a test/fake ID)
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+  const sourceIncidentId = uuidRegex.test(ctx.incidentId) ? ctx.incidentId : null
+
   // Save as pending_approval — admin reviews before publishing
   const { data: post, error: insertError } = await supabase
     .from('blog_posts')
@@ -246,7 +250,7 @@ Format your response EXACTLY like this:
       seo_title: seoTitle || title,
       seo_description: seoDescription || postExcerpt,
       auto_generated: true,
-      source_public_incident_id: ctx.incidentId,
+      source_public_incident_id: sourceIncidentId,
     })
     .select('id, title, slug')
     .single()
