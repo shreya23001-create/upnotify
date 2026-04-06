@@ -1,7 +1,9 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { createApprovalTokens } from '@/lib/db/blog-approval-tokens'
 import { getServerConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
+import type { OutageResearch } from '@/lib/services/outage-researcher'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -15,13 +17,16 @@ export interface OutageContext {
   statusCode: number | null // e.g. 503
   startedAt: string         // ISO timestamp
   incidentId: string        // public_incidents.id
+  research?: OutageResearch // Optional — enriches the post if available
 }
 
-interface GeneratedBlogDraft {
+export interface GeneratedBlogDraft {
   blogPostId: string
   title: string
   slug: string
   excerpt: string
+  approveToken: string
+  rejectToken: string
 }
 
 // ---------------------------------------------------------------------------
@@ -52,7 +57,35 @@ function formatReadableDate(iso: string): string {
 }
 
 // ---------------------------------------------------------------------------
-// Check for duplicate (prevent re-generating for same incident)
+// Build research context for the prompt
+// ---------------------------------------------------------------------------
+
+function buildResearchContext(research: OutageResearch): string {
+  const lines: string[] = []
+
+  if (research.officialStatus) {
+    lines.push(`== OFFICIAL STATUS PAGE (${research.officialStatusUrl}) ==`)
+    lines.push(research.officialStatus.slice(0, 1500))
+    lines.push('')
+  }
+
+  if (research.articles.length > 0) {
+    lines.push('== EXTERNAL SOURCES ==')
+    for (const article of research.articles.slice(0, 12)) {
+      lines.push(`Source: ${article.source}`)
+      lines.push(`Title: ${article.title}`)
+      lines.push(`URL: ${article.url}`)
+      if (article.snippet) lines.push(`Snippet: ${article.snippet.slice(0, 300)}`)
+      if (article.publishedAt) lines.push(`Published: ${article.publishedAt}`)
+      lines.push('')
+    }
+  }
+
+  return lines.join('\n')
+}
+
+// ---------------------------------------------------------------------------
+// Duplicate check
 // ---------------------------------------------------------------------------
 
 async function blogExistsForIncident(incidentId: string): Promise<boolean> {
@@ -70,12 +103,11 @@ async function blogExistsForIncident(incidentId: string): Promise<boolean> {
 // ---------------------------------------------------------------------------
 
 /**
- * Generates an outage blog post draft using Claude, saves it as pending_approval,
- * creates approval tokens, and returns them for the admin email.
- * Safe to call multiple times — deduplicates by incident ID.
+ * Generates an outage blog post using Claude + real-time research from
+ * multiple sources. Saves as pending_approval and creates approval tokens
+ * for admin email review. Safe to call multiple times — deduplicates by incident ID.
  */
 export async function generateOutageBlogPost(ctx: OutageContext): Promise<GeneratedBlogDraft | null> {
-  // Deduplicate: only one blog post per incident
   const exists = await blogExistsForIncident(ctx.incidentId)
   if (exists) {
     logger.info('Blog post already exists for incident — skipping', { incidentId: ctx.incidentId })
@@ -94,23 +126,31 @@ export async function generateOutageBlogPost(ctx: OutageContext): Promise<Genera
     ? `HTTP ${ctx.statusCode} — ${ctx.errorMessage}`
     : ctx.errorMessage
 
+  const hasResearch = ctx.research?.hasRealData
+  const researchBlock = hasResearch ? buildResearchContext(ctx.research!) : ''
+
   const prompt = `You are a technical writer for Uptrue, an uptime monitoring platform.
 Write a blog post in the format of "Is [Site] Down?" that will rank on Google when people search for current outages.
 
 Site: ${ctx.siteDisplayName} (${ctx.siteDomain})
-Outage detected at: ${detectedAt}
-Error: ${errorDetail}
+Outage detected by Uptrue at: ${detectedAt}
+Error detected: ${errorDetail}
+
+${hasResearch ? `REAL-TIME RESEARCH DATA (use this to write a more informed, accurate post):
+${researchBlock}` : 'No external research data available — write based on the detected error only.'}
 
 Write the post in Markdown. The post must:
 1. Open with a clear statement that Uptrue detected an outage for ${ctx.siteDisplayName}
-2. Give readers a way to check if they are affected (check their own connection, try incognito, etc.)
-3. Include a "What We Know So Far" section with the incident details
-4. Include a "What to Do While [Site] Is Down" section with practical workarounds
-5. Include a "Monitor [Site] for Free" section with a call to action to sign up at https://uptrue.io
+2. Include a "What We Know So Far" section — use the research data to explain the likely cause, affected services, and timeline. If the official status page has information, summarise it accurately.
+3. Include a "What Users Are Saying" section if there are social/Reddit mentions — summarise the user reports naturally (do NOT copy verbatim). Credit sources as inline links e.g. "reports on Reddit" or "posts on X".
+4. Include a "What to Do While ${ctx.siteDisplayName} Is Down" section with practical workarounds
+5. Include a "Monitor ${ctx.siteDisplayName} for Free" section with a natural call to action to sign up at https://uptrue.io — do NOT make it salesy, frame it as a helpful tool
 6. Close with a note that Uptrue will update the post as the situation develops
-7. Be between 400–600 words
-8. Use a human, helpful tone — not robotic
+7. Be between 500–700 words
+8. Use a human, helpful tone — not robotic or marketing-heavy
 9. Do NOT include a title at the top (it is added separately)
+10. If you cite a specific source, use Markdown link syntax: [source name](url)
+11. Do NOT fabricate facts — if research data is thin, say "details are still emerging"
 
 Also provide:
 - EXCERPT: One sentence (max 160 chars) summarising the post for Google
@@ -135,7 +175,7 @@ Format your response EXACTLY like this:
   try {
     const message = await client.messages.create({
       model: 'claude-sonnet-4-20250514',
-      max_tokens: 1200,
+      max_tokens: 1500,
       messages: [{ role: 'user', content: prompt }],
     })
 
@@ -163,7 +203,6 @@ Format your response EXACTLY like this:
   let slug = baseSlug
   const supabase = createAdminClient()
 
-  // Ensure slug uniqueness (unlikely collision but safe)
   const { count: slugCount } = await supabase
     .from('blog_posts')
     .select('id', { count: 'exact', head: true })
@@ -174,6 +213,7 @@ Format your response EXACTLY like this:
   }
 
   const title = seoTitle || `Is ${ctx.siteDisplayName} Down? ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })} Outage`
+  const postExcerpt = excerpt || `${ctx.siteDisplayName} is experiencing an outage. Uptrue detected the issue at ${detectedAt}.`
 
   const content = {
     body,
@@ -187,11 +227,10 @@ Format your response EXACTLY like this:
       buttonLabel: 'Start Free Monitoring',
       buttonUrl: 'https://uptrue.io',
     },
+    sources: ctx.research?.articles.map(a => ({ title: a.title, url: a.url, source: a.source })) ?? [],
   }
 
-  const postExcerpt = excerpt || `${ctx.siteDisplayName} is experiencing an outage. Uptrue detected the issue at ${detectedAt}.`
-
-  // Auto-publish immediately — no approval step
+  // Save as pending_approval — admin reviews before publishing
   const { data: post, error: insertError } = await supabase
     .from('blog_posts')
     .insert({
@@ -201,10 +240,9 @@ Format your response EXACTLY like this:
       excerpt: postExcerpt,
       category: 'outage',
       tags: ['outage', ctx.siteDisplayName.toLowerCase(), 'downtime', 'is-it-down'],
-      status: 'published',
-      published_at: new Date().toISOString(),
+      status: 'pending_approval',
       seo_title: seoTitle || title,
-      seo_description: seoDescription || excerpt,
+      seo_description: seoDescription || postExcerpt,
       auto_generated: true,
       source_public_incident_id: ctx.incidentId,
     })
@@ -219,12 +257,20 @@ Format your response EXACTLY like this:
     return null
   }
 
-  logger.info('Auto-generated blog post published', { id: post.id, slug: post.slug })
+  logger.info('Auto-generated blog post saved as pending_approval', { id: post.id, slug: post.slug })
+
+  const tokens = await createApprovalTokens(post.id)
+  if (!tokens) {
+    logger.error('Failed to create approval tokens', { blogPostId: post.id })
+    return null
+  }
 
   return {
     blogPostId: post.id,
     title: post.title,
     slug: post.slug,
     excerpt: postExcerpt,
+    approveToken: tokens.approveToken,
+    rejectToken: tokens.rejectToken,
   }
 }

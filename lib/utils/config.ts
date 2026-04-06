@@ -44,6 +44,7 @@ interface ServerConfig extends PublicConfig {
     consumerSecret: string
     accessToken: string
     accessTokenSecret: string
+    bearerToken: string
   }
   linkedin: {
     accessToken: string
@@ -124,6 +125,7 @@ export function getServerConfig(): ServerConfig {
   const twitterConsumerSecret = process.env.X_CONSUMER_SECRET ?? ''
   const twitterAccessToken = process.env.X_ACCESS_TOKEN ?? ''
   const twitterAccessTokenSecret = process.env.X_ACCESS_TOKEN_SECRET ?? ''
+  const twitterBearerToken = process.env.X_BEARER_TOKEN ?? ''
   const linkedinAccessToken = process.env.LINKEDIN_ACCESS_TOKEN ?? ''
   const linkedinMemberId = process.env.LINKEDIN_MEMBER_ID ?? ''
   const linkedinOrganizationId = process.env.LINKEDIN_ORGANIZATION_ID ?? ''
@@ -155,6 +157,7 @@ export function getServerConfig(): ServerConfig {
       consumerSecret: twitterConsumerSecret,
       accessToken: twitterAccessToken,
       accessTokenSecret: twitterAccessTokenSecret,
+      bearerToken: twitterBearerToken,
     },
     linkedin: {
       accessToken: linkedinAccessToken,
