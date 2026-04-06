@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { getLeaderboardEntries } from '@/lib/db/leaderboard'
 
-export const revalidate = 300 // 5 minutes
+export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: 'Uptime Leaderboard — Most Reliable Websites | Uptrue',

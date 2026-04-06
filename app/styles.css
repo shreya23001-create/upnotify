@@ -1446,6 +1446,11 @@ html.dark .landing-cta { background: linear-gradient(135deg, #1a1d27 0%, #242736
 .tracker-pagination-btn-disabled:hover { border-color: var(--border-primary); background: var(--bg-card); }
 .tracker-pagination-info { font-size: 14px; font-weight: 500; color: var(--text-secondary); }
 
+/* Tracker infinite scroll loading */
+.tracker-loading { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 32px 0; font-size: 14px; color: var(--text-muted); }
+.tracker-loading-spinner { width: 18px; height: 18px; border: 2px solid var(--border-primary); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
 /* FAQ section */
 .tracker-faq-section { background: var(--bg-card); border: 1px solid var(--border-primary); border-radius: 12px; padding: 20px; margin-bottom: 24px; }
 .tracker-faq-item { padding: 16px 0; border-bottom: 1px solid var(--border-primary); }
