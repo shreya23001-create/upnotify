@@ -1,17 +1,14 @@
 export type Environment = 'development' | 'staging' | 'production'
 
 export function getEnvironment(): Environment {
-  const host =
-    typeof window !== 'undefined'
-      ? window.location.hostname
-      : process.env.VERCEL_URL || 'localhost'
+  // NEXT_PUBLIC_VERCEL_ENV is set by Vercel on both server and client —
+  // no window check needed, no hydration mismatch.
+  // Values: 'production' | 'preview' | 'development'
+  // Locally it is undefined, so we fall back to 'development'.
+  const vercelEnv = process.env.NEXT_PUBLIC_VERCEL_ENV
 
-  if (host.includes('localhost') || host.includes('127.0.0.1')) {
-    return 'development'
-  }
-  if (host.includes('.vercel.app')) {
-    return 'staging'
-  }
+  if (!vercelEnv || vercelEnv === 'development') return 'development'
+  if (vercelEnv === 'preview') return 'staging'
   return 'production'
 }
 

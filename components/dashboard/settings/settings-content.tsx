@@ -65,6 +65,7 @@ export function SettingsContent({
   const searchParams = useSearchParams()
   const initialTab = searchParams.get('tab') || 'organisation'
   const [tab, setTab] = useState(initialTab)
+  const billingResult = searchParams.get('billing') // 'success' | 'canceled' | null
   const [revokeIds, setRevokeIds] = useState<string[]>([])
   const [revokeError, setRevokeError] = useState<string | null>(null)
   const [apiKeyList, setApiKeyList] = useState<ApiKey[]>(apiKeys)
@@ -193,6 +194,18 @@ export function SettingsContent({
   return (
     <>
     <div>
+      {/* Billing return banner */}
+      {billingResult === 'success' && (
+        <div className="alert alert-success" style={{ marginBottom: 16 }}>
+          <strong>Plan activated.</strong> Your subscription is now live. It may take a moment to reflect across all features.
+        </div>
+      )}
+      {billingResult === 'canceled' && (
+        <div className="alert alert-warning" style={{ marginBottom: 16 }}>
+          <strong>Payment canceled.</strong> No charge was made. Your current plan remains unchanged.
+        </div>
+      )}
+
       <div className="tabs-list">
         {['organisation', 'team', 'billing', 'credits', 'referrals', 'company', 'api-keys'].map((t) => (
           <button key={t} className={`tab-trigger${tab === t ? ' active' : ''}`} onClick={() => setTab(t)}>

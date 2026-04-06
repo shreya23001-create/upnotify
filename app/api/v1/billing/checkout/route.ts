@@ -89,8 +89,8 @@ export async function POST(request: Request): Promise<NextResponse> {
       subscription_data: {
         metadata: { org_id: org.id, plan_slug: plan.slug },
       },
-      success_url: `${appUrl}/dashboard/settings?billing=success`,
-      cancel_url: `${appUrl}/dashboard/settings?billing=canceled`,
+      success_url: `${appUrl}/dashboard/settings?tab=billing&billing=success`,
+      cancel_url: `${appUrl}/dashboard/settings?tab=billing&billing=canceled`,
     })
 
     if (!session.url) {
