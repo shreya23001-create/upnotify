@@ -47,7 +47,8 @@ interface ServerConfig extends PublicConfig {
   }
   linkedin: {
     accessToken: string
-    organizationId: string
+    memberId: string        // temp: member posting; swap for organizationId before go-live
+    organizationId: string  // go-live: requires w_organization_social scope + LinkedIn approval
   }
   blogApproval: {
     secret: string
@@ -124,6 +125,7 @@ export function getServerConfig(): ServerConfig {
   const twitterAccessToken = process.env.X_ACCESS_TOKEN ?? ''
   const twitterAccessTokenSecret = process.env.X_ACCESS_TOKEN_SECRET ?? ''
   const linkedinAccessToken = process.env.LINKEDIN_ACCESS_TOKEN ?? ''
+  const linkedinMemberId = process.env.LINKEDIN_MEMBER_ID ?? ''
   const linkedinOrganizationId = process.env.LINKEDIN_ORGANIZATION_ID ?? ''
   const blogApprovalSecret = process.env.BLOG_APPROVAL_SECRET ?? ''
 
@@ -156,6 +158,7 @@ export function getServerConfig(): ServerConfig {
     },
     linkedin: {
       accessToken: linkedinAccessToken,
+      memberId: linkedinMemberId,
       organizationId: linkedinOrganizationId,
     },
     blogApproval: {

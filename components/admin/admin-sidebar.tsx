@@ -22,24 +22,59 @@ interface NavItem {
   badge?: string
 }
 
-const NAV_ITEMS: NavItem[] = [
-  { href: '/admin', label: 'Dashboard', icon: IconDashboard },
-  { href: '/admin/users', label: 'Users', icon: IconUsers },
-  { href: '/admin/organisations', label: 'Organisations', icon: IconBuilding },
-  { href: '/admin/plans', label: 'Plans & Pricing', icon: IconCreditCard },
-  { href: '/admin/tracker', label: 'Public Tracker', icon: IconGlobe },
-  { href: '/admin/feature-flags', label: 'Feature Flags', icon: IconToggle },
-  { href: '/admin/messages', label: 'Messages', icon: IconBell },
-  { href: '/admin/credits', label: 'Credit Approvals', icon: IconTag },
-  { href: '/admin/agency-waitlist', label: 'Agency Waitlist', icon: IconUsers },
-  { href: '/admin/revenue', label: 'Revenue', icon: IconCreditCard },
-  { href: '/admin/system', label: 'System Health', icon: IconActivity },
-  { href: '/admin/audit-log', label: 'Audit Log', icon: IconFileText },
-  { href: '/admin/team', label: 'Admin Team', icon: IconShield },
-  { href: '/admin/blog', label: 'Blog', icon: IconEdit },
-  { href: '/admin/aoe', label: 'AOE Outreach', icon: IconMail },
-  { href: '/admin/emails', label: 'Email & Nurture', icon: IconMail },
-  { href: '/admin/settings', label: 'Settings', icon: IconSettings },
+interface NavGroup {
+  label: string
+  items: NavItem[]
+}
+
+const NAV_GROUPS: NavGroup[] = [
+  {
+    label: 'Overview',
+    items: [
+      { href: '/admin', label: 'Dashboard', icon: IconDashboard },
+    ],
+  },
+  {
+    label: 'People',
+    items: [
+      { href: '/admin/users', label: 'Users', icon: IconUsers },
+      { href: '/admin/organisations', label: 'Organisations', icon: IconBuilding },
+      { href: '/admin/agency-waitlist', label: 'Agency Waitlist', icon: IconUsers },
+    ],
+  },
+  {
+    label: 'Billing',
+    items: [
+      { href: '/admin/plans', label: 'Plans & Pricing', icon: IconCreditCard },
+      { href: '/admin/revenue', label: 'Revenue', icon: IconCreditCard },
+      { href: '/admin/credits', label: 'Credit Approvals', icon: IconTag },
+    ],
+  },
+  {
+    label: 'Product',
+    items: [
+      { href: '/admin/tracker', label: 'Public Tracker', icon: IconGlobe },
+      { href: '/admin/feature-flags', label: 'Feature Flags', icon: IconToggle },
+    ],
+  },
+  {
+    label: 'Content',
+    items: [
+      { href: '/admin/blog', label: 'Blog', icon: IconEdit },
+      { href: '/admin/aoe', label: 'AOE Outreach', icon: IconMail },
+      { href: '/admin/emails', label: 'Email & Nurture', icon: IconMail },
+      { href: '/admin/messages', label: 'Messages', icon: IconBell },
+    ],
+  },
+  {
+    label: 'System',
+    items: [
+      { href: '/admin/system', label: 'System Health', icon: IconActivity },
+      { href: '/admin/audit-log', label: 'Audit Log', icon: IconFileText },
+      { href: '/admin/team', label: 'Admin Team', icon: IconShield },
+      { href: '/admin/settings', label: 'Settings', icon: IconSettings },
+    ],
+  },
 ]
 
 function isActive(pathname: string, href: string): boolean {
@@ -78,38 +113,45 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps): React.Reac
 
         {/* Navigation */}
         <nav className="admin-sidebar-nav">
-          <div className="admin-sidebar-section-label">Main</div>
-          {NAV_ITEMS.map((item) => {
-            const active = isActive(pathname, item.href)
-            const Icon = item.icon
+          {NAV_GROUPS.map((group) => (
+            <div key={group.label} className="admin-sidebar-group">
+              <div className="admin-sidebar-section-label">{group.label}</div>
+              {group.items.map((item) => {
+                const active = isActive(pathname, item.href)
+                const Icon = item.icon
 
-            if (item.disabled) {
-              return (
-                <span
-                  key={item.href}
-                  className="admin-sidebar-item admin-sidebar-item-disabled"
-                >
-                  <Icon size={18} className="admin-sidebar-item-icon" />
-                  <span className="admin-sidebar-item-label">{item.label}</span>
-                  {item.badge && (
-                    <span className="admin-sidebar-badge">{item.badge}</span>
-                  )}
-                </span>
-              )
-            }
+                if (item.disabled) {
+                  return (
+                    <span
+                      key={item.href}
+                      className="admin-sidebar-item admin-sidebar-item-disabled"
+                    >
+                      <Icon size={18} className="admin-sidebar-item-icon" />
+                      <span className="admin-sidebar-item-label">{item.label}</span>
+                      {item.badge && (
+                        <span className="admin-sidebar-badge">{item.badge}</span>
+                      )}
+                    </span>
+                  )
+                }
 
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`admin-sidebar-item${active ? ' admin-sidebar-item-active' : ''}`}
-                onClick={onClose}
-              >
-                <Icon size={18} className="admin-sidebar-item-icon" />
-                <span className="admin-sidebar-item-label">{item.label}</span>
-              </Link>
-            )
-          })}
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`admin-sidebar-item${active ? ' admin-sidebar-item-active' : ''}`}
+                    onClick={onClose}
+                  >
+                    <Icon size={18} className="admin-sidebar-item-icon" />
+                    <span className="admin-sidebar-item-label">{item.label}</span>
+                    {item.badge && (
+                      <span className="admin-sidebar-badge">{item.badge}</span>
+                    )}
+                  </Link>
+                )
+              })}
+            </div>
+          ))}
         </nav>
 
         {/* Footer */}

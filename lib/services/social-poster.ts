@@ -137,17 +137,21 @@ async function postToX(post: OutageSocialPost): Promise<SocialPostResult> {
 
 async function postToLinkedIn(post: OutageSocialPost): Promise<SocialPostResult> {
   const config = getServerConfig()
-  const { accessToken, organizationId } = config.linkedin
+  const { accessToken, memberId } = config.linkedin
 
-  if (!accessToken || !organizationId) {
+  if (!accessToken || !memberId) {
+    // NOTE: Before go-live, switch to organizationId + w_organization_social scope
     logger.warn('LinkedIn credentials not configured — skipping LinkedIn post')
     return { success: false, platform: 'linkedin', error: 'LinkedIn credentials not configured' }
   }
 
   const shareText = `🔴 ${post.siteDisplayName} is experiencing an outage.\n\nUptrue detected the issue and published a live status update:\n${post.blogUrl}\n\n#uptime #outage #${post.siteDisplayName.replace(/\s+/g, '')} #monitoring`
 
+  // NOTE: Currently posting as member (w_member_social) for testing.
+  // Before go-live: switch to organization posting (w_organization_social).
+  // See production checklist item: "LinkedIn — switch to company page posting"
   const payload = {
-    author: `urn:li:organization:${organizationId}`,
+    author: `urn:li:person:${memberId}`,
     lifecycleState: 'PUBLISHED',
     specificContent: {
       'com.linkedin.ugc.ShareContent': {
