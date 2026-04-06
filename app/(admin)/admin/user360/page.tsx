@@ -60,30 +60,35 @@ export default async function User360Page({
   }
 
   // ── Load all data in parallel ────────────────────────────────────────────
-  const [orgResult, usersResult, subsResult, invoicesResult, monitorsResult, incidentsResult, statusPagesResult, alertChannelsResult, auditLogResult] =
+  const sixMonthsAgo = new Date()
+  sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6)
+
+  const [orgResult, usersResult, subsResult, invoicesResult, monitorsResult, incidentsResult, statusPagesResult, alertChannelsResult, auditLogResult, checkResultsResult] =
     orgId
       ? await Promise.all([
           supabase.from('organisations').select('*').eq('id', orgId).single(),
           supabase.from('users').select('id, email, full_name, created_at, last_sign_in_at, is_super_admin').eq('org_id', orgId),
-          supabase.from('subscriptions').select('id, status, billing_cycle, current_period_end, created_at, plans(name, slug, price_monthly_gbp, monitor_limit, check_interval_seconds, status_page_limit, has_slack_teams, has_webhooks, has_api_access, ai_report_limit, max_team_members)').eq('org_id', orgId).order('created_at', { ascending: false }),
+          supabase.from('subscriptions').select('id, status, billing_cycle, current_period_end, created_at, plans(name, slug, price_monthly_gbp, price_annual_gbp, monitor_limit, check_interval_seconds, status_page_limit, has_slack_teams, has_webhooks, has_api_access, ai_report_limit, max_team_members)').eq('org_id', orgId).order('created_at', { ascending: false }),
           supabase.from('invoices').select('id, amount_gbp, currency, status, invoice_pdf_url, created_at, period_start').eq('org_id', orgId).order('created_at', { ascending: false }).limit(10),
-          supabase.from('monitors').select('id, name, url, status, check_type, created_at').eq('org_id', orgId).order('created_at', { ascending: false }),
+          supabase.from('monitors').select('id, name, url, status, check_type, check_interval_seconds, is_paused, created_at').eq('org_id', orgId).order('created_at', { ascending: false }),
           supabase.from('incidents').select('id, started_at, resolved_at, cause').eq('org_id', orgId).order('started_at', { ascending: false }).limit(5),
           supabase.from('status_pages').select('id, title, slug, is_published').eq('org_id', orgId),
           supabase.from('alert_channels').select('id, type, is_enabled').eq('org_id', orgId),
           supabase.from('audit_log').select('id, action, resource_type, resource_id, created_at, metadata, user_id').eq('org_id', orgId).order('created_at', { ascending: false }).limit(50),
+          supabase.from('check_results').select('checked_at').eq('org_id', orgId).gte('checked_at', sixMonthsAgo.toISOString()).limit(200000),
         ])
-      : Array(9).fill({ data: null, error: null, count: null })
+      : Array(10).fill({ data: null, error: null, count: null })
 
   const org = orgResult.data as Record<string, unknown> | null
   const users = (usersResult.data ?? []) as Array<{ id: string; email: string; full_name: string | null; created_at: string; last_sign_in_at: string | null; is_super_admin: boolean }>
-  const subs = (subsResult.data ?? []) as Array<{ id: string; status: string; billing_cycle: string; current_period_end: string | null; created_at: string; plans: { name: string; slug: string; price_monthly_gbp: number; monitor_limit: number | null; check_interval_seconds: number; status_page_limit: number | null; has_slack_teams: boolean; has_webhooks: boolean; has_api_access: boolean; ai_report_limit: number | null; max_team_members: number | null } | null }>
+  const subs = (subsResult.data ?? []) as Array<{ id: string; status: string; billing_cycle: string; current_period_end: string | null; created_at: string; plans: { name: string; slug: string; price_monthly_gbp: number; price_annual_gbp: number | null; monitor_limit: number | null; check_interval_seconds: number; status_page_limit: number | null; has_slack_teams: boolean; has_webhooks: boolean; has_api_access: boolean; ai_report_limit: number | null; max_team_members: number | null } | null }>
   const invoices = (invoicesResult.data ?? []) as Array<{ id: string; amount_gbp: number; currency: string; status: string; invoice_pdf_url: string | null; created_at: string; period_start: string | null }>
-  const monitors = (monitorsResult.data ?? []) as Array<{ id: string; name: string; url: string; status: string; check_type: string; created_at: string }>
+  const monitors = (monitorsResult.data ?? []) as Array<{ id: string; name: string; url: string; status: string; check_type: string; check_interval_seconds: number; is_paused: boolean; created_at: string }>
   const incidents = (incidentsResult.data ?? []) as Array<{ id: string; started_at: string; resolved_at: string | null; cause: string | null }>
   const statusPages = (statusPagesResult.data ?? []) as Array<{ id: string; title: string; slug: string; is_published: boolean }>
   const alertChannels = (alertChannelsResult.data ?? []) as Array<{ id: string; type: string; is_enabled: boolean }>
   const auditLog = (auditLogResult.data ?? []) as Array<{ id: string; action: string; resource_type: string | null; resource_id: string | null; created_at: string; metadata: Record<string, unknown> | null; user_id: string | null }>
+  const rawChecks = (checkResultsResult.data ?? []) as Array<{ checked_at: string }>
 
   const activeSub = subs.find(s => s.status === 'active')
   const activePlan = activeSub?.plans ?? null
@@ -91,6 +96,71 @@ export default async function User360Page({
   const monitorDownCount = monitors.filter(m => m.status === 'down').length
   const totalRevenue = invoices.filter(i => i.status === 'paid').reduce((sum, i) => sum + (i.amount_gbp ?? 0), 0)
   const enabledChannelTypes = new Set(alertChannels.filter(c => c.is_enabled).map(c => c.type))
+
+  // ── Unit economics ───────────────────────────────────────────────────────
+  // Monthly run rate (pence): use annual/12 for annual billing, monthly price otherwise
+  const monthlyRevenuePence = activePlan
+    ? (activeSub?.billing_cycle === 'annual' && activePlan.price_annual_gbp
+        ? Math.round(activePlan.price_annual_gbp / 12)
+        : activePlan.price_monthly_gbp)
+    : 0
+
+  // Estimated checks per month from active monitors
+  const SECONDS_PER_MONTH = 30 * 24 * 3600
+  const activeMonitors = monitors.filter(m => !m.is_paused)
+  const checksPerMonthEst = activeMonitors.reduce((sum, m) => {
+    const interval = m.check_interval_seconds || 60
+    return sum + Math.floor(SECONDS_PER_MONTH / interval)
+  }, 0)
+
+  // Cost per check: 0.001p (= £0.00001) — configurable via COST_PER_CHECK_MILLIPENCE env var
+  const costPerCheckMillipence = Number(process.env.COST_PER_CHECK_MILLIPENCE ?? 1)
+  const estimatedCostPence = Math.round(checksPerMonthEst * costPerCheckMillipence / 1000)
+  const grossMarginPence = monthlyRevenuePence - estimatedCostPence
+  const marginPct = monthlyRevenuePence > 0 ? Math.round((grossMarginPence / monthlyRevenuePence) * 100) : 0
+
+  // Aggregate actual check counts by YYYY-MM
+  const checksByMonth: Record<string, number> = {}
+  for (const row of rawChecks) {
+    const key = row.checked_at.slice(0, 7)
+    checksByMonth[key] = (checksByMonth[key] ?? 0) + 1
+  }
+
+  // Build last-6-months chart data
+  type ChartMonth = { label: string; key: string; revenuePence: number; costPence: number; checks: number }
+  const chartMonths: ChartMonth[] = []
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date()
+    d.setDate(1)
+    d.setMonth(d.getMonth() - i)
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+    const label = d.toLocaleString('en-GB', { month: 'short', year: '2-digit' })
+    const checks = checksByMonth[key] ?? 0
+    const costPence = Math.round(checks * costPerCheckMillipence / 1000)
+    chartMonths.push({ label, key, revenuePence: monthlyRevenuePence, costPence, checks })
+  }
+
+  // SVG chart helpers
+  const chartW = 580
+  const chartH = 140
+  const padL = 44
+  const padB = 28
+  const padT = 12
+  const innerW = chartW - padL - 10
+  const innerH = chartH - padB - padT
+  const maxVal = Math.max(...chartMonths.flatMap(m => [m.revenuePence, m.costPence]), 100)
+  const groupW = Math.floor(innerW / 6)
+  const barW = Math.floor(groupW * 0.35)
+
+  function scaleY(pence: number): number {
+    return padT + innerH - Math.round((pence / maxVal) * innerH)
+  }
+  function barH(pence: number): number {
+    return Math.max(2, Math.round((pence / maxVal) * innerH))
+  }
+  function groupX(i: number): number {
+    return padL + i * groupW + Math.floor(groupW * 0.08)
+  }
 
   return (
     <div>
@@ -152,6 +222,146 @@ export default async function User360Page({
                 <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-primary)' }}>{s.value}</div>
               </div>
             ))}
+          </div>
+
+          {/* Unit Economics */}
+          <div className="card" style={{ padding: 20, marginBottom: 16 }}>
+            <h3 style={{ fontSize: 13, fontWeight: 700, marginBottom: 16, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-muted)' }}>
+              Unit Economics — Revenue vs Cost of Service
+            </h3>
+
+            {/* KPI row */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 20 }}>
+              {[
+                {
+                  label: 'Monthly Run Rate',
+                  value: fmtAmount(monthlyRevenuePence),
+                  sub: activeSub?.billing_cycle === 'annual' ? 'annual ÷ 12' : 'monthly',
+                  color: 'var(--accent)',
+                },
+                {
+                  label: 'Checks / Month',
+                  value: checksPerMonthEst.toLocaleString(),
+                  sub: `${activeMonitors.length} active monitors`,
+                  color: 'var(--text-primary)',
+                },
+                {
+                  label: 'Est. Cost / Month',
+                  value: fmtAmount(estimatedCostPence),
+                  sub: `${(costPerCheckMillipence / 10).toFixed(4)}p per check`,
+                  color: estimatedCostPence > monthlyRevenuePence ? '#ef4444' : '#22c55e',
+                },
+                {
+                  label: 'Gross Margin',
+                  value: `${marginPct}%`,
+                  sub: fmtAmount(grossMarginPence) + ' / mo',
+                  color: marginPct < 30 ? '#ef4444' : marginPct < 60 ? '#f97316' : '#22c55e',
+                },
+              ].map(s => (
+                <div key={s.label} style={{ background: 'var(--bg-secondary)', borderRadius: 10, padding: '12px 14px' }}>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{s.label}</div>
+                  <div style={{ fontSize: 20, fontWeight: 800, color: s.color }}>{s.value}</div>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>{s.sub}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* SVG bar chart — Revenue vs Cost last 6 months */}
+            <div style={{ marginBottom: 8 }}>
+              <div style={{ display: 'flex', gap: 16, marginBottom: 8, fontSize: 11, color: 'var(--text-muted)' }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                  <span style={{ width: 12, height: 12, borderRadius: 2, background: '#3b82f6', display: 'inline-block' }} /> Revenue (amortized)
+                </span>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                  <span style={{ width: 12, height: 12, borderRadius: 2, background: '#f97316', display: 'inline-block' }} /> Est. Cost (actual checks)
+                </span>
+              </div>
+              <svg width="100%" viewBox={`0 0 ${chartW} ${chartH}`} style={{ overflow: 'visible', maxWidth: chartW }}>
+                {/* Y-axis gridlines + labels */}
+                {[0, 0.25, 0.5, 0.75, 1].map((pct) => {
+                  const val = Math.round(maxVal * pct)
+                  const y = scaleY(val)
+                  return (
+                    <g key={pct}>
+                      <line x1={padL} y1={y} x2={chartW - 10} y2={y}
+                        stroke="var(--border-light, #e2e8f0)" strokeWidth="1" strokeDasharray={pct === 0 ? '0' : '3,3'} />
+                      <text x={padL - 4} y={y + 4} textAnchor="end" fontSize="9" fill="var(--text-muted, #94a3b8)">
+                        £{(val / 100).toFixed(val >= 10000 ? 0 : 2)}
+                      </text>
+                    </g>
+                  )
+                })}
+
+                {/* Bars per month */}
+                {chartMonths.map((m, i) => {
+                  const gx = groupX(i)
+                  const rH = barH(m.revenuePence)
+                  const cH = barH(m.costPence)
+                  return (
+                    <g key={m.key}>
+                      {/* Revenue bar */}
+                      <rect x={gx} y={scaleY(m.revenuePence)} width={barW} height={rH}
+                        fill="#3b82f6" rx="2" opacity="0.85" />
+                      {/* Cost bar */}
+                      <rect x={gx + barW + 3} y={scaleY(m.costPence)} width={barW} height={cH}
+                        fill="#f97316" rx="2" opacity="0.85" />
+                      {/* X label */}
+                      <text x={gx + barW} y={chartH - 4} textAnchor="middle" fontSize="9" fill="var(--text-muted, #94a3b8)">
+                        {m.label}
+                      </text>
+                      {/* Check count tooltip-style label on cost bar if >0 */}
+                      {m.checks > 0 && cH > 14 && (
+                        <text x={gx + barW + 3 + barW / 2} y={scaleY(m.costPence) + 10}
+                          textAnchor="middle" fontSize="8" fill="white" fontWeight="600">
+                          {m.checks >= 1000 ? `${(m.checks / 1000).toFixed(0)}k` : m.checks}
+                        </text>
+                      )}
+                    </g>
+                  )
+                })}
+              </svg>
+            </div>
+
+            {/* Per-monitor cost table */}
+            {activeMonitors.length > 0 && (
+              <details style={{ marginTop: 12 }}>
+                <summary style={{ fontSize: 12, color: 'var(--text-muted)', cursor: 'pointer', userSelect: 'none' }}>
+                  Per-monitor cost breakdown ({activeMonitors.length} active)
+                </summary>
+                <table style={{ width: '100%', fontSize: 12, borderCollapse: 'collapse', marginTop: 8 }}>
+                  <thead>
+                    <tr style={{ borderBottom: '1px solid var(--border-light)' }}>
+                      <th style={{ textAlign: 'left', padding: '4px 0', color: 'var(--text-muted)', fontWeight: 600 }}>Monitor</th>
+                      <th style={{ textAlign: 'left', padding: '4px 0', color: 'var(--text-muted)', fontWeight: 600 }}>Interval</th>
+                      <th style={{ textAlign: 'right', padding: '4px 0', color: 'var(--text-muted)', fontWeight: 600 }}>Checks/mo</th>
+                      <th style={{ textAlign: 'right', padding: '4px 0', color: 'var(--text-muted)', fontWeight: 600 }}>Est. cost/mo</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {activeMonitors.map(m => {
+                      const interval = m.check_interval_seconds || 60
+                      const checks = Math.floor(SECONDS_PER_MONTH / interval)
+                      const cost = Math.round(checks * costPerCheckMillipence / 1000)
+                      return (
+                        <tr key={m.id} style={{ borderBottom: '1px solid var(--border-light)' }}>
+                          <td style={{ padding: '5px 0', fontWeight: 500 }}>{m.name}</td>
+                          <td style={{ padding: '5px 0', color: 'var(--text-muted)' }}>
+                            {interval >= 60 ? `${interval / 60}m` : `${interval}s`}
+                          </td>
+                          <td style={{ padding: '5px 0', textAlign: 'right' }}>{checks.toLocaleString()}</td>
+                          <td style={{ padding: '5px 0', textAlign: 'right', color: 'var(--text-muted)' }}>{fmtAmount(cost)}</td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </details>
+            )}
+
+            <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 12 }}>
+              Cost estimate based on {(costPerCheckMillipence / 10).toFixed(4)}p per check (Vercel invocation + DB write).
+              Set <code>COST_PER_CHECK_MILLIPENCE</code> env var to adjust.
+            </p>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
