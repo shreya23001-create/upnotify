@@ -30,8 +30,14 @@ async function handleCheckoutCompleted(
         const subResponse = await getStripe().subscriptions.retrieve(
           session.subscription as string
         )
-        const sub = 'data' in subResponse ? subResponse.data : subResponse
-        const subObj = sub as unknown as { items: { data: Array<{ price?: { recurring?: { interval?: string } } }> }; current_period_start: number; current_period_end: number }
+        const subObj = subResponse as unknown as {
+          items: { data: Array<{ price?: { recurring?: { interval?: string } }; current_period_start?: number; current_period_end?: number }> }
+          current_period_start?: number
+          current_period_end?: number
+        }
+        const competeItem = subObj.items.data[0]
+        const competeStartTs = subObj.current_period_start ?? competeItem?.current_period_start
+        const competeEndTs = subObj.current_period_end ?? competeItem?.current_period_end
 
         // Cancel any existing compete subscription for this org
         await supabase
@@ -45,16 +51,9 @@ async function handleCheckoutCompleted(
           compete_plan_id: competePlan.id,
           stripe_subscription_id: session.subscription as string,
           status: 'active',
-          billing_cycle:
-            subObj.items.data[0]?.price?.recurring?.interval === 'year'
-              ? 'annual'
-              : 'monthly',
-          current_period_start: new Date(
-            subObj.current_period_start * 1000
-          ).toISOString(),
-          current_period_end: new Date(
-            subObj.current_period_end * 1000
-          ).toISOString(),
+          billing_cycle: competeItem?.price?.recurring?.interval === 'year' ? 'annual' : 'monthly',
+          current_period_start: competeStartTs ? new Date(competeStartTs * 1000).toISOString() : new Date().toISOString(),
+          current_period_end: competeEndTs ? new Date(competeEndTs * 1000).toISOString() : new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
         })
         logger.info('Compete subscription created from checkout', {
           orgId,
@@ -115,18 +114,27 @@ async function handleCheckoutCompleted(
       .eq('org_id', orgId)
       .eq('status', 'active')
 
-    // Retrieve the new Stripe subscription for period dates
+    // Retrieve the new Stripe subscription for period dates.
+    // Stripe API 2025-01-27.acacia moved current_period_start/end to the
+    // subscription item level. We check both locations for compatibility.
     const subResponse = await getStripe().subscriptions.retrieve(session.subscription as string)
-    const subObj = subResponse as unknown as { items: { data: Array<{ price?: { recurring?: { interval?: string } } }> }; current_period_start: number; current_period_end: number }
+    const subObj = subResponse as unknown as {
+      items: { data: Array<{ price?: { recurring?: { interval?: string } }; current_period_start?: number; current_period_end?: number }> }
+      current_period_start?: number
+      current_period_end?: number
+    }
+    const subItem = subObj.items.data[0]
+    const startTs = subObj.current_period_start ?? subItem?.current_period_start
+    const endTs = subObj.current_period_end ?? subItem?.current_period_end
 
     const insertPayload = {
       org_id: orgId,
       plan_id: plan.id,
       stripe_subscription_id: session.subscription as string,
       status: 'active',
-      billing_cycle: subObj.items.data[0]?.price?.recurring?.interval === 'year' ? 'annual' : 'monthly',
-      current_period_start: new Date(subObj.current_period_start * 1000).toISOString(),
-      current_period_end: new Date(subObj.current_period_end * 1000).toISOString(),
+      billing_cycle: subItem?.price?.recurring?.interval === 'year' ? 'annual' : 'monthly',
+      current_period_start: startTs ? new Date(startTs * 1000).toISOString() : new Date().toISOString(),
+      current_period_end: endTs ? new Date(endTs * 1000).toISOString() : new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
     }
 
     logger.info('checkout: inserting subscription', insertPayload)
