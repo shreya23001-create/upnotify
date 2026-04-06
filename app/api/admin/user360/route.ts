@@ -124,7 +124,7 @@ export async function GET(): Promise<NextResponse> {
   const invoicesByOrg = new Map<string, { totalGbp: number; count: number; lastAt: string | null }>()
   for (const inv of (invoicesRaw ?? []) as InvRow[]) {
     const existing = invoicesByOrg.get(inv.org_id) ?? { totalGbp: 0, count: 0, lastAt: null }
-    existing.totalGbp += inv.amount_gbp ?? 0
+    existing.totalGbp += (inv.amount_gbp ?? 0) / 100
     existing.count++
     if (!existing.lastAt || inv.created_at > existing.lastAt) existing.lastAt = inv.created_at
     invoicesByOrg.set(inv.org_id, existing)
