@@ -11,16 +11,28 @@ interface TelegramResult {
  * Uses MarkdownV2 format for formatting.
  * Never throws — always returns a result.
  */
-async function sendTelegramMessage(text: string): Promise<TelegramResult> {
-  const config = getServerConfig()
-  const { botToken, chatId } = config.telegram
+interface TelegramMessageOptions {
+  text: string
+  inlineKeyboard?: Array<Array<{ text: string; url: string }>>
+}
 
-  if (!botToken || !chatId) {
-    logger.warn('Telegram not configured — skipping notification')
-    return { success: false, error: 'Telegram credentials not configured' }
+async function sendTelegramMessage(
+  chatId: string,
+  options: TelegramMessageOptions,
+  botToken: string
+): Promise<TelegramResult> {
+  const url = `https://api.telegram.org/bot${botToken}/sendMessage`
+
+  const payload: Record<string, unknown> = {
+    chat_id: chatId,
+    text: options.text,
+    parse_mode: 'HTML',
+    disable_web_page_preview: true,
   }
 
-  const url = `https://api.telegram.org/bot${botToken}/sendMessage`
+  if (options.inlineKeyboard) {
+    payload.reply_markup = { inline_keyboard: options.inlineKeyboard }
+  }
 
   try {
     const controller = new AbortController()
@@ -30,12 +42,7 @@ async function sendTelegramMessage(text: string): Promise<TelegramResult> {
       method: 'POST',
       signal: controller.signal,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: chatId,
-        text,
-        parse_mode: 'HTML',
-        disable_web_page_preview: true,
-      }),
+      body: JSON.stringify(payload),
     })
 
     clearTimeout(timeout)
@@ -47,7 +54,7 @@ async function sendTelegramMessage(text: string): Promise<TelegramResult> {
       return { success: false, error: data.description ?? 'Unknown Telegram error' }
     }
 
-    logger.info('Telegram message sent')
+    logger.info('Telegram message sent', { chatId })
     return { success: true }
   } catch (error) {
     const msg = error instanceof Error ? error.message : 'Unknown error'
@@ -100,45 +107,10 @@ export async function sendTelegramAlert(params: MonitorAlertTelegramParams): Pro
     lines.push(`<b>Downtime:</b> ${escapeHtml(params.downtimeDuration)}`)
   }
 
-  lines.push(``)
-  lines.push(`<a href="${params.monitorUrl}">View Monitor →</a>`)
-
-  const text = lines.join('\n')
-
-  const url = `https://api.telegram.org/bot${botToken}/sendMessage`
-
-  try {
-    const controller = new AbortController()
-    const timeout = setTimeout(() => controller.abort(), 8000)
-
-    const res = await fetch(url, {
-      method: 'POST',
-      signal: controller.signal,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: params.chatId,
-        text,
-        parse_mode: 'HTML',
-        disable_web_page_preview: true,
-      }),
-    })
-
-    clearTimeout(timeout)
-
-    const data = await res.json() as { ok: boolean; description?: string }
-
-    if (!data.ok) {
-      logger.error('Telegram alert failed', { chatId: params.chatId, error: data.description })
-      return { success: false, error: data.description ?? 'Unknown Telegram error' }
-    }
-
-    logger.info('Telegram alert sent', { chatId: params.chatId, monitor: params.monitorName })
-    return { success: true }
-  } catch (error) {
-    const msg = error instanceof Error ? error.message : 'Unknown error'
-    logger.error('Telegram alert exception', { error: msg })
-    return { success: false, error: msg }
-  }
+  return sendTelegramMessage(params.chatId, {
+    text: lines.join('\n'),
+    inlineKeyboard: [[{ text: '👁 View Monitor', url: params.monitorUrl }]],
+  }, botToken)
 }
 
 // ---------------------------------------------------------------------------
@@ -159,8 +131,16 @@ interface BlogApprovalTelegramParams {
  * Sends a blog approval request to Telegram with approve/reject links.
  */
 export async function sendBlogApprovalTelegram(params: BlogApprovalTelegramParams): Promise<TelegramResult> {
-  const sourcesInfo = params.sourcesCount > 0
-    ? `📊 <b>Sources:</b> ${params.sourcesCount} found${params.hasOfficialStatus ? ' (incl. official status page)' : ''}\n`
+  const config = getServerConfig()
+  const { botToken, chatId } = config.telegram
+
+  if (!botToken || !chatId) {
+    logger.warn('Telegram not configured — skipping blog approval notification')
+    return { success: false, error: 'Telegram credentials not configured' }
+  }
+
+  const sourcesLine = params.sourcesCount > 0
+    ? `\n📊 <b>Sources:</b> ${params.sourcesCount} found${params.hasOfficialStatus ? ' (incl. official status page)' : ''}`
     : ''
 
   const text = [
@@ -169,15 +149,18 @@ export async function sendBlogApprovalTelegram(params: BlogApprovalTelegramParam
     `<b>${escapeHtml(params.blogTitle)}</b>`,
     ``,
     `<i>${escapeHtml(params.excerpt)}</i>`,
+    sourcesLine,
     ``,
-    sourcesInfo,
-    `✅ <a href="${params.approveUrl}">Approve &amp; Publish</a>`,
-    `❌ <a href="${params.rejectUrl}">Reject</a>`,
-    ``,
-    `<i>Links expire in 7 days.</i>`,
+    `<i>Tap a button below to approve or reject. Links expire in 7 days.</i>`,
   ].join('\n')
 
-  return sendTelegramMessage(text)
+  return sendTelegramMessage(chatId, {
+    text,
+    inlineKeyboard: [[
+      { text: '✅ Approve & Publish', url: params.approveUrl },
+      { text: '❌ Reject', url: params.rejectUrl },
+    ]],
+  }, botToken)
 }
 
 // ---------------------------------------------------------------------------
