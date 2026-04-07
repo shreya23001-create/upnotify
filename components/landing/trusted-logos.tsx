@@ -1,11 +1,14 @@
 import { createAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
 
+const DEFAULT_LOGOS = ['GitHub', 'Stripe', 'Shopify', 'Vercel', 'Cloudflare', 'Notion', 'Slack', 'OpenAI', 'AWS', 'Figma']
+
 interface TrustedLogosData {
-  logos: string[]
+  logos?: string[]
+  names?: string[]
 }
 
-async function fetchLogos(): Promise<string[]> {
+async function fetchLogoNames(): Promise<string[]> {
   try {
     const supabase = createAdminClient()
     const { data, error } = await supabase
@@ -14,33 +17,24 @@ async function fetchLogos(): Promise<string[]> {
       .eq('section_key', 'trusted_logos')
       .single()
 
-    if (error || !data) return []
-
+    if (error || !data) return DEFAULT_LOGOS
     const content = data.content as unknown as TrustedLogosData | null
-    return content?.logos ?? []
+    return content?.names ?? DEFAULT_LOGOS
   } catch (err) {
     logger.warn('TrustedLogos: failed to fetch', {
       error: err instanceof Error ? err.message : String(err),
     })
-    return []
+    return DEFAULT_LOGOS
   }
 }
 
-export async function TrustedLogos(): Promise<React.ReactElement | null> {
-  const logos = await fetchLogos()
-
-  if (logos.length === 0) return null
+export async function TrustedLogos(): Promise<React.ReactElement> {
+  const names = await fetchLogoNames()
 
   return (
-    <div className="trusted-logos-row">
-      {logos.map((url, idx) => (
-        <img
-          key={idx}
-          src={url}
-          alt={`Trusted partner ${idx + 1}`}
-          className="trusted-logo-img"
-          loading="lazy"
-        />
+    <div className="sp-logos">
+      {names.map((name) => (
+        <div key={name} className="sp-logo-item">{name}</div>
       ))}
     </div>
   )

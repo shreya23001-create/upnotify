@@ -16,6 +16,7 @@ import { TrustedLogos } from '@/components/landing/trusted-logos'
 import { AgencyWaitlistCta } from '@/components/landing/agency-waitlist-cta'
 import { Ticker } from '@/components/landing/ticker'
 import { FeatureCarousel } from '@/components/landing/feature-carousel'
+import { HeroCanvas } from '@/components/landing/hero-canvas'
 
 export const metadata: Metadata = {
   title: 'Uptrue — Uptime Monitoring for Agencies & Teams',
@@ -53,150 +54,97 @@ export default function LandingPage(): React.ReactElement {
       <Ticker />
 
       {/* ================================================================
-          HERO — centered with full dashboard mockup
+          HERO — preview-exact structure with canvas animation
           ================================================================ */}
-      <section className="landing-hero landing-hero-centered">
-        <div className="landing-container">
-          <div className="hero-eyebrow">
-            <span className="hero-badge-dot" />
-            10 monitor types · 30-second checks · AI-powered reports
-          </div>
-          <h1 className="hero-title hero-title-centered">
-            Know when your sites go down.<br />
-            <span className="hero-title-accent">Before your customers do.</span>
-          </h1>
-          <p className="hero-subtitle hero-subtitle-centered">
-            Uptime, performance &amp; infrastructure monitoring for agencies and teams.
-            Multi-channel alerts, public status pages, and AI-powered reports — all in one platform.
-          </p>
-          <div className="hero-ctas">
-            <Link href="/signup" className="btn btn-primary btn-lg">
-              <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-              Start Monitoring Free
-            </Link>
-            <Link href="#how-it-works" className="btn btn-secondary btn-lg">See How It Works</Link>
-            <Link href="/score" className="btn btn-ghost btn-lg">Score Your Site Free</Link>
-          </div>
-          <div className="hero-trust-pills">
-            <span>No credit card required</span>
-            <span className="hero-trust-dot">·</span>
-            <span>3 monitors free forever</span>
-            <span className="hero-trust-dot">·</span>
-            <span>30-second check intervals</span>
-            <span className="hero-trust-dot">·</span>
-            <span>GDPR compliant · EU data</span>
-          </div>
-
-          {/* Dashboard mockup */}
-          <div className="hero-mockup">
-            <div className="mockup-window">
-              <div className="mockup-titlebar">
-                <div className="mockup-dots">
-                  <span className="mockup-dot mockup-dot-red" />
-                  <span className="mockup-dot mockup-dot-yellow" />
-                  <span className="mockup-dot mockup-dot-green" />
-                </div>
-                <div className="mockup-url">app.uptrue.io/dashboard</div>
+      <section className="hero" id="heroSection">
+        <HeroCanvas />
+        <div className="hero-grid" />
+        <div className="container">
+          <div className="hero-content">
+            <div className="hero-eyebrow fade-up">
+              <div className="hero-eyebrow-text">
+                <span className="hero-eyebrow-dot" />
+                10 monitor types · 30-second checks · AI-powered reports
               </div>
-              <div className="mockup-body">
-                {/* Sidebar */}
-                <div className="mockup-sidebar">
-                  <div className="ms-logo">
-                    <div className="ms-logo-icon">
-                      <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="white" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                    </div>
-                    <span className="ms-logo-name">Uptrue</span>
+            </div>
+            <h1 className="hero-headline fade-up delay-1">
+              Know when your sites go down.<br />
+              <span className="gradient-text">Before your customers do.</span>
+            </h1>
+            <p className="hero-sub fade-up delay-2">
+              Uptime, performance &amp; infrastructure monitoring for agencies and teams.
+              Multi-channel alerts, public status pages, and AI-powered reports — all in one platform.
+            </p>
+            <div className="hero-ctas fade-up delay-3">
+              <Link href="/signup" className="btn btn-primary btn-lg">
+                <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                Start Monitoring Free
+              </Link>
+              <Link href="#how-it-works" className="btn btn-ghost btn-lg">See How It Works</Link>
+              <Link href="/score" className="btn btn-outline-brand btn-lg">
+                <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                Score Your Site Free
+              </Link>
+            </div>
+            <div className="hero-trust fade-up delay-3">
+              <div className="trust-item"><strong>No</strong> credit card required</div>
+              <div className="trust-item">·</div>
+              <div className="trust-item"><strong>3 monitors</strong> free forever</div>
+              <div className="trust-item">·</div>
+              <div className="trust-item"><strong>30-second</strong> check intervals</div>
+              <div className="trust-item">·</div>
+              <div className="trust-item"><strong>GDPR</strong> compliant · EU data</div>
+            </div>
+
+            {/* Dashboard Mockup */}
+            <div className="hero-mockup fade-up delay-3">
+              <div className="hero-mockup-shadow" />
+              <div className="mockup-window">
+                <div className="mockup-titlebar">
+                  <div className="mockup-dots">
+                    <span className="mockup-dot mockup-dot-red" />
+                    <span className="mockup-dot mockup-dot-yellow" />
+                    <span className="mockup-dot mockup-dot-green" />
                   </div>
-                  <div className="ms-nav">
-                    <div className="ms-item ms-item-active">
-                      <svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-                      Dashboard
-                    </div>
-                    <div className="ms-item">
-                      <svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-                      Monitors
-                      <span className="ms-badge">24</span>
-                    </div>
-                    <div className="ms-item">
-                      <svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-                      Alerts
-                    </div>
-                    <div className="ms-item">
-                      <svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                      Incidents
-                      <span className="ms-badge ms-badge-red">2</span>
-                    </div>
-                    <div className="ms-divider" />
-                    <div className="ms-item">
-                      <svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                      Reports
-                    </div>
-                    <div className="ms-item">
-                      <svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-                      Status Pages
-                    </div>
-                  </div>
+                  <div className="mockup-url">app.uptrue.io/dashboard</div>
                 </div>
-                {/* Main content */}
-                <div className="mockup-main">
-                  <div className="mockup-topbar">
-                    <span className="mockup-page-title">Dashboard</span>
-                    <div className="mockup-avatar">SA</div>
-                  </div>
-                  <div className="mockup-content">
-                    {/* Stat cards */}
-                    <div className="mockup-stats">
-                      <div className="mockup-stat mockup-stat-blue">
-                        <div className="mockup-stat-num">24</div>
-                        <div className="mockup-stat-lbl">Monitors</div>
+                <div className="mockup-body">
+                  <div className="mockup-sidebar">
+                    <div className="ms-logo">
+                      <div className="ms-logo-icon">
+                        <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="white" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
                       </div>
-                      <div className="mockup-stat mockup-stat-green">
-                        <div className="mockup-stat-num">22</div>
-                        <div className="mockup-stat-lbl">Healthy</div>
-                      </div>
-                      <div className="mockup-stat mockup-stat-red">
-                        <div className="mockup-stat-num">1</div>
-                        <div className="mockup-stat-lbl">Down</div>
-                      </div>
-                      <div className="mockup-stat mockup-stat-yellow">
-                        <div className="mockup-stat-num">1</div>
-                        <div className="mockup-stat-lbl">Degraded</div>
-                      </div>
+                      <span className="ms-logo-name">Uptrue</span>
                     </div>
-                    {/* Monitor rows */}
-                    <div className="mockup-table">
-                      <div className="mockup-table-head">
-                        <span>Monitor</span><span>Status</span><span>Uptime</span><span>Response</span>
+                    <div className="ms-nav">
+                      <div className="ms-item ms-item-active"><svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</div>
+                      <div className="ms-item"><svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>Monitors<span className="ms-badge">24</span></div>
+                      <div className="ms-item"><svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>Alerts</div>
+                      <div className="ms-item"><svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Incidents<span className="ms-badge ms-badge-red">2</span></div>
+                      <div className="ms-divider" />
+                      <div className="ms-item"><svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>Reports</div>
+                      <div className="ms-item"><svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Status Pages</div>
+                    </div>
+                  </div>
+                  <div className="mockup-main">
+                    <div className="mockup-topbar">
+                      <span className="mockup-page-title">Dashboard</span>
+                      <div className="mockup-avatar">SA</div>
+                    </div>
+                    <div className="mockup-content">
+                      <div className="mockup-stats">
+                        <div className="mockup-stat mockup-stat-blue"><div className="mockup-stat-num">24</div><div className="mockup-stat-lbl">Monitors</div></div>
+                        <div className="mockup-stat mockup-stat-green"><div className="mockup-stat-num">22</div><div className="mockup-stat-lbl">Healthy</div></div>
+                        <div className="mockup-stat mockup-stat-red"><div className="mockup-stat-num">1</div><div className="mockup-stat-lbl">Down</div></div>
+                        <div className="mockup-stat mockup-stat-yellow"><div className="mockup-stat-num">1</div><div className="mockup-stat-lbl">Degraded</div></div>
                       </div>
-                      <div className="mockup-row">
-                        <span className="mockup-row-name"><span className="mockup-dot-up" />api.example.com</span>
-                        <span className="mockup-pill mockup-pill-up">UP</span>
-                        <span className="mockup-row-uptime">99.98%</span>
-                        <span className="mockup-row-ms">124ms</span>
-                      </div>
-                      <div className="mockup-row">
-                        <span className="mockup-row-name"><span className="mockup-dot-up" />app.clientsite.io</span>
-                        <span className="mockup-pill mockup-pill-up">UP</span>
-                        <span className="mockup-row-uptime">100%</span>
-                        <span className="mockup-row-ms">89ms</span>
-                      </div>
-                      <div className="mockup-row mockup-row-alert">
-                        <span className="mockup-row-name"><span className="mockup-dot-down" />store.brand.co</span>
-                        <span className="mockup-pill mockup-pill-down">DOWN</span>
-                        <span className="mockup-row-uptime mockup-row-bad">97.2%</span>
-                        <span className="mockup-row-ms">—</span>
-                      </div>
-                      <div className="mockup-row">
-                        <span className="mockup-row-name"><span className="mockup-dot-up" />cdn.fastload.net</span>
-                        <span className="mockup-pill mockup-pill-up">UP</span>
-                        <span className="mockup-row-uptime">99.99%</span>
-                        <span className="mockup-row-ms">42ms</span>
-                      </div>
-                      <div className="mockup-row">
-                        <span className="mockup-row-name"><span className="mockup-dot-warn" />checkout.shop.io</span>
-                        <span className="mockup-pill mockup-pill-warn">SLOW</span>
-                        <span className="mockup-row-uptime">99.1%</span>
-                        <span className="mockup-row-ms mockup-row-warn">843ms</span>
+                      <div className="mockup-table">
+                        <div className="mockup-table-head"><span>Monitor</span><span>Status</span><span>Uptime</span><span>Response</span></div>
+                        <div className="mockup-row"><span className="mockup-row-name"><span className="mockup-dot-up" />api.example.com</span><span className="mockup-pill mockup-pill-up">UP</span><span className="mockup-row-uptime">99.98%</span><span className="mockup-row-ms">124ms</span></div>
+                        <div className="mockup-row"><span className="mockup-row-name"><span className="mockup-dot-up" />app.clientsite.io</span><span className="mockup-pill mockup-pill-up">UP</span><span className="mockup-row-uptime">100%</span><span className="mockup-row-ms">89ms</span></div>
+                        <div className="mockup-row mockup-row-alert"><span className="mockup-row-name"><span className="mockup-dot-down" />store.brand.co</span><span className="mockup-pill mockup-pill-down">DOWN</span><span className="mockup-row-uptime mockup-row-bad">97.2%</span><span className="mockup-row-ms">—</span></div>
+                        <div className="mockup-row"><span className="mockup-row-name"><span className="mockup-dot-up" />cdn.fastload.net</span><span className="mockup-pill mockup-pill-up">UP</span><span className="mockup-row-uptime">99.99%</span><span className="mockup-row-ms">42ms</span></div>
+                        <div className="mockup-row"><span className="mockup-row-name"><span className="mockup-dot-warn" />checkout.shop.io</span><span className="mockup-pill mockup-pill-warn">SLOW</span><span className="mockup-row-uptime">99.1%</span><span className="mockup-row-ms mockup-row-warn">843ms</span></div>
                       </div>
                     </div>
                   </div>
@@ -210,39 +158,22 @@ export default function LandingPage(): React.ReactElement {
       {/* ================================================================
           SOCIAL PROOF
           ================================================================ */}
-      <section className="landing-social-proof">
-        <div className="landing-container">
-          <p className="social-proof-text">Tracking uptime for the world&apos;s most-used platforms</p>
+      <div className="social-proof-strip">
+        <div className="container">
+          <div className="sp-label">Tracking uptime for the world&apos;s most-used platforms</div>
           <TrustedLogos />
         </div>
-      </section>
+      </div>
 
       {/* ================================================================
           STATS BAR
           ================================================================ */}
-      <div className="lp-stats-bar">
-        <div className="landing-container">
-          <div className="lp-stats-inner">
-            <div className="lp-stat-item">
-              <div className="lp-stat-value">10</div>
-              <div className="lp-stat-label">Monitor types</div>
-            </div>
-            <div className="lp-stat-divider" />
-            <div className="lp-stat-item">
-              <div className="lp-stat-value">30s</div>
-              <div className="lp-stat-label">Fastest check interval</div>
-            </div>
-            <div className="lp-stat-divider" />
-            <div className="lp-stat-item">
-              <div className="lp-stat-value">99.9%</div>
-              <div className="lp-stat-label">Uptime SLA</div>
-            </div>
-            <div className="lp-stat-divider" />
-            <div className="lp-stat-item">
-              <div className="lp-stat-value">0</div>
-              <div className="lp-stat-label">False alarms (2-region confirm)</div>
-            </div>
-          </div>
+      <div className="stats-bar">
+        <div className="stats-bar-inner">
+          <div className="stat-item"><div className="stat-value">10</div><div className="stat-label">Monitor types</div></div>
+          <div className="stat-item"><div className="stat-value">30s</div><div className="stat-label">Fastest check interval</div></div>
+          <div className="stat-item"><div className="stat-value">99.9%</div><div className="stat-label">Uptime SLA</div></div>
+          <div className="stat-item"><div className="stat-value">0</div><div className="stat-label">False alarms (2-region confirm)</div></div>
         </div>
       </div>
 
