@@ -182,13 +182,15 @@ export default function LandingPage(): React.ReactElement {
       {/* ================================================================
           FEATURES — category tabs + carousel
           ================================================================ */}
-      <section className="landing-section landing-features" id="features">
-        <div className="landing-container">
-          <div className="lp-section-eyebrow">Everything you need</div>
-          <h2 className="landing-section-title">Monitoring that actually works</h2>
-          <p className="landing-section-subtitle">
-            From basic uptime to AI-powered insights. Built for agencies managing hundreds of sites and teams who need reliability.
-          </p>
+      <section className="section landing-features" id="features">
+        <div className="container">
+          <div className="section-header">
+            <div className="section-eyebrow">Everything you need</div>
+            <h2 className="section-title">Monitoring that actually works</h2>
+            <p className="section-sub">
+              From basic uptime to AI-powered insights. Built for agencies managing hundreds of sites and teams who need reliability.
+            </p>
+          </div>
           <FeatureCarousel />
         </div>
       </section>
@@ -196,16 +198,18 @@ export default function LandingPage(): React.ReactElement {
       {/* ================================================================
           HOW IT WORKS
           ================================================================ */}
-      <section className="landing-section landing-steps" id="how-it-works">
-        <div className="landing-container">
-          <div className="lp-section-eyebrow">Simple by design</div>
-          <h2 className="landing-section-title">Up and running in 2 minutes</h2>
-          <div className="steps-grid">
+      <section className="section hiw-section" id="how-it-works">
+        <div className="container">
+          <div className="section-header">
+            <div className="section-eyebrow">Simple by design</div>
+            <h2 className="section-title">Up and running in 2 minutes</h2>
+          </div>
+          <div className="hiw-steps">
             {STEPS.map((step) => (
-              <div key={step.number} className="step-card">
-                <div className="step-number">{step.number}</div>
-                <h3 className="step-title">{step.title}</h3>
-                <p className="step-description">{step.description}</p>
+              <div key={step.number} className="hiw-step">
+                <div className="hiw-number">{step.number}</div>
+                <div className="hiw-title">{step.title}</div>
+                <div className="hiw-desc">{step.description}</div>
               </div>
             ))}
           </div>
@@ -215,90 +219,98 @@ export default function LandingPage(): React.ReactElement {
       {/* ================================================================
           AI SHOWCASE
           ================================================================ */}
-      <section className="landing-section lp-ai-section">
-        <div className="landing-container">
-          <div className="lp-ai-inner">
-            <div className="lp-ai-text">
-              <div className="lp-section-eyebrow">Powered by Claude AI</div>
-              <h2 className="lp-ai-title">Your monitoring gets smarter over time</h2>
-              <p className="lp-ai-sub">Uptrue doesn&apos;t just tell you something went down — it tells you why, what it means for your business, and what to do next. Powered by Claude, Anthropic&apos;s AI.</p>
-              <div className="lp-ai-features">
-                <div className="lp-ai-feature">
-                  <div className="lp-ai-feature-icon lp-ai-icon-purple">🤖</div>
-                  <div>
-                    <h4 className="lp-ai-feature-title">Executive AI Reports</h4>
-                    <p className="lp-ai-feature-desc">One click and Claude analyses 90 days of uptime data, incident patterns, and performance trends — generating a polished summary you can send to clients.</p>
+      <section className="ai-section">
+        <div className="container">
+          <div className="ai-inner">
+            <div className="ai-text">
+              <div className="section-eyebrow">Powered by Claude AI</div>
+              <h2 className="section-title">Your monitoring gets smarter over time</h2>
+              <p className="section-sub">Uptrue doesn&apos;t just tell you something went down — it tells you why, what it means for your business, and what to do next. Powered by Claude, Anthropic&apos;s AI.</p>
+              <div className="ai-features-list">
+                <div className="ai-feature-item">
+                  <div className="ai-feature-icon purple">🤖</div>
+                  <div className="ai-feature-body">
+                    <h4>Executive AI Reports</h4>
+                    <p>One click and Claude analyses 90 days of uptime data, incident patterns, and performance trends — generating a polished summary you can send to clients or stakeholders.</p>
                   </div>
                 </div>
-                <div className="lp-ai-feature">
-                  <div className="lp-ai-feature-icon lp-ai-icon-cyan">🔍</div>
-                  <div>
-                    <h4 className="lp-ai-feature-title">Outage Pattern Detection</h4>
-                    <p className="lp-ai-feature-desc">Uptrue learns your monitor&apos;s normal behaviour and flags anomalies before they become incidents.</p>
+                <div className="ai-feature-item">
+                  <div className="ai-feature-icon cyan">🔍</div>
+                  <div className="ai-feature-body">
+                    <h4>Outage Pattern Detection</h4>
+                    <p>Uptrue learns your monitor&apos;s normal behaviour and flags anomalies before they become incidents. Recurring issues are spotted and surfaced automatically.</p>
                   </div>
                 </div>
-                <div className="lp-ai-feature">
-                  <div className="lp-ai-feature-icon lp-ai-icon-pink">📰</div>
-                  <div>
-                    <h4 className="lp-ai-feature-title">AI Outage Blog</h4>
-                    <p className="lp-ai-feature-desc">When a public service goes down, Uptrue researches and publishes an outage report automatically. Real-time SEO content on autopilot.</p>
+                <div className="ai-feature-item">
+                  <div className="ai-feature-icon pink">📰</div>
+                  <div className="ai-feature-body">
+                    <h4>AI Outage News &amp; Blog</h4>
+                    <p>When a public service goes down, Uptrue researches and publishes an outage report automatically — with your logo and brand. Real-time SEO content on autopilot.</p>
                   </div>
                 </div>
-                <div className="lp-ai-feature">
-                  <div className="lp-ai-feature-icon lp-ai-icon-blue">💡</div>
-                  <div>
-                    <h4 className="lp-ai-feature-title">Plain Language Summaries</h4>
-                    <p className="lp-ai-feature-desc">Every incident gets a human-readable summary. No log-diving. Just &quot;your checkout was down for 8 minutes on Tuesday.&quot;</p>
+                <div className="ai-feature-item">
+                  <div className="ai-feature-icon blue">💡</div>
+                  <div className="ai-feature-body">
+                    <h4>Plain Language Incident Summaries</h4>
+                    <p>Every incident automatically gets a human-readable summary. No log-diving, no decoding stack traces. Just &quot;your checkout was down for 8 minutes on Tuesday.&quot;</p>
                   </div>
                 </div>
               </div>
             </div>
             {/* AI Report Card mockup */}
-            <div className="lp-ai-card">
-              <div className="lp-ai-card-header">
-                <div className="lp-ai-card-title">Monthly Performance Report — Acme Agency</div>
-                <div className="lp-ai-card-badge">
-                  <span className="lp-ai-card-dot" />
-                  AI Generated
+            <div>
+              <div className="ai-report-card">
+                <div className="ai-report-header">
+                  <div className="ai-report-title">Monthly Performance Report — Acme Agency</div>
+                  <div className="ai-report-badge">
+                    <span className="ai-powered-dot" />
+                    AI Generated
+                  </div>
                 </div>
-              </div>
-              <div className="lp-ai-card-meta">March 2026 · 24 monitors · Generated by Claude</div>
-              <div className="lp-ai-card-section">
-                <div className="lp-ai-card-section-label">Executive Summary</div>
-                <div className="lp-ai-line lp-ai-line-long" />
-                <div className="lp-ai-line lp-ai-line-med" />
-                <div className="lp-ai-line lp-ai-line-long" />
-                <div className="lp-ai-line lp-ai-line-short" />
-              </div>
-              <div className="lp-ai-stat-row">
-                <div className="lp-ai-stat lp-ai-stat-green">
-                  <div className="lp-ai-stat-val">99.94%</div>
-                  <div className="lp-ai-stat-lbl">Avg Uptime</div>
+                <div className="ai-report-meta">
+                  <span>March 2026</span>
+                  <span>·</span>
+                  <span>24 monitors</span>
+                  <span>·</span>
+                  <span>Generated by Claude</span>
                 </div>
-                <div className="lp-ai-stat lp-ai-stat-red">
-                  <div className="lp-ai-stat-val">3</div>
-                  <div className="lp-ai-stat-lbl">Incidents</div>
+                <div className="ai-report-section">
+                  <div className="ai-report-section-label">Executive Summary</div>
+                  <div className="ai-report-line long" />
+                  <div className="ai-report-line med" />
+                  <div className="ai-report-line long" />
+                  <div className="ai-report-line short" />
                 </div>
-                <div className="lp-ai-stat lp-ai-stat-blue">
-                  <div className="lp-ai-stat-val">142ms</div>
-                  <div className="lp-ai-stat-lbl">Avg Response</div>
+                <div className="ai-stat-row">
+                  <div className="ai-stat-box green">
+                    <div className="val">99.94%</div>
+                    <div className="lbl">Avg Uptime</div>
+                  </div>
+                  <div className="ai-stat-box red">
+                    <div className="val">3</div>
+                    <div className="lbl">Incidents</div>
+                  </div>
+                  <div className="ai-stat-box blue">
+                    <div className="val">142ms</div>
+                    <div className="lbl">Avg Response</div>
+                  </div>
                 </div>
-              </div>
-              <div className="lp-ai-insight">
-                <span className="lp-ai-insight-icon">💡</span>
-                <div className="lp-ai-insight-text">
-                  <strong>AI Insight:</strong> checkout.shop.io has experienced 3 slowdowns on Tuesday mornings 09:00–10:00 UTC. This pattern suggests a scheduled job or traffic spike.
+                <div className="ai-report-insight">
+                  <div className="ai-insight-icon">💡</div>
+                  <div className="ai-insight-text">
+                    <strong>AI Insight:</strong> checkout.shop.io has experienced 3 slowdowns on Tuesday mornings between 09:00–10:00 UTC. This pattern suggests a scheduled job or traffic spike. Recommend investigating backend cron tasks.
+                  </div>
                 </div>
-              </div>
-              <div className="lp-ai-card-section" style={{ marginTop: 16 }}>
-                <div className="lp-ai-card-section-label">Recommendations</div>
-                <div className="lp-ai-line lp-ai-line-long" />
-                <div className="lp-ai-line lp-ai-line-med" />
-                <div className="lp-ai-line lp-ai-line-short" />
-              </div>
-              <div className="lp-ai-card-footer">
-                <span className="lp-ai-card-dot" />
-                Powered by Claude (Anthropic) · Uptrue AI Reports
+                <div className="ai-report-section" style={{ marginTop: 'var(--space-4)' }}>
+                  <div className="ai-report-section-label">Recommendations</div>
+                  <div className="ai-report-line long" />
+                  <div className="ai-report-line med" />
+                  <div className="ai-report-line xs" />
+                </div>
+                <div className="ai-powered-by">
+                  <span className="ai-powered-dot" />
+                  Powered by Claude (Anthropic) · Uptrue AI Reports
+                </div>
               </div>
             </div>
           </div>
@@ -347,20 +359,25 @@ export default function LandingPage(): React.ReactElement {
       {/* ================================================================
           TESTIMONIALS
           ================================================================ */}
-      <section className="landing-section lp-testimonials-section">
-        <div className="landing-container">
-          <div className="lp-section-eyebrow">Trusted by teams</div>
-          <h2 className="landing-section-title">What our users say</h2>
-          <div className="lp-testimonials-grid">
-            {TESTIMONIALS.map((t) => (
-              <div key={t.name} className="lp-testimonial-card">
-                <div className="lp-testimonial-stars">★★★★★</div>
-                <p className="lp-testimonial-text">&ldquo;{t.quote}&rdquo;</p>
-                <div className="lp-testimonial-author">
-                  <div className="lp-testimonial-avatar" style={{ background: t.color }}>{t.initials}</div>
+      <section className="testimonials-section">
+        <div className="container">
+          <div className="section-header">
+            <div className="section-eyebrow">Trusted by teams</div>
+            <h2 className="section-title">What our users say</h2>
+          </div>
+          <div className="testimonials-grid">
+            {TESTIMONIALS.map((t, i) => (
+              <div key={t.name} className={`testimonial-card t${i + 1}`}>
+                <div className="testimonial-quote">&ldquo;</div>
+                <div className="testimonial-stars">
+                  <span className="testimonial-star">★</span><span className="testimonial-star">★</span><span className="testimonial-star">★</span><span className="testimonial-star">★</span><span className="testimonial-star">★</span>
+                </div>
+                <div className="testimonial-text">{t.quote}</div>
+                <div className="testimonial-author">
+                  <div className={`testimonial-avatar a${i + 1}`}>{t.initials}</div>
                   <div>
-                    <div className="lp-testimonial-name">{t.name}</div>
-                    <div className="lp-testimonial-role">{t.role}</div>
+                    <div className="testimonial-name">{t.name}</div>
+                    <div className="testimonial-role">{t.role}</div>
                   </div>
                 </div>
               </div>
@@ -372,38 +389,42 @@ export default function LandingPage(): React.ReactElement {
       {/* ================================================================
           COMPARISON TABLE
           ================================================================ */}
-      <section className="landing-section lp-comparison-section">
-        <div className="landing-container">
-          <div className="lp-section-eyebrow">How we compare</div>
-          <h2 className="landing-section-title">Uptrue vs the alternatives</h2>
-          <p className="landing-section-subtitle">Not all uptime monitoring is equal. Here&apos;s how Uptrue stacks up against the most popular tools.</p>
-          <div className="lp-comparison-wrap">
-            <table className="lp-comparison-table">
+      <section className="comparison-section">
+        <div className="container">
+          <div className="section-header">
+            <div className="section-eyebrow">How we compare</div>
+            <h2 className="section-title">Uptrue vs the alternatives</h2>
+            <p className="section-sub">Not all uptime monitoring is equal. Here&apos;s how Uptrue stacks up against the most popular tools.</p>
+          </div>
+          <div className="comparison-table-wrap">
+            <table className="comparison-table">
               <thead>
                 <tr>
                   <th>Feature</th>
-                  <th className="lp-col-uptrue"><div className="lp-uptrue-header">Uptrue<span className="lp-uptrue-badge">Best value</span></div></th>
+                  <th className="col-uptrue">
+                    <div className="uptrue-col-header">Uptrue<span className="uptrue-col-badge">Best value</span></div>
+                  </th>
                   <th>BetterUptime</th>
                   <th>UptimeRobot</th>
                 </tr>
               </thead>
               <tbody>
-                <tr><td>Fastest check interval</td><td className="lp-col-uptrue"><span className="lp-comp-highlight">30 seconds</span></td><td>30 seconds</td><td>5 minutes</td></tr>
-                <tr><td>Two-region false alarm prevention</td><td className="lp-col-uptrue"><span className="lp-comp-yes">✓</span></td><td><span className="lp-comp-yes">✓</span></td><td><span className="lp-comp-no">—</span></td></tr>
-                <tr><td>AI-powered reports (Claude)</td><td className="lp-col-uptrue"><span className="lp-comp-yes">✓</span></td><td><span className="lp-comp-no">—</span></td><td><span className="lp-comp-no">—</span></td></tr>
-                <tr><td>Competitor intelligence</td><td className="lp-col-uptrue"><span className="lp-comp-yes">✓</span></td><td><span className="lp-comp-no">—</span></td><td><span className="lp-comp-no">—</span></td></tr>
-                <tr><td>Price &amp; stock tracking (Compete)</td><td className="lp-col-uptrue"><span className="lp-comp-yes">✓</span></td><td><span className="lp-comp-no">—</span></td><td><span className="lp-comp-no">—</span></td></tr>
-                <tr><td>Public status pages</td><td className="lp-col-uptrue"><span className="lp-comp-yes">✓</span></td><td><span className="lp-comp-yes">✓</span></td><td><span className="lp-comp-yes">✓</span></td></tr>
-                <tr><td>Monitor types</td><td className="lp-col-uptrue"><span className="lp-comp-highlight">10 types</span></td><td>7 types</td><td>6 types</td></tr>
-                <tr><td>Starting price</td><td className="lp-col-uptrue"><span className="lp-comp-highlight">£10/yr Lite</span></td><td>$24/mo</td><td>$7/mo</td></tr>
-                <tr><td>GDPR · EU data storage</td><td className="lp-col-uptrue"><span className="lp-comp-yes">✓</span></td><td><span className="lp-comp-yes">✓</span></td><td><span className="lp-comp-no">—</span></td></tr>
-                <tr><td>AI outage blog auto-publish</td><td className="lp-col-uptrue"><span className="lp-comp-yes">✓</span></td><td><span className="lp-comp-no">—</span></td><td><span className="lp-comp-no">—</span></td></tr>
-                <tr><td>Public uptime leaderboard / tracker</td><td className="lp-col-uptrue"><span className="lp-comp-yes">✓</span></td><td><span className="lp-comp-no">—</span></td><td><span className="lp-comp-no">—</span></td></tr>
-                <tr><td>Free plan monitors</td><td className="lp-col-uptrue"><span className="lp-comp-highlight">3 free forever</span></td><td>1 monitor free</td><td>1 monitor free</td></tr>
+                <tr><td>Fastest check interval</td><td className="col-uptrue"><span className="comp-val highlight">30 seconds</span></td><td><span className="comp-val">30 seconds</span></td><td><span className="comp-val">5 minutes</span></td></tr>
+                <tr><td>Two-region false alarm prevention</td><td className="col-uptrue"><span className="comp-yes">✓</span></td><td><span className="comp-yes">✓</span></td><td><span className="comp-no">—</span></td></tr>
+                <tr><td>AI-powered reports (Claude)</td><td className="col-uptrue"><span className="comp-yes">✓</span></td><td><span className="comp-no">—</span></td><td><span className="comp-no">—</span></td></tr>
+                <tr><td>Competitor intelligence</td><td className="col-uptrue"><span className="comp-yes">✓</span></td><td><span className="comp-no">—</span></td><td><span className="comp-no">—</span></td></tr>
+                <tr><td>Price &amp; stock tracking (Compete)</td><td className="col-uptrue"><span className="comp-yes">✓</span></td><td><span className="comp-no">—</span></td><td><span className="comp-no">—</span></td></tr>
+                <tr><td>Public uptime leaderboard / tracker</td><td className="col-uptrue"><span className="comp-yes">✓</span></td><td><span className="comp-no">—</span></td><td><span className="comp-no">—</span></td></tr>
+                <tr><td>Public status pages</td><td className="col-uptrue"><span className="comp-yes">✓</span></td><td><span className="comp-yes">✓</span></td><td><span className="comp-yes">✓</span></td></tr>
+                <tr><td>Monitor types (HTTP, SSL, DNS, Keyword…)</td><td className="col-uptrue"><span className="comp-val highlight">10 types</span></td><td><span className="comp-val">7 types</span></td><td><span className="comp-val">6 types</span></td></tr>
+                <tr><td>Free plan monitors</td><td className="col-uptrue"><span className="comp-val highlight">3 monitors</span></td><td><span className="comp-val">3 monitors</span></td><td><span className="comp-val">50 monitors</span></td></tr>
+                <tr><td>Starting price (paid plan)</td><td className="col-uptrue"><span className="comp-val highlight">£10/yr Lite</span></td><td><span className="comp-val">$24/mo</span></td><td><span className="comp-val">$7/mo</span></td></tr>
+                <tr><td>GDPR · EU data storage</td><td className="col-uptrue"><span className="comp-yes">✓</span></td><td><span className="comp-yes">✓</span></td><td><span className="comp-no">—</span></td></tr>
+                <tr><td>AI outage blog auto-publish</td><td className="col-uptrue"><span className="comp-yes">✓</span></td><td><span className="comp-no">—</span></td><td><span className="comp-no">—</span></td></tr>
               </tbody>
             </table>
           </div>
-          <p className="lp-comparison-note">Comparison based on publicly available information as of April 2026. Features may vary by plan.</p>
+          <p style={{ textAlign: 'center', fontSize: 11, color: 'var(--text-muted)', marginTop: 'var(--space-5)' }}>Comparison based on publicly available information as of April 2026. Features may vary by plan.</p>
         </div>
       </section>
 
@@ -420,34 +441,46 @@ export default function LandingPage(): React.ReactElement {
       {/* ================================================================
           CTA BAND — animated blue→cyan gradient (agreed design)
           ================================================================ */}
-      <section className="cta-band">
-        <div className="cta-band-inner">
-          <div className="cta-band-eyebrow">
-            <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-            Start in 2 minutes
-          </div>
-          <h2 className="cta-band-title">Don&apos;t find out you&apos;re down<br />from a customer tweet.</h2>
-          <p className="cta-band-sub">
-            Uptrue watches your sites, APIs, and infrastructure 24/7 —<br />
-            and tells you first. Free plan included. No credit card required.
-          </p>
-          <div className="cta-band-btns">
-            <Link href="/signup" className="btn cta-band-btn-primary btn-lg">
-              <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-              Start Monitoring Free
-            </Link>
-            <Link href="/#features" className="btn cta-band-btn-outline btn-lg">
-              See All Features →
-            </Link>
-          </div>
-          <div className="cta-band-trust">
-            <span><svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> 3 monitors free forever</span>
-            <span className="cta-band-dot">·</span>
-            <span><svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> No credit card required</span>
-            <span className="cta-band-dot">·</span>
-            <span><svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> GDPR compliant · EU data</span>
-            <span className="cta-band-dot">·</span>
-            <span><svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> 30-second check intervals</span>
+      <section className="cta-band" id="ctaSection">
+        <canvas id="ctaCanvas" />
+        <div className="container">
+          <div className="cta-band-inner">
+            <div className="cta-band-eyebrow">
+              <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              Start in 2 minutes
+            </div>
+            <h2>Don&apos;t find out you&apos;re down<br />from a customer tweet.</h2>
+            <p>Uptrue watches your sites, APIs, and infrastructure 24/7 — and tells you first. Free plan included. No credit card required.</p>
+            <div className="cta-band-buttons">
+              <a href="/signup" className="btn-cta-white">
+                <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                Start Monitoring Free
+              </a>
+              <a href="/#features" className="btn-cta-outline">
+                See All Features →
+              </a>
+            </div>
+            <div className="cta-band-trust">
+              <span className="cta-band-trust-item">
+                <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                3 monitors free forever
+              </span>
+              <span className="cta-band-trust-dot" />
+              <span className="cta-band-trust-item">
+                <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                No credit card required
+              </span>
+              <span className="cta-band-trust-dot" />
+              <span className="cta-band-trust-item">
+                <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                GDPR compliant · EU data
+              </span>
+              <span className="cta-band-trust-dot" />
+              <span className="cta-band-trust-item">
+                <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                30-second check intervals
+              </span>
+            </div>
           </div>
         </div>
       </section>

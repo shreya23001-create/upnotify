@@ -66,11 +66,11 @@ export async function BlogPreview(): Promise<React.ReactElement> {
 
   return (
     <section className="blog-section">
-      <div className="container" style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
+      <div className="container">
         <div className="blog-section-header">
           <div className="blog-section-header-left">
-            <div className="lp-section-eyebrow">From the blog</div>
-            <h2 className="landing-section-title" style={{ textAlign: 'left', marginBottom: 0 }}>Latest articles</h2>
+            <div className="section-eyebrow">From the blog</div>
+            <h2 className="section-title">Latest articles</h2>
           </div>
           <Link href="/blog" className="btn btn-ghost">
             View all posts
@@ -112,6 +112,14 @@ export async function BlogPreview(): Promise<React.ReactElement> {
           })}
         </div>
 
+        <div className="blog-view-all">
+          <Link href="/blog" className="btn btn-ghost btn-lg">
+            Browse all 60+ articles
+            <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+            </svg>
+          </Link>
+        </div>
       </div>
     </section>
   )

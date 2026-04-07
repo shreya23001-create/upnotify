@@ -24,8 +24,9 @@ interface PlanData {
 }
 
 function formatInterval(seconds: number): string {
-  if (seconds >= 300) return `${seconds / 60}-minute check interval`
-  return `${seconds}-second check interval`
+  if (seconds >= 300) return `${seconds / 60}-minute checks`
+  if (seconds === 60) return '1-minute checks'
+  return `${seconds}-second checks`
 }
 
 function formatRetention(days: number | null): string {
@@ -42,10 +43,10 @@ function getFeatures(p: PlanData): { text: string; included: boolean }[] {
   features.push({ text: formatRetention(p.data_retention_days), included: true })
   features.push({ text: 'Email alerts', included: p.has_email_alerts })
 
-  if (p.max_team_members > 0) {
-    features.push({ text: `${p.max_team_members} team members`, included: true })
+  if (p.has_slack_teams) {
+    features.push({ text: 'Email + Slack + Teams', included: true })
   } else {
-    features.push({ text: 'Solo use only', included: true })
+    features.push({ text: 'Slack / Teams', included: false })
   }
 
   if (p.has_status_page_custom_domain) {
@@ -53,14 +54,15 @@ function getFeatures(p: PlanData): { text: string; included: boolean }[] {
   } else if (p.has_status_pages) {
     features.push({ text: p.status_page_limit ? `${p.status_page_limit} status page${p.status_page_limit > 1 ? 's' : ''}` : 'Status pages', included: true })
   } else {
-    features.push({ text: 'Status pages', included: false })
+    features.push({ text: '1 status page', included: p.has_status_pages })
   }
 
-  features.push({ text: 'Slack & Teams alerts', included: p.has_slack_teams })
-  features.push({ text: 'Webhooks', included: p.has_webhooks })
+  if (p.has_webhooks) {
+    features.push({ text: 'Webhooks', included: true })
+  }
 
   if (p.has_ai_predictive || p.ai_report_limit > 0) {
-    features.push({ text: p.ai_report_limit > 0 ? `AI reports (${p.ai_report_limit}/month)` : 'Unlimited AI reports', included: true })
+    features.push({ text: p.ai_report_limit > 0 ? `${p.ai_report_limit} AI reports/month` : 'Unlimited AI reports', included: true })
   } else {
     features.push({ text: 'AI reports', included: false })
   }
@@ -86,28 +88,26 @@ export default function PricingTable(): React.ReactElement {
   const highlightedSlug = 'builder'
 
   return (
-    <section className="landing-section landing-pricing" id="pricing">
-      <div className="landing-container">
-        <div className="lp-section-eyebrow">Simple pricing</div>
-        <h2 className="landing-section-title">Start free, scale as you grow</h2>
-        <p className="landing-section-subtitle">
-          No hidden fees. No credit card required for free plan. Cancel or pause anytime.
-        </p>
+    <section className="section" id="pricing">
+      <div className="container">
+        <div className="section-header">
+          <div className="section-eyebrow">Simple pricing</div>
+          <h2 className="section-title">Start free, scale as you grow</h2>
+          <p className="section-sub">No hidden fees. No credit card required for free plan. Cancel or pause anytime.</p>
+        </div>
 
-        <div className="billing-toggle-wrapper">
-          <button
-            className={`billing-toggle-btn${!isAnnual ? ' billing-toggle-active' : ''}`}
-            onClick={() => setIsAnnual(false)}
+        <div className="pricing-toggle">
+          <span className="toggle-label">Monthly</span>
+          <div
+            className={`toggle-pill${isAnnual ? ' annual' : ''}`}
+            onClick={() => setIsAnnual(!isAnnual)}
+            role="button"
+            aria-label="Toggle billing period"
           >
-            Monthly
-          </button>
-          <button
-            className={`billing-toggle-btn${isAnnual ? ' billing-toggle-active' : ''}`}
-            onClick={() => setIsAnnual(true)}
-          >
-            Annual
-            <span className="billing-toggle-save">Save up to 20%</span>
-          </button>
+            <div className="toggle-thumb" />
+          </div>
+          <span className="toggle-label">Annual</span>
+          <span className="save-badge">Save up to 20%</span>
         </div>
 
         <div className="pricing-grid">
@@ -121,18 +121,18 @@ export default function PricingTable(): React.ReactElement {
             let note: string | undefined
 
             if (isFree) {
-              price = '\u00A30'
+              price = '£0'
               period = 'forever'
             } else if (isAnnual && annualGbp) {
-              price = `\u00A3${annualGbp.toFixed(annualGbp % 1 === 0 ? 0 : 2)}`
-              period = '/year'
+              price = `£${annualGbp.toFixed(annualGbp % 1 === 0 ? 0 : 2)}`
+              period = 'per month · billed annually'
               const savings = Math.round(((monthlyGbp * 12 - annualGbp) / (monthlyGbp * 12)) * 100)
-              note = savings > 0 ? `Save ${savings}% vs monthly` : undefined
+              note = savings > 0 ? `Or £${(monthlyGbp).toFixed(0)}/mo billed monthly` : undefined
             } else {
-              price = `\u00A3${monthlyGbp.toFixed(monthlyGbp % 1 === 0 ? 0 : 2)}`
-              period = '/month'
+              price = `£${monthlyGbp.toFixed(monthlyGbp % 1 === 0 ? 0 : 2)}`
+              period = 'per month'
               if (annualGbp) {
-                note = `Or \u00A3${annualGbp.toFixed(0)}/year`
+                note = `Or £${annualGbp.toFixed(0)}/yr billed annually`
               }
             }
 
@@ -142,37 +142,36 @@ export default function PricingTable(): React.ReactElement {
             return (
               <div
                 key={plan.slug}
-                className={`pricing-card ${isHighlighted ? 'pricing-card-highlighted' : ''}`}
+                className={`pricing-card${isHighlighted ? ' featured' : ''}`}
               >
                 {isHighlighted && (
-                  <div className="pricing-badge">Most Popular</div>
+                  <div className="popular-badge">Most Popular</div>
                 )}
-                <div className="pricing-card-header">
-                  <h3 className="pricing-plan-name">{plan.name}</h3>
-                  <div className="pricing-price">
-                    <span className="pricing-amount">{price}</span>
-                    <span className="pricing-period">{period}</span>
-                  </div>
-                  {note && <p className="pricing-description">{note}</p>}
+                <div className={`plan-name${isHighlighted ? '' : ''}`} style={isHighlighted ? { color: 'var(--brand-blue)' } : {}}>
+                  {plan.name}
                 </div>
-                <ul className="pricing-features">
+                <div className="plan-price">
+                  £<span>{isFree ? '0' : (isAnnual && annualGbp ? (annualGbp / 12).toFixed(annualGbp / 12 % 1 === 0 ? 0 : 0) : monthlyGbp.toFixed(monthlyGbp % 1 === 0 ? 0 : 2))}</span>
+                </div>
+                <div className="plan-period">{period}</div>
+                {note && <div className="plan-price-note">{note}</div>}
+                <hr className="plan-divider" />
+                <ul className="plan-features">
                   {features.map((feature, index) => (
-                    <li
-                      key={index}
-                      className={`pricing-feature ${!feature.included ? 'pricing-feature-disabled' : ''}`}
-                    >
-                      <span className="pricing-feature-icon">
-                        {feature.included ? '\u2713' : '\u2014'}
+                    <li key={index} className="plan-feature">
+                      <span className={feature.included ? 'plan-check' : 'plan-x'}>
+                        {feature.included ? '✓' : '✗'}
                       </span>
-                      {feature.text}
+                      {' '}{feature.text}
                     </li>
                   ))}
                 </ul>
                 <a
-                  href={isFree ? '/signup' : '/signup'}
-                  className={`btn btn-full ${isHighlighted ? 'btn-primary' : 'btn-secondary'}`}
+                  href="/signup"
+                  className={`btn${isHighlighted ? ' btn-primary' : ' btn-ghost'}`}
+                  style={{ width: '100%', justifyContent: 'center' }}
                 >
-                  {isFree ? 'Start Free' : 'Get Started'}
+                  {isFree ? 'Start Free' : `Get ${plan.name}`}
                 </a>
               </div>
             )
