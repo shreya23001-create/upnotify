@@ -2,19 +2,15 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 
+interface CronEntry { label: string; schedule: string; path: string; lastRun: string | null; status: string }
+
 interface SystemHealth {
   database: { status: string; latencyMs: number }
-  crons: {
-    checkRunner: { lastRun: string | null; status: string }
-    publicChecks: { lastRun: string | null; status: string }
-    nurtureEmails: { lastRun: string | null; status: string }
-    aoeQuotaManager: { lastRun: string | null; status: string }
-    aoeSiteDiscovery: { lastRun: string | null; status: string }
-    aoeOutreachEmailer: { lastRun: string | null; status: string }
-  }
+  crons: Record<string, CronEntry>
   monitors: { total: number; active: number; paused: number; inMaintenance: number }
   incidents: { open: number; resolvedToday: number }
   checks: { last24h: number; failRate: number }
+  compete: { activeProducts: number; activeSubscriptions: number }
 }
 
 function timeAgo(dateStr: string | null): string {
@@ -57,6 +53,28 @@ export default function AdminSystemPage(): React.ReactElement {
     }
   }, [])
 
+  // Cron on-demand trigger state: key = cron key, value = 'idle' | 'running' | 'ok' | 'error'
+  const [cronTrigger, setCronTrigger] = useState<Record<string, 'idle' | 'running' | 'ok' | 'error'>>({})
+
+  const triggerCron = useCallback(async (key: string, path: string): Promise<void> => {
+    setCronTrigger(prev => ({ ...prev, [key]: 'running' }))
+    try {
+      const res = await fetch('/api/admin/trigger-cron', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ path }),
+      })
+      setCronTrigger(prev => ({ ...prev, [key]: res.ok ? 'ok' : 'error' }))
+      // Reset back to idle after 4 seconds
+      setTimeout(() => setCronTrigger(prev => ({ ...prev, [key]: 'idle' })), 4000)
+      // Refresh health data after a short delay so last-run updates
+      setTimeout(fetchHealth, 2000)
+    } catch {
+      setCronTrigger(prev => ({ ...prev, [key]: 'error' }))
+      setTimeout(() => setCronTrigger(prev => ({ ...prev, [key]: 'idle' })), 4000)
+    }
+  }, [fetchHealth])
+
   useEffect(() => {
     fetchHealth()
     const interval = setInterval(fetchHealth, 30_000)
@@ -94,21 +112,40 @@ export default function AdminSystemPage(): React.ReactElement {
           <div className="table-wrapper">
             <table className="table">
               <thead>
-                <tr><th>Job</th><th>Status</th><th>Last Run</th></tr>
+                <tr><th>Job</th><th>Schedule</th><th>Status</th><th>Last Run</th><th style={{ width: 80 }}>Trigger</th></tr>
               </thead>
               <tbody>
-                {Object.entries(health.crons).map(([name, cron]) => (
-                  <tr key={name}>
-                    <td style={{ fontWeight: 500 }}>{name.replace(/([A-Z])/g, ' $1').trim()}</td>
-                    <td>
-                      <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <span style={{ width: 8, height: 8, borderRadius: '50%', background: statusColor(cron.status) }} />
-                        {cron.status}
-                      </span>
-                    </td>
-                    <td style={{ fontSize: 13, color: 'var(--text-muted)' }}>{timeAgo(cron.lastRun)}</td>
-                  </tr>
-                ))}
+                {Object.entries(health.crons).map(([key, cron]) => {
+                  const trigState = cronTrigger[key] ?? 'idle'
+                  return (
+                    <tr key={key}>
+                      <td style={{ fontWeight: 500 }}>{cron.label}</td>
+                      <td style={{ fontSize: 12, color: 'var(--text-muted)' }}>{cron.schedule}</td>
+                      <td>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <span style={{ width: 8, height: 8, borderRadius: '50%', background: statusColor(cron.status), flexShrink: 0 }} />
+                          <span style={{ fontSize: 13 }}>{cron.status}</span>
+                        </span>
+                      </td>
+                      <td style={{ fontSize: 13, color: 'var(--text-muted)' }}>{timeAgo(cron.lastRun)}</td>
+                      <td>
+                        <button
+                          className="btn btn-secondary"
+                          style={{
+                            fontSize: 11,
+                            padding: '3px 8px',
+                            color: trigState === 'ok' ? '#22c55e' : trigState === 'error' ? '#ef4444' : undefined,
+                            borderColor: trigState === 'ok' ? '#22c55e' : trigState === 'error' ? '#ef4444' : undefined,
+                          }}
+                          disabled={trigState === 'running'}
+                          onClick={() => triggerCron(key, cron.path)}
+                        >
+                          {trigState === 'running' ? '…' : trigState === 'ok' ? '✓ Done' : trigState === 'error' ? '✗ Error' : '▶ Run'}
+                        </button>
+                      </td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
           </div>
@@ -138,6 +175,20 @@ export default function AdminSystemPage(): React.ReactElement {
           <div style={{ fontSize: 22, fontWeight: 700, color: health.checks.failRate > 5 ? '#ef4444' : undefined }}>{health.checks.failRate.toFixed(1)}%</div>
         </div>
       </div>
+
+      {/* Compete stats */}
+      {health.compete && (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 12, marginBottom: 16 }}>
+          <div className="card" style={{ padding: 16 }}>
+            <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>Compete Products</div>
+            <div style={{ fontSize: 22, fontWeight: 700 }}>{health.compete.activeProducts}</div>
+          </div>
+          <div className="card" style={{ padding: 16 }}>
+            <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>Compete Subscriptions</div>
+            <div style={{ fontSize: 22, fontWeight: 700, color: health.compete.activeSubscriptions > 0 ? '#22c55e' : undefined }}>{health.compete.activeSubscriptions}</div>
+          </div>
+        </div>
+      )}
 
       {/* Dev Simulation Panel */}
       <div className="card" style={{ marginBottom: 16, border: '2px dashed #f59e0b' }}>

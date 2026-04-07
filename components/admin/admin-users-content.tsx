@@ -11,6 +11,12 @@ interface Plan {
   slug: string
 }
 
+interface CompetePlan {
+  id: string
+  name: string
+  slug: string
+}
+
 function fmtDate(iso: string | null): string {
   if (!iso) return '—'
   return new Date(iso).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
@@ -102,9 +108,10 @@ function ConfirmDialog({ title, message, variant, onConfirm, onCancel }: {
 type SortKey = 'score' | 'totalSpendGbp' | 'monitorCount' | 'joinedAt' | 'email'
 
 type ConfirmAction = {
-  type: 'delete' | 'deactivate' | 'activate' | 'change_plan'
+  type: 'delete' | 'deactivate' | 'activate' | 'change_plan' | 'change_compete_plan'
   userId: string
   userName: string
+  orgId?: string
   planId?: string
   planName?: string
 }
@@ -112,6 +119,7 @@ type ConfirmAction = {
 export function AdminUsersContent(): React.ReactElement {
   const [profiles, setProfiles] = useState<User360Profile[]>([])
   const [plans, setPlans] = useState<Plan[]>([])
+  const [competePlans, setCompetePlans] = useState<CompetePlan[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [planFilter, setPlanFilter] = useState('all')
@@ -124,15 +132,18 @@ export function AdminUsersContent(): React.ReactElement {
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
   const [refreshingScores, setRefreshingScores] = useState(false)
   const [scoresRefreshedAt, setScoresRefreshedAt] = useState<string | null>(null)
+  const [page, setPage] = useState(1)
+  const PAGE_SIZE = 15
   const router = useRouter()
 
   useEffect(() => {
     fetch('/api/admin/user360')
       .then(r => r.json())
-      .then((d: { success: boolean; profiles: User360Profile[]; plans: Plan[] }) => {
+      .then((d: { success: boolean; profiles: User360Profile[]; plans: Plan[]; competePlans?: CompetePlan[] }) => {
         if (d.success) {
           setProfiles(d.profiles)
           setPlans(d.plans ?? [])
+          setCompetePlans(d.competePlans ?? [])
           // Seed last-refreshed from any profile that has health score data
           const sample = d.profiles.find(p => p.healthScoreAt)
           if (sample?.healthScoreAt) setScoresRefreshedAt(sample.healthScoreAt)
@@ -150,6 +161,7 @@ export function AdminUsersContent(): React.ReactElement {
   function toggleSort(key: SortKey) {
     if (sortKey === key) setSortDir(d => d === 'desc' ? 'asc' : 'desc')
     else { setSortKey(key); setSortDir('desc') }
+    setPage(1)
   }
 
   function SortIcon({ col }: { col: SortKey }) {
@@ -240,6 +252,18 @@ export function AdminUsersContent(): React.ReactElement {
         } else {
           setMessage({ type: 'error', text: data.error ?? 'Failed' })
         }
+      } else if (confirmAction.type === 'change_compete_plan') {
+        const res = await fetch('/api/admin/users', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: confirmAction.userId, orgId: confirmAction.orgId, action: 'change_compete_plan', planId: confirmAction.planId }),
+        })
+        const data = await res.json() as { success?: boolean; error?: string }
+        if (data.success) {
+          setMessage({ type: 'success', text: `${confirmAction.userName} Compete plan set to ${confirmAction.planName}.` })
+        } else {
+          setMessage({ type: 'error', text: data.error ?? 'Failed' })
+        }
       }
     } catch {
       setMessage({ type: 'error', text: 'Network error' })
@@ -290,6 +314,11 @@ export function AdminUsersContent(): React.ReactElement {
       message: `Move ${confirmAction?.userName} to ${confirmAction?.planName}? This is an admin override — no Stripe payment processed. Takes effect immediately.`,
       variant: 'warning',
     },
+    change_compete_plan: {
+      title: 'Assign Compete Plan',
+      message: `Assign ${confirmAction?.userName} to Compete plan "${confirmAction?.planName}"? Admin override — no Stripe payment processed. Takes effect immediately.`,
+      variant: 'warning',
+    },
   }
 
   return (
@@ -317,12 +346,12 @@ export function AdminUsersContent(): React.ReactElement {
           style={{ fontSize: 13, padding: '6px 10px', width: 240 }}
           placeholder="Search email or org…"
           value={search}
-          onChange={e => setSearch(e.target.value)}
+          onChange={e => { setSearch(e.target.value); setPage(1) }}
         />
-        <select className="form-input" style={{ fontSize: 13, padding: '6px 10px', width: 160 }} value={planFilter} onChange={e => setPlanFilter(e.target.value)}>
+        <select className="form-input" style={{ fontSize: 13, padding: '6px 10px', width: 160 }} value={planFilter} onChange={e => { setPlanFilter(e.target.value); setPage(1) }}>
           {uniquePlans.map(p => <option key={p} value={p}>{p === 'all' ? 'All plans' : p}</option>)}
         </select>
-        <select className="form-input" style={{ fontSize: 13, padding: '6px 10px', width: 150 }} value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
+        <select className="form-input" style={{ fontSize: 13, padding: '6px 10px', width: 150 }} value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setPage(1) }}>
           <option value="all">All users</option>
           <option value="active">Active only</option>
           <option value="inactive">Inactive only</option>
@@ -372,7 +401,7 @@ export function AdminUsersContent(): React.ReactElement {
                 </tr>
               </thead>
               <tbody>
-                {filtered.map(p => (
+                {filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE).map(p => (
                   <>
                     <tr key={p.userId}>
                       <td style={{ paddingLeft: 16 }}><ScoreBadge score={p.score} /></td>
@@ -516,7 +545,7 @@ export function AdminUsersContent(): React.ReactElement {
                                   {impersonatingId === p.userId ? 'Switching…' : '👁 Mimic User'}
                                 </button>
 
-                                <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', marginTop: 4 }}>Change Plan</div>
+                                <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', marginTop: 4 }}>Change Uptime Plan</div>
                                 <select
                                   className="form-input"
                                   style={{ fontSize: 12, padding: '5px 8px' }}
@@ -534,6 +563,29 @@ export function AdminUsersContent(): React.ReactElement {
                                     <option key={pl.id} value={pl.id}>{pl.name}</option>
                                   ))}
                                 </select>
+
+                                {competePlans.length > 0 && (
+                                  <>
+                                    <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', marginTop: 8 }}>Assign Compete Plan</div>
+                                    <select
+                                      className="form-input"
+                                      style={{ fontSize: 12, padding: '5px 8px' }}
+                                      defaultValue=""
+                                      onChange={e => {
+                                        const planId = e.target.value
+                                        if (!planId) return
+                                        const plan = competePlans.find(pl => pl.id === planId)
+                                        setConfirmAction({ type: 'change_compete_plan', userId: p.userId, orgId: p.orgId, userName: p.fullName ?? p.email, planId, planName: plan?.name ?? 'Unknown' })
+                                        e.target.value = ''
+                                      }}
+                                    >
+                                      <option value="">Select Compete plan…</option>
+                                      {competePlans.map(pl => (
+                                        <option key={pl.id} value={pl.id}>{pl.name}</option>
+                                      ))}
+                                    </select>
+                                  </>
+                                )}
 
                                 <div style={{ display: 'flex', gap: 6, marginTop: 4 }}>
                                   {p.isActive ? (
@@ -578,6 +630,20 @@ export function AdminUsersContent(): React.ReactElement {
                 )}
               </tbody>
             </table>
+          </div>
+        </div>
+      )}
+
+      {/* Pagination */}
+      {filtered.length > PAGE_SIZE && (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 12, fontSize: 13 }}>
+          <span style={{ color: 'var(--text-muted)' }}>
+            Showing {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} of {filtered.length} users
+          </span>
+          <div style={{ display: 'flex', gap: 6 }}>
+            <button className="btn btn-secondary btn-sm" disabled={page <= 1} onClick={() => setPage(p => p - 1)}>Previous</button>
+            <span style={{ padding: '6px 12px', color: 'var(--text-secondary)' }}>Page {page} of {Math.ceil(filtered.length / PAGE_SIZE)}</span>
+            <button className="btn btn-secondary btn-sm" disabled={page >= Math.ceil(filtered.length / PAGE_SIZE)} onClick={() => setPage(p => p + 1)}>Next</button>
           </div>
         </div>
       )}

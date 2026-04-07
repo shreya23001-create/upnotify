@@ -91,6 +91,7 @@ export async function GET(): Promise<NextResponse> {
     { data: alertsRaw },
     { data: statusPagesRaw },
     { data: plansRaw },
+    { data: competePlansRaw },
   ] = await Promise.all([
     supabase.from('users').select('id, email, full_name, org_id, is_active, created_at').order('created_at', { ascending: false }),
     supabase.from('organisations').select('id, name, health_score, health_score_label, health_score_at'),
@@ -100,6 +101,7 @@ export async function GET(): Promise<NextResponse> {
     supabase.from('alert_channels').select('org_id').eq('is_enabled', true),
     supabase.from('status_pages').select('org_id'),
     supabase.from('plans').select('id, name, slug'),
+    supabase.from('compete_plans').select('id, name, slug').eq('is_active', true).order('sort_order', { ascending: true }),
   ])
 
   // Build lookup maps
@@ -203,6 +205,7 @@ export async function GET(): Promise<NextResponse> {
   }
 
   const plans = (plansRaw ?? []) as { id: string; name: string; slug: string }[]
+  const competePlans = (competePlansRaw ?? []) as { id: string; name: string; slug: string }[]
 
-  return NextResponse.json({ success: true, profiles, plans })
+  return NextResponse.json({ success: true, profiles, plans, competePlans })
 }

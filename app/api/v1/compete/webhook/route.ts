@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { validateApiKey } from '@/lib/db/api-keys'
 import { getProductByUrl, writePrice } from '@/lib/db/ecom-products'
+import { evaluateRulesForPriceChange } from '@/lib/services/pricing-rules-engine'
 import { logger } from '@/lib/utils/logger'
 
 /**
@@ -66,10 +67,13 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       ? stockStatus
       : null
 
+    const resolvedCurrency = typeof currency === 'string' && currency.length === 3 ? currency.toUpperCase() : 'GBP'
+    const oldPrice = product.last_price ?? null
+
     // Write price data
     const priceEntry = await writePrice(product.id, orgId, {
       price,
-      currency: typeof currency === 'string' && currency.length === 3 ? currency.toUpperCase() : 'GBP',
+      currency: resolvedCurrency,
       stock_status: validatedStock,
       extraction_method: 'manual',
       confidence: 1.0,
@@ -80,17 +84,29 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       return NextResponse.json({ error: 'Failed to write price data' }, { status: 500 })
     }
 
-    logger.info('Compete webhook price received', {
-      orgId,
-      productId: product.id,
-      price,
-      currency: currency ?? 'GBP',
-    })
+    logger.info('Compete webhook price received', { orgId, productId: product.id, price, currency: resolvedCurrency })
+
+    // Evaluate pricing rules if price changed (fire-and-forget — don't block the webhook response)
+    const priceChanged = oldPrice !== null && Math.abs(price - oldPrice) > 0.01
+    if (priceChanged) {
+      evaluateRulesForPriceChange({
+        productId: product.id,
+        orgId,
+        oldPricePence: Math.round(oldPrice * 100),
+        newPricePence: Math.round(price * 100),
+        productName: product.name,
+        productUrl: product.url,
+        stockStatus: validatedStock ?? undefined,
+      }).catch(err => {
+        logger.error('Webhook rule evaluation failed', { productId: product.id, error: String(err) })
+      })
+    }
 
     return NextResponse.json({
       success: true,
       productId: product.id,
       priceRecorded: price,
+      rulesEvaluated: priceChanged,
     })
   } catch (err) {
     logger.error('POST /api/v1/compete/webhook failed', {

@@ -285,7 +285,10 @@ export default async function User360Page({
           <h1 className="admin-page-title">User 360</h1>
           <p className="admin-page-subtitle">Full view of a user or organisation.</p>
         </div>
-        <Link href="/admin/revenue" className="btn btn-secondary" style={{ fontSize: 13 }}>← Revenue</Link>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <Link href="/admin/users" className="btn btn-secondary" style={{ fontSize: 13 }}>← Users</Link>
+          <Link href="/admin/revenue" className="btn btn-secondary" style={{ fontSize: 13 }}>← Revenue</Link>
+        </div>
       </div>
 
       {/* Search bar */}

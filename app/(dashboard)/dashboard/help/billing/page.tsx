@@ -121,7 +121,7 @@ export default function BillingPage(): React.ReactElement {
           </section>
 
           <section className="help-section">
-            <h2>Canceling or Pausing</h2>
+            <h2 className="help-section-title">Canceling or Pausing</h2>
             <p>
               You can cancel or pause your subscription at any time from <Link href="/dashboard/settings?tab=billing">Settings &gt; Billing</Link>.
               If cost is a concern, we offer a <strong>3-month pause</strong> — no charges, data preserved, resume anytime.

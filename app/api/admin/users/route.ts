@@ -22,7 +22,8 @@ export async function PATCH(request: Request): Promise<NextResponse> {
 
   const body = await request.json() as {
     userId: string
-    action: 'deactivate' | 'activate' | 'change_plan'
+    orgId?: string
+    action: 'deactivate' | 'activate' | 'change_plan' | 'change_compete_plan'
     planId?: string
   }
 
@@ -146,6 +147,57 @@ export async function PATCH(request: Request): Promise<NextResponse> {
     })
 
     return NextResponse.json({ success: true, affected })
+  }
+
+  if (body.action === 'change_compete_plan') {
+    if (!body.planId) {
+      return NextResponse.json({ error: 'planId is required' }, { status: 400 })
+    }
+
+    // Resolve org_id from userId if not provided
+    let orgId = body.orgId ?? null
+    if (!orgId) {
+      const { data: userRow } = await supabase.from('users').select('org_id').eq('id', body.userId).single()
+      orgId = userRow?.org_id ?? null
+    }
+
+    if (!orgId) {
+      return NextResponse.json({ error: 'User or org not found' }, { status: 404 })
+    }
+
+    // Cancel any existing active compete subscription for this org
+    await supabase
+      .from('compete_subscriptions')
+      .update({ status: 'canceled', canceled_at: new Date().toISOString() })
+      .eq('org_id', orgId)
+      .eq('status', 'active')
+
+    // Create new compete subscription (admin override — no Stripe)
+    const { error: insertError } = await supabase.from('compete_subscriptions').insert({
+      org_id: orgId,
+      compete_plan_id: body.planId,
+      status: 'active',
+      billing_cycle: 'monthly',
+      extra_products_purchased: 0,
+      current_period_start: new Date().toISOString(),
+      current_period_end: new Date(Date.now() + 30 * 86400000).toISOString(),
+    })
+
+    if (insertError) {
+      logger.error('Admin compete plan assignment failed', { error: insertError.message })
+      return NextResponse.json({ error: 'Failed to assign Compete plan' }, { status: 500 })
+    }
+
+    await writeAuditLog({
+      orgId,
+      userId: adminUserId,
+      action: 'admin.compete_plan_assigned',
+      resourceType: 'compete_subscription',
+      resourceId: body.userId,
+      metadata: { adminEmail, competePlanId: body.planId },
+    })
+
+    return NextResponse.json({ success: true })
   }
 
   return NextResponse.json({ error: 'Invalid action' }, { status: 400 })

@@ -44,6 +44,8 @@ export function TrackerManager({ monitors }: TrackerManagerProps): React.ReactEl
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
   const [filter, setFilter] = useState('')
   const [page, setPage] = useState(1)
+  const [sortKey, setSortKey] = useState<keyof PublicMonitor>('display_name')
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc')
 
   const clearMessages = useCallback((): void => {
     setError(null)
@@ -97,13 +99,31 @@ export function TrackerManager({ monitors }: TrackerManagerProps): React.ReactEl
     setDeleteConfirmId(null)
   }, [clearMessages])
 
-  const filteredMonitors = filter
+  const filteredMonitors = (filter
     ? monitors.filter(m =>
         m.domain.toLowerCase().includes(filter.toLowerCase()) ||
         m.display_name.toLowerCase().includes(filter.toLowerCase()) ||
         m.category.toLowerCase().includes(filter.toLowerCase())
       )
     : monitors
+  ).slice().sort((a, b) => {
+    const av = a[sortKey] ?? ''
+    const bv = b[sortKey] ?? ''
+    if (av < bv) return sortDir === 'asc' ? -1 : 1
+    if (av > bv) return sortDir === 'asc' ? 1 : -1
+    return 0
+  })
+
+  function handleSort(key: keyof PublicMonitor): void {
+    if (sortKey === key) setSortDir(d => d === 'asc' ? 'desc' : 'asc')
+    else { setSortKey(key); setSortDir('asc') }
+    setPage(1)
+  }
+
+  function SortIcon({ col }: { col: keyof PublicMonitor }): React.ReactElement {
+    if (sortKey !== col) return <span style={{ opacity: 0.3, marginLeft: 3 }}>↕</span>
+    return <span style={{ marginLeft: 3 }}>{sortDir === 'asc' ? '↑' : '↓'}</span>
+  }
 
   const totalPages = Math.ceil(filteredMonitors.length / PAGE_SIZE)
   const paginatedMonitors = filteredMonitors.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
@@ -172,12 +192,13 @@ export function TrackerManager({ monitors }: TrackerManagerProps): React.ReactEl
         <table className="plans-table">
           <thead>
             <tr>
-              <th>Site</th>
-              <th>Category</th>
-              <th>Status</th>
-              <th>Response</th>
-              <th>Last Checked</th>
-              <th>Active</th>
+              <th style={{ cursor: 'pointer' }} onClick={() => handleSort('display_name')}>Site <SortIcon col="display_name" /></th>
+              <th style={{ cursor: 'pointer' }} onClick={() => handleSort('category')}>Category <SortIcon col="category" /></th>
+              <th style={{ cursor: 'pointer' }} onClick={() => handleSort('last_status')}>Status <SortIcon col="last_status" /></th>
+              <th style={{ cursor: 'pointer' }} onClick={() => handleSort('last_response_time_ms')}>Response <SortIcon col="last_response_time_ms" /></th>
+              <th style={{ cursor: 'pointer' }} onClick={() => handleSort('last_checked_at')}>Last Checked <SortIcon col="last_checked_at" /></th>
+              <th style={{ cursor: 'pointer' }} onClick={() => handleSort('is_active')}>Active <SortIcon col="is_active" /></th>
+              <th style={{ cursor: 'pointer' }} onClick={() => handleSort('created_at')}>Added <SortIcon col="created_at" /></th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -230,6 +251,9 @@ export function TrackerManager({ monitors }: TrackerManagerProps): React.ReactEl
                     <span className="switch-slider" />
                   </label>
                 </td>
+                <td style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+                  {m.created_at ? new Date(m.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}
+                </td>
                 <td>
                   <div style={{ display: 'flex', gap: 4 }}>
                     <button
@@ -261,7 +285,7 @@ export function TrackerManager({ monitors }: TrackerManagerProps): React.ReactEl
             ))}
             {paginatedMonitors.length === 0 && (
               <tr>
-                <td colSpan={7} style={{ textAlign: 'center', color: 'var(--text-muted)', padding: 32 }}>
+                <td colSpan={8} style={{ textAlign: 'center', color: 'var(--text-muted)', padding: 32 }}>
                   {filter ? 'No sites match your filter.' : 'No tracked sites yet. Add one above.'}
                 </td>
               </tr>

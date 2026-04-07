@@ -435,17 +435,19 @@ function extractFromNextData(html: string): PriceExtractionResult {
       const variants = obj.variants as unknown
       if (Array.isArray(variants) && variants.length > 0) {
         const v = variants[0] as Record<string, unknown>
+        const priceV2 = v.priceV2 as Record<string, unknown> | null | undefined
+        const priceData = v.price_data as Record<string, unknown> | null | undefined
         const price = parsePrice(String(
-          v.price ?? v.priceV2?.amount ?? v.price_data?.unit_amount ?? ''
+          v.price ?? priceV2?.amount ?? priceData?.unit_amount ?? ''
         ))
         if (price !== null) {
-          const unitAmount = v.price_data?.unit_amount as number | undefined
+          const unitAmount = priceData?.unit_amount as number | undefined
           // Stripe-style unit_amount is in pence
           const finalPrice = unitAmount ? unitAmount / 100 : price
           return {
             success: true,
             price: finalPrice,
-            currency: String(v.currency ?? v.price_data?.currency ?? 'GBP').toUpperCase(),
+            currency: String(v.currency ?? priceData?.currency ?? 'GBP').toUpperCase(),
             stockStatus: parseAvailabilityText(String(v.available ?? v.inventory_policy ?? '')),
             productName: typeof obj.title === 'string' ? obj.title : null,
             extractionMethod: 'next-data',
