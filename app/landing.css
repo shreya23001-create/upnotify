@@ -556,8 +556,9 @@ html.dark .pub-nav {
 }
 .blog-card:hover .blog-card-arrow { transform: translateX(4px); }
 .blog-card-image {
-  height: 6px;
+  height: 130px; position: relative; overflow: hidden; flex-shrink: 0;
 }
+.blog-card-image svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 .blog-card-body { padding: var(--space-5); flex: 1; display: flex; flex-direction: column; }
 .blog-card-meta {
   display: flex; align-items: center; gap: var(--space-3);
@@ -1253,4 +1254,16 @@ html.dark .pub-nav {
   .footer-top { grid-template-columns: 1fr; }
   .cta-band h2 { font-size: 32px; }
   .stats-bar-inner { gap: var(--space-8); }
+  .hero-ctas { flex-direction: column; align-items: stretch; }
+  .hero-ctas .btn { justify-content: center; }
+  .blog-section-header { flex-direction: column; align-items: flex-start; gap: var(--space-4); }
+}
+@media (max-width: 480px) {
+  .stats-bar-inner { flex-wrap: wrap; gap: var(--space-6); justify-content: center; }
+  .stats-bar .stat-item { min-width: 120px; }
+  .hiw-steps { gap: var(--space-6); }
+  .mockup-sidebar { display: none; }
+  .mockup-body { height: 320px; }
+  .cta-band-trust { flex-direction: column; gap: var(--space-3); align-items: center; }
+  .cta-band-trust-dot { display: none; }
 }
