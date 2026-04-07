@@ -5,9 +5,33 @@ import { getCurrentUser } from '@/lib/db/users'
 import { getProductById, getPriceHistory, getProductsByGroup } from '@/lib/db/ecom-products'
 import { checkCompeteAccess } from '@/lib/utils/plan-limits'
 import { IconArrowLeft } from '@/components/icons'
+import { TestExtractionPanel } from '@/components/compete/test-extraction-panel'
 
 export const metadata: Metadata = {
   title: 'Product Detail — Compete',
+}
+
+function friendlyMethod(method: string | null): string {
+  if (!method) return '—'
+  const map: Record<string, string> = {
+    json_ld: 'Structured data (JSON-LD)',
+    css_selector: 'Custom CSS selector',
+    microdata: 'Product markup (Microdata)',
+    open_graph: 'Open Graph tags',
+    shopify_api: 'Shopify API',
+    nextjs_hydration: 'JS hydration data',
+    data_attr: 'Data attribute',
+    text_pattern: 'Price text pattern',
+    auto: 'Auto-detected',
+  }
+  return map[method] ?? method
+}
+
+function confidenceBadge(c: number | null): { label: string; color: string; bg: string } {
+  if (c === null) return { label: 'Unknown', color: '#64748b', bg: '#f1f5f9' }
+  if (c >= 0.8) return { label: 'High', color: '#166534', bg: '#dcfce7' }
+  if (c >= 0.5) return { label: 'Medium', color: '#92400e', bg: '#fef3c7' }
+  return { label: 'Low', color: '#991b1b', bg: '#fee2e2' }
 }
 
 interface PageProps {
@@ -171,6 +195,11 @@ export default async function ProductDetailPage({ params, searchParams }: PagePr
 
   const chartSvg = buildPriceChart(priceHistory, currency)
 
+  // Latest check confidence (last entry in ascending history)
+  const latestHistory = priceHistory.length > 0 ? priceHistory[priceHistory.length - 1] : null
+  const latestConfidence = latestHistory ? (latestHistory.confidence as number | null) ?? null : null
+  const confBadge = confidenceBadge(latestConfidence)
+
   const pageUrl = (path: string) => `/dashboard/compete/${id}?period=${path}`
 
   return (
@@ -257,12 +286,49 @@ export default async function ProductDetailPage({ params, searchParams }: PagePr
       <div className="card compete-detail-card" style={{ marginBottom: 24 }}>
         <h3 className="compete-detail-heading">Extraction Details</h3>
         <div className="compete-detail-grid">
-          <div><span className="compete-detail-label">Method</span><span className="compete-detail-value">{product.extraction_method}</span></div>
-          <div><span className="compete-detail-label">Check Interval</span><span className="compete-detail-value">{product.check_interval_minutes} min</span></div>
-          <div><span className="compete-detail-label">Currency</span><span className="compete-detail-value">{currency}</span></div>
-          <div><span className="compete-detail-label">Status</span><span className="compete-detail-value">{product.is_active ? 'Active' : 'Paused'}</span></div>
+          <div>
+            <span className="compete-detail-label">Method</span>
+            <span className="compete-detail-value">{friendlyMethod(product.extraction_method)}</span>
+          </div>
+          <div>
+            <span className="compete-detail-label">Last confidence</span>
+            {latestConfidence !== null ? (
+              <span
+                className="compete-confidence-badge"
+                style={{ color: confBadge.color, background: confBadge.bg }}
+              >
+                {Math.round(latestConfidence * 100)}% — {confBadge.label}
+              </span>
+            ) : (
+              <span className="compete-detail-value" style={{ color: 'var(--text-muted)' }}>No checks yet</span>
+            )}
+          </div>
+          <div>
+            <span className="compete-detail-label">Check Interval</span>
+            <span className="compete-detail-value">{product.check_interval_minutes} min</span>
+          </div>
+          <div>
+            <span className="compete-detail-label">Currency</span>
+            <span className="compete-detail-value">{currency}</span>
+          </div>
+          <div>
+            <span className="compete-detail-label">Status</span>
+            <span className="compete-detail-value">{product.is_active ? 'Active' : 'Paused'}</span>
+          </div>
+          {product.css_selector && (
+            <div>
+              <span className="compete-detail-label">CSS Selector</span>
+              <span className="compete-detail-value"><code>{product.css_selector}</code></span>
+            </div>
+          )}
         </div>
       </div>
+
+      {/* Test extraction on demand */}
+      <TestExtractionPanel
+        productUrl={product.url}
+        cssSelector={(product as unknown as Record<string, unknown>).css_selector as string | null}
+      />
 
       {/* Price history table */}
       <div className="card compete-detail-card" style={{ marginBottom: 24 }}>
@@ -298,8 +364,21 @@ export default async function ProductDetailPage({ params, searchParams }: PagePr
                         ) : <span style={{ color: 'var(--text-muted)' }}>—</span>}
                       </td>
                       <td><span className={getStockStatusClass(entry.stock_status)}>{getStockStatusLabel(entry.stock_status)}</span></td>
-                      <td style={{ color: 'var(--text-muted)', fontSize: 13 }}>{entry.extraction_method ?? '—'}</td>
-                      <td style={{ color: 'var(--text-muted)', fontSize: 13 }}>{entry.confidence !== null ? `${Math.round((entry.confidence as number) * 100)}%` : '—'}</td>
+                      <td style={{ color: 'var(--text-muted)', fontSize: 13 }}>{friendlyMethod(entry.extraction_method ?? null)}</td>
+                      <td>
+                        {entry.confidence !== null ? (() => {
+                          const c = entry.confidence as number
+                          const badge = confidenceBadge(c)
+                          return (
+                            <span
+                              className="compete-confidence-badge"
+                              style={{ color: badge.color, background: badge.bg, fontSize: 11 }}
+                            >
+                              {Math.round(c * 100)}%
+                            </span>
+                          )
+                        })() : <span style={{ color: 'var(--text-muted)' }}>—</span>}
+                      </td>
                     </tr>
                   )
                 })}

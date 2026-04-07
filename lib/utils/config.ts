@@ -58,6 +58,12 @@ interface ServerConfig extends PublicConfig {
   blogApproval: {
     secret: string
   }
+  support: {
+    apiKey:         string  // Bearer token for external tool — set SUPPORT_API_KEY
+    webhookUrl:     string  // Outbound webhook for external tool — set SUPPORT_WEBHOOK_URL
+    webhookSecret:  string  // HMAC secret for webhook signing — set SUPPORT_WEBHOOK_SECRET
+  }
+  adminEmails: string[]
 }
 
 /**
@@ -139,6 +145,10 @@ export function getServerConfig(): ServerConfig {
   const telegramBotToken = process.env.TELEGRAM_BOT_TOKEN ?? ''
   const telegramChatId = process.env.TELEGRAM_CHAT_ID ?? ''
   const blogApprovalSecret = process.env.BLOG_APPROVAL_SECRET ?? ''
+  const supportApiKey = process.env.SUPPORT_API_KEY ?? ''
+  const supportWebhookUrl = process.env.SUPPORT_WEBHOOK_URL ?? ''
+  const supportWebhookSecret = process.env.SUPPORT_WEBHOOK_SECRET ?? ''
+  const adminEmailsList = (process.env.ADMIN_EMAILS ?? '').split(',').map(e => e.trim()).filter(Boolean)
 
   cachedServerConfig = {
     ...publicConfig,
@@ -180,6 +190,12 @@ export function getServerConfig(): ServerConfig {
     blogApproval: {
       secret: blogApprovalSecret,
     },
+    support: {
+      apiKey:        supportApiKey,
+      webhookUrl:    supportWebhookUrl,
+      webhookSecret: supportWebhookSecret,
+    },
+    adminEmails: adminEmailsList,
   }
 
   return cachedServerConfig

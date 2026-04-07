@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import type { EcomProductGroup } from '@/lib/types'
 
 interface AddProductFormProps {
@@ -18,6 +19,27 @@ interface ExtractionPreview {
   extractionMethod: string
   confidence: number
   error?: string
+}
+
+function confidenceLevel(c: number): { label: string; color: string; bg: string } {
+  if (c >= 0.8) return { label: 'High confidence', color: '#166534', bg: '#dcfce7' }
+  if (c >= 0.5) return { label: 'Medium confidence', color: '#92400e', bg: '#fef3c7' }
+  return { label: 'Low confidence', color: '#991b1b', bg: '#fee2e2' }
+}
+
+function friendlyMethod(method: string): string {
+  const map: Record<string, string> = {
+    json_ld: 'Structured data (JSON-LD)',
+    css_selector: 'Custom CSS selector',
+    microdata: 'Product markup (Microdata)',
+    open_graph: 'Open Graph tags',
+    shopify_api: 'Shopify API',
+    nextjs_hydration: 'JS hydration data',
+    data_attr: 'Data attribute',
+    text_pattern: 'Price text pattern',
+    auto: 'Auto-detected',
+  }
+  return map[method] ?? method
 }
 
 function formatPrice(price: number | null, currency: string): string {
@@ -42,6 +64,8 @@ export function AddProductForm({
   const [preview, setPreview] = useState<ExtractionPreview | null>(null)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [showCssHelp, setShowCssHelp] = useState(false)
+  const router = useRouter()
 
   async function handleExtract(): Promise<void> {
     if (!url.trim()) {
@@ -114,13 +138,18 @@ export function AddProductForm({
         }),
       })
 
-      const data = await res.json() as { error?: string }
+      const data = await res.json() as { error?: string; product?: { id: string } }
       if (!res.ok) {
         setError(data.error ?? 'Failed to save product')
         return
       }
 
-      setSuccess('Product added successfully! Reload page to see it in the table.')
+      if (data.product?.id) {
+        router.push(`/dashboard/compete/${data.product.id}`)
+        return
+      }
+
+      setSuccess('Product added successfully!')
       setUrl('')
       setCssSelector('')
       setPreview(null)
@@ -221,11 +250,27 @@ export function AddProductForm({
             </select>
           </div>
           <div className="form-group">
-            <label className="form-label">CSS Selector (optional)</label>
+            <div className="compete-css-label-row">
+              <label className="form-label">CSS Selector (optional)</label>
+              <button
+                type="button"
+                className="compete-css-help-toggle"
+                onClick={() => setShowCssHelp(!showCssHelp)}
+              >
+                {showCssHelp ? 'Hide help' : 'What is this?'}
+              </button>
+            </div>
+            {showCssHelp && (
+              <div className="compete-css-help-box">
+                <p>A CSS selector tells the extractor exactly where the price is on the page — useful when auto-detection gives low confidence.</p>
+                <p><strong>How to find it:</strong> Open the product page in Chrome → right-click the price → <em>Inspect</em> → look at the highlighted element for its class or ID.</p>
+                <p><strong>Examples:</strong> <code>.price</code> · <code>#product-price</code> · <code>[data-price]</code> · <code>.woocommerce-Price-amount</code></p>
+              </div>
+            )}
             <input
               type="text"
               className="form-input"
-              placeholder=".product-price"
+              placeholder=".product-price, #price, [data-price]"
               value={cssSelector}
               onChange={(e) => setCssSelector(e.target.value)}
             />
@@ -242,6 +287,15 @@ export function AddProductForm({
         {preview && preview.success && (
           <div className="compete-preview">
             <h4 className="compete-preview-title">Extraction Preview</h4>
+
+            {preview.confidence < 0.65 && (
+              <div className="compete-low-confidence-warning">
+                <strong>Medium/low confidence ({Math.round(preview.confidence * 100)}%).</strong>{' '}
+                The extractor found a price but the result may be unreliable.
+                Add a CSS selector above (or expand &ldquo;What is this?&rdquo;) for more accurate ongoing tracking.
+              </div>
+            )}
+
             <div className="compete-preview-grid">
               <div className="compete-preview-item">
                 <span className="compete-preview-label">Product Name</span>
@@ -260,19 +314,25 @@ export function AddProductForm({
                 <span className="compete-preview-value">{preview.currency}</span>
               </div>
               <div className="compete-preview-item">
-                <span className="compete-preview-label">Stock Status</span>
+                <span className="compete-preview-label">Stock</span>
                 <span className="compete-preview-value">
                   {preview.stockStatus ?? 'Not detected'}
                 </span>
               </div>
               <div className="compete-preview-item">
                 <span className="compete-preview-label">Method</span>
-                <span className="compete-preview-value">{preview.extractionMethod}</span>
+                <span className="compete-preview-value">{friendlyMethod(preview.extractionMethod)}</span>
               </div>
               <div className="compete-preview-item">
                 <span className="compete-preview-label">Confidence</span>
-                <span className="compete-preview-value">
-                  {Math.round(preview.confidence * 100)}%
+                <span
+                  className="compete-confidence-badge"
+                  style={{
+                    color: confidenceLevel(preview.confidence).color,
+                    background: confidenceLevel(preview.confidence).bg,
+                  }}
+                >
+                  {Math.round(preview.confidence * 100)}% — {confidenceLevel(preview.confidence).label}
                 </span>
               </div>
             </div>

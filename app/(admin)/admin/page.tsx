@@ -160,6 +160,10 @@ export default async function AdminDashboardPage(): Promise<React.ReactElement> 
             <span className="admin-quick-link-label">Credit Approvals</span>
             <span className="admin-quick-link-desc">Review submissions, approve or reject</span>
           </Link>
+          <Link href="/admin/support" className="admin-quick-link">
+            <span className="admin-quick-link-label">Support Tickets</span>
+            <span className="admin-quick-link-desc">View and respond to customer support requests</span>
+          </Link>
           <Link href="/admin/settings" className="admin-quick-link">
             <span className="admin-quick-link-label">Settings</span>
             <span className="admin-quick-link-desc">Trusted logos, landing page content</span>
