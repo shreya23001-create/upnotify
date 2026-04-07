@@ -18,6 +18,7 @@ import { Ticker } from '@/components/landing/ticker'
 import { FeatureCarousel } from '@/components/landing/feature-carousel'
 import { HeroCanvas } from '@/components/landing/hero-canvas'
 import { BlogPreview } from '@/components/landing/blog-preview'
+import { DowntimeCalculator } from '@/components/landing/downtime-calculator'
 
 export const metadata: Metadata = {
   title: 'Uptrue — Uptime Monitoring for Agencies & Teams',
@@ -312,46 +313,37 @@ export default function LandingPage(): React.ReactElement {
       <CompetePricing />
 
       {/* ================================================================
-          AGENCY
+          AGENCY — dark card from preview
           ================================================================ */}
-      <section className="landing-section landing-agency" id="agency">
+      <section className="agency-section" id="agency">
         <div className="landing-container">
-          <div className="agency-grid">
-            <div className="agency-content">
-              <div className="agency-label-row">
-                <span className="agency-label">Built for Agencies</span>
-                <span className="agency-coming-soon-badge">Coming Soon</span>
+          <div className="agency-card">
+            <div className="agency-text">
+              <div style={{ marginBottom: 12 }}>
+                <span className="agency-coming-badge">Coming Soon · Join Waitlist</span>
               </div>
-              <h2 className="agency-title">Monitor hundreds of client sites under your brand</h2>
-              <p className="agency-description">
-                White-label everything, manage multi-client workspaces, and unlock revenue sharing. Built from the ground up for agencies managing dozens — or hundreds — of client websites.
-              </p>
-              <ul className="agency-features">
-                <li><span className="agency-check">✓</span>Full white-label — your brand, your domain</li>
-                <li><span className="agency-check">✓</span>Multi-tenant workspaces for each client</li>
-                <li><span className="agency-check">✓</span>Revenue sharing via Stripe Connect</li>
-                <li><span className="agency-check">✓</span>Your own analytics on every client page</li>
-                <li><span className="agency-check">✓</span>AI reports branded with your agency name</li>
-              </ul>
-              <AgencyWaitlistCta />
+              <h2>Monitor hundreds of client sites under your brand</h2>
+              <p>The Agency tier gives you full white-label, multi-tenant workspaces, revenue sharing, custom analytics, and AI reports branded with your agency name. Built for agencies managing dozens of clients.</p>
+              <div className="agency-badges">
+                <div className="agency-badge">🏷️ Full white-label</div>
+                <div className="agency-badge">👥 Multi-tenant workspaces</div>
+                <div className="agency-badge">💰 Revenue sharing</div>
+                <div className="agency-badge">🤖 Branded AI reports</div>
+                <div className="agency-badge">📊 Custom analytics</div>
+              </div>
             </div>
-            <div className="agency-visual">
-              <div className="agency-mock">
-                <div className="agency-mock-header">
-                  <div className="agency-mock-logo">YourAgency</div>
-                  <span className="agency-mock-badge">White-labelled</span>
-                </div>
-                <div className="agency-mock-clients">
-                  <div className="agency-mock-client"><span className="agency-mock-dot agency-mock-dot-green" /><span>Client A — 12 monitors</span><span className="agency-mock-uptime">99.98%</span></div>
-                  <div className="agency-mock-client"><span className="agency-mock-dot agency-mock-dot-green" /><span>Client B — 8 monitors</span><span className="agency-mock-uptime">100%</span></div>
-                  <div className="agency-mock-client"><span className="agency-mock-dot agency-mock-dot-yellow" /><span>Client C — 23 monitors</span><span className="agency-mock-uptime">99.87%</span></div>
-                  <div className="agency-mock-client"><span className="agency-mock-dot agency-mock-dot-green" /><span>Client D — 5 monitors</span><span className="agency-mock-uptime">100%</span></div>
-                </div>
-              </div>
+            <div style={{ flexShrink: 0 }}>
+              <AgencyWaitlistCta />
+              <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 12, textAlign: 'center' }}>No commitment · Early access pricing</p>
             </div>
           </div>
         </div>
       </section>
+
+      {/* ================================================================
+          DOWNTIME CALCULATOR
+          ================================================================ */}
+      <DowntimeCalculator />
 
       {/* ================================================================
           TESTIMONIALS
