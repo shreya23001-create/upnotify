@@ -17,26 +17,27 @@ export default function AuthLayout({ children }: { children: React.ReactNode }):
           Uptrue
         </Link>
 
-        {/* Decorative background */}
-        <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0 }}>
-          {/* Grid overlay */}
+        {/* Caption — centred visually */}
+        <div className="auth-canvas-placeholder">
+          {/* Decorative grid overlay */}
           <div style={{
             position: 'absolute', inset: 0, opacity: 0.04,
             backgroundImage: 'linear-gradient(rgba(255,255,255,.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.5) 1px, transparent 1px)',
             backgroundSize: '40px 40px',
+            pointerEvents: 'none',
           }} />
           {/* Glowing orb */}
           <div style={{
-            position: 'absolute', width: 320, height: 320, borderRadius: '50%',
+            position: 'absolute', width: 300, height: 300, borderRadius: '50%',
             background: 'radial-gradient(circle, rgba(59,130,246,0.18) 0%, transparent 70%)',
             top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+            pointerEvents: 'none',
           }} />
         </div>
 
-        {/* Caption */}
         <div className="auth-caption">
-          <div className="auth-caption-title">Your monitors are watching.</div>
-          <div className="auth-caption-sub">We check every 30 seconds, around the clock.</div>
+          <div className="auth-caption-title" id="authCaptionTitle">Your monitors are watching.</div>
+          <div className="auth-caption-sub" id="authCaptionSub">We check every 30 seconds, around the clock.</div>
         </div>
 
         {/* Scene dots */}

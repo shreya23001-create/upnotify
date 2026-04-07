@@ -2241,8 +2241,8 @@ html.dark .landing-cta { background: linear-gradient(135deg, #1a1d27 0%, #242736
 .blog-index-title { font-size: 36px; font-weight: 800; color: var(--text-primary); margin-bottom: 12px; letter-spacing: -0.5px; }
 .blog-index-subtitle { font-size: 17px; color: var(--text-secondary); line-height: 1.7; max-width: 600px; }
 
-/* Blog post cards */
-.blog-posts-grid { display: flex; flex-direction: column; gap: 24px; }
+/* Blog post cards (old list style — replaced by grid below) */
+/* .blog-posts-grid is now defined as a 3-column grid further in this file */
 .blog-post-card { display: block; padding: 28px; background: var(--bg-card); border: 1px solid var(--border-primary); border-radius: 12px; transition: all 0.2s ease; box-shadow: var(--shadow-sm); }
 .blog-post-card:hover { box-shadow: var(--shadow-md); border-color: var(--accent); transform: translateY(-2px); }
 .blog-post-card-body { display: flex; flex-direction: column; gap: 10px; }
@@ -4823,3 +4823,75 @@ html.dark .monitor-stat-icon.icon-red { background: rgba(239,68,68,0.15); }
   .blog-newsletter-form { flex-direction: column; width: 100%; }
   .blog-newsletter-input { width: 100%; }
 }
+
+/* --- PUB NAV (matches uptrue-preview.html exactly) --- */
+.pub-nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(16px) saturate(180%);
+  border-bottom: 1px solid var(--border);
+  height: 60px;
+}
+html.dark .pub-nav { background: rgba(13,17,23,0.85); }
+.pub-nav-inner {
+  display: flex; align-items: center; justify-content: space-between;
+  height: 100%; max-width: 1200px; margin: 0 auto; padding: 0 var(--space-6);
+}
+.nav-logo {
+  display: flex; align-items: center; gap: var(--space-2);
+  font-size: 18px; font-weight: 800; color: var(--text-primary);
+  text-decoration: none;
+}
+.nav-logo-icon {
+  width: 32px; height: 32px; background: var(--brand-gradient);
+  border-radius: var(--radius-md);
+  display: flex; align-items: center; justify-content: center;
+}
+.nav-links {
+  display: flex; align-items: center; gap: 2px;
+  list-style: none; margin: 0; padding: 0;
+}
+.nav-links li a {
+  padding: 6px 12px; border-radius: var(--radius-md);
+  font-size: 13px; font-weight: 500; color: var(--text-secondary);
+  transition: all var(--dur-fast);
+  display: flex; align-items: center; gap: 4px;
+  text-decoration: none;
+}
+.nav-links li a:hover { color: var(--text-primary); background: var(--bg-muted); }
+.nav-actions { display: flex; align-items: center; gap: var(--space-2); }
+@media (max-width: 900px) { .nav-links { display: none; } }
+
+/* --- AUTH LAYOUT overrides (ensure correct light/dark) --- */
+.auth-page { display: flex; min-height: 100vh; }
+.auth-left {
+  width: 42%; flex-shrink: 0; background: #080f1e;
+  position: relative; overflow: hidden;
+  display: flex; flex-direction: column; padding: 36px 40px;
+}
+.auth-left-logo {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 15px; font-weight: 800; color: #fff;
+  text-decoration: none; z-index: 2; position: relative; margin-bottom: auto;
+}
+.auth-left-logo-icon {
+  width: 28px; height: 28px; background: var(--brand-gradient);
+  border-radius: 7px; display: flex; align-items: center; justify-content: center;
+}
+.auth-caption { position: relative; z-index: 2; margin-top: auto; padding-top: 24px; }
+.auth-caption-title { font-size: 18px; font-weight: 700; color: #fff; line-height: 1.3; margin-bottom: 6px; }
+.auth-caption-sub { font-size: 13px; color: rgba(255,255,255,0.45); line-height: 1.6; }
+.auth-scene-dots { display: flex; gap: 6px; margin-top: 16px; position: relative; z-index: 2; }
+.auth-scene-dot {
+  width: 20px; height: 3px; border-radius: 2px;
+  background: rgba(255,255,255,0.15); transition: background 0.4s ease, width 0.4s ease;
+}
+.auth-scene-dot.active { background: #38bdf8; width: 28px; }
+.auth-proof { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 20px; position: relative; z-index: 2; }
+.auth-proof-item { font-size: 11px; color: rgba(255,255,255,0.28); display: flex; align-items: center; gap: 5px; }
+.auth-proof-dot { width: 5px; height: 5px; background: #10b981; border-radius: 50%; }
+.auth-right {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  background: var(--bg-page); padding: 40px 24px; position: relative;
+}
+.auth-form-wrap { width: 100%; max-width: 380px; }

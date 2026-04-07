@@ -2,24 +2,16 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { UptrueLogo } from '@/components/ui/uptrue-logo'
 import { createClient } from '@/lib/supabase/client'
 
-/**
- * PublicNav — consistent navigation for all public pages.
- * Layout: logo LEFT, nav links CENTER, login/signup RIGHT.
- * Shows "Dashboard" for authenticated users, "Log in / Start Free" for guests.
- */
 export function PublicNav(): React.ReactElement {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false)
 
   useEffect(() => {
     const supabase = createClient()
-    // Check current session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setIsLoggedIn(!!session)
     })
-    // Listen for auth state changes (login/logout while page is open)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setIsLoggedIn(!!session)
     })
@@ -27,28 +19,41 @@ export function PublicNav(): React.ReactElement {
   }, [])
 
   return (
-    <nav className="landing-nav">
-      <div className="landing-nav-inner">
-        <Link href="/" className="landing-logo" aria-label="Uptrue home">
-          <UptrueLogo />
+    <nav className="pub-nav">
+      <div className="pub-nav-inner">
+        <Link href="/" className="nav-logo" aria-label="Uptrue home">
+          <div className="nav-logo-icon">
+            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="white" strokeWidth="2.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+          </div>
+          Uptrue
         </Link>
-        <div className="landing-nav-links">
-          <Link href="/#features">Features</Link>
-          <Link href="/#pricing">Pricing</Link>
-          <Link href="/score">Score <span className="nav-badge">Free</span></Link>
-          <Link href="/tracker">Tracker <span className="nav-badge">Free</span></Link>
-          <Link href="/tools">Tools <span className="nav-badge">Free</span></Link>
-          <Link href="/compete">Compete</Link>
-          <Link href="/leaderboard">Leaderboard</Link>
-          <Link href="/blog">Blog</Link>
-        </div>
-        <div className="landing-nav-actions">
+
+        <ul className="nav-links">
+          <li><Link href="/#features">Features</Link></li>
+          <li><Link href="/#pricing">Pricing</Link></li>
+          <li>
+            <Link href="/score">
+              Score <span className="nav-badge">Free</span>
+            </Link>
+          </li>
+          <li>
+            <Link href="/tracker">
+              Tracker <span className="nav-badge">Free</span>
+            </Link>
+          </li>
+          <li><Link href="/compete">Compete</Link></li>
+          <li><Link href="/blog">Blog</Link></li>
+        </ul>
+
+        <div className="nav-actions">
           {isLoggedIn ? (
-            <Link href="/dashboard" className="btn btn-primary">Dashboard</Link>
+            <Link href="/dashboard" className="btn btn-primary btn-sm">Dashboard</Link>
           ) : (
             <>
-              <Link href="/login" className="btn btn-ghost">Log in</Link>
-              <Link href="/signup" className="btn btn-primary">Start Free</Link>
+              <Link href="/login" className="btn btn-ghost btn-sm">Log in</Link>
+              <Link href="/signup" className="btn btn-primary btn-sm">Start Free</Link>
             </>
           )}
         </div>

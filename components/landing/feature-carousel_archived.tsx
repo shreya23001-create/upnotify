@@ -122,6 +122,7 @@ export function FeatureCarousel(): React.ReactElement {
   const [offset, setOffset] = useState(0)
   const [cardW, setCardW] = useState(300)
   const trackRef = useRef<HTMLDivElement>(null)
+  const outerRef = useRef<HTMLDivElement>(null)
 
   const visible = activeCat === 'all' ? CARDS : CARDS.filter(c => c.cat === activeCat || c.cat === 'Coming Soon')
   const total = visible.length
@@ -129,7 +130,10 @@ export function FeatureCarousel(): React.ReactElement {
 
   const measureCard = useCallback(() => {
     const first = trackRef.current?.children[0] as HTMLElement | undefined
-    if (first) setCardW(first.offsetWidth + 16)
+    if (first) {
+      const gap = 16 // --space-4
+      setCardW(first.offsetWidth + gap)
+    }
   }, [])
 
   useEffect(() => {
@@ -168,22 +172,14 @@ export function FeatureCarousel(): React.ReactElement {
 
       {/* Carousel */}
       <div className="feature-carousel-wrap">
-        <button
-          className={`carousel-arrow prev${offset === 0 ? ' disabled' : ''}`}
-          onClick={() => move(-1)}
-          aria-label="Previous"
-        >
+        <button className={`carousel-arrow prev${offset === 0 ? ' disabled' : ''}`} onClick={() => move(-1)} aria-label="Previous">
           <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
         </button>
-        <button
-          className={`carousel-arrow next${offset >= maxOffset ? ' disabled' : ''}`}
-          onClick={() => move(1)}
-          aria-label="Next"
-        >
+        <button className={`carousel-arrow next${offset >= maxOffset ? ' disabled' : ''}`} onClick={() => move(1)} aria-label="Next">
           <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
 
-        <div className="feature-carousel-track-outer">
+        <div className="feature-carousel-track-outer" ref={outerRef}>
           <div
             className="feature-carousel-track"
             ref={trackRef}
@@ -198,7 +194,7 @@ export function FeatureCarousel(): React.ReactElement {
                 >
                   {card.cat}
                 </div>
-                <div className="feature-icon" style={{ background: card.iconBg }}>
+                <div className="feature-icon" style={{ background: card.iconBg, fontSize: 26 }}>
                   {card.icon}
                 </div>
                 <div className="feature-title">{card.title}</div>

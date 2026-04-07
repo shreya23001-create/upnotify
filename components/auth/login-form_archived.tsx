@@ -10,7 +10,8 @@ export function LoginForm({ mode = 'login' }: { mode?: 'login' | 'signup' }) {
 
   function getRefCode(): string | null {
     if (typeof window === 'undefined') return null
-    return new URLSearchParams(window.location.search).get('ref')
+    const params = new URLSearchParams(window.location.search)
+    return params.get('ref')
   }
 
   function handleEmailSubmit(formData: FormData): void {
@@ -20,8 +21,11 @@ export function LoginForm({ mode = 'login' }: { mode?: 'login' | 'signup' }) {
     if (ref) formData.set('ref', ref)
     startTransition(async () => {
       const result = await signInWithEmail(formData)
-      if (result.error) setError(result.error)
-      else setEmailSent(true)
+      if (result.error) {
+        setError(result.error)
+      } else {
+        setEmailSent(true)
+      }
     })
   }
 
@@ -30,8 +34,11 @@ export function LoginForm({ mode = 'login' }: { mode?: 'login' | 'signup' }) {
     const ref = getRefCode()
     startTransition(async () => {
       const result = await signInWithGoogle(window.location.origin, ref ?? undefined)
-      if (result.error) setError(result.error)
-      else if (result.url) window.location.href = result.url
+      if (result.error) {
+        setError(result.error)
+      } else if (result.url) {
+        window.location.href = result.url
+      }
     })
   }
 
@@ -41,7 +48,11 @@ export function LoginForm({ mode = 'login' }: { mode?: 'login' | 'signup' }) {
         <div style={{ fontSize: 40, marginBottom: 16 }}>📬</div>
         <h2 className="auth-form-heading">Check your email</h2>
         <p className="auth-form-sub">We sent you a magic link. Click it to sign in.</p>
-        <button className="auth-submit" onClick={() => setEmailSent(false)} style={{ marginTop: 16 }}>
+        <button
+          className="auth-submit"
+          onClick={() => setEmailSent(false)}
+          style={{ marginTop: 16 }}
+        >
           Try a different email
         </button>
       </div>
@@ -50,7 +61,7 @@ export function LoginForm({ mode = 'login' }: { mode?: 'login' | 'signup' }) {
 
   return (
     <>
-      {/* Returning user banner — login only */}
+      {/* Returning banner — login only */}
       {mode === 'login' && (
         <div className="auth-returning-banner show">
           <div className="auth-returning-dot" />
@@ -75,7 +86,7 @@ export function LoginForm({ mode = 'login' }: { mode?: 'login' | 'signup' }) {
         </div>
       )}
 
-      {/* Google */}
+      {/* Google — always first */}
       <button className="auth-google-btn" onClick={handleGoogleClick} disabled={isPending} type="button">
         <svg width="18" height="18" viewBox="0 0 24 24">
           <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -131,8 +142,8 @@ export function LoginForm({ mode = 'login' }: { mode?: 'login' | 'signup' }) {
 
       <p className="auth-switch">
         {mode === 'login'
-          ? <><a href="/signup">Don&apos;t have an account? Sign up free</a></>
-          : <><a href="/login">Already have an account? Sign in</a></>}
+          ? <>Don&apos;t have an account? <a href="/signup">Sign up free</a></>
+          : <>Already have an account? <a href="/login">Sign in</a></>}
       </p>
       <p className="auth-terms">
         By {mode === 'login' ? 'continuing' : 'signing up'} you agree to our{' '}

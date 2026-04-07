@@ -9,6 +9,7 @@ const POSTS_PER_PAGE = 9
 
 const FILTER_TABS = ['All posts', 'Guide', 'Security', 'Performance', 'Ecommerce', 'Incident Report', 'Agency']
 
+// Gradient for each category (matches preview)
 const CARD_GRADIENTS: Record<string, string> = {
   Guide: 'linear-gradient(90deg,#8b5cf6,#3b82f6)',
   Security: 'linear-gradient(90deg,#ef4444,#f59e0b)',
@@ -38,6 +39,10 @@ function gradient(cat: string): string {
   return CARD_GRADIENTS[cat] ?? 'linear-gradient(90deg,#3b82f6,#06b6d4)'
 }
 
+function formatDate(d: string): string {
+  return new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+}
+
 function BlogIndexContent({ posts }: { posts: UnifiedPost[] }) {
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -56,6 +61,7 @@ function BlogIndexContent({ posts }: { posts: UnifiedPost[] }) {
 
   const featuredPost = filtered[0]
   const remainingPosts = filtered.slice(1)
+
   const totalPages = Math.ceil(remainingPosts.length / POSTS_PER_PAGE)
   const start = (page - 1) * POSTS_PER_PAGE
   const pagePosts = remainingPosts.slice(start, start + POSTS_PER_PAGE)
@@ -72,12 +78,16 @@ function BlogIndexContent({ posts }: { posts: UnifiedPost[] }) {
     router.push('/blog')
   }
 
+  function handleSearch(e: React.ChangeEvent<HTMLInputElement>) {
+    setSearchQuery(e.target.value)
+  }
+
   return (
     <div className="blog-page">
 
       {/* Hero */}
       <div className="blog-hero">
-        <div className="container" style={{ maxWidth: 1080, padding: '0 24px', margin: '0 auto' }}>
+        <div className="container">
           <div className="blog-hero-inner">
             <div className="blog-hero-eyebrow">Uptrue Blog</div>
             <h1>Uptime, monitoring &amp;<br />reliability insights</h1>
@@ -94,7 +104,7 @@ function BlogIndexContent({ posts }: { posts: UnifiedPost[] }) {
                   type="text"
                   placeholder="Search articles…"
                   value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
+                  onChange={handleSearch}
                 />
               </div>
             </div>
@@ -102,14 +112,17 @@ function BlogIndexContent({ posts }: { posts: UnifiedPost[] }) {
         </div>
       </div>
 
-      <div style={{ maxWidth: 1080, padding: '0 24px', margin: '0 auto' }}>
+      <div className="container" style={{ maxWidth: 1080, padding: '0 24px', margin: '0 auto' }}>
 
         {/* Featured post */}
         {featuredPost && page === 1 && (
           <div className="blog-featured-wrap">
             <div className="blog-featured-label">Featured</div>
             <Link href={`/blog/${featuredPost.slug}`} className="blog-featured-card">
-              <div className="blog-featured-img" style={{ background: gradient(featuredPost.category) }}>
+              <div
+                className="blog-featured-img"
+                style={{ background: gradient(featuredPost.category) }}
+              >
                 <div className="blog-featured-img-overlay" />
               </div>
               <div className="blog-featured-body">
@@ -132,7 +145,12 @@ function BlogIndexContent({ posts }: { posts: UnifiedPost[] }) {
                 <div className="blog-featured-excerpt">{featuredPost.excerpt}</div>
                 <div className="blog-featured-footer">
                   <div className="blog-author">
-                    <div className="blog-author-avatar" style={{ background: gradient(featuredPost.category) }}>U</div>
+                    <div
+                      className="blog-author-avatar"
+                      style={{ background: gradient(featuredPost.category) }}
+                    >
+                      U
+                    </div>
                     <div>
                       <div className="blog-author-name">Uptrue Team</div>
                       <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{featuredPost.displayDate}</div>
@@ -186,10 +204,16 @@ function BlogIndexContent({ posts }: { posts: UnifiedPost[] }) {
                   const bs = badgeStyle(post.category)
                   return (
                     <Link key={post.slug} href={`/blog/${post.slug}`} className="blog-card">
-                      <div className="blog-card-image" style={{ background: gradient(post.category) }} />
+                      <div
+                        className="blog-card-image"
+                        style={{ background: gradient(post.category) }}
+                      />
                       <div className="blog-card-body">
                         <div className="blog-card-meta">
-                          <span className="blog-cat-badge" style={{ background: bs.bg, color: bs.color, border: `1px solid ${bs.border}` }}>
+                          <span
+                            className="blog-cat-badge"
+                            style={{ background: bs.bg, color: bs.color, border: `1px solid ${bs.border}` }}
+                          >
                             {post.category}
                           </span>
                           <span className="blog-card-readtime">{post.readTime}</span>
@@ -214,7 +238,7 @@ function BlogIndexContent({ posts }: { posts: UnifiedPost[] }) {
               </div>
             )}
 
-            {/* Pagination */}
+            {/* Load more / pagination */}
             {totalPages > 1 && (
               <div className="blog-load-more">
                 {page < totalPages ? (
@@ -251,7 +275,7 @@ function BlogIndexContent({ posts }: { posts: UnifiedPost[] }) {
 
 export function BlogIndexClient({ posts }: { posts: UnifiedPost[] }) {
   return (
-    <Suspense fallback={<div style={{ padding: '48px 0', textAlign: 'center', color: 'var(--text-muted)' }}>Loading…</div>}>
+    <Suspense fallback={<div style={{ padding: '48px 0', textAlign: 'center', color: 'var(--text-muted)' }}>Loading posts…</div>}>
       <BlogIndexContent posts={posts} />
     </Suspense>
   )
