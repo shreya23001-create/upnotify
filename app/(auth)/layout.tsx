@@ -2,111 +2,72 @@ import Link from 'next/link'
 
 export default function AuthLayout({ children }: { children: React.ReactNode }): React.ReactElement {
   return (
-    <div className="auth-split">
+    <div className="auth-page">
 
-      {/* ── Left panel — brand ── */}
-      <div className="auth-split-left">
-        <div className="auth-split-left-inner">
+      {/* ── Left panel — dark brand panel ── */}
+      <div className="auth-left">
 
-          {/* Logo */}
-          <Link href="/" className="auth-brand-logo">
-            <div className="auth-brand-logo-icon">
-              <svg width="18" height="18" fill="none" stroke="white" strokeWidth="2.5" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-              </svg>
-            </div>
-            <span className="auth-brand-logo-name">Uptrue</span>
-          </Link>
-
-          {/* Plan pills */}
-          <div className="auth-plan-pills">
-            <span className="auth-plan-pill free">Free</span>
-            <span className="auth-plan-pill starter">Starter £19/mo</span>
-            <span className="auth-plan-pill pro">Pro £49/mo</span>
+        {/* Logo */}
+        <Link href="/" className="auth-left-logo">
+          <div className="auth-left-logo-icon">
+            <svg width="15" height="15" fill="none" stroke="white" strokeWidth="2.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
           </div>
+          Uptrue
+        </Link>
 
-          {/* Headline */}
-          <div className="auth-brand-headline">
-            <h1>Know when your sites go down.</h1>
-            <p>Before your customers do.</p>
-          </div>
-
-          {/* Proof stats */}
-          <div className="auth-proof-stats">
-            <div className="auth-proof-stat">
-              <div className="auth-proof-stat-num">60s</div>
-              <div className="auth-proof-stat-lbl">Check interval</div>
-            </div>
-            <div className="auth-proof-stat">
-              <div className="auth-proof-stat-num">10+</div>
-              <div className="auth-proof-stat-lbl">Monitor types</div>
-            </div>
-            <div className="auth-proof-stat">
-              <div className="auth-proof-stat-num">99.9%</div>
-              <div className="auth-proof-stat-lbl">Platform uptime</div>
-            </div>
-          </div>
-
-          {/* Feature list */}
-          <ul className="auth-brand-features">
-            <li>
-              <span className="auth-brand-check">✓</span>
-              10 monitor types — HTTP, SSL, DNS, keyword, port &amp; more
-            </li>
-            <li>
-              <span className="auth-brand-check">✓</span>
-              Two-confirmation detection — zero false alarms
-            </li>
-            <li>
-              <span className="auth-brand-check">✓</span>
-              Multi-channel alerts — Email, Slack, Teams, webhooks
-            </li>
-            <li>
-              <span className="auth-brand-check">✓</span>
-              Public status pages with real-time uptime bars
-            </li>
-            <li>
-              <span className="auth-brand-check">✓</span>
-              AI-powered reports — share with clients in one click
-            </li>
-          </ul>
-
-          {/* Mini status mock */}
-          <div className="auth-brand-mock">
-            <div className="auth-mock-row auth-mock-row-up">
-              <span className="auth-mock-dot auth-mock-dot-up" />
-              <span className="auth-mock-site">api.example.com</span>
-              <span className="auth-mock-badge auth-mock-badge-up">UP</span>
-              <span className="auth-mock-ms">124ms</span>
-            </div>
-            <div className="auth-mock-row auth-mock-row-up">
-              <span className="auth-mock-dot auth-mock-dot-up" />
-              <span className="auth-mock-site">app.clientsite.io</span>
-              <span className="auth-mock-badge auth-mock-badge-up">UP</span>
-              <span className="auth-mock-ms">89ms</span>
-            </div>
-            <div className="auth-mock-row auth-mock-row-down">
-              <span className="auth-mock-dot auth-mock-dot-down" />
-              <span className="auth-mock-site">store.brand.co</span>
-              <span className="auth-mock-badge auth-mock-badge-down">DOWN</span>
-              <span className="auth-mock-ms">—</span>
-            </div>
-          </div>
-
-          {/* Bottom trust line */}
-          <p className="auth-brand-trust">
-            Free plan · No credit card required · Cancel any time
-          </p>
+        {/* Caption — centred visually */}
+        <div className="auth-canvas-placeholder">
+          {/* Decorative grid overlay */}
+          <div style={{
+            position: 'absolute', inset: 0, opacity: 0.04,
+            backgroundImage: 'linear-gradient(rgba(255,255,255,.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.5) 1px, transparent 1px)',
+            backgroundSize: '40px 40px',
+            pointerEvents: 'none',
+          }} />
+          {/* Glowing orb */}
+          <div style={{
+            position: 'absolute', width: 300, height: 300, borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(59,130,246,0.18) 0%, transparent 70%)',
+            top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+            pointerEvents: 'none',
+          }} />
         </div>
+
+        <div className="auth-caption">
+          <div className="auth-caption-title" id="authCaptionTitle">Your monitors are watching.</div>
+          <div className="auth-caption-sub" id="authCaptionSub">We check every 30 seconds, around the clock.</div>
+        </div>
+
+        {/* Scene dots */}
+        <div className="auth-scene-dots">
+          <div className="auth-scene-dot active" />
+          <div className="auth-scene-dot" />
+          <div className="auth-scene-dot" />
+          <div className="auth-scene-dot" />
+          <div className="auth-scene-dot" />
+        </div>
+
+        {/* Proof bar */}
+        <div className="auth-proof">
+          <span className="auth-proof-item">
+            <span className="auth-proof-dot" />
+            2,800+ checks per minute
+          </span>
+          <span className="auth-proof-item">EU data · GDPR</span>
+          <span className="auth-proof-item">99.97% accuracy</span>
+        </div>
+
       </div>
 
       {/* ── Right panel — form ── */}
-      <div className="auth-split-right">
-        <div className="auth-split-right-inner">
+      <div className="auth-right">
+        <div className="auth-form-wrap">
           {children}
         </div>
-        <p className="auth-split-back">
-          <Link href="/">← Back to Uptrue.io</Link>
+        <p style={{ position: 'absolute', bottom: 20, fontSize: 12, color: 'var(--text-muted)' }}>
+          <Link href="/" style={{ color: 'var(--text-muted)', textDecoration: 'none' }}>← Back to Uptrue.io</Link>
         </p>
       </div>
 

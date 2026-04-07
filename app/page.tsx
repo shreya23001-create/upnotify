@@ -14,6 +14,8 @@ import { PublicNav } from '@/components/ui/public-nav'
 import { PublicFooter } from '@/components/ui/public-footer'
 import { TrustedLogos } from '@/components/landing/trusted-logos'
 import { AgencyWaitlistCta } from '@/components/landing/agency-waitlist-cta'
+import { Ticker } from '@/components/landing/ticker'
+import { FeatureCarousel } from '@/components/landing/feature-carousel'
 
 export const metadata: Metadata = {
   title: 'Uptrue — Uptime Monitoring for Agencies & Teams',
@@ -27,21 +29,6 @@ export const metadata: Metadata = {
     url: 'https://uptrue.io',
   },
 }
-
-const FEATURES = [
-  { icon: '🔍', title: 'Uptime Monitoring', subtitle: '10 monitor types', description: 'HTTP, SSL, DNS, keyword, domain, port, ping, API endpoint, heartbeat, and competitor tracking. Every angle covered.', glow: 'linear-gradient(90deg,#3b82f6,#06b6d4)' },
-  { icon: '🛡️', title: 'Two-Confirmation Detection', subtitle: 'Zero false alarms', description: 'Every downtime alert is verified from a second region before firing. No more 3am wake-ups for nothing.', glow: 'linear-gradient(90deg,#10b981,#06b6d4)' },
-  { icon: '🔔', title: 'Multi-Channel Alerts', subtitle: 'Email, Slack, Teams & more', description: 'Email, Slack, Microsoft Teams, and webhooks with HMAC-signed payloads. Route alerts to the right people instantly.', glow: 'linear-gradient(90deg,#f59e0b,#ef4444)' },
-  { icon: '📊', title: 'Public Status Pages', subtitle: 'Branded & real-time', description: 'Give your customers transparency. Automatic incident updates, uptime bars, and subscription notifications.', glow: 'linear-gradient(90deg,#8b5cf6,#3b82f6)' },
-  { icon: '🧠', title: 'AI-Powered Reports', subtitle: 'Claude AI analysis', description: 'Uptime, performance, incident, and SLA reports with AI-generated executive summaries. Share with clients in one click.', glow: 'linear-gradient(90deg,#ec4899,#8b5cf6)' },
-  { icon: '⭐', title: 'Uptrue Score', subtitle: 'Free site health check', description: 'Score any website on uptime, SSL, DNS, performance, and security. Instant results, no signup required.', glow: 'linear-gradient(90deg,#06b6d4,#10b981)' },
-  { icon: '🌐', title: 'Public Tracker', subtitle: 'Free uptime profiles', description: 'Every tracked site gets a public profile with real-time status, uptime history, and embeddable badge — free for everyone.', glow: 'linear-gradient(90deg,#f59e0b,#06b6d4)' },
-  { icon: '🏁', title: 'Competitor Intelligence', subtitle: 'Benchmark your uptime', description: 'Monitor competitor websites and compare uptime side by side. Know when they go down and prove your reliability edge.', glow: 'linear-gradient(90deg,#10b981,#3b82f6)' },
-  { icon: '💰', title: 'Uptrue Compete', subtitle: 'Price & stock tracking', description: 'Track competitor prices, detect stock changes, and get alerts when prices drop. Automatic extraction from any ecommerce site.', glow: 'linear-gradient(90deg,#3b82f6,#8b5cf6)' },
-  { icon: '🧰', title: 'Free SSL & Uptime Tools', subtitle: 'No signup required', description: 'Check any SSL certificate, calculate SLA downtime budgets, or score your site health — all free, instantly.', glow: 'linear-gradient(90deg,#06b6d4,#3b82f6)' },
-  { icon: '🏆', title: 'Public Uptime Leaderboard', subtitle: 'Show off your reliability', description: 'The most reliable websites ranked by real uptime data. Opt in your monitors and earn trust from visitors.', glow: 'linear-gradient(90deg,#f59e0b,#ef4444)' },
-  { icon: '🏷️', title: 'Agency White-Label', subtitle: 'Your brand, our engine', description: 'Full white-label for agencies. Custom branding, your own analytics on client pages, and revenue sharing built in.', glow: 'linear-gradient(90deg,#0f172a,#3b82f6)' },
-]
 
 const STEPS = [
   { number: '1', title: 'Add a Monitor', description: 'Enter a URL, IP, or domain. Choose from 10 monitor types. Set your check interval — as low as 30 seconds.' },
@@ -63,6 +50,7 @@ export default function LandingPage(): React.ReactElement {
       <WebSiteJsonLd />
       <FaqPageJsonLd items={FAQ_ITEMS} />
       <PublicNav />
+      <Ticker />
 
       {/* ================================================================
           HERO — centered with full dashboard mockup
@@ -220,6 +208,16 @@ export default function LandingPage(): React.ReactElement {
       </section>
 
       {/* ================================================================
+          SOCIAL PROOF
+          ================================================================ */}
+      <section className="landing-social-proof">
+        <div className="landing-container">
+          <p className="social-proof-text">Tracking uptime for the world&apos;s most-used platforms</p>
+          <TrustedLogos />
+        </div>
+      </section>
+
+      {/* ================================================================
           STATS BAR
           ================================================================ */}
       <div className="lp-stats-bar">
@@ -249,17 +247,7 @@ export default function LandingPage(): React.ReactElement {
       </div>
 
       {/* ================================================================
-          SOCIAL PROOF
-          ================================================================ */}
-      <section className="landing-social-proof">
-        <div className="landing-container">
-          <p className="social-proof-text">Tracking uptime for the world&apos;s most-used platforms</p>
-          <TrustedLogos />
-        </div>
-      </section>
-
-      {/* ================================================================
-          FEATURES GRID
+          FEATURES — category tabs + carousel
           ================================================================ */}
       <section className="landing-section landing-features" id="features">
         <div className="landing-container">
@@ -268,17 +256,7 @@ export default function LandingPage(): React.ReactElement {
           <p className="landing-section-subtitle">
             From basic uptime to AI-powered insights. Built for agencies managing hundreds of sites and teams who need reliability.
           </p>
-          <div className="features-grid">
-            {FEATURES.map((feature) => (
-              <div key={feature.title} className="feature-card">
-                <div className="feature-card-glow" style={{ background: feature.glow }} />
-                <div className="feature-icon">{feature.icon}</div>
-                <h3 className="feature-title">{feature.title}</h3>
-                <span className="feature-subtitle">{feature.subtitle}</span>
-                <p className="feature-description">{feature.description}</p>
-              </div>
-            ))}
-          </div>
+          <FeatureCarousel />
         </div>
       </section>
 

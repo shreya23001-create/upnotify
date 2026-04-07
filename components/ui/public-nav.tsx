@@ -35,9 +35,9 @@ export function PublicNav(): React.ReactElement {
         <div className="landing-nav-links">
           <Link href="/#features">Features</Link>
           <Link href="/#pricing">Pricing</Link>
-          <Link href="/score">Score <sup className="nav-free-tag">Free</sup></Link>
-          <Link href="/tracker">Tracker <sup className="nav-free-tag">Free</sup></Link>
-          <Link href="/tools">Tools <sup className="nav-free-tag">Free</sup></Link>
+          <Link href="/score">Score <span className="nav-badge">Free</span></Link>
+          <Link href="/tracker">Tracker <span className="nav-badge">Free</span></Link>
+          <Link href="/tools">Tools <span className="nav-badge">Free</span></Link>
           <Link href="/compete">Compete</Link>
           <Link href="/leaderboard">Leaderboard</Link>
           <Link href="/blog">Blog</Link>

@@ -7,21 +7,56 @@ import type { UnifiedPost } from './page'
 
 const POSTS_PER_PAGE = 9
 
-const CATEGORIES = ['All', 'Guide', 'WordPress', 'Hosting', 'Ecommerce', 'Security', 'Performance', 'Agency', 'Outage']
+const FILTER_TABS = ['All posts', 'Guide', 'Security', 'Performance', 'Ecommerce', 'Incident Report', 'Agency']
+
+// Gradient for each category (matches preview)
+const CARD_GRADIENTS: Record<string, string> = {
+  Guide: 'linear-gradient(90deg,#8b5cf6,#3b82f6)',
+  Security: 'linear-gradient(90deg,#ef4444,#f59e0b)',
+  Performance: 'linear-gradient(90deg,#10b981,#06b6d4)',
+  Ecommerce: 'linear-gradient(90deg,#f59e0b,#ec4899)',
+  'Incident Report': 'linear-gradient(90deg,#ef4444,#7c3aed)',
+  Agency: 'linear-gradient(90deg,#0c1322,#3b82f6)',
+  WordPress: 'linear-gradient(90deg,#3b82f6,#06b6d4)',
+  Hosting: 'linear-gradient(90deg,#10b981,#3b82f6)',
+  Outage: 'linear-gradient(90deg,#ef4444,#7c3aed)',
+}
+
+const BADGE_STYLES: Record<string, { bg: string; color: string; border: string }> = {
+  Guide: { bg: 'rgba(139,92,246,0.1)', color: '#8b5cf6', border: 'rgba(139,92,246,0.2)' },
+  Security: { bg: 'rgba(239,68,68,0.1)', color: '#ef4444', border: 'rgba(239,68,68,0.2)' },
+  Performance: { bg: 'rgba(16,185,129,0.1)', color: '#10b981', border: 'rgba(16,185,129,0.2)' },
+  Ecommerce: { bg: 'rgba(245,158,11,0.1)', color: '#f59e0b', border: 'rgba(245,158,11,0.2)' },
+  'Incident Report': { bg: 'rgba(239,68,68,0.1)', color: '#ef4444', border: 'rgba(239,68,68,0.2)' },
+  Agency: { bg: 'rgba(59,130,246,0.1)', color: '#06b6d4', border: 'rgba(6,182,212,0.2)' },
+}
+
+function badgeStyle(cat: string) {
+  return BADGE_STYLES[cat] ?? { bg: 'rgba(59,130,246,0.1)', color: '#3b82f6', border: 'rgba(59,130,246,0.2)' }
+}
+
+function gradient(cat: string): string {
+  return CARD_GRADIENTS[cat] ?? 'linear-gradient(90deg,#3b82f6,#06b6d4)'
+}
+
+function formatDate(d: string): string {
+  return new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+}
 
 function BlogIndexContent({ posts }: { posts: UnifiedPost[] }) {
   const searchParams = useSearchParams()
   const router = useRouter()
   const page = Math.max(1, parseInt(searchParams.get('page') ?? '1', 10))
-  const [activeCategory, setActiveCategory] = useState('All')
+  const [activeTab, setActiveTab] = useState('All posts')
   const [searchQuery, setSearchQuery] = useState('')
 
+  const catFilter = activeTab === 'All posts' ? null : activeTab
+
   const filtered = posts.filter(p => {
-    const matchesCategory = activeCategory === 'All' || p.category === activeCategory
-    const matchesSearch = searchQuery === '' ||
-      p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.excerpt.toLowerCase().includes(searchQuery.toLowerCase())
-    return matchesCategory && matchesSearch
+    const matchesCat = !catFilter || p.category === catFilter
+    const q = searchQuery.toLowerCase()
+    const matchesSearch = !q || p.title.toLowerCase().includes(q) || p.excerpt.toLowerCase().includes(q)
+    return matchesCat && matchesSearch
   })
 
   const featuredPost = filtered[0]
@@ -33,64 +68,129 @@ function BlogIndexContent({ posts }: { posts: UnifiedPost[] }) {
 
   function goToPage(p: number) {
     const params = new URLSearchParams(searchParams.toString())
-    if (p === 1) {
-      params.delete('page')
-    } else {
-      params.set('page', String(p))
-    }
+    if (p === 1) params.delete('page')
+    else params.set('page', String(p))
     router.push(`/blog${params.size > 0 ? `?${params.toString()}` : ''}`)
   }
 
-  function handleCategoryChange(cat: string) {
-    setActiveCategory(cat)
+  function switchTab(tab: string) {
+    setActiveTab(tab)
     router.push('/blog')
   }
 
-  function handleSearch(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    const fd = new FormData(e.currentTarget)
-    setSearchQuery(fd.get('q') as string ?? '')
+  function handleSearch(e: React.ChangeEvent<HTMLInputElement>) {
+    setSearchQuery(e.target.value)
   }
 
   return (
-    <div className="blog-index">
+    <div className="blog-page">
+
       {/* Hero */}
-      <div className="blog-hero-section">
-        <div className="blog-hero-inner">
-          <span className="blog-hero-eyebrow">Uptrue Blog</span>
-          <h1 className="blog-hero-title">Uptime, monitoring &amp; WordPress guides</h1>
-          <p className="blog-hero-subtitle">
-            Real-world fixes, monitoring tips, outage reports, and performance guides for developers, agencies, and site owners.
-          </p>
-          <form className="blog-hero-search" onSubmit={handleSearch}>
-            <input
-              className="blog-hero-search-input"
-              name="q"
-              type="text"
-              placeholder="Search articles..."
-              defaultValue={searchQuery}
-            />
-            <button type="submit" className="blog-hero-search-btn">Search</button>
-          </form>
+      <div className="blog-hero">
+        <div className="container">
+          <div className="blog-hero-inner" style={{ textAlign: 'center' }}>
+            <div className="blog-hero-eyebrow">Uptrue Blog</div>
+            <h1>Uptime, monitoring &amp;<br />reliability insights</h1>
+            <p className="blog-hero-sub">
+              Practical guides, incident reports, and deep dives for developers and agencies who care about keeping sites up.
+            </p>
+            <div className="blog-search-wrap">
+              <div className="blog-search-icon-wrap">
+                <svg className="blog-search-icon" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                </svg>
+                <input
+                  className="blog-search"
+                  type="text"
+                  placeholder="Search articles…"
+                  value={searchQuery}
+                  onChange={handleSearch}
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Filter tabs */}
-      <div className="blog-filter-bar">
-        <div className="blog-filter-inner">
-          {CATEGORIES.map(cat => (
-            <button
-              key={cat}
-              className={`blog-filter-tab${activeCategory === cat ? ' active' : ''}`}
-              onClick={() => handleCategoryChange(cat)}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
-      </div>
+      <div className="container" style={{ maxWidth: 1080, padding: '0 24px', margin: '0 auto' }}>
 
-      <div className="blog-content-area">
+        {/* Featured post */}
+        {featuredPost && page === 1 && (
+          <div className="blog-featured-wrap">
+            <div className="blog-featured-label">Featured</div>
+            <Link href={`/blog/${featuredPost.slug}`} className="blog-featured-card preview-style">
+              <div
+                className="blog-featured-img"
+                style={{ background: gradient(featuredPost.category) }}
+              >
+                <div className="blog-featured-img-overlay" />
+              </div>
+              <div className="blog-featured-body">
+                <div className="blog-featured-meta">
+                  <span
+                    className="blog-cat-badge"
+                    style={{
+                      background: badgeStyle(featuredPost.category).bg,
+                      color: badgeStyle(featuredPost.category).color,
+                      border: `1px solid ${badgeStyle(featuredPost.category).border}`,
+                    }}
+                  >
+                    {featuredPost.category}
+                  </span>
+                  <span className="blog-card-readtime">{featuredPost.readTime}</span>
+                  <span className="blog-meta-sep">·</span>
+                  <span className="blog-card-date">{featuredPost.displayDate}</span>
+                </div>
+                <div className="blog-featured-title">{featuredPost.title}</div>
+                <div className="blog-featured-excerpt">{featuredPost.excerpt}</div>
+                <div className="blog-featured-footer">
+                  <div className="blog-author">
+                    <div
+                      className="blog-author-avatar"
+                      style={{ background: gradient(featuredPost.category) }}
+                    >
+                      U
+                    </div>
+                    <div>
+                      <div className="blog-author-name">Uptrue Team</div>
+                      <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{featuredPost.displayDate}</div>
+                    </div>
+                  </div>
+                  <span className="blog-card-link">
+                    Read article
+                    <svg className="blog-card-arrow" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                    </svg>
+                  </span>
+                </div>
+              </div>
+            </Link>
+          </div>
+        )}
+
+        {/* Filter row */}
+        <div className="blog-filter-row">
+          <div className="blog-filter-tabs">
+            {FILTER_TABS.map(tab => (
+              <button
+                key={tab}
+                className={`blog-filter-btn${activeTab === tab ? ' active' : ''}`}
+                onClick={() => switchTab(tab)}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
+          <div className="blog-sort">
+            Sort by:
+            <select>
+              <option>Latest</option>
+              <option>Most read</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Posts grid */}
         {filtered.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '64px 0', color: 'var(--text-muted)' }}>
             <div style={{ fontSize: 40, marginBottom: 16 }}>🔍</div>
@@ -98,110 +198,76 @@ function BlogIndexContent({ posts }: { posts: UnifiedPost[] }) {
           </div>
         ) : (
           <>
-            {/* Featured post */}
-            {featuredPost && page === 1 && (
-              <div className="blog-featured-section">
-                <div className="blog-featured-label">Featured Article</div>
-                <Link href={`/blog/${featuredPost.slug}`} className="blog-featured-card">
-                  <div className="blog-featured-visual">
-                    <span className="blog-featured-category">{featuredPost.category}</span>
-                    <div className="blog-featured-visual-title">{featuredPost.title}</div>
-                  </div>
-                  <div className="blog-featured-content">
-                    <div className="blog-featured-excerpt">{featuredPost.excerpt}</div>
-                    <div className="blog-featured-meta">
-                      <span>{featuredPost.displayDate}</span>
-                      <span className="blog-featured-meta-dot" />
-                      <span>{featuredPost.readTime}</span>
-                      {featuredPost.isAutoGenerated && (
-                        <>
-                          <span className="blog-featured-meta-dot" />
-                          <span style={{ color: '#dc2626', fontWeight: 700, fontSize: 11, textTransform: 'uppercase' }}>Live</span>
-                        </>
-                      )}
-                    </div>
-                    <span className="blog-featured-read-more">Read article →</span>
-                  </div>
-                </Link>
+            {pagePosts.length > 0 && (
+              <div className="blog-posts-grid-preview">
+                {pagePosts.map(post => {
+                  const bs = badgeStyle(post.category)
+                  return (
+                    <Link key={post.slug} href={`/blog/${post.slug}`} className="blog-card">
+                      <div
+                        className="blog-card-image"
+                        style={{ background: gradient(post.category) }}
+                      />
+                      <div className="blog-card-body">
+                        <div className="blog-card-meta">
+                          <span
+                            className="blog-cat-badge"
+                            style={{ background: bs.bg, color: bs.color, border: `1px solid ${bs.border}` }}
+                          >
+                            {post.category}
+                          </span>
+                          <span className="blog-card-readtime">{post.readTime}</span>
+                          <span className="blog-meta-sep">·</span>
+                          <span className="blog-card-date">{post.displayDate}</span>
+                        </div>
+                        <div className="blog-card-title">{post.title}</div>
+                        <div className="blog-card-excerpt">{post.excerpt}</div>
+                      </div>
+                      <div className="blog-card-footer">
+                        <span className="blog-card-link">
+                          Read article
+                          <svg className="blog-card-arrow" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                          </svg>
+                        </span>
+                        <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>uptrue.io/blog</span>
+                      </div>
+                    </Link>
+                  )
+                })}
               </div>
             )}
 
-            {/* Article grid */}
-            {pagePosts.length > 0 && (
-              <>
-                <div className="blog-section-label">
-                  {activeCategory === 'All' ? 'All Articles' : activeCategory}
-                  {' '}({filtered.length - (page === 1 ? 1 : 0)} articles)
-                </div>
-                <div className="blog-posts-grid">
-                  {pagePosts.map(post => (
-                    <Link key={post.slug} href={`/blog/${post.slug}`} className="blog-post-card">
-                      <div className="blog-post-card-body">
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <span className="blog-post-category">{post.category}</span>
-                          {post.isAutoGenerated && (
-                            <span style={{
-                              display: 'inline-block', fontSize: '11px', fontWeight: 600,
-                              color: '#dc2626', background: 'rgba(220,38,38,0.08)',
-                              padding: '2px 8px', borderRadius: '20px', textTransform: 'uppercase' as const,
-                              letterSpacing: '0.5px',
-                            }}>Live</span>
-                          )}
-                        </div>
-                        <div className="blog-post-card-title">{post.title}</div>
-                        <div className="blog-post-card-excerpt">{post.excerpt}</div>
-                        <div className="blog-post-card-meta">
-                          <span>{post.displayDate}</span>
-                          <span className="blog-post-card-dot" />
-                          <span>{post.readTime}</span>
-                        </div>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              </>
-            )}
-
-            {/* Pagination */}
+            {/* Load more / pagination */}
             {totalPages > 1 && (
-              <div className="blog-pagination">
-                <button
-                  onClick={() => goToPage(page - 1)}
-                  disabled={page <= 1}
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px',
-                    background: 'none', border: '1px solid var(--border-primary)', borderRadius: '8px',
-                    color: page <= 1 ? 'var(--text-muted)' : 'var(--text-primary)',
-                    cursor: page <= 1 ? 'not-allowed' : 'pointer', fontSize: '14px', fontWeight: 500,
-                    opacity: page <= 1 ? 0.5 : 1,
-                  }}
-                >← Newer</button>
-                <span className="blog-pagination-info">Page {page} of {totalPages}</span>
-                <button
-                  onClick={() => goToPage(page + 1)}
-                  disabled={page >= totalPages}
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px',
-                    background: 'none', border: '1px solid var(--border-primary)', borderRadius: '8px',
-                    color: page >= totalPages ? 'var(--text-muted)' : 'var(--text-primary)',
-                    cursor: page >= totalPages ? 'not-allowed' : 'pointer', fontSize: '14px', fontWeight: 500,
-                    opacity: page >= totalPages ? 0.5 : 1,
-                  }}
-                >Older →</button>
+              <div className="blog-load-more">
+                {page < totalPages ? (
+                  <button className="btn btn-ghost" onClick={() => goToPage(page + 1)}>
+                    Load more articles
+                    <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                      <polyline points="6 9 12 15 18 9"/>
+                    </svg>
+                  </button>
+                ) : (
+                  <button className="btn btn-ghost" onClick={() => goToPage(page - 1)}>← Newer articles</button>
+                )}
               </div>
             )}
           </>
         )}
 
-        {/* Newsletter CTA */}
-        <div className="blog-newsletter-section">
-          <div className="blog-newsletter-title">Get uptime tips in your inbox</div>
-          <div className="blog-newsletter-sub">No spam. Guides, monitoring insights, and outage alerts for site owners.</div>
-          <form className="blog-newsletter-form" onSubmit={e => e.preventDefault()}>
-            <input className="blog-newsletter-input" type="email" placeholder="you@example.com" />
-            <button type="submit" className="blog-newsletter-btn">Subscribe</button>
-          </form>
+        {/* Newsletter */}
+        <div className="blog-newsletter">
+          <div className="blog-newsletter-left">
+            <h3>Get articles in your inbox</h3>
+            <p>One email when we publish. No noise. Unsubscribe any time.</p>
+          </div>
+          <div className="blog-newsletter-form">
+            <input className="blog-newsletter-input" type="email" placeholder="you@company.com" />
+            <button className="btn btn-primary">Subscribe</button>
+          </div>
         </div>
+
       </div>
     </div>
   )
