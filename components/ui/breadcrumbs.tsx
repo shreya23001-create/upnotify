@@ -14,6 +14,19 @@ const labelMap: Record<string, string> = {
   new: 'New',
   edit: 'Edit',
   admin: 'Admin',
+  incidents: 'Incidents',
+  competitors: 'Competitors',
+  compete: 'Compete',
+  support: 'Support',
+  help: 'Help',
+}
+
+function ChevronRight() {
+  return (
+    <svg width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+      <polyline points="9 18 15 12 9 6" />
+    </svg>
+  )
 }
 
 export function Breadcrumbs() {
@@ -24,16 +37,16 @@ export function Breadcrumbs() {
 
   const crumbs = segments.map((seg, i) => {
     const href = '/' + segments.slice(0, i + 1).join('/')
-    const label = labelMap[seg] || (seg.length > 20 ? seg.slice(0, 8) + '...' : seg)
+    const label = labelMap[seg] ?? (seg.length > 24 ? seg.slice(0, 10) + '…' : seg)
     const isLast = i === segments.length - 1
     return { href, label, isLast }
   })
 
   return (
-    <nav className="breadcrumbs">
+    <nav className="breadcrumbs" aria-label="Breadcrumb">
       {crumbs.map((crumb, i) => (
-        <span key={crumb.href}>
-          {i > 0 && <span className="breadcrumb-sep">/</span>}
+        <span key={crumb.href} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          {i > 0 && <span className="breadcrumb-sep"><ChevronRight /></span>}
           {crumb.isLast ? (
             <span className="breadcrumb-current">{crumb.label}</span>
           ) : (

@@ -108,6 +108,9 @@ export default async function MonitorDetailPage({
       {/* Stat cards */}
       <div className="monitor-stat-grid">
         <div className="monitor-stat-card card-up">
+          <div className="monitor-stat-icon icon-up">
+            <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+          </div>
           <div className="monitor-stat-label">Uptime · 30 days</div>
           <div className="monitor-stat-value">
             {uptimePercent.toFixed(2)}<span className="monitor-stat-unit">%</span>
@@ -120,6 +123,9 @@ export default async function MonitorDetailPage({
         </div>
 
         <div className="monitor-stat-card card-blue">
+          <div className="monitor-stat-icon icon-blue">
+            <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          </div>
           <div className="monitor-stat-label">Avg Response · 50 checks</div>
           <div className="monitor-stat-value">
             {avgResponseTime != null ? <>{avgResponseTime}<span className="monitor-stat-unit">ms</span></> : '—'}
@@ -130,6 +136,9 @@ export default async function MonitorDetailPage({
         </div>
 
         <div className="monitor-stat-card card-up">
+          <div className="monitor-stat-icon icon-up">
+            <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
           <div className="monitor-stat-label">Checks · Recent</div>
           <div className="monitor-stat-value">{totalChecks30d}</div>
           <div className="monitor-stat-sub">
@@ -138,6 +147,9 @@ export default async function MonitorDetailPage({
         </div>
 
         <div className={`monitor-stat-card ${openIncidentCount > 0 ? 'card-warn' : 'card-up'}`}>
+          <div className={`monitor-stat-icon ${openIncidentCount > 0 ? 'icon-warn' : 'icon-up'}`}>
+            <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          </div>
           <div className="monitor-stat-label">Open Incidents</div>
           <div className="monitor-stat-value">{openIncidentCount}</div>
           <div className="monitor-stat-sub">
@@ -152,62 +164,66 @@ export default async function MonitorDetailPage({
       {/* Config + incidents */}
       <div className="grid-2" style={{ marginBottom: 24 }}>
         <div className="card">
-          <div className="card-header"><div className="card-title">Configuration</div></div>
-          <div className="card-content">
-            <div className="mon-config-grid">
-              <div className="mon-config-item">
-                <div className="mon-config-item-label">Type</div>
-                <div className="mon-config-item-value" style={{ textTransform: 'capitalize' }}>{monitor.type}</div>
-              </div>
-              <div className="mon-config-item">
-                <div className="mon-config-item-label">Check Interval</div>
-                <div className="mon-config-item-value">{formatInterval(monitor.check_interval_seconds)}</div>
-              </div>
-              <div className="mon-config-item">
-                <div className="mon-config-item-label">Timeout</div>
-                <div className="mon-config-item-value">{monitor.timeout_ms}ms</div>
-              </div>
-              <div className="mon-config-item">
-                <div className="mon-config-item-label">Severity</div>
-                <div className="mon-config-item-value" style={{ textTransform: 'capitalize' }}>{monitor.severity}</div>
-              </div>
-              {monitor.last_checked_at && (
-                <div className="mon-config-item mon-config-item-full">
-                  <div className="mon-config-item-label">Last Checked</div>
-                  <div className="mon-config-item-value" style={{ fontFamily: 'var(--font-mono, monospace)', fontSize: 13 }}>
-                    {new Date(monitor.last_checked_at).toLocaleString('en-GB', { dateStyle: 'short', timeStyle: 'short' })}
-                  </div>
-                </div>
-              )}
-              <div className="mon-config-item mon-config-item-full">
-                <div className="mon-config-item-label">Target URL</div>
-                <div className="mon-config-item-value" style={{ fontFamily: 'var(--font-mono, monospace)', fontSize: 12, fontWeight: 500, wordBreak: 'break-all' }}>{monitor.target}</div>
-              </div>
+          <div className="card-header">
+            <div className="card-title">Monitor Settings</div>
+          </div>
+          <div className="mon-config-grid">
+            <div className="mon-config-item">
+              <div className="mon-config-item-label">Check Interval</div>
+              <div className="mon-config-item-value">{formatInterval(monitor.check_interval_seconds)}</div>
+              <div className="mon-config-item-sub">{Math.round(86400 / monitor.check_interval_seconds).toLocaleString()} checks/day</div>
             </div>
-            {isKeywordMonitor && displayPositive.length > 0 && (
-              <div className="info-row" style={{ alignItems: 'flex-start' }}>
-                <span className="info-row-label">Must Exist</span>
-                <span className="info-row-value" style={{ textTransform: 'none' }}>
-                  <span className="keyword-chips-row">
+            <div className="mon-config-item">
+              <div className="mon-config-item-label">Timeout</div>
+              <div className="mon-config-item-value">{monitor.timeout_ms / 1000}s</div>
+              <div className="mon-config-item-sub">Returns SLOW above 800ms</div>
+            </div>
+            <div className="mon-config-item">
+              <div className="mon-config-item-label">Type</div>
+              <div className="mon-config-item-value" style={{ textTransform: 'capitalize' }}>{monitor.type}</div>
+              <div className="mon-config-item-sub" style={{ textTransform: 'capitalize' }}>{monitor.severity} severity</div>
+            </div>
+          </div>
+          {isKeywordMonitor && (displayPositive.length > 0 || displayNegative.length > 0) && (
+            <div className="alert-channels-row">
+              {displayPositive.length > 0 && (
+                <>
+                  <div className="alert-channels-label">Must Exist</div>
+                  <div>
                     {displayPositive.map((kw, i) => (
                       <span key={i} className="keyword-tag keyword-tag-positive keyword-tag-readonly">{kw}</span>
                     ))}
-                  </span>
-                </span>
-              </div>
-            )}
-            {isKeywordMonitor && displayNegative.length > 0 && (
-              <div className="info-row" style={{ alignItems: 'flex-start' }}>
-                <span className="info-row-label">Must NOT Exist</span>
-                <span className="info-row-value" style={{ textTransform: 'none' }}>
-                  <span className="keyword-chips-row">
+                  </div>
+                </>
+              )}
+              {displayNegative.length > 0 && (
+                <>
+                  <div className="alert-channels-label" style={{ marginTop: 8 }}>Must NOT Exist</div>
+                  <div>
                     {displayNegative.map((kw, i) => (
                       <span key={i} className="keyword-tag keyword-tag-negative keyword-tag-readonly">{kw}</span>
                     ))}
-                  </span>
-                </span>
-              </div>
-            )}
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+          <div className="alert-channels-row">
+            <div className="alert-channels-label">Alert Channels</div>
+            <div>
+              <span className="alert-chip">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                Email
+              </span>
+              <span className="alert-chip">
+                <svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                Slack
+              </span>
+              <span className="alert-chip">
+                <svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.81a19.79 19.79 0 01-3.07-8.63A2 2 0 012 0h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 14v3a0 0 0 010-.08z"/></svg>
+                Webhooks
+              </span>
+            </div>
           </div>
         </div>
 

@@ -22,6 +22,7 @@ interface NavItem {
   label: string
   icon: React.ComponentType<{ size?: number }>
   badge?: number
+  badgeVariant?: 'red' | 'blue'
 }
 
 const mainNavItems: NavItem[] = [
@@ -47,26 +48,32 @@ export function Sidebar(): React.ReactElement {
   const { user } = useAuth()
   const [collapsed, setCollapsed] = useState(false)
   const [openIncidentCount, setOpenIncidentCount] = useState(0)
+  const [monitorCount, setMonitorCount] = useState(0)
 
   useEffect(() => {
     let cancelled = false
 
-    async function fetchCount(): Promise<void> {
+    async function fetchCounts(): Promise<void> {
       try {
-        const res = await fetch('/api/v1/incidents/count')
-        if (!res.ok) return
-        const data = await res.json() as { success: boolean; count: number }
-        if (!cancelled && data.success) {
-          setOpenIncidentCount(data.count)
+        const [incRes, monRes] = await Promise.allSettled([
+          fetch('/api/v1/incidents/count'),
+          fetch('/api/v1/monitors/count'),
+        ])
+        if (incRes.status === 'fulfilled' && incRes.value.ok) {
+          const data = await incRes.value.json() as { success: boolean; count: number }
+          if (!cancelled && data.success) setOpenIncidentCount(data.count)
+        }
+        if (monRes.status === 'fulfilled' && monRes.value.ok) {
+          const data = await monRes.value.json() as { success: boolean; count: number }
+          if (!cancelled && data.success) setMonitorCount(data.count)
         }
       } catch {
-        // Silently ignore — badge just won't show
+        // Silently ignore — badges just won't show
       }
     }
 
-    fetchCount()
-    // Refresh count every 60 seconds
-    const interval = setInterval(fetchCount, 60_000)
+    fetchCounts()
+    const interval = setInterval(fetchCounts, 60_000)
 
     return () => {
       cancelled = true
@@ -86,10 +93,13 @@ export function Sidebar(): React.ReactElement {
   if (isAgency) {
     mainItems.push({ href: '/dashboard/clients', label: 'Clients', icon: IconBuilding })
   }
-  // Inject open incident badge count onto Alerts and Incidents nav items
+  // Inject badge counts onto nav items
   const itemsWithBadges = mainNavItems.map(item => {
     if ((item.href === '/dashboard/alerts' || item.href === '/dashboard/incidents') && openIncidentCount > 0) {
-      return { ...item, badge: openIncidentCount }
+      return { ...item, badge: openIncidentCount, badgeVariant: 'red' as const }
+    }
+    if (item.href === '/dashboard/monitors' && monitorCount > 0) {
+      return { ...item, badge: monitorCount, badgeVariant: 'blue' as const }
     }
     return item
   })
@@ -128,6 +138,7 @@ export function Sidebar(): React.ReactElement {
                 isActive={isActive(item.href)}
                 collapsed={collapsed}
                 badge={item.badge}
+                badgeVariant={item.badgeVariant}
               />
             ))}
           </div>
@@ -154,6 +165,21 @@ export function Sidebar(): React.ReactElement {
       {/* Credits promo — collapsible, only for non-admin users */}
       {!collapsed && !user?.is_super_admin && (
         <CreditsPromo />
+      )}
+
+      {/* User info at bottom */}
+      {!collapsed && user && (
+        <div className="sidebar-user-footer">
+          <div className="sidebar-user-avatar">
+            {user.full_name
+              ? user.full_name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+              : user.email?.slice(0, 2).toUpperCase() ?? '?'}
+          </div>
+          <div className="sidebar-user-info">
+            <div className="sidebar-user-name">{user.full_name ?? user.email?.split('@')[0]}</div>
+            <div className="sidebar-user-role">{user.is_super_admin ? 'Super Admin' : 'Admin'}</div>
+          </div>
+        </div>
       )}
 
       <div className="sidebar-collapse-btn-wrapper">
@@ -192,7 +218,7 @@ function CreditsPromo(): React.ReactElement {
 }
 
 function SidebarLink({
-  href, label, icon: Icon, isActive, collapsed, badge,
+  href, label, icon: Icon, isActive, collapsed, badge, badgeVariant = 'red',
 }: {
   href: string
   label: string
@@ -200,6 +226,7 @@ function SidebarLink({
   isActive: boolean
   collapsed: boolean
   badge?: number
+  badgeVariant?: 'red' | 'blue'
 }): React.ReactElement {
   return (
     <Link
@@ -215,7 +242,9 @@ function SidebarLink({
       </span>
       {!collapsed && <span className="sidebar-link-label">{label}</span>}
       {!collapsed && badge !== undefined && badge > 0 && (
-        <span className="sidebar-link-badge">{badge > 99 ? '99+' : badge}</span>
+        <span className={`sidebar-link-badge${badgeVariant === 'blue' ? ' sidebar-link-badge-blue' : ''}`}>
+          {badge > 99 ? '99+' : badge}
+        </span>
       )}
     </Link>
   )
