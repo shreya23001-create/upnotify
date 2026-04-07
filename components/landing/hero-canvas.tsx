@@ -71,8 +71,9 @@ export function HeroCanvas(): React.ReactElement {
 
       const uptimePct = isDown ? lerp(99.94, 98.20, ph.pct) :
                         isRec  ? lerp(98.20, 99.94, ph.pct) : 99.94
-      const downCount = isDown ? Math.round(lerp(0, 1, Math.min(1, ph.pct*3))) :
-                        isRec  ? Math.round(lerp(1, 0, ph.pct)) : 0
+      const downCount = isDown ? Math.round(lerp(0, 2, Math.min(1, ph.pct * 2.5))) :
+                        isRec  ? Math.round(lerp(2, 0, ph.pct)) : 0
+      const healthyCount = 24 - downCount - (isDeg ? 1 : 0)
       const respTime  = isDown ? Math.round(lerp(142, 8200, ph.pct)) :
                         isDeg  ? Math.round(lerp(142, 680, ph.pct))  :
                         isRec  ? Math.round(lerp(8200, 142, ph.pct)) : 142
@@ -94,20 +95,25 @@ export function HeroCanvas(): React.ReactElement {
       const cardW = (panW - 12) / 2, cardH = 52
       const cy = ly + 44
       const cards = [
-        { label:'MONITORS', val:'24',              color:'#3b82f6' },
-        { label:'HEALTHY',  val:'23',              color:'#10b981' },
-        { label:'DOWN',     val:String(downCount), color:'#ef4444' },
+        { label:'MONITORS', val:'24',                   color:'#3b82f6' },
+        { label:'HEALTHY',  val:String(healthyCount),  color:'#10b981' },
+        { label:'DOWN',     val:String(downCount),      color:'#ef4444' },
         { label:'AVG RESP', val:(respTime > 999 ? (respTime/1000).toFixed(1)+'s' : respTime+'ms'),
           color: respTime > 2000 ? '#ef4444' : '#3b82f6' },
       ]
       cards.forEach((c, i) => {
         const cx2 = lx + 64 + (i % 2) * (cardW + 4)
         const cy2 = cy + Math.floor(i / 2) * (cardH + 4)
-        const isAlert = (c.label === 'DOWN' && downCount > 0) || (c.label === 'AVG RESP' && respTime > 1000)
-        rr(cx2, cy2, cardW, cardH, 5, '#ffffff', isAlert ? '#fecaca' : '#e2e8f0', a * 0.8)
+        const isAlert = (c.label === 'DOWN' && downCount > 0) ||
+                        (c.label === 'HEALTHY' && downCount > 0) ||
+                        (c.label === 'AVG RESP' && respTime > 1000)
+        const isHealthyAlert = c.label === 'HEALTHY' && downCount > 0
+        const borderCol = isHealthyAlert ? '#fde68a' : isAlert ? '#fecaca' : '#e2e8f0'
+        const valCol    = isHealthyAlert ? '#d97706' : isAlert ? '#ef4444' : '#0f172a'
+        rr(cx2, cy2, cardW, cardH, 5, '#ffffff', borderCol, a * 0.8)
         rr(cx2, cy2+cardH-3, cardW, 3, [0,0,2,2], c.color, null, a * (isAlert ? 1.6 : 0.9))
         txt(c.label, cx2+8, cy2+15, 7, '#94a3b8', a*1.2, '700')
-        txt(c.val, cx2+8, cy2+40, isAlert ? 18 : 16, isAlert ? '#ef4444' : '#0f172a', a*1.4, '800')
+        txt(c.val, cx2+8, cy2+40, isAlert ? 18 : 16, valCol, a*1.4, '800')
       })
 
       const ty = cy + cardH * 2 + 12
@@ -117,12 +123,20 @@ export function HeroCanvas(): React.ReactElement {
       txt('STATUS',  lx+64+tableW*0.45, ty+11, 7, '#94a3b8', a*1.1, '700')
       txt('UPTIME',  lx+64+tableW*0.65, ty+11, 7, '#94a3b8', a*1.1, '700')
 
+      // second monitor goes slow during degrading, then down during peak incident (downCount===2)
+      const blogIsDown = isDown && downCount >= 2
+      const blogIsSlow = isDeg || (isDown && downCount < 2)
+      const blogRecov  = isRec && ph.pct < 0.6
       const rows = [
         { name:'api.acmecorp.com',  status:'Up',   uptime:'99.98%', down:false, warn:false },
-        { name:'checkout.shop.io',  status: isDown ? 'Down' : isDeg ? 'Slow' : 'Up',
-          uptime: uptimePct.toFixed(2)+'%', down: isDown, warn: isDeg },
+        { name:'checkout.shop.io',
+          status: isDown ? 'Down' : isDeg ? 'Slow' : isRec && ph.pct < 0.5 ? 'Slow' : 'Up',
+          uptime: uptimePct.toFixed(2)+'%', down: isDown, warn: isDeg || (isRec && ph.pct < 0.5) },
         { name:'cdn.assets.io',     status:'Up',   uptime:'100%',   down:false, warn:false },
-        { name:'blog.example.com',  status:'Up',   uptime:'99.9%',  down:false, warn:false },
+        { name:'blog.example.com',
+          status: blogIsDown ? 'Down' : (blogIsSlow || blogRecov) ? 'Slow' : 'Up',
+          uptime: blogIsDown ? '99.1%' : '99.9%',
+          down: blogIsDown, warn: blogIsSlow || blogRecov },
       ]
       rows.forEach((row, i) => {
         const ry = ty + 16 + i * 20

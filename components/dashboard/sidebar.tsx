@@ -95,7 +95,7 @@ export function Sidebar(): React.ReactElement {
   }
   // Inject badge counts onto nav items
   const itemsWithBadges = mainNavItems.map(item => {
-    if ((item.href === '/dashboard/alerts' || item.href === '/dashboard/incidents') && openIncidentCount > 0) {
+    if (item.href === '/dashboard/incidents' && openIncidentCount > 0) {
       return { ...item, badge: openIncidentCount, badgeVariant: 'red' as const }
     }
     if (item.href === '/dashboard/monitors' && monitorCount > 0) {
