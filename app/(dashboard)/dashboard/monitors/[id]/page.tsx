@@ -2,11 +2,13 @@ import { notFound, redirect } from 'next/navigation'
 import { getCurrentUser } from '@/lib/db/users'
 import { getMonitorById } from '@/lib/db/monitors'
 import { getIncidentsByWorkspace } from '@/lib/db/incidents'
-import { getCheckResultsByMonitor } from '@/lib/db/check-results'
+import { getCheckResultsByMonitor, getUptimeBarDataForRange } from '@/lib/db/check-results'
+import { getUptimePercentage } from '@/lib/db/status-pages'
 import { MonitorStatusBadge } from '@/components/monitors/monitor-status-badge'
 import { MonitorTypeIcon } from '@/components/monitors/monitor-type-icon'
 import { MonitorActions } from '@/components/monitors/monitor-actions'
 import { CheckResultsHistory } from '@/components/monitors/check-results-history'
+import { MonitorUptimeBars } from '@/components/monitors/monitor-uptime-bars'
 import { BadgeEmbed } from '@/components/monitors/badge-embed'
 import { KeywordResultsDisplay } from '@/components/monitors/keyword-results-display'
 
@@ -15,6 +17,12 @@ interface KeywordMonitorConfig {
   negativeKeywords?: string[]
   keyword?: string
   shouldExist?: boolean
+}
+
+function formatInterval(seconds: number): string {
+  if (seconds < 60) return `Every ${seconds}s`
+  if (seconds < 3600) return `Every ${seconds / 60}m`
+  return `Every ${seconds / 3600}h`
 }
 
 export default async function MonitorDetailPage({
@@ -29,15 +37,16 @@ export default async function MonitorDetailPage({
   const monitor = await getMonitorById(id)
   if (!monitor) notFound()
 
-  const [incidents, checkResults] = await Promise.all([
+  const [incidents, checkResults, uptimeSlots, uptimePercent] = await Promise.all([
     getIncidentsByWorkspace(monitor.workspace_id, { limit: 5 }),
-    getCheckResultsByMonitor(monitor.id, 20),
+    getCheckResultsByMonitor(monitor.id, 50),
+    getUptimeBarDataForRange(monitor.id, '30d'),
+    getUptimePercentage(monitor.id, 30),
   ])
 
   const isKeywordMonitor = monitor.type === 'keyword'
   const keywordConfig = monitor.config as KeywordMonitorConfig | undefined
 
-  // Resolve keywords for display (backward compat with legacy single keyword)
   let displayPositive: string[] = []
   let displayNegative: string[] = []
   if (isKeywordMonitor && keywordConfig) {
@@ -53,34 +62,107 @@ export default async function MonitorDetailPage({
     }
   }
 
-  // Get the latest check result metadata for keyword display
   const latestResult = checkResults.length > 0 ? checkResults[0] : undefined
   const latestMetadata = latestResult?.metadata as Record<string, unknown> | undefined
 
+  // Compute avg + p95 response time from recent results
+  const responseTimes = checkResults
+    .filter(r => r.response_time_ms != null && r.response_time_ms > 0)
+    .map(r => r.response_time_ms as number)
+  const avgResponseTime = responseTimes.length > 0
+    ? Math.round(responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length)
+    : null
+  const p95ResponseTime = responseTimes.length > 0
+    ? Math.round(responseTimes.sort((a, b) => a - b)[Math.floor(responseTimes.length * 0.95)] ?? 0)
+    : null
+  const totalChecks30d = checkResults.length
+  const openIncidentCount = incidents.filter(i => i.status !== 'resolved').length
+
   return (
     <div>
-      <div className="monitor-header">
-        <MonitorTypeIcon type={monitor.type} />
-        <h1 className="page-title">{monitor.name}</h1>
-        <MonitorStatusBadge status={monitor.status} />
+      {/* Redesigned monitor header */}
+      <div className="monitor-header-v2">
+        <div className="monitor-header-v2-left">
+          <div className="monitor-header-v2-title-row">
+            <h1 className="monitor-header-v2-name">{monitor.name}</h1>
+            <MonitorStatusBadge status={monitor.status} />
+            <span className="monitor-type-badge">{monitor.type}</span>
+          </div>
+          <div className="monitor-header-v2-url">{monitor.target}</div>
+        </div>
+        <div className="monitor-header-v2-right">
+          <span className="monitor-interval-chip">
+            <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+            {formatInterval(monitor.check_interval_seconds)}
+          </span>
+          <MonitorActions monitorId={monitor.id} isPaused={monitor.is_paused} />
+        </div>
       </div>
 
-      <MonitorActions monitorId={monitor.id} isPaused={monitor.is_paused} />
+      {/* Stat cards */}
+      <div className="monitor-stat-grid">
+        <div className="monitor-stat-card card-up">
+          <div className="monitor-stat-label">Uptime · 30 days</div>
+          <div className="monitor-stat-value">
+            {uptimePercent.toFixed(2)}<span className="monitor-stat-unit">%</span>
+          </div>
+          <div className="monitor-stat-sub">
+            {uptimeSlots.filter(s => s.status === 'down').length === 0
+              ? 'No downtime recorded'
+              : `${uptimeSlots.filter(s => s.status === 'down').length} slot(s) with issues`}
+          </div>
+        </div>
 
-      <div className="grid-2" style={{ marginTop: 24 }}>
+        <div className="monitor-stat-card card-blue">
+          <div className="monitor-stat-label">Avg Response · 50 checks</div>
+          <div className="monitor-stat-value">
+            {avgResponseTime != null ? <>{avgResponseTime}<span className="monitor-stat-unit">ms</span></> : '—'}
+          </div>
+          <div className="monitor-stat-sub">
+            {p95ResponseTime != null ? `P95: ${p95ResponseTime}ms` : 'No response data'}
+          </div>
+        </div>
+
+        <div className="monitor-stat-card card-up">
+          <div className="monitor-stat-label">Checks · Recent</div>
+          <div className="monitor-stat-value">{totalChecks30d}</div>
+          <div className="monitor-stat-sub">
+            {checkResults.filter(r => r.status === 'down').length} failed
+          </div>
+        </div>
+
+        <div className={`monitor-stat-card ${openIncidentCount > 0 ? 'card-warn' : 'card-up'}`}>
+          <div className="monitor-stat-label">Open Incidents</div>
+          <div className="monitor-stat-value">{openIncidentCount}</div>
+          <div className="monitor-stat-sub">
+            {incidents.length} total in view
+          </div>
+        </div>
+      </div>
+
+      {/* 90-day uptime bars */}
+      <MonitorUptimeBars slots={uptimeSlots} uptimePercent={uptimePercent} rangeLabel="30 days" />
+
+      {/* Config + incidents */}
+      <div className="grid-2" style={{ marginBottom: 24 }}>
         <div className="card">
           <div className="card-header"><div className="card-title">Configuration</div></div>
           <div className="card-content">
             <div className="info-row"><span className="info-row-label">Type</span><span className="info-row-value">{monitor.type}</span></div>
-            <div className="info-row"><span className="info-row-label">Target</span><span className="info-row-value" style={{ textTransform: 'none' }}>{monitor.target}</span></div>
-            <div className="info-row"><span className="info-row-label">Interval</span><span className="info-row-value">{monitor.check_interval_seconds}s</span></div>
+            <div className="info-row"><span className="info-row-label">Target</span><span className="info-row-value" style={{ textTransform: 'none', fontFamily: 'var(--font-mono, monospace)', fontSize: 12 }}>{monitor.target}</span></div>
+            <div className="info-row"><span className="info-row-label">Interval</span><span className="info-row-value">{formatInterval(monitor.check_interval_seconds)}</span></div>
             <div className="info-row"><span className="info-row-label">Timeout</span><span className="info-row-value">{monitor.timeout_ms}ms</span></div>
             <div className="info-row"><span className="info-row-label">Severity</span><span className="info-row-value">{monitor.severity}</span></div>
-            <div className="info-row"><span className="info-row-label">Flap Count</span><span className="info-row-value">{monitor.flap_count}</span></div>
             {monitor.last_checked_at && (
-              <div className="info-row"><span className="info-row-label">Last Checked</span><span className="info-row-value" style={{ textTransform: 'none' }}>{new Date(monitor.last_checked_at).toLocaleString()}</span></div>
+              <div className="info-row">
+                <span className="info-row-label">Last Check</span>
+                <span className="info-row-value" style={{ textTransform: 'none' }}>
+                  {new Date(monitor.last_checked_at).toLocaleString('en-GB', { dateStyle: 'short', timeStyle: 'short' })}
+                </span>
+              </div>
             )}
-
             {isKeywordMonitor && displayPositive.length > 0 && (
               <div className="info-row" style={{ alignItems: 'flex-start' }}>
                 <span className="info-row-label">Must Exist</span>
@@ -93,7 +175,6 @@ export default async function MonitorDetailPage({
                 </span>
               </div>
             )}
-
             {isKeywordMonitor && displayNegative.length > 0 && (
               <div className="info-row" style={{ alignItems: 'flex-start' }}>
                 <span className="info-row-label">Must NOT Exist</span>
@@ -110,9 +191,9 @@ export default async function MonitorDetailPage({
         </div>
 
         <div className="card">
-          <div className="card-header"><div className="card-title">
-            {isKeywordMonitor ? 'Last Keyword Check' : 'Recent Incidents'}
-          </div></div>
+          <div className="card-header">
+            <div className="card-title">{isKeywordMonitor ? 'Last Keyword Check' : 'Recent Incidents'}</div>
+          </div>
           <div className="card-content">
             {isKeywordMonitor ? (
               latestMetadata ? (
@@ -123,13 +204,20 @@ export default async function MonitorDetailPage({
             ) : (
               <>
                 {incidents.length === 0 ? (
-                  <p style={{ fontSize: 14, color: '#71717a' }}>No incidents for this monitor.</p>
+                  <p style={{ fontSize: 14, color: '#71717a' }}>No incidents recorded.</p>
                 ) : (
                   <div className="space-y-sm">
                     {incidents.map((inc) => (
-                      <div key={inc.id} style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f4f4f5', paddingBottom: 8 }}>
-                        <span style={{ fontSize: 14 }}>{inc.title}</span>
-                        <span className={`badge ${inc.status === 'resolved' ? 'badge-outline' : 'badge-danger'}`}>{inc.status}</span>
+                      <div key={inc.id} className="incident-row">
+                        <div className="incident-row-info">
+                          <span className="incident-row-title">{inc.title}</span>
+                          <span className="incident-row-time">
+                            {new Date(inc.started_at).toLocaleString('en-GB', { dateStyle: 'short', timeStyle: 'short' })}
+                          </span>
+                        </div>
+                        <span className={`badge ${inc.status === 'resolved' ? 'badge-outline' : 'badge-danger'}`}>
+                          {inc.status}
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -140,17 +228,24 @@ export default async function MonitorDetailPage({
         </div>
       </div>
 
-      {/* For keyword monitors, show incidents below the keyword results */}
+      {/* Keyword incidents below keyword results */}
       {isKeywordMonitor && incidents.length > 0 && (
-        <div style={{ marginTop: 24 }}>
+        <div style={{ marginBottom: 24 }}>
           <div className="card">
             <div className="card-header"><div className="card-title">Recent Incidents</div></div>
             <div className="card-content">
               <div className="space-y-sm">
                 {incidents.map((inc) => (
-                  <div key={inc.id} style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f4f4f5', paddingBottom: 8 }}>
-                    <span style={{ fontSize: 14 }}>{inc.title}</span>
-                    <span className={`badge ${inc.status === 'resolved' ? 'badge-outline' : 'badge-danger'}`}>{inc.status}</span>
+                  <div key={inc.id} className="incident-row">
+                    <div className="incident-row-info">
+                      <span className="incident-row-title">{inc.title}</span>
+                      <span className="incident-row-time">
+                        {new Date(inc.started_at).toLocaleString('en-GB', { dateStyle: 'short', timeStyle: 'short' })}
+                      </span>
+                    </div>
+                    <span className={`badge ${inc.status === 'resolved' ? 'badge-outline' : 'badge-danger'}`}>
+                      {inc.status}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -159,11 +254,13 @@ export default async function MonitorDetailPage({
         </div>
       )}
 
-      <div style={{ marginTop: 24 }}>
+      {/* Full check history */}
+      <div style={{ marginBottom: 24 }}>
         <CheckResultsHistory results={checkResults} />
       </div>
 
-      <div style={{ marginTop: 24 }}>
+      {/* Badge embed */}
+      <div style={{ marginBottom: 24 }}>
         <BadgeEmbed monitorId={monitor.id} />
       </div>
     </div>

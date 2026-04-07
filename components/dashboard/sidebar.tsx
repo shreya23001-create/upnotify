@@ -9,7 +9,7 @@ import { useAuth } from '@/components/providers/auth-provider'
 import {
   IconDashboard, IconActivity, IconGlobe, IconAlertTriangle,
   IconBuilding, IconSettings, IconShield, IconChevronLeft, IconChevronRight,
-  IconHelpCircle, IconTrendingUp, IconTarget, IconBarChart,
+  IconHelpCircle, IconTrendingUp, IconTarget, IconBarChart, IconInbox,
 } from '@/components/icons'
 
 interface NavSection {
@@ -36,6 +36,7 @@ const mainNavItems: NavItem[] = [
 ]
 
 const secondaryNavItems: NavItem[] = [
+  { href: '/dashboard/support', label: 'Support', icon: IconInbox },
   { href: '/dashboard/settings', label: 'Settings', icon: IconSettings },
   { href: '/dashboard/help', label: 'Help', icon: IconHelpCircle },
 ]
@@ -150,18 +151,9 @@ export function Sidebar(): React.ReactElement {
         )}
       </nav>
 
-      {/* Credits promo — only for Free/Lite users */}
+      {/* Credits promo — collapsible, only for non-admin users */}
       {!collapsed && !user?.is_super_admin && (
-        <div className="sidebar-credits-promo">
-          <div className="sidebar-credits-promo-icon">{'\uD83D\uDCB0'}</div>
-          <div className="sidebar-credits-promo-text">
-            <strong>Earn Credits</strong>
-            <span>Get up to {'\u00A3'}10/mo off your plan</span>
-          </div>
-          <Link href="/dashboard/settings?tab=referrals" className="sidebar-credits-promo-link">
-            Learn how {'\u2192'}
-          </Link>
-        </div>
+        <CreditsPromo />
       )}
 
       <div className="sidebar-collapse-btn-wrapper">
@@ -174,6 +166,28 @@ export function Sidebar(): React.ReactElement {
         </button>
       </div>
     </aside>
+  )
+}
+
+function CreditsPromo(): React.ReactElement {
+  const [open, setOpen] = useState(true)
+
+  return (
+    <div className="sidebar-credits-promo">
+      <div className="sidebar-credits-promo-header" onClick={() => setOpen(!open)}>
+        <span className="sidebar-credits-promo-icon">✨</span>
+        <span className="sidebar-credits-promo-title">Earn Credits</span>
+        <span className="sidebar-credits-promo-toggle" style={{ transform: open ? 'rotate(0deg)' : 'rotate(-90deg)', transition: 'transform 0.2s' }}>
+          <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+      </div>
+      <div className={`sidebar-credits-promo-body${open ? '' : ' collapsed'}`}>
+        <div className="sidebar-credits-promo-text">Get up to £10/mo off your plan by referring friends.</div>
+        <Link href="/dashboard/settings?tab=referrals" className="sidebar-credits-promo-link">
+          Learn how →
+        </Link>
+      </div>
+    </div>
   )
 }
 

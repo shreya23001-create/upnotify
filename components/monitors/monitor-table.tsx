@@ -165,7 +165,9 @@ export function MonitorTable({ monitors, uptimeData }: MonitorTableProps) {
         searchPlaceholder="Search monitors..."
         filters={filters}
         bulkActions={bulkActions}
+        emptyIcon="📡"
         emptyMessage="No monitors yet. Create your first monitor to get started."
+        emptyAction={{ label: '+ Add Monitor', href: '/dashboard/monitors/new' }}
       />
       <ConfirmDialog
         isOpen={pendingConfirm !== null}

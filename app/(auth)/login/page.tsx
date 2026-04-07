@@ -12,14 +12,12 @@ export const metadata: Metadata = {
 
 export default function LoginPage(): React.ReactElement {
   return (
-    <div>
-      <div className="auth-card">
-        <LoginForm mode="login" />
-      </div>
-      <p className="auth-footer">
+    <>
+      <LoginForm mode="login" />
+      <p className="auth-switch-link">
         Don&apos;t have an account?{' '}
-        <Link href="/signup">Sign up</Link>
+        <Link href="/signup">Sign up free</Link>
       </p>
-    </div>
+    </>
   )
 }

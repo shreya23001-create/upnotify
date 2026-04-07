@@ -72,7 +72,9 @@ export function ReportsTable({ reports }: { reports: Report[] }) {
         searchPlaceholder="Search reports..."
         filters={filters}
         bulkActions={bulkActions}
-        emptyMessage="No reports generated yet. Click Generate Report to create your first report."
+        emptyIcon="📄"
+        emptyMessage="No reports generated yet. Generate an AI-powered executive summary for your clients."
+        emptyAction={{ label: '+ Generate Report', href: '/dashboard/reports/new' }}
       />
       <ConfirmDialog
         isOpen={deleteIds.length > 0}

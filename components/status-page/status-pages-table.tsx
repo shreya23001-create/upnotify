@@ -109,7 +109,9 @@ export function StatusPagesTable({ pages }: { pages: StatusPage[] }) {
         data={pages}
         searchPlaceholder="Search status pages..."
         bulkActions={bulkActions}
-        emptyMessage="No status pages yet. Create one to share uptime status publicly."
+        emptyIcon="🌐"
+        emptyMessage="No status pages yet. Create one to share your uptime status publicly."
+        emptyAction={{ label: '+ Create Status Page', href: '/dashboard/status-pages/new' }}
       />
       <ConfirmDialog
         isOpen={pendingConfirm !== null}

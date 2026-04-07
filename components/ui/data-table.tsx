@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo, useCallback } from 'react'
+import Link from 'next/link'
 
 export interface Column<T> {
   key: string
@@ -29,6 +30,8 @@ interface DataTableProps<T extends { id: string }> {
   bulkActions?: BulkAction[]
   pageSize?: number
   emptyMessage?: string
+  emptyAction?: { label: string; href: string }
+  emptyIcon?: string
 }
 
 export function DataTable<T extends { id: string }>({
@@ -39,6 +42,8 @@ export function DataTable<T extends { id: string }>({
   bulkActions = [],
   pageSize: initialPageSize = 10,
   emptyMessage = 'No data found.',
+  emptyAction,
+  emptyIcon = '📊',
 }: DataTableProps<T>) {
   const [search, setSearch] = useState('')
   const [filterValues, setFilterValues] = useState<Record<string, string>>({})
@@ -116,7 +121,18 @@ export function DataTable<T extends { id: string }>({
   }, [paged, selectedIds.size])
 
   if (data.length === 0) {
-    return <div className="empty-state"><div className="empty-state-icon">📊</div><h3>No data yet</h3><p>{emptyMessage}</p></div>
+    return (
+      <div className="empty-state">
+        <div className="empty-state-icon">{emptyIcon}</div>
+        <h3>No data yet</h3>
+        <p>{emptyMessage}</p>
+        {emptyAction && (
+          <Link href={emptyAction.href} className="btn btn-primary" style={{ marginTop: 16 }}>
+            {emptyAction.label}
+          </Link>
+        )}
+      </div>
+    )
   }
 
   return (

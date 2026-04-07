@@ -1,11 +1,11 @@
 import type { Metadata, Viewport } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
+import { Inter, JetBrains_Mono } from "next/font/google"
 import { CookieConsent } from "@/components/ui/cookie-consent"
 import { GoogleAnalytics } from "@/components/analytics/google-analytics"
 import "./styles.css"
 
-const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] })
-const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] })
+const inter = Inter({ variable: "--font-inter", subsets: ["latin"], display: "swap" })
+const jetbrainsMono = JetBrains_Mono({ variable: "--font-mono", subsets: ["latin"], display: "swap" })
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -92,7 +92,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
+    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
       <body>
         <script dangerouslySetInnerHTML={{ __html: `
           (function() {

@@ -252,7 +252,9 @@ export function AlertChannelsTable({ channels }: { channels: AlertChannel[] }) {
         searchPlaceholder="Search alert channels..."
         filters={filters}
         bulkActions={bulkActions}
+        emptyIcon="🔔"
         emptyMessage="No alert channels configured. Add a channel to receive downtime notifications."
+        emptyAction={{ label: '+ Add Channel', href: '/dashboard/alerts/new' }}
       />
       <ConfirmDialog
         isOpen={pendingConfirm !== null}

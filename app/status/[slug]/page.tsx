@@ -48,7 +48,7 @@ export default async function PublicStatusPage({
 }): Promise<React.ReactElement> {
   const { slug } = await params
   const { range: rangeParam } = await searchParams
-  const range = ['24h', '7d', '30d'].includes(rangeParam || '') ? rangeParam! : '24h'
+  const range = ['24h', '7d', '30d', '90d'].includes(rangeParam || '') ? rangeParam! : '30d'
 
   const statusPage = await getStatusPageBySlug(slug)
   if (!statusPage) notFound()
@@ -74,7 +74,7 @@ export default async function PublicStatusPage({
     monitors = data ?? []
   }
 
-  const uptimeDays = range === '24h' ? 1 : range === '7d' ? 7 : range === '30d' ? 30 : 90
+  const uptimeDays = range === '24h' ? 1 : range === '7d' ? 7 : range === '90d' ? 90 : 30
 
   const [uptimeEntries, uptimePercentages] = await Promise.all([
     Promise.all(monitors.map(async (m) => [m.id, await getUptimeBarDataForRange(m.id, range)] as const)),
@@ -124,15 +124,17 @@ export default async function PublicStatusPage({
         {monitors.length === 0 ? (
           <p style={{ color: '#94a3b8', fontSize: 14 }}>No monitors configured for this status page.</p>
         ) : (
-          <div className="status-monitor-list">
-            {monitors.map(m => (
-              <StatusMonitorRow
-                key={m.id}
-                monitor={m}
-                uptimeSlots={uptimeData[m.id] || []}
-                uptimePercent={uptimePercent[m.id] ?? 100}
-              />
-            ))}
+          <div className="status-card-wrap">
+            <div className="status-monitor-list">
+              {monitors.map(m => (
+                <StatusMonitorRow
+                  key={m.id}
+                  monitor={m}
+                  uptimeSlots={uptimeData[m.id] || []}
+                  uptimePercent={uptimePercent[m.id] ?? 100}
+                />
+              ))}
+            </div>
           </div>
         )}
       </div>
