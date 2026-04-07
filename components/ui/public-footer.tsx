@@ -21,7 +21,7 @@ export function PublicFooter(): React.ReactElement {
                 <text x="10" y="30" fontFamily="system-ui,-apple-system,sans-serif" fontSize="16" fontWeight="800" fill="white" letterSpacing="0.5">
                   <tspan dy="0">U</tspan><tspan dy="-5">p</tspan>
                 </text>
-                <text x="46" y="34" fontFamily="system-ui,-apple-system,sans-serif" fontSize="28" fontWeight="700" fill="#ffffff" letterSpacing="-0.5">Uptrue</text>
+                <text x="46" y="34" fontFamily="system-ui,-apple-system,sans-serif" fontSize="28" fontWeight="700" fill="#0f172a" letterSpacing="-0.5">Uptrue</text>
               </svg>
             </Link>
             <p className="footer-desc">

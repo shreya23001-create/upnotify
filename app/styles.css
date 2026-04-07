@@ -4843,6 +4843,7 @@ html.dark .pub-nav { background: rgba(13,17,23,0.85); }
   font-size: 18px; font-weight: 800; color: var(--text-primary);
   text-decoration: none;
 }
+html.dark .nav-logo text:last-child { fill: #f1f5f9 !important; }
 .nav-logo-icon {
   width: 32px; height: 32px; background: var(--brand-gradient);
   border-radius: var(--radius-md);
