@@ -194,6 +194,8 @@ export function CompetitorDetail({ competitor, orgMonitors }: Props): React.Reac
   const [loading, setLoading] = useState(true)
   const [compareMonitorId, setCompareMonitorId] = useState<string>('')
   const [compareMonitor, setCompareMonitor] = useState<OrgMonitor | null>(null)
+  const [compareStats, setCompareStats] = useState<{ uptimePct: number; avgResponseMs: number | null; status: string } | null>(null)
+  const [compareLoading, setCompareLoading] = useState(false)
   const [aiLoading, setAiLoading] = useState(false)
   const [aiError, setAiError] = useState<string | null>(null)
   const [aiSummary, setAiSummary] = useState<string | null>(competitor.ai_summary)
@@ -216,11 +218,26 @@ export function CompetitorDetail({ competitor, orgMonitors }: Props): React.Reac
 
   useEffect(() => {
     if (compareMonitorId) {
-      setCompareMonitor(orgMonitors.find(m => m.id === compareMonitorId) ?? null)
+      const monitor = orgMonitors.find(m => m.id === compareMonitorId) ?? null
+      setCompareMonitor(monitor)
+      if (monitor) {
+        setCompareLoading(true)
+        setCompareStats(null)
+        fetch(`/api/v1/monitors/${compareMonitorId}/stats?days=${period}`)
+          .then(r => r.json())
+          .then((json: { success?: boolean; monitor?: { status: string }; stats?: { uptimePct: number; avgResponseMs: number | null } }) => {
+            if (json.success && json.stats && json.monitor) {
+              setCompareStats({ ...json.stats, status: json.monitor.status })
+            }
+          })
+          .catch(() => null)
+          .finally(() => setCompareLoading(false))
+      }
     } else {
       setCompareMonitor(null)
+      setCompareStats(null)
     }
-  }, [compareMonitorId, orgMonitors])
+  }, [compareMonitorId, orgMonitors, period])
 
   const canRefreshAi = !aiSummaryAt ||
     (Date.now() - new Date(aiSummaryAt).getTime()) > 24 * 3600000
@@ -361,8 +378,8 @@ export function CompetitorDetail({ competitor, orgMonitors }: Props): React.Reac
                     <div style={{ color: stats.uptimePct !== null && stats.uptimePct < 99 ? '#f59e0b' : '#22c55e' }}>
                       {stats.uptimePct !== null ? `${stats.uptimePct}%` : '--'}
                     </div>
-                    <div style={{ color: 'var(--text-muted)', fontStyle: 'italic', fontSize: 12 }}>
-                      See your monitors page
+                    <div style={{ color: compareLoading ? 'var(--text-muted)' : compareStats && compareStats.uptimePct < 99 ? '#f59e0b' : '#22c55e' }}>
+                      {compareLoading ? 'Loading...' : compareStats ? `${compareStats.uptimePct}%` : '--'}
                     </div>
                   </div>
                   <div className="comp-compare-row">
@@ -374,8 +391,12 @@ export function CompetitorDetail({ competitor, orgMonitors }: Props): React.Reac
                           : `${stats.avgResponseMs}ms`
                         : '--'}
                     </div>
-                    <div style={{ color: 'var(--text-muted)', fontStyle: 'italic', fontSize: 12 }}>
-                      See your monitors page
+                    <div style={{ color: 'var(--text-muted)' }}>
+                      {compareLoading ? 'Loading...' : compareStats?.avgResponseMs !== null && compareStats?.avgResponseMs !== undefined
+                        ? compareStats.avgResponseMs >= 1000
+                          ? `${(compareStats.avgResponseMs / 1000).toFixed(1)}s`
+                          : `${compareStats.avgResponseMs}ms`
+                        : '--'}
                     </div>
                   </div>
                   <div className="comp-compare-row">
@@ -383,8 +404,8 @@ export function CompetitorDetail({ competitor, orgMonitors }: Props): React.Reac
                     <div style={{ color: getStatusColor(competitor.last_status) }}>
                       {getStatusLabel(competitor.last_status)}
                     </div>
-                    <div style={{ color: 'var(--text-muted)', fontStyle: 'italic', fontSize: 12 }}>
-                      See your monitors page
+                    <div style={{ color: compareLoading ? 'var(--text-muted)' : getStatusColor(compareStats?.status ?? 'unknown') }}>
+                      {compareLoading ? 'Loading...' : compareStats ? getStatusLabel(compareStats.status) : '--'}
                     </div>
                   </div>
                 </div>

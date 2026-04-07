@@ -95,7 +95,8 @@ export function CompetitorDashboard({
     }
   }
 
-  async function handleDelete(id: string): Promise<void> {
+  async function handleDelete(id: string, displayName: string): Promise<void> {
+    if (!confirm(`Remove "${displayName}" from competitor monitoring? This will delete all check history for this competitor.`)) return
     try {
       const res = await fetch(`/api/v1/competitors?id=${id}&org_id=${orgId}`, {
         method: 'DELETE',
@@ -198,7 +199,7 @@ export function CompetitorDashboard({
                 </Link>
                 <button
                   className="btn-icon-sm"
-                  onClick={() => handleDelete(comp.id)}
+                  onClick={() => handleDelete(comp.id, comp.display_name)}
                   title="Remove competitor"
                   aria-label={`Remove ${comp.display_name}`}
                 >
@@ -235,6 +236,12 @@ export function CompetitorDashboard({
                   </span>
                 </div>
               </div>
+              <Link
+                href={`/dashboard/competitors/${comp.id}`}
+                className="competitor-card-view-link"
+              >
+                View charts &amp; history →
+              </Link>
             </div>
           ))}
         </div>

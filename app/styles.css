@@ -2062,6 +2062,8 @@ html.dark .landing-cta { background: linear-gradient(135deg, #1a1d27 0%, #242736
 .competitor-stat-value { font-size: 15px; font-weight: 700; color: var(--text-primary); }
 .btn-icon-sm { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 18px; color: var(--text-muted); transition: all 0.2s; background: transparent; border: none; cursor: pointer; }
 .btn-icon-sm:hover { background: var(--bg-hover); color: var(--color-danger, #ef4444); }
+.competitor-card-view-link { display: block; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border-color); font-size: 13px; font-weight: 500; color: var(--color-primary, #3b82f6); text-decoration: none; transition: color 0.15s; }
+.competitor-card-view-link:hover { color: var(--color-primary-dark, #2563eb); }
 .status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
 .page-subtitle { font-size: 15px; color: var(--text-secondary); margin-top: 4px; }
 
