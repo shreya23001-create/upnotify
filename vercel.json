@@ -14,7 +14,7 @@
     },
     {
       "path": "/api/cron/compete-checks",
-      "schedule": "0 * * * *"
+      "schedule": "0 0 * * *"
     },
     {
       "path": "/api/cron/compete-brief",
@@ -46,7 +46,7 @@
     },
     {
       "path": "/api/cron/competitor-checks",
-      "schedule": "0 * * * *"
+      "schedule": "0 0 * * *"
     }
   ]
 }
