@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 
 interface FeatureCard {
   cat: string
@@ -117,17 +117,30 @@ const TABS = [
   )},
 ]
 
-const CARD_VISIBLE = 3.5
-
 export function FeatureCarousel(): React.ReactElement {
   const [activeCat, setActiveCat] = useState('all')
   const [offset, setOffset] = useState(0)
+  const [cardW, setCardW] = useState(300)
   const trackRef = useRef<HTMLDivElement>(null)
+  const outerRef = useRef<HTMLDivElement>(null)
 
   const visible = activeCat === 'all' ? CARDS : CARDS.filter(c => c.cat === activeCat || c.cat === 'Coming Soon')
   const total = visible.length
-  const cardW = 280 + 20 // card width + gap
-  const maxOffset = Math.max(0, total - Math.floor(CARD_VISIBLE))
+  const maxOffset = Math.max(0, total - 3)
+
+  const measureCard = useCallback(() => {
+    const first = trackRef.current?.children[0] as HTMLElement | undefined
+    if (first) {
+      const gap = 16 // --space-4
+      setCardW(first.offsetWidth + gap)
+    }
+  }, [])
+
+  useEffect(() => {
+    measureCard()
+    window.addEventListener('resize', measureCard)
+    return () => window.removeEventListener('resize', measureCard)
+  }, [measureCard, visible.length])
 
   function move(dir: number): void {
     setOffset(prev => Math.min(maxOffset, Math.max(0, prev + dir)))
@@ -159,14 +172,14 @@ export function FeatureCarousel(): React.ReactElement {
 
       {/* Carousel */}
       <div className="feature-carousel-wrap">
-        <button className="carousel-arrow prev" onClick={() => move(-1)} disabled={offset === 0} aria-label="Previous">
+        <button className={`carousel-arrow prev${offset === 0 ? ' disabled' : ''}`} onClick={() => move(-1)} aria-label="Previous">
           <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
         </button>
-        <button className="carousel-arrow next" onClick={() => move(1)} disabled={offset >= maxOffset} aria-label="Next">
+        <button className={`carousel-arrow next${offset >= maxOffset ? ' disabled' : ''}`} onClick={() => move(1)} aria-label="Next">
           <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
 
-        <div className="feature-carousel-track-outer">
+        <div className="feature-carousel-track-outer" ref={outerRef}>
           <div
             className="feature-carousel-track"
             ref={trackRef}

@@ -63,7 +63,7 @@ export function LoginForm({ mode = 'login' }: { mode?: 'login' | 'signup' }) {
     <>
       {/* Returning banner — login only */}
       {mode === 'login' && (
-        <div className="auth-returning-banner">
+        <div className="auth-returning-banner show">
           <div className="auth-returning-dot" />
           <div className="auth-returning-text">Welcome back — your monitors are running</div>
         </div>

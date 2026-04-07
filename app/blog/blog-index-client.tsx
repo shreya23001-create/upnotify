@@ -88,7 +88,7 @@ function BlogIndexContent({ posts }: { posts: UnifiedPost[] }) {
       {/* Hero */}
       <div className="blog-hero">
         <div className="container">
-          <div className="blog-hero-inner" style={{ textAlign: 'center' }}>
+          <div className="blog-hero-inner">
             <div className="blog-hero-eyebrow">Uptrue Blog</div>
             <h1>Uptime, monitoring &amp;<br />reliability insights</h1>
             <p className="blog-hero-sub">
@@ -118,7 +118,7 @@ function BlogIndexContent({ posts }: { posts: UnifiedPost[] }) {
         {featuredPost && page === 1 && (
           <div className="blog-featured-wrap">
             <div className="blog-featured-label">Featured</div>
-            <Link href={`/blog/${featuredPost.slug}`} className="blog-featured-card preview-style">
+            <Link href={`/blog/${featuredPost.slug}`} className="blog-featured-card">
               <div
                 className="blog-featured-img"
                 style={{ background: gradient(featuredPost.category) }}
@@ -199,7 +199,7 @@ function BlogIndexContent({ posts }: { posts: UnifiedPost[] }) {
         ) : (
           <>
             {pagePosts.length > 0 && (
-              <div className="blog-posts-grid-preview">
+              <div className="blog-posts-grid">
                 {pagePosts.map(post => {
                   const bs = badgeStyle(post.category)
                   return (
