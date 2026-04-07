@@ -26,14 +26,21 @@ export function AuthLeftPanel(): React.ReactElement {
     <div className="auth-left">
       <AuthCanvas onSceneChange={handleSceneChange} />
 
-      {/* Logo */}
-      <Link href="/" className="auth-left-logo">
-        <div className="auth-left-logo-icon">
-          <svg width="15" height="15" fill="none" stroke="white" strokeWidth="2.5" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-          </svg>
-        </div>
-        Uptrue
+      {/* Logo — matches public nav */}
+      <Link href="/" className="auth-left-logo" aria-label="Uptrue home">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 50" height="28" aria-hidden="true">
+          <defs>
+            <linearGradient id="authNavG" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#3b82f6"/>
+              <stop offset="100%" stopColor="#06b6d4"/>
+            </linearGradient>
+          </defs>
+          <path d="M20 6 L36 12 L36 24 C36 32 28 38 20 42 C12 38 4 32 4 24 L4 12 Z" fill="url(#authNavG)"/>
+          <text x="10" y="30" fontFamily="system-ui,-apple-system,sans-serif" fontSize="16" fontWeight="800" fill="white" letterSpacing="0.5">
+            <tspan dy="0">U</tspan><tspan dy="-5">p</tspan>
+          </text>
+          <text x="46" y="34" fontFamily="system-ui,-apple-system,sans-serif" fontSize="28" fontWeight="700" fill="white" letterSpacing="-0.5">Uptrue</text>
+        </svg>
       </Link>
 
       {/* Decorative background */}

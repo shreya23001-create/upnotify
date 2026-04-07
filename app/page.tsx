@@ -399,6 +399,8 @@ export default function LandingPage(): React.ReactElement {
                 <tr><td>Starting price</td><td className="lp-col-uptrue"><span className="lp-comp-highlight">£10/yr Lite</span></td><td>$24/mo</td><td>$7/mo</td></tr>
                 <tr><td>GDPR · EU data storage</td><td className="lp-col-uptrue"><span className="lp-comp-yes">✓</span></td><td><span className="lp-comp-yes">✓</span></td><td><span className="lp-comp-no">—</span></td></tr>
                 <tr><td>AI outage blog auto-publish</td><td className="lp-col-uptrue"><span className="lp-comp-yes">✓</span></td><td><span className="lp-comp-no">—</span></td><td><span className="lp-comp-no">—</span></td></tr>
+                <tr><td>Public uptime leaderboard / tracker</td><td className="lp-col-uptrue"><span className="lp-comp-yes">✓</span></td><td><span className="lp-comp-no">—</span></td><td><span className="lp-comp-no">—</span></td></tr>
+                <tr><td>Free plan monitors</td><td className="lp-col-uptrue"><span className="lp-comp-highlight">3 free forever</span></td><td>1 monitor free</td><td>1 monitor free</td></tr>
               </tbody>
             </table>
           </div>

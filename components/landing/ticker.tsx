@@ -57,24 +57,11 @@ async function fetchTickerEvents(): Promise<TickerMonitor[]> {
 export async function Ticker(): Promise<React.ReactElement> {
   const monitors = await fetchTickerEvents()
 
-  // Fallback static events if DB is empty or not yet populated
-  const FALLBACK = [
-    { domain: 'github.com',       display_name: 'GitHub',       last_status: 'up',       last_checked_at: null, last_response_time_ms: 120 },
-    { domain: 'stripe.com',       display_name: 'Stripe',       last_status: 'degraded', last_checked_at: null, last_response_time_ms: null },
-    { domain: 'shopify.com',      display_name: 'Shopify',      last_status: 'up',       last_checked_at: null, last_response_time_ms: 98  },
-    { domain: 'vercel.com',       display_name: 'Vercel',       last_status: 'up',       last_checked_at: null, last_response_time_ms: 44  },
-    { domain: 'cloudflare.com',   display_name: 'Cloudflare',   last_status: 'up',       last_checked_at: null, last_response_time_ms: 61  },
-    { domain: 'notion.so',        display_name: 'Notion',       last_status: 'down',     last_checked_at: null, last_response_time_ms: null },
-    { domain: 'figma.com',        display_name: 'Figma',        last_status: 'up',       last_checked_at: null, last_response_time_ms: 110 },
-    { domain: 'slack.com',        display_name: 'Slack',        last_status: 'up',       last_checked_at: null, last_response_time_ms: 82  },
-    { domain: 'aws.amazon.com',   display_name: 'AWS',          last_status: 'degraded', last_checked_at: null, last_response_time_ms: null },
-    { domain: 'openai.com',       display_name: 'OpenAI',       last_status: 'up',       last_checked_at: null, last_response_time_ms: 135 },
-  ]
-
-  const events = monitors.length >= 6 ? monitors : FALLBACK
+  // Hide ticker entirely if DB has no live data yet
+  if (monitors.length === 0) return <></>
 
   // Double for seamless infinite scroll
-  const doubled = [...events, ...events]
+  const doubled = [...monitors, ...monitors]
 
   return (
     <div className="pub-ticker">
