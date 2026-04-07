@@ -8,6 +8,7 @@
 import { NextResponse } from 'next/server'
 import { getServerConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
+import { startCronRun, endCronRun, getTriggeredBy } from '@/lib/utils/cron-logger'
 import { getAoeSettings } from '@/lib/aoe/db/aoe-settings'
 import { insertDiscoveredSite, domainExists } from '@/lib/aoe/db/aoe-site-discovery'
 import { findContactEmail } from '@/lib/aoe/services/email-finder'
@@ -178,11 +179,15 @@ export async function GET(request: Request): Promise<NextResponse> {
     }
   }
 
+  const cronStart = Date.now()
+  const runId = await startCronRun('/api/cron/aoe/site-discovery', getTriggeredBy(request))
+
   try {
     // Check master kill switch
     const settings = await getAoeSettings()
     if (!settings.master_enabled) {
       logger.info('AOE site-discovery: skipped — master disabled')
+      await endCronRun(runId, cronStart, 'ok', { summary: 'skipped: master_disabled' })
       return NextResponse.json({ ok: true, skipped: true, reason: 'master_disabled' })
     }
 
@@ -226,6 +231,7 @@ export async function GET(request: Request): Promise<NextResponse> {
       totalAdded,
     })
 
+    await endCronRun(runId, cronStart, 'ok', { summary: `added: ${totalAdded} (ssl: ${sslAdded}, ecom: ${ecomAdded})` })
     return NextResponse.json({
       ok: true,
       sslDomains: sslDomains.length,
@@ -237,6 +243,7 @@ export async function GET(request: Request): Promise<NextResponse> {
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Unknown error'
     logger.error('AOE site-discovery error', { error: message })
+    await endCronRun(runId, cronStart, 'error', { errorMessage: message })
     return NextResponse.json({ error: 'Internal error' }, { status: 500 })
   }
 }

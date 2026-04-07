@@ -9,6 +9,7 @@ import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getServerConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
+import { startCronRun, endCronRun, getTriggeredBy } from '@/lib/utils/cron-logger'
 import { AOE_CONFIG } from '@/lib/aoe/config'
 import { getAoeSettings } from '@/lib/aoe/db/aoe-settings'
 import { getBurstQuota, incrementBurstSent, getOrCreateQuota } from '@/lib/aoe/db/aoe-email-quota'
@@ -59,8 +60,12 @@ export async function GET(request: Request): Promise<NextResponse> {
     }
   }
 
+  const cronStart = Date.now()
+  const runId = await startCronRun('/api/cron/aoe/last-day-burst', getTriggeredBy(request))
+
   // Only fire on last day of month
   if (!isLastDayOfMonth()) {
+    await endCronRun(runId, cronStart, 'ok', { summary: 'skipped: not_last_day' })
     return NextResponse.json({ ok: true, skipped: true, reason: 'not_last_day' })
   }
 
@@ -68,6 +73,7 @@ export async function GET(request: Request): Promise<NextResponse> {
     // Check master kill switch
     const settings = await getAoeSettings()
     if (!settings.master_enabled) {
+      await endCronRun(runId, cronStart, 'ok', { summary: 'skipped: master_disabled' })
       return NextResponse.json({ ok: true, skipped: true, reason: 'master_disabled' })
     }
 
@@ -75,6 +81,7 @@ export async function GET(request: Request): Promise<NextResponse> {
     const burstAvailable = await getBurstQuota()
     if (burstAvailable <= 0) {
       logger.info('AOE last-day-burst: no burst quota available')
+      await endCronRun(runId, cronStart, 'ok', { summary: 'skipped: no_burst_quota' })
       return NextResponse.json({ ok: true, skipped: true, reason: 'no_burst_quota', burstAvailable })
     }
 
@@ -88,6 +95,7 @@ export async function GET(request: Request): Promise<NextResponse> {
     // Get sites ready to email up to burst quota
     const sites = await getSitesReadyToEmail(burstAvailable)
     if (sites.length === 0) {
+      await endCronRun(runId, cronStart, 'ok', { summary: 'skipped: no_sites_ready' })
       return NextResponse.json({ ok: true, sent: 0, skipped: 0, reason: 'no_sites_ready' })
     }
 
@@ -158,10 +166,12 @@ export async function GET(request: Request): Promise<NextResponse> {
 
     logger.info('AOE last-day-burst completed', { sent, skipped, errors, burstAvailable })
 
+    await endCronRun(runId, cronStart, 'ok', { summary: `sent: ${sent}, skipped: ${skipped}, errors: ${errors}, burstAvailable: ${burstAvailable}` })
     return NextResponse.json({ ok: true, sent, skipped, errors, burstAvailable })
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Unknown error'
     logger.error('AOE last-day-burst error', { error: message })
+    await endCronRun(runId, cronStart, 'error', { errorMessage: message })
     return NextResponse.json({ error: 'Internal error' }, { status: 500 })
   }
 }

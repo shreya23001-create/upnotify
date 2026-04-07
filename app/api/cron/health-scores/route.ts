@@ -17,6 +17,7 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
+import { startCronRun, endCronRun, getTriggeredBy } from '@/lib/utils/cron-logger'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60
@@ -47,6 +48,9 @@ export async function GET(req: Request): Promise<NextResponse> {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
+  const cronStart = Date.now()
+  const runId = await startCronRun('/api/cron/health-scores', getTriggeredBy(req))
+
   const supabase = createAdminClient()
   const now = new Date()
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString()
@@ -76,6 +80,7 @@ export async function GET(req: Request): Promise<NextResponse> {
     ])
 
     if (!orgsRaw || orgsRaw.length === 0) {
+      await endCronRun(runId, cronStart, 'ok', { summary: 'skipped: no organisations found' })
       return NextResponse.json({ success: true, processed: 0 })
     }
 
@@ -210,10 +215,13 @@ export async function GET(req: Request): Promise<NextResponse> {
     }
 
     logger.info('Health scores computed', { count: updates.length })
+    await endCronRun(runId, cronStart, 'ok', { summary: `processed: ${updates.length}` })
     return NextResponse.json({ success: true, processed: updates.length, at: nowIso })
 
   } catch (error) {
-    logger.error('Health score cron failed', { error: String(error) })
-    return NextResponse.json({ success: false, error: String(error) }, { status: 500 })
+    const message = String(error)
+    logger.error('Health score cron failed', { error: message })
+    await endCronRun(runId, cronStart, 'error', { errorMessage: message })
+    return NextResponse.json({ success: false, error: message }, { status: 500 })
   }
 }

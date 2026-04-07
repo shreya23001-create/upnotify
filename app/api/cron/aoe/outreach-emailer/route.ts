@@ -9,6 +9,7 @@ import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getServerConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
+import { startCronRun, endCronRun, getTriggeredBy } from '@/lib/utils/cron-logger'
 import { AOE_CONFIG } from '@/lib/aoe/config'
 import { getAoeSettings } from '@/lib/aoe/db/aoe-settings'
 import { getQuotaState, incrementMarketingSent } from '@/lib/aoe/db/aoe-email-quota'
@@ -137,11 +138,15 @@ export async function GET(request: Request): Promise<NextResponse> {
     }
   }
 
+  const cronStart = Date.now()
+  const runId = await startCronRun('/api/cron/aoe/outreach-emailer', getTriggeredBy(request))
+
   try {
     // Check master kill switch
     const settings = await getAoeSettings()
     if (!settings.master_enabled) {
       logger.info('AOE outreach-emailer: skipped — master disabled')
+      await endCronRun(runId, cronStart, 'ok', { summary: 'skipped: master_disabled' })
       return NextResponse.json({ ok: true, skipped: true, reason: 'master_disabled' })
     }
 
@@ -152,12 +157,14 @@ export async function GET(request: Request): Promise<NextResponse> {
         status: quota?.status,
         remainingMarketing: quota?.remainingMarketing,
       })
+      await endCronRun(runId, cronStart, 'ok', { summary: 'skipped: quota_paused' })
       return NextResponse.json({ ok: true, skipped: true, reason: 'quota_paused' })
     }
 
     // How many can we send this run?
     const sendLimit = Math.min(BATCH_SIZE, quota.remainingMarketing)
     if (sendLimit <= 0) {
+      await endCronRun(runId, cronStart, 'ok', { summary: 'skipped: no_quota' })
       return NextResponse.json({ ok: true, skipped: true, reason: 'no_quota' })
     }
 
@@ -171,6 +178,7 @@ export async function GET(request: Request): Promise<NextResponse> {
     const sites = await getSitesReadyToEmail(sendLimit)
     if (sites.length === 0) {
       logger.info('AOE outreach-emailer: no sites ready')
+      await endCronRun(runId, cronStart, 'ok', { summary: 'skipped: no sites ready' })
       return NextResponse.json({ ok: true, sent: 0, skipped: 0 })
     }
 
@@ -204,10 +212,12 @@ export async function GET(request: Request): Promise<NextResponse> {
 
     logger.info('AOE outreach-emailer completed', { sent, skipped, errors })
 
+    await endCronRun(runId, cronStart, 'ok', { summary: `sent: ${sent}, skipped: ${skipped}, errors: ${errors}` })
     return NextResponse.json({ ok: true, sent, skipped, errors })
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Unknown error'
     logger.error('AOE outreach-emailer error', { error: message })
+    await endCronRun(runId, cronStart, 'error', { errorMessage: message })
     return NextResponse.json({ error: 'Internal error' }, { status: 500 })
   }
 }

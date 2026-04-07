@@ -5,6 +5,7 @@ import { evaluateRulesForPriceChange } from '@/lib/services/pricing-rules-engine
 import { sendUserMessage } from '@/lib/db/user-messages'
 import { getServerConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
+import { startCronRun, endCronRun, getTriggeredBy } from '@/lib/utils/cron-logger'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60
@@ -23,6 +24,9 @@ export async function GET(request: Request): Promise<NextResponse> {
     }
   }
 
+  const cronStart = Date.now()
+  const runId = await startCronRun('/api/cron/compete-checks', getTriggeredBy(request))
+
   try {
     const supabase = createAdminClient()
 
@@ -40,6 +44,7 @@ export async function GET(request: Request): Promise<NextResponse> {
 
     if (error || !products) {
       logger.error('Failed to fetch due products', { error: error?.message })
+      await endCronRun(runId, cronStart, 'error', { errorMessage: error?.message ?? 'Failed to fetch products' })
       return NextResponse.json({ error: 'Failed to fetch products' }, { status: 500 })
     }
 
@@ -174,11 +179,12 @@ export async function GET(request: Request): Promise<NextResponse> {
     }
 
     logger.info('Compete check cron completed', { checked, priceChanged, errors })
+    await endCronRun(runId, cronStart, 'ok', { summary: `checked: ${checked}, priceChanged: ${priceChanged}, errors: ${errors}` })
     return NextResponse.json({ ok: true, checked, priceChanged, errors })
   } catch (error) {
-    logger.error('Compete check cron error', {
-      error: error instanceof Error ? error.message : 'Unknown',
-    })
+    const message = error instanceof Error ? error.message : 'Unknown'
+    logger.error('Compete check cron error', { error: message })
+    await endCronRun(runId, cronStart, 'error', { errorMessage: message })
     return NextResponse.json({ error: 'Internal error' }, { status: 500 })
   }
 }

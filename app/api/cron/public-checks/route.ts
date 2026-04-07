@@ -15,6 +15,7 @@ import { sendBlogApprovalEmail } from '@/lib/services/email'
 import { sendBlogApprovalTelegram } from '@/lib/services/telegram'
 import { getServerConfig, getConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
+import { startCronRun, endCronRun, getTriggeredBy } from '@/lib/utils/cron-logger'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60
@@ -166,6 +167,9 @@ export async function GET(request: Request): Promise<NextResponse> {
     }
   }
 
+  const cronStart = Date.now()
+  const runId = await startCronRun('/api/cron/public-checks', getTriggeredBy(request))
+
   try {
     const allMonitors = await getActivePublicMonitors()
 
@@ -292,9 +296,12 @@ export async function GET(request: Request): Promise<NextResponse> {
     }
 
     logger.info('Public check runner completed', { total: monitors.length, down: downResults.length })
+    await endCronRun(runId, cronStart, 'ok', { summary: `checked: ${monitors.length}, down: ${downResults.length}` })
     return NextResponse.json({ ok: true, checked: monitors.length, down: downResults.length })
   } catch (error) {
-    logger.error('Public check runner error', { error: error instanceof Error ? error.message : 'Unknown' })
+    const message = error instanceof Error ? error.message : 'Unknown'
+    logger.error('Public check runner error', { error: message })
+    await endCronRun(runId, cronStart, 'error', { errorMessage: message })
     return NextResponse.json({ error: 'Internal error' }, { status: 500 })
   }
 }

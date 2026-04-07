@@ -4,6 +4,47 @@ import { createAdminClient } from '@/lib/supabase/admin'
 
 export const dynamic = 'force-dynamic'
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function untyped(client: unknown): any { return client }
+
+interface CronRun {
+  id: string
+  status: 'running' | 'ok' | 'error'
+  triggered_by: 'schedule' | 'manual'
+  duration_ms: number | null
+  result_summary: string | null
+  error_message: string | null
+  ran_at: string
+}
+
+async function getCronHistory(supabase: ReturnType<typeof createAdminClient>): Promise<Record<string, CronRun[]>> {
+  // Get last 5 runs per cron path in one query, ordered by ran_at desc
+  const { data } = await untyped(supabase)
+    .from('cron_run_log')
+    .select('id, cron_path, status, triggered_by, duration_ms, result_summary, error_message, ran_at')
+    .order('ran_at', { ascending: false })
+    .limit(200) // enough to cover 5 per cron × 13 crons with headroom
+
+  if (!data) return {}
+
+  const byPath: Record<string, CronRun[]> = {}
+  for (const row of data as (CronRun & { cron_path: string })[]) {
+    if (!byPath[row.cron_path]) byPath[row.cron_path] = []
+    if (byPath[row.cron_path].length < 5) {
+      byPath[row.cron_path].push({
+        id: row.id,
+        status: row.status,
+        triggered_by: row.triggered_by,
+        duration_ms: row.duration_ms,
+        result_summary: row.result_summary,
+        error_message: row.error_message,
+        ran_at: row.ran_at,
+      })
+    }
+  }
+  return byPath
+}
+
 async function isAdmin(): Promise<boolean> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -27,6 +68,9 @@ export async function GET(): Promise<NextResponse> {
 
   const supabase = createAdminClient()
   const now = Date.now()
+
+  // ── Cron run history (last 5 per cron) ───────────────────────────────────────
+  const cronHistory = await getCronHistory(supabase)
 
   // ── Database health ───────────────────────────────────────────────────────
   const dbStart = Date.now()
@@ -142,6 +186,7 @@ export async function GET(): Promise<NextResponse> {
         path: '/api/cron/check-runner',
         lastRun: lastUserCheck?.data?.checked_at ?? null,
         status: cronStatus(lastUserCheck?.data?.checked_at ?? null, 70, now),
+        history: cronHistory['/api/cron/check-runner'] ?? [],
       },
       publicChecks: {
         label: 'Public Checks',
@@ -149,6 +194,7 @@ export async function GET(): Promise<NextResponse> {
         path: '/api/cron/public-checks',
         lastRun: lastPublicCheck?.data?.checked_at ?? null,
         status: cronStatus(lastPublicCheck?.data?.checked_at ?? null, 15, now),
+        history: cronHistory['/api/cron/public-checks'] ?? [],
       },
       nurtureEmails: {
         label: 'Nurture Emails',
@@ -156,6 +202,7 @@ export async function GET(): Promise<NextResponse> {
         path: '/api/cron/nurture-emails',
         lastRun: lastNurtureEmail?.data?.sent_at ?? null,
         status: cronStatus(lastNurtureEmail?.data?.sent_at ?? null, 1500, now),
+        history: cronHistory['/api/cron/nurture-emails'] ?? [],
       },
       healthScores: {
         label: 'Health Scores',
@@ -163,6 +210,7 @@ export async function GET(): Promise<NextResponse> {
         path: '/api/cron/health-scores',
         lastRun: healthScoreAt,
         status: cronStatus(healthScoreAt, 10080, now),
+        history: cronHistory['/api/cron/health-scores'] ?? [],
       },
       competeChecks: {
         label: 'Compete Price Checks',
@@ -170,6 +218,7 @@ export async function GET(): Promise<NextResponse> {
         path: '/api/cron/compete-checks',
         lastRun: lastCompeteCheck?.data?.checked_at ?? null,
         status: cronStatus(lastCompeteCheck?.data?.checked_at ?? null, 70, now),
+        history: cronHistory['/api/cron/compete-checks'] ?? [],
       },
       competeBrief: {
         label: 'Compete Weekly Brief',
@@ -177,6 +226,7 @@ export async function GET(): Promise<NextResponse> {
         path: '/api/cron/compete-brief',
         lastRun: lastCompeteBrief?.data?.created_at ?? null,
         status: cronStatus(lastCompeteBrief?.data?.created_at ?? null, 10080, now),
+        history: cronHistory['/api/cron/compete-brief'] ?? [],
       },
       aoeQuotaManager: {
         label: 'AOE Quota Manager',
@@ -184,6 +234,7 @@ export async function GET(): Promise<NextResponse> {
         path: '/api/cron/aoe/quota-manager',
         lastRun: lastAoeQuota?.data?.calculated_at ?? null,
         status: cronStatus(lastAoeQuota?.data?.calculated_at ?? null, 1500, now),
+        history: cronHistory['/api/cron/aoe/quota-manager'] ?? [],
       },
       aoeSiteDiscovery: {
         label: 'AOE Site Discovery',
@@ -191,6 +242,7 @@ export async function GET(): Promise<NextResponse> {
         path: '/api/cron/aoe/site-discovery',
         lastRun: lastAoeDiscovery?.data?.discovered_at ?? null,
         status: cronStatus(lastAoeDiscovery?.data?.discovered_at ?? null, 10080, now),
+        history: cronHistory['/api/cron/aoe/site-discovery'] ?? [],
       },
       aoeOutreachChecker: {
         label: 'AOE Outreach Checker',
@@ -198,6 +250,7 @@ export async function GET(): Promise<NextResponse> {
         path: '/api/cron/aoe/outreach-checker',
         lastRun: lastAoeOutreachChecker?.data?.checked_at ?? null,
         status: cronStatus(lastAoeOutreachChecker?.data?.checked_at ?? null, 1500, now),
+        history: cronHistory['/api/cron/aoe/outreach-checker'] ?? [],
       },
       aoeOutreachEmailer: {
         label: 'AOE Outreach Emailer',
@@ -205,6 +258,7 @@ export async function GET(): Promise<NextResponse> {
         path: '/api/cron/aoe/outreach-emailer',
         lastRun: lastAoeEmailer?.data?.sent_at ?? null,
         status: cronStatus(lastAoeEmailer?.data?.sent_at ?? null, 1500, now),
+        history: cronHistory['/api/cron/aoe/outreach-emailer'] ?? [],
       },
       aoeLastDayBurst: {
         label: 'AOE Last Day Burst',
@@ -212,6 +266,7 @@ export async function GET(): Promise<NextResponse> {
         path: '/api/cron/aoe/last-day-burst',
         lastRun: lastAoeLastDay?.data?.sent_at ?? null,
         status: cronStatus(lastAoeLastDay?.data?.sent_at ?? null, 1500, now),
+        history: cronHistory['/api/cron/aoe/last-day-burst'] ?? [],
       },
       aoeDailySnapshot: {
         label: 'AOE Daily Snapshot',
@@ -219,6 +274,7 @@ export async function GET(): Promise<NextResponse> {
         path: '/api/cron/aoe/daily-snapshot',
         lastRun: snapshotDate,
         status: cronStatus(snapshotDate, 1500, now),
+        history: cronHistory['/api/cron/aoe/daily-snapshot'] ?? [],
       },
       competitorChecks: {
         label: 'Competitor Checks',
@@ -226,6 +282,7 @@ export async function GET(): Promise<NextResponse> {
         path: '/api/cron/competitor-checks',
         lastRun: lastCompetitorCheck?.data?.checked_at ?? null,
         status: cronStatus(lastCompetitorCheck?.data?.checked_at ?? null, 70, now),
+        history: cronHistory['/api/cron/competitor-checks'] ?? [],
       },
     },
 

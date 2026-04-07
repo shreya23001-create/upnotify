@@ -4,6 +4,7 @@ import { sendUserMessage } from '@/lib/db/user-messages'
 import { sendAlertEmail } from '@/lib/services/email'
 import { getServerConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
+import { startCronRun, endCronRun, getTriggeredBy } from '@/lib/utils/cron-logger'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60
@@ -25,6 +26,9 @@ export async function GET(request: Request): Promise<NextResponse> {
     }
   }
 
+  const cronStart = Date.now()
+  const runId = await startCronRun('/api/cron/compete-brief', getTriggeredBy(request))
+
   try {
     const supabase = createAdminClient()
     const oneWeekAgo = new Date(Date.now() - 7 * 86400000).toISOString()
@@ -36,6 +40,7 @@ export async function GET(request: Request): Promise<NextResponse> {
       .eq('status', 'active')
 
     if (!competeSubs || competeSubs.length === 0) {
+      await endCronRun(runId, cronStart, 'ok', { summary: 'skipped: no active compete subscriptions' })
       return NextResponse.json({ ok: true, briefsSent: 0, reason: 'No active compete subscriptions' })
     }
 
@@ -56,11 +61,12 @@ export async function GET(request: Request): Promise<NextResponse> {
     }
 
     logger.info('Compete weekly brief cron completed', { briefsSent })
+    await endCronRun(runId, cronStart, 'ok', { summary: `briefsSent: ${briefsSent}` })
     return NextResponse.json({ ok: true, briefsSent })
   } catch (error) {
-    logger.error('Compete brief cron error', {
-      error: error instanceof Error ? error.message : 'Unknown',
-    })
+    const message = error instanceof Error ? error.message : 'Unknown'
+    logger.error('Compete brief cron error', { error: message })
+    await endCronRun(runId, cronStart, 'error', { errorMessage: message })
     return NextResponse.json({ error: 'Internal error' }, { status: 500 })
   }
 }

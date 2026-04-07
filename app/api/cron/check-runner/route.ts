@@ -7,6 +7,7 @@ import { dispatchChecker } from '@/lib/services/checker'
 import { dispatchAlerts, dispatchRecoveryAlerts } from '@/lib/services/alert-dispatcher'
 import { getServerConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
+import { startCronRun, endCronRun, getTriggeredBy } from '@/lib/utils/cron-logger'
 import type { Monitor } from '@/lib/types'
 import type { CheckerResult } from '@/lib/checkers/types'
 
@@ -33,6 +34,9 @@ export async function GET(request: Request): Promise<NextResponse> {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
   }
+
+  const cronStart = Date.now()
+  const runId = await startCronRun('/api/cron/check-runner', getTriggeredBy(request))
 
   try {
     const { searchParams } = new URL(request.url)
@@ -181,9 +185,12 @@ export async function GET(request: Request): Promise<NextResponse> {
     const down = downResults.length
     logger.info('Check runner completed', { total, down })
 
+    await endCronRun(runId, cronStart, 'ok', { summary: `checked: ${total}, down: ${down}` })
     return NextResponse.json({ ok: true, checked: total, down })
   } catch (error) {
-    logger.error('Check runner error', { error: error instanceof Error ? error.message : 'Unknown' })
+    const message = error instanceof Error ? error.message : 'Unknown'
+    logger.error('Check runner error', { error: message })
+    await endCronRun(runId, cronStart, 'error', { errorMessage: message })
     return NextResponse.json({ error: 'Internal error' }, { status: 500 })
   }
 }

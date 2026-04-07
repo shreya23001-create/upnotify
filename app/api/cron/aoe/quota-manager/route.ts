@@ -9,6 +9,7 @@ import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getServerConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
+import { startCronRun, endCronRun, getTriggeredBy } from '@/lib/utils/cron-logger'
 import { AOE_CONFIG } from '@/lib/aoe/config'
 import { upsertQuota, getCurrentMonth, getOrCreateQuota } from '@/lib/aoe/db/aoe-email-quota'
 import { sendEmail } from '@/lib/services/email'
@@ -28,6 +29,9 @@ export async function GET(request: Request): Promise<NextResponse> {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
   }
+
+  const cronStart = Date.now()
+  const runId = await startCronRun('/api/cron/aoe/quota-manager', getTriggeredBy(request))
 
   try {
     const supabase = createAdminClient()
@@ -151,10 +155,12 @@ export async function GET(request: Request): Promise<NextResponse> {
       adminAlertSent,
     })
 
+    await endCronRun(runId, cronStart, 'ok', { summary: `month: ${month}, status: ${status}, availableMarketing: ${availableMarketing}, usage: ${Math.round(usagePercent * 100)}%` })
     return NextResponse.json({ ok: true, ...result })
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Unknown error'
     logger.error('AOE quota-manager error', { error: message })
+    await endCronRun(runId, cronStart, 'error', { errorMessage: message })
     return NextResponse.json({ error: 'Internal error' }, { status: 500 })
   }
 }

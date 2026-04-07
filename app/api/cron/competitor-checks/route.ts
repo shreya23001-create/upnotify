@@ -27,6 +27,7 @@ import {
 import { sendUserMessage } from '@/lib/db/user-messages'
 import { getServerConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
+import { startCronRun, endCronRun, getTriggeredBy } from '@/lib/utils/cron-logger'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60
@@ -50,11 +51,15 @@ export async function GET(request: Request): Promise<NextResponse> {
     }
   }
 
+  const cronStart = Date.now()
+  const runId = await startCronRun('/api/cron/competitor-checks', getTriggeredBy(request))
+
   try {
     const competitors = await getAllCompetitorMonitors()
     logger.info('Competitor checks cron started', { count: competitors.length })
 
     if (competitors.length === 0) {
+      await endCronRun(runId, cronStart, 'ok', { summary: 'skipped: no competitor monitors' })
       return NextResponse.json({ ok: true, checked: 0 })
     }
 
@@ -200,12 +205,13 @@ export async function GET(request: Request): Promise<NextResponse> {
     }
 
     logger.info('Competitor checks cron complete', { checked, alertsFired, errors })
+    await endCronRun(runId, cronStart, 'ok', { summary: `checked: ${checked}, alertsFired: ${alertsFired}, errors: ${errors}` })
     return NextResponse.json({ ok: true, checked, alertsFired, errors })
 
   } catch (err) {
-    logger.error('Competitor checks cron failed', {
-      error: err instanceof Error ? err.message : String(err),
-    })
+    const message = err instanceof Error ? err.message : String(err)
+    logger.error('Competitor checks cron failed', { error: message })
+    await endCronRun(runId, cronStart, 'error', { errorMessage: message })
     return NextResponse.json({ error: 'Internal error' }, { status: 500 })
   }
 }

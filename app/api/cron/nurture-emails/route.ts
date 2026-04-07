@@ -9,6 +9,7 @@ import { sendPauseReminders } from '@/lib/services/plan-enforcement'
 import { getEmailRateStatus } from '@/lib/services/email'
 import { getServerConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
+import { startCronRun, endCronRun, getTriggeredBy } from '@/lib/utils/cron-logger'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60
@@ -42,6 +43,9 @@ export async function GET(request: Request): Promise<NextResponse> {
     }
   }
 
+  const cronStart = Date.now()
+  const runId = await startCronRun('/api/cron/nurture-emails', getTriggeredBy(request))
+
   try {
     const rateStatus = getEmailRateStatus()
     const availableBudget = Math.min(NURTURE_BUDGET, rateStatus.remaining)
@@ -51,6 +55,7 @@ export async function GET(request: Request): Promise<NextResponse> {
         sent: rateStatus.sent,
         limit: rateStatus.limit,
       })
+      await endCronRun(runId, cronStart, 'ok', { summary: 'skipped: no email budget remaining' })
       return NextResponse.json({
         ok: true,
         message: 'No email budget remaining',
@@ -151,10 +156,12 @@ export async function GET(request: Request): Promise<NextResponse> {
     const pauseResult = await sendPauseReminders()
     logger.info('Pause reminders sent', { count: pauseResult.sent })
 
+    await endCronRun(runId, cronStart, 'ok', { summary: `processed: ${result.processed}, sent: ${result.sent}, errors: ${result.errors}, pauseReminders: ${pauseResult.sent}` })
     return NextResponse.json({ ok: true, ...result, pauseReminders: pauseResult.sent })
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Unknown error'
     logger.error('Nurture cron error', { error: message })
+    await endCronRun(runId, cronStart, 'error', { errorMessage: message })
     return NextResponse.json({ error: 'Internal error' }, { status: 500 })
   }
 }

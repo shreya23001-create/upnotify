@@ -8,6 +8,7 @@ import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getServerConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
+import { startCronRun, endCronRun, getTriggeredBy } from '@/lib/utils/cron-logger'
 import { AOE_CONFIG } from '@/lib/aoe/config'
 import { getCurrentMonth, getQuotaForDashboard } from '@/lib/aoe/db/aoe-email-quota'
 import { getAoeCampaignStats } from '@/lib/aoe/db/aoe-outreach-log'
@@ -250,6 +251,9 @@ export async function GET(request: Request): Promise<NextResponse> {
     }
   }
 
+  const cronStart = Date.now()
+  const runId = await startCronRun('/api/cron/aoe/daily-snapshot', getTriggeredBy(request))
+
   try {
     const supabase = createAdminClient()
     const month    = getCurrentMonth()
@@ -297,6 +301,7 @@ export async function GET(request: Request): Promise<NextResponse> {
 
     if (adminEmails.length === 0) {
       logger.warn('AOE daily-snapshot: no ADMIN_EMAILS configured')
+      await endCronRun(runId, cronStart, 'ok', { summary: 'skipped: no_admin_emails' })
       return NextResponse.json({ ok: true, skipped: true, reason: 'no_admin_emails' })
     }
 
@@ -304,10 +309,12 @@ export async function GET(request: Request): Promise<NextResponse> {
 
     logger.info('AOE daily-snapshot sent', { to: adminEmails[0], date })
 
+    await endCronRun(runId, cronStart, 'ok', { summary: `snapshot sent for ${date}` })
     return NextResponse.json({ ok: true, date, month })
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Unknown error'
     logger.error('AOE daily-snapshot error', { error: message })
+    await endCronRun(runId, cronStart, 'error', { errorMessage: message })
     return NextResponse.json({ error: 'Internal error' }, { status: 500 })
   }
 }

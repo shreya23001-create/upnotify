@@ -55,7 +55,9 @@ export async function POST(request: Request): Promise<NextResponse> {
   const protocol = host.startsWith('localhost') ? 'http' : 'https'
   const targetUrl = `${protocol}://${host}${cronPath}`
 
-  const headers: Record<string, string> = {}
+  const headers: Record<string, string> = {
+    'x-cron-trigger': 'manual',
+  }
   if (cronSecret) {
     headers['Authorization'] = `Bearer ${cronSecret}`
   }
