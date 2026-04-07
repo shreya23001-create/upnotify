@@ -41,16 +41,28 @@ export default async function DashboardPage(): Promise<React.ReactElement> {
 
   return (
     <div>
-      <h1 className="page-title" style={{ marginBottom: 24 }}>Dashboard</h1>
+      {/* Page header with date */}
+      <div className="page-header" style={{ marginBottom: 24 }}>
+        <div>
+          <h1 className="page-title">Dashboard</h1>
+          <p className="page-subtitle">
+            {new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+          </p>
+        </div>
+      </div>
 
+      {/* Onboarding checklist */}
       <div style={{ marginBottom: 24 }}>
         <OnboardingChecklist hasMonitors={stats.total > 0} hasAlertChannels={alertChannels.length > 0} hasStatusPages={statusPages.length > 0} />
       </div>
 
+      {/* Stats */}
       <StatsCards stats={stats} />
 
+      {/* Charts */}
       <DashboardCharts stats={stats} incidents={incidents} checkResults={checkResults} />
 
+      {/* Warnings — paused monitors / disabled channels */}
       {(pausedMonitors.length > 0 || disabledChannels.length > 0) && (
         <div className="grid-2" style={{ marginBottom: 24 }}>
           {pausedMonitors.length > 0 && <PausedMonitors monitors={pausedMonitors} />}
@@ -58,6 +70,7 @@ export default async function DashboardPage(): Promise<React.ReactElement> {
         </div>
       )}
 
+      {/* Recent incidents */}
       <div className="grid-2">
         <RecentIncidents incidents={incidents} />
       </div>
