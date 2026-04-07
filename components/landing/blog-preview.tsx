@@ -84,7 +84,7 @@ export async function BlogPreview(): Promise<React.ReactElement> {
           {posts.map(post => {
             const bs = badgeStyle(post.category)
             return (
-              <Link key={post.slug} href={`/blog/${post.slug}`} className="blog-card">
+              <Link key={post.slug} href={`/blog/${post.slug}`} className="blog-card" style={{ '--card-gradient': gradient(post.category) } as React.CSSProperties}>
                 <div className="blog-card-image" style={{ background: gradient(post.category) }} />
                 <div className="blog-card-body">
                   <div className="blog-card-meta">

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import Link from 'next/link'
 
 function fmt(n: number): string {
@@ -10,6 +10,24 @@ function fmt(n: number): string {
 export function DowntimeCalculator(): React.ReactElement {
   const [revenue, setRevenue] = useState(50000)
   const [hours, setHours] = useState(2)
+  const cardRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const card = cardRef.current
+    if (!card) return
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          card.classList.add('buzz')
+          card.addEventListener('animationend', () => card.classList.remove('buzz'), { once: true })
+          observer.disconnect()
+        }
+      },
+      { threshold: 0.25 }
+    )
+    observer.observe(card)
+    return () => observer.disconnect()
+  }, [])
 
   const calc = useCallback(() => {
     const hourlyRevenue = revenue / (30 * 24)
@@ -39,7 +57,7 @@ export function DowntimeCalculator(): React.ReactElement {
           </p>
         </div>
 
-        <div className="calculator-card">
+        <div className="calculator-card" ref={cardRef}>
           {/* Fear callout */}
           <div className="calc-fear-intro">
             <div className="calc-fear-icon">⚠️</div>
