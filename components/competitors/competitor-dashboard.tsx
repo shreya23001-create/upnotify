@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import type { CompetitorMonitor } from '@/lib/db/competitor-monitors'
 
 interface CompetitorDashboardProps {
@@ -188,13 +189,13 @@ export function CompetitorDashboard({
           {items.map((comp) => (
             <div key={comp.id} className="card competitor-card">
               <div className="competitor-card-header">
-                <div className="competitor-card-status">
+                <Link href={`/dashboard/competitors/${comp.id}`} className="competitor-card-status" style={{ textDecoration: 'none', flex: 1 }}>
                   <span
                     className="status-dot"
                     style={{ background: getStatusColor(comp.last_status) }}
                   />
                   <span className="competitor-card-name">{comp.display_name}</span>
-                </div>
+                </Link>
                 <button
                   className="btn-icon-sm"
                   onClick={() => handleDelete(comp.id)}

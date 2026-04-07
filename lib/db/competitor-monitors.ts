@@ -318,6 +318,62 @@ export async function getAllCompetitorMonitors(): Promise<CompetitorMonitor[]> {
   return (data ?? []) as unknown as CompetitorMonitor[]
 }
 
+/** Update AI summary after generation. */
+export async function updateCompetitorAiSummary(
+  id: string,
+  summary: string
+): Promise<void> {
+  const supabase = createAdminClient()
+  const { error } = await untyped(supabase)
+    .from('competitor_monitors')
+    .update({ ai_summary: summary, ai_summary_at: new Date().toISOString() })
+    .eq('id', id)
+
+  if (error) {
+    logger.error('Failed to update competitor AI summary', { error: error.message, id })
+  }
+}
+
+/**
+ * Get daily aggregated check results for the uptime bar chart.
+ * Returns one entry per day with counts of up/down/degraded checks.
+ * Used for 90-day bar chart on detail page.
+ */
+export async function getCompetitorDailyStats(
+  competitorId: string,
+  orgId: string,
+  days = 90
+): Promise<{ date: string; up: number; down: number; degraded: number; total: number }[]> {
+  const supabase = await createClient()
+  const since = new Date(Date.now() - days * 86400000).toISOString()
+
+  const { data, error } = await untyped(supabase)
+    .from('competitor_check_results')
+    .select('status, checked_at')
+    .eq('competitor_id', competitorId)
+    .eq('org_id', orgId)
+    .gte('checked_at', since)
+    .order('checked_at', { ascending: true })
+
+  if (error || !data) return []
+
+  // Group by UTC date
+  const byDate: Record<string, { up: number; down: number; degraded: number }> = {}
+  for (const row of data as { status: string; checked_at: string }[]) {
+    const date = row.checked_at.slice(0, 10) // YYYY-MM-DD
+    if (!byDate[date]) byDate[date] = { up: 0, down: 0, degraded: 0 }
+    if (row.status === 'up') byDate[date].up++
+    else if (row.status === 'down') byDate[date].down++
+    else if (row.status === 'degraded') byDate[date].degraded++
+  }
+
+  return Object.entries(byDate).map(([date, counts]) => ({
+    date,
+    ...counts,
+    total: counts.up + counts.down + counts.degraded,
+  }))
+}
+
 /**
  * Get all active user IDs for an org — used to send in-app notifications.
  */
