@@ -73,14 +73,14 @@ export async function Ticker(): Promise<React.ReactElement> {
             const msg = statusToMsg(ev.last_status)
             const when = timeAgo(ev.last_checked_at)
             return (
-              <div key={i} className={`ticker-event ${type}`}>
+              <a key={i} href={`/tracker/${ev.domain}`} className={`ticker-event ${type}`} style={{ textDecoration: 'none', cursor: 'pointer' }}>
                 <span className={`ticker-dot ${type}`} />
                 <strong>{ev.display_name}</strong>
                 {' — '}
                 {msg}
                 {' '}
                 <span className="ticker-time">{when}</span>
-              </div>
+              </a>
             )
           })}
         </div>

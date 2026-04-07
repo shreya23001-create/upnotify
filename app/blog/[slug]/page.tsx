@@ -184,9 +184,23 @@ export default async function DynamicBlogPost({ params }: { params: Promise<{ sl
 
   const bodyHtml = markdownToHtml(body)
 
+  const CARD_GRADIENTS: Record<string, string> = {
+    Guide: 'linear-gradient(135deg,#8b5cf6,#3b82f6)',
+    Security: 'linear-gradient(135deg,#ef4444,#f59e0b)',
+    Performance: 'linear-gradient(135deg,#10b981,#06b6d4)',
+    Ecommerce: 'linear-gradient(135deg,#f59e0b,#ec4899)',
+    'Incident Report': 'linear-gradient(135deg,#ef4444,#7c3aed)',
+    Agency: 'linear-gradient(135deg,#0c1322,#3b82f6)',
+    WordPress: 'linear-gradient(135deg,#3b82f6,#06b6d4)',
+    Hosting: 'linear-gradient(135deg,#10b981,#3b82f6)',
+    Outage: 'linear-gradient(135deg,#ef4444,#7c3aed)',
+  }
+  const heroGradient = CARD_GRADIENTS[post.category ?? ''] ?? 'linear-gradient(135deg,#3b82f6,#06b6d4)'
+
   return (
     <div className="blog-article-wrap">
     <article className="blog-article">
+      <div className="blog-article-hero" style={{ background: heroGradient }} aria-hidden="true" />
       <header className="blog-article-header">
         <div className="blog-article-meta-top">
           {post.category && (
