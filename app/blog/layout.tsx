@@ -24,7 +24,7 @@ export default function BlogLayout({ children }: { children: React.ReactNode }):
   return (
     <div className="blog-layout">
       <PublicNav />
-      <main className="blog-main" style={{ paddingTop: 64 }}>{children}</main>
+      <main className="blog-main" style={{ paddingTop: 64, paddingLeft: 0, paddingRight: 0 }}>{children}</main>
       <PublicFooter />
     </div>
   )

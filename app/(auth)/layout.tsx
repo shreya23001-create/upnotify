@@ -18,10 +18,33 @@ export default function AuthLayout({ children }: { children: React.ReactNode }):
             <span className="auth-brand-logo-name">Uptrue</span>
           </Link>
 
+          {/* Plan pills */}
+          <div className="auth-plan-pills">
+            <span className="auth-plan-pill free">Free</span>
+            <span className="auth-plan-pill starter">Starter £19/mo</span>
+            <span className="auth-plan-pill pro">Pro £49/mo</span>
+          </div>
+
           {/* Headline */}
           <div className="auth-brand-headline">
             <h1>Know when your sites go down.</h1>
             <p>Before your customers do.</p>
+          </div>
+
+          {/* Proof stats */}
+          <div className="auth-proof-stats">
+            <div className="auth-proof-stat">
+              <div className="auth-proof-stat-num">60s</div>
+              <div className="auth-proof-stat-lbl">Check interval</div>
+            </div>
+            <div className="auth-proof-stat">
+              <div className="auth-proof-stat-num">10+</div>
+              <div className="auth-proof-stat-lbl">Monitor types</div>
+            </div>
+            <div className="auth-proof-stat">
+              <div className="auth-proof-stat-num">99.9%</div>
+              <div className="auth-proof-stat-lbl">Platform uptime</div>
+            </div>
           </div>
 
           {/* Feature list */}

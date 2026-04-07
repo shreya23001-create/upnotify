@@ -11,6 +11,7 @@ import { CheckResultsHistory } from '@/components/monitors/check-results-history
 import { MonitorUptimeBars } from '@/components/monitors/monitor-uptime-bars'
 import { BadgeEmbed } from '@/components/monitors/badge-embed'
 import { KeywordResultsDisplay } from '@/components/monitors/keyword-results-display'
+import { CopyUrlButton } from '@/components/monitors/copy-url-button'
 
 interface KeywordMonitorConfig {
   positiveKeywords?: string[]
@@ -88,7 +89,10 @@ export default async function MonitorDetailPage({
             <MonitorStatusBadge status={monitor.status} />
             <span className="monitor-type-badge">{monitor.type}</span>
           </div>
-          <div className="monitor-header-v2-url">{monitor.target}</div>
+          <div className="monitor-target-row">
+            <div className="monitor-header-v2-url">{monitor.target}</div>
+            <CopyUrlButton url={monitor.target} />
+          </div>
         </div>
         <div className="monitor-header-v2-right">
           <span className="monitor-interval-chip">
@@ -150,19 +154,36 @@ export default async function MonitorDetailPage({
         <div className="card">
           <div className="card-header"><div className="card-title">Configuration</div></div>
           <div className="card-content">
-            <div className="info-row"><span className="info-row-label">Type</span><span className="info-row-value">{monitor.type}</span></div>
-            <div className="info-row"><span className="info-row-label">Target</span><span className="info-row-value" style={{ textTransform: 'none', fontFamily: 'var(--font-mono, monospace)', fontSize: 12 }}>{monitor.target}</span></div>
-            <div className="info-row"><span className="info-row-label">Interval</span><span className="info-row-value">{formatInterval(monitor.check_interval_seconds)}</span></div>
-            <div className="info-row"><span className="info-row-label">Timeout</span><span className="info-row-value">{monitor.timeout_ms}ms</span></div>
-            <div className="info-row"><span className="info-row-label">Severity</span><span className="info-row-value">{monitor.severity}</span></div>
-            {monitor.last_checked_at && (
-              <div className="info-row">
-                <span className="info-row-label">Last Check</span>
-                <span className="info-row-value" style={{ textTransform: 'none' }}>
-                  {new Date(monitor.last_checked_at).toLocaleString('en-GB', { dateStyle: 'short', timeStyle: 'short' })}
-                </span>
+            <div className="mon-config-grid">
+              <div className="mon-config-item">
+                <div className="mon-config-item-label">Type</div>
+                <div className="mon-config-item-value" style={{ textTransform: 'capitalize' }}>{monitor.type}</div>
               </div>
-            )}
+              <div className="mon-config-item">
+                <div className="mon-config-item-label">Check Interval</div>
+                <div className="mon-config-item-value">{formatInterval(monitor.check_interval_seconds)}</div>
+              </div>
+              <div className="mon-config-item">
+                <div className="mon-config-item-label">Timeout</div>
+                <div className="mon-config-item-value">{monitor.timeout_ms}ms</div>
+              </div>
+              <div className="mon-config-item">
+                <div className="mon-config-item-label">Severity</div>
+                <div className="mon-config-item-value" style={{ textTransform: 'capitalize' }}>{monitor.severity}</div>
+              </div>
+              {monitor.last_checked_at && (
+                <div className="mon-config-item mon-config-item-full">
+                  <div className="mon-config-item-label">Last Checked</div>
+                  <div className="mon-config-item-value" style={{ fontFamily: 'var(--font-mono, monospace)', fontSize: 13 }}>
+                    {new Date(monitor.last_checked_at).toLocaleString('en-GB', { dateStyle: 'short', timeStyle: 'short' })}
+                  </div>
+                </div>
+              )}
+              <div className="mon-config-item mon-config-item-full">
+                <div className="mon-config-item-label">Target URL</div>
+                <div className="mon-config-item-value" style={{ fontFamily: 'var(--font-mono, monospace)', fontSize: 12, fontWeight: 500, wordBreak: 'break-all' }}>{monitor.target}</div>
+              </div>
+            </div>
             {isKeywordMonitor && displayPositive.length > 0 && (
               <div className="info-row" style={{ alignItems: 'flex-start' }}>
                 <span className="info-row-label">Must Exist</span>

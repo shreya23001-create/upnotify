@@ -57,11 +57,17 @@ export function LoginForm({ mode = 'login' }: { mode?: 'login' | 'signup' }) {
 
   return (
     <div>
+      {mode === 'login' && (
+        <div className="auth-returning-banner">
+          <span className="auth-returning-icon">👋</span>
+          <span className="auth-returning-text">Welcome back — your monitors are running</span>
+        </div>
+      )}
       <h1 className="auth-title">
-        {mode === 'login' ? 'Welcome back' : 'Create an account'}
+        {mode === 'login' ? 'Sign in to Uptrue' : 'Create your account'}
       </h1>
       <p className="auth-subtitle">
-        {mode === 'login' ? 'Sign in to your Uptrue account' : 'Get started with Uptrue monitoring'}
+        {mode === 'login' ? 'Use your magic link or Google to sign in' : 'Start monitoring in under 2 minutes — free'}
       </p>
 
       {error && <div className="form-error">{error}</div>}
