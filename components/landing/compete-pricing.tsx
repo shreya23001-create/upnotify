@@ -33,12 +33,12 @@ export default function CompetePricing(): React.ReactElement {
   }, [])
 
   return (
-    <section className="landing-section landing-compete-pricing" id="compete-pricing">
-      <div className="landing-container">
+    <section className="section" id="compete-pricing">
+      <div className="container">
         <div className="compete-pricing-header">
           <span className="compete-pricing-badge">Add-on</span>
-          <h2 className="landing-section-title">Uptrue Compete</h2>
-          <p className="landing-section-subtitle">
+          <h2 className="section-title">Uptrue Compete</h2>
+          <p className="section-sub">
             Track competitor prices, detect stock changes, and get alerts when prices drop.
             Add to any paid monitoring plan.
           </p>

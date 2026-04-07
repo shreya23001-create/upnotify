@@ -1,12 +1,31 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState, useEffect, useTransition } from 'react'
 import { signInWithEmail, signInWithGoogle } from '@/lib/auth/actions'
+
+const HINT_COOKIE = 'uptrue_user_hint'
+
+function readEmailHint(): string {
+  if (typeof document === 'undefined') return ''
+  const match = document.cookie.match(new RegExp(`(?:^|; )${HINT_COOKIE}=([^;]*)`))
+  if (!match) return ''
+  try { return decodeURIComponent(atob(match[1])) } catch { return '' }
+}
+
+function setEmailHint(email: string): void {
+  const encoded = btoa(encodeURIComponent(email))
+  document.cookie = `${HINT_COOKIE}=${encoded}; max-age=31536000; path=/; SameSite=Lax`
+}
 
 export function LoginForm({ mode = 'login' }: { mode?: 'login' | 'signup' }) {
   const [emailSent, setEmailSent] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
+  const [hintEmail, setHintEmail] = useState('')
+
+  useEffect(() => {
+    if (mode === 'login') setHintEmail(readEmailHint())
+  }, [mode])
 
   function getRefCode(): string | null {
     if (typeof window === 'undefined') return null
@@ -18,10 +37,14 @@ export function LoginForm({ mode = 'login' }: { mode?: 'login' | 'signup' }) {
     formData.set('origin', window.location.origin)
     const ref = getRefCode()
     if (ref) formData.set('ref', ref)
+    const email = formData.get('email') as string
     startTransition(async () => {
       const result = await signInWithEmail(formData)
       if (result.error) setError(result.error)
-      else setEmailSent(true)
+      else {
+        if (email) setEmailHint(email)
+        setEmailSent(true)
+      }
     })
   }
 
@@ -115,11 +138,13 @@ export function LoginForm({ mode = 'login' }: { mode?: 'login' | 'signup' }) {
             {mode === 'signup' ? 'Work email' : 'Email address'}
           </label>
           <input
+            key={hintEmail}
             className="auth-input"
             id="email"
             name="email"
             type="email"
             placeholder="you@company.com"
+            defaultValue={hintEmail}
             required
             disabled={isPending}
           />

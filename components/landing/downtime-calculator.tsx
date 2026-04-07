@@ -29,13 +29,15 @@ export function DowntimeCalculator(): React.ReactElement {
 
   return (
     <section className="calculator-section">
-      <div className="landing-container">
-        <div className="lp-section-eyebrow" style={{ color: '#ef4444' }}>The real cost of downtime</div>
-        <h2 className="landing-section-title">It&apos;s not just lost revenue.<br />It&apos;s your reputation.</h2>
-        <p className="landing-section-subtitle">
-          Every minute your site is down, customers are leaving, telling friends, and never coming back.
-          Calculate the true cost — including what you can&apos;t see on a balance sheet.
-        </p>
+      <div className="container">
+        <div className="section-header">
+          <div className="section-eyebrow" style={{ color: '#ef4444' }}>The real cost of downtime</div>
+          <h2 className="section-title">It&apos;s not just lost revenue.<br />It&apos;s your reputation.</h2>
+          <p className="section-sub">
+            Every minute your site is down, customers are leaving, telling friends, and never coming back.
+            Calculate the true cost — including what you can&apos;t see on a balance sheet.
+          </p>
+        </div>
 
         <div className="calculator-card">
           {/* Fear callout */}

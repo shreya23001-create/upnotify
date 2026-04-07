@@ -13,6 +13,7 @@ import { DowntimeCalculator } from '@/components/landing/downtime-calculator'
 import Faq from '@/components/landing/faq'
 import { AgencyWaitlistCta } from '@/components/landing/agency-waitlist-cta'
 import { TrustedLogos } from '@/components/landing/trusted-logos'
+import { CtaCanvas } from '@/components/landing/cta-canvas'
 import {
   OrganizationJsonLd,
   SoftwareApplicationJsonLd,
@@ -871,7 +872,7 @@ export default function LandingPage(): React.ReactElement {
           CTA BAND
           ================================================================ */}
       <section className="cta-band" id="ctaSection">
-        <canvas id="ctaCanvas" />
+        <CtaCanvas />
         <div className="container">
           <div className="cta-band-inner">
             <div className="cta-band-eyebrow">

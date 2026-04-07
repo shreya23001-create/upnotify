@@ -159,10 +159,9 @@ export default async function ScoreResultsPage({ params }: PageProps): Promise<R
 
   return (
     <div className="score-results-wrapper">
-      <div className="score-results-page">
-      {result && <JsonLd result={result} />}
-
       <PublicNav />
+      {result && <JsonLd result={result} />}
+      <div className="score-results-page">
 
       <div className="score-results-header">
         <h1 className="score-results-title">

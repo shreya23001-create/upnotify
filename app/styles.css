@@ -1998,7 +1998,7 @@ html.dark .landing-cta { background: linear-gradient(135deg, #1a1d27 0%, #242736
 
 /* Results page */
 .score-results-wrapper { display: flex; flex-direction: column; min-height: 100vh; }
-.score-results-page { max-width: 900px; margin: 0 auto; padding: 80px 24px 64px; flex: 1; width: 100%; }
+.score-results-page { max-width: 900px; margin: 0 auto; padding: 32px 24px 64px; flex: 1; width: 100%; }
 .score-results-header { text-align: center; padding: 32px 0 24px; }
 .score-results-title { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; color: var(--text-primary); }
 .score-results-domain { background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
