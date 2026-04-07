@@ -13,6 +13,7 @@ export default function Faq(): React.ReactElement {
   return (
     <section className="landing-section landing-faq" id="faq">
       <div className="landing-container">
+        <div className="lp-section-eyebrow">Questions answered</div>
         <h2 className="landing-section-title">Frequently asked questions</h2>
         <p className="landing-section-subtitle">
           Everything you need to know about Uptrue

@@ -34,15 +34,15 @@ export const metadata: Metadata = {
 }
 
 const STEPS = [
-  { number: '1', title: 'Add a Monitor', description: 'Enter a URL, IP, or domain. Choose from 10 monitor types. Set your check interval — as low as 30 seconds.' },
-  { number: '2', title: 'Get Alerted Instantly', description: 'When something goes wrong, Uptrue confirms from a second region and alerts you via your preferred channel.' },
-  { number: '3', title: 'Share Status & Reports', description: 'Publish branded status pages for your customers. Generate AI-powered reports for stakeholders.' },
+  { number: '1', title: 'Add a Monitor', description: 'Enter your URL, choose a monitor type, and set a check interval as low as 30 seconds. No config files, no agents, no setup scripts.' },
+  { number: '2', title: 'Get Alerted Instantly', description: 'When something goes wrong, Uptrue confirms from a second region and fires an alert to your preferred channel — Slack, email, Teams, or webhook.' },
+  { number: '3', title: 'Share Status & Reports', description: 'Publish branded status pages your customers can check themselves. Generate AI-powered reports to share uptime SLAs with stakeholders.' },
 ]
 
 const TESTIMONIALS = [
-  { quote: 'We caught three client outages before their users noticed. Our clients still don\'t know how close it was. Uptrue paid for itself in the first week.', name: 'Sarah Mitchell', role: 'Founder · Brightwave Digital Agency', initials: 'SM', color: '#3b82f6' },
-  { quote: 'The AI reports are genuinely impressive. I send them to our board every month — they actually read them. It\'s the first monitoring tool that speaks human.', name: 'James Thornton', role: 'CTO · Formly SaaS', initials: 'JT', color: '#8b5cf6' },
-  { quote: 'Switched from UptimeRobot. Zero false alarms since day one. The two-region confirmation alone has saved our on-call team from 3am panic alerts.', name: 'Alex Deacon', role: 'DevOps Lead · Cartify Commerce', initials: 'AD', color: '#06b6d4' },
+  { quote: 'We caught three client outages before their users noticed. Our clients still don\'t know how close it was. Uptrue paid for itself in the first week.', name: 'Sarah Mitchell', role: 'Founder · Brightwave Digital Agency', initials: 'SM', color: 'linear-gradient(135deg,#3b82f6,#06b6d4)' },
+  { quote: 'The AI reports are genuinely impressive. I send them to our board every month — they actually read them. It\'s the first monitoring tool that speaks human.', name: 'James Thornton', role: 'CTO · Formly SaaS', initials: 'JT', color: 'linear-gradient(135deg,#10b981,#06b6d4)' },
+  { quote: 'Switched from UptimeRobot. Zero false alarms since day one. The two-region confirmation alone has saved our on-call team from 3am panic alerts.', name: 'Alex Deacon', role: 'DevOps Lead · Cartify Commerce', initials: 'AD', color: 'linear-gradient(135deg,#8b5cf6,#3b82f6)' },
 ]
 
 export default function LandingPage(): React.ReactElement {
@@ -172,10 +172,10 @@ export default function LandingPage(): React.ReactElement {
           ================================================================ */}
       <div className="stats-bar">
         <div className="stats-bar-inner">
-          <div className="stat-item"><div className="stat-value">10</div><div className="stat-label">Monitor types</div></div>
-          <div className="stat-item"><div className="stat-value">30s</div><div className="stat-label">Fastest check interval</div></div>
-          <div className="stat-item"><div className="stat-value">99.9%</div><div className="stat-label">Uptime SLA</div></div>
-          <div className="stat-item"><div className="stat-value">0</div><div className="stat-label">False alarms (2-region confirm)</div></div>
+          <div className="stat-item"><div className="stat-value gradient-text">10</div><div className="stat-label">Monitor types</div></div>
+          <div className="stat-item"><div className="stat-value gradient-text">30s</div><div className="stat-label">Fastest check interval</div></div>
+          <div className="stat-item"><div className="stat-value gradient-text">99.9%</div><div className="stat-label">Uptime SLA</div></div>
+          <div className="stat-item"><div className="stat-value gradient-text">0</div><div className="stat-label">False alarms (2-region confirm)</div></div>
         </div>
       </div>
 
@@ -198,9 +198,8 @@ export default function LandingPage(): React.ReactElement {
           ================================================================ */}
       <section className="landing-section landing-steps" id="how-it-works">
         <div className="landing-container">
-          <div className="lp-section-eyebrow">Simple setup</div>
-          <h2 className="landing-section-title">Up and running in 60 seconds</h2>
-          <p className="landing-section-subtitle">Three steps. No complex setup. No credit card required.</p>
+          <div className="lp-section-eyebrow">Simple by design</div>
+          <h2 className="landing-section-title">Up and running in 2 minutes</h2>
           <div className="steps-grid">
             {STEPS.map((step) => (
               <div key={step.number} className="step-card">
@@ -222,7 +221,7 @@ export default function LandingPage(): React.ReactElement {
             <div className="lp-ai-text">
               <div className="lp-section-eyebrow">Powered by Claude AI</div>
               <h2 className="lp-ai-title">Your monitoring gets smarter over time</h2>
-              <p className="lp-ai-sub">Uptrue doesn&apos;t just tell you something went down — it tells you why, what it means for your business, and what to do next.</p>
+              <p className="lp-ai-sub">Uptrue doesn&apos;t just tell you something went down — it tells you why, what it means for your business, and what to do next. Powered by Claude, Anthropic&apos;s AI.</p>
               <div className="lp-ai-features">
                 <div className="lp-ai-feature">
                   <div className="lp-ai-feature-icon lp-ai-icon-purple">🤖</div>
@@ -257,7 +256,7 @@ export default function LandingPage(): React.ReactElement {
             {/* AI Report Card mockup */}
             <div className="lp-ai-card">
               <div className="lp-ai-card-header">
-                <div className="lp-ai-card-title">Monthly Performance Report</div>
+                <div className="lp-ai-card-title">Monthly Performance Report — Acme Agency</div>
                 <div className="lp-ai-card-badge">
                   <span className="lp-ai-card-dot" />
                   AI Generated
@@ -425,7 +424,7 @@ export default function LandingPage(): React.ReactElement {
         <div className="cta-band-inner">
           <div className="cta-band-eyebrow">
             <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-            START IN 2 MINUTES
+            Start in 2 minutes
           </div>
           <h2 className="cta-band-title">Don&apos;t find out you&apos;re down<br />from a customer tweet.</h2>
           <p className="cta-band-sub">

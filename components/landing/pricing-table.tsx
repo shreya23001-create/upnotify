@@ -88,9 +88,10 @@ export default function PricingTable(): React.ReactElement {
   return (
     <section className="landing-section landing-pricing" id="pricing">
       <div className="landing-container">
-        <h2 className="landing-section-title">Simple, transparent pricing</h2>
+        <div className="lp-section-eyebrow">Simple pricing</div>
+        <h2 className="landing-section-title">Start free, scale as you grow</h2>
         <p className="landing-section-subtitle">
-          Start free. Scale as you grow. No hidden fees.
+          No hidden fees. No credit card required for free plan. Cancel or pause anytime.
         </p>
 
         <div className="billing-toggle-wrapper">

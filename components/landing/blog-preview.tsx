@@ -112,14 +112,6 @@ export async function BlogPreview(): Promise<React.ReactElement> {
           })}
         </div>
 
-        <div style={{ textAlign: 'center', marginTop: 48 }}>
-          <Link href="/blog" className="btn btn-ghost btn-lg">
-            Browse all 60+ articles
-            <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-            </svg>
-          </Link>
-        </div>
       </div>
     </section>
   )
