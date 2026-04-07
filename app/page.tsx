@@ -17,6 +17,7 @@ import { AgencyWaitlistCta } from '@/components/landing/agency-waitlist-cta'
 import { Ticker } from '@/components/landing/ticker'
 import { FeatureCarousel } from '@/components/landing/feature-carousel'
 import { HeroCanvas } from '@/components/landing/hero-canvas'
+import { BlogPreview } from '@/components/landing/blog-preview'
 
 export const metadata: Metadata = {
   title: 'Uptrue — Uptime Monitoring for Agencies & Teams',
@@ -59,7 +60,7 @@ export default function LandingPage(): React.ReactElement {
       <section className="hero" id="heroSection">
         <HeroCanvas />
         <div className="hero-grid" />
-        <div className="container">
+        <div className="landing-container">
           <div className="hero-content">
             <div className="hero-eyebrow fade-up">
               <div className="hero-eyebrow-text">
@@ -414,18 +415,47 @@ export default function LandingPage(): React.ReactElement {
       </section>
 
       {/* ================================================================
+          BLOG PREVIEW
+          ================================================================ */}
+      <BlogPreview />
+
+      {/* ================================================================
           FAQ
           ================================================================ */}
       <Faq />
 
       {/* ================================================================
-          CTA FOOTER
+          CTA BAND — animated blue→cyan gradient (agreed design)
           ================================================================ */}
-      <section className="landing-cta">
-        <div className="landing-container">
-          <h2 className="cta-title">Start monitoring in 60 seconds</h2>
-          <p className="cta-subtitle">Free plan available. No credit card required. Cancel any time.</p>
-          <Link href="/signup" className="btn btn-primary btn-lg">Get Started Free →</Link>
+      <section className="cta-band">
+        <div className="cta-band-inner">
+          <div className="cta-band-eyebrow">
+            <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            START IN 2 MINUTES
+          </div>
+          <h2 className="cta-band-title">Don&apos;t find out you&apos;re down<br />from a customer tweet.</h2>
+          <p className="cta-band-sub">
+            Uptrue watches your sites, APIs, and infrastructure 24/7 —<br />
+            and tells you first. Free plan included. No credit card required.
+          </p>
+          <div className="cta-band-btns">
+            <Link href="/signup" className="btn cta-band-btn-primary btn-lg">
+              <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              Start Monitoring Free
+            </Link>
+            <Link href="/#features" className="btn cta-band-btn-outline btn-lg">
+              See All Features →
+            </Link>
+          </div>
+          <div className="cta-band-trust">
+            <span><svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> 3 monitors free forever</span>
+            <span className="cta-band-dot">·</span>
+            <span><svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> No credit card required</span>
+            <span className="cta-band-dot">·</span>
+            <span><svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> GDPR compliant · EU data</span>
+            <span className="cta-band-dot">·</span>
+            <span><svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> 30-second check intervals</span>
+          </div>
         </div>
       </section>
 

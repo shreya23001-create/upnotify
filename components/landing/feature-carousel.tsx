@@ -123,7 +123,7 @@ export function FeatureCarousel(): React.ReactElement {
   const [cardW, setCardW] = useState(300)
   const trackRef = useRef<HTMLDivElement>(null)
 
-  const visible = activeCat === 'all' ? CARDS : CARDS.filter(c => c.cat === activeCat || c.cat === 'Coming Soon')
+  const visible = activeCat === 'all' ? CARDS : CARDS.filter(c => c.cat === activeCat)
   const total = visible.length
   const maxOffset = Math.max(0, total - 3)
 
@@ -143,6 +143,14 @@ export function FeatureCarousel(): React.ReactElement {
   }
 
   function switchTab(cat: string): void {
+    // Immediately clear transform without animation, then restore transition
+    if (trackRef.current) {
+      trackRef.current.style.transition = 'none'
+      trackRef.current.style.transform = 'translateX(0)'
+      requestAnimationFrame(() => {
+        if (trackRef.current) trackRef.current.style.transition = ''
+      })
+    }
     setActiveCat(cat)
     setOffset(0)
   }
