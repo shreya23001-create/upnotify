@@ -112,27 +112,50 @@ export default function PricingTable(): React.ReactElement {
 
         <div className="pricing-grid">
           {plans.map((plan) => {
-            const isFree = plan.price_monthly_gbp === 0 && (!plan.price_annual_gbp || plan.price_annual_gbp === 0)
-            const monthlyGbp = plan.price_monthly_gbp / 100
-            const annualGbp = plan.price_annual_gbp ? plan.price_annual_gbp / 100 : null
+            const monthlyPence = plan.price_monthly_gbp
+            const annualPence  = plan.price_annual_gbp
 
-            let price: string
+            const isFree = monthlyPence === 0 && (!annualPence || annualPence === 0)
+
+            // Convert to £
+            const monthlyGbp = monthlyPence / 100
+            const annualGbp  = annualPence ? annualPence / 100 : null
+
+            // Monthly-equivalent of annual price (for display in annual mode)
+            const annualPerMonth = annualGbp ? annualGbp / 12 : null
+
+            // Decide how to display the price
+            let displayPrice: string
             let period: string
             let note: string | undefined
 
             if (isFree) {
-              price = '£0'
+              displayPrice = '0'
               period = 'forever'
-            } else if (isAnnual && annualGbp) {
-              price = `£${annualGbp.toFixed(annualGbp % 1 === 0 ? 0 : 2)}`
-              period = 'per month · billed annually'
-              const savings = Math.round(((monthlyGbp * 12 - annualGbp) / (monthlyGbp * 12)) * 100)
-              note = savings > 0 ? `Or £${(monthlyGbp).toFixed(0)}/mo billed monthly` : undefined
+
+            } else if (isAnnual && annualGbp !== null) {
+              // Annual mode
+              if (annualPerMonth !== null && annualPerMonth >= 1) {
+                // Monthly equivalent is >= £1 — show per-month equivalent
+                const perMo = Math.round(annualPerMonth)
+                displayPrice = String(perMo)
+                period = 'per month · billed annually'
+                note = `Or £${monthlyGbp % 1 === 0 ? monthlyGbp.toFixed(0) : monthlyGbp.toFixed(2)}/mo billed monthly`
+              } else {
+                // Annual total is cheap (e.g. Lite £10/yr) — show the yearly price
+                displayPrice = annualGbp % 1 === 0 ? annualGbp.toFixed(0) : annualGbp.toFixed(2)
+                period = 'per year'
+                note = monthlyGbp > 0
+                  ? `Or £${monthlyGbp % 1 === 0 ? monthlyGbp.toFixed(0) : monthlyGbp.toFixed(2)}/mo billed monthly`
+                  : undefined
+              }
+
             } else {
-              price = `£${monthlyGbp.toFixed(monthlyGbp % 1 === 0 ? 0 : 2)}`
+              // Monthly mode
+              displayPrice = monthlyGbp % 1 === 0 ? monthlyGbp.toFixed(0) : monthlyGbp.toFixed(2)
               period = 'per month'
-              if (annualGbp) {
-                note = `Or £${annualGbp.toFixed(0)}/yr billed annually`
+              if (annualGbp !== null) {
+                note = `Or £${annualGbp % 1 === 0 ? annualGbp.toFixed(0) : annualGbp.toFixed(2)}/yr billed annually`
               }
             }
 
@@ -147,11 +170,11 @@ export default function PricingTable(): React.ReactElement {
                 {isHighlighted && (
                   <div className="popular-badge">Most Popular</div>
                 )}
-                <div className={`plan-name${isHighlighted ? '' : ''}`} style={isHighlighted ? { color: 'var(--brand-blue)' } : {}}>
+                <div className="plan-name" style={isHighlighted ? { color: 'var(--brand-blue)' } : {}}>
                   {plan.name}
                 </div>
                 <div className="plan-price">
-                  £<span>{isFree ? '0' : (isAnnual && annualGbp ? (annualGbp / 12).toFixed(annualGbp / 12 % 1 === 0 ? 0 : 0) : monthlyGbp.toFixed(monthlyGbp % 1 === 0 ? 0 : 2))}</span>
+                  £<span>{displayPrice}</span>
                 </div>
                 <div className="plan-period">{period}</div>
                 {note && <div className="plan-price-note">{note}</div>}

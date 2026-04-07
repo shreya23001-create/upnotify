@@ -22,6 +22,9 @@ import {
 } from '@/components/seo/json-ld'
 import { FAQ_ITEMS } from '@/lib/constants/faq'
 
+// Revalidate every 5 minutes so Ticker + BlogPreview stay fresh from DB
+export const revalidate = 300
+
 export const metadata: Metadata = {
   title: 'Uptrue — Uptime Monitoring for Agencies & Teams',
   description:

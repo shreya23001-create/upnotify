@@ -81,7 +81,7 @@ export function DowntimeCalculator(): React.ReactElement {
                   step={0.5}
                   value={hours}
                   onChange={e => setHours(Number(e.target.value))}
-                  style={{ width: '100%' }}
+                  style={{ width: '100%', '--pct': `${(hours / 24) * 100}%` } as React.CSSProperties}
                 />
                 <div className="calculator-slider-label">
                   <span>0 hrs</span>
