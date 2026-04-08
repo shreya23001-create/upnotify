@@ -943,6 +943,7 @@ export type Database = {
           has_status_pages: boolean
           status_page_limit: number
           ai_report_limit: number
+          competitor_limit: number
         }
         Insert: {
           check_interval_seconds?: number
@@ -978,6 +979,7 @@ export type Database = {
           type: string
           updated_at?: string
           voice_call_monthly_limit?: number
+          competitor_limit?: number
         }
         Update: {
           check_interval_seconds?: number
@@ -995,6 +997,7 @@ export type Database = {
           has_white_label?: boolean
           status_page_limit?: number
           ai_report_limit?: number
+          competitor_limit?: number
           id?: string
           is_visible?: boolean
           max_team_members?: number

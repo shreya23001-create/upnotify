@@ -190,7 +190,7 @@ export function CompetitorDashboard({
           {items.map((comp) => (
             <div key={comp.id} className="card competitor-card">
               <div className="competitor-card-header">
-                <Link href={`/dashboard/competitors/${comp.id}`} className="competitor-card-status" style={{ textDecoration: 'none', flex: 1 }}>
+                <Link href={`/dashboard/watchdog/${comp.id}`} className="competitor-card-status" style={{ textDecoration: 'none', flex: 1 }}>
                   <span
                     className="status-dot"
                     style={{ background: getStatusColor(comp.last_status) }}
@@ -237,7 +237,7 @@ export function CompetitorDashboard({
                 </div>
               </div>
               <Link
-                href={`/dashboard/competitors/${comp.id}`}
+                href={`/dashboard/watchdog/${comp.id}`}
                 className="competitor-card-view-link"
               >
                 View charts &amp; history →

@@ -145,6 +145,7 @@ export function PlansManager({ plans, creditRules, subscriberCounts, competePlan
                   <th>Interval</th>
                   <th>Workspaces</th>
                   <th>Team</th>
+                  <th>Watchdog</th>
                   <th>Subs</th>
                   <th>Visible</th>
                   <th>Actions</th>
@@ -165,6 +166,7 @@ export function PlansManager({ plans, creditRules, subscriberCounts, competePlan
                     <td>{plan.check_interval_seconds}s</td>
                     <td>{plan.client_workspace_limit ?? 'Unlimited'}</td>
                     <td>{plan.max_team_members}</td>
+                    <td>{(plan as unknown as Record<string, unknown>).competitor_limit as number ?? 3}</td>
                     <td><span className="badge badge-muted">{subscriberCounts[plan.id] ?? 0}</span></td>
                     <td>
                       <label className="switch">
@@ -204,6 +206,7 @@ export function PlansManager({ plans, creditRules, subscriberCounts, competePlan
                     <th>Status Pages</th>
                     <th>Custom Domain</th>
                     <th>AI Reports</th>
+                    <th>Watchdog</th>
                     <th>API</th>
                     <th>White Label</th>
                     <th>Retention</th>
@@ -223,6 +226,7 @@ export function PlansManager({ plans, creditRules, subscriberCounts, competePlan
                       <td>{p.has_status_pages ? (p.status_page_limit ? `${p.status_page_limit}` : 'Unlimited') : no}</td>
                       <td>{plan.has_status_page_custom_domain ? yes : no}</td>
                       <td>{plan.has_ai_predictive || (p.ai_report_limit as number) > 0 ? (p.ai_report_limit ? `${p.ai_report_limit}/mo` : 'Unlimited') : no}</td>
+                      <td>{((p.competitor_limit as number) ?? 3)} sites</td>
                       <td>{plan.has_api_access ? yes : no}</td>
                       <td>{plan.has_white_label ? yes : no}</td>
                       <td>{plan.data_retention_days ? `${plan.data_retention_days}d` : 'Unlimited'}</td>
@@ -510,6 +514,11 @@ export function PlansManager({ plans, creditRules, subscriberCounts, competePlan
                   <label className="form-label">Voice Call Limit/Month</label>
                   <input className="form-input" name="voice_call_monthly_limit" type="number" defaultValue={editingPlan.voice_call_monthly_limit} min={0} />
                 </div>
+                <div className="form-group">
+                  <label className="form-label">Watchdog Limit (competitors)</label>
+                  <input className="form-input" name="competitor_limit" type="number" defaultValue={(editingPlan as unknown as Record<string, unknown>).competitor_limit as number ?? 3} min={0} />
+                  <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Max competitor sites tracked via Watchdog</span>
+                </div>
               </div>
 
               <h3 className="plans-section-title">Features</h3>
@@ -593,6 +602,7 @@ export function PlansManager({ plans, creditRules, subscriberCounts, competePlan
                   <li>Status page custom domain: <strong>{editingPlan.has_status_page_custom_domain ? 'Yes' : 'No'}</strong></li>
                   <li>White label: <strong>{editingPlan.has_white_label ? 'Yes' : 'No'}</strong></li>
                   <li>Voice calls: <strong>{editingPlan.has_voice_calls ? `Yes (${editingPlan.voice_call_monthly_limit}/mo)` : 'No'}</strong></li>
+                  <li>Watchdog: <strong>{(editingPlan as unknown as Record<string, unknown>).competitor_limit as number ?? 3} competitor{((editingPlan as unknown as Record<string, unknown>).competitor_limit as number ?? 3) === 1 ? '' : 's'}</strong> — checked on Watchdog add</li>
                   <li>Compete: <strong>Separate add-on</strong> — managed in Compete tab</li>
                 </ul>
                 <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 8 }}>

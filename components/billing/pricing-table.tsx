@@ -58,6 +58,9 @@ function getPlanFeatures(plan: Plan): PlanFeatureDisplay[] {
     features.push({ text: 'AI reports', included: false })
   }
 
+  const watchdogLimit = (p.competitor_limit as number | undefined) ?? 3
+  features.push({ text: `Watchdog — ${watchdogLimit} competitor${watchdogLimit === 1 ? '' : 's'}`, included: true })
+
   features.push({ text: 'API access', included: plan.has_api_access })
 
   return features
