@@ -206,6 +206,8 @@ export function PlansManager({ plans, creditRules, subscriberCounts, competePlan
                     <th>Status Pages</th>
                     <th>Custom Domain</th>
                     <th>AI Reports</th>
+                    <th>llms.txt</th>
+                    <th>Citation</th>
                     <th>Watchdog</th>
                     <th>API</th>
                     <th>White Label</th>
@@ -226,6 +228,15 @@ export function PlansManager({ plans, creditRules, subscriberCounts, competePlan
                       <td>{p.has_status_pages ? (p.status_page_limit ? `${p.status_page_limit}` : 'Unlimited') : no}</td>
                       <td>{plan.has_status_page_custom_domain ? yes : no}</td>
                       <td>{plan.has_ai_predictive || (p.ai_report_limit as number) > 0 ? (p.ai_report_limit ? `${p.ai_report_limit}/mo` : 'Unlimited') : no}</td>
+                      <td>
+                        {(p.llms_txt_limit as number) === -1 ? 'Unlimited' :
+                         (p.llms_txt_limit as number) === 1  ? '1 (lifetime)' :
+                         (p.llms_txt_limit as number) === 0  ? no : `${p.llms_txt_limit}`}
+                      </td>
+                      <td>
+                        {(p.citation_check_monthly_limit as number) === -1 ? 'Unlimited' :
+                         (p.citation_check_monthly_limit as number) === 0  ? no : `${p.citation_check_monthly_limit}/mo`}
+                      </td>
                       <td>{((p.competitor_limit as number) ?? 3)} sites</td>
                       <td>{plan.has_api_access ? yes : no}</td>
                       <td>{plan.has_white_label ? yes : no}</td>
@@ -586,6 +597,20 @@ export function PlansManager({ plans, creditRules, subscriberCounts, competePlan
                   <input className="form-input" name="ai_report_limit" type="number" defaultValue={(editingPlan as unknown as Record<string, unknown>).ai_report_limit as number ?? 0} min={0} />
                   <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>0 = unlimited</span>
                 </div>
+                <div className="form-group">
+                  <label className="form-label">llms.txt Limit</label>
+                  <input className="form-input" name="llms_txt_limit" type="number"
+                    defaultValue={(editingPlan as unknown as Record<string, unknown>).llms_txt_limit as number ?? 1}
+                    min={-1} />
+                  <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>-1 = unlimited, 0 = disabled, 1 = one lifetime generation</span>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">AI Citation Checks/Month</label>
+                  <input className="form-input" name="citation_check_monthly_limit" type="number"
+                    defaultValue={(editingPlan as unknown as Record<string, unknown>).citation_check_monthly_limit as number ?? 0}
+                    min={-1} />
+                  <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>-1 = unlimited, 0 = disabled, N = monthly limit</span>
+                </div>
               </div>
               </div>
 
@@ -603,6 +628,15 @@ export function PlansManager({ plans, creditRules, subscriberCounts, competePlan
                   <li>White label: <strong>{editingPlan.has_white_label ? 'Yes' : 'No'}</strong></li>
                   <li>Voice calls: <strong>{editingPlan.has_voice_calls ? `Yes (${editingPlan.voice_call_monthly_limit}/mo)` : 'No'}</strong></li>
                   <li>Watchdog: <strong>{(editingPlan as unknown as Record<string, unknown>).competitor_limit as number ?? 3} competitor{((editingPlan as unknown as Record<string, unknown>).competitor_limit as number ?? 3) === 1 ? '' : 's'}</strong> — checked on Watchdog add</li>
+                  <li>llms.txt Generator: <strong>{
+                    (editingPlan as unknown as Record<string, unknown>).llms_txt_limit === -1 ? 'Unlimited' :
+                    (editingPlan as unknown as Record<string, unknown>).llms_txt_limit === 1  ? '1 lifetime generation' :
+                    (editingPlan as unknown as Record<string, unknown>).llms_txt_limit === 0  ? 'Disabled' : `${(editingPlan as unknown as Record<string, unknown>).llms_txt_limit} generation(s)`
+                  }</strong></li>
+                  <li>AI Citation Monitor: <strong>{
+                    (editingPlan as unknown as Record<string, unknown>).citation_check_monthly_limit === -1 ? 'Unlimited' :
+                    (editingPlan as unknown as Record<string, unknown>).citation_check_monthly_limit === 0  ? 'Disabled' : `${(editingPlan as unknown as Record<string, unknown>).citation_check_monthly_limit} checks/month`
+                  }</strong></li>
                   <li>Compete: <strong>Separate add-on</strong> — managed in Compete tab</li>
                 </ul>
                 <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 8 }}>

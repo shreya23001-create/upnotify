@@ -8,6 +8,7 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://uptrue.io/signup' },
 }
 
-export default function SignupPage(): React.ReactElement {
-  return <LoginForm mode="signup" />
+export default async function SignupPage({ searchParams }: { searchParams: Promise<{ next?: string }> }): Promise<React.ReactElement> {
+  const { next } = await searchParams
+  return <LoginForm mode="signup" next={next} />
 }

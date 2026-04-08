@@ -153,6 +153,24 @@ export function IconBarChart({ size = 18, className }: IconProps) {
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
 }
 
+export function IconSparkles({ size = 18, className }: IconProps) {
+  return (
+    <svg
+      width={size} height={size} viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" strokeWidth="1.5"
+      strokeLinecap="round" strokeLinejoin="round"
+      className={`icon-sparkles${className ? ' ' + className : ''}`}
+    >
+      {/* Main large 4-pointed star */}
+      <path d="M12 3L13.5 9.5L20 11L13.5 12.5L12 19L10.5 12.5L4 11L10.5 9.5Z" />
+      {/* Small sparkle top-right */}
+      <path d="M19 2L19.8 4.2L22 5L19.8 5.8L19 8L18.2 5.8L16 5L18.2 4.2Z" />
+      {/* Small sparkle bottom-left */}
+      <path d="M5 15L5.6 17L7.5 17.5L5.6 18L5 20L4.4 18L2.5 17.5L4.4 17Z" />
+    </svg>
+  )
+}
+
 export function IconPieChart({ size = 18, className }: IconProps) {
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
 }

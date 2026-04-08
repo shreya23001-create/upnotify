@@ -59,20 +59,19 @@ export interface CitationCheckResult {
 }
 
 // ---------------------------------------------------------------------------
-// Plan limits
+// Plan limits — read from DB (single source of truth)
 // ---------------------------------------------------------------------------
-const LLMS_TXT_LIMITS: Record<string, number> = {
-  free:    1,      // lifetime
-  lite:    999999, // unlimited
-  builder: 999999,
-  scale:   999999,
-}
-
-const CITATION_MONTHLY_LIMITS: Record<string, number> = {
-  free:    0,  // free engines only — handled separately
-  lite:    2,
-  builder: 4,
-  scale:   4,
+async function getAiVisibilityPlanLimits(planSlug: string): Promise<{ llmsTxtLimit: number; citationMonthlyLimit: number }> {
+  const adminClient = createAdminClient() as AnySupabase
+  const { data } = await adminClient
+    .from('plans')
+    .select('llms_txt_limit, citation_check_monthly_limit')
+    .eq('slug', planSlug)
+    .single()
+  return {
+    llmsTxtLimit:         data?.llms_txt_limit              ?? 1,
+    citationMonthlyLimit: data?.citation_check_monthly_limit ?? 0,
+  }
 }
 
 export async function getLlmsTxtGenerationCount(orgId: string): Promise<number> {
@@ -90,16 +89,17 @@ export async function getLlmsTxtGenerationCount(orgId: string): Promise<number> 
 }
 
 export async function canGenerateLlmsTxt(orgId: string, planSlug: string): Promise<{ allowed: boolean; reason?: string }> {
-  const limit = LLMS_TXT_LIMITS[planSlug] ?? 1
-  if (limit >= 999999) return { allowed: true }
+  const { llmsTxtLimit: limit } = await getAiVisibilityPlanLimits(planSlug)
+  if (limit === -1) return { allowed: true }
+  if (limit === 0)  return { allowed: false, reason: 'AI Visibility is not available on your current plan. Upgrade to access this feature.' }
 
   const count = await getLlmsTxtGenerationCount(orgId)
   if (count >= limit) {
     return {
       allowed: false,
-      reason: planSlug === 'free'
-        ? 'Free plan includes one llms.txt generation. Upgrade to generate unlimited files.'
-        : `You have reached your generation limit for this plan.`,
+      reason: limit === 1
+        ? 'Free plan includes one llms.txt generation lifetime. Upgrade to generate unlimited files.'
+        : `You have reached your llms.txt generation limit (${limit}) for this plan.`,
     }
   }
   return { allowed: true }
@@ -181,7 +181,15 @@ export async function canRunCitationCheck(
     return { allowed: true }
   }
 
-  const monthlyLimit = CITATION_MONTHLY_LIMITS[planSlug] ?? 0
+  const { citationMonthlyLimit: monthlyLimit } = await getAiVisibilityPlanLimits(planSlug)
+  if (monthlyLimit === -1) return { allowed: true }
+  if (monthlyLimit === 0) {
+    return {
+      allowed: false,
+      reason: 'AI Citation Monitor is not available on your current plan. Upgrade to access this feature.',
+    }
+  }
+
   const used = await getCitationRunsThisMonth(orgId)
 
   if (used >= monthlyLimit) {

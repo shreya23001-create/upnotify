@@ -82,6 +82,14 @@ const CARDS: FeatureCard[] = [
     tags: ['Free · no signup', '100+ sites', 'Live data', 'Leaderboard'],
   },
   {
+    cat: 'Intelligence', catColor: '#8b5cf6', catBg: 'rgba(139,92,246,0.1)', catBorder: 'rgba(139,92,246,0.2)',
+    glow: 'linear-gradient(90deg,#8b5cf6,#06b6d4)',
+    iconBg: 'linear-gradient(135deg,rgba(139,92,246,0.15),rgba(6,182,212,0.12))',
+    icon: '✨', title: 'AI Visibility',
+    desc: 'See if ChatGPT, Perplexity, Gemini, and Claude cite your website. Generate your llms.txt in seconds, run citation checks, and track your AI search presence over time.',
+    tags: ['llms.txt generator', 'Citation monitor', 'GEO · AEO', 'Free AI SEO checker'],
+  },
+  {
     cat: 'Coming Soon', catColor: '#06b6d4', catBg: 'rgba(6,182,212,0.1)', catBorder: 'rgba(6,182,212,0.2)',
     glow: 'linear-gradient(90deg,#0c1322,#3b82f6)',
     iconBg: 'linear-gradient(135deg,rgba(12,19,34,0.4),rgba(59,130,246,0.12))',

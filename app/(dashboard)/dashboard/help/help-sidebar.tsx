@@ -75,6 +75,13 @@ export const helpTopics: HelpTopic[] = [
     icon: '🧰',
     keywords: ['tool', 'ssl', 'checker', 'uptime', 'calculator', 'score', 'free'],
   },
+  {
+    href: '/dashboard/help/ai-visibility',
+    title: 'AI Visibility',
+    description: 'Generate your llms.txt file, monitor AI citations, and improve your AI search presence with GEO and AEO.',
+    icon: '✨',
+    keywords: ['ai', 'seo', 'geo', 'aeo', 'llms', 'llms.txt', 'citation', 'visibility', 'chatgpt', 'perplexity', 'gemini', 'ai search'],
+  },
   // Compete help hidden — launching in v1.5
   {
     href: '/dashboard/help/incidents',

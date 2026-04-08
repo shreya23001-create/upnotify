@@ -293,7 +293,7 @@ export default function AiSeoCheckerPage(): React.ReactElement {
                 <strong>Generate and deploy your llms.txt.</strong> Even a simple one-page file
                 improves your AI search presence by giving models a direct description of your site.
                 Use the{' '}
-                <Link href="/signup" style={{ color: 'var(--color-primary)' }}>free Uptrue generator</Link>{' '}
+                <Link href="/signup?next=/dashboard/ai-visibility" style={{ color: 'var(--color-primary)' }}>free Uptrue generator</Link>{' '}
                 to create one tailored to selected AI engines.
               </li>
               <li>
@@ -402,7 +402,7 @@ export default function AiSeoCheckerPage(): React.ReactElement {
                 generate your llms.txt and track whether Perplexity, ChatGPT, and Gemini are
                 actually citing you for your target keywords.
               </p>
-              <Link href="/signup" className="btn btn-primary" style={{ marginRight: 'var(--space-3)' }}>
+              <Link href="/signup?next=/dashboard/ai-visibility" className="btn btn-primary" style={{ marginRight: 'var(--space-3)' }}>
                 Get Started Free
               </Link>
               <Link href="/dashboard/ai-visibility" className="btn btn-outline-brand">

@@ -22,6 +22,8 @@ interface PlanData {
   data_retention_days: number | null
   competitor_limit: number
   is_visible: boolean
+  llms_txt_limit: number
+  citation_check_monthly_limit: number
 }
 
 function formatInterval(seconds: number): string {
@@ -70,6 +72,24 @@ function getFeatures(p: PlanData): { text: string; included: boolean }[] {
 
   const watchdogLimit = p.competitor_limit ?? 3
   features.push({ text: `Watchdog — ${watchdogLimit} competitor${watchdogLimit === 1 ? '' : 's'}`, included: true })
+
+  // llms.txt Generator
+  if (p.llms_txt_limit === -1) {
+    features.push({ text: 'llms.txt Generator (unlimited)', included: true })
+  } else if (p.llms_txt_limit === 1) {
+    features.push({ text: 'llms.txt Generator (1 lifetime)', included: true })
+  } else if (p.llms_txt_limit === 0) {
+    features.push({ text: 'llms.txt Generator', included: false })
+  }
+
+  // AI Citation Monitor
+  if (p.citation_check_monthly_limit === -1) {
+    features.push({ text: 'AI Citation Monitor (unlimited)', included: true })
+  } else if (p.citation_check_monthly_limit > 0) {
+    features.push({ text: `AI Citation Monitor (${p.citation_check_monthly_limit}/month)`, included: true })
+  } else {
+    features.push({ text: 'AI Citation Monitor', included: false })
+  }
 
   features.push({ text: p.has_api_access ? 'Full API access' : 'API access', included: p.has_api_access })
 

@@ -15,6 +15,7 @@ export async function signInWithEmail(
   const email = formData.get('email') as string | null
   const origin = formData.get('origin') as string | null
   const ref = formData.get('ref') as string | null
+  const next = formData.get('next') as string | null
 
   if (!email) {
     return { error: 'Email is required' }
@@ -22,9 +23,11 @@ export async function signInWithEmail(
 
   const supabase = await createClient()
   const baseUrl = origin || getConfig().app.url
-  const callbackUrl = ref
-    ? `${baseUrl}/auth/callback?ref=${encodeURIComponent(ref)}`
-    : `${baseUrl}/auth/callback`
+  const params = new URLSearchParams()
+  if (ref) params.set('ref', ref)
+  if (next) params.set('next', next)
+  const queryStr = params.toString()
+  const callbackUrl = queryStr ? `${baseUrl}/auth/callback?${queryStr}` : `${baseUrl}/auth/callback`
 
   const { error } = await supabase.auth.signInWithOtp({
     email,
@@ -44,15 +47,17 @@ export async function signInWithEmail(
  * The caller (client component) must redirect the browser.
  * Accepts optional referral code to pass through to callback.
  */
-export async function signInWithGoogle(origin: string, ref?: string): Promise<{
+export async function signInWithGoogle(origin: string, ref?: string, next?: string): Promise<{
   url?: string
   error?: string
 }> {
   const supabase = await createClient()
   const baseUrl = origin || getConfig().app.url
-  const callbackUrl = ref
-    ? `${baseUrl}/auth/callback?ref=${encodeURIComponent(ref)}`
-    : `${baseUrl}/auth/callback`
+  const params = new URLSearchParams()
+  if (ref) params.set('ref', ref)
+  if (next) params.set('next', next)
+  const queryStr = params.toString()
+  const callbackUrl = queryStr ? `${baseUrl}/auth/callback?${queryStr}` : `${baseUrl}/auth/callback`
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',

@@ -17,7 +17,7 @@ function setEmailHint(email: string): void {
   document.cookie = `${HINT_COOKIE}=${encoded}; max-age=31536000; path=/; SameSite=Lax`
 }
 
-export function LoginForm({ mode = 'login' }: { mode?: 'login' | 'signup' }) {
+export function LoginForm({ mode = 'login', next }: { mode?: 'login' | 'signup'; next?: string }) {
   const [emailSent, setEmailSent] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
@@ -37,6 +37,7 @@ export function LoginForm({ mode = 'login' }: { mode?: 'login' | 'signup' }) {
     formData.set('origin', window.location.origin)
     const ref = getRefCode()
     if (ref) formData.set('ref', ref)
+    if (next) formData.set('next', next)
     const email = formData.get('email') as string
     startTransition(async () => {
       const result = await signInWithEmail(formData)
@@ -52,7 +53,7 @@ export function LoginForm({ mode = 'login' }: { mode?: 'login' | 'signup' }) {
     setError(null)
     const ref = getRefCode()
     startTransition(async () => {
-      const result = await signInWithGoogle(window.location.origin, ref ?? undefined)
+      const result = await signInWithGoogle(window.location.origin, ref ?? undefined, next ?? undefined)
       if (result.error) setError(result.error)
       else if (result.url) window.location.href = result.url
     })

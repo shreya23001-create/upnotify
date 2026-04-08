@@ -38,6 +38,7 @@ export async function updatePlanAction(formData: FormData): Promise<ActionResult
     'data_retention_days', 'voice_call_monthly_limit',
     'status_page_limit', 'ai_report_limit',
     'competitor_limit',
+    'llms_txt_limit', 'citation_check_monthly_limit',
   ] as const
   const nullableIntFields = ['price_annual_gbp', 'price_annual_usd', 'price_annual_inr', 'monitor_limit', 'client_workspace_limit', 'data_retention_days']
   for (const field of intFields) {

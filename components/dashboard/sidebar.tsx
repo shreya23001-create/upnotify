@@ -9,7 +9,7 @@ import { useAuth } from '@/components/providers/auth-provider'
 import {
   IconDashboard, IconActivity, IconGlobe, IconAlertTriangle,
   IconBuilding, IconSettings, IconShield, IconChevronLeft, IconChevronRight,
-  IconHelpCircle, IconTrendingUp, IconWatchdog, IconBarChart, IconInbox,
+  IconHelpCircle, IconTrendingUp, IconWatchdog, IconSparkles, IconInbox,
 } from '@/components/icons'
 
 interface NavSection {
@@ -33,7 +33,7 @@ const mainNavItems: NavItem[] = [
   { href: '/dashboard/status-pages', label: 'Status Pages', icon: IconGlobe },
   { href: '/dashboard/reports', label: 'Reports', icon: IconTrendingUp },
   { href: '/dashboard/watchdog', label: 'Watchdog', icon: IconWatchdog },
-  { href: '/dashboard/ai-visibility', label: 'AI Visibility', icon: IconBarChart },
+  { href: '/dashboard/ai-visibility', label: 'AI Visibility', icon: IconSparkles },
   // Compete hidden — launching in v1.5
 ]
 

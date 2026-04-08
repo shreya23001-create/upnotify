@@ -189,6 +189,26 @@ function LlmsTxtTab({ engines, generations, planSlug, canGenerate, blockReason }
                 Upload this file to your web root as <code>llms.txt</code>, then re-run the{' '}
                 <a href="/tools/ai-seo-checker" target="_blank">AI SEO Checker</a> to confirm it&apos;s detected.
               </p>
+              {generated && (
+                <details className="ai-vis-next-steps" style={{ marginTop: 20 }}>
+                  <summary style={{ cursor: 'pointer', fontWeight: 600, fontSize: 14, padding: '10px 0', listStyle: 'none', display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span>📋</span> What to do next with your llms.txt
+                  </summary>
+                  <div style={{ paddingTop: 12 }}>
+                    <ol style={{ paddingLeft: '1.4rem', lineHeight: 2.2, fontSize: 13, color: 'var(--text-secondary)' }}>
+                      <li><strong>Save the file</strong> — click Download above to get <code>llms.txt</code></li>
+                      <li><strong>Upload to your web root</strong> — place it at <code>https://yourdomain.com/llms.txt</code> (same level as robots.txt). For WordPress: upload via FTP or File Manager to the root folder. For Webflow/Squarespace: upload as a static file in Settings → Custom Code. For Vercel/Netlify: place the file in your <code>public/</code> folder.</li>
+                      <li><strong>Check your robots.txt</strong> — make sure it allows GPTBot, ClaudeBot, PerplexityBot, and Google-Extended. If it&apos;s missing or blocking them, use the <a href="/tools/ai-seo-checker" target="_blank">free AI SEO Checker</a> to see exactly what to fix.</li>
+                      <li><strong>Verify it&apos;s live</strong> — visit <code>https://yourdomain.com/llms.txt</code> in your browser to confirm it&apos;s accessible. Then run the <a href="/tools/ai-seo-checker" target="_blank">AI SEO Checker</a> on your domain — the llms.txt check should now pass.</li>
+                      <li><strong>Monitor your citations</strong> — switch to the <strong>AI Citation Monitor</strong> tab above to track which AI engines are actually citing your domain for your target keywords. Runs complete asynchronously and you&apos;ll receive an email when done.</li>
+                      <li><strong>Keep it updated</strong> — regenerate your llms.txt whenever you add major new sections or pages to your site. AI engines re-crawl llms.txt regularly.</li>
+                    </ol>
+                    <div style={{ marginTop: 12, padding: '10px 14px', background: 'rgba(59,130,246,0.06)', borderRadius: 8, fontSize: 12, color: 'var(--text-muted)' }}>
+                      💡 <strong>Tip:</strong> Customise the generated file before uploading — fill in the <code>[placeholder]</code> sections with your real site description, key pages, and author details. The more specific, the better your AI citations will be.
+                    </div>
+                  </div>
+                </details>
+              )}
             </>
           ) : (
             <div className="ai-vis-empty">
