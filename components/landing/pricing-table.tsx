@@ -20,6 +20,7 @@ interface PlanData {
   ai_report_limit: number
   has_api_access: boolean
   data_retention_days: number | null
+  competitor_limit: number
   is_visible: boolean
 }
 
@@ -66,6 +67,9 @@ function getFeatures(p: PlanData): { text: string; included: boolean }[] {
   } else {
     features.push({ text: 'AI reports', included: false })
   }
+
+  const watchdogLimit = p.competitor_limit ?? 3
+  features.push({ text: `Watchdog — ${watchdogLimit} competitor${watchdogLimit === 1 ? '' : 's'}`, included: true })
 
   features.push({ text: p.has_api_access ? 'Full API access' : 'API access', included: p.has_api_access })
 
