@@ -527,6 +527,55 @@ export async function sendBlogApprovalEmail(params: BlogApprovalEmailParams): Pr
 }
 
 // ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// AI Visibility — Citation report email
+// ---------------------------------------------------------------------------
+
+interface CitationReportEmailParams {
+  to:      string
+  domain:  string
+  score:   number
+  citedBy: string[]
+  runUrl:  string
+}
+
+export async function sendCitationReportEmail(params: CitationReportEmailParams): Promise<EmailResult> {
+  const scoreColor  = params.score >= 75 ? '#16a34a' : params.score >= 40 ? '#d97706' : '#dc2626'
+  const scoreLabel  = params.score >= 75 ? 'Good' : params.score >= 40 ? 'Needs Work' : 'Low Visibility'
+  const citedList   = params.citedBy.length > 0
+    ? params.citedBy.map(e => `<li style="margin:4px 0;font-size:14px;color:#374151;">✓ ${escapeHtml(e)}</li>`).join('')
+    : '<li style="margin:4px 0;font-size:14px;color:#6b7280;">Not cited by any engine in this check</li>'
+
+  const html = baseTemplate(`
+    <h2 style="margin:0 0 4px;font-size:18px;color:#111827;">AI Citation Check Complete</h2>
+    <p style="margin:0 0 20px;font-size:14px;color:#6b7280;">
+      Your citation check for <strong>${escapeHtml(params.domain)}</strong> has finished.
+    </p>
+
+    <div style="background:#f9fafb;border-radius:8px;padding:20px;margin-bottom:24px;text-align:center;">
+      <div style="font-size:42px;font-weight:800;color:${scoreColor};">${params.score}</div>
+      <div style="font-size:13px;color:${scoreColor};font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">${scoreLabel}</div>
+      <div style="font-size:12px;color:#9ca3af;margin-top:4px;">AI Visibility Score</div>
+    </div>
+
+    <p style="margin:0 0 8px;font-size:14px;font-weight:700;color:#111827;">Cited by:</p>
+    <ul style="margin:0 0 24px;padding-left:20px;">
+      ${citedList}
+    </ul>
+
+    <a href="${params.runUrl}" style="display:block;padding:12px 0;background:linear-gradient(135deg,#3b82f6,#06b6d4);color:#ffffff;font-size:15px;font-weight:600;text-decoration:none;border-radius:6px;text-align:center;">
+      View Full Report →
+    </a>
+
+    <p style="margin:20px 0 0;font-size:12px;color:#9ca3af;text-align:center;">
+      Manage your AI Visibility settings at uptrue.io/dashboard/ai-visibility
+    </p>
+  `)
+
+  return sendEmail(params.to, `AI Citation Check: ${params.domain} — Score ${params.score}/100`, html)
+}
+
+// ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 

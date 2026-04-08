@@ -507,6 +507,24 @@ export default function LandingPage(): React.ReactElement {
                   <td><span className="comp-no">—</span></td>
                   <td><span className="comp-no">—</span></td>
                 </tr>
+                <tr>
+                  <td>Free AI SEO Checker (4-category audit)</td>
+                  <td className="col-uptrue"><span className="comp-yes">✓</span></td>
+                  <td><span className="comp-no">—</span></td>
+                  <td><span className="comp-no">—</span></td>
+                </tr>
+                <tr>
+                  <td>llms.txt Generator</td>
+                  <td className="col-uptrue"><span className="comp-yes">✓</span></td>
+                  <td><span className="comp-no">—</span></td>
+                  <td><span className="comp-no">—</span></td>
+                </tr>
+                <tr>
+                  <td>AI Citation Monitoring (Perplexity, ChatGPT, Gemini…)</td>
+                  <td className="col-uptrue"><span className="comp-yes">✓</span></td>
+                  <td><span className="comp-no">—</span></td>
+                  <td><span className="comp-no">—</span></td>
+                </tr>
               </tbody>
             </table>
           </div>

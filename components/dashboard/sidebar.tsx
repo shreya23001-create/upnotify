@@ -33,6 +33,7 @@ const mainNavItems: NavItem[] = [
   { href: '/dashboard/status-pages', label: 'Status Pages', icon: IconGlobe },
   { href: '/dashboard/reports', label: 'Reports', icon: IconTrendingUp },
   { href: '/dashboard/watchdog', label: 'Watchdog', icon: IconWatchdog },
+  { href: '/dashboard/ai-visibility', label: 'AI Visibility', icon: IconBarChart },
   // Compete hidden — launching in v1.5
 ]
 

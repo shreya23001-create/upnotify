@@ -56,6 +56,7 @@ export function PublicNav(): React.ReactElement {
           <li><Link href="/#pricing">Pricing</Link></li>
           <li><Link href="/score">Score <span className="nav-badge">Free</span></Link></li>
           <li><Link href="/tracker">Tracker <span className="nav-badge">Free</span></Link></li>
+          <li><Link href="/tools/ai-seo-checker">AI SEO <span className="nav-badge">Free</span></Link></li>
           <li><Link href="/tools">Tools <span className="nav-badge">Free</span></Link></li>
           <li><Link href="/blog">Blog</Link></li>
         </ul>
@@ -98,6 +99,7 @@ export function PublicNav(): React.ReactElement {
             <li><Link href="/#pricing" onClick={close}>Pricing</Link></li>
             <li><Link href="/score" onClick={close}>Score <span className="nav-badge">Free</span></Link></li>
             <li><Link href="/tracker" onClick={close}>Tracker <span className="nav-badge">Free</span></Link></li>
+            <li><Link href="/tools/ai-seo-checker" onClick={close}>AI SEO Checker <span className="nav-badge">Free</span></Link></li>
             <li><Link href="/tools" onClick={close}>Tools <span className="nav-badge">Free</span></Link></li>
             <li><Link href="/blog" onClick={close}>Blog</Link></li>
           </ul>

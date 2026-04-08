@@ -17,6 +17,13 @@ export const metadata: Metadata = {
 
 const TOOLS = [
   {
+    slug: 'ai-seo-checker',
+    title: 'AI SEO Checker',
+    description:
+      'Is your website visible to ChatGPT, Perplexity, Claude, and Gemini? Get your AI readiness score, audit crawler access, generate your llms.txt, and see where to submit your site.',
+    tag: 'New',
+  },
+  {
     slug: 'ssl-checker',
     title: 'SSL Certificate Checker',
     description:
@@ -28,7 +35,7 @@ const TOOLS = [
     title: 'Uptime & SLA Calculator',
     description:
       'Calculate allowed downtime for any uptime percentage. See how much downtime 99.9%, 99.99%, and other SLA levels actually mean in real time.',
-    tag: 'New',
+    tag: '',
   },
 ]
 

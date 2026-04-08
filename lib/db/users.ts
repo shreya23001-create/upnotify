@@ -144,6 +144,20 @@ export async function getUserProfile(): Promise<{ user: ImpersonatedUser; organi
   return { user, organisation, isImpersonating: false }
 }
 
+export async function getUserById(userId: string): Promise<User | null> {
+  const supabase = createAdminClient()
+  const { data, error } = await supabase
+    .from('users')
+    .select('*')
+    .eq('id', userId)
+    .single()
+  if (error) {
+    logger.error('getUserById failed', { error: error.message, userId })
+    return null
+  }
+  return data ?? null
+}
+
 export async function getUsersByOrg(orgId: string): Promise<User[]> {
   const supabase = await createClient()
   const { data, error } = await supabase
