@@ -9,7 +9,7 @@ import PricingTable from '@/components/landing/pricing-table'
 import CompetePricing from '@/components/landing/compete-pricing'
 import { HeroCanvas } from '@/components/landing/hero-canvas'
 import { FeatureCarousel } from '@/components/landing/feature-carousel'
-import { DowntimeCalculator } from '@/components/landing/downtime-calculator'
+import { DowntimeCalculatorPopup } from '@/components/landing/downtime-calculator-popup'
 import Faq from '@/components/landing/faq'
 import { AgencyWaitlistCta } from '@/components/landing/agency-waitlist-cta'
 import { TrustedLogos } from '@/components/landing/trusted-logos'
@@ -723,7 +723,7 @@ export default function LandingPage(): React.ReactElement {
       {/* ================================================================
           DOWNTIME CALCULATOR
           ================================================================ */}
-      <DowntimeCalculator />
+      <DowntimeCalculatorPopup />
 
       {/* ================================================================
           TESTIMONIALS

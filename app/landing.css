@@ -1129,6 +1129,80 @@ html.dark .pub-nav {
 .calc-note { font-size: 11px; color: var(--text-muted); margin-top: var(--space-3); text-align: center; }
 
 /* ============================================================
+   DOWNTIME CALCULATOR — POPUP MODE
+   ============================================================ */
+@keyframes calcSlideDown {
+  from { opacity: 0; transform: translateY(-48px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0)     scale(1); }
+}
+@keyframes calcBackdropIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.calc-popup-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(10, 15, 30, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 72px 16px 16px;
+  overflow-y: auto;
+  animation: calcBackdropIn 0.25s ease forwards;
+}
+
+.calc-popup-panel {
+  position: relative;
+  width: 100%;
+  max-width: 860px;
+  animation: calcSlideDown 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Hide the section wrapper padding inside popup — calculator card fills the panel */
+.calc-popup-panel .calculator-section {
+  padding: 0;
+  background: transparent;
+}
+
+.calc-popup-close {
+  position: absolute;
+  top: -14px;
+  right: -14px;
+  z-index: 10;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1px solid var(--border, #e2e8f0);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-primary, #0f172a);
+  transition: background 0.15s, transform 0.15s;
+}
+.calc-popup-close:hover {
+  background: #f8fafc;
+  transform: scale(1.1);
+}
+
+@media (max-width: 600px) {
+  .calc-popup-backdrop {
+    padding: 56px 10px 10px;
+    align-items: flex-start;
+  }
+  .calc-popup-close {
+    top: -12px;
+    right: -4px;
+  }
+}
+
+/* ============================================================
    LIVE TICKER
    ============================================================ */
 .pub-ticker {
