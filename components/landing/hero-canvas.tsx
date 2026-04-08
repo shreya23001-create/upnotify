@@ -6,6 +6,9 @@ export function HeroCanvas(): React.ReactElement {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
+    // Skip animation on mobile/tablet — avoids overlap issues and saves battery
+    if (window.innerWidth < 900) return
+
     const canvas = canvasRef.current
     const hero = canvas?.closest('section')
     if (!canvas || !hero) return

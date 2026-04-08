@@ -598,47 +598,12 @@ export default function CompeteLandingPage(): React.ReactElement {
           </p>
           <div className="features-grid">
             {CASE_STUDIES.map((study) => (
-              <div key={study.title} className="feature-card" style={{ position: 'relative', overflow: 'hidden' }}>
-                {/* Coming Soon overlay */}
-                <div
-                  style={{
-                    position: 'absolute',
-                    inset: 0,
-                    background: 'rgba(255,255,255,0.75)',
-                    backdropFilter: 'blur(2px)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    zIndex: 2,
-                    borderRadius: 'inherit',
-                  }}
-                >
-                  <span
-                    style={{
-                      background: 'var(--color-primary)',
-                      color: '#fff',
-                      padding: '8px 20px',
-                      borderRadius: 20,
-                      fontSize: 13,
-                      fontWeight: 600,
-                      letterSpacing: '0.02em',
-                    }}
-                  >
-                    Coming Soon
-                  </span>
-                </div>
+              <div key={study.title} className="feature-card">
                 <div className="feature-icon">{'\u{1F4BC}'}</div>
                 <h3 className="feature-title">{study.title}</h3>
                 <span className="feature-subtitle">{study.subtitle}</span>
                 <p className="feature-description">{study.description}</p>
-                <p
-                  style={{
-                    fontSize: 13,
-                    fontWeight: 600,
-                    color: 'var(--color-primary)',
-                    marginTop: 8,
-                  }}
-                >
+                <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--color-primary)', marginTop: 8 }}>
                   {study.metric}
                 </p>
               </div>

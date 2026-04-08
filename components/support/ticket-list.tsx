@@ -31,6 +31,13 @@ const PRIORITY_CLASS: Record<string, string> = {
   low:    'support-priority-low',
 }
 
+/** Stable human-readable ticket number derived from UUID — no DB column needed */
+function ticketNumber(id: string): string {
+  const hex = id.replace(/-/g, '').slice(0, 8)
+  const num = parseInt(hex, 16) % 100000
+  return `TKT-${num.toString().padStart(5, '0')}`
+}
+
 function timeAgo(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime()
   const mins = Math.floor(diff / 60000)
@@ -48,6 +55,7 @@ export function TicketList({ tickets }: TicketListProps): React.ReactElement {
   const [category, setCategory] = useState<TicketCategory>('general')
   const [priority, setPriority] = useState<TicketPriority>('normal')
   const [message,  setMessage]  = useState('')
+  const [files,    setFiles]    = useState<File[]>([])
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [items, setItems] = useState<SupportTicket[]>(tickets)
@@ -62,16 +70,28 @@ export function TicketList({ tickets }: TicketListProps): React.ReactElement {
     setError('')
 
     try {
+      // Upload attachments first if any
+      const attachmentUrls: string[] = []
+      for (const file of files) {
+        const fd = new FormData()
+        fd.append('file', file)
+        const upRes = await fetch('/api/v1/support/upload', { method: 'POST', body: fd })
+        if (upRes.ok) {
+          const upData = await upRes.json() as { url?: string }
+          if (upData.url) attachmentUrls.push(upData.url)
+        }
+      }
+
       const res = await fetch('/api/v1/support/tickets', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ subject, category, priority, message }),
+        body: JSON.stringify({ subject, category, priority, message, attachments: attachmentUrls }),
       })
       const data = await res.json() as { ticket?: SupportTicket; error?: string }
       if (!res.ok) { setError(data.error ?? 'Failed to create ticket'); return }
 
       setItems(prev => [data.ticket!, ...prev])
-      setSubject(''); setMessage(''); setShowForm(false)
+      setSubject(''); setMessage(''); setFiles([]); setShowForm(false)
       router.push(`/dashboard/support/${data.ticket!.id}`)
     } catch {
       setError('Network error. Please try again.')
@@ -134,13 +154,27 @@ export function TicketList({ tickets }: TicketListProps): React.ReactElement {
                 rows={5}
               />
             </div>
+            <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+              <label className="form-label">Attachments <span style={{ fontWeight: 400, color: 'var(--text-muted)' }}>(optional — max 5MB each)</span></label>
+              <input
+                type="file" multiple accept="image/*,.pdf,.txt,.log,.csv,.zip"
+                className="form-input"
+                style={{ paddingTop: 8, paddingBottom: 8, cursor: 'pointer' }}
+                onChange={e => setFiles(Array.from(e.target.files ?? []))}
+              />
+              {files.length > 0 && (
+                <div style={{ marginTop: 6, fontSize: 12, color: 'var(--text-muted)' }}>
+                  {files.map(f => f.name).join(', ')}
+                </div>
+              )}
+            </div>
           </div>
           {error && <p className="form-error">{error}</p>}
           <div className="support-form-actions">
             <button className="btn btn-primary" onClick={handleSubmit} disabled={submitting}>
               {submitting ? 'Submitting...' : 'Submit Ticket'}
             </button>
-            <button className="btn btn-ghost" onClick={() => { setShowForm(false); setError('') }}>
+            <button className="btn btn-ghost" onClick={() => { setShowForm(false); setError(''); setFiles([]) }}>
               Cancel
             </button>
           </div>
@@ -167,7 +201,10 @@ export function TicketList({ tickets }: TicketListProps): React.ReactElement {
               className="card support-ticket-row"
             >
               <div className="support-ticket-row-main">
-                <div className="support-ticket-subject">{ticket.subject}</div>
+                <div className="support-ticket-subject">
+                  <span className="support-ticket-number">{ticketNumber(ticket.id)}</span>
+                  {ticket.subject}
+                </div>
                 <div className="support-ticket-meta">
                   <span className={`support-badge ${STATUS_CLASS[ticket.status] ?? ''}`}>
                     {STATUS_LABEL[ticket.status] ?? ticket.status}

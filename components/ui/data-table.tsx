@@ -174,6 +174,7 @@ export function DataTable<T extends { id: string }>({
         </div>
       )}
 
+      <div className="table-wrapper">
       <table className="table">
         <thead>
           <tr>
@@ -223,6 +224,7 @@ export function DataTable<T extends { id: string }>({
           ))}
         </tbody>
       </table>
+      </div>
 
       {filtered.length > pageSize && (
         <div className="data-table-pagination">

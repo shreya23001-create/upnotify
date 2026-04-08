@@ -103,6 +103,40 @@ html.dark .pub-nav {
 }
 .nav-actions { display: flex; align-items: center; gap: var(--space-2); }
 
+/* Hamburger — hidden on desktop, shown on mobile */
+.nav-hamburger {
+  display: none; align-items: center; justify-content: center;
+  width: 40px; height: 40px; border: none; background: transparent;
+  cursor: pointer; color: var(--text-primary); border-radius: var(--radius-md);
+  transition: background var(--dur-fast);
+}
+.nav-hamburger:hover { background: var(--bg-muted); }
+
+/* Mobile dropdown menu */
+.nav-mobile-menu {
+  border-top: 1px solid var(--border);
+  padding: 12px 16px 20px;
+  background: var(--bg-card);
+}
+.nav-mobile-links {
+  list-style: none; margin: 0 0 16px; padding: 0;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.nav-mobile-links li a {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 12px; border-radius: var(--radius-md);
+  font-size: 15px; font-weight: 500; color: var(--text-secondary);
+  transition: all var(--dur-fast);
+}
+.nav-mobile-links li a:hover { color: var(--text-primary); background: var(--bg-muted); }
+.nav-mobile-cta { display: flex; flex-direction: column; gap: 8px; }
+
+@media (max-width: 900px) {
+  .nav-links { display: none; }
+  .nav-actions { display: none; }
+  .nav-hamburger { display: flex; }
+}
+
 /* ============================================================
    HERO
    ============================================================ */
@@ -1243,6 +1277,7 @@ html.dark .pub-nav {
   .hero { padding: var(--space-12) 0 var(--space-16); }
   .hero-headline { font-size: clamp(28px, 8vw, 42px); }
   .hero-sub { font-size: 16px; }
+  .hero-canvas { display: none; }
   .mockup-body { height: 400px; }
   .mockup-sidebar { width: 140px; }
   .agency-card { flex-direction: column; padding: var(--space-10) var(--space-8); }
@@ -1252,6 +1287,7 @@ html.dark .pub-nav {
   .testimonials-grid { grid-template-columns: 1fr; }
   .blog-grid { grid-template-columns: 1fr; }
   .footer-top { grid-template-columns: 1fr; }
+  .footer-bottom { flex-direction: column; align-items: center; text-align: center; }
   .cta-band h2 { font-size: 32px; }
   .stats-bar-inner { gap: var(--space-8); }
   .hero-ctas { flex-direction: column; align-items: stretch; }

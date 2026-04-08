@@ -117,16 +117,15 @@ export default async function PublicStatusPage({
 
     <div className="status-page">
       <div className="status-page-header">
-        {orgLogoUrl && (
-          <div className="status-page-logo">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={orgLogoUrl}
-              alt={`${statusPage.name} logo`}
-              className="status-page-logo-img"
-            />
-          </div>
-        )}
+        <div className="status-page-logo">
+          {orgLogoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={orgLogoUrl} alt={`${statusPage.name} logo`} className="status-page-logo-img" />
+          ) : (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src="/favicon.ico" alt="Uptrue" className="status-page-logo-favicon" />
+          )}
+        </div>
         <h1 className="status-page-title">{statusPage.name}</h1>
         <p className="status-last-updated">Last updated: {new Date().toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' })}</p>
       </div>
@@ -170,6 +169,13 @@ export default async function PublicStatusPage({
       </div>
 
     </div>
+
+    {/* Footer */}
+    <footer className="sp-footer">
+      <div className="sp-footer-inner">
+        <span>Powered by <a href="https://uptrue.io" target="_blank" rel="noopener noreferrer">Uptrue</a> — uptime monitoring &amp; status pages</span>
+      </div>
+    </footer>
     </div>
   )
 }

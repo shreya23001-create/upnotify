@@ -39,11 +39,20 @@ function formatDate(str: string): string {
   })
 }
 
+/** Stable human-readable ticket number derived from UUID */
+function ticketNumber(id: string): string {
+  const hex = id.replace(/-/g, '').slice(0, 8)
+  const num = parseInt(hex, 16) % 100000
+  return `TKT-${num.toString().padStart(5, '0')}`
+}
+
 export function TicketThread({ ticket, messages, isAdmin = false }: TicketThreadProps): React.ReactElement {
-  const [thread, setThread]   = useState<SupportMessage[]>(messages)
-  const [reply,  setReply]    = useState('')
-  const [sending, setSending] = useState(false)
-  const [error,   setError]   = useState('')
+  const [thread, setThread]       = useState<SupportMessage[]>(messages)
+  const [reply,  setReply]        = useState('')
+  const [replyFiles, setReplyFiles] = useState<File[]>([])
+  const [sending,    setSending]  = useState(false)
+  const [draftLoading, setDraftLoading] = useState(false)
+  const [error,   setError]       = useState('')
   const [currentTicket, setCurrentTicket] = useState(ticket)
 
   // Admin-only controls
@@ -53,20 +62,44 @@ export function TicketThread({ ticket, messages, isAdmin = false }: TicketThread
 
   const isClosed = currentTicket.status === 'closed'
 
+  async function handleDraftWithAI(): Promise<void> {
+    setDraftLoading(true)
+    try {
+      const res = await fetch(`/api/v1/support/tickets/${ticket.id}/ai-draft`, { method: 'POST' })
+      const data = await res.json() as { draft?: string; error?: string }
+      if (res.ok && data.draft) setReply(data.draft)
+    } catch { /* silent */ } finally {
+      setDraftLoading(false)
+    }
+  }
+
   async function handleReply(): Promise<void> {
     if (!reply.trim()) return
     setSending(true); setError('')
 
     try {
+      // Upload attachments first if any
+      const attachmentUrls: string[] = []
+      for (const file of replyFiles) {
+        const fd = new FormData()
+        fd.append('file', file)
+        const upRes = await fetch('/api/v1/support/upload', { method: 'POST', body: fd })
+        if (upRes.ok) {
+          const upData = await upRes.json() as { url?: string }
+          if (upData.url) attachmentUrls.push(upData.url)
+        }
+      }
+
       const res = await fetch(`/api/v1/support/tickets/${ticket.id}/messages`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: reply }),
+        body: JSON.stringify({ message: reply, attachments: attachmentUrls }),
       })
       const data = await res.json() as { message?: SupportMessage; error?: string }
       if (!res.ok) { setError(data.error ?? 'Failed to send reply'); return }
       setThread(prev => [...prev, data.message!])
       setReply('')
+      setReplyFiles([])
     } catch {
       setError('Network error. Please try again.')
     } finally {
@@ -98,6 +131,9 @@ export function TicketThread({ ticket, messages, isAdmin = false }: TicketThread
       <div className="card support-thread-header">
         <div className="support-thread-header-top">
           <div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 4, letterSpacing: '0.02em' }}>
+              {ticketNumber(currentTicket.id)}
+            </div>
             <h2 className="support-thread-subject">{currentTicket.subject}</h2>
             <div className="support-thread-meta">
               <span className={`support-badge ${STATUS_CLASS[currentTicket.status] ?? ''}`}>
@@ -165,9 +201,21 @@ export function TicketThread({ ticket, messages, isAdmin = false }: TicketThread
       {/* Reply form */}
       {!isClosed && (
         <div className="card support-reply-card">
-          <label className="form-label" style={{ marginBottom: 8 }}>
-            {isAdmin ? 'Reply to user' : 'Add a reply'}
-          </label>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+            <label className="form-label" style={{ margin: 0 }}>
+              {isAdmin ? 'Reply to user' : 'Add a reply'}
+            </label>
+            {isAdmin && (
+              <button
+                className="btn btn-sm btn-secondary"
+                onClick={handleDraftWithAI}
+                disabled={draftLoading}
+                title="Generate an AI draft response based on ticket history and help docs"
+              >
+                {draftLoading ? '✨ Drafting...' : '✨ Draft with AI'}
+              </button>
+            )}
+          </div>
           <textarea
             className="form-input support-textarea"
             placeholder={isAdmin ? 'Write your reply...' : 'Write your reply or provide more information...'}
@@ -175,8 +223,24 @@ export function TicketThread({ ticket, messages, isAdmin = false }: TicketThread
             rows={4}
             disabled={sending}
           />
+          <div style={{ marginTop: 10 }}>
+            <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', display: 'block', marginBottom: 4 }}>
+              Attach files <span style={{ fontWeight: 400 }}>(optional — max 5MB each)</span>
+            </label>
+            <input
+              type="file" multiple accept="image/*,.pdf,.txt,.log,.csv,.zip"
+              className="form-input"
+              style={{ paddingTop: 8, paddingBottom: 8, cursor: 'pointer', fontSize: 13 }}
+              onChange={e => setReplyFiles(Array.from(e.target.files ?? []))}
+            />
+            {replyFiles.length > 0 && (
+              <div style={{ marginTop: 4, fontSize: 12, color: 'var(--text-muted)' }}>
+                {replyFiles.map(f => f.name).join(', ')}
+              </div>
+            )}
+          </div>
           {error && <p className="form-error" style={{ marginTop: 6 }}>{error}</p>}
-          <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+          <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
             <button className="btn btn-primary" onClick={handleReply} disabled={sending || !reply.trim()}>
               {sending ? 'Sending...' : 'Send Reply'}
             </button>
