@@ -50,6 +50,11 @@ export function PublicNav(): React.ReactElement {
               Tracker <span className="nav-badge">Free</span>
             </Link>
           </li>
+          <li>
+            <Link href="/tools">
+              Tools <span className="nav-badge">Free</span>
+            </Link>
+          </li>
           <li><Link href="/compete">Compete</Link></li>
           <li><Link href="/blog">Blog</Link></li>
         </ul>

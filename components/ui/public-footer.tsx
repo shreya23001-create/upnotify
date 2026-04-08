@@ -42,6 +42,7 @@ export function PublicFooter(): React.ReactElement {
               <li><Link href="/#pricing">Pricing</Link></li>
               <li><Link href="/score">Score <span style={{ color: 'var(--color-up)', fontSize: 10 }}>Free</span></Link></li>
               <li><Link href="/tracker">Tracker <span style={{ color: 'var(--color-up)', fontSize: 10 }}>Free</span></Link></li>
+              <li><Link href="/tools">Tools <span style={{ color: 'var(--color-up)', fontSize: 10 }}>Free</span></Link></li>
               <li><Link href="/leaderboard">Leaderboard</Link></li>
               <li><Link href="/compete">Compete</Link></li>
               <li><Link href="/blog">Blog</Link></li>
