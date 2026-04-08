@@ -88,10 +88,15 @@ export default async function TrackerDirectoryPage({
   return (
     <div className="tracker-directory">
       <div className="tracker-hero">
-        <h1 className="tracker-hero-title">Website Status Tracker</h1>
-        <p className="tracker-hero-subtitle">
-          Real-time uptime monitoring for {total} popular websites and services.
-        </p>
+        <div className="container">
+          <div className="tracker-hero-inner">
+            <div className="tracker-hero-eyebrow">Live Status</div>
+            <h1 className="tracker-hero-title">Is It Down Right Now?</h1>
+            <p className="tracker-hero-subtitle">
+              Real-time uptime monitoring for {total} popular websites and services. Updated every minute.
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Category filter */}
