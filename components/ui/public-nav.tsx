@@ -57,7 +57,6 @@ export function PublicNav(): React.ReactElement {
           <li><Link href="/score">Score <span className="nav-badge">Free</span></Link></li>
           <li><Link href="/tracker">Tracker <span className="nav-badge">Free</span></Link></li>
           <li><Link href="/tools">Tools <span className="nav-badge">Free</span></Link></li>
-          <li><Link href="/compete">Compete</Link></li>
           <li><Link href="/blog">Blog</Link></li>
         </ul>
 
@@ -100,7 +99,6 @@ export function PublicNav(): React.ReactElement {
             <li><Link href="/score" onClick={close}>Score <span className="nav-badge">Free</span></Link></li>
             <li><Link href="/tracker" onClick={close}>Tracker <span className="nav-badge">Free</span></Link></li>
             <li><Link href="/tools" onClick={close}>Tools <span className="nav-badge">Free</span></Link></li>
-            <li><Link href="/compete" onClick={close}>Compete</Link></li>
             <li><Link href="/blog" onClick={close}>Blog</Link></li>
           </ul>
           <div className="nav-mobile-cta">

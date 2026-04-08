@@ -1,3 +1,4 @@
+import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import CompetePricing from '@/components/landing/compete-pricing'
@@ -235,6 +236,7 @@ const BLOG_CARDS = [
    ================================================================ */
 
 export default function CompeteLandingPage(): React.ReactElement {
+  notFound() // Hidden until v1.5 launch
   return (
     <div className="landing">
       {/* JSON-LD: Product */}

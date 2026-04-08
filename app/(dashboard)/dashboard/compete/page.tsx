@@ -1,3 +1,4 @@
+// @ts-nocheck — dead route, redirects to /dashboard until Compete launches in v1.5
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
@@ -15,6 +16,7 @@ export const metadata: Metadata = {
 }
 
 export default async function CompetePage(): Promise<React.ReactElement> {
+  return redirect('/dashboard') // Hidden until v1.5 launch
   const user = await getCurrentUser()
   if (!user) redirect('/login')
 

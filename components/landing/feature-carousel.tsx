@@ -64,14 +64,7 @@ const CARDS: FeatureCard[] = [
     desc: 'Monitor any website automatically. See when rivals go down before their customers do — and benchmark your reliability against the competition.',
     tags: ['Uptime tracking', 'Incident alerts', 'Benchmarking'],
   },
-  {
-    cat: 'Intelligence', catColor: '#f59e0b', catBg: 'rgba(245,158,11,0.1)', catBorder: 'rgba(245,158,11,0.2)',
-    glow: 'linear-gradient(90deg,#f59e0b,#06b6d4)',
-    iconBg: 'linear-gradient(135deg,rgba(245,158,11,0.12),rgba(6,182,212,0.1))',
-    icon: '💰', title: 'Uptrue Compete',
-    desc: 'Track competitor prices and stock changes automatically. Get alerts the moment a price drops. Ecommerce intelligence starting at £9/month.',
-    tags: ['Price tracking', 'Stock alerts', 'CSV export', 'From £9/mo'],
-  },
+  // Compete card hidden — launching in v1.5
   {
     cat: 'Free Tool', catColor: '#10b981', catBg: 'rgba(16,185,129,0.1)', catBorder: 'rgba(16,185,129,0.2)',
     glow: 'linear-gradient(90deg,#10b981,#3b82f6)',

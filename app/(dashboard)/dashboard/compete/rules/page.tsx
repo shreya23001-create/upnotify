@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
 interface Rule {
@@ -90,6 +91,8 @@ function AutoUpdateConfirm({ ruleId, onConfirm, onCancel }: { ruleId: string; on
 }
 
 export default function PricingRulesPage(): React.ReactElement {
+  const router = useRouter()
+  useEffect(() => { router.replace('/dashboard') }, [router]) // Hidden until v1.5 launch
   const [rules, setRules] = useState<Rule[]>([])
   const [executions, setExecutions] = useState<Execution[]>([])
   const [loading, setLoading] = useState(true)

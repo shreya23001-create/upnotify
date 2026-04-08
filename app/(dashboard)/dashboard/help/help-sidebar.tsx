@@ -75,13 +75,7 @@ export const helpTopics: HelpTopic[] = [
     icon: '🧰',
     keywords: ['tool', 'ssl', 'checker', 'uptime', 'calculator', 'score', 'free'],
   },
-  {
-    href: '/dashboard/help/compete',
-    title: 'Uptrue Compete',
-    description: 'Track competitor prices, stock levels, and set pricing rules.',
-    icon: '\uD83D\uDCB0',
-    keywords: ['compete', 'price', 'stock', 'tracking', 'extraction', 'product', 'ecommerce'],
-  },
+  // Compete help hidden — launching in v1.5
   {
     href: '/dashboard/help/incidents',
     title: 'Incidents',

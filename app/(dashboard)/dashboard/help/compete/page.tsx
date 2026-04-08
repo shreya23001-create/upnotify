@@ -1,11 +1,14 @@
 'use client'
 
-import { usePathname } from 'next/navigation'
+import { useEffect } from 'react'
+import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { HelpSidebar } from '../help-sidebar'
 
 export default function HelpCompetePage(): React.ReactElement {
   const pathname = usePathname()
+  const router = useRouter()
+  useEffect(() => { router.replace('/dashboard/help') }, [router]) // Hidden until v1.5 launch
   return (
     <div className="help-layout">
       <HelpSidebar currentPath={pathname} />

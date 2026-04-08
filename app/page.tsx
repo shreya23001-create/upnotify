@@ -6,7 +6,6 @@ import { PublicFooter } from '@/components/ui/public-footer'
 import { Ticker } from '@/components/landing/ticker'
 import { BlogPreview } from '@/components/landing/blog-preview'
 import PricingTable from '@/components/landing/pricing-table'
-import CompetePricing from '@/components/landing/compete-pricing'
 import { HeroDashboardMockup } from '@/components/landing/hero-dashboard-mockup'
 import { FeatureCarousel } from '@/components/landing/feature-carousel'
 import { DowntimeCalculator } from '@/components/landing/downtime-calculator'
@@ -341,7 +340,6 @@ export default function LandingPage(): React.ReactElement {
           PRICING
           ================================================================ */}
       <PricingTable />
-      <CompetePricing />
 
       {/* ================================================================
           AGENCY CTA
@@ -463,12 +461,6 @@ export default function LandingPage(): React.ReactElement {
                 </tr>
                 <tr>
                   <td>Watchdog (competitor tracking)</td>
-                  <td className="col-uptrue"><span className="comp-yes">✓</span></td>
-                  <td><span className="comp-no">—</span></td>
-                  <td><span className="comp-no">—</span></td>
-                </tr>
-                <tr>
-                  <td>Price &amp; stock tracking (Compete)</td>
                   <td className="col-uptrue"><span className="comp-yes">✓</span></td>
                   <td><span className="comp-no">—</span></td>
                   <td><span className="comp-no">—</span></td>

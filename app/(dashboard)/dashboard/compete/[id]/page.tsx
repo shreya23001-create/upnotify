@@ -1,3 +1,4 @@
+// @ts-nocheck — dead route, redirects to /dashboard until Compete launches in v1.5
 import type { Metadata } from 'next'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
@@ -158,6 +159,7 @@ function buildPriceChart(history: Array<{ price: number; checked_at: string; cur
 }
 
 export default async function ProductDetailPage({ params, searchParams }: PageProps): Promise<React.ReactElement> {
+  return redirect('/dashboard') // Hidden until v1.5 launch
   const { id } = await params
   const { period: periodParam } = await searchParams
   const period = periodParam === '60' ? 60 : periodParam === '90' ? 90 : 30
