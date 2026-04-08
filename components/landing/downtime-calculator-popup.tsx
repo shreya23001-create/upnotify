@@ -1,20 +1,16 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { DowntimeCalculator } from './downtime-calculator'
+import { DowntimeCalculatorCard } from './downtime-calculator'
 
 const SESSION_KEY = 'uptrue_calc_popup_seen'
 
 export function DowntimeCalculatorPopup(): React.ReactElement {
-  const [mode, setMode] = useState<'idle' | 'popup' | 'inline'>('idle')
+  const [isPopup, setIsPopup] = useState(false)
   const sentinelRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    // Already seen this session — go straight to inline
-    if (sessionStorage.getItem(SESSION_KEY)) {
-      setMode('inline')
-      return
-    }
+    if (sessionStorage.getItem(SESSION_KEY)) return
 
     const sentinel = sentinelRef.current
     if (!sentinel) return
@@ -22,49 +18,63 @@ export function DowntimeCalculatorPopup(): React.ReactElement {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          setMode('popup')
+          setIsPopup(true)
           observer.disconnect()
         }
       },
-      { threshold: 0.1, rootMargin: '0px 0px -100px 0px' }
+      { threshold: 0.1 }
     )
     observer.observe(sentinel)
     return () => observer.disconnect()
   }, [])
 
+  // Lock / unlock body scroll
+  useEffect(() => {
+    if (isPopup) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => { document.body.style.overflow = '' }
+  }, [isPopup])
+
   function dismiss() {
     sessionStorage.setItem(SESSION_KEY, '1')
-    setMode('inline')
+    setIsPopup(false)
   }
 
   return (
-    <>
-      {/* Sentinel — sits at the top of where the calculator section is */}
-      <div ref={sentinelRef} style={{ height: 1 }} aria-hidden="true" />
+    <section className="calculator-section">
+      <div className="container">
 
-      {/* Backdrop + popup */}
-      {mode === 'popup' && (
-        <div className="calc-popup-backdrop" onClick={dismiss}>
-          <div
-            className="calc-popup-panel"
-            onClick={e => e.stopPropagation()}
-          >
-            <button
-              className="calc-popup-close"
-              onClick={dismiss}
-              aria-label="Close calculator"
-            >
-              <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/>
-              </svg>
-            </button>
-            <DowntimeCalculator />
-          </div>
+        {/* Section header — always visible on page */}
+        <div className="section-header">
+          <div className="section-eyebrow" style={{ color: '#ef4444' }}>The real cost of downtime</div>
+          <h2 className="section-title">It&apos;s not just lost revenue.<br />It&apos;s your reputation.</h2>
+          <p className="section-sub">
+            Every minute your site is down, customers are leaving, telling friends, and never coming back.
+            Calculate the true cost — including what you can&apos;t see on a balance sheet.
+          </p>
         </div>
-      )}
 
-      {/* Inline — normal page position after dismiss */}
-      {mode === 'inline' && <DowntimeCalculator />}
-    </>
+        {/* Sentinel — triggers popup when header scrolls into view */}
+        <div ref={sentinelRef} style={{ height: 1 }} aria-hidden="true" />
+
+        {/* Popup — card floats above page */}
+        {isPopup && (
+          <div className="calc-popup-backdrop" onClick={dismiss}>
+            <div className="calc-popup-panel" onClick={e => e.stopPropagation()}>
+              <DowntimeCalculatorCard onClose={dismiss} />
+            </div>
+          </div>
+        )}
+
+        {/* Inline card — always rendered so no layout shift after dismiss */}
+        <div style={{ visibility: isPopup ? 'hidden' : 'visible' }}>
+          <DowntimeCalculatorCard />
+        </div>
+
+      </div>
+    </section>
   )
 }

@@ -1132,8 +1132,8 @@ html.dark .pub-nav {
    DOWNTIME CALCULATOR — POPUP MODE
    ============================================================ */
 @keyframes calcSlideDown {
-  from { opacity: 0; transform: translateY(-48px) scale(0.98); }
-  to   { opacity: 1; transform: translateY(0)     scale(1); }
+  from { opacity: 0; transform: translateY(-20px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 @keyframes calcBackdropIn {
   from { opacity: 0; }
@@ -1144,61 +1144,50 @@ html.dark .pub-nav {
   position: fixed;
   inset: 0;
   z-index: 1000;
-  background: rgba(10, 15, 30, 0.55);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  background: rgba(10, 15, 30, 0.45);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
-  padding: 72px 16px 16px;
+  padding: 24px 16px;
   overflow-y: auto;
-  animation: calcBackdropIn 0.25s ease forwards;
+  animation: calcBackdropIn 0.35s ease forwards;
 }
 
 .calc-popup-panel {
-  position: relative;
   width: 100%;
   max-width: 860px;
-  animation: calcSlideDown 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: calcSlideDown 0.5s ease-out forwards;
 }
 
-/* Hide the section wrapper padding inside popup — calculator card fills the panel */
-.calc-popup-panel .calculator-section {
-  padding: 0;
-  background: transparent;
-}
-
+/* ✕ button — sits inside the card, top-right corner */
 .calc-popup-close {
   position: absolute;
-  top: -14px;
-  right: -14px;
+  top: 16px;
+  right: 16px;
   z-index: 10;
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  background: #fff;
-  border: 1px solid var(--border, #e2e8f0);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  background: rgba(0,0,0,0.06);
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: var(--text-primary, #0f172a);
-  transition: background 0.15s, transform 0.15s;
+  color: var(--text-muted, #64748b);
+  transition: background 0.2s, color 0.2s;
 }
 .calc-popup-close:hover {
-  background: #f8fafc;
-  transform: scale(1.1);
+  background: rgba(0,0,0,0.12);
+  color: var(--text-primary, #0f172a);
 }
 
 @media (max-width: 600px) {
   .calc-popup-backdrop {
-    padding: 56px 10px 10px;
     align-items: flex-start;
-  }
-  .calc-popup-close {
-    top: -12px;
-    right: -4px;
+    padding: 16px 10px;
   }
 }
 
