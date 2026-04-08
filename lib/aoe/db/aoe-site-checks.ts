@@ -60,15 +60,20 @@ export async function getSiteChecks(domain: string): Promise<AoeSiteCheck[]> {
 
 // ---------------------------------------------------------------------------
 // Categorise a domain after 3 nights of checks
-// Returns the category and summary stats
+// hasLlmsTxt: pass the result of the llms.txt check from aoe_site_discovery
+// Priority: down > ssl_expiry > slow > ecom_issue > compete > no_llms_txt > skip
 // ---------------------------------------------------------------------------
 
-export async function categorizeSite(domain: string, platform: string | null): Promise<AoeSiteCheckSummary> {
+export async function categorizeSite(
+  domain: string,
+  platform: string | null,
+  hasLlmsTxt?: boolean | null,
+): Promise<AoeSiteCheckSummary> {
   const checks = await getSiteChecks(domain)
-  const { campaigns, quota: _ } = AOE_CONFIG
+  const { campaigns } = AOE_CONFIG
 
-  const downCount   = checks.filter(c => c.is_down).length
-  const slowCount   = checks.filter(c => !c.is_down && (c.response_time_ms ?? 0) > campaigns.site_slow.slowThresholdMs).length
+  const downCount     = checks.filter(c => c.is_down).length
+  const slowCount     = checks.filter(c => !c.is_down && (c.response_time_ms ?? 0) > campaigns.site_slow.slowThresholdMs).length
   const responseTimes = checks.filter(c => c.response_time_ms !== null).map(c => c.response_time_ms as number)
   const avgResponseMs = responseTimes.length > 0 ? Math.round(responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length) : 0
   const worstResponseMs = responseTimes.length > 0 ? Math.max(...responseTimes) : 0
@@ -76,7 +81,6 @@ export async function categorizeSite(domain: string, platform: string | null): P
 
   let category: AoeSiteCategory = 'skip'
 
-  // Priority: down > ssl_expiry > slow > ecom_compete > skip
   if (downCount >= 1) {
     category = (platform === 'shopify' || platform === 'woocommerce') ? 'ecom_issue' : 'down'
   } else if (sslExpiryDays !== null && sslExpiryDays <= 14) {
@@ -85,6 +89,8 @@ export async function categorizeSite(domain: string, platform: string | null): P
     category = 'slow'
   } else if (platform === 'shopify' || platform === 'woocommerce') {
     category = 'compete' // no issues, but ecommerce — pitch Compete
+  } else if (hasLlmsTxt === false) {
+    category = 'no_llms_txt' // healthy site missing llms.txt — pitch AI SEO tools
   }
 
   return {

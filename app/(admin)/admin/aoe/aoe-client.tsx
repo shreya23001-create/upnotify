@@ -89,7 +89,22 @@ const CAMPAIGN_LABELS: Record<string, string> = {
   site_down:    'Site Down Outreach',
   site_slow:    'Site Slow Outreach',
   ecom_down:    'Ecom Down Outreach',
+  ai_seo:       'AI Visibility Outreach',
   compete_cold: 'Compete Cold Outreach',
+}
+
+// Campaigns shown in the toggle table (order matters)
+const CAMPAIGN_KEYS = ['ssl_expiry', 'site_down', 'site_slow', 'ecom_down', 'ai_seo', 'compete_cold'] as const
+type CampaignKey = typeof CAMPAIGN_KEYS[number]
+
+// Setting key lookup — must match aoe_settings DB keys
+const CAMPAIGN_SETTING_KEY: Record<CampaignKey, string> = {
+  ssl_expiry:   'campaign_ssl_expiry',
+  site_down:    'campaign_site_down',
+  site_slow:    'campaign_site_slow',
+  ecom_down:    'campaign_ecom_down',
+  ai_seo:       'campaign_ai_seo',
+  compete_cold: 'campaign_compete_cold',
 }
 
 // ---------------------------------------------------------------------------
@@ -271,26 +286,35 @@ export function AdminAoeClientPage(): React.ReactElement {
                 </tr>
               </thead>
               <tbody>
-                {(['ssl_expiry', 'site_down', 'site_slow', 'ecom_down', 'compete_cold'] as const).map(campaign => {
-                  const enabled = settingVal(stats.settings, `campaign_${campaign}_enabled`)
+                {CAMPAIGN_KEYS.map(campaign => {
+                  const settingKey = CAMPAIGN_SETTING_KEY[campaign]
+                  const enabled = settingVal(stats.settings, settingKey)
                   const stat = stats.campaigns.find(c => c.campaign === campaign)
+                  const isAiSeo = campaign === 'ai_seo'
                   return (
                     <tr key={campaign}>
-                      <td style={{ fontWeight: 500 }}>{CAMPAIGN_LABELS[campaign] ?? campaign}</td>
+                      <td style={{ fontWeight: 500 }}>
+                        {CAMPAIGN_LABELS[campaign] ?? campaign}
+                        {isAiSeo && (
+                          <span style={{ marginLeft: 8, fontSize: 11, background: '#7c3aed', color: '#fff', padding: '1px 7px', borderRadius: 8, fontWeight: 600 }}>
+                            Harvey review pending
+                          </span>
+                        )}
+                      </td>
                       <td>
                         <button
-                          onClick={() => toggle(`campaign_${campaign}_enabled`, enabled)}
-                          disabled={!masterEnabled || saving === `campaign_${campaign}_enabled`}
+                          onClick={() => toggle(settingKey, enabled)}
+                          disabled={!masterEnabled || saving === settingKey}
                           style={{
                             padding: '3px 12px',
                             borderRadius: 10,
                             border: 'none',
-                            cursor: (!masterEnabled || saving === `campaign_${campaign}_enabled`) ? 'not-allowed' : 'pointer',
+                            cursor: (!masterEnabled || saving === settingKey) ? 'not-allowed' : 'pointer',
                             fontSize: 12,
                             fontWeight: 600,
                             background: enabled && masterEnabled ? '#22c55e' : '#6b7280',
                             color: '#fff',
-                            opacity: saving === `campaign_${campaign}_enabled` ? 0.6 : 1,
+                            opacity: saving === settingKey ? 0.6 : 1,
                           }}
                         >
                           {enabled ? 'ON' : 'OFF'}

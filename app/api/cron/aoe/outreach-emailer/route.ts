@@ -23,25 +23,27 @@ import type { AoeSiteDiscovery } from '@/lib/aoe/types'
 export const dynamic = 'force-dynamic'
 export const maxDuration = 300
 
-const BATCH_SIZE   = 100   // max emails per run (quota further limits this)
-const CONCURRENCY  = 5     // parallel sends
+const BATCH_SIZE  = 100  // max emails per run (quota further limits this)
+const CONCURRENCY = 5    // parallel sends
 
-// Campaign → setting key mapping
+// Campaign → setting key mapping (keys match AoeSettings interface directly)
 const CAMPAIGN_SETTING_KEYS: Record<string, string> = {
-  ssl_expiry:   'campaign_ssl_expiry_enabled',
-  site_down:    'campaign_site_down_enabled',
-  site_slow:    'campaign_site_slow_enabled',
-  ecom_issue:   'campaign_site_down_enabled',  // ecom_issue uses the down campaign toggle
-  compete:      'campaign_compete_cold_enabled',
+  ssl_expiry:   'campaign_ssl_expiry',
+  site_down:    'campaign_site_down',
+  site_slow:    'campaign_site_slow',
+  ecom_issue:   'campaign_ecom_down',   // ecom_issue uses the ecom_down toggle
+  compete:      'campaign_compete_cold',
+  no_llms_txt:  'campaign_ai_seo',
 }
 
-// Category → campaign type mapping (for logging)
+// Category → campaign type mapping (for outreach log)
 const CATEGORY_TO_CAMPAIGN = {
-  ssl_expiry:  'ssl_expiry',
-  down:        'site_down',
-  ecom_issue:  'ecom_down',
-  slow:        'site_slow',
-  compete:     'compete_cold',
+  ssl_expiry:   'ssl_expiry',
+  down:         'site_down',
+  ecom_issue:   'ecom_down',
+  slow:         'site_slow',
+  compete:      'compete_cold',
+  no_llms_txt:  'ai_seo',
 } as const
 
 // ---------------------------------------------------------------------------
@@ -70,20 +72,15 @@ async function processSite(
     .ilike('email', `%@${site.domain}`)
   if ((userCount ?? 0) > 0) return 'skipped'
 
-  // Gate 4: categorise the site
-  const summary = await categorizeSite(site.domain, site.platform)
+  // Gate 4: categorise the site (pass has_llms_txt so no_llms_txt is detected)
+  const summary = await categorizeSite(site.domain, site.platform, site.has_llms_txt)
   if (summary.category === 'skip') return 'skipped'
 
-  // Gate 5: campaign enabled?
+  // Gate 5: campaign enabled? (checks against AoeSettings keys directly)
   const settingKey = CAMPAIGN_SETTING_KEYS[summary.category]
   if (settingKey && settingMap.get(settingKey) === false) return 'skipped'
 
-  // Gate 6: compete_cold is off by default — only send if explicitly enabled
-  if (summary.category === 'compete' && !settingMap.get('campaign_compete_cold_enabled')) {
-    return 'skipped'
-  }
-
-  // Build email — use a placeholder message ID first, then replace after send
+  // Build email
   const placeholderId = `placeholder-${Date.now()}`
   const template = buildAoeEmail(site.domain, summary, placeholderId)
   if (!template) return 'skipped'
@@ -98,6 +95,7 @@ async function processSite(
   if (!result.success) return 'error'
 
   const campaign = CATEGORY_TO_CAMPAIGN[summary.category as keyof typeof CATEGORY_TO_CAMPAIGN] ?? 'site_down'
+  const isCompeteProduct = summary.category === 'compete'
 
   // Log to outreach log
   await logAoeEmailSent({
@@ -106,7 +104,7 @@ async function processSite(
     emailSource: site.email_source ?? 'website_scrape',
     campaign,
     platform: site.platform,
-    product: summary.category === 'compete' ? 'compete' : 'uptrue',
+    product: isCompeteProduct ? 'compete' : 'uptrue',
     resendMessageId: result.messageId,
   })
 

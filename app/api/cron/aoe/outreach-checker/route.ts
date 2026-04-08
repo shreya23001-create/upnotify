@@ -3,6 +3,7 @@
 // Cron: outreach-checker — runs nightly at 3am UTC
 // Performs silent HTTP + SSL checks on sites in the discovery queue
 // After 18 checks (3 nights × 6 runs) → categorise and mark ready/skip
+// Also checks for llms.txt at completion to feed the AI SEO campaign
 // =============================================================================
 
 import { NextResponse } from 'next/server'
@@ -16,6 +17,7 @@ import {
   incrementCheckCount,
   markSiteReady,
   markSiteSkip,
+  setLlmsTxtStatus,
 } from '@/lib/aoe/db/aoe-site-discovery'
 import { logSiteCheck, categorizeSite, deleteOldSiteChecks } from '@/lib/aoe/db/aoe-site-checks'
 import { checkSite } from '@/lib/aoe/services/site-checker'
@@ -28,10 +30,31 @@ export const maxDuration = 300 // 5 minutes
 // Config
 // ---------------------------------------------------------------------------
 
-const BATCH_SIZE    = 200   // sites to check per run
-const CONCURRENCY   = 10    // parallel checks
-const TIMEOUT_MS    = 10000 // per-site timeout
-const CHECKS_TO_COMPLETE = 18 // 3 nights × 6 runs per night
+const BATCH_SIZE         = 200  // sites to check per run
+const CONCURRENCY        = 10   // parallel checks
+const TIMEOUT_MS         = 10000 // per-site timeout
+const CHECKS_TO_COMPLETE = 18   // 3 nights × 6 runs per night
+
+// ---------------------------------------------------------------------------
+// Check whether a site has an llms.txt file (called once at pipeline completion)
+// ---------------------------------------------------------------------------
+
+async function checkLlmsTxt(domain: string): Promise<boolean> {
+  try {
+    const controller = new AbortController()
+    const timer = setTimeout(() => controller.abort(), 5000)
+    const res = await fetch(`https://${domain}/llms.txt`, {
+      signal: controller.signal,
+      redirect: 'follow',
+      headers: { 'User-Agent': 'Uptrue-Bot/1.0 (+https://uptrue.io/bot)' },
+    })
+    clearTimeout(timer)
+    return res.ok
+  } catch {
+    // Can't reach it — treat as missing (conservative: only email if clearly absent)
+    return false
+  }
+}
 
 // ---------------------------------------------------------------------------
 // Process a single site
@@ -55,14 +78,18 @@ async function processSite(
 
   await incrementCheckCount(site.domain)
 
-  // After completing all 18 checks — categorise and move to ready/skip
+  // After completing all 18 checks — check llms.txt, categorise, mark ready/skip
   if (checkNumber >= CHECKS_TO_COMPLETE) {
-    const summary = await categorizeSite(site.domain, site.platform)
+    // One-time llms.txt check at pipeline completion (not on every nightly run)
+    const hasLlmsTxt = await checkLlmsTxt(site.domain)
+    await setLlmsTxtStatus(site.domain, hasLlmsTxt)
+
+    const summary = await categorizeSite(site.domain, site.platform, hasLlmsTxt)
 
     if (summary.category === 'skip') {
       await markSiteSkip(site.domain, 'no_issues')
     } else {
-      // Has issues worth emailing about → move to ready queue
+      // Has something worth emailing about → move to ready queue
       await markSiteReady(site.domain)
       logger.info('AOE: site ready to email', {
         domain: site.domain,
@@ -70,6 +97,7 @@ async function processSite(
         downCount: summary.downCount,
         slowCount: summary.slowCount,
         sslExpiryDays: summary.sslExpiryDays,
+        hasLlmsTxt,
       })
     }
   }
@@ -138,7 +166,7 @@ export async function GET(request: Request): Promise<NextResponse> {
       }
     }
 
-    // How many are now ready to email
+    // How many completed their full check cycle this run
     const completedThisRun = sites.filter(
       s => ((s.check_count ?? 0) + 1) >= CHECKS_TO_COMPLETE
     ).length
@@ -151,12 +179,7 @@ export async function GET(request: Request): Promise<NextResponse> {
     })
 
     await endCronRun(runId, cronStart, 'ok', { summary: `checked: ${checked}, completedThisRun: ${completedThisRun}, errors: ${errors}` })
-    return NextResponse.json({
-      ok: true,
-      checked,
-      errors,
-      completedThisRun,
-    })
+    return NextResponse.json({ ok: true, checked, errors, completedThisRun })
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Unknown error'
     logger.error('AOE outreach-checker error', { error: message })

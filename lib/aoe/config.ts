@@ -54,6 +54,13 @@ export const AOE_CONFIG: AoeConfig = {
       ctaText: 'Track my competitors free →',
       ctaUrl: 'https://uptrue.io/signup?utm_source=outreach&utm_campaign=compete_cold&utm_medium=email',
     },
+    ai_seo: {
+      enabled: false, // starts disabled — turn on from admin panel after Harvey sign-off
+      primaryCtaText: 'Check your AI visibility score — free →',
+      primaryCtaUrl: 'https://uptrue.io/tools/ai-visibility?utm_source=outreach&utm_campaign=ai_seo&utm_medium=email',
+      secondaryCtaText: 'Generate your llms.txt — free →',
+      secondaryCtaUrl: 'https://uptrue.io/tools/llms-txt?utm_source=outreach&utm_campaign=ai_seo&utm_medium=email',
+    },
   },
 
   // -------------------------------------------------------------------------

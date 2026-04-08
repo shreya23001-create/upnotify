@@ -160,6 +160,18 @@ export async function markSiteOptedOut(domain: string): Promise<void> {
 }
 
 // ---------------------------------------------------------------------------
+// Store the result of the llms.txt check (called by outreach-checker at completion)
+// ---------------------------------------------------------------------------
+
+export async function setLlmsTxtStatus(domain: string, hasLlmsTxt: boolean): Promise<void> {
+  const supabase = createAdminClient()
+  await supabase
+    .from('aoe_site_discovery')
+    .update({ has_llms_txt: hasLlmsTxt })
+    .eq('domain', domain)
+}
+
+// ---------------------------------------------------------------------------
 // Check if domain already exists in discovery
 // ---------------------------------------------------------------------------
 

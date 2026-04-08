@@ -58,8 +58,9 @@ ${content}
 </html>`
 }
 
-function ctaButton(text: string, url: string): string {
-  return `<a href="${url}" style="display:inline-block;padding:11px 28px;background-color:${AOE_CONFIG.product.primaryColour};color:#ffffff;font-size:14px;font-weight:600;text-decoration:none;border-radius:6px;">${text}</a>`
+function ctaButton(text: string, url: string, colour?: string): string {
+  const bg = colour ?? AOE_CONFIG.product.primaryColour
+  return `<a href="${url}" style="display:inline-block;padding:11px 28px;background-color:${bg};color:#ffffff;font-size:14px;font-weight:600;text-decoration:none;border-radius:6px;">${text}</a>`
 }
 
 function esc(s: string): string {
@@ -310,6 +311,81 @@ export function buildCompeteColdEmail(
 }
 
 // ---------------------------------------------------------------------------
+// 6. AI SEO — healthy site with no llms.txt (dual CTA)
+// Gentle fear: competitors are visible to AI search, you're not yet
+// ---------------------------------------------------------------------------
+
+export function buildAiSeoEmail(
+  domain: string,
+  _summary: AoeSiteCheckSummary,
+  messageId: string
+): AoeEmailTemplate {
+  const { campaigns, product } = AOE_CONFIG
+  const cta = campaigns.ai_seo
+
+  const subject = `${domain} is invisible to AI search engines`
+
+  const html = baseLayout(`
+    <h2 style="margin:0 0 8px;font-size:18px;font-weight:700;color:#111827;">
+      ${esc(domain)} is <span style="color:#7c3aed;">invisible to AI search</span>
+    </h2>
+    <p style="margin:0 0 20px;font-size:14px;color:#374151;line-height:1.6;">
+      Hi,<br><br>
+      We ran a quick check on <strong>${esc(domain)}</strong>. Your site looks healthy — good uptime and response times.
+      But AI search engines like ChatGPT, Perplexity, and Claude
+      <strong>can't read or cite your content</strong> because you don't have an
+      <code style="background:#f3f4f6;padding:1px 5px;border-radius:3px;font-size:13px;">llms.txt</code> file.
+    </p>
+    <div style="background:#f5f3ff;border:1px solid #ddd6fe;border-radius:6px;padding:16px 20px;margin-bottom:24px;">
+      <p style="margin:0 0 8px;font-size:14px;color:#5b21b6;font-weight:600;">While you're not visible, your competitors are:</p>
+      <ul style="margin:0;padding-left:20px;font-size:14px;color:#374151;line-height:1.8;">
+        <li>AI-driven search is growing fast — ChatGPT alone answers millions of queries per day</li>
+        <li>Sites with <code style="background:#ede9fe;padding:1px 4px;border-radius:3px;font-size:12px;">llms.txt</code> get cited in AI answers; sites without don't</li>
+        <li>Early movers in AI SEO will hold rankings for years</li>
+      </ul>
+    </div>
+    <p style="margin:0 0 24px;font-size:14px;color:#374151;line-height:1.6;">
+      We built two free tools to fix this today — no account required to get started:
+    </p>
+
+    <!-- Primary CTA: AI Visibility Score -->
+    <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:20px 24px;margin-bottom:12px;">
+      <div style="margin-bottom:8px;">
+        <span style="display:inline-block;background:#7c3aed;color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;letter-spacing:0.5px;text-transform:uppercase;">Free</span>
+      </div>
+      <p style="margin:0 0 4px;font-size:15px;font-weight:700;color:#111827;">AI Visibility Score</p>
+      <p style="margin:0 0 14px;font-size:13px;color:#6b7280;line-height:1.5;">
+        See exactly how visible ${esc(domain)} is to AI search engines — scored, explained, and actionable.
+      </p>
+      ${ctaButton(cta.primaryCtaText, cta.primaryCtaUrl, '#7c3aed')}
+    </div>
+
+    <!-- Secondary CTA: llms.txt Generator -->
+    <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:20px 24px;margin-bottom:20px;">
+      <div style="margin-bottom:8px;">
+        <span style="display:inline-block;background:#0891b2;color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;letter-spacing:0.5px;text-transform:uppercase;">Free</span>
+      </div>
+      <p style="margin:0 0 4px;font-size:15px;font-weight:700;color:#111827;">llms.txt Generator</p>
+      <p style="margin:0 0 14px;font-size:13px;color:#6b7280;line-height:1.5;">
+        Generate the file that tells AI engines what your site is about. Takes 2 minutes, works immediately.
+      </p>
+      ${ctaButton(cta.secondaryCtaText, cta.secondaryCtaUrl, '#0891b2')}
+    </div>
+
+    <p style="margin:0;font-size:12px;color:#9ca3af;line-height:1.6;">
+      Both tools are completely free. No account needed to get started.<br>
+      We checked <strong>${esc(domain)}</strong> using publicly available data.
+    </p>
+    <p style="margin:12px 0 0;font-size:12px;color:#9ca3af;">
+      ${product.name} also monitors uptime, SSL, and performance —
+      <a href="${product.signupUrl}" style="color:#3b82f6;text-decoration:none;">free to start</a>
+    </p>
+  `, buildUnsubscribeUrl(messageId))
+
+  return { subject, html }
+}
+
+// ---------------------------------------------------------------------------
 // Router — pick the right template for a category
 // ---------------------------------------------------------------------------
 
@@ -319,11 +395,12 @@ export function buildAoeEmail(
   messageId: string
 ): AoeEmailTemplate | null {
   switch (summary.category) {
-    case 'ssl_expiry':  return buildSslExpiryEmail(domain, summary, messageId)
-    case 'down':        return buildSiteDownEmail(domain, summary, messageId)
-    case 'ecom_issue':  return buildEcomDownEmail(domain, summary, messageId)
-    case 'slow':        return buildSiteSlowEmail(domain, summary, messageId)
-    case 'compete':     return buildCompeteColdEmail(domain, summary, messageId)
-    default:            return null
+    case 'ssl_expiry':   return buildSslExpiryEmail(domain, summary, messageId)
+    case 'down':         return buildSiteDownEmail(domain, summary, messageId)
+    case 'ecom_issue':   return buildEcomDownEmail(domain, summary, messageId)
+    case 'slow':         return buildSiteSlowEmail(domain, summary, messageId)
+    case 'compete':      return buildCompeteColdEmail(domain, summary, messageId)
+    case 'no_llms_txt':  return buildAiSeoEmail(domain, summary, messageId)
+    default:             return null
   }
 }

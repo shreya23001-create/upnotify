@@ -13,6 +13,7 @@ export type AoeCampaign =
   | 'site_slow'
   | 'ecom_down'
   | 'compete_cold'
+  | 'ai_seo'
 
 export type AoePlatform = 'general' | 'shopify' | 'woocommerce'
 
@@ -51,6 +52,7 @@ export interface AoeSiteDiscovery {
   ready_at: string | null
   emailed_at: string | null
   skip_reason: AoeSkipReason | null
+  has_llms_txt?: boolean | null
 }
 
 // ---------------------------------------------------------------------------
@@ -71,12 +73,13 @@ export interface AoeSiteCheck {
 
 // Categorised result after 3 nights of checks
 export type AoeSiteCategory =
-  | 'down'       // was actually down during checks
-  | 'slow'       // response time > threshold on 4+ checks
-  | 'ssl_expiry' // SSL expiring within configured days
-  | 'ecom_issue' // shopify/woocommerce specific issue
-  | 'compete'    // no issues but ecommerce — Compete pitch
-  | 'skip'       // no issues found, not worth emailing
+  | 'down'        // was actually down during checks
+  | 'slow'        // response time > threshold on 4+ checks
+  | 'ssl_expiry'  // SSL expiring within configured days
+  | 'ecom_issue'  // shopify/woocommerce specific issue
+  | 'compete'     // no issues but ecommerce — Compete pitch
+  | 'no_llms_txt' // healthy site with no llms.txt — AI SEO pitch
+  | 'skip'        // no issues found, not worth emailing
 
 export interface AoeSiteCheckSummary {
   domain: string
@@ -161,6 +164,7 @@ export interface AoeSettings {
   campaign_site_down: boolean
   campaign_ecom_down: boolean
   campaign_compete_cold: boolean
+  campaign_ai_seo: boolean
   last_day_burst_enabled: boolean
   daily_discovery_limit: number
   daily_email_limit: number
@@ -185,6 +189,15 @@ export interface AoeEcomCampaignConfig extends AoeCampaignConfig {
   platforms: AoePlatform[]
 }
 
+// AI SEO campaign has two CTAs (AI Visibility tool + llms.txt generator)
+export interface AoeAiSeoCampaignConfig {
+  enabled: boolean
+  primaryCtaText: string
+  primaryCtaUrl: string    // AI Visibility tool
+  secondaryCtaText: string
+  secondaryCtaUrl: string  // llms.txt generator
+}
+
 export interface AoeConfig {
   product: {
     name: string
@@ -202,6 +215,7 @@ export interface AoeConfig {
     site_slow: AoeCampaignConfig & { slowThresholdMs: number }
     ecom_down: AoeEcomCampaignConfig
     compete_cold: AoeEcomCampaignConfig
+    ai_seo: AoeAiSeoCampaignConfig
   }
   quota: {
     monthlyLimit: number
