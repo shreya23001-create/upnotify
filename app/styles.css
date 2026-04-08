@@ -519,6 +519,40 @@ html.dark .stat-icon-yellow { background: rgba(245,158,11,0.15); }
 .stat-label { font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.6px; display: flex; align-items: center; gap: 6px; }
 .stat-delta { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
 
+/* -------------------------------------------------------
+   Dashboard stat cards — baseline design
+   ------------------------------------------------------- */
+.db-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-4); margin-bottom: var(--space-6); }
+.db-stat-card {
+  background: var(--bg-card); border: 1px solid var(--border-primary);
+  border-radius: var(--radius-lg); padding: var(--space-5);
+  box-shadow: var(--shadow-sm); position: relative; overflow: hidden;
+  transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.db-stat-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+.db-stat-card::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; }
+.db-stat-card.all::after { background: linear-gradient(90deg, var(--brand-blue), var(--brand-cyan)); }
+.db-stat-card.up::after { background: var(--color-up); }
+.db-stat-card.down::after { background: var(--color-down); }
+.db-stat-card.warn::after { background: var(--color-warn); }
+.db-stat-icon {
+  width: 36px; height: 36px; border-radius: var(--radius-md);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: var(--space-3);
+}
+.db-stat-icon.all { background: var(--color-info-bg); color: var(--brand-blue); }
+.db-stat-icon.up  { background: var(--color-up-bg);   color: var(--color-up); }
+.db-stat-icon.down { background: var(--color-down-bg); color: var(--color-down); }
+.db-stat-icon.warn { background: var(--color-warn-bg); color: var(--color-warn); }
+.db-stat-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: var(--space-1); }
+.db-stat-value { font-size: 30px; font-weight: 900; color: var(--text-primary); letter-spacing: -0.03em; line-height: 1; }
+.db-stat-value-up   { color: var(--color-up); }
+.db-stat-value-down { color: var(--color-down); }
+.db-stat-value-warn { color: var(--color-warn); }
+.db-stat-delta { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+@media (max-width: 900px) { .db-stats { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 500px)  { .db-stats { grid-template-columns: 1fr; } }
+
 /* Status dot */
 .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
 .status-dot-up { background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,0.4); }

@@ -29,13 +29,12 @@ interface DashboardData {
 
 function LoadingSkeleton(): React.ReactElement {
   return (
-    <div className="stats-grid">
+    <div className="db-stats">
       {[1, 2, 3, 4].map((i) => (
-        <div key={i} className="card stat-card" style={{ minHeight: 110, opacity: 0.5 }}>
-          <div className="card-content-compact">
-            <div style={{ height: 14, background: 'var(--border)', borderRadius: 4, width: '60%', marginBottom: 8 }} />
-            <div style={{ height: 28, background: 'var(--border)', borderRadius: 4, width: '40%' }} />
-          </div>
+        <div key={i} className="db-stat-card all" style={{ minHeight: 110, opacity: 0.4 }}>
+          <div style={{ width: 36, height: 36, borderRadius: 10, background: 'var(--border-primary)', marginBottom: 12 }} />
+          <div style={{ height: 10, background: 'var(--border-primary)', borderRadius: 4, width: '55%', marginBottom: 8 }} />
+          <div style={{ height: 26, background: 'var(--border-primary)', borderRadius: 4, width: '35%' }} />
         </div>
       ))}
     </div>
