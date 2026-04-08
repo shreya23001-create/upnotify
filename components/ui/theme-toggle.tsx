@@ -4,10 +4,9 @@ import React, { useState, useEffect } from 'react'
 
 export function ThemeToggle(): React.ReactElement {
   const [dark, setDark] = useState<boolean>(() => {
-    if (typeof window === 'undefined') return false
+    if (typeof window === 'undefined') return true
     const saved = localStorage.getItem('uptrue_theme')
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-    return saved === 'dark' || (!saved && prefersDark)
+    return saved !== 'light'
   })
 
   useEffect(() => {
