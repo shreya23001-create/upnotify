@@ -1303,3 +1303,174 @@ html.dark .pub-nav {
   .cta-band-trust { flex-direction: column; gap: var(--space-3); align-items: center; }
   .cta-band-trust-dot { display: none; }
 }
+
+/* ============================================================
+   HERO DASHBOARD MOCKUP — Interactive additions (hm- prefix)
+   Appended only — zero changes to existing mm-/ms- rules
+   ============================================================ */
+
+/* Alert banner (animation-driven) */
+.hm-alert-banner {
+  position: absolute; top: 0; left: 0; right: 0; z-index: 10;
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 14px; font-size: 10px; font-weight: 500;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.hm-alert-hidden {
+  opacity: 0; pointer-events: none; transform: translateY(-100%);
+}
+.hm-alert-down {
+  background: rgba(239,68,68,0.12); border-bottom: 1px solid rgba(239,68,68,0.25);
+  color: var(--color-down);
+  opacity: 1; transform: translateY(0);
+}
+.hm-alert-recovery {
+  background: rgba(16,185,129,0.1); border-bottom: 1px solid rgba(16,185,129,0.2);
+  color: var(--color-up);
+  opacity: 1; transform: translateY(0);
+}
+.hm-alert-time {
+  margin-left: auto; font-size: 9px; opacity: 0.7;
+}
+
+/* Stat cards — clickable */
+.hm-stat-card {
+  cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease;
+  user-select: none;
+}
+.hm-stat-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(15,23,42,0.1);
+}
+.hm-stat-active {
+  box-shadow: 0 0 0 2px var(--brand-blue), 0 4px 12px rgba(59,130,246,0.15) !important;
+}
+.hm-filter-chip {
+  position: absolute; top: 6px; right: 6px;
+  font-size: 7px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+  padding: 1px 5px; border-radius: 9999px;
+  background: var(--brand-blue); color: white;
+}
+.hm-active-filter-tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  margin-left: 6px; font-size: 9px; font-weight: 600;
+  padding: 1px 6px; border-radius: 9999px;
+  background: var(--color-info-bg); color: var(--brand-blue);
+  border: 1px solid rgba(59,130,246,0.2);
+}
+.hm-filter-clear {
+  cursor: pointer; opacity: 0.6; font-size: 8px;
+}
+.hm-filter-clear:hover { opacity: 1; }
+
+/* Clickable table rows */
+.hm-clickable-row { cursor: pointer; }
+.hm-clickable-row:hover td { background: var(--bg-muted) !important; }
+
+/* Expanded row detail panel */
+.hm-row-detail-row td { padding: 0 !important; border-bottom: 1px solid var(--border); }
+.hm-row-detail {
+  display: flex; align-items: center; gap: 20px;
+  padding: 8px 12px;
+  background: var(--bg-subtle);
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.hm-detail-item {
+  display: flex; align-items: center; gap: 6px; flex-shrink: 0;
+}
+.hm-detail-label {
+  font-size: 8px; font-weight: 700; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+.hm-detail-val {
+  font-size: 10px; font-weight: 700; color: var(--text-primary);
+  font-family: var(--font-mono, monospace);
+}
+.hm-detail-val.hm-val-fast { color: var(--color-up); }
+
+/* Sparkline chart in row detail */
+.hm-spark {
+  display: flex; align-items: flex-end; gap: 2px; height: 24px;
+}
+.hm-spark-bar {
+  width: 4px; border-radius: 2px; min-height: 2px;
+  transition: height 0.3s ease;
+}
+
+/* New row added by user */
+.hm-new-row td { background: rgba(59,130,246,0.03) !important; }
+.hm-new-row:hover td { background: rgba(59,130,246,0.06) !important; }
+
+/* Add Monitor button — clickable cursor */
+.hm-clickable { cursor: pointer; }
+.hm-clickable:hover { filter: brightness(1.1); }
+
+/* Modal overlay — sits inside mockup-body (absolute, clipped by mockup-window overflow:hidden) */
+.hm-modal-overlay {
+  position: absolute; inset: 0; z-index: 20;
+  background: rgba(0,0,0,0.45);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+}
+.hm-modal {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 12px; width: 100%; max-width: 320px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+  overflow: hidden;
+  animation: hm-modal-in 0.2s ease;
+}
+@keyframes hm-modal-in {
+  from { opacity: 0; transform: scale(0.95) translateY(-8px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+.hm-modal-hdr {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 14px; border-bottom: 1px solid var(--border);
+}
+.hm-modal-title { font-size: 12px; font-weight: 700; color: var(--text-primary); }
+.hm-modal-close {
+  font-size: 11px; color: var(--text-muted); background: none; border: none;
+  cursor: pointer; padding: 2px 5px; border-radius: 4px;
+  line-height: 1;
+}
+.hm-modal-close:hover { background: var(--bg-muted); color: var(--text-primary); }
+.hm-modal-body { padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
+.hm-form-row { display: flex; flex-direction: column; gap: 4px; }
+.hm-form-two { flex-direction: row !important; gap: 8px; }
+.hm-form-two > div { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.hm-form-label { font-size: 9px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.hm-form-input, .hm-form-select {
+  font-size: 11px; color: var(--text-primary);
+  background: var(--bg-input, var(--bg-subtle)); border: 1px solid var(--border);
+  border-radius: 6px; padding: 5px 8px; width: 100%;
+  outline: none; font-family: inherit;
+}
+.hm-form-input:focus, .hm-form-select:focus {
+  border-color: var(--brand-blue);
+  box-shadow: 0 0 0 2px rgba(59,130,246,0.15);
+}
+.hm-modal-footer {
+  display: flex; align-items: center; justify-content: flex-end; gap: 6px;
+  padding: 10px 14px; border-top: 1px solid var(--border);
+  background: var(--bg-subtle);
+}
+.hm-btn-cancel {
+  padding: 5px 12px; border-radius: 6px; font-size: 10px; font-weight: 600;
+  color: var(--text-secondary); background: var(--bg-card); border: 1px solid var(--border);
+  cursor: pointer;
+}
+.hm-btn-cancel:hover { background: var(--bg-muted); }
+.hm-btn-save {
+  display: flex; align-items: center; gap: 4px;
+  padding: 5px 12px; border-radius: 6px; font-size: 10px; font-weight: 600;
+  color: white; background: var(--brand-gradient); border: none;
+  cursor: pointer;
+}
+.hm-btn-save:hover { filter: brightness(1.08); }
+.hm-modal-success {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 8px; padding: 28px 14px;
+  font-size: 12px; font-weight: 700; color: var(--color-up);
+}
