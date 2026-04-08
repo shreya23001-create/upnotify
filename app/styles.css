@@ -520,6 +520,38 @@ html.dark .stat-icon-yellow { background: rgba(245,158,11,0.15); }
 .stat-delta { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
 
 /* -------------------------------------------------------
+   Dashboard page layout — baseline design
+   ------------------------------------------------------- */
+.db-content { padding: 0; }
+.db-page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 24px; }
+.db-page-title { font-size: 24px; font-weight: 800; color: var(--text-primary); letter-spacing: -0.02em; }
+.db-page-sub { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+.db-page-actions { display: flex; gap: 8px; }
+
+/* Inline status badges for dashboard table */
+.db-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 8px; border-radius: 9999px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+.db-badge-up      { background: var(--color-up-bg);   color: var(--color-up);   border: 1px solid var(--color-up-border); }
+.db-badge-down    { background: var(--color-down-bg); color: var(--color-down); border: 1px solid var(--color-down-border); }
+.db-badge-warn    { background: var(--color-warn-bg); color: var(--color-warn); border: 1px solid var(--color-warn-border); }
+.db-badge-outline { background: var(--bg-muted); color: var(--text-muted); border: 1px solid var(--border-primary); }
+.db-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+.db-dot-pulse { animation: pulse 1s infinite; }
+
+/* Response time colours */
+.db-response-time { font-size: 13px; font-weight: 600; font-family: monospace; }
+.db-response-time.fast { color: var(--color-up); }
+.db-response-time.med  { color: var(--color-warn); }
+.db-response-time.slow { color: var(--color-down); }
+
+/* Uptime % */
+.db-uptime-pct { font-size: 13px; font-weight: 700; color: var(--color-up); font-family: monospace; }
+.db-uptime-pct.partial { color: var(--color-warn); }
+
+/* Search input inside card header */
+.db-search { display: flex; align-items: center; gap: 8px; background: var(--bg-input); border: 1px solid var(--border-primary); border-radius: var(--radius-md); padding: 6px 10px; font-size: 11px; color: var(--text-muted); width: 180px; }
+.db-search input { border: none; background: none; outline: none; font-family: inherit; font-size: 11px; color: var(--text-primary); width: 100%; }
+
+/* -------------------------------------------------------
    Dashboard stat cards — baseline design
    ------------------------------------------------------- */
 .db-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-4); margin-bottom: var(--space-6); }
