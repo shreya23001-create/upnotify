@@ -92,6 +92,22 @@ export async function getMonitorsByOrgId(orgId: string): Promise<Pick<Monitor, '
   return (data ?? []) as Pick<Monitor, 'id' | 'name' | 'target'>[]
 }
 
+export async function getMonitorsByOrg(orgId: string): Promise<Monitor[]> {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('monitors')
+    .select('*')
+    .eq('org_id', orgId)
+    .order('updated_at', { ascending: false })
+    .limit(10)
+
+  if (error) {
+    logger.error('Failed to get monitors by org', { error: error.message })
+    return []
+  }
+  return data ?? []
+}
+
 export async function getAllActiveMonitors(): Promise<Monitor[]> {
   const supabase = createAdminClient()
   const { data, error } = await supabase
