@@ -22,7 +22,9 @@ import {
 } from '@/components/seo/json-ld'
 import { FAQ_ITEMS } from '@/lib/constants/faq'
 
-// Revalidate every 5 minutes so Ticker + BlogPreview stay fresh from DB
+// force-dynamic: homepage fetches live DB data (Ticker, BlogPreview, TrustedLogos).
+// revalidate=300 would fail local builds without env vars. Revisit when local
+// env vars are fully configured or when CDN-level caching is added at the edge.
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {

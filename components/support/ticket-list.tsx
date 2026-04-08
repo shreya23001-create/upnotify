@@ -79,6 +79,10 @@ export function TicketList({ tickets }: TicketListProps): React.ReactElement {
         if (upRes.ok) {
           const upData = await upRes.json() as { url?: string }
           if (upData.url) attachmentUrls.push(upData.url)
+        } else {
+          setError(`Failed to upload "${file.name}". Please try again.`)
+          setSubmitting(false)
+          return
         }
       }
 

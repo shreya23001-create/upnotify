@@ -87,6 +87,10 @@ export function TicketThread({ ticket, messages, isAdmin = false }: TicketThread
         if (upRes.ok) {
           const upData = await upRes.json() as { url?: string }
           if (upData.url) attachmentUrls.push(upData.url)
+        } else {
+          setError(`Failed to upload "${file.name}". Please try again.`)
+          setSending(false)
+          return
         }
       }
 

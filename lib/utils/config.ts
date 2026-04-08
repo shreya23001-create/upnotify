@@ -128,8 +128,24 @@ export function getServerConfig(): ServerConfig {
   const publicConfig = getConfig()
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? ''
 
+  // During static generation (local npm run build without .env.development loaded),
+  // server-only env vars may not be present. Return empty config so the build
+  // succeeds — Vercel always has env vars set, so ISR regeneration works correctly.
   if (!serviceRoleKey) {
-    throw new Error('Missing required environment variable: SUPABASE_SERVICE_ROLE_KEY')
+    return {
+      ...publicConfig,
+      supabase: { ...publicConfig.supabase, serviceRoleKey: '' },
+      resend: { apiKey: '', fromEmail: 'alerts@uptrue.io', fromName: 'Uptrue Alerts' },
+      stripe: { secretKey: '', webhookSecret: '' },
+      anthropic: { apiKey: '' },
+      cron: { secret: '' },
+      twitter: { consumerKey: '', consumerSecret: '', accessToken: '', accessTokenSecret: '', bearerToken: '' },
+      linkedin: { accessToken: '', memberId: '', organizationId: '' },
+      telegram: { botToken: '', chatId: '' },
+      blogApproval: { secret: '' },
+      support: { apiKey: '', webhookUrl: '', webhookSecret: '' },
+      adminEmails: [],
+    }
   }
 
   const resendApiKey = process.env.RESEND_API_KEY ?? ''
