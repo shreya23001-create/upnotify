@@ -1474,3 +1474,51 @@ html.dark .pub-nav {
   gap: 8px; padding: 28px 14px;
   font-size: 12px; font-weight: 700; color: var(--color-up);
 }
+
+/* ============================================================
+   DARK MODE — Landing page overrides
+   ============================================================ */
+
+/* Hero — replace light gradient with dark equivalent */
+html.dark .hero {
+  background: linear-gradient(
+    135deg,
+    #0d1117 0%,
+    #0f1422 30%,
+    #110e1f 60%,
+    #0c1520 85%,
+    #0d1117 100%
+  );
+}
+html.dark .hero::before {
+  background: radial-gradient(ellipse at center, rgba(59,130,246,0.15) 0%, rgba(6,182,212,0.08) 40%, transparent 70%);
+}
+
+/* Hero text — ensure full visibility on dark background */
+html.dark .hero-headline { color: #f0f4ff; }
+html.dark .hero-sub { color: #94a3b8; }
+html.dark .hero-eyebrow-text {
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(255,255,255,0.1);
+  color: #94a3b8;
+}
+html.dark .trust-item { color: #64748b; }
+html.dark .trust-item strong { color: #e2e8f0; }
+
+/* Buttons on dark hero */
+html.dark .btn-ghost {
+  color: #e2e8f0;
+  border-color: rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.05);
+}
+html.dark .btn-ghost:hover {
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.25);
+}
+html.dark .btn-outline-brand {
+  color: #60a5fa;
+  border-color: rgba(96,165,250,0.35);
+}
+html.dark .btn-outline-brand:hover {
+  background: rgba(59,130,246,0.12);
+}
