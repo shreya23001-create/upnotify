@@ -462,7 +462,7 @@ export default function LandingPage(): React.ReactElement {
                   <td><span className="comp-no">—</span></td>
                 </tr>
                 <tr>
-                  <td>Competitor intelligence</td>
+                  <td>Watchdog (competitor tracking)</td>
                   <td className="col-uptrue"><span className="comp-yes">✓</span></td>
                   <td><span className="comp-no">—</span></td>
                   <td><span className="comp-no">—</span></td>

@@ -48,11 +48,11 @@ export const helpTopics: HelpTopic[] = [
     keywords: ['plan', 'billing', 'price', 'upgrade', 'downgrade', 'subscription', 'free', 'lite', 'builder', 'scale'],
   },
   {
-    href: '/dashboard/help/competitors',
-    title: 'Tracking Your Competitors',
+    href: '/dashboard/help/watchdog',
+    title: 'Watchdog — Competitor Tracking',
     description: 'Monitor competitor uptime, compare reliability, and benchmark your performance.',
-    icon: '🏁',
-    keywords: ['competitor', 'compare', 'benchmark', 'rival', 'uptime', 'tracking'],
+    icon: '🐕',
+    keywords: ['watchdog', 'competitor', 'compare', 'benchmark', 'rival', 'uptime', 'tracking'],
   },
   {
     href: '/dashboard/help/credits',

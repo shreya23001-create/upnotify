@@ -173,6 +173,25 @@ export function IconTarget({ size = 18, className }: IconProps) {
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
 }
 
+export function IconWatchdog({ size = 18, className }: IconProps) {
+  /* Watchdog — stylised dog face: snout, ears, eyes, nose */
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      {/* Head */}
+      <path d="M5 10 C5 5 19 5 19 10 L19 15 C19 19 5 19 5 15 Z" />
+      {/* Left ear */}
+      <path d="M5 10 C4 7 2 6 3 4 C4 3 6 5 7 7" />
+      {/* Right ear */}
+      <path d="M19 10 C20 7 22 6 21 4 C20 3 18 5 17 7" />
+      {/* Eyes */}
+      <circle cx="9" cy="11" r="1" fill="currentColor" stroke="none" />
+      <circle cx="15" cy="11" r="1" fill="currentColor" stroke="none" />
+      {/* Nose */}
+      <ellipse cx="12" cy="14.5" rx="2" ry="1.2" fill="currentColor" stroke="none" opacity="0.6" />
+    </svg>
+  )
+}
+
 export function IconAlertTriangle({ size = 18, className }: IconProps) {
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
 }

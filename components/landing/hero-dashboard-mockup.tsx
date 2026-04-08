@@ -302,8 +302,14 @@ export function HeroDashboardMockup(): React.ReactElement {
               <div className="ms-section">Intelligence</div>
               <div className="ms-item">
                 <div className="ms-item-left">
-                  <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" /></svg>
-                  Competitors
+                  <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                    <path d="M5 10 C5 5 19 5 19 10 L19 15 C19 19 5 19 5 15 Z" />
+                    <path d="M5 10 C4 7 2 6 3 4 C4 3 6 5 7 7" />
+                    <path d="M19 10 C20 7 22 6 21 4 C20 3 18 5 17 7" />
+                    <circle cx="9" cy="11" r="1" fill="currentColor" stroke="none" />
+                    <circle cx="15" cy="11" r="1" fill="currentColor" stroke="none" />
+                  </svg>
+                  Watchdog
                 </div>
               </div>
               <div className="ms-item">

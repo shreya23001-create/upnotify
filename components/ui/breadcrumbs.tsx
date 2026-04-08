@@ -15,7 +15,7 @@ const labelMap: Record<string, string> = {
   edit: 'Edit',
   admin: 'Admin',
   incidents: 'Incidents',
-  competitors: 'Competitors',
+  watchdog: 'Watchdog',
   compete: 'Compete',
   support: 'Support',
   help: 'Help',

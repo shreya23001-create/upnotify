@@ -113,8 +113,8 @@ export async function GET(request: Request): Promise<NextResponse> {
                   body: `${competitor.domain} is not responding. ${result.errorMessage ?? ''}`.trim(),
                   type: 'warning',
                   category: 'general',
-                  actionUrl: '/dashboard/competitors',
-                  actionLabel: 'View competitors',
+                  actionUrl: '/dashboard/watchdog',
+                  actionLabel: 'View Watchdog',
                   metadata: { competitorId: competitor.id, domain: competitor.domain },
                 })
               ))
@@ -140,8 +140,8 @@ export async function GET(request: Request): Promise<NextResponse> {
                   body: `${competitor.domain} appears to be in maintenance mode ("${result.keywordMatched ?? ''}").`,
                   type: 'info',
                   category: 'general',
-                  actionUrl: '/dashboard/competitors',
-                  actionLabel: 'View competitors',
+                  actionUrl: '/dashboard/watchdog',
+                  actionLabel: 'View Watchdog',
                   metadata: { competitorId: competitor.id, domain: competitor.domain, keyword: result.keywordMatched },
                 })
               ))
@@ -168,8 +168,8 @@ export async function GET(request: Request): Promise<NextResponse> {
                   body: `${competitor.domain} is back up. Was ${openIncident.cause ?? 'down'} for ${downtimeStr}.`,
                   type: 'success',
                   category: 'general',
-                  actionUrl: '/dashboard/competitors',
-                  actionLabel: 'View competitors',
+                  actionUrl: '/dashboard/watchdog',
+                  actionLabel: 'View Watchdog',
                   metadata: { competitorId: competitor.id, domain: competitor.domain, downtimeMins },
                 })
               ))

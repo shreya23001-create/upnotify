@@ -21,7 +21,7 @@ const CARDS: FeatureCard[] = [
     glow: 'linear-gradient(90deg,#3b82f6,#06b6d4)',
     iconBg: 'linear-gradient(135deg,rgba(59,130,246,0.15),rgba(6,182,212,0.15))',
     icon: '📡', title: 'Uptime Monitoring',
-    desc: '10 monitor types including HTTP, SSL, DNS, keyword detection, domain expiry, port, ping, API endpoint, heartbeat, and competitor tracking.',
+    desc: '10 monitor types including HTTP, SSL, DNS, keyword detection, domain expiry, port, ping, API endpoint, heartbeat, and Watchdog tracking.',
     tags: ['HTTP/HTTPS', 'SSL', 'DNS', 'Keyword', 'Port', 'Ping'],
   },
   {
@@ -60,8 +60,8 @@ const CARDS: FeatureCard[] = [
     cat: 'Intelligence', catColor: '#06b6d4', catBg: 'rgba(6,182,212,0.1)', catBorder: 'rgba(6,182,212,0.2)',
     glow: 'linear-gradient(90deg,#06b6d4,#10b981)',
     iconBg: 'linear-gradient(135deg,rgba(6,182,212,0.12),rgba(16,185,129,0.12))',
-    icon: '🏆', title: 'Competitor Intelligence',
-    desc: 'Monitor competitor uptime automatically. See when rivals go down before their customers do — and use it to your advantage.',
+    icon: '🐕', title: 'Watchdog',
+    desc: 'Monitor any website automatically. See when rivals go down before their customers do — and benchmark your reliability against the competition.',
     tags: ['Uptime tracking', 'Incident alerts', 'Benchmarking'],
   },
   {

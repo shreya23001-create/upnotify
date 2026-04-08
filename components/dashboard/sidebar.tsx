@@ -9,7 +9,7 @@ import { useAuth } from '@/components/providers/auth-provider'
 import {
   IconDashboard, IconActivity, IconGlobe, IconAlertTriangle,
   IconBuilding, IconSettings, IconShield, IconChevronLeft, IconChevronRight,
-  IconHelpCircle, IconTrendingUp, IconTarget, IconBarChart, IconInbox,
+  IconHelpCircle, IconTrendingUp, IconWatchdog, IconBarChart, IconInbox,
 } from '@/components/icons'
 
 interface NavSection {
@@ -32,7 +32,7 @@ const mainNavItems: NavItem[] = [
   { href: '/dashboard/incidents', label: 'Incidents', icon: IconAlertTriangle },
   { href: '/dashboard/status-pages', label: 'Status Pages', icon: IconGlobe },
   { href: '/dashboard/reports', label: 'Reports', icon: IconTrendingUp },
-  { href: '/dashboard/competitors', label: 'Competitors', icon: IconTarget },
+  { href: '/dashboard/watchdog', label: 'Watchdog', icon: IconWatchdog },
   { href: '/dashboard/compete', label: 'Compete', icon: IconBarChart },
 ]
 
