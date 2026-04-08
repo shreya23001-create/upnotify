@@ -23,6 +23,7 @@ export function OrganizationJsonLd(): React.ReactElement {
     logo: 'https://uptrue.io/logo.svg',
     description:
       'Uptime, performance and infrastructure monitoring platform for agencies and teams.',
+    foundingDate: '2026',
     address: {
       '@type': 'PostalAddress',
       streetAddress: 'C/O Benison Solvers Limited, 1000 Great West Road',
@@ -35,6 +36,10 @@ export function OrganizationJsonLd(): React.ReactElement {
       email: 'support@uptrue.io',
       contactType: 'customer support',
     },
+    sameAs: [
+      'https://x.com/uptrue_io',
+      'https://www.linkedin.com/company/uptrue-io/',
+    ],
   }
 
   return <JsonLd data={data} />
@@ -111,6 +116,15 @@ export function WebSiteJsonLd(): React.ReactElement {
     url: 'https://uptrue.io',
     description:
       'Uptime, performance and infrastructure monitoring for agencies and teams.',
+    dateModified: new Date().toISOString().split('T')[0],
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: {
+        '@type': 'EntryPoint',
+        urlTemplate: 'https://uptrue.io/tracker?q={search_term_string}',
+      },
+      'query-input': 'required name=search_term_string',
+    },
   }
 
   return <JsonLd data={data} />

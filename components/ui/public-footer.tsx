@@ -93,7 +93,10 @@ export function PublicFooter(): React.ReactElement {
         </div>
 
         <div className="footer-bottom">
-          <div>© {new Date().getFullYear()} Vision Software Solutions Limited · Brentford, UK · Company No. 02710980</div>
+          <div>
+            © {new Date().getFullYear()} <a href="https://find-and-update.company-information.service.gov.uk/company/02710980" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit' }}>Vision Software Solutions Limited</a>
+            {' '}· Brentford, UK · Company No. 02710980
+          </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-5)' }}>
             <Link href="/terms" style={{ color: 'var(--text-muted)' }}>Terms</Link>
             <Link href="/privacy" style={{ color: 'var(--text-muted)' }}>Privacy</Link>

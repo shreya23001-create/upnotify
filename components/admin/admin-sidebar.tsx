@@ -58,6 +58,7 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { href: '/admin/tracker', label: 'Public Tracker', icon: IconGlobe },
       { href: '/admin/feature-flags', label: 'Feature Flags', icon: IconToggle },
+      { href: '/admin/ai-engines', label: 'AI Engines', icon: IconActivity },
     ],
   },
   {
