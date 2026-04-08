@@ -28,7 +28,7 @@ interface NavItem {
 const mainNavItems: NavItem[] = [
   { href: '/dashboard', label: 'Dashboard', icon: IconDashboard },
   { href: '/dashboard/monitors', label: 'Monitors', icon: IconActivity },
-  { href: '/dashboard/alerts', label: 'Alerts', icon: IconAlertTriangle },
+  { href: '/dashboard/alerts', label: 'Alert Channels', icon: IconAlertTriangle },
   { href: '/dashboard/incidents', label: 'Incidents', icon: IconAlertTriangle },
   { href: '/dashboard/status-pages', label: 'Status Pages', icon: IconGlobe },
   { href: '/dashboard/reports', label: 'Reports', icon: IconTrendingUp },
@@ -165,21 +165,6 @@ export function Sidebar(): React.ReactElement {
       {/* Credits promo — collapsible, only for non-admin users */}
       {!collapsed && !user?.is_super_admin && (
         <CreditsPromo />
-      )}
-
-      {/* User info at bottom */}
-      {!collapsed && user && (
-        <div className="sidebar-user-footer">
-          <div className="sidebar-user-avatar">
-            {user.full_name
-              ? user.full_name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
-              : user.email?.slice(0, 2).toUpperCase() ?? '?'}
-          </div>
-          <div className="sidebar-user-info">
-            <div className="sidebar-user-name">{user.full_name ?? user.email?.split('@')[0]}</div>
-            <div className="sidebar-user-role">{user.is_super_admin ? 'Super Admin' : 'Admin'}</div>
-          </div>
-        </div>
       )}
 
       <div className="sidebar-collapse-btn-wrapper">

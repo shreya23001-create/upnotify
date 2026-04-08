@@ -48,12 +48,19 @@ export function WorkspaceProvider({
     useState<Workspace | null>(() => {
       if (typeof window === 'undefined') return workspaces[0] ?? null
       const savedId = localStorage.getItem(STORAGE_KEY)
+      if (savedId === '') return null  // '' = All Workspaces
       const saved = workspaces.find((w) => w.id === savedId)
       return saved ?? workspaces[0] ?? null
     })
 
   const setCurrentWorkspace = useCallback(
     (workspaceId: string) => {
+      if (workspaceId === '') {
+        // Empty string = "All Workspaces" (null)
+        setCurrentWorkspaceState(null)
+        localStorage.setItem(STORAGE_KEY, '')
+        return
+      }
       const ws = workspaces.find((w) => w.id === workspaceId)
       if (ws) {
         setCurrentWorkspaceState(ws)

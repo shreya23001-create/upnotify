@@ -56,15 +56,22 @@ export async function getOpenIncidents(orgId: string): Promise<Incident[]> {
   return data ?? []
 }
 
-export async function getRecentIncidents(orgId: string, limit: number = 10): Promise<Incident[]> {
+export async function getRecentIncidents(
+  orgId: string,
+  limit: number = 10,
+  workspaceId?: string
+): Promise<Incident[]> {
   const supabase = await createClient()
-  const { data, error } = await supabase
+  let query = supabase
     .from('incidents')
     .select('*')
     .eq('org_id', orgId)
     .order('started_at', { ascending: false })
     .limit(limit)
 
+  if (workspaceId) query = query.eq('workspace_id', workspaceId)
+
+  const { data, error } = await query
   if (error) {
     logger.error('Failed to get recent incidents', { error: error.message })
     return []

@@ -131,7 +131,7 @@ export default function AlertsPage(): React.ReactElement {
           <section className="help-section">
             <h2 className="help-section-title">Setting up a channel step by step</h2>
             <ol className="help-steps">
-              <li>Go to <strong>Alerts</strong> in the sidebar.</li>
+              <li>Go to <strong>Alert Channels</strong> in the sidebar.</li>
               <li>Click <strong>Add Channel</strong>.</li>
               <li>Choose the channel type (email, Slack, Teams, or webhook).</li>
               <li>Enter the required details -- an email address, webhook URL, etc.</li>

@@ -114,6 +114,27 @@ export async function getUptimeBarData(monitorId: string): Promise<UptimeSlot[]>
  * Get recent check results for all monitors in an organisation.
  * Used by the dashboard charts to show uptime and response time trends.
  */
+export async function getRecentCheckResultsByMonitorIds(monitorIds: string[], days: number = 30): Promise<CheckResult[]> {
+  if (monitorIds.length === 0) return []
+  const supabase = createAdminClient()
+  const since = new Date()
+  since.setDate(since.getDate() - days)
+
+  const { data, error } = await supabase
+    .from('check_results')
+    .select('*')
+    .in('monitor_id', monitorIds)
+    .gte('checked_at', since.toISOString())
+    .order('checked_at', { ascending: true })
+    .limit(5000)
+
+  if (error) {
+    logger.error('Failed to get check results by monitor IDs', { error: error.message })
+    return []
+  }
+  return data ?? []
+}
+
 export async function getRecentCheckResultsByOrg(orgId: string, days: number = 30): Promise<CheckResult[]> {
   const supabase = createAdminClient()
   const since = new Date()

@@ -13,6 +13,7 @@ export function WorkspaceSwitcher() {
       onChange={(e) => setCurrentWorkspace(e.target.value)}
       style={{ width: 200 }}
     >
+      <option value="">All Workspaces</option>
       {workspaces.map((ws) => (
         <option key={ws.id} value={ws.id}>{ws.name}</option>
       ))}

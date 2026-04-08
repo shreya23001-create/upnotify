@@ -87,10 +87,16 @@ export function getConfig(): PublicConfig {
   const adminEmails = process.env.ADMIN_EMAILS || ''
   const gaMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? ''
 
+  // NEXT_PUBLIC_* vars are only available in the browser at runtime, not during
+  // static prerendering at build time. Don't throw server-side — the browser will
+  // always have these vars injected by Next.js when the page is served.
   if (!url || !anonKey) {
-    if (typeof window === 'undefined') {
+    if (typeof window !== 'undefined') {
+      // In the browser, missing vars means a real misconfiguration — fail loud.
       throw new Error('Missing required Supabase environment variables (NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY)')
     }
+    // During SSR/build: return config with empty strings — browser will get real values
+    return { supabase: { url: '', anonKey: '' }, app: { url: appUrl }, admin: { emails: adminEmails.split(',').map(e => e.trim()).filter(Boolean) }, analytics: { gaMeasurementId } }
   }
 
   cachedPublicConfig = {

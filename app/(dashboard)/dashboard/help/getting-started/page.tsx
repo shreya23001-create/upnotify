@@ -101,7 +101,7 @@ export default function GettingStartedPage(): React.ReactElement {
               Monitoring is only useful if you actually find out when something breaks. Alerts make sure you do.
             </p>
             <ol className="help-steps">
-              <li>Go to <strong>Alerts</strong> in the sidebar.</li>
+              <li>Go to <strong>Alert Channels</strong> in the sidebar.</li>
               <li>Click <strong>Add Channel</strong>.</li>
               <li>Choose where you want notifications -- email, Slack, Microsoft Teams, or webhook.</li>
               <li>Follow the setup steps for your chosen channel.</li>
