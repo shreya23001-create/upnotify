@@ -4,22 +4,12 @@ import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useState } from 'react'
 import type { UnifiedPost } from './page'
+import { BlogCardImage } from '@/components/ui/blog-card-image'
 
 const POSTS_PER_PAGE = 9
 
 const FILTER_TABS = ['All posts', 'Guide', 'Security', 'Performance', 'Ecommerce', 'Incident Report', 'Agency']
 
-const CARD_GRADIENTS: Record<string, string> = {
-  Guide: 'linear-gradient(90deg,#8b5cf6,#3b82f6)',
-  Security: 'linear-gradient(90deg,#ef4444,#f59e0b)',
-  Performance: 'linear-gradient(90deg,#10b981,#06b6d4)',
-  Ecommerce: 'linear-gradient(90deg,#f59e0b,#ec4899)',
-  'Incident Report': 'linear-gradient(90deg,#ef4444,#7c3aed)',
-  Agency: 'linear-gradient(90deg,#0c1322,#3b82f6)',
-  WordPress: 'linear-gradient(90deg,#3b82f6,#06b6d4)',
-  Hosting: 'linear-gradient(90deg,#10b981,#3b82f6)',
-  Outage: 'linear-gradient(90deg,#ef4444,#7c3aed)',
-}
 
 const BADGE_STYLES: Record<string, { bg: string; color: string; border: string }> = {
   Guide: { bg: 'rgba(139,92,246,0.1)', color: '#8b5cf6', border: 'rgba(139,92,246,0.2)' },
@@ -34,9 +24,6 @@ function badgeStyle(cat: string) {
   return BADGE_STYLES[cat] ?? { bg: 'rgba(59,130,246,0.1)', color: '#3b82f6', border: 'rgba(59,130,246,0.2)' }
 }
 
-function gradient(cat: string): string {
-  return CARD_GRADIENTS[cat] ?? 'linear-gradient(90deg,#3b82f6,#06b6d4)'
-}
 
 function BlogIndexContent({ posts }: { posts: UnifiedPost[] }) {
   const searchParams = useSearchParams()
@@ -109,8 +96,8 @@ function BlogIndexContent({ posts }: { posts: UnifiedPost[] }) {
           <div className="blog-featured-wrap">
             <div className="blog-featured-label">Featured</div>
             <Link href={`/blog/${featuredPost.slug}`} className="blog-featured-card">
-              <div className="blog-featured-img" style={{ background: gradient(featuredPost.category) }}>
-                <div className="blog-featured-img-overlay" />
+              <div className="blog-featured-img">
+                <BlogCardImage category={featuredPost.category} title={featuredPost.title} style={{ height: '100%' }} />
               </div>
               <div className="blog-featured-body">
                 <div className="blog-featured-meta">
@@ -132,7 +119,7 @@ function BlogIndexContent({ posts }: { posts: UnifiedPost[] }) {
                 <div className="blog-featured-excerpt">{featuredPost.excerpt}</div>
                 <div className="blog-featured-footer">
                   <div className="blog-author">
-                    <div className="blog-author-avatar" style={{ background: gradient(featuredPost.category) }}>U</div>
+                    <div className="blog-author-avatar" style={{ background: 'linear-gradient(135deg,#3b82f6,#06b6d4)' }}>U</div>
                     <div>
                       <div className="blog-author-name">Uptrue Team</div>
                       <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{featuredPost.displayDate}</div>
@@ -186,7 +173,9 @@ function BlogIndexContent({ posts }: { posts: UnifiedPost[] }) {
                   const bs = badgeStyle(post.category)
                   return (
                     <Link key={post.slug} href={`/blog/${post.slug}`} className="blog-card">
-                      <div className="blog-card-image" style={{ background: gradient(post.category) }} />
+                      <div className="blog-card-image">
+                        <BlogCardImage category={post.category} title={post.title} style={{ height: '100%' }} />
+                      </div>
                       <div className="blog-card-body">
                         <div className="blog-card-meta">
                           <span className="blog-cat-badge" style={{ background: bs.bg, color: bs.color, border: `1px solid ${bs.border}` }}>
