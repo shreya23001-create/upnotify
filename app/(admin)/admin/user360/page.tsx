@@ -1,20 +1,10 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { getCurrentUser } from '@/lib/db/users'
+import { canAccessAdminModule } from '@/lib/db/admin-roles'
 
 export const dynamic = 'force-dynamic'
-
-// ─── Auth guard ──────────────────────────────────────────────────────────────
-
-async function isAdmin(): Promise<boolean> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user?.email) return false
-  const adminEmails = (process.env.ADMIN_EMAILS || '')
-    .split(',').map(e => e.trim().toLowerCase()).filter(Boolean)
-  return adminEmails.includes(user.email.toLowerCase())
-}
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -41,7 +31,9 @@ export default async function User360Page({
 }: {
   searchParams: Promise<{ org_id?: string; email?: string; period?: string }>
 }): Promise<React.ReactElement> {
-  if (!(await isAdmin())) redirect('/admin')
+  const user = await getCurrentUser()
+  if (!user) redirect('/login')
+  if (!await canAccessAdminModule(user.email, !!user.is_super_admin, 'user360')) redirect('/admin')
 
   const { org_id, email, period } = await searchParams
   const supabase = createAdminClient()

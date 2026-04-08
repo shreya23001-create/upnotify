@@ -1,7 +1,16 @@
+import { redirect } from 'next/navigation'
+import { getCurrentUser } from '@/lib/db/users'
+import { canAccessAdminModule } from '@/lib/db/admin-roles'
 import { getAllBlogPostsAdmin } from '@/lib/db/blog-posts'
 import { AdminBlogContent } from '@/components/admin/admin-blog-content'
 
+export const dynamic = 'force-dynamic'
+
 export default async function AdminBlogPage(): Promise<React.ReactElement> {
+  const user = await getCurrentUser()
+  if (!user) redirect('/login')
+  if (!await canAccessAdminModule(user.email, !!user.is_super_admin, 'blog')) redirect('/admin')
+
   const posts = await getAllBlogPostsAdmin()
 
   const publishedCount = posts.filter(p => p.status === 'published').length

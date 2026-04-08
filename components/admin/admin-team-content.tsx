@@ -12,38 +12,53 @@ interface AdminPermissions {
   plans: { read: boolean; write: boolean }
   tracker: { read: boolean; write: boolean }
   feature_flags: { read: boolean; write: boolean }
+  blog: { read: boolean; write: boolean }
+  aoe: { read: boolean; write: boolean }
+  audit_log: { read: boolean; write: boolean }
+  support: { read: boolean; write: boolean }
+  system: { read: boolean; write: boolean }
+  user360: { read: boolean; write: boolean }
   impersonate: boolean
 }
 
 const DEFAULT_PERMISSIONS: AdminPermissions = {
-  users: { read: true, write: false },
+  users:         { read: true, write: false },
   organisations: { read: true, write: false },
-  plans: { read: true, write: false },
-  tracker: { read: true, write: false },
+  plans:         { read: true, write: false },
+  tracker:       { read: true, write: false },
   feature_flags: { read: true, write: false },
+  blog:          { read: true, write: false },
+  aoe:           { read: true, write: false },
+  audit_log:     { read: true, write: false },
+  support:       { read: true, write: false },
+  system:        { read: true, write: false },
+  user360:       { read: true, write: false },
   impersonate: false,
 }
 
 const MODULE_LABELS: Record<string, string> = {
-  users: 'Users',
+  users:         'Users',
   organisations: 'Organisations',
-  plans: 'Plans & Pricing',
-  tracker: 'Public Tracker',
+  plans:         'Plans & Pricing',
+  tracker:       'Public Tracker',
   feature_flags: 'Feature Flags',
+  blog:          'Blog',
+  aoe:           'Outreach Engine (AOE)',
+  audit_log:     'Audit Logs',
+  support:       'Support',
+  system:        'System Health',
+  user360:       'User 360',
 }
 
 function parsePerms(json: unknown): AdminPermissions {
   if (typeof json === 'object' && json !== null && !Array.isArray(json)) {
     const obj = json as Record<string, unknown>
     const result = { ...DEFAULT_PERMISSIONS }
-    for (const key of Object.keys(MODULE_LABELS)) {
+    for (const key of Object.keys(MODULE_LABELS) as Array<keyof Omit<AdminPermissions, 'impersonate'>>) {
       const mod = obj[key]
       if (typeof mod === 'object' && mod !== null) {
         const m = mod as Record<string, boolean>
-        result[key as keyof Omit<AdminPermissions, 'impersonate'>] = {
-          read: Boolean(m.read),
-          write: Boolean(m.write),
-        }
+        result[key] = { read: Boolean(m.read), write: Boolean(m.write) }
       }
     }
     result.impersonate = Boolean(obj.impersonate)

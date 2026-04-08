@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { getCurrentUser } from '@/lib/db/users'
+import { canAccessAdminModule } from '@/lib/db/admin-roles'
 import { getAllTickets, countTicketsByStatus } from '@/lib/db/support'
 import type { TicketFilter } from '@/lib/db/support'
 
@@ -48,8 +49,7 @@ export default async function AdminSupportPage({ searchParams }: PageProps): Pro
   const user = await getCurrentUser()
   if (!user) redirect('/login')
 
-  const adminEmails = (process.env.ADMIN_EMAILS ?? '').split(',').map(e => e.trim())
-  if (!adminEmails.includes(user.email)) redirect('/dashboard')
+  if (!await canAccessAdminModule(user.email, !!user.is_super_admin, 'support')) redirect('/admin')
 
   const { status: statusFilter, priority: priorityFilter } = await searchParams
 

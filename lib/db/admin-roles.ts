@@ -10,33 +10,57 @@ export interface AdminPermissions {
   plans: { read: boolean; write: boolean }
   tracker: { read: boolean; write: boolean }
   feature_flags: { read: boolean; write: boolean }
+  blog: { read: boolean; write: boolean }
+  aoe: { read: boolean; write: boolean }
+  audit_log: { read: boolean; write: boolean }
+  support: { read: boolean; write: boolean }
+  system: { read: boolean; write: boolean }
+  user360: { read: boolean; write: boolean }
   impersonate: boolean
 }
 
 /** Default permissions per role */
 const ROLE_DEFAULTS: Record<string, AdminPermissions> = {
   super_admin: {
-    users: { read: true, write: true },
-    organisations: { read: true, write: true },
-    plans: { read: true, write: true },
-    tracker: { read: true, write: true },
-    feature_flags: { read: true, write: true },
+    users:        { read: true, write: true },
+    organisations:{ read: true, write: true },
+    plans:        { read: true, write: true },
+    tracker:      { read: true, write: true },
+    feature_flags:{ read: true, write: true },
+    blog:         { read: true, write: true },
+    aoe:          { read: true, write: true },
+    audit_log:    { read: true, write: true },
+    support:      { read: true, write: true },
+    system:       { read: true, write: true },
+    user360:      { read: true, write: true },
     impersonate: true,
   },
   admin: {
-    users: { read: true, write: true },
-    organisations: { read: true, write: true },
-    plans: { read: true, write: true },
-    tracker: { read: true, write: true },
-    feature_flags: { read: true, write: false },
+    users:        { read: true, write: true },
+    organisations:{ read: true, write: true },
+    plans:        { read: true, write: true },
+    tracker:      { read: true, write: true },
+    feature_flags:{ read: true, write: false },
+    blog:         { read: true, write: true },
+    aoe:          { read: true, write: false },
+    audit_log:    { read: true, write: false },
+    support:      { read: true, write: true },
+    system:       { read: true, write: false },
+    user360:      { read: true, write: false },
     impersonate: true,
   },
   viewer: {
-    users: { read: true, write: false },
-    organisations: { read: true, write: false },
-    plans: { read: true, write: false },
-    tracker: { read: true, write: false },
-    feature_flags: { read: true, write: false },
+    users:        { read: true, write: false },
+    organisations:{ read: true, write: false },
+    plans:        { read: true, write: false },
+    tracker:      { read: true, write: false },
+    feature_flags:{ read: true, write: false },
+    blog:         { read: true, write: false },
+    aoe:          { read: true, write: false },
+    audit_log:    { read: true, write: false },
+    support:      { read: true, write: false },
+    system:       { read: true, write: false },
+    user360:      { read: true, write: false },
     impersonate: false,
   },
 }
@@ -49,15 +73,32 @@ export function parsePermissions(json: Json): AdminPermissions {
   if (typeof json === 'object' && json !== null && !Array.isArray(json)) {
     const obj = json as Record<string, unknown>
     return {
-      users: parseModulePermission(obj.users),
+      users:         parseModulePermission(obj.users),
       organisations: parseModulePermission(obj.organisations),
-      plans: parseModulePermission(obj.plans),
-      tracker: parseModulePermission(obj.tracker),
+      plans:         parseModulePermission(obj.plans),
+      tracker:       parseModulePermission(obj.tracker),
       feature_flags: parseModulePermission(obj.feature_flags),
-      impersonate: Boolean(obj.impersonate),
+      blog:          parseModulePermission(obj.blog),
+      aoe:           parseModulePermission(obj.aoe),
+      audit_log:     parseModulePermission(obj.audit_log),
+      support:       parseModulePermission(obj.support),
+      system:        parseModulePermission(obj.system),
+      user360:       parseModulePermission(obj.user360),
+      impersonate:   Boolean(obj.impersonate),
     }
   }
   return getDefaultPermissions('viewer')
+}
+
+/** Check if an admin role has read access to a module. Super admins always pass. */
+export function hasPermission(
+  permissions: AdminPermissions,
+  module: keyof Omit<AdminPermissions, 'impersonate'>,
+  access: 'read' | 'write' = 'read'
+): boolean {
+  const mod = permissions[module]
+  if (typeof mod === 'object') return mod[access]
+  return false
 }
 
 function parseModulePermission(val: unknown): { read: boolean; write: boolean } {
@@ -176,6 +217,23 @@ export async function deleteAdminRole(id: string): Promise<boolean> {
     return false
   }
   return true
+}
+
+/**
+ * Server-side guard for admin pages.
+ * Super admins always pass. Sub-admins must have read access to the module.
+ * Returns true if access is granted, false otherwise.
+ */
+export async function canAccessAdminModule(
+  email: string,
+  isSuperAdmin: boolean,
+  module: keyof Omit<AdminPermissions, 'impersonate'>
+): Promise<boolean> {
+  if (isSuperAdmin) return true
+  const role = await getAdminRoleByEmail(email)
+  if (!role || !role.is_active) return false
+  const perms = parsePermissions(role.permissions as Json)
+  return hasPermission(perms, module, 'read')
 }
 
 /** Check if an email has any admin access (active role in admin_roles table) */
