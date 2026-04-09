@@ -65,9 +65,9 @@ async function discoverViaCrtSh(limit: number): Promise<string[]> {
     if (domains.size >= limit) break
 
     try {
-      // exclude=expired: crt.sh filters out expired certs server-side
-      // deduplicate=Y: avoid duplicate common names in response
-      const url = `https://crt.sh/?q=%.${tld}&output=json&exclude=expired&deduplicate=Y`
+      // Basic JSON query — crt.sh does not support exclude=expired in JSON mode
+      // We filter in code below: not_after within our window
+      const url = `https://crt.sh/?q=%.${tld}&output=json`
       const controller = new AbortController()
       const timer = setTimeout(() => controller.abort(), 30_000)
 
@@ -133,42 +133,6 @@ async function discoverViaCrtSh(limit: number): Promise<string[]> {
 // ZIP local file header → deflate-compressed → CSV
 // ---------------------------------------------------------------------------
 
-function parseTrancoZip(zipBuffer: Buffer): string[] {
-  // Verify ZIP signature: PK\x03\x04
-  if (zipBuffer.readUInt32LE(0) !== 0x04034b50) {
-    throw new Error('Not a valid ZIP file — unexpected signature')
-  }
-
-  const compressionMethod = zipBuffer.readUInt16LE(8)
-  let   compressedSize    = zipBuffer.readUInt32LE(18)
-  const fileNameLength    = zipBuffer.readUInt16LE(26)
-  const extraFieldLength  = zipBuffer.readUInt16LE(28)
-  const dataOffset        = 30 + fileNameLength + extraFieldLength
-
-  // compressedSize may be 0 (data descriptor follows data).
-  // Find it by locating the End-of-Central-Directory record (0x06054b50).
-  if (compressedSize === 0) {
-    let eocd = zipBuffer.length - 22
-    while (eocd > dataOffset && zipBuffer.readUInt32LE(eocd) !== 0x06054b50) eocd--
-    const cdOffset = zipBuffer.readUInt32LE(eocd + 16)
-    compressedSize = cdOffset - dataOffset
-  }
-
-  const compressed = zipBuffer.subarray(dataOffset, dataOffset + compressedSize)
-
-  if (compressionMethod === 0) {
-    // Stored — no compression
-    return compressed.toString('utf8').split('\n')
-  }
-
-  if (compressionMethod !== 8) {
-    throw new Error(`Unsupported ZIP compression method: ${compressionMethod}`)
-  }
-
-  // Deflate — use Node.js built-in zlib (no external dependency)
-  return new Promise<never>(() => { /* handled synchronously below */ }) as never
-  // (synchronous inflate below)
-}
 
 async function discoverViaTranco(limit: number): Promise<string[]> {
   try {
@@ -240,7 +204,7 @@ async function discoverViaTranco(limit: number): Promise<string[]> {
     const slice       = lines.slice(windowStart, windowStart + limit * 4)
 
     return slice
-      .map(line => line.split(',')[1]?.trim().toLowerCase())
+      .map(line => line.split(',')[1]?.replace(/\r/g, '').trim().toLowerCase())
       .filter((d): d is string => Boolean(d) && d.includes('.'))
       .filter(d => TARGET_TLDS.some(t => d.endsWith(`.${t}`)))
       .slice(0, limit * 2) // 2x buffer so processBatch can cap at limit
