@@ -100,7 +100,7 @@ export async function GET(): Promise<NextResponse> {
   const failedCheckCount = failedChecks.count ?? 0
   const failRate = totalCheckCount > 0 ? (failedCheckCount / totalCheckCount) * 100 : 0
 
-  // ── Cron last-run timestamps (all 12 crons) ───────────────────────────────
+  // ── Cron last-run timestamps (all 13 crons) ───────────────────────────────
   const [
     lastUserCheck,
     lastPublicCheck,
@@ -115,6 +115,7 @@ export async function GET(): Promise<NextResponse> {
     lastAoeLastDay,
     lastAoeSnapshot,
     lastCompetitorCheck,
+    lastRazorpayRecovery,
   ] = await Promise.all([
     // check-runner
     supabase.from('check_results').select('checked_at').not('org_id', 'is', null)
@@ -165,6 +166,10 @@ export async function GET(): Promise<NextResponse> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (supabase as unknown as any).from('competitor_check_results').select('checked_at')
       .order('checked_at', { ascending: false }).limit(1).maybeSingle(),
+    // razorpay-recovery — via cron_run_log
+    untyped(supabase).from('cron_run_log').select('ran_at')
+      .eq('cron_path', '/api/cron/razorpay-recovery')
+      .order('ran_at', { ascending: false }).limit(1).maybeSingle(),
   ])
 
   // ── Compete stats ─────────────────────────────────────────────────────────
@@ -175,6 +180,7 @@ export async function GET(): Promise<NextResponse> {
 
   const healthScoreAt = (lastOrgHealthScore?.data as Record<string, unknown> | null)?.health_score_at as string | null ?? null
   const snapshotDate = (lastAoeSnapshot?.data as Record<string, unknown> | null)?.snapshot_date as string | null ?? null
+  const razorpayRecoveryAt = (lastRazorpayRecovery?.data as Record<string, unknown> | null)?.ran_at as string | null ?? null
 
   const health = {
     database: { status: dbError ? 'error' : 'ok', latencyMs: dbLatency },
@@ -283,6 +289,14 @@ export async function GET(): Promise<NextResponse> {
         lastRun: lastCompetitorCheck?.data?.checked_at ?? null,
         status: cronStatus(lastCompetitorCheck?.data?.checked_at ?? null, 70, now),
         history: cronHistory['/api/cron/competitor-checks'] ?? [],
+      },
+      razorpayRecovery: {
+        label: 'Razorpay Recovery',
+        schedule: 'Daily 10am IST',
+        path: '/api/cron/razorpay-recovery',
+        lastRun: razorpayRecoveryAt,
+        status: cronStatus(razorpayRecoveryAt, 1500, now),
+        history: cronHistory['/api/cron/razorpay-recovery'] ?? [],
       },
     },
 
