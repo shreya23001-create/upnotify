@@ -8,9 +8,12 @@ export function InvoiceList({ invoices }: { invoices: Invoice[] }) {
     { key: 'created_at', label: 'Date', render: (i) => (
       <span>{new Date(i.created_at).toLocaleDateString()}</span>
     )},
-    { key: 'amount_gbp', label: 'Amount', render: (i) => (
-      <span style={{ fontWeight: 600 }}>{'\u00A3'}{(i.amount_gbp / 100).toFixed(2)}</span>
-    )},
+    { key: 'amount_gbp', label: 'Amount', render: (i) => {
+      if (i.currency === 'inr') {
+        return <span style={{ fontWeight: 600 }}>₹{(i.amount_gbp / 100).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+      }
+      return <span style={{ fontWeight: 600 }}>£{(i.amount_gbp / 100).toFixed(2)}</span>
+    }},
     { key: 'status', label: 'Status', render: (i) => (
       <span className={`badge ${i.status === 'paid' ? 'badge-success' : i.status === 'open' ? 'badge-warning' : 'badge-outline'}`}>
         {i.status}
@@ -26,11 +29,16 @@ export function InvoiceList({ invoices }: { invoices: Invoice[] }) {
       return <span className="table-muted">{fmt(start)} → {fmt(end)}</span>
     }},
     { key: 'invoice_pdf_url', label: '', sortable: false, searchable: false, render: (i) => (
-      i.invoice_pdf_url ? (
-        <a href={i.invoice_pdf_url} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-secondary">
-          Download PDF
+      <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+        <a href={`/dashboard/billing/invoice/${i.id}`} className="btn btn-sm btn-secondary">
+          View Invoice
         </a>
-      ) : null
+        {i.invoice_pdf_url && (
+          <a href={i.invoice_pdf_url} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-ghost">
+            Stripe PDF
+          </a>
+        )}
+      </div>
     )},
   ]
 

@@ -50,6 +50,22 @@ export async function getInvoices(orgId: string): Promise<Invoice[]> {
   return data ?? []
 }
 
+export async function getInvoiceById(id: string, orgId: string): Promise<Invoice | null> {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('invoices')
+    .select('*')
+    .eq('id', id)
+    .eq('org_id', orgId) // RLS: org scoping
+    .single()
+
+  if (error) {
+    logger.error('Failed to get invoice', { error: error.message })
+    return null
+  }
+  return data
+}
+
 export async function getPlanBySlug(slug: string): Promise<Plan | null> {
   const supabase = createAdminClient()
   const { data, error } = await supabase

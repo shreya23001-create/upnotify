@@ -138,7 +138,7 @@ export function PricingTable({ plans, currentPlanSlug, creditBalancePence = 0, d
   const [isPortalPending, startPortalTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
   const [isAnnual, setIsAnnual] = useState(true)
-  const [currency, setCurrency] = useState<SupportedCurrency>(defaultCurrency)
+  const currency: SupportedCurrency = defaultCurrency
 
   const directPlans = plans.filter(p => p.type === 'direct')
 
@@ -192,8 +192,8 @@ export function PricingTable({ plans, currentPlanSlug, creditBalancePence = 0, d
 
   return (
     <div>
-      {/* Currency + billing cycle toggles */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 8 }}>
+      {/* Billing cycle toggle */}
+      <div style={{ marginBottom: 8 }}>
         <div className="billing-toggle-wrapper">
           <button
             className={`billing-toggle-btn${!isAnnual ? ' billing-toggle-active' : ''}`}
@@ -209,25 +209,11 @@ export function PricingTable({ plans, currentPlanSlug, creditBalancePence = 0, d
             {currency === 'gbp' && <span className="billing-toggle-save">Save 20%</span>}
           </button>
         </div>
-        <div className="billing-toggle-wrapper">
-          <button
-            className={`billing-toggle-btn${currency === 'gbp' ? ' billing-toggle-active' : ''}`}
-            onClick={() => setCurrency('gbp')}
-          >
-            £ GBP
-          </button>
-          <button
-            className={`billing-toggle-btn${currency === 'inr' ? ' billing-toggle-active' : ''}`}
-            onClick={() => setCurrency('inr')}
-          >
-            ₹ INR
-          </button>
-        </div>
       </div>
 
       {currency === 'inr' && (
         <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 12 }}>
-          INR prices are shown for reference. Razorpay checkout coming soon.
+          Razorpay checkout coming soon. Prices shown for reference.
         </p>
       )}
 

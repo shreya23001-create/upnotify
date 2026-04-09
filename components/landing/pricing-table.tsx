@@ -103,7 +103,7 @@ function getFeatures(p: PlanData): { text: string; included: boolean }[] {
 
 export default function PricingTable({ defaultCurrency = 'gbp' }: { defaultCurrency?: SupportedCurrency }): React.ReactElement {
   const [isAnnual, setIsAnnual] = useState(true)
-  const [currency, setCurrency] = useState<SupportedCurrency>(defaultCurrency)
+  const currency: SupportedCurrency = defaultCurrency
   const [plans, setPlans] = useState<PlanData[]>([])
 
   useEffect(() => {
@@ -139,16 +139,6 @@ export default function PricingTable({ defaultCurrency = 'gbp' }: { defaultCurre
             </div>
             <span className="toggle-label">Annual</span>
             {currency === 'gbp' && <span className="save-badge">Save up to 20%</span>}
-          </div>
-          <div style={{ display: 'flex', gap: 4, background: 'var(--bg-secondary, #f4f4f5)', borderRadius: 8, padding: 4 }}>
-            <button
-              onClick={() => setCurrency('gbp')}
-              style={{ padding: '4px 14px', borderRadius: 6, border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: 13, background: currency === 'gbp' ? '#fff' : 'transparent', boxShadow: currency === 'gbp' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none' }}
-            >£ GBP</button>
-            <button
-              onClick={() => setCurrency('inr')}
-              style={{ padding: '4px 14px', borderRadius: 6, border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: 13, background: currency === 'inr' ? '#fff' : 'transparent', boxShadow: currency === 'inr' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none' }}
-            >₹ INR</button>
           </div>
         </div>
         {currency === 'inr' && (

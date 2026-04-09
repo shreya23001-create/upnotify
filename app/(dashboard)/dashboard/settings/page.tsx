@@ -8,7 +8,6 @@ import { checkTeamMemberLimit } from '@/lib/utils/plan-limits'
 import { getUserCredits, getUserCreditBalance } from '@/lib/db/user-credits'
 import { getAllCreditRules } from '@/lib/db/credit-rules'
 import { getOrCreateReferralCode, getReferralsByUser } from '@/lib/db/referrals'
-import { getActiveCompetePlans, getCompeteSubscription } from '@/lib/db/compete-plans'
 import { getDefaultCurrency } from '@/lib/utils/geo.server'
 import { SettingsContent } from '@/components/dashboard/settings/settings-content'
 
@@ -23,7 +22,6 @@ export default async function SettingsPage(): Promise<React.ReactElement> {
     subscriptionWithPlan, teamLimit,
     credits, creditBalance, creditRules,
     referralCode, referrals,
-    competePlans, competeSubscription,
   ] = await Promise.all([
     getUsersByOrg(organisation.id),
     getSubscription(organisation.id),
@@ -37,12 +35,9 @@ export default async function SettingsPage(): Promise<React.ReactElement> {
     getAllCreditRules(),
     getOrCreateReferralCode(user.id),
     getReferralsByUser(user.id),
-    getActiveCompetePlans(),
-    getCompeteSubscription(organisation.id),
   ])
 
   const currentPlan = subscriptionWithPlan?.plan ?? null
-  const hasPaidBasePlan = !!subscription && subscription.status === 'active' && (currentPlan?.price_monthly_gbp ?? 0) > 0
 
   return (
     <div>
@@ -65,9 +60,6 @@ export default async function SettingsPage(): Promise<React.ReactElement> {
         creditRules={creditRules}
         referralCode={referralCode}
         referrals={referrals}
-        competePlans={competePlans}
-        competeSubscription={competeSubscription}
-        hasPaidBasePlan={hasPaidBasePlan}
         defaultCurrency={defaultCurrency}
       />
     </div>
