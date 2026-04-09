@@ -77,12 +77,12 @@ export function CurrentPlan({ plan, subscription }: Props) {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               {isPaused ? (
                 <button className="btn btn-primary btn-sm" onClick={() => setShowCancel(true)}>
-                  Resume Plan
+                  Resume or Cancel
                 </button>
               ) : (
                 <>
                   <button className="btn btn-secondary btn-sm" onClick={handleManage} disabled={isPending}>
-                    {isPending ? 'Loading...' : 'Manage Subscription'}
+                    {isPending ? 'Loading...' : 'Manage Billing'}
                   </button>
                   {!isCancelling && (
                     <button
@@ -90,7 +90,7 @@ export function CurrentPlan({ plan, subscription }: Props) {
                       style={{ fontSize: 12, color: 'var(--text-muted)' }}
                       onClick={() => setShowCancel(true)}
                     >
-                      Cancel or Pause
+                      Cancel plan
                     </button>
                   )}
                 </>

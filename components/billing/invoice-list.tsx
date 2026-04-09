@@ -29,15 +29,10 @@ export function InvoiceList({ invoices }: { invoices: Invoice[] }) {
       return <span className="table-muted">{fmt(start)} → {fmt(end)}</span>
     }},
     { key: 'invoice_pdf_url', label: '', sortable: false, searchable: false, render: (i) => (
-      <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
         <a href={`/dashboard/billing/invoice/${i.id}`} className="btn btn-sm btn-secondary">
           View Invoice
         </a>
-        {i.invoice_pdf_url && (
-          <a href={i.invoice_pdf_url} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-ghost">
-            Stripe PDF
-          </a>
-        )}
       </div>
     )},
   ]

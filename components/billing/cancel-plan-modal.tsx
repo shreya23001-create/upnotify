@@ -21,65 +21,63 @@ const REASONS = [
   { value: 'other', label: 'Other reason' },
 ]
 
-type Step = 'reason' | 'pause_offer' | 'confirm_cancel' | 'confirm_pause' | 'processing' | 'done'
+type Step = 'reason' | 'confirm_cancel' | 'processing' | 'done'
 
 export function CancelPlanModal({ planName, isOpen, isPaused, pauseUntil, onClose, onComplete }: CancelPlanModalProps): React.ReactElement | null {
   const [step, setStep] = useState<Step>('reason')
   const [reason, setReason] = useState('')
   const [detail, setDetail] = useState('')
   const [countdown, setCountdown] = useState(5)
-  const [result, setResult] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (step !== 'confirm_cancel' && step !== 'confirm_pause') return
+    if (step !== 'confirm_cancel') return
     setCountdown(5)
   }, [step])
 
   useEffect(() => {
-    if ((step !== 'confirm_cancel' && step !== 'confirm_pause') || countdown <= 0) return
+    if (step !== 'confirm_cancel' || countdown <= 0) return
     const t = setTimeout(() => setCountdown(c => c - 1), 1000)
     return () => clearTimeout(t)
   }, [countdown, step])
+
+  // Reset state when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setStep('reason')
+      setReason('')
+      setDetail('')
+      setError(null)
+    }
+  }, [isOpen])
 
   if (!isOpen) return null
 
   const handleSelectReason = (): void => {
     if (!reason) return
-    if (reason === 'too_expensive') {
-      setStep('pause_offer')
-    } else {
-      setStep('confirm_cancel')
-    }
+    setError(null)
+    setStep('confirm_cancel')
   }
 
-  const handleAction = async (action: 'cancel' | 'pause'): Promise<void> => {
+  const handleCancel = async (): Promise<void> => {
     setStep('processing')
+    setError(null)
     try {
       const res = await fetch('/api/v1/billing/cancel', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action, reason, reasonDetail: detail || undefined }),
+        body: JSON.stringify({ action: 'cancel', reason, reasonDetail: detail || undefined }),
       })
-      const data = await res.json() as { success?: boolean; error?: string; pauseUntil?: string; cancelAt?: string }
+      const data = await res.json() as { success?: boolean; error?: string; cancelAt?: string }
       if (data.success) {
-        const cancelDateStr = data.cancelAt
-          ? new Date(data.cancelAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
-          : null
-        setResult({
-          type: 'success',
-          text: action === 'pause'
-            ? `Your subscription is paused until ${new Date(data.pauseUntil ?? '').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}. No charges will be made.`
-            : cancelDateStr
-              ? `Your subscription will cancel on ${cancelDateStr}. You keep full access until then.`
-              : 'Your subscription has been canceled. You are now on the Free plan.',
-        })
-        setStep('done')
+        // Hard redirect — guarantees fresh server-side data on the billing tab
+        window.location.href = '/dashboard/settings?tab=billing&billing=cancelled'
       } else {
-        setResult({ type: 'error', text: data.error ?? 'Something went wrong' })
+        setError(data.error ?? 'Something went wrong. Please try again.')
         setStep('reason')
       }
     } catch {
-      setResult({ type: 'error', text: 'Network error. Please try again.' })
+      setError('Network error. Please try again.')
       setStep('reason')
     }
   }
@@ -94,13 +92,14 @@ export function CancelPlanModal({ planName, isOpen, isPaused, pauseUntil, onClos
       })
       const data = await res.json() as { success?: boolean; error?: string }
       if (data.success) {
-        setResult({ type: 'success', text: 'Your subscription is active again! All monitors have been reactivated.' })
-        setStep('done')
+        window.location.href = '/dashboard/settings?tab=billing&billing=portal_return'
       } else {
-        setResult({ type: 'error', text: data.error ?? 'Something went wrong' })
+        setError(data.error ?? 'Something went wrong')
+        setStep('reason')
       }
     } catch {
-      setResult({ type: 'error', text: 'Network error. Please try again.' })
+      setError('Network error. Please try again.')
+      setStep('reason')
     }
   }
 
@@ -108,14 +107,6 @@ export function CancelPlanModal({ planName, isOpen, isPaused, pauseUntil, onClos
     <div className="popup-overlay" onClick={onClose}>
       <div className="popup-content popup-content-lg" onClick={e => e.stopPropagation()}>
         <button className="popup-close" onClick={onClose}>&times;</button>
-
-        {step === 'done' && result && (
-          <div style={{ textAlign: 'center', padding: '30px 10px' }}>
-            <div style={{ fontSize: 48, marginBottom: 16 }}>{result.type === 'success' ? '\u2705' : '\u274C'}</div>
-            <p style={{ fontSize: 15, color: 'var(--text-secondary)', lineHeight: 1.7, marginBottom: 20 }}>{result.text}</p>
-            <button className="btn btn-primary" onClick={() => { onClose(); onComplete() }}>Close</button>
-          </div>
-        )}
 
         {step === 'processing' && (
           <div style={{ textAlign: 'center', padding: 40 }}>
@@ -132,12 +123,12 @@ export function CancelPlanModal({ planName, isOpen, isPaused, pauseUntil, onClos
               <strong>{pauseUntil ? new Date(pauseUntil).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : 'unknown'}</strong>.
               No charges are being made. Your monitors are paused.
             </p>
+            {error && <p style={{ color: '#ef4444', marginBottom: 12, fontSize: 13 }}>{error}</p>}
             <div style={{ display: 'flex', gap: 10 }}>
-              <button className="btn btn-primary" onClick={handleResume}>Resume Now</button>
+              <button className="btn btn-primary" onClick={() => void handleResume()}>Resume Now</button>
               <button className="btn btn-secondary" onClick={() => setStep('confirm_cancel')}>Cancel Permanently</button>
               <button className="btn btn-ghost" onClick={onClose}>Close</button>
             </div>
-            {result?.type === 'error' && <p style={{ color: '#ef4444', marginTop: 12, fontSize: 13 }}>{result.text}</p>}
           </div>
         )}
 
@@ -149,7 +140,7 @@ export function CancelPlanModal({ planName, isOpen, isPaused, pauseUntil, onClos
               We are sorry to see you go. Please tell us why you are canceling so we can improve.
             </p>
 
-            {result?.type === 'error' && <p style={{ color: '#ef4444', marginBottom: 12, fontSize: 13 }}>{result.text}</p>}
+            {error && <p style={{ color: '#ef4444', marginBottom: 12, fontSize: 13 }}>{error}</p>}
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 16 }}>
               {REASONS.map(r => (
@@ -178,55 +169,12 @@ export function CancelPlanModal({ planName, isOpen, isPaused, pauseUntil, onClos
           </div>
         )}
 
-        {/* Step 2: Pause offer (for cost concern) */}
-        {step === 'pause_offer' && (
-          <div>
-            <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>How about a pause instead?</h2>
-            <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.7, marginBottom: 16 }}>
-              We understand cost is a concern. Instead of canceling, you can <strong>pause your subscription for up to 3 months</strong>. During the pause:
-            </p>
-            <ul style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.8, paddingLeft: 20, marginBottom: 16 }}>
-              <li><strong>No charges</strong> — billing is completely stopped</li>
-              <li><strong>Data preserved</strong> — all monitors, settings, and history kept</li>
-              <li><strong>Resume anytime</strong> — one click to reactivate everything</li>
-              <li><strong>Auto-resumes</strong> — after 3 months, or whenever you are ready</li>
-              <li><strong>Reminders</strong> — we will notify you 14 days and 3 days before billing resumes</li>
-            </ul>
-
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              <button className="btn btn-primary" onClick={() => setStep('confirm_pause')}>
-                Pause for 3 Months
-              </button>
-              <button className="btn btn-danger" onClick={() => setStep('confirm_cancel')}>
-                No, Cancel Permanently
-              </button>
-              <button className="btn btn-ghost" onClick={onClose}>Keep My Plan</button>
-            </div>
-          </div>
-        )}
-
-        {/* Step 3a: Confirm pause */}
-        {step === 'confirm_pause' && (
-          <div>
-            <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>Confirm Pause</h2>
-            <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.7, marginBottom: 16 }}>
-              Your subscription will be paused for 3 months. During this time, your monitors will stop running and no alerts will be sent. Your data and settings will be preserved.
-            </p>
-            <div style={{ display: 'flex', gap: 8 }}>
-              <button className="btn btn-primary" disabled={countdown > 0} onClick={() => handleAction('pause')}>
-                {countdown > 0 ? `Wait ${countdown}s...` : 'Confirm Pause'}
-              </button>
-              <button className="btn btn-secondary" onClick={() => setStep('reason')}>Go Back</button>
-            </div>
-          </div>
-        )}
-
-        {/* Step 3b: Confirm cancel */}
+        {/* Step 2: Confirm cancel */}
         {step === 'confirm_cancel' && (
           <div>
             <h2 style={{ fontSize: 18, fontWeight: 700, color: '#dc2626', marginBottom: 8 }}>Confirm Cancellation</h2>
             <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.7, marginBottom: 12 }}>
-              When you cancel, you will be moved to the <strong>Free plan</strong>. Here is what changes:
+              Your plan will remain active until the end of your current billing period. After that, you will be moved to the <strong>Free plan</strong>:
             </p>
             <div style={{ background: 'var(--bg-secondary)', borderRadius: 8, padding: 14, marginBottom: 16, fontSize: 13, lineHeight: 1.8 }}>
               <div><strong>Monitors:</strong> limited to 3 (excess will be paused)</div>
@@ -239,9 +187,10 @@ export function CancelPlanModal({ planName, isOpen, isPaused, pauseUntil, onClos
             <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 16 }}>
               Your data will not be deleted. You can upgrade again at any time.
             </p>
+            {error && <p style={{ color: '#ef4444', marginBottom: 12, fontSize: 13 }}>{error}</p>}
             <div style={{ display: 'flex', gap: 8 }}>
-              <button className="btn btn-danger" disabled={countdown > 0} onClick={() => handleAction('cancel')}>
-                {countdown > 0 ? `Wait ${countdown}s...` : 'Cancel My Subscription'}
+              <button className="btn btn-danger" disabled={countdown > 0} onClick={() => void handleCancel()}>
+                {countdown > 0 ? `Wait ${countdown}s…` : 'Cancel My Subscription'}
               </button>
               <button className="btn btn-secondary" onClick={() => setStep('reason')}>Go Back</button>
             </div>

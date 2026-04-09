@@ -589,14 +589,14 @@ export function PricingTable({ plans, currentPlanSlug, subscription, creditBalan
                           </button>
                         )
                       ) : (
-                        // GBP / Stripe — open cancel/pause modal
+                        // GBP / Stripe — open cancel modal
                         !isCancelling && (
                           <button
                             className="btn btn-ghost btn-full"
                             style={{ fontSize: 13, color: 'var(--text-muted)' }}
                             onClick={() => setShowCancelModal(true)}
                           >
-                            {isPaused ? 'Resume or Cancel' : 'Cancel or Pause'}
+                            {isPaused ? 'Resume or Cancel' : 'Cancel plan'}
                           </button>
                         )
                       )}

@@ -239,6 +239,11 @@ export function SettingsContent({
           <strong>Payment canceled.</strong> No charge was made. Your current plan remains unchanged.
         </div>
       )}
+      {billingResult === 'cancelled' && (
+        <div className="alert alert-warning" style={{ marginBottom: 16 }}>
+          <strong>Subscription cancelled.</strong> You keep full access until the end of your billing period. After that, your account moves to the Free plan.
+        </div>
+      )}
       {billingResult === 'portal_return' && (
         <div className="alert alert-success" style={{ marginBottom: 16 }}>
           <strong>Changes saved.</strong> Your subscription changes are being processed by Stripe. This page may take a moment to reflect the latest status.
