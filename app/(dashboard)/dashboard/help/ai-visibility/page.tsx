@@ -228,7 +228,7 @@ export default function AiVisibilityHelpPage(): React.ReactElement {
             </ul>
             <p>
               Citation check limits reset on the 1st of each month.{' '}
-              <Link href="/dashboard/settings/billing">Upgrade your plan</Link> to increase your limits.
+              <Link href="/dashboard/settings?tab=billing">Upgrade your plan</Link> to increase your limits.
             </p>
           </section>
 

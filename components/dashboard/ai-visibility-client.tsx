@@ -137,7 +137,7 @@ function LlmsTxtTab({ engines, generations, planSlug, canGenerate, blockReason }
           {!canGenerate && blockReason && (
             <div className="ai-vis-limit-notice">
               <div className="ai-vis-limit-text">{blockReason}</div>
-              <a href="/dashboard/settings/billing" className="ai-vis-upgrade-link">Upgrade plan →</a>
+              <a href="/dashboard/settings?tab=billing" className="ai-vis-upgrade-link">Upgrade plan →</a>
             </div>
           )}
 
@@ -170,7 +170,7 @@ function LlmsTxtTab({ engines, generations, planSlug, canGenerate, blockReason }
             </button>
 
             {planSlug === 'free' && (
-              <p className="ai-vis-plan-note">Free plan: 1 generation. <a href="/dashboard/settings/billing">Upgrade</a> for unlimited.</p>
+              <p className="ai-vis-plan-note">Free plan: 1 generation. <a href="/dashboard/settings?tab=billing">Upgrade</a> for unlimited.</p>
             )}
           </form>
         </div>
@@ -301,7 +301,7 @@ function CitationTab({ engines, freeEngineIds, runs, planSlug, runsThisMonth, mo
       {planSlug === 'free' && (
         <div className="ai-vis-free-notice">
           <strong>Free plan:</strong> You can check free-tier engines only (Copilot, Exa).{' '}
-          <a href="/dashboard/settings/billing">Upgrade to Lite</a> to access all engines and get 2 checks/month.
+          <a href="/dashboard/settings?tab=billing">Upgrade to Lite</a> to access all engines and get 2 checks/month.
         </div>
       )}
 
@@ -329,7 +329,7 @@ function CitationTab({ engines, freeEngineIds, runs, planSlug, runsThisMonth, mo
           {!canRun && (
             <div className="ai-vis-limit-notice">
               <div className="ai-vis-limit-text">You&apos;ve used all {monthlyLimit} checks for this month. Resets on the 1st.</div>
-              <a href="/dashboard/settings/billing" className="ai-vis-upgrade-link">Upgrade for more →</a>
+              <a href="/dashboard/settings?tab=billing" className="ai-vis-upgrade-link">Upgrade for more →</a>
             </div>
           )}
 
