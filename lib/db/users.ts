@@ -159,18 +159,23 @@ export async function getUserById(userId: string): Promise<User | null> {
 }
 
 export async function getUsersByOrg(orgId: string): Promise<User[]> {
-  const supabase = await createClient()
+  // Include users whose current org_id matches AND users who accepted an invite
+  // into this org but have since switched back (original_org_id = orgId while org_id = invited org).
+  // Using admin client to avoid RLS blocking cross-org queries.
+  const supabase = createAdminClient()
   const { data, error } = await supabase
     .from('users')
     .select('*')
-    .eq('org_id', orgId)
+    .or(`org_id.eq.${orgId},and(original_org_id.eq.${orgId},org_id.neq.${orgId})`)
     .order('created_at', { ascending: true })
 
   if (error) {
     logger.error('Failed to get users by org', { error: error.message })
     return []
   }
-  return data ?? []
+  // Deduplicate by id (safety net)
+  const seen = new Set<string>()
+  return (data ?? []).filter(u => { if (seen.has(u.id)) return false; seen.add(u.id); return true })
 }
 
 export async function updateUserProfile(
