@@ -1,12 +1,16 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import type { SupportedCurrency } from '@/lib/utils/currency'
+import { formatInr } from '@/lib/utils/currency'
 
 interface PlanData {
   name: string
   slug: string
   price_monthly_gbp: number
   price_annual_gbp: number | null
+  price_monthly_inr: number
+  price_annual_inr: number
   monitor_limit: number | null
   check_interval_seconds: number
   max_team_members: number
@@ -97,8 +101,9 @@ function getFeatures(p: PlanData): { text: string; included: boolean }[] {
   return features
 }
 
-export default function PricingTable(): React.ReactElement {
+export default function PricingTable({ defaultCurrency = 'gbp' }: { defaultCurrency?: SupportedCurrency }): React.ReactElement {
   const [isAnnual, setIsAnnual] = useState(true)
+  const [currency, setCurrency] = useState<SupportedCurrency>(defaultCurrency)
   const [plans, setPlans] = useState<PlanData[]>([])
 
   useEffect(() => {
@@ -121,19 +126,34 @@ export default function PricingTable(): React.ReactElement {
           <p className="section-sub">No hidden fees. No credit card required for free plan. Cancel or pause anytime.</p>
         </div>
 
-        <div className="pricing-toggle">
-          <span className="toggle-label">Monthly</span>
-          <div
-            className={`toggle-pill${isAnnual ? ' annual' : ''}`}
-            onClick={() => setIsAnnual(!isAnnual)}
-            role="button"
-            aria-label="Toggle billing period"
-          >
-            <div className="toggle-thumb" />
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 24, flexWrap: 'wrap', marginBottom: 8 }}>
+          <div className="pricing-toggle" style={{ margin: 0 }}>
+            <span className="toggle-label">Monthly</span>
+            <div
+              className={`toggle-pill${isAnnual ? ' annual' : ''}`}
+              onClick={() => setIsAnnual(!isAnnual)}
+              role="button"
+              aria-label="Toggle billing period"
+            >
+              <div className="toggle-thumb" />
+            </div>
+            <span className="toggle-label">Annual</span>
+            {currency === 'gbp' && <span className="save-badge">Save up to 20%</span>}
           </div>
-          <span className="toggle-label">Annual</span>
-          <span className="save-badge">Save up to 20%</span>
+          <div style={{ display: 'flex', gap: 4, background: 'var(--bg-secondary, #f4f4f5)', borderRadius: 8, padding: 4 }}>
+            <button
+              onClick={() => setCurrency('gbp')}
+              style={{ padding: '4px 14px', borderRadius: 6, border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: 13, background: currency === 'gbp' ? '#fff' : 'transparent', boxShadow: currency === 'gbp' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none' }}
+            >£ GBP</button>
+            <button
+              onClick={() => setCurrency('inr')}
+              style={{ padding: '4px 14px', borderRadius: 6, border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: 13, background: currency === 'inr' ? '#fff' : 'transparent', boxShadow: currency === 'inr' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none' }}
+            >₹ INR</button>
+          </div>
         </div>
+        {currency === 'inr' && (
+          <p style={{ textAlign: 'center', fontSize: 13, color: 'var(--text-muted)', marginBottom: 24 }}>+ 18% GST · Razorpay checkout coming soon</p>
+        )}
 
         <div className="pricing-grid">
           {plans.map((plan) => {
@@ -141,51 +161,54 @@ export default function PricingTable(): React.ReactElement {
             const annualPence  = plan.price_annual_gbp
 
             const isFree = monthlyPence === 0 && (!annualPence || annualPence === 0)
+            const isHighlighted = plan.slug === highlightedSlug
+            const features = getFeatures(plan)
 
-            // Convert to £
-            const monthlyGbp = monthlyPence / 100
-            const annualGbp  = annualPence ? annualPence / 100 : null
-
-            // Monthly-equivalent of annual price (for display in annual mode)
-            const annualPerMonth = annualGbp ? annualGbp / 12 : null
-
-            // Decide how to display the price
+            // INR display
             let displayPrice: string
             let period: string
             let note: string | undefined
+            let currencySymbol = '£'
 
-            if (isFree) {
-              displayPrice = '0'
-              period = 'forever'
-
-            } else if (isAnnual && annualGbp !== null) {
-              // Annual mode
-              if (annualPerMonth !== null && annualPerMonth >= 1) {
-                // Monthly equivalent is >= £1 — show per-month equivalent
-                const perMo = Math.round(annualPerMonth)
-                displayPrice = String(perMo)
-                period = 'per month · billed annually'
-                note = `Or £${monthlyGbp % 1 === 0 ? monthlyGbp.toFixed(0) : monthlyGbp.toFixed(2)}/mo billed monthly`
-              } else {
-                // Annual total is cheap (e.g. Lite £10/yr) — show the yearly price
-                displayPrice = annualGbp % 1 === 0 ? annualGbp.toFixed(0) : annualGbp.toFixed(2)
+            if (currency === 'inr' && !isFree) {
+              currencySymbol = ''
+              const monthlyInr = plan.price_monthly_inr ?? 0
+              const annualInr  = plan.price_annual_inr ?? 0
+              if (isAnnual && annualInr > 0) {
+                displayPrice = formatInr(annualInr)
                 period = 'per year'
-                note = monthlyGbp > 0
-                  ? `Or £${monthlyGbp % 1 === 0 ? monthlyGbp.toFixed(0) : monthlyGbp.toFixed(2)}/mo billed monthly`
-                  : undefined
+                note = `Or ${formatInr(monthlyInr)}/mo`
+              } else {
+                displayPrice = formatInr(monthlyInr)
+                period = 'per month'
+                if (annualInr > 0) note = `Or ${formatInr(annualInr)}/yr`
               }
-
             } else {
-              // Monthly mode
-              displayPrice = monthlyGbp % 1 === 0 ? monthlyGbp.toFixed(0) : monthlyGbp.toFixed(2)
-              period = 'per month'
-              if (annualGbp !== null) {
-                note = `Or £${annualGbp % 1 === 0 ? annualGbp.toFixed(0) : annualGbp.toFixed(2)}/yr billed annually`
+              // GBP display
+              const monthlyGbp = monthlyPence / 100
+              const annualGbp  = annualPence ? annualPence / 100 : null
+              const annualPerMonth = annualGbp ? annualGbp / 12 : null
+
+              if (isFree) {
+                displayPrice = '0'
+                period = 'forever'
+              } else if (isAnnual && annualGbp !== null) {
+                if (annualPerMonth !== null && annualPerMonth >= 1) {
+                  const perMo = Math.round(annualPerMonth)
+                  displayPrice = String(perMo)
+                  period = 'per month · billed annually'
+                  note = `Or £${monthlyGbp % 1 === 0 ? monthlyGbp.toFixed(0) : monthlyGbp.toFixed(2)}/mo billed monthly`
+                } else {
+                  displayPrice = annualGbp % 1 === 0 ? annualGbp.toFixed(0) : annualGbp.toFixed(2)
+                  period = 'per year'
+                  note = monthlyGbp > 0 ? `Or £${monthlyGbp % 1 === 0 ? monthlyGbp.toFixed(0) : monthlyGbp.toFixed(2)}/mo billed monthly` : undefined
+                }
+              } else {
+                displayPrice = monthlyGbp % 1 === 0 ? monthlyGbp.toFixed(0) : monthlyGbp.toFixed(2)
+                period = 'per month'
+                if (annualGbp !== null) note = `Or £${annualGbp % 1 === 0 ? annualGbp.toFixed(0) : annualGbp.toFixed(2)}/yr billed annually`
               }
             }
-
-            const isHighlighted = plan.slug === highlightedSlug
-            const features = getFeatures(plan)
 
             return (
               <div
@@ -199,7 +222,7 @@ export default function PricingTable(): React.ReactElement {
                   {plan.name}
                 </div>
                 <div className="plan-price">
-                  £<span>{displayPrice}</span>
+                  {currencySymbol}<span>{displayPrice}</span>
                 </div>
                 <div className="plan-period">{period}</div>
                 {note && <div className="plan-price-note">{note}</div>}
@@ -214,13 +237,19 @@ export default function PricingTable(): React.ReactElement {
                     </li>
                   ))}
                 </ul>
-                <a
-                  href="/signup"
-                  className={`btn${isHighlighted ? ' btn-primary' : ' btn-ghost'}`}
-                  style={{ width: '100%', justifyContent: 'center' }}
-                >
-                  {isFree ? 'Start Free' : `Get ${plan.name}`}
-                </a>
+                {currency === 'inr' && !isFree ? (
+                  <button className="btn btn-ghost" style={{ width: '100%', justifyContent: 'center' }} disabled>
+                    Razorpay coming soon
+                  </button>
+                ) : (
+                  <a
+                    href="/signup"
+                    className={`btn${isHighlighted ? ' btn-primary' : ' btn-ghost'}`}
+                    style={{ width: '100%', justifyContent: 'center' }}
+                  >
+                    {isFree ? 'Start Free' : `Get ${plan.name}`}
+                  </a>
+                )}
               </div>
             )
           })}

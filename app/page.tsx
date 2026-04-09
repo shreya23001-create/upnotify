@@ -6,6 +6,7 @@ import { PublicFooter } from '@/components/ui/public-footer'
 import { Ticker } from '@/components/landing/ticker'
 import { BlogPreview } from '@/components/landing/blog-preview'
 import PricingTable from '@/components/landing/pricing-table'
+import { getDefaultCurrency } from '@/lib/utils/geo.server'
 import { HeroDashboardMockup } from '@/components/landing/hero-dashboard-mockup'
 import { FeatureCarousel } from '@/components/landing/feature-carousel'
 import { DowntimeCalculator } from '@/components/landing/downtime-calculator'
@@ -90,7 +91,8 @@ const TESTIMONIALS = [
   },
 ]
 
-export default function LandingPage(): React.ReactElement {
+export default async function LandingPage(): Promise<React.ReactElement> {
+  const defaultCurrency = await getDefaultCurrency()
   return (
     <>
       <OrganizationJsonLd />
@@ -339,7 +341,7 @@ export default function LandingPage(): React.ReactElement {
       {/* ================================================================
           PRICING
           ================================================================ */}
-      <PricingTable />
+      <PricingTable defaultCurrency={defaultCurrency} />
 
       {/* ================================================================
           AGENCY CTA
