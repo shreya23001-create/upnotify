@@ -101,6 +101,10 @@ export async function POST(request: Request): Promise<NextResponse> {
       subscription_data: {
         metadata: { org_id: org.id, plan_slug: plan.slug },
       },
+      // Automatically calculate and collect VAT/tax based on customer location
+      automatic_tax: { enabled: true },
+      // Allow customers to enter their VAT number for B2B reverse charge
+      tax_id_collection: { enabled: true },
       success_url: `${appUrl}/dashboard/settings?tab=billing&billing=success`,
       cancel_url: `${appUrl}/dashboard/settings?tab=billing&billing=canceled`,
     })

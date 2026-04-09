@@ -9,6 +9,7 @@ import { getUserCredits, getUserCreditBalance } from '@/lib/db/user-credits'
 import { getAllCreditRules } from '@/lib/db/credit-rules'
 import { getOrCreateReferralCode, getReferralsByUser } from '@/lib/db/referrals'
 import { getActiveCompetePlans, getCompeteSubscription } from '@/lib/db/compete-plans'
+import { getDefaultCurrency } from '@/lib/utils/geo'
 import { SettingsContent } from '@/components/dashboard/settings/settings-content'
 
 export default async function SettingsPage(): Promise<React.ReactElement> {
@@ -16,6 +17,7 @@ export default async function SettingsPage(): Promise<React.ReactElement> {
   if (!profile) redirect('/login')
 
   const { user, organisation } = profile
+  const defaultCurrency = await getDefaultCurrency()
   const [
     members, subscription, invoices, apiKeys, plans,
     subscriptionWithPlan, teamLimit,
@@ -66,6 +68,7 @@ export default async function SettingsPage(): Promise<React.ReactElement> {
         competePlans={competePlans}
         competeSubscription={competeSubscription}
         hasPaidBasePlan={hasPaidBasePlan}
+        defaultCurrency={defaultCurrency}
       />
     </div>
   )

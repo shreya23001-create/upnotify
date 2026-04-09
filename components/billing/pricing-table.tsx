@@ -2,6 +2,8 @@
 
 import { useState, useTransition } from 'react'
 import type { Plan } from '@/lib/types'
+import type { SupportedCurrency } from '@/lib/utils/geo'
+import { formatInr, formatGbp } from '@/lib/utils/geo'
 
 interface PlanFeatureDisplay {
   text: string
@@ -12,6 +14,7 @@ interface Props {
   plans: Plan[]
   currentPlanSlug?: string
   creditBalancePence?: number
+  defaultCurrency?: SupportedCurrency
 }
 
 function getPlanFeatures(plan: Plan): PlanFeatureDisplay[] {
@@ -75,7 +78,22 @@ function getPlanFeatures(plan: Plan): PlanFeatureDisplay[] {
   return features
 }
 
-function getPlanPrice(plan: Plan, isAnnual: boolean): { amount: string; period: string; note?: string } {
+function getPlanPrice(plan: Plan, isAnnual: boolean, currency: SupportedCurrency): { amount: string; period: string; note?: string } {
+  const p = plan as unknown as Record<string, number>
+
+  // INR pricing
+  if (currency === 'inr') {
+    const monthlyPaise = p.price_monthly_inr ?? 0
+    const annualPaise = p.price_annual_inr ?? 0
+    if (monthlyPaise === 0 && annualPaise === 0) return { amount: formatInr(0), period: 'forever' }
+    // Lite is annual-only in GBP but monthly available in INR
+    if (isAnnual && annualPaise > 0) {
+      return { amount: formatInr(annualPaise), period: '/year', note: '+ 18% GST' }
+    }
+    return { amount: formatInr(monthlyPaise), period: '/month', note: '+ 18% GST' }
+  }
+
+  // GBP pricing
   const monthlyPence = plan.price_monthly_gbp
   const annualPence = plan.price_annual_gbp
 
@@ -115,11 +133,12 @@ function getPlanCta(plan: Plan, isCurrent: boolean, isHigherTier: boolean): stri
   return 'Switch Plan'
 }
 
-export function PricingTable({ plans, currentPlanSlug, creditBalancePence = 0 }: Props): React.ReactElement {
+export function PricingTable({ plans, currentPlanSlug, creditBalancePence = 0, defaultCurrency = 'gbp' }: Props): React.ReactElement {
   const [isPending, startTransition] = useTransition()
   const [isPortalPending, startPortalTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
   const [isAnnual, setIsAnnual] = useState(true)
+  const [currency, setCurrency] = useState<SupportedCurrency>(defaultCurrency)
 
   const directPlans = plans.filter(p => p.type === 'direct')
 
@@ -173,24 +192,46 @@ export function PricingTable({ plans, currentPlanSlug, creditBalancePence = 0 }:
 
   return (
     <div>
-      {/* Annual / Monthly toggle */}
-      <div className="billing-toggle-wrapper">
-        <button
-          className={`billing-toggle-btn${!isAnnual ? ' billing-toggle-active' : ''}`}
-          onClick={() => setIsAnnual(false)}
-        >
-          Monthly
-        </button>
-        <button
-          className={`billing-toggle-btn${isAnnual ? ' billing-toggle-active' : ''}`}
-          onClick={() => setIsAnnual(true)}
-        >
-          Annual
-          <span className="billing-toggle-save">Save 20%</span>
-        </button>
+      {/* Currency + billing cycle toggles */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 8 }}>
+        <div className="billing-toggle-wrapper">
+          <button
+            className={`billing-toggle-btn${!isAnnual ? ' billing-toggle-active' : ''}`}
+            onClick={() => setIsAnnual(false)}
+          >
+            Monthly
+          </button>
+          <button
+            className={`billing-toggle-btn${isAnnual ? ' billing-toggle-active' : ''}`}
+            onClick={() => setIsAnnual(true)}
+          >
+            Annual
+            {currency === 'gbp' && <span className="billing-toggle-save">Save 20%</span>}
+          </button>
+        </div>
+        <div className="billing-toggle-wrapper">
+          <button
+            className={`billing-toggle-btn${currency === 'gbp' ? ' billing-toggle-active' : ''}`}
+            onClick={() => setCurrency('gbp')}
+          >
+            £ GBP
+          </button>
+          <button
+            className={`billing-toggle-btn${currency === 'inr' ? ' billing-toggle-active' : ''}`}
+            onClick={() => setCurrency('inr')}
+          >
+            ₹ INR
+          </button>
+        </div>
       </div>
 
-      {creditBalancePence > 0 && (
+      {currency === 'inr' && (
+        <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 12 }}>
+          INR prices are shown for reference. Razorpay checkout coming soon.
+        </p>
+      )}
+
+      {creditBalancePence > 0 && currency === 'gbp' && (
         <div className="credit-balance-banner">
           Your credits: <strong>{'\u00A3'}{creditGbp}</strong> will be applied to your next bill
         </div>
@@ -206,12 +247,14 @@ export function PricingTable({ plans, currentPlanSlug, creditBalancePence = 0 }:
           const isCurrent = plan.slug === currentPlanSlug || (plan.slug === 'free' && !currentPlanSlug)
           const isHigherTier = index > effectiveCurrentIndex
           const isFree = plan.price_monthly_gbp === 0 && (!plan.price_annual_gbp || plan.price_annual_gbp === 0)
-          const price = getPlanPrice(plan, isAnnual)
+          const price = getPlanPrice(plan, isAnnual, currency)
           const features = getPlanFeatures(plan)
           const ctaText = getPlanCta(plan, isCurrent, isHigherTier)
           const isPopular = plan.slug === 'builder'
           const hasAnnual = plan.price_annual_gbp && plan.price_annual_gbp > 0 && plan.price_monthly_gbp > 0
           const billingCycle = isAnnual && hasAnnual ? 'annual' : 'monthly'
+          // INR checkout not yet available — disable upgrade buttons for INR
+          const isInrMode = currency === 'inr' && !isFree
 
           return (
             <div
@@ -263,6 +306,10 @@ export function PricingTable({ plans, currentPlanSlug, creditBalancePence = 0 }:
               ) : isFree ? (
                 <button className="btn btn-secondary btn-full" disabled>
                   Free Plan
+                </button>
+              ) : isInrMode ? (
+                <button className="btn btn-secondary btn-full" disabled>
+                  Razorpay coming soon
                 </button>
               ) : isHigherTier ? (
                 <button

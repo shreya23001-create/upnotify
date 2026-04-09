@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation'
 import { DataTable, type Column, type BulkAction } from '@/components/ui/data-table'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import type { Organisation, User, Subscription, Invoice, ApiKey, Plan, UserCredit, CreditRule, Referral } from '@/lib/types'
+import type { SupportedCurrency } from '@/lib/utils/geo'
 import { CurrentPlan } from '@/components/billing/current-plan'
 import { PricingTable } from '@/components/billing/pricing-table'
 import { InvoiceList } from '@/components/billing/invoice-list'
@@ -38,6 +39,7 @@ interface SettingsContentProps {
   competePlans: CompetePlan[]
   competeSubscription: CompeteSubscription | null
   hasPaidBasePlan: boolean
+  defaultCurrency: SupportedCurrency
 }
 
 export function SettingsContent({
@@ -61,6 +63,7 @@ export function SettingsContent({
   competePlans,
   competeSubscription,
   hasPaidBasePlan,
+  defaultCurrency,
 }: SettingsContentProps): React.ReactElement {
   const searchParams = useSearchParams()
   const initialTab = searchParams.get('tab') || 'organisation'
@@ -265,7 +268,7 @@ export function SettingsContent({
       {tab === 'billing' && (
         <div className="space-y">
           <CurrentPlan plan={currentPlan} subscription={subscription} />
-          <PricingTable plans={plans} currentPlanSlug={currentPlan?.slug} creditBalancePence={creditBalance} />
+          <PricingTable plans={plans} currentPlanSlug={currentPlan?.slug} creditBalancePence={creditBalance} defaultCurrency={defaultCurrency} />
 
           {/* Compete add-on section */}
           <div className="card">
