@@ -14,7 +14,7 @@ import { AOE_CONFIG } from '@/lib/aoe/config'
 import { getAoeSettings } from '@/lib/aoe/db/aoe-settings'
 import { getQuotaState, incrementMarketingSent } from '@/lib/aoe/db/aoe-email-quota'
 import { getSitesReadyToEmail, markSiteEmailed } from '@/lib/aoe/db/aoe-site-discovery'
-import { logAoeEmailSent, wasRecentlyEmailed, hasOptedOut } from '@/lib/aoe/db/aoe-outreach-log'
+import { logAoeEmailSent, wasRecentlyEmailed, wasEmailRecentlyContacted, hasOptedOut } from '@/lib/aoe/db/aoe-outreach-log'
 import { categorizeSite } from '@/lib/aoe/db/aoe-site-checks'
 import { sendAoeEmail } from '@/lib/aoe/services/email-sender'
 import { buildAoeEmail } from '@/lib/aoe/email-templates'
@@ -56,13 +56,18 @@ async function processSite(
 ): Promise<'sent' | 'skipped' | 'error'> {
   if (!site.email) return 'skipped'
 
-  // Gate 1: cooldown check
+  // Gate 1: domain-level cooldown — same domain not emailed twice within cooldown period
   const recentlySent = await wasRecentlyEmailed(site.domain, AOE_CONFIG.sending.cooldownDays)
   if (recentlySent) return 'skipped'
 
-  // Gate 2: opt-out check
+  // Gate 2: domain-level opt-out
   const optedOut = await hasOptedOut(site.domain)
   if (optedOut) return 'skipped'
+
+  // Gate 2b: email-level cooldown — same email address not contacted across any domain
+  // Prevents john@acme.com getting emailed for 5 domains he owns
+  const emailContacted = await wasEmailRecentlyContacted(site.email, AOE_CONFIG.sending.cooldownDays)
+  if (emailContacted) return 'skipped'
 
   // Gate 3: existing Uptrue user? Skip — they already have alerts
   const supabase = createAdminClient()

@@ -49,7 +49,7 @@ export async function logAoeEmailSent(input: {
 }
 
 // ---------------------------------------------------------------------------
-// Check if domain was emailed recently (cooldown check)
+// Check if domain was emailed recently (domain-level cooldown check)
 // ---------------------------------------------------------------------------
 
 export async function wasRecentlyEmailed(domain: string, cooldownDays: number): Promise<boolean> {
@@ -60,6 +60,24 @@ export async function wasRecentlyEmailed(domain: string, cooldownDays: number): 
     .from('aoe_outreach_log')
     .select('id', { count: 'exact', head: true })
     .eq('domain', domain)
+    .gte('sent_at', cutoff)
+
+  return (count ?? 0) > 0
+}
+
+// ---------------------------------------------------------------------------
+// Check if an email address was contacted recently across any domain
+// Prevents john@acme.com getting emailed for 5 different domains he owns
+// ---------------------------------------------------------------------------
+
+export async function wasEmailRecentlyContacted(email: string, cooldownDays: number): Promise<boolean> {
+  const supabase = createAdminClient()
+  const cutoff = new Date(Date.now() - cooldownDays * 24 * 60 * 60 * 1000).toISOString()
+
+  const { count } = await supabase
+    .from('aoe_outreach_log')
+    .select('id', { count: 'exact', head: true })
+    .eq('email_sent_to', email)
     .gte('sent_at', cutoff)
 
   return (count ?? 0) > 0
