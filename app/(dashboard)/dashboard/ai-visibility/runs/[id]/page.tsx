@@ -96,8 +96,7 @@ function PendingState({ run }: { run: CitationCheckRun }): React.ReactElement {
         We&apos;re querying each AI engine with your keywords. This usually takes 2–5 minutes.
         Refresh this page to check for updates, or wait for your email notification.
       </div>
-      <a href="/dashboard/ai-visibility/runs" className="btn btn-secondary btn-sm"
-        onClick={() => window.location.reload()}>
+      <a href={`/dashboard/ai-visibility/runs/${run.id}`} className="btn btn-secondary btn-sm">
         Refresh
       </a>
     </div>
