@@ -161,8 +161,17 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     else notCitedBySlugs.push(engine.slug)
   }
 
+  // If no results at all, every engine was skipped — no API keys configured
+  if (results.length === 0) {
+    await updateCitationRunStatus(
+      runId, 'failed', undefined,
+      'No API keys are configured for the selected engines. Ask your administrator to add keys in Admin → AI Engines.',
+    )
+    return NextResponse.json({ ok: false, error: 'No engine keys available' })
+  }
+
   // Save results
-  if (results.length > 0) await saveCitationResults(results)
+  await saveCitationResults(results)
 
   // Calculate score
   const totalEngines = runEngines.length

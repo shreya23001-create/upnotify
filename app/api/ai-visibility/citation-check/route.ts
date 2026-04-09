@@ -61,8 +61,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   }
 
   // Fire async processor (non-blocking — Vercel edge/serverless compatible)
-  // We call the internal cron-style endpoint to process this run
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
+  // Use VERCEL_URL (always set by Vercel) with https, fall back to NEXT_PUBLIC_APP_URL, then localhost
+  const vercelUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null
+  const baseUrl   = vercelUrl ?? process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
   fetch(`${baseUrl}/api/ai-visibility/process-run`, {
     method: 'POST',
     headers: {
