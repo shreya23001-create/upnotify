@@ -2,6 +2,38 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 
+// ---------------------------------------------------------------------------
+// Cron groups — defines display order and section labels
+// ---------------------------------------------------------------------------
+
+const CRON_GROUPS: { label: string; color: string; keys: string[] }[] = [
+  {
+    label: 'Core Platform',
+    color: '#3b82f6',
+    keys: ['checkRunner', 'publicChecks', 'healthScores'],
+  },
+  {
+    label: 'Marketing & Nurture',
+    color: '#8b5cf6',
+    keys: ['nurtureEmails'],
+  },
+  {
+    label: 'Watchdog',
+    color: '#f59e0b',
+    keys: ['competitorChecks'],
+  },
+  {
+    label: 'Compete',
+    color: '#06b6d4',
+    keys: ['competeChecks', 'competeBrief'],
+  },
+  {
+    label: 'AOE — Automated Outreach Engine',
+    color: '#10b981',
+    keys: ['aoeQuotaManager', 'aoeSiteDiscovery', 'aoeOutreachChecker', 'aoeOutreachEmailer', 'aoeLastDayBurst', 'aoeDailySnapshot'],
+  },
+]
+
 interface CronRun {
   id: string
   status: 'running' | 'ok' | 'error'
@@ -133,17 +165,42 @@ export function AdminSystemClientPage(): React.ReactElement {
                 </tr>
               </thead>
               <tbody>
-                {Object.entries(health.crons).map(([key, cron]) => {
-                  const trigState = cronTrigger[key] ?? 'idle'
-                  const isExpanded = expandedCron === key
-                  return (
-                    <>
+                {CRON_GROUPS.flatMap(group => {
+                  const groupRows: React.ReactElement[] = []
+
+                  // Group header row
+                  groupRows.push(
+                    <tr key={`group-${group.label}`}>
+                      <td colSpan={6} style={{
+                        padding: '8px 16px',
+                        fontSize: 11,
+                        fontWeight: 700,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.6px',
+                        color: group.color,
+                        background: `${group.color}12`,
+                        borderTop: '1px solid var(--border-color)',
+                        borderBottom: '1px solid var(--border-color)',
+                      }}>
+                        {group.label}
+                      </td>
+                    </tr>
+                  )
+
+                  // Cron rows for this group
+                  for (const key of group.keys) {
+                    const cron = health.crons[key as keyof typeof health.crons]
+                    if (!cron) continue
+                    const trigState = cronTrigger[key] ?? 'idle'
+                    const isExpanded = expandedCron === key
+
+                    groupRows.push(
                       <tr
                         key={key}
                         style={{ cursor: 'pointer' }}
                         onClick={() => setExpandedCron(isExpanded ? null : key)}
                       >
-                        <td style={{ fontWeight: 500 }}>
+                        <td style={{ fontWeight: 500, paddingLeft: 24 }}>
                           <span style={{ marginRight: 6, fontSize: 11, color: 'var(--text-muted)' }}>{isExpanded ? '▲' : '▼'}</span>
                           {cron.label}
                         </td>
@@ -156,7 +213,6 @@ export function AdminSystemClientPage(): React.ReactElement {
                         </td>
                         <td style={{ fontSize: 13, color: 'var(--text-muted)' }}>{timeAgo(cron.lastRun)}</td>
                         <td onClick={e => e.stopPropagation()}>
-                          {/* Last 5 run dots — newest right */}
                           <span style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
                             {cron.history.length === 0
                               ? <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>No runs yet</span>
@@ -190,7 +246,10 @@ export function AdminSystemClientPage(): React.ReactElement {
                           </button>
                         </td>
                       </tr>
-                      {isExpanded && (
+                    )
+
+                    if (isExpanded) {
+                      groupRows.push(
                         <tr key={`${key}-expanded`}>
                           <td colSpan={6} style={{ padding: 0, background: 'var(--bg-secondary)' }}>
                             {cron.history.length === 0 ? (
@@ -234,9 +293,11 @@ export function AdminSystemClientPage(): React.ReactElement {
                             )}
                           </td>
                         </tr>
-                      )}
-                    </>
-                  )
+                      )
+                    }
+                  }
+
+                  return groupRows
                 })}
               </tbody>
             </table>
