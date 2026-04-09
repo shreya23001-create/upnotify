@@ -60,13 +60,18 @@ export function CancelPlanModal({ planName, isOpen, isPaused, pauseUntil, onClos
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action, reason, reasonDetail: detail || undefined }),
       })
-      const data = await res.json() as { success?: boolean; error?: string; pauseUntil?: string }
+      const data = await res.json() as { success?: boolean; error?: string; pauseUntil?: string; cancelAt?: string }
       if (data.success) {
+        const cancelDateStr = data.cancelAt
+          ? new Date(data.cancelAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+          : null
         setResult({
           type: 'success',
           text: action === 'pause'
             ? `Your subscription is paused until ${new Date(data.pauseUntil ?? '').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}. No charges will be made.`
-            : 'Your subscription has been canceled. You are now on the Free plan.',
+            : cancelDateStr
+              ? `Your subscription will cancel on ${cancelDateStr}. You keep full access until then.`
+              : 'Your subscription has been canceled. You are now on the Free plan.',
         })
         setStep('done')
       } else {

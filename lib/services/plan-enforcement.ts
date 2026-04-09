@@ -392,25 +392,51 @@ export async function cancelSubscription(
   reason: string,
   reasonDetail?: string,
   planSlug?: string
-): Promise<{ success: boolean; error?: string }> {
+): Promise<{ success: boolean; error?: string; cancelAt?: string }> {
   const supabase = createAdminClient()
 
   try {
-    // 1. Cancel Stripe subscription
     const { getStripe } = await import('@/lib/services/stripe')
     const stripe = getStripe()
-    await stripe.subscriptions.cancel(stripeSubscriptionId)
 
-    // 2. Update subscription in DB
-    await supabase
+    // Check if subscription is paused — paused subs cancel immediately (no billing to protect)
+    const { data: subRow } = await supabase
       .from('subscriptions')
-      .update({ status: 'canceled', canceled_at: new Date().toISOString() })
+      .select('status, current_period_end')
       .eq('stripe_subscription_id', stripeSubscriptionId)
+      .single()
 
-    // 3. Enforce Free plan limits
-    await enforceDowngradeLimits(orgId, userId)
+    const isPaused = subRow?.status === 'paused'
 
-    // 4. Log cancellation reason
+    let cancelAt: string | undefined
+
+    if (isPaused) {
+      // 1a. Paused → cancel immediately (they're not being billed)
+      await stripe.subscriptions.cancel(stripeSubscriptionId)
+      await supabase
+        .from('subscriptions')
+        .update({ status: 'canceled', canceled_at: new Date().toISOString() })
+        .eq('stripe_subscription_id', stripeSubscriptionId)
+      // Enforce limits now
+      await enforceDowngradeLimits(orgId, userId)
+    } else {
+      // 1b. Active → cancel at period end (user keeps access until paid period expires)
+      const updatedSub = await stripe.subscriptions.update(stripeSubscriptionId, {
+        cancel_at_period_end: true,
+      })
+      const sub = updatedSub as unknown as { current_period_end?: number }
+      cancelAt = sub.current_period_end
+        ? new Date(sub.current_period_end * 1000).toISOString()
+        : subRow?.current_period_end ?? undefined
+
+      // Mark as 'cancelling' — webhook will set 'canceled' + enforce limits at period end
+      await supabase
+        .from('subscriptions')
+        .update({ status: 'cancelling', canceled_at: new Date().toISOString() })
+        .eq('stripe_subscription_id', stripeSubscriptionId)
+    }
+
+    // 2. Log cancellation reason immediately (capture why they left)
     await supabase.from('cancellation_log').insert({
       org_id: orgId,
       user_id: userId,
@@ -420,20 +446,26 @@ export async function cancelSubscription(
       plan_slug: planSlug ?? null,
     })
 
-    // 5. Notify user
+    // 3. Notify user
+    const cancelDateStr = cancelAt
+      ? new Date(cancelAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+      : null
+
     await sendUserMessage({
       userId,
       orgId,
-      title: 'Subscription canceled',
-      body: 'Your subscription has been canceled. You are now on the Free plan. Your excess monitors have been paused and excess channels disabled. You can upgrade again anytime.',
+      title: isPaused ? 'Subscription canceled' : 'Subscription set to cancel',
+      body: isPaused
+        ? 'Your subscription has been canceled. You are now on the Free plan.'
+        : `Your subscription will cancel on ${cancelDateStr ?? 'the end of your billing period'}. You keep full access until then. After that you will move to the Free plan.`,
       type: 'warning',
       category: 'billing',
       actionUrl: '/dashboard/settings?tab=billing',
       actionLabel: 'View Plans',
     })
 
-    logger.info('Subscription canceled by user', { orgId, reason })
-    return { success: true }
+    logger.info('Subscription canceled by user', { orgId, reason, isPaused, cancelAt })
+    return { success: true, cancelAt }
   } catch (err) {
     logger.error('Failed to cancel subscription', { orgId, error: err instanceof Error ? err.message : 'Unknown' })
     return { success: false, error: err instanceof Error ? err.message : 'Failed to cancel' }

@@ -275,21 +275,27 @@ async function handleSubscriptionUpdated(
 ): Promise<void> {
   const supabase = createAdminClient()
   const sub = subObj as unknown as Record<string, unknown>
+  const items = (sub.items as { data: Array<{ current_period_start?: number; current_period_end?: number }> }).data
+  const item = items?.[0]
+
+  // Stripe API 2025+ moved current_period_* to subscription item level
+  const periodStart = (sub.current_period_start as number | undefined) ?? item?.current_period_start
+  const periodEnd   = (sub.current_period_end   as number | undefined) ?? item?.current_period_end
+
+  // cancel_at_period_end=true means user cancelled but keeps access until period end
+  const cancelAtPeriodEnd = sub.cancel_at_period_end as boolean | undefined
 
   const statusMap: Record<string, string> = {
-    active: 'active',
-    past_due: 'past_due',
-    canceled: 'canceled',
+    active:    cancelAtPeriodEnd ? 'cancelling' : 'active',
+    past_due:  'past_due',
+    canceled:  'canceled',
+    paused:    'paused',
   }
 
   const updateData = {
     status: statusMap[sub.status as string] ?? 'incomplete',
-    current_period_start: new Date(
-      (sub.current_period_start as number) * 1000
-    ).toISOString(),
-    current_period_end: new Date(
-      (sub.current_period_end as number) * 1000
-    ).toISOString(),
+    current_period_start: periodStart ? new Date(periodStart * 1000).toISOString() : undefined,
+    current_period_end:   periodEnd   ? new Date(periodEnd   * 1000).toISOString() : undefined,
     canceled_at: sub.canceled_at
       ? new Date((sub.canceled_at as number) * 1000).toISOString()
       : null,
@@ -318,6 +324,13 @@ async function handleSubscriptionDeleted(
     canceled_at: new Date().toISOString(),
   }
 
+  // Look up our subscription record to get org_id (needed for limit enforcement)
+  const { data: subRecord } = await supabase
+    .from('subscriptions')
+    .select('id, org_id, plan_id')
+    .eq('stripe_subscription_id', sub.id as string)
+    .maybeSingle()
+
   // Cancel base subscription
   await supabase
     .from('subscriptions')
@@ -330,7 +343,37 @@ async function handleSubscriptionDeleted(
     .update(cancelData)
     .eq('stripe_subscription_id', sub.id as string)
 
-  logger.info('Subscription canceled', { subscriptionId: sub.id })
+  // Enforce Free plan limits + notify — runs regardless of whether cancel came
+  // from the CancelPlanModal flow or directly via Stripe portal
+  if (subRecord?.org_id) {
+    await enforceDowngradeLimits(subRecord.org_id)
+
+    // Find plan name for notification
+    let planName = 'Free'
+    if (subRecord.plan_id) {
+      const { data: plan } = await supabase
+        .from('plans')
+        .select('name')
+        .eq('id', subRecord.plan_id)
+        .single()
+      if (plan) planName = plan.name
+    }
+
+    // Find org admin to notify
+    const { data: owner } = await supabase
+      .from('users')
+      .select('id')
+      .eq('org_id', subRecord.org_id)
+      .eq('role', 'admin')
+      .limit(1)
+      .single()
+
+    if (owner) {
+      await notifyPlanChange(subRecord.org_id, planName, 'downgraded')
+    }
+  }
+
+  logger.info('Subscription canceled + limits enforced', { subscriptionId: sub.id, orgId: subRecord?.org_id })
 }
 
 export async function POST(request: Request): Promise<NextResponse> {

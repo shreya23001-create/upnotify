@@ -17,7 +17,9 @@ export function CurrentPlan({ plan, subscription }: Props) {
 
   const sub = subscription as unknown as Record<string, unknown> | null
   const isPaused = sub?.status === 'paused'
+  const isCancelling = sub?.status === 'cancelling'
   const pauseUntil = sub?.pause_until as string | null
+  const currentPeriodEnd = sub?.current_period_end as string | null
 
   function handleManage(): void {
     startTransition(async () => {
@@ -50,8 +52,8 @@ export function CurrentPlan({ plan, subscription }: Props) {
             <div>
               <div className="stat-label">Current Plan</div>
               <div style={{ fontSize: 20, fontWeight: 700, marginBottom: 4 }}>{plan.name}</div>
-              <span className={`badge ${subscription.status === 'active' ? 'badge-success' : isPaused ? 'badge-warning' : 'badge-danger'}`}>
-                {isPaused ? 'Paused' : subscription.status}
+              <span className={`badge ${subscription.status === 'active' ? 'badge-success' : isPaused ? 'badge-warning' : isCancelling ? 'badge-warning' : 'badge-danger'}`}>
+                {isPaused ? 'Paused' : isCancelling ? 'Cancels at period end' : subscription.status}
               </span>
               <span style={{ marginLeft: 8, fontSize: 14, color: '#94a3b8', textTransform: 'capitalize' }}>
                 {subscription.billing_cycle}
@@ -61,7 +63,12 @@ export function CurrentPlan({ plan, subscription }: Props) {
                   Paused until {new Date(pauseUntil).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}. Monitors are not running.
                 </p>
               )}
-              {!isPaused && subscription.current_period_end && (
+              {isCancelling && currentPeriodEnd && (
+                <p style={{ fontSize: 13, color: '#f59e0b', marginTop: 8, fontWeight: 500 }}>
+                  Access until {new Date(currentPeriodEnd).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}, then moves to Free plan.
+                </p>
+              )}
+              {!isPaused && !isCancelling && subscription.current_period_end && (
                 <p style={{ fontSize: 13, color: '#94a3b8', marginTop: 8 }}>
                   Next billing: {new Date(subscription.current_period_end).toLocaleDateString()}
                 </p>
@@ -77,13 +84,15 @@ export function CurrentPlan({ plan, subscription }: Props) {
                   <button className="btn btn-secondary btn-sm" onClick={handleManage} disabled={isPending}>
                     {isPending ? 'Loading...' : 'Manage Subscription'}
                   </button>
-                  <button
-                    className="btn btn-ghost btn-sm"
-                    style={{ fontSize: 12, color: 'var(--text-muted)' }}
-                    onClick={() => setShowCancel(true)}
-                  >
-                    Cancel or Pause
-                  </button>
+                  {!isCancelling && (
+                    <button
+                      className="btn btn-ghost btn-sm"
+                      style={{ fontSize: 12, color: 'var(--text-muted)' }}
+                      onClick={() => setShowCancel(true)}
+                    >
+                      Cancel or Pause
+                    </button>
+                  )}
                 </>
               )}
             </div>

@@ -302,7 +302,6 @@ function getPlanCta(plan: Plan, isCurrent: boolean, isHigherTier: boolean): stri
 
 export function PricingTable({ plans, currentPlanSlug, creditBalancePence = 0, defaultCurrency = 'gbp' }: Props): React.ReactElement {
   const [isPending, startTransition] = useTransition()
-  const [isPortalPending, startPortalTransition] = useTransition()
   const [isRazorpayPending, setIsRazorpayPending] = useState(false)
   const [isCancelPending, setIsCancelPending] = useState(false)
   const [cancelConfirm, setCancelConfirm] = useState(false)
@@ -339,23 +338,6 @@ export function PricingTable({ plans, currentPlanSlug, creditBalancePence = 0, d
     } finally {
       setIsCancelPending(false)
     }
-  }
-
-  function handleOpenPortal(): void {
-    setError(null)
-    startPortalTransition(async () => {
-      try {
-        const res = await fetch('/api/v1/billing/portal', { method: 'POST' })
-        const data: { url?: string; error?: string } = await res.json()
-        if (data.url) {
-          window.location.href = data.url
-        } else {
-          setError(data.error || 'Could not open billing portal. Please try again.')
-        }
-      } catch {
-        setError('Something went wrong. Please check your connection and try again.')
-      }
-    })
   }
 
   function handleSubscribe(planSlug: string, billingCycle: string): void {
@@ -581,16 +563,6 @@ export function PricingTable({ plans, currentPlanSlug, creditBalancePence = 0, d
                         </button>
                       )}
                     </div>
-                  ) : !isFree ? (
-                    // GBP / Stripe cancel — open portal
-                    <button
-                      className="btn btn-ghost btn-full"
-                      style={{ marginTop: 8, fontSize: 13, color: 'var(--text-muted)' }}
-                      onClick={handleOpenPortal}
-                      disabled={isPortalPending}
-                    >
-                      {isPortalPending ? 'Opening...' : 'Cancel subscription'}
-                    </button>
                   ) : null}
                 </div>
               ) : isFree ? (
