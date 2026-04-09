@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import crypto from 'crypto'
 import { getCurrentUser } from '@/lib/db/users'
 import { getCurrentOrganisation } from '@/lib/db/organisations'
 import { createAdminClient } from '@/lib/supabase/admin'
@@ -65,12 +66,26 @@ export async function POST(request: Request): Promise<NextResponse> {
       ? (p.razorpay_annual_plan_id as string | null)
       : (p.razorpay_monthly_plan_id as string | null)
 
-    if (!razorpayPlanId) {
-      logger.error('Razorpay plan ID not configured', { planSlug, billingCycle })
-      return NextResponse.json(
-        { error: 'Razorpay plan not configured for this plan. Please contact support.' },
-        { status: 500 }
-      )
+    const { razorpay } = getServerConfig()
+    const isMockMode = !razorpay.keyId || razorpay.keyId === 'rzp_test_placeholder'
+
+    // ── MOCK MODE — no real Razorpay keys configured ──────────────────────────
+    // Returns a fake subscription ID so the frontend can show a test modal.
+    // Remove this block once real keys are added.
+    if (isMockMode || !razorpayPlanId) {
+      const amountPaise = billingCycle === 'annual'
+        ? ((plan as unknown as Record<string, number>).price_annual_inr ?? 0)
+        : ((plan as unknown as Record<string, number>).price_monthly_inr ?? 0)
+      return NextResponse.json({
+        mockMode: true,
+        subscriptionId: `mock_sub_${crypto.randomUUID().replace(/-/g, '').slice(0, 14)}`,
+        planSlug: plan.slug,
+        planName: plan.name as string,
+        billingCycle,
+        amountPaise,
+        userEmail: user.email,
+        orgName: org.name,
+      })
     }
 
     // Ensure Razorpay customer exists for this org
@@ -95,13 +110,16 @@ export async function POST(request: Request): Promise<NextResponse> {
       userEmail: user.email,
     })
 
-    const { razorpay } = getServerConfig()
+    const amountPaise = billingCycle === 'annual'
+      ? ((plan as unknown as Record<string, number>).price_annual_inr ?? 0)
+      : ((plan as unknown as Record<string, number>).price_monthly_inr ?? 0)
 
     return NextResponse.json({
       subscriptionId: rzpSub.id,
       keyId: razorpay.keyId,
       planName: plan.name as string,
       billingCycle,
+      amountPaise,
       userEmail: user.email,
       orgName: org.name,
     })
