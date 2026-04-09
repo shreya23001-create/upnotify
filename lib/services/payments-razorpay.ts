@@ -161,6 +161,11 @@ export async function cancelRazorpaySubscription(
   subscriptionId: string,
   cancelAtCycleEnd = true
 ): Promise<void> {
+  // Skip real API call for mock subscriptions (dev/staging testing only)
+  if (subscriptionId.startsWith('mock_')) {
+    logger.info('Razorpay: mock subscription — skipping API cancel', { subscriptionId })
+    return
+  }
   const rzp = getRazorpay()
   await rzp.subscriptions.cancel(subscriptionId, cancelAtCycleEnd)
   logger.info('Razorpay: subscription cancel requested', {

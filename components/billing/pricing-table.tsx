@@ -304,6 +304,8 @@ export function PricingTable({ plans, currentPlanSlug, creditBalancePence = 0, d
   const [isPending, startTransition] = useTransition()
   const [isPortalPending, startPortalTransition] = useTransition()
   const [isRazorpayPending, setIsRazorpayPending] = useState(false)
+  const [isCancelPending, setIsCancelPending] = useState(false)
+  const [cancelConfirm, setCancelConfirm] = useState(false)
   const [mockCheckout, setMockCheckout] = useState<MockCheckoutData | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isAnnual, setIsAnnual] = useState(true)
@@ -314,6 +316,30 @@ export function PricingTable({ plans, currentPlanSlug, creditBalancePence = 0, d
   // Determine the index of the current plan for upgrade/downgrade logic
   const currentPlanIndex = directPlans.findIndex(p => p.slug === currentPlanSlug)
   const effectiveCurrentIndex = currentPlanIndex >= 0 ? currentPlanIndex : 0 // Free if no subscription
+
+  async function handleRazorpayCancel(): Promise<void> {
+    if (!cancelConfirm) { setCancelConfirm(true); return }
+    setError(null)
+    setIsCancelPending(true)
+    setCancelConfirm(false)
+    try {
+      const res = await fetch('/api/v1/billing/cancel', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'cancel', reason: 'other' }),
+      })
+      const data = await res.json() as { success?: boolean; message?: string; error?: string }
+      if (data.success) {
+        window.location.href = '/dashboard/settings?tab=billing&billing=cancelled'
+      } else {
+        setError(data.error || 'Could not cancel subscription. Please try again.')
+      }
+    } catch {
+      setError('Something went wrong. Please try again.')
+    } finally {
+      setIsCancelPending(false)
+    }
+  }
 
   function handleOpenPortal(): void {
     setError(null)
@@ -522,7 +548,41 @@ export function PricingTable({ plans, currentPlanSlug, creditBalancePence = 0, d
               {isCurrent ? (
                 <div>
                   <div className="pricing-card-current-label">{'\u2713'} You&apos;re on this plan</div>
-                  {!isFree && (
+                  {!isFree && currency === 'inr' ? (
+                    // INR / Razorpay cancel — no portal
+                    <div style={{ marginTop: 8 }}>
+                      {cancelConfirm ? (
+                        <div style={{ display: 'flex', gap: 8 }}>
+                          <button
+                            className="btn btn-ghost btn-full"
+                            style={{ fontSize: 13, color: 'var(--danger, #dc2626)', borderColor: 'var(--danger, #dc2626)' }}
+                            onClick={() => void handleRazorpayCancel()}
+                            disabled={isCancelPending}
+                          >
+                            {isCancelPending ? 'Cancelling…' : 'Yes, cancel'}
+                          </button>
+                          <button
+                            className="btn btn-secondary btn-full"
+                            style={{ fontSize: 13 }}
+                            onClick={() => setCancelConfirm(false)}
+                            disabled={isCancelPending}
+                          >
+                            Keep plan
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          className="btn btn-ghost btn-full"
+                          style={{ fontSize: 13, color: 'var(--text-muted)' }}
+                          onClick={() => void handleRazorpayCancel()}
+                          disabled={isCancelPending}
+                        >
+                          Cancel subscription
+                        </button>
+                      )}
+                    </div>
+                  ) : !isFree ? (
+                    // GBP / Stripe cancel — open portal
                     <button
                       className="btn btn-ghost btn-full"
                       style={{ marginTop: 8, fontSize: 13, color: 'var(--text-muted)' }}
@@ -531,13 +591,14 @@ export function PricingTable({ plans, currentPlanSlug, creditBalancePence = 0, d
                     >
                       {isPortalPending ? 'Opening...' : 'Cancel subscription'}
                     </button>
-                  )}
+                  ) : null}
                 </div>
               ) : isFree ? (
                 <button className="btn btn-secondary btn-full" disabled>
                   Free Plan
                 </button>
               ) : isInrMode ? (
+                // INR: upgrade AND downgrade both go through Razorpay checkout
                 <button
                   className="btn btn-primary btn-full"
                   onClick={() => void handleRazorpayCheckout(plan.slug, billingCycle)}
