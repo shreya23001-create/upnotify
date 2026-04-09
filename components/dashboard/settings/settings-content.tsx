@@ -260,7 +260,7 @@ export function SettingsContent({
       {tab === 'billing' && (
         <div className="space-y">
           <CurrentPlan plan={currentPlan} subscription={subscription} />
-          <PricingTable plans={plans} currentPlanSlug={currentPlan?.slug} creditBalancePence={creditBalance} defaultCurrency={defaultCurrency} />
+          <PricingTable plans={plans} currentPlanSlug={currentPlan?.slug} subscription={subscription} creditBalancePence={creditBalance} defaultCurrency={defaultCurrency} />
 
           <InvoiceList invoices={invoices} />
         </div>

@@ -6,13 +6,15 @@ import type { Subscription, Invoice, Plan } from '@/lib/types'
 export async function getSubscription(orgId: string): Promise<Subscription | null> {
   const supabase = await createClient()
 
-  // Try active first
+  // Active or cancelling (paid until period end) — show either
   const { data: active, error: activeErr } = await supabase
     .from('subscriptions')
     .select('*')
     .eq('org_id', orgId)
-    .eq('status', 'active')
-    .single()
+    .in('status', ['active', 'cancelling'])
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
 
   if (active) return active
 
@@ -22,14 +24,14 @@ export async function getSubscription(orgId: string): Promise<Subscription | nul
     .select('*')
     .eq('org_id', orgId)
     .eq('status', 'trialing')
-    .single()
+    .maybeSingle()
 
   if (trialing) return trialing
 
-  if (activeErr && activeErr.code !== 'PGRST116') {
+  if (activeErr) {
     logger.error('Failed to get subscription', { error: activeErr.message })
   }
-  if (trialErr && trialErr.code !== 'PGRST116') {
+  if (trialErr) {
     logger.error('Failed to get trial subscription', { error: trialErr.message })
   }
   return null
@@ -101,13 +103,15 @@ export async function getSubscriptionWithPlan(
 ): Promise<{ subscription: Subscription; plan: Plan } | null> {
   const supabase = createAdminClient()
 
-  // Try active first
+  // Active or cancelling (paid until period end) — both have full plan limits
   const { data: active } = await supabase
     .from('subscriptions')
     .select('*, plans(*)')
     .eq('org_id', orgId)
-    .eq('status', 'active')
-    .single()
+    .in('status', ['active', 'cancelling'])
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
 
   if (active && (active as Record<string, unknown>).plans) {
     return {
@@ -122,7 +126,7 @@ export async function getSubscriptionWithPlan(
     .select('*, plans(*)')
     .eq('org_id', orgId)
     .eq('status', 'trialing')
-    .single()
+    .maybeSingle()
 
   if (trialing && (trialing as Record<string, unknown>).plans) {
     return {

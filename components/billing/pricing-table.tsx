@@ -1,9 +1,11 @@
 'use client'
 
 import { useState, useTransition, useCallback } from 'react'
-import type { Plan } from '@/lib/types'
+import { useRouter } from 'next/navigation'
+import type { Plan, Subscription } from '@/lib/types'
 import type { SupportedCurrency } from '@/lib/utils/currency'
 import { formatInr, formatGbp } from '@/lib/utils/currency'
+import { CancelPlanModal } from './cancel-plan-modal'
 
 // ─── Mock Razorpay Modal (dev/staging only — remove when real keys are set) ────
 
@@ -180,6 +182,7 @@ interface PlanFeatureDisplay {
 interface Props {
   plans: Plan[]
   currentPlanSlug?: string
+  subscription?: Subscription | null
   creditBalancePence?: number
   defaultCurrency?: SupportedCurrency
 }
@@ -225,16 +228,19 @@ function getPlanFeatures(plan: Plan): PlanFeatureDisplay[] {
   features.push({ text: `Watchdog — ${watchdogLimit} competitor${watchdogLimit === 1 ? '' : 's'}`, included: true })
 
   // AI Visibility
+  // llms_txt_limit: 0=disabled, 1=one lifetime generation, -1=unlimited
+  // citation_check_monthly_limit: 0=disabled, N=monthly runs, -1=unlimited
   const llmsTxtLimit = p.llms_txt_limit as number | undefined
   const citationLimit = p.citation_check_monthly_limit as number | undefined
-  if (llmsTxtLimit && llmsTxtLimit > 0) {
-    const llmsText = llmsTxtLimit >= 999 ? 'llms.txt Generator (unlimited)' : `llms.txt Generator (${llmsTxtLimit}/month)`
+  if (llmsTxtLimit !== undefined && llmsTxtLimit !== 0) {
+    const llmsText = llmsTxtLimit === -1 ? 'llms.txt Generator (unlimited)' : `llms.txt Generator (${llmsTxtLimit}/month)`
     features.push({ text: llmsText, included: true })
   } else {
     features.push({ text: 'llms.txt Generator', included: false })
   }
-  if (citationLimit && citationLimit > 0) {
-    features.push({ text: `AI Citation Monitor (${citationLimit}/month)`, included: true })
+  if (citationLimit !== undefined && citationLimit !== 0) {
+    const citText = citationLimit === -1 ? 'AI Citation Monitor (unlimited)' : `AI Citation Monitor (${citationLimit}/month)`
+    features.push({ text: citText, included: true })
   } else {
     features.push({ text: 'AI Citation Monitor', included: false })
   }
@@ -300,15 +306,22 @@ function getPlanCta(plan: Plan, isCurrent: boolean, isHigherTier: boolean): stri
   return 'Switch Plan'
 }
 
-export function PricingTable({ plans, currentPlanSlug, creditBalancePence = 0, defaultCurrency = 'gbp' }: Props): React.ReactElement {
+export function PricingTable({ plans, currentPlanSlug, subscription, creditBalancePence = 0, defaultCurrency = 'gbp' }: Props): React.ReactElement {
   const [isPending, startTransition] = useTransition()
   const [isRazorpayPending, setIsRazorpayPending] = useState(false)
   const [isCancelPending, setIsCancelPending] = useState(false)
   const [cancelConfirm, setCancelConfirm] = useState(false)
+  const [showCancelModal, setShowCancelModal] = useState(false)
   const [mockCheckout, setMockCheckout] = useState<MockCheckoutData | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isAnnual, setIsAnnual] = useState(true)
   const currency: SupportedCurrency = defaultCurrency
+  const router = useRouter()
+
+  const sub = subscription as unknown as Record<string, unknown> | null | undefined
+  const isPaused = sub?.status === 'paused'
+  const isCancelling = sub?.status === 'cancelling'
+  const pauseUntil = sub?.pause_until as string | null | undefined
 
   const directPlans = plans.filter(p => p.type === 'direct')
 
@@ -445,6 +458,18 @@ export function PricingTable({ plans, currentPlanSlug, creditBalancePence = 0, d
         />
       )}
 
+      {/* Cancel / Pause modal — GBP (Stripe) users */}
+      {currentPlanSlug && (
+        <CancelPlanModal
+          planName={directPlans.find(p => p.slug === currentPlanSlug)?.name ?? currentPlanSlug}
+          isOpen={showCancelModal}
+          isPaused={isPaused}
+          pauseUntil={pauseUntil ?? null}
+          onClose={() => setShowCancelModal(false)}
+          onComplete={() => router.refresh()}
+        />
+      )}
+
       {/* Billing cycle toggle */}
       <div style={{ marginBottom: 8 }}>
         <div className="billing-toggle-wrapper">
@@ -530,40 +555,53 @@ export function PricingTable({ plans, currentPlanSlug, creditBalancePence = 0, d
               {isCurrent ? (
                 <div>
                   <div className="pricing-card-current-label">{'\u2713'} You&apos;re on this plan</div>
-                  {!isFree && currency === 'inr' ? (
-                    // INR / Razorpay cancel — no portal
+                  {!isFree && (
                     <div style={{ marginTop: 8 }}>
-                      {cancelConfirm ? (
-                        <div style={{ display: 'flex', gap: 8 }}>
+                      {currency === 'inr' ? (
+                        // INR / Razorpay — inline two-step cancel
+                        cancelConfirm ? (
+                          <div style={{ display: 'flex', gap: 8 }}>
+                            <button
+                              className="btn btn-ghost btn-full"
+                              style={{ fontSize: 13, color: 'var(--danger, #dc2626)', borderColor: 'var(--danger, #dc2626)' }}
+                              onClick={() => void handleRazorpayCancel()}
+                              disabled={isCancelPending}
+                            >
+                              {isCancelPending ? 'Cancelling…' : 'Yes, cancel'}
+                            </button>
+                            <button
+                              className="btn btn-secondary btn-full"
+                              style={{ fontSize: 13 }}
+                              onClick={() => setCancelConfirm(false)}
+                              disabled={isCancelPending}
+                            >
+                              Keep plan
+                            </button>
+                          </div>
+                        ) : (
                           <button
                             className="btn btn-ghost btn-full"
-                            style={{ fontSize: 13, color: 'var(--danger, #dc2626)', borderColor: 'var(--danger, #dc2626)' }}
+                            style={{ fontSize: 13, color: 'var(--text-muted)' }}
                             onClick={() => void handleRazorpayCancel()}
                             disabled={isCancelPending}
                           >
-                            {isCancelPending ? 'Cancelling…' : 'Yes, cancel'}
+                            Cancel subscription
                           </button>
-                          <button
-                            className="btn btn-secondary btn-full"
-                            style={{ fontSize: 13 }}
-                            onClick={() => setCancelConfirm(false)}
-                            disabled={isCancelPending}
-                          >
-                            Keep plan
-                          </button>
-                        </div>
+                        )
                       ) : (
-                        <button
-                          className="btn btn-ghost btn-full"
-                          style={{ fontSize: 13, color: 'var(--text-muted)' }}
-                          onClick={() => void handleRazorpayCancel()}
-                          disabled={isCancelPending}
-                        >
-                          Cancel subscription
-                        </button>
+                        // GBP / Stripe — open cancel/pause modal
+                        !isCancelling && (
+                          <button
+                            className="btn btn-ghost btn-full"
+                            style={{ fontSize: 13, color: 'var(--text-muted)' }}
+                            onClick={() => setShowCancelModal(true)}
+                          >
+                            {isPaused ? 'Resume or Cancel' : 'Cancel or Pause'}
+                          </button>
+                        )
                       )}
                     </div>
-                  ) : null}
+                  )}
                 </div>
               ) : isFree ? (
                 <button className="btn btn-secondary btn-full" disabled>
