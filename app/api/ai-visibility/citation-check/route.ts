@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { getCurrentUser } from '@/lib/db/users'
 import { getActiveEngines } from '@/lib/db/ai-engines'
-import { canRunCitationCheck, createCitationRun } from '@/lib/db/ai-visibility'
+import { canRunCitationCheck, createCitationRun, getCitationRunsThisMonth } from '@/lib/db/ai-visibility'
 import { getSubscriptionWithPlan } from '@/lib/db/subscriptions'
 import { logger } from '@/lib/utils/logger'
 
@@ -41,6 +41,23 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   if (!run) {
     logger.error('createCitationRun failed', { orgId: user.org_id })
     return NextResponse.json({ error: 'Failed to start check. Please try again.' }, { status: 500 })
+  }
+
+  // Race-condition guard: re-check monthly count AFTER insert to catch concurrent requests
+  if (planSlug !== 'free') {
+    const { citationMonthlyLimit } = await (async () => {
+      const { canRunCitationCheck: _, ...rest } = await import('@/lib/db/ai-visibility')
+      return { citationMonthlyLimit: (await rest.getCitationRunsThisMonth(user.org_id)) }
+    })()
+    const sub2 = await getSubscriptionWithPlan(user.org_id)
+    const monthlyLimit = sub2?.plan?.citation_check_monthly_limit ?? 0
+    if (monthlyLimit > 0 && citationMonthlyLimit > monthlyLimit) {
+      // Over limit — delete the run we just created
+      const { createAdminClient } = await import('@/lib/supabase/admin')
+      await createAdminClient().from('citation_check_runs').delete().eq('id', run.id)
+      logger.warn('Citation check race condition — rolled back run', { orgId: user.org_id, runId: run.id })
+      return NextResponse.json({ error: 'Monthly citation limit reached. Please try again next month.' }, { status: 403 })
+    }
   }
 
   // Fire async processor (non-blocking — Vercel edge/serverless compatible)

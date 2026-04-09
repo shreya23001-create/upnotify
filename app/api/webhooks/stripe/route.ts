@@ -75,6 +75,22 @@ async function handleCheckoutCompleted(
     if (!planSlug) { logger.error('checkout: missing plan_slug in metadata', { sessionId: session.id }); return }
     if (!session.subscription) { logger.error('checkout: missing subscription on session', { sessionId: session.id }); return }
 
+    // Idempotency guard: Stripe may retry the webhook — skip if already recorded
+    const { data: existingSub } = await supabase
+      .from('subscriptions')
+      .select('id')
+      .eq('stripe_subscription_id', session.subscription as string)
+      .maybeSingle()
+
+    if (existingSub) {
+      logger.info('checkout: subscription already recorded — skipping duplicate webhook', {
+        subscriptionId: session.subscription,
+        orgId,
+        sessionId: session.id,
+      })
+      return
+    }
+
     const { data: plan, error: planError } = await supabase
       .from('plans')
       .select('id, name')

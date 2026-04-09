@@ -42,15 +42,20 @@ export function StatusMonitorRow({ monitor, uptimeSlots, uptimePercent }: Props)
 
       {/* Middle — uptime bars */}
       <div className="status-monitor-uptime">
-        <div className="status-monitor-uptime-bar">
-          {uptimeSlots.map((slot, i) => {
-            const tickClass = slot.status === 'up' ? 'status-uptime-tick status-uptime-tick-up'
-              : slot.status === 'down' ? 'status-uptime-tick status-uptime-tick-down'
-              : slot.status === 'degraded' ? 'status-uptime-tick status-uptime-tick-degraded'
-              : 'status-uptime-tick status-uptime-tick-none'
-            return <div key={i} className={tickClass} title={`${slot.slot}: ${slot.status}`} />
-          })}
-        </div>
+        {/* Show "Insufficient data" when fewer than 2 days have real check data */}
+        {uptimeSlots.filter(s => s.status !== 'none').length < 2 ? (
+          <div className="status-uptime-insufficient">Collecting data…</div>
+        ) : (
+          <div className="status-monitor-uptime-bar">
+            {uptimeSlots.map((slot, i) => {
+              const tickClass = slot.status === 'up' ? 'status-uptime-tick status-uptime-tick-up'
+                : slot.status === 'down' ? 'status-uptime-tick status-uptime-tick-down'
+                : slot.status === 'degraded' ? 'status-uptime-tick status-uptime-tick-degraded'
+                : 'status-uptime-tick status-uptime-tick-none'
+              return <div key={i} className={tickClass} title={`${slot.slot}: ${slot.status}`} />
+            })}
+          </div>
+        )}
       </div>
 
       {/* Right — percentage + status pill */}

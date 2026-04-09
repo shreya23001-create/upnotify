@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 
@@ -8,6 +9,7 @@ export function PublicNav(): React.ReactElement {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const navRef = useRef<HTMLElement>(null)
+  const pathname = usePathname()
 
   useEffect(() => {
     const supabase = createClient()
@@ -18,6 +20,20 @@ export function PublicNav(): React.ReactElement {
       setIsLoggedIn(!!session)
     })
     return () => { subscription.unsubscribe() }
+  }, [])
+
+  // Close menu on route change — layout doesn't remount between navigations
+  useEffect(() => {
+    setMobileOpen(false)
+  }, [pathname])
+
+  // Close menu when window resizes to desktop width
+  useEffect(() => {
+    function handleResize(): void {
+      if (window.innerWidth >= 768) setMobileOpen(false)
+    }
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
   }, [])
 
   useEffect(() => {

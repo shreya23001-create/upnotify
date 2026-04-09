@@ -1049,6 +1049,7 @@ html.dark .data-table-bulk-bar span { color: #93c5fd; }
 .status-uptime-tick-down { background: #ef4444; }
 .status-uptime-tick-degraded { background: #f59e0b; }
 .status-uptime-tick-none { background: var(--border-primary); }
+.status-uptime-insufficient { font-size: 11px; color: var(--text-tertiary); font-style: italic; white-space: nowrap; }
 .status-monitor-right { display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
 .status-monitor-percent { font-size: 13px; font-weight: 700; min-width: 44px; text-align: right; font-family: var(--font-mono, monospace); }
 .percent-good { color: #10b981; }

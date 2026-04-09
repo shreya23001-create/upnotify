@@ -17,6 +17,7 @@ function isValidRedirectPath(path: string): boolean {
   if (!path.startsWith('/')) return false
   if (path.startsWith('//')) return false
   if (path.includes('://')) return false
+  if (path.length > 200) return false // prevent oversized redirect paths
   return true
 }
 

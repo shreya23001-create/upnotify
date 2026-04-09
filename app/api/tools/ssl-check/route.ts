@@ -178,7 +178,15 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     }
 
     // Validate domain — block path traversal and injection
-    const cleaned = domain.replace(/^www\./, '').toLowerCase()
+    const cleaned = domain.replace(/^https?:\/\//, '').replace(/\/.*$/, '').replace(/^www\./, '').toLowerCase()
+
+    // Reject raw IP addresses — SSL certificates require a domain name
+    const ipv4Regex = /^(\d{1,3}\.){3}\d{1,3}$/
+    const ipv6Regex = /^[0-9a-f:]+$/i
+    if (ipv4Regex.test(cleaned) || ipv6Regex.test(cleaned) || cleaned === 'localhost') {
+      return NextResponse.json({ error: 'Please enter a domain name (e.g. example.com), not an IP address.' }, { status: 400 })
+    }
+
     const domainRegex = /^[a-zA-Z0-9][a-zA-Z0-9.-]{0,252}[a-zA-Z0-9]$/
     if (!domainRegex.test(cleaned) || cleaned.includes('..')) {
       return NextResponse.json({ error: 'Invalid domain format' }, { status: 400 })

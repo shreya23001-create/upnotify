@@ -62,9 +62,10 @@ export async function getRecentIncidents(
   workspaceId?: string
 ): Promise<Incident[]> {
   const supabase = await createClient()
+  // Join with monitors to filter out incidents from deleted monitors (prevent orphaned rows)
   let query = supabase
     .from('incidents')
-    .select('*')
+    .select('*, monitors!inner(id)')
     .eq('org_id', orgId)
     .order('started_at', { ascending: false })
     .limit(limit)
@@ -76,7 +77,8 @@ export async function getRecentIncidents(
     logger.error('Failed to get recent incidents', { error: error.message })
     return []
   }
-  return data ?? []
+  // Strip the joined monitors field before returning
+  return (data ?? []).map(({ monitors: _m, ...rest }) => rest as Incident)
 }
 
 export async function updateIncidentStatus(
@@ -140,6 +142,26 @@ export async function createIncident(data: {
   severity: string
 }): Promise<Incident | null> {
   const supabase = createAdminClient()
+
+  // Guard: if an open incident already exists for this monitor, return it
+  // rather than creating a duplicate. This handles monitor flapping.
+  const { data: existing } = await supabase
+    .from('incidents')
+    .select('*')
+    .eq('monitor_id', data.monitor_id)
+    .neq('status', 'resolved')
+    .order('started_at', { ascending: false })
+    .limit(1)
+    .single()
+
+  if (existing) {
+    logger.info('Open incident already exists for monitor — skipping duplicate creation', {
+      monitorId: data.monitor_id,
+      existingIncidentId: existing.id,
+    })
+    return existing as Incident
+  }
+
   const { data: incident, error } = await supabase
     .from('incidents')
     .insert({

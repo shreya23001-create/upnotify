@@ -94,7 +94,17 @@ export async function checkCompetitorDomain(
 
     const responseTimeMs = Date.now() - start
 
-    // Hard down: 4xx/5xx
+    // 403/401: site is reachable but blocking automated access — mark degraded not down
+    if (response.status === 403 || response.status === 401) {
+      return {
+        status: 'degraded',
+        responseTimeMs,
+        statusCode: response.status,
+        errorMessage: response.status === 403 ? 'Access blocked (HTTP 403)' : 'Auth required (HTTP 401)',
+      }
+    }
+
+    // 5xx server errors or other non-ok codes: genuinely down
     if (!response.ok) {
       return {
         status: 'down',

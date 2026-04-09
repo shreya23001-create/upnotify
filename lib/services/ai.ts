@@ -97,11 +97,16 @@ ${incidentSection}
 
 Write the summary in plain English. Do not use markdown. Focus on actionable insights. Always use DD/MMM/YYYY dates and HH:MM times.`
 
-    const message = await client.messages.create({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 500,
-      messages: [{ role: 'user', content: prompt }],
-    })
+    const message = await Promise.race([
+      client.messages.create({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 500,
+        messages: [{ role: 'user', content: prompt }],
+      }),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('AI summary timeout after 25s')), 25000)
+      ),
+    ])
 
     const textBlock = message.content.find(b => b.type === 'text')
     return textBlock ? textBlock.text : 'Unable to generate summary.'

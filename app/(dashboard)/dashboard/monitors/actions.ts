@@ -9,6 +9,56 @@ import { checkMonitorLimit, getPlanLimits } from '@/lib/utils/plan-limits'
 import { logger } from '@/lib/utils/logger'
 import { devAuditLog } from '@/lib/db/audit'
 import { impersonationGuard } from '@/lib/auth/impersonation-guard'
+import { resolveIncident, getOpenIncidentForMonitor } from '@/lib/db/incidents'
+
+// Types that require a URL target (need SSRF + protocol validation)
+const URL_TARGET_TYPES = ['http', 'https', 'keyword', 'api', 'ssl', 'domain']
+
+// Private IP ranges that must never be monitored (SSRF protection)
+const PRIVATE_IP_PATTERNS = [
+  /^localhost$/i,
+  /^127\./,
+  /^10\./,
+  /^192\.168\./,
+  /^172\.(1[6-9]|2\d|3[01])\./,
+  /^::1$/,
+  /^169\.254\./,       // link-local
+  /^metadata\./i,      // cloud metadata endpoints
+]
+
+function isSafeMonitorTarget(target: string, type: string): { safe: boolean; error?: string } {
+  if (!URL_TARGET_TYPES.includes(type)) return { safe: true }
+
+  // Auto-detect missing protocol — will be normalised below, just validate shape
+  const testUrl = target.includes('://') ? target : `https://${target}`
+
+  let parsed: URL
+  try {
+    parsed = new URL(testUrl)
+  } catch {
+    return { safe: false, error: 'Please enter a valid URL (e.g. https://example.com)' }
+  }
+
+  if (!['http:', 'https:'].includes(parsed.protocol)) {
+    return { safe: false, error: 'Only http:// and https:// URLs are supported' }
+  }
+
+  const hostname = parsed.hostname
+  for (const pattern of PRIVATE_IP_PATTERNS) {
+    if (pattern.test(hostname)) {
+      return { safe: false, error: 'Private or localhost URLs cannot be monitored' }
+    }
+  }
+
+  return { safe: true }
+}
+
+/** Normalise monitor target: prepend https:// if no protocol present */
+function normaliseTarget(target: string, type: string): string {
+  if (!URL_TARGET_TYPES.includes(type)) return target
+  if (target && !target.includes('://')) return `https://${target}`
+  return target
+}
 
 export async function createMonitorAction(formData: FormData): Promise<{ error?: string }> {
   const guard = await impersonationGuard()
@@ -42,6 +92,13 @@ export async function createMonitorAction(formData: FormData): Promise<{ error?:
   if (!name || !type || !target) {
     return { error: 'Name, type, and target are required' }
   }
+
+  // Normalise target (auto-prepend https:// if missing)
+  const normalisedTarget = normaliseTarget(target, type)
+
+  // SSRF + URL safety validation
+  const safetyCheck = isSafeMonitorTarget(normalisedTarget, type)
+  if (!safetyCheck.safe) return { error: safetyCheck.error }
 
   // Build type-specific config
   const config: Record<string, unknown> = {}
@@ -96,7 +153,7 @@ export async function createMonitorAction(formData: FormData): Promise<{ error?:
     workspace_id: workspace.id,
     name,
     type,
-    target,
+    target: normalisedTarget,
     check_interval_seconds: requestedInterval,
     severity,
     config,
@@ -171,8 +228,14 @@ export async function updateMonitorAction(monitorId: string, formData: FormData)
 
   if (!name || !target) return { error: 'Name and target are required' }
 
-  const config: Record<string, unknown> = {}
   const type = formData.get('type') as string
+
+  // Normalise + validate target URL
+  const normalisedUpdateTarget = normaliseTarget(target, type)
+  const updateSafetyCheck = isSafeMonitorTarget(normalisedUpdateTarget, type)
+  if (!updateSafetyCheck.safe) return { error: updateSafetyCheck.error }
+
+  const config: Record<string, unknown> = {}
 
   if (type === 'keyword') {
     const positiveStr = formData.get('positiveKeywords') as string
@@ -222,7 +285,7 @@ export async function updateMonitorAction(monitorId: string, formData: FormData)
 
   const monitor = await updateMonitor(monitorId, {
     name,
-    target,
+    target: normalisedUpdateTarget,
     check_interval_seconds: updateInterval,
     severity: severity || undefined,
     config: Object.keys(config).length > 0 ? config : undefined,
@@ -248,6 +311,13 @@ export async function deleteMonitorAction(monitorId: string): Promise<{ error?: 
     return { error: 'Monitor not found' }
   }
 
+  // Resolve any open incident before deleting — prevents orphaned incidents
+  const openIncident = await getOpenIncidentForMonitor(monitorId)
+  if (openIncident) {
+    await resolveIncident(monitorId)
+    logger.info('Auto-resolved open incident before monitor delete', { monitorId, incidentId: openIncident.id })
+  }
+
   const success = await deleteMonitor(monitorId)
   if (!success) return { error: 'Failed to delete monitor' }
   await devAuditLog({ orgId: user.org_id, userId: user.id, action: 'monitor.deleted', resourceType: 'monitor', resourceId: monitorId })
@@ -265,6 +335,13 @@ export async function pauseMonitorAction(monitorId: string): Promise<{ error?: s
   const existing = await getMonitorById(monitorId)
   if (!existing || existing.org_id !== user.org_id) {
     return { error: 'Monitor not found' }
+  }
+
+  // Resolve any open incident when pausing — checks will stop so incident can't auto-recover
+  const openIncidentOnPause = await getOpenIncidentForMonitor(monitorId)
+  if (openIncidentOnPause) {
+    await resolveIncident(monitorId)
+    logger.info('Auto-resolved open incident on monitor pause', { monitorId, incidentId: openIncidentOnPause.id })
   }
 
   await pauseMonitor(monitorId)

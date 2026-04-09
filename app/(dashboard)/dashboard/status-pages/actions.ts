@@ -28,6 +28,14 @@ export async function createStatusPageAction(formData: FormData): Promise<{ erro
 
   if (!name || !slug) return { error: 'Name and slug are required' }
 
+  // Reserved slugs — must not conflict with app routes under /status/
+  const RESERVED_SLUGS = ['api', 'admin', 'dashboard', 'login', 'signup', 'health',
+    'status', 'uptrue', 'app', 'www', 'mail', 'support', 'help', 'blog', 'pricing']
+  const normSlug = slug.toLowerCase().replace(/[^a-z0-9-]/g, '-')
+  if (RESERVED_SLUGS.includes(normSlug)) {
+    return { error: `"${normSlug}" is a reserved name. Please choose a different slug.` }
+  }
+
   // Enforce plan limits on status pages
   const spLimit = await checkStatusPageLimit(user.org_id)
   if (!spLimit.allowed) {
@@ -74,6 +82,13 @@ export async function updateStatusPageAction(pageId: string, formData: FormData)
   const isPublished = formData.get('is_published') !== 'false'
 
   if (!name || !slug) return { error: 'Name and slug are required' }
+
+  const RESERVED_SLUGS_UPDATE = ['api', 'admin', 'dashboard', 'login', 'signup', 'health',
+    'status', 'uptrue', 'app', 'www', 'mail', 'support', 'help', 'blog', 'pricing']
+  const normSlugUpdate = slug.toLowerCase().replace(/[^a-z0-9-]/g, '-')
+  if (RESERVED_SLUGS_UPDATE.includes(normSlugUpdate)) {
+    return { error: `"${normSlugUpdate}" is a reserved name. Please choose a different slug.` }
+  }
 
   const monitorIds = monitorIdsStr ? monitorIdsStr.split(',').filter(Boolean) : []
 

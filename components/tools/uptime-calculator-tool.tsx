@@ -61,9 +61,11 @@ export function UptimeCalculatorTool(): React.ReactElement {
 
   const downtimeMinutesValue = parseFloat(downtimeMinutes)
   const isValidDowntime = !isNaN(downtimeMinutesValue) && downtimeMinutesValue >= 0
-  const reversePct = isValidDowntime
+  const reversePctRaw = isValidDowntime
     ? Math.round((1 - downtimeMinutesValue / MINUTES_PER_MONTH) * 1000000) / 10000
     : null
+  // Clamp: downtime can't exceed 100% of the month, and uptime can't be negative
+  const reversePct = reversePctRaw !== null ? Math.min(100, Math.max(0, reversePctRaw)) : null
 
   return (
     <div className="uptime-calculator">

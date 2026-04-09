@@ -31,6 +31,20 @@ export async function ensureStripeCustomer(
   if (org?.stripe_customer_id) return org.stripe_customer_id
 
   const stripe = getStripe()
+
+  // Dedup guard: search Stripe by email before creating a new customer
+  // Prevents orphaned duplicate customers if DB record was lost
+  const existing = await stripe.customers.list({ email, limit: 1 })
+  if (existing.data.length > 0) {
+    const existingCustomer = existing.data[0]
+    await supabase
+      .from('organisations')
+      .update({ stripe_customer_id: existingCustomer.id })
+      .eq('id', orgId)
+    logger.info('Stripe customer already exists — reusing', { orgId, customerId: existingCustomer.id })
+    return existingCustomer.id
+  }
+
   const customer = await stripe.customers.create({
     email,
     name,

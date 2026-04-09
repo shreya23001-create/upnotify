@@ -118,6 +118,53 @@ function hasSocialLinks(html: string): boolean {
 }
 
 // ---------------------------------------------------------------------------
+// Fetch with max-redirect guard (prevents infinite/deep redirect chains)
+// ---------------------------------------------------------------------------
+const MAX_REDIRECTS = 5
+const SEO_UA = 'UptrueSEOChecker/1.0 (+https://uptrue.io/tools/ai-seo-checker)'
+
+async function fetchWithRedirectLimit(url: string, timeoutMs: number): Promise<Response | null> {
+  let current = url
+  for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
+    let res: Response
+    try {
+      res = await fetch(current, {
+        method: 'GET',
+        redirect: 'manual',
+        signal: AbortSignal.timeout(timeoutMs),
+        headers: { 'User-Agent': SEO_UA },
+      })
+    } catch {
+      return null
+    }
+
+    if (res.status >= 300 && res.status < 400) {
+      const location = res.headers.get('location')
+      if (!location) return res
+      const next = location.startsWith('http') ? location : new URL(location, current).toString()
+      if (!isSafeUrl(next)) return null
+      current = next
+      continue
+    }
+
+    // Non-redirect — return a "followed" response by re-fetching without redirect: manual
+    // so the caller gets a real response with body
+    try {
+      return await fetch(current, {
+        method: 'GET',
+        redirect: 'error',
+        signal: AbortSignal.timeout(timeoutMs),
+        headers: { 'User-Agent': SEO_UA },
+      })
+    } catch {
+      return res // return the last manual response as fallback
+    }
+  }
+  // Exceeded MAX_REDIRECTS
+  return null
+}
+
+// ---------------------------------------------------------------------------
 // robots.txt parser
 // ---------------------------------------------------------------------------
 interface RobotsResult {
@@ -246,6 +293,11 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   }
 
   const rawUrl = (body.url ?? '').trim()
+
+  if (rawUrl.length > 2048) {
+    return NextResponse.json({ error: 'URL is too long. Maximum 2048 characters.' }, { status: 400 })
+  }
+
   const urlWithProtocol = rawUrl.startsWith('http') ? rawUrl : `https://${rawUrl}`
 
   if (!isSafeUrl(urlWithProtocol)) {
@@ -263,16 +315,12 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const fetchStart = Date.now()
     const [robotsResult, pageRes] = await Promise.all([
       fetchRobots(baseUrl),
-      fetch(urlWithProtocol, {
-        signal: AbortSignal.timeout(10000),
-        redirect: 'follow',
-        headers: { 'User-Agent': 'UptrueSEOChecker/1.0 (+https://uptrue.io/tools/ai-seo-checker)' },
-      }).catch(() => null),
+      fetchWithRedirectLimit(urlWithProtocol, 10000),
     ])
     const responseTimeMs = Date.now() - fetchStart
 
     if (!pageRes) {
-      return NextResponse.json({ error: 'Could not reach that URL. Please check it is publicly accessible.' }, { status: 422 })
+      return NextResponse.json({ error: 'Could not reach that URL. It may have too many redirects or be publicly inaccessible.' }, { status: 422 })
     }
 
     const finalUrl    = pageRes.url
