@@ -134,6 +134,7 @@ vi.mock('@/lib/supabase/admin', () => ({
     auth: {
       admin: {
         deleteUser: vi.fn().mockReturnValue({ error: null }),
+        signOut: vi.fn().mockReturnValue({ error: null }),
       },
     },
   }),
@@ -328,76 +329,28 @@ describe('GDPR account deletion', () => {
     resetMockDb()
     setTableDefaults()
 
-    // Default: no status pages (so subscriber loop is skipped)
-    mockTableResponses['status_pages'] = {
-      selectResult: { data: [], error: null },
-      countResult: { count: 0, error: null },
-      deleteResult: { error: null },
-    }
-
-    // Default: no remaining users after deletion (org will be deleted)
+    // Default: sole org member → org will be deleted via cascade
     mockTableResponses['users'] = {
       countResult: { count: 0, error: null },
-      deleteResult: { error: null },
-    }
-  })
-
-  it('deletes all data in correct cascade order and returns counts', async () => {
-    // Set up counts for key tables
-    mockTableResponses['check_results'] = {
-      countResult: { count: 500, error: null },
-      deleteResult: { error: null },
-    }
-    mockTableResponses['monitors'] = {
-      countResult: { count: 5, error: null },
-      deleteResult: { error: null },
-    }
-    mockTableResponses['incidents'] = {
-      countResult: { count: 3, error: null },
-      deleteResult: { error: null },
-    }
-
-    const result = await deleteUserAccount('usr-001', 'org-001')
-
-    expect(result.success).toBe(true)
-    expect(result.deletedCounts.check_results).toBe(500)
-    expect(result.deletedCounts.monitors).toBe(5)
-    expect(result.deletedCounts.incidents).toBe(3)
-    expect(result.deletedCounts.auth_user).toBe(1)
-
-    // Children must be deleted before parents
-    const checkIdx = deletedTables.indexOf('check_results')
-    const monitorIdx = deletedTables.indexOf('monitors')
-    const incidentIdx = deletedTables.indexOf('incidents')
-    expect(checkIdx).toBeLessThan(monitorIdx)
-    expect(incidentIdx).toBeLessThan(monitorIdx)
-  })
-
-  it('deletes org and workspaces when user is sole member', async () => {
-    mockTableResponses['users'] = {
-      countResult: { count: 0, error: null },
-      deleteResult: { error: null },
-    }
-    mockTableResponses['workspaces'] = {
-      countResult: { count: 2, error: null },
       deleteResult: { error: null },
     }
     mockTableResponses['organisations'] = {
       countResult: { count: 1, error: null },
       deleteResult: { error: null },
     }
+  })
 
+  it('returns success and deletes organisation when user is sole member', async () => {
     const result = await deleteUserAccount('usr-001', 'org-001')
 
     expect(result.success).toBe(true)
-    expect(result.deletedCounts.workspaces).toBe(2)
-    expect(result.deletedCounts.organisation).toBe(1)
-    expect(deletedTables).toContain('workspaces')
+    // Organisation was deleted — Postgres cascade handled the rest
     expect(deletedTables).toContain('organisations')
+    // User row was NOT separately deleted (org cascade removes it)
+    expect(deletedTables).not.toContain('users')
   })
 
-  it('does not delete org when other members remain', async () => {
-    // Simulate other users still in org
+  it('deletes only user row when other org members remain', async () => {
     mockTableResponses['users'] = {
       countResult: { count: 2, error: null },
       deleteResult: { error: null },
@@ -406,27 +359,36 @@ describe('GDPR account deletion', () => {
     const result = await deleteUserAccount('usr-001', 'org-001')
 
     expect(result.success).toBe(true)
-    expect(result.deletedCounts.organisation).toBe(0)
-    expect(result.deletedCounts.workspaces).toBe(0)
+    // Organisation preserved — other members still there
     expect(deletedTables).not.toContain('organisations')
+    // Only the user row was removed
+    expect(deletedTables).toContain('users')
   })
 
-  it('stops on failure and returns partial result with failedStep', async () => {
-    // alerts table will fail
-    mockTableResponses['alerts'] = {
-      countResult: { count: 10, error: null },
-      deleteResult: { error: { message: 'Foreign key constraint violation' } },
+  it('returns failure with failedStep when org deletion fails', async () => {
+    mockTableResponses['organisations'] = {
+      countResult: { count: 1, error: null },
+      deleteResult: { error: { message: 'Permission denied' } },
     }
 
     const result = await deleteUserAccount('usr-001', 'org-001')
 
     expect(result.success).toBe(false)
-    expect(result.failedStep).toBe('alerts')
-    expect(result.error).toBe('Foreign key constraint violation')
+    expect(result.failedStep).toBe('organisation')
+    expect(result.error).toBe('Permission denied')
+  })
 
-    // Tables after alerts should NOT have been touched
-    expect(deletedTables).not.toContain('monitors')
-    expect(deletedTables).not.toContain('organisations')
+  it('returns failure with failedStep when user-row deletion fails', async () => {
+    mockTableResponses['users'] = {
+      countResult: { count: 2, error: null },
+      deleteResult: { error: { message: 'FK constraint' } },
+    }
+
+    const result = await deleteUserAccount('usr-001', 'org-001')
+
+    expect(result.success).toBe(false)
+    expect(result.failedStep).toBe('users')
+    expect(result.error).toBe('FK constraint')
   })
 
   it('writes audit log entries before and after deletion', async () => {
@@ -445,27 +407,5 @@ describe('GDPR account deletion', () => {
       (l) => l.action === 'account.deletion_completed'
     )
     expect(completedLog).toBeDefined()
-  })
-
-  it('handles status page subscriber deletion before status pages', async () => {
-    mockTableResponses['status_pages'] = {
-      selectResult: {
-        data: [{ id: 'sp-001' }, { id: 'sp-002' }],
-        error: null,
-      },
-      countResult: { count: 2, error: null },
-      deleteResult: { error: null },
-    }
-    // status_page_subscribers mock needs to handle count queries too
-    mockTableResponses['status_page_subscribers'] = {
-      countResult: { count: 5, error: null },
-      deleteResult: { error: null },
-    }
-
-    const result = await deleteUserAccount('usr-001', 'org-001')
-
-    expect(result.success).toBe(true)
-    // Subscribers deleted for both status pages
-    expect(result.deletedCounts.status_page_subscribers).toBe(10) // 5 per page
   })
 })

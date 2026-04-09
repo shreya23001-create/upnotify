@@ -1,9 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
-import type { Database, Json } from '@/lib/types/database.types'
-
-type TableName = keyof Database['public']['Tables']
+import type { Json } from '@/lib/types/database.types'
 
 /**
  * Structured GDPR data export payload.
@@ -282,78 +280,10 @@ export async function exportUserData(
 // GDPR Account Deletion
 // =========================================================================
 
-/**
- * Counts of rows deleted per table. Returned so the caller can
- * confirm exactly what was removed.
- */
-interface DeletedCounts {
-  check_results: number
-  voice_call_logs: number
-  alerts: number
-  incidents: number
-  alert_channels: number
-  monitors: number
-  maintenance_windows: number
-  status_page_subscribers: number
-  status_pages: number
-  reports: number
-  api_keys: number
-  invoices: number
-  subscriptions: number
-  contact_preferences: number
-  agency_tags: number
-  stripe_connect_payouts: number
-  admin_permissions: number
-  users: number
-  workspaces: number
-  organisation: number
-  auth_user: number
-}
-
 interface DeletionResult {
   success: boolean
-  deletedCounts: DeletedCounts
   error?: string
-  /** The step that failed — allows partial-result diagnosis */
   failedStep?: string
-}
-
-/**
- * Delete all rows from a table matching a column value and return
- * the count of rows deleted. Uses count-then-delete because the
- * Supabase JS client does not expose affected-row counts on delete.
- */
-async function deleteByOrgFilter(
-  table: TableName,
-  column: string,
-  value: string,
-): Promise<{ count: number; error: string | null }> {
-  const supabase = createAdminClient()
-
-  const { count, error: countError } = await supabase
-    .from(table)
-    .select('id', { count: 'exact', head: true })
-    .eq(column, value)
-
-  if (countError) {
-    return { count: 0, error: countError.message }
-  }
-
-  const rowCount = count ?? 0
-  if (rowCount === 0) {
-    return { count: 0, error: null }
-  }
-
-  const { error: deleteError } = await supabase
-    .from(table)
-    .delete()
-    .eq(column, value)
-
-  if (deleteError) {
-    return { count: 0, error: deleteError.message }
-  }
-
-  return { count: rowCount, error: null }
 }
 
 /**
@@ -386,17 +316,16 @@ async function writeGdprDeletionAuditLog(
 }
 
 /**
- * Cascading delete of all user and organisation data.
+ * Deletes all user and organisation data using Postgres ON DELETE CASCADE.
+ *
+ * All tables with org_id → organisations(id) have CASCADE defined in the
+ * DB schema, so deleting the organisation row cascades everything automatically.
+ * This is safer than manual step-by-step deletion because it never misses
+ * new tables added after this code was written.
  *
  * **Pre-conditions (enforced by the API route, NOT here):**
- * - `userId` is the currently authenticated user
- * - `orgId` is that user's organisation
- * - Active Stripe subscription has been cancelled
- * - The user has provided the confirmation string
- *
- * Deletion order respects foreign keys (children first).
- * If any step fails the function stops immediately and returns
- * a partial result so the caller knows exactly what was deleted.
+ * - Active Stripe/Razorpay subscriptions have already been cancelled
+ * - `orgId` is confirmed to belong to `userId`
  *
  * @param userId - The Supabase Auth user ID
  * @param orgId  - The organisation ID the user belongs to
@@ -405,204 +334,58 @@ export async function deleteUserAccount(
   userId: string,
   orgId: string,
 ): Promise<DeletionResult> {
-  const counts: DeletedCounts = {
-    check_results: 0,
-    voice_call_logs: 0,
-    alerts: 0,
-    incidents: 0,
-    alert_channels: 0,
-    monitors: 0,
-    maintenance_windows: 0,
-    status_page_subscribers: 0,
-    status_pages: 0,
-    reports: 0,
-    api_keys: 0,
-    invoices: 0,
-    subscriptions: 0,
-    contact_preferences: 0,
-    agency_tags: 0,
-    stripe_connect_payouts: 0,
-    admin_permissions: 0,
-    users: 0,
-    workspaces: 0,
-    organisation: 0,
-    auth_user: 0,
-  }
-
-  // ── Audit log BEFORE any deletion ────────────────────────────────
-  await writeGdprDeletionAuditLog(orgId, userId, 'account.deletion_started', {
-    reason: 'User requested account deletion (GDPR right to erasure)',
-  })
-
-  logger.info('GDPR account deletion started', { userId, orgId })
-
-  // Helper that runs a step, mutates counts, and returns early on error.
-  type StepKey = keyof DeletedCounts
-  async function runStep(
-    stepKey: StepKey,
-    table: TableName,
-    column: string,
-    value: string,
-  ): Promise<string | null> {
-    const result = await deleteByOrgFilter(table, column, value)
-    if (result.error) {
-      logger.error(`GDPR deletion failed at ${stepKey}`, { error: result.error })
-      return result.error
-    }
-    counts[stepKey] = result.count
-    return null
-  }
-
-  // ── 1. Check results (FK -> monitors) ────────────────────────────
-  let err = await runStep('check_results', 'check_results', 'org_id', orgId)
-  if (err) return { success: false, deletedCounts: counts, error: err, failedStep: 'check_results' }
-
-  // ── 2. Voice call logs (FK -> alerts) ────────────────────────────
-  err = await runStep('voice_call_logs', 'voice_call_logs', 'org_id', orgId)
-  if (err) return { success: false, deletedCounts: counts, error: err, failedStep: 'voice_call_logs' }
-
-  // ── 3. Alerts (FK -> incidents, alert_channels) ──────────────────
-  err = await runStep('alerts', 'alerts', 'org_id', orgId)
-  if (err) return { success: false, deletedCounts: counts, error: err, failedStep: 'alerts' }
-
-  // ── 4. Incidents (FK -> monitors) ────────────────────────────────
-  err = await runStep('incidents', 'incidents', 'org_id', orgId)
-  if (err) return { success: false, deletedCounts: counts, error: err, failedStep: 'incidents' }
-
-  // ── 5. Alert channels (FK -> org) ────────────────────────────────
-  err = await runStep('alert_channels', 'alert_channels', 'org_id', orgId)
-  if (err) return { success: false, deletedCounts: counts, error: err, failedStep: 'alert_channels' }
-
-  // ── 6. Monitors (FK -> org, workspace) ───────────────────────────
-  err = await runStep('monitors', 'monitors', 'org_id', orgId)
-  if (err) return { success: false, deletedCounts: counts, error: err, failedStep: 'monitors' }
-
-  // ── 7. Maintenance windows (FK -> org, workspace) ────────────────
-  err = await runStep('maintenance_windows', 'maintenance_windows', 'org_id', orgId)
-  if (err) return { success: false, deletedCounts: counts, error: err, failedStep: 'maintenance_windows' }
-
-  // ── 8. Status page subscribers (FK -> status_pages) ──────────────
-  // Must delete subscribers before their parent status pages.
   const supabase = createAdminClient()
-  const { data: statusPages } = await supabase
-    .from('status_pages')
-    .select('id')
-    .eq('org_id', orgId)
 
-  let subscriberCount = 0
-  if (statusPages && statusPages.length > 0) {
-    for (const sp of statusPages) {
-      const sub = await deleteByOrgFilter('status_page_subscribers', 'status_page_id', sp.id)
-      if (sub.error) {
-        logger.error('GDPR deletion failed at status_page_subscribers', {
-          error: sub.error,
-          statusPageId: sp.id,
-        })
-        return {
-          success: false,
-          deletedCounts: counts,
-          error: sub.error,
-          failedStep: 'status_page_subscribers',
-        }
-      }
-      subscriberCount += sub.count
-    }
-  }
-  counts.status_page_subscribers = subscriberCount
+  await writeGdprDeletionAuditLog(orgId, userId, 'account.deletion_started', {
+    reason: 'Admin-initiated account deletion',
+  })
+  logger.info('Account deletion started', { userId, orgId })
 
-  // ── 9. Status pages (FK -> org) ──────────────────────────────────
-  err = await runStep('status_pages', 'status_pages', 'org_id', orgId)
-  if (err) return { success: false, deletedCounts: counts, error: err, failedStep: 'status_pages' }
+  // Sign out all active sessions before deleting the user
+  await supabase.auth.admin.signOut(userId, 'global')
 
-  // ── 10. Reports (FK -> org) ──────────────────────────────────────
-  err = await runStep('reports', 'reports', 'org_id', orgId)
-  if (err) return { success: false, deletedCounts: counts, error: err, failedStep: 'reports' }
-
-  // ── 11. API keys (FK -> org) ─────────────────────────────────────
-  err = await runStep('api_keys', 'api_keys', 'org_id', orgId)
-  if (err) return { success: false, deletedCounts: counts, error: err, failedStep: 'api_keys' }
-
-  // ── 12. Invoices (FK -> subscriptions, org) ──────────────────────
-  err = await runStep('invoices', 'invoices', 'org_id', orgId)
-  if (err) return { success: false, deletedCounts: counts, error: err, failedStep: 'invoices' }
-
-  // ── 13. Subscriptions (FK -> org, plans) ─────────────────────────
-  err = await runStep('subscriptions', 'subscriptions', 'org_id', orgId)
-  if (err) return { success: false, deletedCounts: counts, error: err, failedStep: 'subscriptions' }
-
-  // ── 14. Contact preferences (FK -> user, org) ───────────────────
-  err = await runStep('contact_preferences', 'contact_preferences', 'org_id', orgId)
-  if (err) return { success: false, deletedCounts: counts, error: err, failedStep: 'contact_preferences' }
-
-  // ── 15. Agency tags (FK -> org) ──────────────────────────────────
-  err = await runStep('agency_tags', 'agency_tags', 'org_id', orgId)
-  if (err) return { success: false, deletedCounts: counts, error: err, failedStep: 'agency_tags' }
-
-  // ── 16. Stripe connect payouts (FK -> org) ───────────────────────
-  err = await runStep('stripe_connect_payouts', 'stripe_connect_payouts', 'org_id', orgId)
-  if (err) return { success: false, deletedCounts: counts, error: err, failedStep: 'stripe_connect_payouts' }
-
-  // ── 17. Admin permissions (FK -> users) ──────────────────────────
-  err = await runStep('admin_permissions', 'admin_permissions', 'user_id', userId)
-  if (err) return { success: false, deletedCounts: counts, error: err, failedStep: 'admin_permissions' }
-
-  // ── 18. User row ────────────────────────────────────────────────
-  // Delete only the requesting user — other org members are unaffected.
-  const userDelete = await deleteByOrgFilter('users', 'id', userId)
-  if (userDelete.error) {
-    logger.error('GDPR deletion failed at users', { error: userDelete.error })
-    return { success: false, deletedCounts: counts, error: userDelete.error, failedStep: 'users' }
-  }
-  counts.users = userDelete.count
-
-  // ── 19. Check if user was sole member of org ────────────────────
+  // Check if user is the sole member of the org
   const { count: remainingUsers } = await supabase
     .from('users')
     .select('id', { count: 'exact', head: true })
     .eq('org_id', orgId)
 
-  if (remainingUsers === 0) {
-    // ── 20. Workspaces (FK -> org) ────────────────────────────────
-    err = await runStep('workspaces', 'workspaces', 'org_id', orgId)
-    if (err) return { success: false, deletedCounts: counts, error: err, failedStep: 'workspaces' }
+  if ((remainingUsers ?? 0) <= 1) {
+    // Delete the organisation — Postgres ON DELETE CASCADE removes ALL org data
+    // automatically: monitors, incidents, check_results, subscriptions, invoices,
+    // compete_subscriptions, alert_channels, status_pages, user_messages,
+    // aoe data, llms_txt_generations, citation runs, and everything else.
+    const { error: orgDeleteError } = await supabase
+      .from('organisations')
+      .delete()
+      .eq('id', orgId)
 
-    // ── 21. Organisation ──────────────────────────────────────────
-    const orgDelete = await deleteByOrgFilter('organisations', 'id', orgId)
-    if (orgDelete.error) {
-      logger.error('GDPR deletion failed at organisation', { error: orgDelete.error })
-      return { success: false, deletedCounts: counts, error: orgDelete.error, failedStep: 'organisation' }
+    if (orgDeleteError) {
+      logger.error('Deletion failed at organisation', { error: orgDeleteError.message })
+      return { success: false, error: orgDeleteError.message, failedStep: 'organisation' }
     }
-    counts.organisation = orgDelete.count
   } else {
-    logger.info('Organisation not deleted — other members remain', {
-      orgId,
-      remainingUsers,
-    })
+    // Other members exist — only remove this user's row
+    const { error: userDeleteError } = await supabase
+      .from('users')
+      .delete()
+      .eq('id', userId)
+
+    if (userDeleteError) {
+      logger.error('Deletion failed at user row', { error: userDeleteError.message })
+      return { success: false, error: userDeleteError.message, failedStep: 'users' }
+    }
   }
 
-  // ── 22. Supabase Auth user ──────────────────────────────────────
+  // Remove the Supabase Auth record (public.users already gone via cascade or direct delete)
   const { error: authDeleteError } = await supabase.auth.admin.deleteUser(userId)
   if (authDeleteError) {
-    logger.error('GDPR deletion failed at auth user', {
-      error: authDeleteError.message,
-    })
-    return {
-      success: false,
-      deletedCounts: counts,
-      error: authDeleteError.message,
-      failedStep: 'auth_user',
-    }
+    logger.error('Deletion failed at auth user', { error: authDeleteError.message })
+    return { success: false, error: authDeleteError.message, failedStep: 'auth_user' }
   }
-  counts.auth_user = 1
 
-  // ── Final audit log ─────────────────────────────────────────────
-  // The user row is gone, but we still write the completion log
-  // keyed by the now-deleted userId for traceability.
-  await writeGdprDeletionAuditLog(orgId, userId, 'account.deletion_completed', {
-    deletedCounts: counts,
-  })
+  await writeGdprDeletionAuditLog(orgId, userId, 'account.deletion_completed', {})
+  logger.info('Account deletion completed', { userId, orgId })
 
-  logger.info('GDPR account deletion completed', { userId, orgId, counts })
-
-  return { success: true, deletedCounts: counts }
+  return { success: true }
 }

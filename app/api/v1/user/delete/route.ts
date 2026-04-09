@@ -119,13 +119,11 @@ export async function DELETE(request: Request): Promise<NextResponse> {
         orgId: user.org_id,
         failedStep: result.failedStep,
         error: result.error,
-        deletedCounts: result.deletedCounts,
       })
       return NextResponse.json(
         {
-          error: 'Account deletion partially failed. Please contact support.',
+          error: 'Account deletion failed. Please contact support.',
           failedStep: result.failedStep,
-          deletedCounts: result.deletedCounts,
         },
         { status: 500 },
       )
@@ -134,14 +132,12 @@ export async function DELETE(request: Request): Promise<NextResponse> {
     logger.info('GDPR account deletion completed successfully', {
       userId: user.id,
       orgId: user.org_id,
-      deletedCounts: result.deletedCounts,
     })
 
     return NextResponse.json(
       {
         success: true,
         message: 'Your account and all associated data have been permanently deleted.',
-        deletedCounts: result.deletedCounts,
       },
       { status: 200 },
     )
