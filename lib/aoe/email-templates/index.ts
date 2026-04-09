@@ -323,7 +323,7 @@ export function buildAiSeoEmail(
   const { campaigns, product } = AOE_CONFIG
   const cta = campaigns.ai_seo
 
-  const subject = `${domain} is invisible to AI search engines`
+  const subject = `Quick question about ${domain} and AI search`
 
   const html = baseLayout(`
     <h2 style="margin:0 0 8px;font-size:18px;font-weight:700;color:#111827;">
