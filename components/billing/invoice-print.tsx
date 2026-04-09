@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect } from 'react'
 import type { Invoice, Organisation } from '@/lib/types'
 
 // ─── Seller details ──────────────────────────────────────────────────────────
@@ -48,6 +49,19 @@ export function InvoicePrint({ invoice, organisation, userEmail }: Props): React
   const isInr = invoice.currency === 'inr'
   const seller = isInr ? SELLER_INR : SELLER_GBP
 
+  // Auto-trigger print dialog for Razorpay (INR) invoices — Stripe invoices open their own PDF
+  useEffect(() => {
+    if (isInr) {
+      const t = setTimeout(() => window.print(), 800)
+      return () => clearTimeout(t)
+    }
+  }, [isInr])
+
+  // GST / VAT calculations for INR invoices (18% GST inclusive)
+  const totalPaise = invoice.amount_gbp
+  const baseAmountPaise = isInr ? Math.round(totalPaise / 1.18) : totalPaise
+  const gstPaise = isInr ? totalPaise - baseAmountPaise : 0
+
   return (
     <div className="invoice-page">
       {/* Print / Back bar — hidden when printing */}
@@ -56,7 +70,7 @@ export function InvoicePrint({ invoice, organisation, userEmail }: Props): React
           ← Back to Billing
         </a>
         <button className="btn btn-primary btn-sm" onClick={() => window.print()}>
-          Print / Save PDF
+          Download PDF
         </button>
       </div>
 
@@ -68,7 +82,6 @@ export function InvoicePrint({ invoice, organisation, userEmail }: Props): React
           <div className="invoice-logo-block">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/logo.svg" alt="Uptrue" className="invoice-logo" />
-            <span className="invoice-brand">Uptrue</span>
           </div>
           <div className="invoice-title-block">
             <div className="invoice-title">INVOICE</div>
@@ -149,39 +162,27 @@ export function InvoicePrint({ invoice, organisation, userEmail }: Props): React
             <tr>
               <td>Uptrue Subscription</td>
               <td>
-                {invoice.period_start && invoice.period_end
+                {invoice.period_start && invoice.period_end && invoice.period_start !== invoice.period_end
                   ? `${fmt(invoice.period_start)} – ${fmt(invoice.period_end)}`
                   : fmt(invoice.created_at)}
               </td>
-              <td style={{ textAlign: 'right' }}>{fmtAmount(invoice.amount_gbp, invoice.currency)}</td>
+              <td style={{ textAlign: 'right' }}>{fmtAmount(isInr ? baseAmountPaise : totalPaise, invoice.currency)}</td>
             </tr>
           </tbody>
           <tfoot>
-            {!isInr && (
-              <tr>
-                <td colSpan={2} style={{ textAlign: 'right', color: 'var(--text-muted)', fontSize: 13 }}>
-                  VAT (if applicable, shown on Stripe invoice)
-                </td>
-                <td style={{ textAlign: 'right', color: 'var(--text-muted)', fontSize: 13 }}>—</td>
-              </tr>
-            )}
             {isInr && (
               <tr>
                 <td colSpan={2} style={{ textAlign: 'right', color: 'var(--text-muted)', fontSize: 13 }}>
                   GST @ 18%
                 </td>
                 <td style={{ textAlign: 'right', color: 'var(--text-muted)', fontSize: 13 }}>
-                  {fmtAmount(Math.round(invoice.amount_gbp * 0.18), invoice.currency)}
+                  {fmtAmount(gstPaise, invoice.currency)}
                 </td>
               </tr>
             )}
             <tr className="invoice-total-row">
               <td colSpan={2} style={{ textAlign: 'right' }}>Total</td>
-              <td style={{ textAlign: 'right' }}>
-                {isInr
-                  ? fmtAmount(Math.round(invoice.amount_gbp * 1.18), invoice.currency)
-                  : fmtAmount(invoice.amount_gbp, invoice.currency)}
-              </td>
+              <td style={{ textAlign: 'right' }}>{fmtAmount(totalPaise, invoice.currency)}</td>
             </tr>
           </tfoot>
         </table>
@@ -189,11 +190,6 @@ export function InvoicePrint({ invoice, organisation, userEmail }: Props): React
         {/* Footer */}
         <div className="invoice-footer">
           <p>Thank you for your business. For any billing queries, contact {seller.email}</p>
-          {!isInr && (
-            <p style={{ marginTop: 4 }}>
-              For full VAT breakdown, please refer to the official Stripe invoice linked in your billing history.
-            </p>
-          )}
         </div>
 
       </div>
