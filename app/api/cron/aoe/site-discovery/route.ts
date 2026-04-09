@@ -27,9 +27,10 @@ export const maxDuration = 300
 const CONCURRENCY     = 5
 const REQUEST_TIMEOUT = 8000
 
-// Tranco rank window — avoid top 5000 (mega-corps) and bottom long tail
-const TRANCO_RANK_START = 5_001
-const TRANCO_RANK_END   = 50_000
+// Tranco rank window — ranks 100K–500K are actual SMBs
+// Top 50K contains major brands (national-lottery.co.uk, take2games.com etc)
+const TRANCO_RANK_START = 100_000
+const TRANCO_RANK_END   = 500_000
 
 // TLDs most likely to be SMB targets
 const TARGET_TLDS = ['co.uk', 'org.uk', 'com.au', 'co.nz', 'ie', 'ca', 'com']
