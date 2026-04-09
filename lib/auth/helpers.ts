@@ -46,6 +46,7 @@ export function isPublicRoute(pathname: string): boolean {
   if (pathname.startsWith('/api/v1/agency-waitlist')) return true
   if (pathname === '/api/v1/plans') return true
   if (pathname === '/api/v1/compete/plans') return true
+  if (pathname.startsWith('/api/debug/')) return true
   if (pathname.startsWith('/invite/')) return true
   if (pathname.startsWith('/r/')) return true
   return false
