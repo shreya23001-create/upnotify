@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server'
 import { getCurrentUser } from '@/lib/db/users'
 import { getSubscriptionWithPlan } from '@/lib/db/subscriptions'
-import { pauseSubscription, cancelSubscription, resumeSubscription } from '@/lib/services/plan-enforcement'
+import { pauseSubscription, cancelSubscription, resumeSubscription, enforceDowngradeLimits } from '@/lib/services/plan-enforcement'
+import { cancelRazorpaySubscription } from '@/lib/services/payments-razorpay'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
 
 export const dynamic = 'force-dynamic'
@@ -56,8 +58,23 @@ export async function POST(request: Request): Promise<NextResponse> {
         return NextResponse.json({ error: 'Cancellation reason is required' }, { status: 400 })
       }
 
+      const subRecord = sub as unknown as Record<string, unknown>
+      const rzpSubId = subRecord.razorpay_subscription_id as string | null
+
+      // Razorpay subscription — cancel via Razorpay API
+      if (rzpSubId) {
+        await cancelRazorpaySubscription(rzpSubId, true) // cancel at cycle end
+        const supabase = createAdminClient()
+        await supabase
+          .from('subscriptions')
+          .update({ status: 'cancelling' } as Record<string, unknown>)
+          .eq('id', sub.id)
+        await enforceDowngradeLimits(user.org_id)
+        return NextResponse.json({ success: true, message: 'Subscription will cancel at the end of the current billing period.' })
+      }
+
       if (!sub.stripe_subscription_id) {
-        return NextResponse.json({ error: 'Cannot cancel — no Stripe subscription linked' }, { status: 400 })
+        return NextResponse.json({ error: 'Cannot cancel — no payment provider linked to subscription' }, { status: 400 })
       }
 
       const result = await cancelSubscription(

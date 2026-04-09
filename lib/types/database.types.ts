@@ -830,6 +830,7 @@ export type Database = {
           slug: string
           stripe_connect_account_id: string | null
           stripe_customer_id: string | null
+          razorpay_customer_id: string | null
           timezone: string
           type: string
           updated_at: string
@@ -851,6 +852,7 @@ export type Database = {
           slug: string
           stripe_connect_account_id?: string | null
           stripe_customer_id?: string | null
+          razorpay_customer_id?: string | null
           timezone?: string
           type?: string
           updated_at?: string
@@ -872,6 +874,7 @@ export type Database = {
           slug?: string
           stripe_connect_account_id?: string | null
           stripe_customer_id?: string | null
+          razorpay_customer_id?: string | null
           timezone?: string
           type?: string
           updated_at?: string
@@ -934,6 +937,8 @@ export type Database = {
           slug: string
           stripe_price_id_annual: string | null
           stripe_price_id_monthly: string | null
+          razorpay_monthly_plan_id: string | null
+          razorpay_annual_plan_id: string | null
           type: string
           updated_at: string
           voice_call_monthly_limit: number
@@ -978,6 +983,8 @@ export type Database = {
           slug: string
           stripe_price_id_annual?: string | null
           stripe_price_id_monthly?: string | null
+          razorpay_monthly_plan_id?: string | null
+          razorpay_annual_plan_id?: string | null
           type: string
           updated_at?: string
           voice_call_monthly_limit?: number
@@ -1017,6 +1024,8 @@ export type Database = {
           slug?: string
           stripe_price_id_annual?: string | null
           stripe_price_id_monthly?: string | null
+          razorpay_monthly_plan_id?: string | null
+          razorpay_annual_plan_id?: string | null
           type?: string
           updated_at?: string
           voice_call_monthly_limit?: number
@@ -1412,6 +1421,7 @@ export type Database = {
           plan_id: string
           status: string
           stripe_subscription_id: string | null
+          razorpay_subscription_id: string | null
           trial_ends_at: string | null
           updated_at: string
           paused_at: string | null
@@ -1429,6 +1439,7 @@ export type Database = {
           plan_id: string
           status?: string
           stripe_subscription_id?: string | null
+          razorpay_subscription_id?: string | null
           trial_ends_at?: string | null
           updated_at?: string
           paused_at?: string | null
@@ -1446,6 +1457,7 @@ export type Database = {
           plan_id?: string
           status?: string
           stripe_subscription_id?: string | null
+          razorpay_subscription_id?: string | null
           trial_ends_at?: string | null
           updated_at?: string
           paused_at?: string | null

@@ -33,6 +33,11 @@ interface ServerConfig extends PublicConfig {
     secretKey: string
     webhookSecret: string
   }
+  razorpay: {
+    keyId: string
+    keySecret: string
+    webhookSecret: string
+  }
   anthropic: {
     apiKey: string
   }
@@ -137,6 +142,7 @@ export function getServerConfig(): ServerConfig {
       supabase: { ...publicConfig.supabase, serviceRoleKey: '' },
       resend: { apiKey: '', fromEmail: 'alerts@uptrue.io', fromName: 'Uptrue Alerts' },
       stripe: { secretKey: '', webhookSecret: '' },
+      razorpay: { keyId: '', keySecret: '', webhookSecret: '' },
       anthropic: { apiKey: '' },
       cron: { secret: '' },
       twitter: { consumerKey: '', consumerSecret: '', accessToken: '', accessTokenSecret: '', bearerToken: '' },
@@ -154,6 +160,9 @@ export function getServerConfig(): ServerConfig {
 
   const stripeSecretKey = process.env.STRIPE_SECRET_KEY ?? ''
   const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET ?? ''
+  const razorpayKeyId = process.env.RAZORPAY_KEY_ID ?? ''
+  const razorpayKeySecret = process.env.RAZORPAY_KEY_SECRET ?? ''
+  const razorpayWebhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET ?? ''
   const anthropicApiKey = process.env.ANTHROPIC_API_KEY ?? ''
   const cronSecret = process.env.CRON_SECRET ?? ''
   const twitterConsumerKey = process.env.X_CONSUMER_KEY ?? ''
@@ -186,6 +195,11 @@ export function getServerConfig(): ServerConfig {
     stripe: {
       secretKey: stripeSecretKey,
       webhookSecret: stripeWebhookSecret,
+    },
+    razorpay: {
+      keyId: razorpayKeyId,
+      keySecret: razorpayKeySecret,
+      webhookSecret: razorpayWebhookSecret,
     },
     anthropic: {
       apiKey: anthropicApiKey,

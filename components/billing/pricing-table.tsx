@@ -1,9 +1,28 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState, useTransition, useCallback } from 'react'
 import type { Plan } from '@/lib/types'
 import type { SupportedCurrency } from '@/lib/utils/currency'
 import { formatInr, formatGbp } from '@/lib/utils/currency'
+
+// ─── Razorpay checkout helper ─────────────────────────────────────────────────
+
+declare global {
+  interface Window {
+    Razorpay: new (options: Record<string, unknown>) => { open(): void }
+  }
+}
+
+function loadRazorpayScript(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if (typeof window !== 'undefined' && window.Razorpay) { resolve(); return }
+    const script = document.createElement('script')
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js'
+    script.onload = () => resolve()
+    script.onerror = () => reject(new Error('Failed to load Razorpay'))
+    document.body.appendChild(script)
+  })
+}
 
 interface PlanFeatureDisplay {
   text: string
@@ -136,6 +155,7 @@ function getPlanCta(plan: Plan, isCurrent: boolean, isHigherTier: boolean): stri
 export function PricingTable({ plans, currentPlanSlug, creditBalancePence = 0, defaultCurrency = 'gbp' }: Props): React.ReactElement {
   const [isPending, startTransition] = useTransition()
   const [isPortalPending, startPortalTransition] = useTransition()
+  const [isRazorpayPending, setIsRazorpayPending] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isAnnual, setIsAnnual] = useState(true)
   const currency: SupportedCurrency = defaultCurrency
@@ -188,6 +208,55 @@ export function PricingTable({ plans, currentPlanSlug, creditBalancePence = 0, d
     })
   }
 
+  const handleRazorpayCheckout = useCallback(async (planSlug: string, billingCycle: string): Promise<void> => {
+    setError(null)
+    setIsRazorpayPending(true)
+    try {
+      // 1. Create Razorpay subscription server-side
+      const res = await fetch('/api/v1/billing/razorpay/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ planSlug, billingCycle }),
+      })
+      const data = await res.json() as {
+        subscriptionId?: string
+        keyId?: string
+        planName?: string
+        userEmail?: string
+        orgName?: string
+        error?: string
+      }
+      if (!res.ok || !data.subscriptionId) {
+        setError(data.error ?? 'Failed to start checkout. Please try again.')
+        setIsRazorpayPending(false)
+        return
+      }
+
+      // 2. Load Razorpay.js and open checkout modal
+      await loadRazorpayScript()
+      const rzp = new window.Razorpay({
+        key:              data.keyId,
+        subscription_id:  data.subscriptionId,
+        name:             'Uptrue',
+        description:      `${data.planName ?? planSlug} · ${billingCycle === 'annual' ? 'Annual' : 'Monthly'} (incl. 18% GST)`,
+        image:            '/logo.svg',
+        prefill:          { email: data.userEmail ?? '', name: data.orgName ?? '' },
+        theme:            { color: '#3b82f6' },
+        handler:          (_response: unknown) => {
+          // Payment captured — webhook will activate the subscription
+          window.location.href = '/dashboard/settings?tab=billing&billing=success'
+        },
+        modal: {
+          ondismiss: () => { setIsRazorpayPending(false) },
+        },
+      })
+      rzp.open()
+    } catch (err) {
+      setError('Something went wrong. Please try again.')
+      setIsRazorpayPending(false)
+    }
+  }, [])
+
   const creditGbp = (creditBalancePence / 100).toFixed(2)
 
   return (
@@ -239,7 +308,6 @@ export function PricingTable({ plans, currentPlanSlug, creditBalancePence = 0, d
           const isPopular = plan.slug === 'builder'
           const hasAnnual = plan.price_annual_gbp && plan.price_annual_gbp > 0 && plan.price_monthly_gbp > 0
           const billingCycle = isAnnual && hasAnnual ? 'annual' : 'monthly'
-          // INR checkout not yet available — disable upgrade buttons for INR
           const isInrMode = currency === 'inr' && !isFree
 
           return (
@@ -294,8 +362,12 @@ export function PricingTable({ plans, currentPlanSlug, creditBalancePence = 0, d
                   Free Plan
                 </button>
               ) : isInrMode ? (
-                <button className="btn btn-secondary btn-full" disabled>
-                  Razorpay coming soon
+                <button
+                  className="btn btn-primary btn-full"
+                  onClick={() => void handleRazorpayCheckout(plan.slug, billingCycle)}
+                  disabled={isRazorpayPending}
+                >
+                  {isRazorpayPending ? 'Opening…' : ctaText}
                 </button>
               ) : isHigherTier ? (
                 <button
