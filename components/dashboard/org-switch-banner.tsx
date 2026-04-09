@@ -5,11 +5,12 @@ import { useRouter } from 'next/navigation'
 
 interface OrgSwitchBannerProps {
   currentOrgName: string
-  originalOrgId: string
-  originalOrgName: string
+  targetOrgId: string
+  targetOrgName: string
+  label: 'Switch to' | 'Switch back to'
 }
 
-export function OrgSwitchBanner({ currentOrgName, originalOrgId, originalOrgName }: OrgSwitchBannerProps): React.ReactElement {
+export function OrgSwitchBanner({ currentOrgName, targetOrgId, targetOrgName, label }: OrgSwitchBannerProps): React.ReactElement {
   const router = useRouter()
   const [switching, setSwitching] = useState(false)
 
@@ -19,7 +20,7 @@ export function OrgSwitchBanner({ currentOrgName, originalOrgId, originalOrgName
       const res = await fetch('/api/v1/org-switch', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ targetOrgId: originalOrgId }),
+        body: JSON.stringify({ targetOrgId }),
       })
       if (res.ok) {
         router.refresh()
@@ -42,7 +43,7 @@ export function OrgSwitchBanner({ currentOrgName, originalOrgId, originalOrgName
         disabled={switching}
         style={{ marginLeft: 12 }}
       >
-        {switching ? 'Switching...' : `Switch back to ${originalOrgName}`}
+        {switching ? 'Switching...' : `${label} ${targetOrgName}`}
       </button>
     </div>
   )
