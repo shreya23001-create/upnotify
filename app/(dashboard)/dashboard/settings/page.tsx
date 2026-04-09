@@ -9,7 +9,7 @@ import { getUserCredits, getUserCreditBalance } from '@/lib/db/user-credits'
 import { getAllCreditRules } from '@/lib/db/credit-rules'
 import { getOrCreateReferralCode, getReferralsByUser } from '@/lib/db/referrals'
 import { getActiveCompetePlans, getCompeteSubscription } from '@/lib/db/compete-plans'
-import { getDefaultCurrency } from '@/lib/utils/geo'
+import { getDefaultCurrency } from '@/lib/utils/geo.server'
 import { SettingsContent } from '@/components/dashboard/settings/settings-content'
 
 export default async function SettingsPage(): Promise<React.ReactElement> {

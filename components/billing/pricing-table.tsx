@@ -2,8 +2,8 @@
 
 import { useState, useTransition } from 'react'
 import type { Plan } from '@/lib/types'
-import type { SupportedCurrency } from '@/lib/utils/geo'
-import { formatInr, formatGbp } from '@/lib/utils/geo'
+import type { SupportedCurrency } from '@/lib/utils/currency'
+import { formatInr, formatGbp } from '@/lib/utils/currency'
 
 interface PlanFeatureDisplay {
   text: string
