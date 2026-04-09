@@ -944,6 +944,8 @@ export type Database = {
           status_page_limit: number
           ai_report_limit: number
           competitor_limit: number
+          llms_txt_limit: number
+          citation_check_monthly_limit: number
         }
         Insert: {
           check_interval_seconds?: number
@@ -980,6 +982,8 @@ export type Database = {
           updated_at?: string
           voice_call_monthly_limit?: number
           competitor_limit?: number
+          llms_txt_limit?: number
+          citation_check_monthly_limit?: number
         }
         Update: {
           check_interval_seconds?: number
@@ -1016,6 +1020,8 @@ export type Database = {
           type?: string
           updated_at?: string
           voice_call_monthly_limit?: number
+          llms_txt_limit?: number
+          citation_check_monthly_limit?: number
         }
         Relationships: []
       }
@@ -2692,6 +2698,90 @@ export type Database = {
           value?: string
           updated_at?: string
           updated_by?: string | null
+        }
+        Relationships: []
+      }
+      citation_check_runs: {
+        Row: {
+          id: string
+          org_id: string
+          user_id: string
+          domain: string
+          keywords: string[]
+          engine_ids: string[]
+          status: string
+          started_at: string | null
+          completed_at: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          org_id: string
+          user_id: string
+          domain: string
+          keywords: string[]
+          engine_ids: string[]
+          status?: string
+          started_at?: string | null
+          completed_at?: string | null
+          created_at?: string
+        }
+        Update: {
+          status?: string
+          started_at?: string | null
+          completed_at?: string | null
+        }
+        Relationships: []
+      }
+      citation_check_results: {
+        Row: {
+          id: string
+          run_id: string
+          engine_id: string
+          keyword: string
+          cited: boolean
+          citation_url: string | null
+          snippet: string | null
+          checked_at: string
+        }
+        Insert: {
+          id?: string
+          run_id: string
+          engine_id: string
+          keyword: string
+          cited: boolean
+          citation_url?: string | null
+          snippet?: string | null
+          checked_at?: string
+        }
+        Update: {
+          cited?: boolean
+          citation_url?: string | null
+          snippet?: string | null
+        }
+        Relationships: []
+      }
+      llms_txt_generations: {
+        Row: {
+          id: string
+          org_id: string
+          user_id: string
+          domain: string
+          engine_ids: string[]
+          content: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          org_id: string
+          user_id: string
+          domain: string
+          engine_ids?: string[]
+          content: string
+          created_at?: string
+        }
+        Update: {
+          content?: string
         }
         Relationships: []
       }
