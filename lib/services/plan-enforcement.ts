@@ -304,12 +304,10 @@ export async function pauseSubscription(
   planSlug?: string
 ): Promise<{ success: boolean; error?: string; pauseUntil?: string }> {
   const supabase = createAdminClient()
-
-  // Pause for 3 months
   const pauseUntil = new Date(Date.now() + 90 * 86400000)
 
+  // ── 1. Pause Stripe billing — must succeed for pause to be valid ───────────
   try {
-    // 1. Pause Stripe billing
     const { getStripe } = await import('@/lib/services/stripe')
     const stripe = getStripe()
     await stripe.subscriptions.update(stripeSubscriptionId, {
@@ -318,8 +316,14 @@ export async function pauseSubscription(
         resumes_at: Math.floor(pauseUntil.getTime() / 1000),
       },
     })
+  } catch (stripeErr) {
+    const msg = stripeErr instanceof Error ? stripeErr.message : String(stripeErr)
+    logger.error('Stripe pause API call failed', { orgId, error: msg })
+    return { success: false, error: 'Failed to contact payment provider. Please try again.' }
+  }
 
-    // 2. Update subscription in DB
+  // ── 2. Update DB + pause resources — these must all succeed ───────────────
+  try {
     await supabase
       .from('subscriptions')
       .update({
@@ -330,28 +334,33 @@ export async function pauseSubscription(
       })
       .eq('stripe_subscription_id', stripeSubscriptionId)
 
-    // 3. Pause all monitors
     await supabase
       .from('monitors')
       .update({ is_paused: true })
       .eq('org_id', orgId)
       .eq('is_paused', false)
 
-    // 4. Disable all alert channels
     await supabase
       .from('alert_channels')
       .update({ is_enabled: false })
       .eq('org_id', orgId)
       .eq('is_enabled', true)
 
-    // 5. Unpublish all status pages
     await supabase
       .from('status_pages')
       .update({ is_published: false })
       .eq('org_id', orgId)
       .eq('is_published', true)
+  } catch (dbErr) {
+    logger.error('Failed to update DB after pause', {
+      orgId,
+      error: dbErr instanceof Error ? dbErr.message : String(dbErr),
+    })
+    return { success: false, error: 'Failed to update subscription. Please contact support.' }
+  }
 
-    // 6. Log cancellation reason
+  // ── 3. Log reason — non-fatal ──────────────────────────────────────────────
+  try {
     await supabase.from('cancellation_log').insert({
       org_id: orgId,
       user_id: userId,
@@ -360,8 +369,15 @@ export async function pauseSubscription(
       action_taken: 'paused',
       plan_slug: planSlug ?? null,
     })
+  } catch (logErr) {
+    logger.warn('Failed to write pause log — continuing', {
+      orgId,
+      error: logErr instanceof Error ? logErr.message : String(logErr),
+    })
+  }
 
-    // 7. Notify user
+  // ── 4. Notify user — non-fatal ─────────────────────────────────────────────
+  try {
     await sendUserMessage({
       userId,
       orgId,
@@ -372,13 +388,15 @@ export async function pauseSubscription(
       actionUrl: '/dashboard/settings?tab=billing',
       actionLabel: 'Manage Subscription',
     })
-
-    logger.info('Subscription paused', { orgId, pauseUntil: pauseUntil.toISOString() })
-    return { success: true, pauseUntil: pauseUntil.toISOString() }
-  } catch (err) {
-    logger.error('Failed to pause subscription', { orgId, error: err instanceof Error ? err.message : 'Unknown' })
-    return { success: false, error: err instanceof Error ? err.message : 'Failed to pause' }
+  } catch (msgErr) {
+    logger.warn('Failed to send pause notification — continuing', {
+      orgId,
+      error: msgErr instanceof Error ? msgErr.message : String(msgErr),
+    })
   }
+
+  logger.info('Subscription paused', { orgId, pauseUntil: pauseUntil.toISOString() })
+  return { success: true, pauseUntil: pauseUntil.toISOString() }
 }
 
 // ---------------------------------------------------------------------------
@@ -395,49 +413,80 @@ export async function cancelSubscription(
 ): Promise<{ success: boolean; error?: string; cancelAt?: string }> {
   const supabase = createAdminClient()
 
+  // ── 1. Read current DB state ───────────────────────────────────────────────
+  const { data: subRow } = await supabase
+    .from('subscriptions')
+    .select('status, current_period_end')
+    .eq('stripe_subscription_id', stripeSubscriptionId)
+    .maybeSingle()
+
+  const isPaused = subRow?.status === 'paused'
+  let cancelAt: string | undefined
+
+  // ── 2. Call Stripe — isolate so non-fatal errors don't block DB update ─────
   try {
     const { getStripe } = await import('@/lib/services/stripe')
     const stripe = getStripe()
 
-    // Check if subscription is paused — paused subs cancel immediately (no billing to protect)
-    const { data: subRow } = await supabase
-      .from('subscriptions')
-      .select('status, current_period_end')
-      .eq('stripe_subscription_id', stripeSubscriptionId)
-      .single()
-
-    const isPaused = subRow?.status === 'paused'
-
-    let cancelAt: string | undefined
-
     if (isPaused) {
-      // 1a. Paused → cancel immediately (they're not being billed)
+      // Paused → cancel immediately (not being billed, no period to protect)
       await stripe.subscriptions.cancel(stripeSubscriptionId)
+    } else {
+      // Active → schedule cancel at period end so user keeps access they paid for
+      const updatedSub = await stripe.subscriptions.update(stripeSubscriptionId, {
+        cancel_at_period_end: true,
+      })
+      // Stripe API 2025+: current_period_end may be at item level
+      const s = updatedSub as unknown as {
+        current_period_end?: number
+        items?: { data: Array<{ current_period_end?: number }> }
+      }
+      const periodEndTs = s.current_period_end ?? s.items?.data?.[0]?.current_period_end
+      cancelAt = periodEndTs
+        ? new Date(periodEndTs * 1000).toISOString()
+        : (subRow?.current_period_end ?? undefined)
+    }
+  } catch (stripeErr) {
+    const msg = stripeErr instanceof Error ? stripeErr.message : String(stripeErr)
+    // If Stripe says the subscription no longer exists, treat it as already canceled
+    // and continue updating our DB — do not surface this as a user-facing failure.
+    if (msg.includes('No such subscription') || msg.includes('resource_missing')) {
+      logger.warn('Stripe subscription not found — marking DB as canceled', {
+        orgId,
+        stripeSubscriptionId,
+        error: msg,
+      })
+    } else {
+      // Real Stripe error (auth failure, network, etc.) — abort
+      logger.error('Stripe cancel API call failed', { orgId, error: msg })
+      return { success: false, error: 'Failed to contact payment provider. Please try again.' }
+    }
+  }
+
+  // ── 3. Update DB — always happens, even if Stripe was already gone ─────────
+  try {
+    if (isPaused) {
       await supabase
         .from('subscriptions')
         .update({ status: 'canceled', canceled_at: new Date().toISOString() })
         .eq('stripe_subscription_id', stripeSubscriptionId)
-      // Enforce limits now
       await enforceDowngradeLimits(orgId, userId)
     } else {
-      // 1b. Active → cancel at period end (user keeps access until paid period expires)
-      const updatedSub = await stripe.subscriptions.update(stripeSubscriptionId, {
-        cancel_at_period_end: true,
-      })
-      const sub = updatedSub as unknown as { current_period_end?: number }
-      cancelAt = sub.current_period_end
-        ? new Date(sub.current_period_end * 1000).toISOString()
-        : subRow?.current_period_end ?? undefined
-
-      // Mark as 'cancelling' — do NOT set canceled_at yet (that is when access actually ends).
-      // The customer.subscription.deleted webhook sets canceled_at at the real end date.
       await supabase
         .from('subscriptions')
         .update({ status: 'cancelling' })
         .eq('stripe_subscription_id', stripeSubscriptionId)
     }
+  } catch (dbErr) {
+    logger.error('Failed to update subscription status after cancel', {
+      orgId,
+      error: dbErr instanceof Error ? dbErr.message : String(dbErr),
+    })
+    return { success: false, error: 'Failed to update subscription. Please contact support.' }
+  }
 
-    // 2. Log cancellation reason immediately (capture why they left)
+  // ── 4. Log reason — non-fatal, never blocks cancel success ────────────────
+  try {
     await supabase.from('cancellation_log').insert({
       org_id: orgId,
       user_id: userId,
@@ -446,8 +495,15 @@ export async function cancelSubscription(
       action_taken: 'canceled',
       plan_slug: planSlug ?? null,
     })
+  } catch (logErr) {
+    logger.warn('Failed to write cancellation log — continuing', {
+      orgId,
+      error: logErr instanceof Error ? logErr.message : String(logErr),
+    })
+  }
 
-    // 3. Notify user
+  // ── 5. Notify user — non-fatal, never blocks cancel success ───────────────
+  try {
     const cancelDateStr = cancelAt
       ? new Date(cancelAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
       : null
@@ -464,13 +520,15 @@ export async function cancelSubscription(
       actionUrl: '/dashboard/settings?tab=billing',
       actionLabel: 'View Plans',
     })
-
-    logger.info('Subscription canceled by user', { orgId, reason, isPaused, cancelAt })
-    return { success: true, cancelAt }
-  } catch (err) {
-    logger.error('Failed to cancel subscription', { orgId, error: err instanceof Error ? err.message : 'Unknown' })
-    return { success: false, error: err instanceof Error ? err.message : 'Failed to cancel' }
+  } catch (msgErr) {
+    logger.warn('Failed to send cancellation notification — continuing', {
+      orgId,
+      error: msgErr instanceof Error ? msgErr.message : String(msgErr),
+    })
   }
+
+  logger.info('Subscription canceled by user', { orgId, reason, isPaused, cancelAt })
+  return { success: true, cancelAt }
 }
 
 // ---------------------------------------------------------------------------
