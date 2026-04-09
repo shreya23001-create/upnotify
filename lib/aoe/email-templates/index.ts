@@ -332,9 +332,10 @@ export function buildAiSeoEmail(
     <p style="margin:0 0 20px;font-size:14px;color:#374151;line-height:1.6;">
       Hi,<br><br>
       We ran a quick check on <strong>${esc(domain)}</strong>. Your site looks healthy — good uptime and response times.
-      But AI search engines like ChatGPT, Perplexity, and Claude
-      <strong>can't read or cite your content</strong> because you don't have an
-      <code style="background:#f3f4f6;padding:1px 5px;border-radius:3px;font-size:13px;">llms.txt</code> file.
+      But we couldn't find an <code style="background:#f3f4f6;padding:1px 5px;border-radius:3px;font-size:13px;">llms.txt</code> file
+      at <code style="background:#f3f4f6;padding:1px 5px;border-radius:3px;font-size:13px;">${esc(domain)}/llms.txt</code> —
+      which means AI search engines like ChatGPT, Perplexity, and Claude
+      <strong>may not be able to read or cite your content</strong>.
     </p>
     <div style="background:#f5f3ff;border:1px solid #ddd6fe;border-radius:6px;padding:16px 20px;margin-bottom:24px;">
       <p style="margin:0 0 8px;font-size:14px;color:#5b21b6;font-weight:600;">While you're not visible, your competitors are:</p>
