@@ -100,10 +100,18 @@ export default function TermsOfServicePage(): React.ReactElement {
       </p>
       <p>
         Prices are displayed in the currency applicable to your region. We currently support British
-        Pounds Sterling (GBP), United States Dollars (USD), and Indian Rupees (INR). The currency
-        charged to your payment method will be confirmed at checkout. All prices are exclusive of
-        applicable taxes, which will be added where required by law. Exchange rate conversions, where
-        applicable, are handled by your payment processor and are outside our control.
+        Pounds Sterling (GBP) and Indian Rupees (INR). The currency charged to your payment method
+        will be confirmed at checkout. All prices are exclusive of applicable taxes, which will be
+        added where required by law.
+      </p>
+      <p>
+        <strong>Regional pricing.</strong> INR pricing is available exclusively to customers whose
+        primary billing address and payment method are registered in India. By selecting INR pricing,
+        you confirm that your primary place of business or residence is India and that your payment
+        method is issued by an Indian financial institution. Uptrue reserves the right to migrate
+        accounts to GBP pricing, with 30 days&apos; notice, if we determine that this condition is
+        not met. We will not disable accounts for this reason — any pricing adjustment will be applied
+        at the next renewal date.
       </p>
       <p>
         Where available, you may choose to pay annually. Annual billing is charged as a single upfront
