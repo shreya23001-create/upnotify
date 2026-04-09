@@ -83,14 +83,65 @@ async function queryGenericLlm(
   return { cited, confidence: 'medium', responseText: responseText.slice(0, 500), sourceUrls: [] }
 }
 
+// Exa — semantic search engine, returns exact source URLs (free tier available)
+async function queryExa(apiKey: string, keyword: string, domain: string): Promise<{
+  cited: boolean; confidence: 'high' | 'medium' | 'indicative'; responseText: string; sourceUrls: string[]
+}> {
+  const res = await fetch('https://api.exa.ai/search', {
+    method: 'POST',
+    headers: { 'x-api-key': apiKey, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      query:      keyword,
+      numResults: 10,
+      contents:   { text: { maxCharacters: 200 } },
+    }),
+    signal: AbortSignal.timeout(15000),
+  })
+
+  if (!res.ok) throw new Error(`Exa API error: ${res.status}`)
+  const data = await res.json() as {
+    results: { url: string; title?: string; text?: string }[]
+  }
+
+  const sourceUrls  = (data.results ?? []).map(r => r.url).filter(Boolean)
+  const cited       = sourceUrls.some(u => u.toLowerCase().includes(domain.toLowerCase()))
+  const responseText = (data.results ?? []).slice(0, 3).map(r => `${r.title ?? ''} — ${r.url}`).join('\n')
+
+  return { cited, confidence: 'high', responseText: responseText.slice(0, 500), sourceUrls }
+}
+
+// Bing — uses Bing Web Search API v7 (free tier: 3,000/month)
+async function queryBingCopilot(apiKey: string, keyword: string, domain: string): Promise<{
+  cited: boolean; confidence: 'high' | 'medium' | 'indicative'; responseText: string; sourceUrls: string[]
+}> {
+  const url = `https://api.bing.microsoft.com/v7.0/search?q=${encodeURIComponent(keyword)}&count=10`
+  const res = await fetch(url, {
+    headers: { 'Ocp-Apim-Subscription-Key': apiKey },
+    signal: AbortSignal.timeout(15000),
+  })
+
+  if (!res.ok) throw new Error(`Bing API error: ${res.status}`)
+  const data = await res.json() as {
+    webPages?: { value: { url: string; name: string }[] }
+  }
+
+  const sourceUrls  = (data.webPages?.value ?? []).map(r => r.url).filter(Boolean)
+  const cited       = sourceUrls.some(u => u.toLowerCase().includes(domain.toLowerCase()))
+  const responseText = (data.webPages?.value ?? []).slice(0, 3).map(r => `${r.name} — ${r.url}`).join('\n')
+
+  return { cited, confidence: 'high', responseText: responseText.slice(0, 500), sourceUrls }
+}
+
 const ENGINE_QUERY_MAP: Record<string, (key: string, keyword: string, domain: string) => Promise<{
   cited: boolean; confidence: 'high' | 'medium' | 'indicative'; responseText: string; sourceUrls: string[]
 }>> = {
   perplexity: (key, kw, domain) => queryPerplexity(key, kw, domain),
-  chatgpt: (key, kw, domain) => queryGenericLlm(key, 'https://api.openai.com/v1/chat/completions', 'gpt-4o-mini', kw, domain),
-  claude: (key, kw, domain) => queryGenericLlm(key, 'https://api.anthropic.com/v1/messages', 'claude-haiku-4-5-20251001', kw, domain),
-  gemini: (key, kw, domain) => queryGenericLlm(key, 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', 'gemini-1.5-flash', kw, domain),
-  grok: (key, kw, domain) => queryGenericLlm(key, 'https://api.x.ai/v1/chat/completions', 'grok-beta', kw, domain),
+  chatgpt:    (key, kw, domain) => queryGenericLlm(key, 'https://api.openai.com/v1/chat/completions', 'gpt-4o-mini', kw, domain),
+  claude:     (key, kw, domain) => queryGenericLlm(key, 'https://api.anthropic.com/v1/messages', 'claude-haiku-4-5-20251001', kw, domain),
+  gemini:     (key, kw, domain) => queryGenericLlm(key, 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', 'gemini-1.5-flash', kw, domain),
+  grok:       (key, kw, domain) => queryGenericLlm(key, 'https://api.x.ai/v1/chat/completions', 'grok-beta', kw, domain),
+  exa:        (key, kw, domain) => queryExa(key, kw, domain),
+  copilot:    (key, kw, domain) => queryBingCopilot(key, kw, domain),
 }
 
 // ---------------------------------------------------------------------------
