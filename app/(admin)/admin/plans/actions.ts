@@ -83,6 +83,8 @@ export async function updatePlanAction(formData: FormData): Promise<ActionResult
   logger.info('Admin: Plan updated', { planId: id, planName: result.name })
   revalidatePath('/admin/plans')
   revalidatePath('/admin')
+  revalidatePath('/', 'layout')          // landing page + all public pages
+  revalidatePath('/settings/billing')    // billing pricing table
   return { success: true }
 }
 

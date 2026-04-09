@@ -91,7 +91,8 @@ function getFeatures(p: PlanData): { text: string; included: boolean }[] {
     features.push({ text: 'AI Citation Monitor', included: false })
   }
 
-  features.push({ text: p.has_api_access ? 'Full API access' : 'API access', included: p.has_api_access })
+  // API access — hidden until API feature is ready for public listing
+  // features.push({ text: p.has_api_access ? 'Full API access' : 'API access', included: p.has_api_access })
 
   return features
 }

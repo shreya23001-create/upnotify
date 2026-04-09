@@ -17,6 +17,6 @@ export async function GET(): Promise<NextResponse> {
   }
 
   return NextResponse.json({ plans: data ?? [] }, {
-    headers: { 'Cache-Control': 'public, max-age=300, s-maxage=300' },
+    headers: { 'Cache-Control': 'no-store' },
   })
 }
