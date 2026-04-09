@@ -65,14 +65,15 @@ function getPlanFeatures(plan: Plan): PlanFeatureDisplay[] {
   const llmsTxtLimit = p.llms_txt_limit as number | undefined
   const citationLimit = p.citation_check_monthly_limit as number | undefined
   if (llmsTxtLimit && llmsTxtLimit > 0) {
-    features.push({ text: `llms.txt — ${llmsTxtLimit} generation${llmsTxtLimit === 1 ? '' : 's'}/month`, included: true })
+    const llmsText = llmsTxtLimit >= 999 ? 'llms.txt Generator (unlimited)' : `llms.txt Generator (${llmsTxtLimit}/month)`
+    features.push({ text: llmsText, included: true })
   } else {
-    features.push({ text: 'llms.txt generation', included: false })
+    features.push({ text: 'llms.txt Generator', included: false })
   }
   if (citationLimit && citationLimit > 0) {
-    features.push({ text: `AI citation checks — ${citationLimit}/month`, included: true })
+    features.push({ text: `AI Citation Monitor (${citationLimit}/month)`, included: true })
   } else {
-    features.push({ text: 'AI citation checks', included: false })
+    features.push({ text: 'AI Citation Monitor', included: false })
   }
 
   // API access — hidden until API feature is ready for public listing
