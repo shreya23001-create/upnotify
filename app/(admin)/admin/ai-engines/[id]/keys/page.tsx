@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { getAllEnginesAdmin, getEngineKeys } from '@/lib/db/ai-engines'
 import { notFound } from 'next/navigation'
+import { DeleteKeyButton } from './delete-key-button'
 
 export const metadata: Metadata = { title: 'Engine API Keys — Admin' }
 
@@ -82,12 +83,7 @@ export default async function EngineKeysPage({ params }: PageProps): Promise<Rea
                       </span>
                     </td>
                     <td>
-                      <form action={`/api/admin/ai-engines/keys/${key.id}/delete`} method="POST">
-                        <button type="submit" className="admin-action-link" style={{ color: 'var(--color-danger)' }}
-                          onClick={e => { if (!confirm('Delete this key? This cannot be undone.')) e.preventDefault() }}>
-                          Delete
-                        </button>
-                      </form>
+                      <DeleteKeyButton keyId={key.id} />
                     </td>
                   </tr>
                 )
