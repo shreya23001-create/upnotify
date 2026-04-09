@@ -91,13 +91,6 @@ export const helpTopics: HelpTopic[] = [
     keywords: ['incident', 'down', 'outage', 'investigating', 'resolved', 'recovery'],
   },
   {
-    href: '/dashboard/help/team',
-    title: 'Team & Invites',
-    description: 'Invite members, manage roles, and switch organisations.',
-    icon: '\uD83D\uDC65',
-    keywords: ['team', 'invite', 'member', 'role', 'organisation', 'switch'],
-  },
-  {
     href: '/dashboard/help/cancel-pause',
     title: 'Cancel or Pause',
     description: 'Pause your subscription for up to 3 months or cancel anytime.',

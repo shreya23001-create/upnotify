@@ -251,7 +251,7 @@ export function SettingsContent({
       )}
 
       <div className="tabs-list">
-        {['organisation', 'team', 'billing', 'credits', 'referrals', 'company', 'api-keys'].map((t) => (
+        {['organisation', 'billing', 'credits', 'referrals', 'company', 'api-keys'].map((t) => (
           <button key={t} className={`tab-trigger${tab === t ? ' active' : ''}`} onClick={() => setTab(t)}>
             {t === 'api-keys' ? 'API Keys' : t.charAt(0).toUpperCase() + t.slice(1)}
           </button>
@@ -260,33 +260,6 @@ export function SettingsContent({
 
       {tab === 'organisation' && (
         <OrgSettingsForm organisation={organisation} />
-      )}
-
-      {tab === 'team' && (
-        <div className="card">
-          <div className="card-header card-header-row">
-            <div className="card-title">Team Members</div>
-            <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>
-              {teamMembers.length - 1} / {teamMemberLimit === 0 ? '0' : teamMemberLimit} members
-            </span>
-          </div>
-          <div className="card-content">
-            {canManageTeam && (
-              <TeamInviteForm
-                canInvite={canInvite}
-                teamMemberLimit={teamMemberLimit}
-                teamMemberCount={teamMemberCount}
-                onInviteSent={handleInviteSent}
-              />
-            )}
-            <DataTable
-              columns={memberColumns}
-              data={teamMembers}
-              searchPlaceholder="Search members..."
-              emptyMessage="No team members."
-            />
-          </div>
-        </div>
       )}
 
       {tab === 'billing' && (

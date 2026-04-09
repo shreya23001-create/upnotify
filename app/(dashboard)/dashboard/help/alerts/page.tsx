@@ -123,8 +123,8 @@ export default function AlertsPage(): React.ReactElement {
             <ul className="help-list">
               <li><strong>Free</strong> -- Email alerts only.</li>
               <li><strong>Lite</strong> -- Email, Slack, Teams, and webhooks.</li>
-              <li><strong>Builder</strong> -- Everything in Lite, plus more team members to notify.</li>
-              <li><strong>Scale</strong> -- All channels, all team members, no limits.</li>
+              <li><strong>Builder</strong> -- Everything in Lite, plus webhooks.</li>
+              <li><strong>Scale</strong> -- All channels, no limits.</li>
             </ul>
           </section>
 

@@ -29,13 +29,6 @@ function getPlanFeatures(plan: Plan): PlanFeatureDisplay[] {
     included: true,
   })
 
-  const teamLimit = p.max_team_members as number | undefined
-  if (teamLimit && teamLimit > 0) {
-    features.push({ text: `${teamLimit} team members`, included: true })
-  } else {
-    features.push({ text: 'Solo use only', included: true })
-  }
-
   features.push({ text: 'Email alerts', included: Boolean(p.has_email_alerts ?? true) })
   features.push({ text: 'Slack & Teams alerts', included: Boolean(p.has_slack_teams) })
   features.push({ text: 'Webhooks', included: Boolean(p.has_webhooks) })

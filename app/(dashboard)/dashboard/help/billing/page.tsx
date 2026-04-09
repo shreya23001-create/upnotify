@@ -66,8 +66,7 @@ export default function BillingPage(): React.ReactElement {
             <p>
               Uptrue has four plans: <strong>Free</strong>, <strong>Lite</strong>,{' '}
               <strong>Builder</strong>, and <strong>Scale</strong>. Each plan offers different
-              monitor limits, check intervals, data retention, alert channels, and team member
-              capacity. For current pricing and full feature comparisons, see the{' '}
+              monitor limits, check intervals, data retention, and alert channels. For current pricing and full feature comparisons, see the{' '}
               <Link href="/#pricing">pricing page</Link>.
             </p>
           </section>
