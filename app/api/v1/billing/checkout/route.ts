@@ -95,6 +95,8 @@ export async function POST(request: Request): Promise<NextResponse> {
       },
       // Automatically calculate and collect VAT/tax based on customer location
       automatic_tax: { enabled: true },
+      // Save the billing address entered in checkout to the Customer — required for automatic tax
+      customer_update: { address: 'auto', name: 'auto' },
       // Allow customers to enter their VAT number for B2B reverse charge
       tax_id_collection: { enabled: true },
       success_url: `${appUrl}/dashboard/settings?tab=billing&billing=success`,
