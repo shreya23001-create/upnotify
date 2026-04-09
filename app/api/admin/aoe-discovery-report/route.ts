@@ -318,7 +318,7 @@ export async function GET(): Promise<NextResponse> {
     return NextResponse.json({ ok: false, error: 'Failed to query aoe_site_discovery: ' + error.message }, { status: 500 })
   }
 
-  const rows = (data ?? []) as DiscoveryRow[]
+  const rows = (data ?? []) as unknown as DiscoveryRow[]
 
   if (rows.length === 0) {
     return NextResponse.json({
