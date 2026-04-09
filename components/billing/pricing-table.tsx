@@ -61,6 +61,20 @@ function getPlanFeatures(plan: Plan): PlanFeatureDisplay[] {
   const watchdogLimit = (p.competitor_limit as number | undefined) ?? 3
   features.push({ text: `Watchdog — ${watchdogLimit} competitor${watchdogLimit === 1 ? '' : 's'}`, included: true })
 
+  // AI Visibility
+  const llmsTxtLimit = p.llms_txt_limit as number | undefined
+  const citationLimit = p.citation_check_monthly_limit as number | undefined
+  if (llmsTxtLimit && llmsTxtLimit > 0) {
+    features.push({ text: `llms.txt — ${llmsTxtLimit} generation${llmsTxtLimit === 1 ? '' : 's'}/month`, included: true })
+  } else {
+    features.push({ text: 'llms.txt generation', included: false })
+  }
+  if (citationLimit && citationLimit > 0) {
+    features.push({ text: `AI citation checks — ${citationLimit}/month`, included: true })
+  } else {
+    features.push({ text: 'AI citation checks', included: false })
+  }
+
   // API access — hidden until API feature is ready for public listing
   // features.push({ text: 'API access', included: plan.has_api_access })
 

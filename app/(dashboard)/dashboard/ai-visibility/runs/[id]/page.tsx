@@ -23,7 +23,6 @@ export default async function CitationRunPage({
     getActiveEngines(),
   ])
 
-  // Not found or belongs to a different org
   if (!run || run.org_id !== user.org_id) notFound()
 
   const engineMap = Object.fromEntries(engines.map(e => [e.id, e]))
@@ -73,17 +72,14 @@ function RunStatusBadge({ status }: { status: CitationCheckRun['status'] }): Rea
       background: `${colors[status]}20`, color: colors[status],
       border: `1px solid ${colors[status]}40`,
     }}>
-      <span style={{
-        width: 7, height: 7, borderRadius: '50%', background: colors[status],
-        animation: status === 'running' ? 'pulse 1.5s infinite' : undefined,
-      }} />
+      <span style={{ width: 7, height: 7, borderRadius: '50%', background: colors[status] }} />
       {status.charAt(0).toUpperCase() + status.slice(1)}
     </span>
   )
 }
 
 // ---------------------------------------------------------------------------
-// Pending / running state
+// Pending state
 // ---------------------------------------------------------------------------
 function PendingState({ run }: { run: CitationCheckRun }): React.ReactElement {
   return (
@@ -93,12 +89,9 @@ function PendingState({ run }: { run: CitationCheckRun }): React.ReactElement {
         {run.status === 'pending' ? 'Check queued' : 'Check in progress'}
       </div>
       <div style={{ color: 'var(--text-secondary)', fontSize: 14, marginBottom: 24 }}>
-        We&apos;re querying each AI engine with your keywords. This usually takes 2–5 minutes.
-        Refresh this page to check for updates, or wait for your email notification.
+        We&apos;re querying each AI engine with your keywords. This usually takes a few seconds.
       </div>
-      <a href={`/dashboard/ai-visibility/runs/${run.id}`} className="btn btn-secondary btn-sm">
-        Refresh
-      </a>
+      <a href={`/dashboard/ai-visibility/runs/${run.id}`} className="btn btn-secondary btn-sm">Refresh</a>
     </div>
   )
 }
@@ -112,7 +105,7 @@ function FailedState({ run }: { run: CitationCheckRun }): React.ReactElement {
       <div style={{ fontSize: 48, marginBottom: 16 }}>⚠️</div>
       <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 8 }}>Check failed</div>
       <div style={{ color: 'var(--text-secondary)', fontSize: 14, marginBottom: 24 }}>
-        {run.error_message ?? 'An unexpected error occurred while running this check. Please try again.'}
+        {run.error_message ?? 'An unexpected error occurred. Please try again.'}
       </div>
       <a href="/dashboard/ai-visibility" className="btn btn-primary btn-sm">Run a new check</a>
     </div>
@@ -120,7 +113,7 @@ function FailedState({ run }: { run: CitationCheckRun }): React.ReactElement {
 }
 
 // ---------------------------------------------------------------------------
-// Completed state — full results
+// Completed state
 // ---------------------------------------------------------------------------
 function CompletedState({ run, results, engineMap }: {
   run:       CitationCheckRun
@@ -136,6 +129,12 @@ function CompletedState({ run, results, engineMap }: {
     byKeyword[r.keyword].push(r)
   }
 
+  // Detect competitor domains from source URLs (domains that aren't the user's domain)
+  const competitorDomains = detectCompetitors(results, run.domain)
+
+  // Build remediation tips based on results
+  const remediations = buildRemediations(run, results, engineMap)
+
   return (
     <div>
       {/* Summary cards */}
@@ -148,14 +147,14 @@ function CompletedState({ run, results, engineMap }: {
         </div>
       )}
 
-      {/* Engine summary row */}
+      {/* Engine breakdown */}
       {summary && (summary.cited_by.length > 0 || summary.not_cited_by.length > 0) && (
         <div className="ai-vis-panel" style={{ marginBottom: 24 }}>
           <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 14 }}>Engine breakdown</h3>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
             {run.engine_ids.map(engId => {
               const engine = engineMap[engId]
-              const cited = summary.cited_by.includes(engine?.slug ?? engId)
+              const cited  = summary.cited_by.includes(engine?.slug ?? engId)
               return (
                 <div key={engId} style={{
                   display: 'flex', alignItems: 'center', gap: 8,
@@ -173,8 +172,38 @@ function CompletedState({ run, results, engineMap }: {
         </div>
       )}
 
-      {/* Results per keyword */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      {/* Competitor CTA — shown when competitors appear in results */}
+      {competitorDomains.length > 0 && (
+        <div style={{
+          marginBottom: 24,
+          padding: '18px 20px',
+          background: 'rgba(245,158,11,0.06)',
+          border: '1px solid rgba(245,158,11,0.25)',
+          borderRadius: 12,
+          display: 'flex', alignItems: 'flex-start', gap: 14,
+        }}>
+          <span style={{ fontSize: 22, flexShrink: 0 }}>👀</span>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 6 }}>
+              Competitors are being cited instead of you
+            </div>
+            <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 12, lineHeight: 1.6 }}>
+              We spotted <strong>{competitorDomains.slice(0, 3).join(', ')}{competitorDomains.length > 3 ? ` +${competitorDomains.length - 3} more` : ''}</strong> appearing
+              in AI responses for your target keywords. Add them to Watchdog to get alerted when their content changes.
+            </div>
+            <a href="/dashboard/watchdog" className="btn btn-sm" style={{
+              background: 'rgba(245,158,11,0.12)', color: '#b45309',
+              border: '1px solid rgba(245,158,11,0.3)', borderRadius: 8,
+              padding: '6px 14px', fontSize: 13, fontWeight: 600, textDecoration: 'none', display: 'inline-block',
+            }}>
+              Track in Watchdog →
+            </a>
+          </div>
+        </div>
+      )}
+
+      {/* Per-keyword results */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 28 }}>
         {run.keywords.map(keyword => {
           const keyResults = byKeyword[keyword] ?? []
           return (
@@ -185,16 +214,13 @@ function CompletedState({ run, results, engineMap }: {
                   {keyResults.filter(r => r.cited).length}/{keyResults.length} engines cited you
                 </span>
               </div>
-
               {keyResults.length === 0 ? (
                 <div style={{ color: 'var(--text-secondary)', fontSize: 13 }}>No results recorded for this keyword.</div>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                   {keyResults.map(result => {
                     const engine = engineMap[result.engine_id]
-                    return (
-                      <ResultRow key={result.id} result={result} engineName={engine?.name ?? result.engine_id} />
-                    )
+                    return <ResultRow key={result.id} result={result} engineName={engine?.name ?? result.engine_id} />
                   })}
                 </div>
               )}
@@ -202,35 +228,41 @@ function CompletedState({ run, results, engineMap }: {
           )
         })}
       </div>
+
+      {/* Remediation section */}
+      {remediations.length > 0 && (
+        <div className="ai-vis-panel" style={{ borderTop: '3px solid #3b82f6' }}>
+          <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 4 }}>How to improve your AI visibility</h3>
+          <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 20 }}>
+            Based on your results, here are the highest-impact actions you can take.
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            {remediations.map((tip, i) => (
+              <RemediationTip key={i} priority={tip.priority} title={tip.title} body={tip.body} link={tip.link} linkLabel={tip.linkLabel} />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
 
 // ---------------------------------------------------------------------------
-// Individual result row
+// Result row
 // ---------------------------------------------------------------------------
 function ResultRow({ result, engineName }: { result: CitationCheckResult; engineName: string }): React.ReactElement {
-  const citedColor   = result.cited === true ? '#22c55e' : result.cited === false ? '#ef4444' : '#94a3b8'
-  const citedLabel   = result.cited === true ? '✓ Cited' : result.cited === false ? '✗ Not cited' : '— Unknown'
-  const confidenceLabels: Record<string, string> = {
-    high:        'High confidence',
-    medium:      'Medium confidence',
-    indicative:  'Indicative',
-  }
+  const citedColor  = result.cited === true ? '#22c55e' : result.cited === false ? '#ef4444' : '#94a3b8'
+  const citedLabel  = result.cited === true ? '✓ Cited' : result.cited === false ? '✗ Not cited' : '— Unknown'
+  const confLabels: Record<string, string> = { high: 'High confidence', medium: 'Medium confidence', indicative: 'Indicative' }
 
   return (
-    <div style={{
-      border: '1px solid var(--border)',
-      borderRadius: 10,
-      padding: 16,
-      background: 'var(--surface)',
-    }}>
+    <div style={{ border: '1px solid var(--border)', borderRadius: 10, padding: 16, background: 'var(--surface)' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: result.response_text ? 12 : 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <span style={{ fontWeight: 600, fontSize: 14 }}>{engineName}</span>
           {result.confidence && (
             <span style={{ fontSize: 11, color: 'var(--text-muted)', background: 'var(--surface-raised)', padding: '2px 8px', borderRadius: 10 }}>
-              {confidenceLabels[result.confidence] ?? result.confidence}
+              {confLabels[result.confidence] ?? result.confidence}
             </span>
           )}
         </div>
@@ -241,7 +273,7 @@ function ResultRow({ result, engineName }: { result: CitationCheckResult; engine
         <div style={{
           fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6,
           background: 'var(--surface-sunken)', borderRadius: 8, padding: '10px 14px',
-          maxHeight: 120, overflow: 'hidden', position: 'relative',
+          maxHeight: 120, overflow: 'hidden',
         }}>
           {result.response_text.slice(0, 400)}{result.response_text.length > 400 ? '…' : ''}
         </div>
@@ -266,19 +298,174 @@ function ResultRow({ result, engineName }: { result: CitationCheckResult; engine
 }
 
 // ---------------------------------------------------------------------------
-// Summary metric card
+// Summary card
 // ---------------------------------------------------------------------------
 function SummaryCard({ label, value, accent }: { label: string; value: string; accent: string }): React.ReactElement {
   return (
-    <div style={{
-      background: 'var(--surface)',
-      border: '1px solid var(--border)',
-      borderRadius: 12,
-      padding: '18px 20px',
-      borderTop: `3px solid ${accent}`,
-    }}>
+    <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: '18px 20px', borderTop: `3px solid ${accent}` }}>
       <div style={{ fontSize: 24, fontWeight: 700, color: accent }}>{value}</div>
       <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 4 }}>{label}</div>
     </div>
   )
+}
+
+// ---------------------------------------------------------------------------
+// Remediation tip
+// ---------------------------------------------------------------------------
+function RemediationTip({ priority, title, body, link, linkLabel }: {
+  priority:  'high' | 'medium' | 'low'
+  title:     string
+  body:      string
+  link?:     string
+  linkLabel?: string
+}): React.ReactElement {
+  const colors = { high: '#ef4444', medium: '#f59e0b', low: '#3b82f6' }
+  const labels = { high: 'High impact', medium: 'Medium impact', low: 'Quick win' }
+  return (
+    <div style={{ display: 'flex', gap: 14, padding: '14px 16px', background: 'var(--surface-raised)', borderRadius: 10, border: '1px solid var(--border)' }}>
+      <div style={{ flexShrink: 0, marginTop: 2 }}>
+        <span style={{
+          display: 'inline-block', padding: '2px 8px', borderRadius: 10, fontSize: 11, fontWeight: 700,
+          background: `${colors[priority]}15`, color: colors[priority], border: `1px solid ${colors[priority]}30`,
+        }}>
+          {labels[priority]}
+        </span>
+      </div>
+      <div style={{ flex: 1 }}>
+        <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 4 }}>{title}</div>
+        <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6 }}>{body}</div>
+        {link && (
+          <a href={link} target={link.startsWith('http') ? '_blank' : undefined} rel="noopener noreferrer"
+            style={{ display: 'inline-block', marginTop: 8, fontSize: 13, fontWeight: 600, color: 'var(--color-primary)', textDecoration: 'none' }}>
+            {linkLabel ?? 'Learn more'} →
+          </a>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+function extractDomain(url: string): string {
+  try { return new URL(url).hostname.replace(/^www\./, '') }
+  catch { return '' }
+}
+
+function detectCompetitors(results: CitationCheckResult[], ownDomain: string): string[] {
+  const clean = ownDomain.replace(/^www\./, '')
+  const found = new Set<string>()
+  for (const r of results) {
+    for (const url of r.source_urls) {
+      const d = extractDomain(url)
+      if (d && d !== clean && !d.endsWith(clean)) found.add(d)
+    }
+  }
+  // Return up to 5, sorted by frequency
+  const freq: Record<string, number> = {}
+  for (const r of results) {
+    for (const url of r.source_urls) {
+      const d = extractDomain(url)
+      if (found.has(d)) freq[d] = (freq[d] ?? 0) + 1
+    }
+  }
+  return [...found].sort((a, b) => (freq[b] ?? 0) - (freq[a] ?? 0)).slice(0, 5)
+}
+
+interface RemediationItem {
+  priority:  'high' | 'medium' | 'low'
+  title:     string
+  body:      string
+  link?:     string
+  linkLabel?: string
+}
+
+function buildRemediations(
+  run: CitationCheckRun,
+  results: CitationCheckResult[],
+  engineMap: Record<string, AiEngine>,
+): RemediationItem[] {
+  const tips: RemediationItem[] = []
+  const summary = run.summary
+  if (!summary) return tips
+
+  const score = summary.score
+
+  // Not cited by anything
+  if (score === 0) {
+    tips.push({
+      priority: 'high',
+      title: 'Add an llms.txt file to your site',
+      body: 'You have no AI citations yet. The single most impactful first step is adding an llms.txt file — it tells AI engines exactly what your site is about and who it helps. Generate one now.',
+      link: '/dashboard/ai-visibility',
+      linkLabel: 'Generate llms.txt',
+    })
+    tips.push({
+      priority: 'high',
+      title: 'Publish authoritative, long-form content for these keywords',
+      body: `AI engines like Exa and Perplexity cite content that directly and clearly answers the query. Create a dedicated page or article that thoroughly covers "${run.keywords[0]}" and similar terms. Include your domain name, company name, and key differentiators prominently.`,
+    })
+    tips.push({
+      priority: 'medium',
+      title: 'Add structured data (JSON-LD) to your site',
+      body: 'JSON-LD schema markup (Organization, WebSite, FAQPage) makes your content significantly easier for AI engines to parse and attribute. Add it to your homepage and key landing pages.',
+      link: 'https://schema.org/docs/gs.html',
+      linkLabel: 'Schema.org guide',
+    })
+  }
+
+  // Partially cited
+  if (score > 0 && score < 100) {
+    const notCitedEngineNames = (summary.not_cited_by ?? [])
+      .map(slug => Object.values(engineMap).find(e => e.slug === slug)?.name ?? slug)
+
+    if (notCitedEngineNames.length > 0) {
+      tips.push({
+        priority: 'high',
+        title: `Improve visibility on ${notCitedEngineNames.slice(0, 2).join(' and ')}`,
+        body: `You're already cited by some engines but not by ${notCitedEngineNames.join(', ')}. Each engine has different signals: Perplexity and Exa prioritise pages with clear structured URLs and direct answers. ChatGPT and Claude weight training data and web grounding — publishing regular, well-structured content helps. Check your robots.txt allows AI crawlers (GPTBot, ClaudeBot, PerplexityBot).`,
+      })
+    }
+
+    tips.push({
+      priority: 'medium',
+      title: 'Expand your content around these exact keywords',
+      body: `Create FAQ sections, comparison pages, and how-to guides specifically targeting: ${run.keywords.map(k => `"${k}"`).join(', ')}. AI engines prefer pages that directly answer a question in full rather than pages that mention the keyword in passing.`,
+    })
+  }
+
+  // Has some citations — improvement tips
+  if (score > 0) {
+    tips.push({
+      priority: 'medium',
+      title: 'Check your robots.txt allows AI crawlers',
+      body: 'Make sure your robots.txt does not block GPTBot (ChatGPT), ClaudeBot (Claude), PerplexityBot, or Google-Extended (Gemini). Blocking these means the engine cannot index your latest content and will stop citing you over time.',
+      link: '/tools/ai-seo-checker',
+      linkLabel: 'Run free AI SEO check',
+    })
+
+    tips.push({
+      priority: 'low',
+      title: 'Keep your llms.txt up to date',
+      body: 'AI engines re-crawl llms.txt regularly. Regenerate yours whenever you add major new sections, products, or pages. The more specific and accurate it is, the more precisely you will be cited.',
+      link: '/dashboard/ai-visibility',
+      linkLabel: 'Regenerate llms.txt',
+    })
+  }
+
+  // Check if any result has errors suggesting a crawl block
+  const hasErrors = results.some(r => r.response_text?.startsWith('Error:'))
+  if (hasErrors) {
+    tips.push({
+      priority: 'low',
+      title: 'Some engine queries returned errors',
+      body: 'One or more engines returned errors during this check. This may be temporary API rate limiting. Re-run the check to get fresh results.',
+      link: '/dashboard/ai-visibility',
+      linkLabel: 'Run again',
+    })
+  }
+
+  return tips
 }

@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { getCurrentUser } from '@/lib/db/users'
@@ -27,8 +29,8 @@ export default async function AiVisibilityPage(): Promise<React.ReactElement> {
     getCitationRunsThisMonth(user.org_id),
   ])
 
-  const CITATION_LIMITS: Record<string, number> = { free: 0, lite: 2, builder: 4, scale: 4 }
-  const citationLimit = CITATION_LIMITS[planSlug] ?? 0
+  // Read citation limit from DB — never hardcode plan limits
+  const citationLimit = (plan?.plan as unknown as Record<string, number> | null)?.citation_check_monthly_limit ?? 0
 
   return (
     <div className="db-content">
