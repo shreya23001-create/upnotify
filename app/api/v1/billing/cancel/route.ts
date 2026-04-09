@@ -69,7 +69,9 @@ export async function POST(request: Request): Promise<NextResponse> {
           .from('subscriptions')
           .update({ status: 'cancelling' } as Record<string, unknown>)
           .eq('id', sub.id)
-        await enforceDowngradeLimits(user.org_id)
+        // Do NOT enforce limits here — user keeps access until period end.
+        // The Razorpay webhook (subscription.cancelled) fires at period end and
+        // calls enforceDowngradeLimits at that point.
         return NextResponse.json({ success: true, message: 'Subscription will cancel at the end of the current billing period.' })
       }
 

@@ -19,6 +19,7 @@ import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
 import { verifyRazorpayWebhook } from '@/lib/services/payments-razorpay'
+import { getStripe } from '@/lib/services/stripe'
 import { isProduction } from '@/lib/utils/environment'
 import { enforceDowngradeLimits, notifyPlanChange } from '@/lib/services/plan-enforcement'
 
@@ -60,6 +61,13 @@ interface RzpWebhookEvent {
 // ─── Handlers ─────────────────────────────────────────────────────────────────
 
 async function handleSubscriptionActivated(sub: RzpSubscription): Promise<void> {
+  // Reject mock subscription IDs — they exist only for dev testing and must never
+  // be processed by real webhook logic (idempotency guard would miss them otherwise)
+  if (sub.id.startsWith('mock_')) {
+    logger.info('Razorpay webhook: ignoring mock subscription ID', { subId: sub.id })
+    return
+  }
+
   const supabase = createAdminClient()
   const orgId    = sub.notes?.org_id
   const planSlug = sub.notes?.plan_slug
@@ -93,13 +101,33 @@ async function handleSubscriptionActivated(sub: RzpSubscription): Promise<void> 
     return
   }
 
-  // Cancel any existing active Razorpay subscriptions for this org to avoid double-billing
+  // Cancel ALL existing active subscriptions for this org — both Razorpay and Stripe.
+  // This prevents double-billing when a user switches payment providers or upgrades.
+  const { data: existingActiveSubs } = await supabase
+    .from('subscriptions')
+    .select('id, stripe_subscription_id, razorpay_subscription_id')
+    .eq('org_id', orgId)
+    .in('status', ['active', 'cancelling'])
+
+  for (const existingSub of existingActiveSubs ?? []) {
+    // Cancel in Stripe if this was a Stripe subscription
+    if (existingSub.stripe_subscription_id) {
+      try {
+        await getStripe().subscriptions.cancel(existingSub.stripe_subscription_id)
+      } catch (err) {
+        logger.warn('Razorpay activation: failed to cancel old Stripe sub', {
+          stripeSubId: existingSub.stripe_subscription_id,
+          error: err instanceof Error ? err.message : String(err),
+        })
+      }
+    }
+  }
+
   await supabase
     .from('subscriptions')
     .update({ status: 'canceled', canceled_at: new Date().toISOString() })
     .eq('org_id', orgId)
-    .eq('status', 'active')
-    .not('razorpay_subscription_id', 'is', null)
+    .in('status', ['active', 'cancelling'])
 
   const periodStart = sub.current_start ? new Date(sub.current_start * 1000).toISOString() : new Date().toISOString()
   const periodEnd   = sub.current_end   ? new Date(sub.current_end   * 1000).toISOString() : null
@@ -134,22 +162,27 @@ async function handleSubscriptionCharged(sub: RzpSubscription, payment: RzpPayme
 
   if (!orgId || !payment) return
 
-  // Find our subscription record
+  // Find our subscription record (include status to avoid overwriting cancelling → active)
   const { data: subRecord } = await supabase
     .from('subscriptions')
-    .select('id')
+    .select('id, status')
     .eq('razorpay_subscription_id', sub.id)
     .maybeSingle()
 
-  // Update period dates
+  // Update period dates. Only flip status to 'active' when recovering from 'past_due'.
+  // Never overwrite 'cancelling' — user requested cancel-at-period-end and a renewal
+  // charge mid-period must not undo that.
   if (sub.current_start && sub.current_end && subRecord) {
+    const updatePayload: Record<string, unknown> = {
+      current_period_start: new Date(sub.current_start * 1000).toISOString(),
+      current_period_end:   new Date(sub.current_end   * 1000).toISOString(),
+    }
+    if (subRecord.status === 'past_due') {
+      updatePayload.status = 'active'
+    }
     await supabase
       .from('subscriptions')
-      .update({
-        status: 'active',
-        current_period_start: new Date(sub.current_start * 1000).toISOString(),
-        current_period_end:   new Date(sub.current_end   * 1000).toISOString(),
-      })
+      .update(updatePayload)
       .eq('id', subRecord.id)
   }
 

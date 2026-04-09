@@ -104,17 +104,19 @@ async function handleCheckoutCompleted(
 
     logger.info('checkout: plan found', { planId: plan.id, planName: plan.name })
 
-    // Cancel old Stripe subscriptions to stop double-billing
+    // Cancel old subscriptions (active OR cancelling — both need cleanup now that new one exists)
     const { data: oldSubs } = await supabase
       .from('subscriptions')
-      .select('stripe_subscription_id')
+      .select('stripe_subscription_id, status')
       .eq('org_id', orgId)
-      .eq('status', 'active')
+      .in('status', ['active', 'cancelling'])
 
     for (const oldSub of (oldSubs ?? [])) {
       const oldStripeId = oldSub.stripe_subscription_id as string | null
       if (oldStripeId && oldStripeId !== (session.subscription as string)) {
         try {
+          // For cancelling subs, cancel_at_period_end is already set — force cancel now
+          // since the user has subscribed to a new plan
           await getStripe().subscriptions.cancel(oldStripeId)
           logger.info('checkout: cancelled old Stripe subscription', { oldStripeId, orgId })
         } catch (err) {
@@ -123,12 +125,12 @@ async function handleCheckoutCompleted(
       }
     }
 
-    // Cancel old DB subscription rows
+    // Cancel old DB subscription rows (active and cancelling)
     await supabase
       .from('subscriptions')
       .update({ status: 'canceled', canceled_at: new Date().toISOString() })
       .eq('org_id', orgId)
-      .eq('status', 'active')
+      .in('status', ['active', 'cancelling'])
 
     // Retrieve the new Stripe subscription for period dates.
     // Stripe API 2025-01-27.acacia moved current_period_start/end to the
@@ -292,13 +294,25 @@ async function handleSubscriptionUpdated(
     paused:    'paused',
   }
 
-  const updateData = {
-    status: statusMap[sub.status as string] ?? 'incomplete',
-    current_period_start: periodStart ? new Date(periodStart * 1000).toISOString() : undefined,
-    current_period_end:   periodEnd   ? new Date(periodEnd   * 1000).toISOString() : undefined,
-    canceled_at: sub.canceled_at
-      ? new Date((sub.canceled_at as number) * 1000).toISOString()
-      : null,
+  // Guard: don't overwrite past_due → active without payment confirmation.
+  // If DB says past_due but Stripe says active, the customer.subscription.updated
+  // event fires without a corresponding invoice.paid — skip the status update.
+  const { data: existingRow } = await supabase
+    .from('subscriptions')
+    .select('status')
+    .eq('stripe_subscription_id', sub.id as string)
+    .maybeSingle()
+
+  const incomingStatus = statusMap[sub.status as string] ?? 'incomplete'
+  const currentDbStatus = existingRow?.status ?? null
+  const isSpuriousActivation = incomingStatus === 'active' && currentDbStatus === 'past_due'
+
+  const updateData: Record<string, unknown> = {
+    status: isSpuriousActivation ? 'past_due' : incomingStatus,
+    ...(periodStart ? { current_period_start: new Date(periodStart * 1000).toISOString() } : {}),
+    ...(periodEnd   ? { current_period_end:   new Date(periodEnd   * 1000).toISOString() } : {}),
+    // Only set canceled_at when Stripe actually provides it — never clear it on unrelated events
+    ...(sub.canceled_at ? { canceled_at: new Date((sub.canceled_at as number) * 1000).toISOString() } : {}),
   }
 
   // Update base subscription
@@ -343,9 +357,25 @@ async function handleSubscriptionDeleted(
     .update(cancelData)
     .eq('stripe_subscription_id', sub.id as string)
 
-  // Enforce Free plan limits + notify — runs regardless of whether cancel came
-  // from the CancelPlanModal flow or directly via Stripe portal
+  // Only enforce Free plan limits if the org has no other active/cancelling subscription.
+  // If the user upgraded to a new plan, the new active sub already exists and downgrade
+  // enforcement would incorrectly pause monitors on a paying customer.
   if (subRecord?.org_id) {
+    const { count: otherActiveSubs } = await supabase
+      .from('subscriptions')
+      .select('id', { count: 'exact', head: true })
+      .eq('org_id', subRecord.org_id)
+      .in('status', ['active', 'cancelling', 'trialing'])
+      .neq('id', subRecord.id)
+
+    if ((otherActiveSubs ?? 0) > 0) {
+      logger.info('Subscription deleted but org has another active sub — skipping limit enforcement', {
+        subscriptionId: sub.id,
+        orgId: subRecord.org_id,
+      })
+      return
+    }
+
     await enforceDowngradeLimits(subRecord.org_id)
 
     // Find plan name for notification

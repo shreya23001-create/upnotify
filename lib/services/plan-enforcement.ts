@@ -429,10 +429,11 @@ export async function cancelSubscription(
         ? new Date(sub.current_period_end * 1000).toISOString()
         : subRow?.current_period_end ?? undefined
 
-      // Mark as 'cancelling' — webhook will set 'canceled' + enforce limits at period end
+      // Mark as 'cancelling' — do NOT set canceled_at yet (that is when access actually ends).
+      // The customer.subscription.deleted webhook sets canceled_at at the real end date.
       await supabase
         .from('subscriptions')
-        .update({ status: 'cancelling', canceled_at: new Date().toISOString() })
+        .update({ status: 'cancelling' })
         .eq('stripe_subscription_id', stripeSubscriptionId)
     }
 
@@ -491,7 +492,16 @@ export async function resumeSubscription(
       pause_collection: '',
     } as Record<string, unknown>)
 
-    // 2. Update subscription in DB
+    // 2. Fetch paused_at before clearing it — used to identify system-paused resources
+    const { data: subRow } = await supabase
+      .from('subscriptions')
+      .select('paused_at')
+      .eq('stripe_subscription_id', stripeSubscriptionId)
+      .single()
+
+    const pausedAt = subRow?.paused_at ?? new Date(0).toISOString()
+
+    // 3. Update subscription in DB
     await supabase
       .from('subscriptions')
       .update({
@@ -502,26 +512,30 @@ export async function resumeSubscription(
       })
       .eq('stripe_subscription_id', stripeSubscriptionId)
 
-    // 3. Unpause all monitors
+    // 4. Only unpause monitors the system paused (updated at or after paused_at).
+    // Monitors the user manually paused before the subscription pause are left alone.
     await supabase
       .from('monitors')
       .update({ is_paused: false })
       .eq('org_id', orgId)
       .eq('is_paused', true)
+      .gte('updated_at', pausedAt)
 
-    // 4. Re-enable alert channels
+    // 5. Re-enable alert channels the system disabled (same timestamp guard)
     await supabase
       .from('alert_channels')
       .update({ is_enabled: true })
       .eq('org_id', orgId)
       .eq('is_enabled', false)
+      .gte('updated_at', pausedAt)
 
-    // 5. Republish status pages
+    // 6. Republish status pages the system unpublished
     await supabase
       .from('status_pages')
       .update({ is_published: true })
       .eq('org_id', orgId)
       .eq('is_published', false)
+      .gte('updated_at', pausedAt)
 
     // 6. Notify user
     await sendUserMessage({

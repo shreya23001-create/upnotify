@@ -63,19 +63,22 @@ function extractLimits(plan: Record<string, unknown>): PlanLimits {
   }
 }
 
-/** Fetch plan limits for an org based on its active or trialing subscription.
+/** Fetch plan limits for an org based on its active, cancelling, or trialing subscription.
  *  Reads from the plans table (single source of truth).
+ *  'cancelling' subs retain full plan limits — the user paid until period end.
  *  Trialing subscriptions get the trial plan's limits until trial_ends_at. */
 export async function getPlanLimits(orgId: string): Promise<PlanLimits> {
   const supabase = createAdminClient()
 
-  // Check for active subscription first
+  // Active or cancelling (paid until period end) — same limits apply
   const { data: sub } = await supabase
     .from('subscriptions')
     .select('*, plans(*)')
     .eq('org_id', orgId)
-    .eq('status', 'active')
-    .single()
+    .in('status', ['active', 'cancelling'])
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
 
   if (sub && sub.plans) {
     return extractLimits(sub.plans as Record<string, unknown>)
