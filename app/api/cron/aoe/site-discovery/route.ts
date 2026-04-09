@@ -1,10 +1,9 @@
 // =============================================================================
 // AOE — Automated Outreach Engine
 // Cron: site-discovery — runs weekly (Sunday 2am UTC)
-// Discovers new sites via two sources:
-//   1. crt.sh CT logs  — recently-issued SSL certs (exclude=expired, last 180 days)
-//   2. Tranco top-1M   — CSV zip download, random window from rank 5001–50000
-// Splits limit 50/50. Duplicate domains silently skipped.
+// Source: Tranco top-1M CSV zip — random window from rank 5001–50000
+// crt.sh was dropped — consistently times out and only returns historical certs
+// SSL expiry is still detected per-domain by the outreach-checker cron
 // Categorisation happens in outreach-checker — not here.
 // =============================================================================
 
@@ -28,103 +27,12 @@ export const maxDuration = 300
 const CONCURRENCY     = 5
 const REQUEST_TIMEOUT = 8000
 
-// SSL window — wide enough for volume. Checker re-validates on send.
-const SSL_MIN_DAYS = 7
-const SSL_MAX_DAYS = 60
-
-// Only include certs issued within this many days (filters out historical records)
-const RECENTLY_ISSUED_DAYS = 180
-
 // Tranco rank window — avoid top 5000 (mega-corps) and bottom long tail
 const TRANCO_RANK_START = 5_001
 const TRANCO_RANK_END   = 50_000
 
 // TLDs most likely to be SMB targets
 const TARGET_TLDS = ['co.uk', 'org.uk', 'com.au', 'co.nz', 'ie', 'ca', 'com']
-
-// ---------------------------------------------------------------------------
-// Source 1: crt.sh — recently-issued SSL certs (non-expired)
-// exclude=expired → server filters expired certs → we see recent issuances
-// not_before filter → ignore historical records pre-dating RECENTLY_ISSUED_DAYS
-// ---------------------------------------------------------------------------
-
-interface CrtShEntry {
-  common_name: string
-  name_value:  string
-  not_after:   string
-  not_before?: string
-}
-
-async function discoverViaCrtSh(limit: number): Promise<string[]> {
-  const domains       = new Set<string>()
-  const minMs         = SSL_MIN_DAYS  * 86_400_000
-  const maxMs         = SSL_MAX_DAYS  * 86_400_000
-  const recentCutoff  = Date.now() - RECENTLY_ISSUED_DAYS * 86_400_000
-
-  for (const tld of TARGET_TLDS) {
-    if (domains.size >= limit) break
-
-    try {
-      // Basic JSON query — crt.sh does not support exclude=expired in JSON mode
-      // We filter in code below: not_after within our window
-      const url = `https://crt.sh/?q=%.${tld}&output=json`
-      const controller = new AbortController()
-      const timer = setTimeout(() => controller.abort(), 30_000)
-
-      const res = await fetch(url, {
-        signal: controller.signal,
-        headers: { 'Accept': 'application/json' },
-      })
-      clearTimeout(timer)
-
-      if (!res.ok) {
-        logger.warn('AOE discovery: crt.sh non-OK', { tld, status: res.status })
-        continue
-      }
-
-      const entries = await res.json() as CrtShEntry[]
-      const now = Date.now()
-
-      for (const entry of entries) {
-        if (domains.size >= limit) break
-
-        // Filter: only recently-issued certs (eliminates historical records)
-        if (entry.not_before) {
-          const issuedAt = new Date(entry.not_before).getTime()
-          if (issuedAt < recentCutoff) continue
-        }
-
-        // Filter: SSL expiring in our window (relevant for SSL campaign)
-        const expiry       = new Date(entry.not_after).getTime()
-        const msUntilExpiry = expiry - now
-        if (msUntilExpiry < minMs || msUntilExpiry > maxMs) continue
-
-        const rawName = entry.common_name || entry.name_value || ''
-        const domain = rawName
-          .replace(/^\*\./, '')
-          .split('\n')[0]
-          .trim()
-          .toLowerCase()
-
-        if (!domain || domain.includes(' ') || !domain.includes('.')) continue
-        if (domain.startsWith('www.')) continue
-        if (!TARGET_TLDS.some(t => domain.endsWith(`.${t}`))) continue
-
-        domains.add(domain)
-      }
-
-      logger.info('AOE discovery: crt.sh tld processed', {
-        tld,
-        returned: entries.length,
-        collected: domains.size,
-      })
-    } catch (err) {
-      logger.error('AOE discovery: crt.sh query failed', { tld, error: String(err) })
-    }
-  }
-
-  return [...domains]
-}
 
 // ---------------------------------------------------------------------------
 // Source 2: Tranco — download CSV zip, parse with built-in zlib
@@ -279,49 +187,31 @@ export async function GET(request: Request): Promise<NextResponse> {
       return NextResponse.json({ ok: true, skipped: true, reason: 'master_disabled' })
     }
 
-    const totalLimit  = settings.daily_discovery_limit ?? 50
-    const crtLimit    = Math.ceil(totalLimit * 0.5)
-    const trancoLimit = totalLimit - crtLimit
+    const totalLimit = settings.daily_discovery_limit ?? 50
 
-    logger.info('AOE site-discovery: starting', { totalLimit, crtLimit, trancoLimit })
+    logger.info('AOE site-discovery: starting', { totalLimit, source: 'tranco' })
 
-    // ── Source 1: crt.sh ───────────────────────────────────────────────────
-    const crtDomains = await discoverViaCrtSh(crtLimit * 2)
-    logger.info('AOE discovery: crt.sh collected', { count: crtDomains.length })
-
-    // ── Source 2: Tranco CSV zip ───────────────────────────────────────────
-    const trancoDomains = await discoverViaTranco(trancoLimit)
+    // ── Tranco CSV zip — full quota ────────────────────────────────────────
+    const trancoDomains = await discoverViaTranco(totalLimit)
     logger.info('AOE discovery: Tranco collected', { count: trancoDomains.length })
 
-    // ── Process both in parallel ───────────────────────────────────────────
-    const [crtResult, trancoResult] = await Promise.all([
-      processBatch(crtDomains,    crtLimit),
-      processBatch(trancoDomains, trancoLimit),
-    ])
-
-    const totalAdded   = crtResult.added   + trancoResult.added
-    const totalSkipped = crtResult.skipped + trancoResult.skipped
+    // ── Process ────────────────────────────────────────────────────────────
+    const result = await processBatch(trancoDomains, totalLimit)
 
     logger.info('AOE site-discovery completed', {
-      crtFetched:    crtDomains.length,
       trancoFetched: trancoDomains.length,
-      crtAdded:      crtResult.added,
-      trancoAdded:   trancoResult.added,
-      totalAdded,
-      totalSkipped,
+      added:         result.added,
+      skipped:       result.skipped,
     })
 
-    const summary = `added: ${totalAdded} (crt: ${crtResult.added}, tranco: ${trancoResult.added}) | skipped existing: ${totalSkipped}`
+    const summary = `added: ${result.added} | skipped existing: ${result.skipped}`
     await endCronRun(runId, cronStart, 'ok', { summary })
 
     return NextResponse.json({
       ok:            true,
-      totalAdded,
-      totalSkipped,
-      crtFetched:    crtDomains.length,
-      crtAdded:      crtResult.added,
+      totalAdded:    result.added,
+      totalSkipped:  result.skipped,
       trancoFetched: trancoDomains.length,
-      trancoAdded:   trancoResult.added,
     })
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Unknown error'
