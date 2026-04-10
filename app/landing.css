@@ -1522,3 +1522,278 @@ html.dark .btn-outline-brand {
 html.dark .btn-outline-brand:hover {
   background: rgba(59,130,246,0.12);
 }
+
+/* ─── Hero mockup: notification cards ────────────────────────────────────── */
+.hm-notif-stack {
+  position: absolute;
+  top: 36px;
+  right: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  z-index: 120;
+  pointer-events: none;
+  width: 210px;
+}
+.hm-notif-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.10), 0 1px 3px rgba(0,0,0,0.06);
+  padding: 9px 11px;
+  transform: translateX(230px);
+  opacity: 0;
+  transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s ease;
+}
+.hm-notif-card.hm-notif-show {
+  transform: translateX(0);
+  opacity: 1;
+}
+.hm-notif-card.hm-notif-recover {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+}
+.hm-notif-hdr {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 5px;
+}
+.hm-notif-icon {
+  width: 17px;
+  height: 17px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.hm-notif-source { font-size: 9px; font-weight: 700; color: #64748b; flex: 1; }
+.hm-notif-time   { font-size: 8.5px; color: #94a3b8; }
+.hm-notif-title  { font-size: 10.5px; font-weight: 700; color: #0f172a; margin-bottom: 2px; }
+.hm-notif-body   { font-size: 9.5px; color: #64748b; line-height: 1.4; }
+
+/* ─── Hero mockup: AI Visibility nav item ─────────────────────────────────── */
+.hm-aiv-nav-item {
+  cursor: pointer;
+  border: 1px solid rgba(59,130,246,0.18);
+  background: rgba(59,130,246,0.06) !important;
+  flex-wrap: wrap;
+  transition: box-shadow 0.35s, background 0.35s;
+}
+.hm-aiv-nav-item:hover {
+  background: rgba(59,130,246,0.12) !important;
+}
+.hm-aiv-nav-item.active {
+  background: rgba(59,130,246,0.15) !important;
+  border-color: rgba(59,130,246,0.35);
+}
+@keyframes aivPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(59,130,246,0.4); }
+  50%       { box-shadow: 0 0 0 4px rgba(59,130,246,0.15); }
+}
+.hm-aiv-pulse {
+  animation: aivPulse 1.4s ease-in-out infinite;
+  background: rgba(59,130,246,0.12) !important;
+  border-color: rgba(59,130,246,0.4) !important;
+}
+.hm-aiv-new-badge {
+  margin-left: auto;
+  background: linear-gradient(90deg,#3b82f6,#06b6d4);
+  color: white;
+  font-size: 7px;
+  padding: 1px 5px;
+  border-radius: 10px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.hm-aiv-hint {
+  width: 100%;
+  font-size: 8.5px;
+  color: #06b6d4;
+  font-weight: 700;
+  padding-left: 21px;
+  margin-top: 1px;
+  animation: fadeIn 0.4s ease;
+}
+
+/* ─── Hero mockup: AI Visibility panel ───────────────────────────────────── */
+.hm-aiv-panel {
+  position: absolute;
+  inset: 0;
+  background: #f8fafc;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 0.25s ease;
+}
+.hm-aiv-hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 13px;
+  border-bottom: 1px solid #e2e8f0;
+  background: white;
+  flex-shrink: 0;
+}
+.hm-aiv-hdr-left {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.hm-aiv-hdr-icon {
+  width: 22px;
+  height: 22px;
+  background: linear-gradient(135deg,#3b82f6,#06b6d4);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.hm-aiv-hdr-title { font-size: 12.5px; font-weight: 700; color: #0f172a; }
+.hm-aiv-badge {
+  background: linear-gradient(90deg,#3b82f6,#06b6d4);
+  color: white;
+  font-size: 7.5px;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-weight: 700;
+}
+.hm-aiv-back {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  color: #64748b;
+  font-size: 10.5px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 3px 8px;
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+.hm-aiv-back:hover { background: #f1f5f9; color: #0f172a; }
+
+.hm-aiv-body {
+  display: flex;
+  gap: 12px;
+  padding: 13px;
+  overflow: hidden;
+  flex: 1;
+}
+
+/* Score column */
+.hm-aiv-score-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 120px;
+  flex-shrink: 0;
+}
+.hm-aiv-score-label {
+  font-size: 9.5px;
+  color: #64748b;
+  text-align: center;
+  line-height: 1.45;
+}
+.hm-aiv-score-label strong { color: #0f172a; }
+.hm-aiv-back-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #f1f5f9;
+  border: none;
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 9.5px;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  margin-top: 2px;
+  transition: background 0.15s;
+}
+.hm-aiv-back-btn:hover { background: #e2e8f0; color: #0f172a; }
+
+/* Engine list */
+.hm-aiv-engines { flex: 1; display: flex; flex-direction: column; gap: 0; min-width: 0; }
+.hm-aiv-engines-label {
+  font-size: 9px;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 6px;
+}
+.hm-aiv-engine-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+.hm-aiv-engine-row:last-child { border-bottom: none; }
+.hm-aiv-engine-logo {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 10px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+.hm-aiv-engine-name { font-size: 10.5px; font-weight: 600; color: #0f172a; flex: 1; min-width: 0; }
+.hm-aiv-engine-bar-wrap {
+  width: 44px;
+  height: 4px;
+  background: #f1f5f9;
+  border-radius: 3px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.hm-aiv-engine-bar {
+  height: 100%;
+  background: linear-gradient(90deg,#3b82f6,#06b6d4);
+  border-radius: 3px;
+  transition: width 0.9s ease;
+}
+.hm-aiv-engine-status {
+  font-size: 9px;
+  font-weight: 600;
+  color: #94a3b8;
+  width: 52px;
+  text-align: right;
+  flex-shrink: 0;
+}
+.hm-aiv-engine-status.cited    { color: #16a34a; }
+.hm-aiv-engine-status.notcited { color: #94a3b8; }
+
+/* CTA card */
+.hm-aiv-cta {
+  margin-top: 8px;
+  padding: 9px 10px;
+  background: linear-gradient(135deg,rgba(59,130,246,0.06),rgba(6,182,212,0.06));
+  border: 1px solid rgba(59,130,246,0.15);
+  border-radius: 8px;
+}
+.hm-aiv-cta-title { font-size: 10px; font-weight: 700; color: #0f172a; margin-bottom: 3px; }
+.hm-aiv-cta-body  { font-size: 9.5px; color: #64748b; line-height: 1.4; margin-bottom: 7px; }
+.hm-aiv-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: linear-gradient(135deg,#3b82f6,#06b6d4);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 9.5px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(59,130,246,0.28);
+}

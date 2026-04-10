@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 
 /* ─── Types ─────────────────────────────────────────────────────────────── */
 type Phase = 'normal' | 'degrading' | 'down' | 'recovering'
@@ -24,10 +24,17 @@ interface UserMonitor {
   type: string
 }
 
+interface NotifState {
+  email: boolean
+  slack: boolean
+  telegram: boolean
+  recover: boolean
+}
+
 /* ─── Constants ─────────────────────────────────────────────────────────── */
 const PHASE_ORDER: Phase[] = ['normal', 'degrading', 'down', 'recovering']
 const PHASE_DURATIONS: Record<Phase, number> = {
-  normal: 7000, degrading: 1200, down: 2000, recovering: 1800,
+  normal: 7000, degrading: 1200, down: 2800, recovering: 2000,
 }
 const PHASE_DATA: Record<Phase, PhaseState> = {
   normal: {
@@ -56,8 +63,16 @@ const PHASE_DATA: Record<Phase, PhaseState> = {
 const BARS_GOOD = [10, 14, 8, 16, 12, 15, 9, 13, 11, 16, 14, 10, 15, 12, 8, 14, 13, 11, 16, 9]
 const BARS_BAD  = [10, 14, 8, 16, 12, 15, 9, 13, 11, 16, 14, 10, 15, 12, 8, 7, 4, 2, 1, 0]
 
-// Spark chart values for row 2 detail (checkout.shop.io)
-const CHECKOUT_SPARK = [24, 25, 23, 26, 0, 0, 16] // 0 = down (timeout), scaled /8 px height
+const CHECKOUT_SPARK = [24, 25, 23, 26, 0, 0, 16]
+
+const AIV_ENGINES = [
+  { id: 'chatgpt',    name: 'ChatGPT',       color: '#10a37f', letter: 'G', score: 82, cited: true  },
+  { id: 'perplexity', name: 'Perplexity',    color: '#20b2aa', letter: 'P', score: 71, cited: true  },
+  { id: 'claude',     name: 'Claude',        color: '#c97046', letter: 'C', score: 24, cited: false },
+  { id: 'gemini',     name: 'Google Gemini', color: '#4285f4', letter: 'G', score: 68, cited: true  },
+]
+const AIV_TOTAL = Math.round(AIV_ENGINES.reduce((s, e) => s + e.score, 0) / AIV_ENGINES.length)
+const AIV_CIRC  = 2 * Math.PI * 44 // r=44
 
 /* ─── Sub-components ────────────────────────────────────────────────────── */
 function StatusBadge({ status }: { status: MonitorStatus | string }): React.ReactElement {
@@ -92,6 +107,31 @@ function UptimeBars({ bad }: { bad: boolean }): React.ReactElement {
   )
 }
 
+/* ─── Notification card ─────────────────────────────────────────────────── */
+interface NotifCardProps {
+  visible: boolean
+  icon: React.ReactNode
+  iconBg: string
+  source: string
+  title: string
+  titleColor?: string
+  body: string
+  isRecover?: boolean
+}
+function NotifCard({ visible, icon, iconBg, source, title, titleColor, body, isRecover }: NotifCardProps): React.ReactElement {
+  return (
+    <div className={`hm-notif-card${visible ? ' hm-notif-show' : ''}${isRecover ? ' hm-notif-recover' : ''}`}>
+      <div className="hm-notif-hdr">
+        <div className="hm-notif-icon" style={{ background: iconBg }}>{icon}</div>
+        <span className="hm-notif-source">{source}</span>
+        <span className="hm-notif-time">now</span>
+      </div>
+      <div className="hm-notif-title" style={titleColor ? { color: titleColor } : undefined}>{title}</div>
+      <div className="hm-notif-body">{body}</div>
+    </div>
+  )
+}
+
 /* ─── Main export ────────────────────────────────────────────────────────── */
 export function HeroDashboardMockup(): React.ReactElement {
   const [phase, setPhase]               = useState<Phase>('normal')
@@ -101,23 +141,111 @@ export function HeroDashboardMockup(): React.ReactElement {
   const [userMonitors, setUserMonitors] = useState<UserMonitor[]>([])
   const [form, setForm]                 = useState({ name: '', url: '', type: 'HTTP', interval: '1m' })
   const [addSuccess, setAddSuccess]     = useState(false)
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  /* Auto-animation cycle */
+  // Notification cards
+  const [notif, setNotif] = useState<NotifState>({ email: false, slack: false, telegram: false, recover: false })
+
+  // AI Visibility
+  const [aivOpen, setAivOpen]         = useState(false)
+  const [pulseAiv, setPulseAiv]       = useState(false)
+  const [aivRevealed, setAivRevealed] = useState<Record<string, boolean>>({})
+  const [aivScore, setAivScore]       = useState(0)
+
+  const timerRef    = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const aivOpenRef  = useRef(false)
+  const notifTimers = useRef<ReturnType<typeof setTimeout>[]>([])
+
+  function clearNotifTimers(): void {
+    notifTimers.current.forEach(t => clearTimeout(t))
+    notifTimers.current = []
+  }
+
+  /* ── Auto-animation cycle ───────────────────────────────────────────── */
+  const schedule = useCallback((current: Phase): void => {
+    timerRef.current = setTimeout(() => {
+      if (aivOpenRef.current) return // paused while AIV is open
+      const idx = PHASE_ORDER.indexOf(current)
+      const next = PHASE_ORDER[(idx + 1) % PHASE_ORDER.length]
+      setPhase(next)
+
+      clearNotifTimers()
+
+      if (next === 'down') {
+        setNotif({ email: false, slack: false, telegram: false, recover: false })
+        notifTimers.current.push(setTimeout(() => setNotif(n => ({ ...n, email: true })), 400))
+        notifTimers.current.push(setTimeout(() => setNotif(n => ({ ...n, slack: true })), 900))
+        notifTimers.current.push(setTimeout(() => setNotif(n => ({ ...n, telegram: true })), 1400))
+      } else if (next === 'recovering') {
+        setNotif({ email: false, slack: false, telegram: false, recover: true })
+        // Pulse AI Visibility after recovery settles
+        notifTimers.current.push(setTimeout(() => {
+          if (!aivOpenRef.current) setPulseAiv(true)
+        }, 1600))
+        notifTimers.current.push(setTimeout(() => {
+          setNotif(n => ({ ...n, recover: false }))
+        }, 2800))
+        notifTimers.current.push(setTimeout(() => {
+          if (!aivOpenRef.current) setPulseAiv(false)
+        }, 5500))
+      } else {
+        setNotif({ email: false, slack: false, telegram: false, recover: false })
+      }
+
+      schedule(next)
+    }, PHASE_DURATIONS[current])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
   useEffect(() => {
-    let current: Phase = 'normal'
-    function schedule(): void {
-      timerRef.current = setTimeout(() => {
-        const idx = PHASE_ORDER.indexOf(current)
-        current = PHASE_ORDER[(idx + 1) % PHASE_ORDER.length]
-        setPhase(current)
-        schedule()
-      }, PHASE_DURATIONS[current])
+    schedule('normal')
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current)
+      clearNotifTimers()
     }
-    schedule()
-    return () => { if (timerRef.current) clearTimeout(timerRef.current) }
-  }, [])
+  }, [schedule])
 
+  /* ── AI Visibility open / close ─────────────────────────────────────── */
+  function openAiv(): void {
+    aivOpenRef.current = true
+    setAivOpen(true)
+    if (timerRef.current) clearTimeout(timerRef.current)
+    clearNotifTimers()
+    setNotif({ email: false, slack: false, telegram: false, recover: false })
+    setPulseAiv(false)
+    setAivRevealed({})
+    setAivScore(0)
+
+    // Reveal engines in sequence
+    AIV_ENGINES.forEach((e, i) => {
+      notifTimers.current.push(setTimeout(() => {
+        setAivRevealed(r => ({ ...r, [e.id]: true }))
+        if (i === AIV_ENGINES.length - 1) {
+          // Animate score dial after last engine
+          notifTimers.current.push(setTimeout(() => {
+            const dur = 900
+            const startTs = Date.now()
+            const tick = (): void => {
+              const t = Math.min((Date.now() - startTs) / dur, 1)
+              setAivScore(Math.round(AIV_TOTAL * t))
+              if (t < 1) requestAnimationFrame(tick)
+            }
+            requestAnimationFrame(tick)
+          }, 200))
+        }
+      }, 400 + i * 500))
+    })
+  }
+
+  function closeAiv(): void {
+    aivOpenRef.current = false
+    setAivOpen(false)
+    setAivRevealed({})
+    setAivScore(0)
+    clearNotifTimers()
+    setPhase('normal')
+    schedule('normal')
+  }
+
+  /* ── Add monitor modal ──────────────────────────────────────────────── */
   const pd    = PHASE_DATA[phase]
   const total = 24 + userMonitors.length
 
@@ -141,6 +269,9 @@ export function HeroDashboardMockup(): React.ReactElement {
     return activeFilter === f ? ' hm-stat-active' : ''
   }
 
+  /* ── Computed AIV ring fill ─────────────────────────────────────────── */
+  const aivFilled = (aivScore / 100) * AIV_CIRC
+
   /* ── Render ─────────────────────────────────────────────────────────── */
   return (
     <div className="hero-mockup fade-up delay-3">
@@ -157,13 +288,54 @@ export function HeroDashboardMockup(): React.ReactElement {
 
         <div className="mockup-body" style={{ position: 'relative' }}>
 
+          {/* ── Notification cards ───────────────────────────────────── */}
+          <div className="hm-notif-stack">
+            <NotifCard
+              visible={notif.email}
+              iconBg="#dcfce7"
+              icon={<svg width="10" height="10" fill="none" stroke="#16a34a" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>}
+              source="Email Alert"
+              title="⚠ checkout.shop.io is DOWN"
+              titleColor="#dc2626"
+              body="Response timeout · confirmed from 2 regions"
+            />
+            <NotifCard
+              visible={notif.slack}
+              iconBg="#4a154b"
+              icon={<svg width="10" height="10" viewBox="0 0 24 24" fill="white"><path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zM6.313 15.165a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313zM8.834 5.042a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834zM8.834 6.313a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312zM18.956 8.834a2.528 2.528 0 0 1 2.522-2.521A2.528 2.528 0 0 1 24 8.834a2.528 2.528 0 0 1-2.522 2.521h-2.522V8.834zM17.688 8.834a2.528 2.528 0 0 1-2.523 2.521 2.527 2.527 0 0 1-2.52-2.521V2.522A2.527 2.527 0 0 1 15.165 0a2.528 2.528 0 0 1 2.523 2.522v6.312zM15.165 18.956a2.528 2.528 0 0 1 2.523 2.522A2.528 2.528 0 0 1 15.165 24a2.527 2.527 0 0 1-2.52-2.522v-2.522h2.52zM15.165 17.688a2.527 2.527 0 0 1-2.52-2.523 2.526 2.526 0 0 1 2.52-2.52h6.313A2.527 2.527 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.523h-6.313z"/></svg>}
+              source="Slack · #alerts"
+              title="🔴 Monitor DOWN"
+              titleColor="#dc2626"
+              body="checkout.shop.io · HTTP 504 · 2/2 regions failed"
+            />
+            <NotifCard
+              visible={notif.telegram}
+              iconBg="#0088cc"
+              icon={<svg width="10" height="10" viewBox="0 0 24 24" fill="white"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.869 4.326-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.829.941z"/></svg>}
+              source="Telegram"
+              title="🚨 checkout.shop.io is DOWN"
+              titleColor="#dc2626"
+              body="Incident #483 opened · 3:42 PM UTC"
+            />
+            <NotifCard
+              visible={notif.recover}
+              isRecover
+              iconBg="linear-gradient(135deg,#3b82f6,#06b6d4)"
+              icon={<svg width="10" height="10" fill="none" stroke="white" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>}
+              source="Slack · #alerts"
+              title="✅ Recovered"
+              titleColor="#16a34a"
+              body="checkout.shop.io · back online · downtime 4m 12s"
+            />
+          </div>
+
           {/* ── Alert banner (auto-animation) ────────────────────────── */}
           <div className={`hm-alert-banner${phase === 'down' ? ' hm-alert-down' : phase === 'recovering' ? ' hm-alert-recovery' : ' hm-alert-hidden'}`}>
             {phase === 'down' ? (
               <>
                 <svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><line x1="15" y1="9" x2="9" y2="15" /><line x1="9" y1="9" x2="15" y2="15" /></svg>
-                <strong>Incident detected:</strong>&nbsp;checkout.shop.io is down — alert sent to 3 channels
-                <span className="hm-alert-time">3 min ago</span>
+                <strong>Incident detected:</strong>&nbsp;checkout.shop.io is down — alerts firing
+                <span className="hm-alert-time">just now</span>
               </>
             ) : phase === 'recovering' ? (
               <>
@@ -239,6 +411,96 @@ export function HeroDashboardMockup(): React.ReactElement {
             </div>
           )}
 
+          {/* ── AI Visibility panel (overlay) ────────────────────────── */}
+          {aivOpen && (
+            <div className="hm-aiv-panel">
+              {/* Panel header */}
+              <div className="hm-aiv-hdr">
+                <div className="hm-aiv-hdr-left">
+                  <div className="hm-aiv-hdr-icon">
+                    <svg width="11" height="11" fill="none" stroke="white" strokeWidth="2" viewBox="0 0 24 24">
+                      <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                    </svg>
+                  </div>
+                  <span className="hm-aiv-hdr-title">AI Visibility</span>
+                  <span className="hm-aiv-badge">NEW</span>
+                </div>
+                <button className="hm-aiv-back" onClick={closeAiv}>
+                  <svg width="9" height="9" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                  Dashboard
+                </button>
+              </div>
+
+              {/* Panel body */}
+              <div className="hm-aiv-body">
+                {/* Score ring */}
+                <div className="hm-aiv-score-col">
+                  <svg width="104" height="104" viewBox="0 0 104 104">
+                    <circle cx="52" cy="52" r="44" fill="none" stroke="#f1f5f9" strokeWidth="10"/>
+                    <circle
+                      cx="52" cy="52" r="44"
+                      fill="none" strokeWidth="10"
+                      stroke="url(#aivG)"
+                      strokeLinecap="round"
+                      strokeDasharray={`${aivFilled} ${AIV_CIRC}`}
+                      transform="rotate(-90 52 52)"
+                      style={{ transition: 'stroke-dasharray 0.1s linear' }}
+                    />
+                    <defs>
+                      <linearGradient id="aivG" x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0%" stopColor="#3b82f6"/>
+                        <stop offset="100%" stopColor="#06b6d4"/>
+                      </linearGradient>
+                    </defs>
+                    <text x="52" y="48" textAnchor="middle" fontSize="22" fontWeight="800" fill="#0f172a">{aivScore}</text>
+                    <text x="52" y="62" textAnchor="middle" fontSize="9" fill="#64748b">/100</text>
+                    <text x="52" y="75" textAnchor="middle" fontSize="8" fill="#64748b">
+                      {aivScore >= 60 ? 'Good visibility' : aivScore > 0 ? 'Moderate' : 'Scanning…'}
+                    </text>
+                  </svg>
+                  <div className="hm-aiv-score-label">
+                    AI Visibility Score<br/>
+                    <strong>mywebsite.com</strong>
+                  </div>
+                  <button className="hm-aiv-back-btn" onClick={closeAiv}>
+                    <svg width="9" height="9" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                    Back
+                  </button>
+                </div>
+
+                {/* Engine list */}
+                <div className="hm-aiv-engines">
+                  <div className="hm-aiv-engines-label">AI Engine Citations</div>
+                  {AIV_ENGINES.map(e => {
+                    const revealed = aivRevealed[e.id]
+                    return (
+                      <div key={e.id} className="hm-aiv-engine-row">
+                        <div className="hm-aiv-engine-logo" style={{ background: e.color }}>{e.letter}</div>
+                        <div className="hm-aiv-engine-name">{e.name}</div>
+                        <div className="hm-aiv-engine-bar-wrap">
+                          <div className="hm-aiv-engine-bar" style={{ width: revealed ? `${e.score}%` : '0%' }} />
+                        </div>
+                        <div className={`hm-aiv-engine-status${revealed ? (e.cited ? ' cited' : ' notcited') : ''}`}>
+                          {revealed ? (e.cited ? 'Cited ✓' : 'Not cited') : '—'}
+                        </div>
+                      </div>
+                    )
+                  })}
+
+                  {/* CTA */}
+                  <div className="hm-aiv-cta">
+                    <div className="hm-aiv-cta-title">📄 No llms.txt detected</div>
+                    <div className="hm-aiv-cta-body">AI engines can&apos;t read your site structure. Generate your llms.txt to boost citation rate.</div>
+                    <div className="hm-aiv-cta-btn">
+                      <svg width="9" height="9" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                      Generate llms.txt →
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* ── Sidebar ──────────────────────────────────────────────── */}
           <div className="mockup-sidebar">
             <div className="ms-top">
@@ -260,7 +522,7 @@ export function HeroDashboardMockup(): React.ReactElement {
             </div>
             <div className="ms-nav">
               <div className="ms-section">Monitoring</div>
-              <div className="ms-item active">
+              <div className={`ms-item${!aivOpen ? ' active' : ''}`}>
                 <div className="ms-item-left">
                   <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /></svg>
                   Dashboard
@@ -317,6 +579,22 @@ export function HeroDashboardMockup(): React.ReactElement {
                   <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
                   Compete
                 </div>
+              </div>
+
+              {/* AI Visibility — clickable, pulses after recovery */}
+              <div
+                className={`ms-item hm-aiv-nav-item${aivOpen ? ' active' : ''}${pulseAiv ? ' hm-aiv-pulse' : ''}`}
+                onClick={openAiv}
+                title="Try AI Visibility"
+              >
+                <div className="ms-item-left">
+                  <svg width="13" height="13" fill="none" stroke={aivOpen ? 'currentColor' : '#3b82f6'} strokeWidth="2" viewBox="0 0 24 24">
+                    <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                  </svg>
+                  <span style={{ color: aivOpen ? undefined : '#3b82f6', fontWeight: 700 }}>AI Visibility</span>
+                </div>
+                <span className="hm-aiv-new-badge">NEW</span>
+                {pulseAiv && <span className="hm-aiv-hint">← Try it</span>}
               </div>
             </div>
             <div className="ms-bottom">
@@ -382,7 +660,7 @@ export function HeroDashboardMockup(): React.ReactElement {
                 </div>
               </div>
 
-              {/* Stat cards — clickable */}
+              {/* Stat cards */}
               <div className="mm-stats">
                 {([
                   { key: 'all', variant: 'all', label: 'Total Monitors', value: total, color: undefined,
@@ -403,9 +681,7 @@ export function HeroDashboardMockup(): React.ReactElement {
                     <div className={`mm-stat-icon ${card.variant}`}>{card.icon}</div>
                     <div className="mm-stat-label">{card.label}</div>
                     <div className="mm-stat-value" style={card.color ? { color: card.color } : undefined}>{card.value}</div>
-                    {activeFilter === card.key && (
-                      <div className="hm-filter-chip">Filtered</div>
-                    )}
+                    {activeFilter === card.key && <div className="hm-filter-chip">Filtered</div>}
                   </div>
                 ))}
               </div>
@@ -442,12 +718,7 @@ export function HeroDashboardMockup(): React.ReactElement {
                       <td><div className="mm-monitor-name">api.acmecorp.com</div><div className="mm-monitor-url">https://api.acmecorp.com/health</div></td>
                       <td><span className="mm-type-tag">HTTP</span></td>
                       <td><StatusBadge status="up" /></td>
-                      <td>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                          <UptimeBars bad={false} />
-                          <span className="mm-uptime-pct">99.98%</span>
-                        </div>
-                      </td>
+                      <td><div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}><UptimeBars bad={false} /><span className="mm-uptime-pct">99.98%</span></div></td>
                       <td><span className="mm-response fast">142ms</span></td>
                       <td style={{ fontSize: '9px', color: 'var(--text-muted)' }}>8s ago</td>
                     </tr>
@@ -471,12 +742,7 @@ export function HeroDashboardMockup(): React.ReactElement {
                       <td><div className="mm-monitor-name">checkout.shop.io</div><div className="mm-monitor-url">https://checkout.shop.io</div></td>
                       <td><span className="mm-type-tag">HTTP</span></td>
                       <td><StatusBadge status={pd.status} /></td>
-                      <td>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                          <UptimeBars bad={pd.uptimeBad} />
-                          <span className={`mm-uptime-pct${pd.uptimeBad ? ' bad' : ''}`}>{pd.uptime}</span>
-                        </div>
-                      </td>
+                      <td><div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}><UptimeBars bad={pd.uptimeBad} /><span className={`mm-uptime-pct${pd.uptimeBad ? ' bad' : ''}`}>{pd.uptime}</span></div></td>
                       <td><span className={`mm-response ${pd.responseClass}`}>{pd.response}</span></td>
                       <td style={{ fontSize: '9px', color: pd.stats.down > 0 ? 'var(--color-down)' : 'var(--text-muted)' }}>{pd.lastCheck}</td>
                     </tr>
@@ -507,12 +773,7 @@ export function HeroDashboardMockup(): React.ReactElement {
                       <td><div className="mm-monitor-name">cdn.assets.io</div><div className="mm-monitor-url">https://cdn.assets.io</div></td>
                       <td><span className="mm-type-tag">HTTP</span></td>
                       <td><StatusBadge status="up" /></td>
-                      <td>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                          <UptimeBars bad={false} />
-                          <span className="mm-uptime-pct">99.9%</span>
-                        </div>
-                      </td>
+                      <td><div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}><UptimeBars bad={false} /><span className="mm-uptime-pct">99.9%</span></div></td>
                       <td><span className="mm-response fast">241ms</span></td>
                       <td style={{ fontSize: '9px', color: 'var(--text-muted)' }}>1m ago</td>
                     </tr>
@@ -536,12 +797,7 @@ export function HeroDashboardMockup(): React.ReactElement {
                       <td><div className="mm-monitor-name">blog.example.com</div><div className="mm-monitor-url">https://blog.example.com</div></td>
                       <td><span className="mm-type-tag">SSL</span></td>
                       <td><StatusBadge status="up" /></td>
-                      <td>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                          <UptimeBars bad={false} />
-                          <span className="mm-uptime-pct">100%</span>
-                        </div>
-                      </td>
+                      <td><div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}><UptimeBars bad={false} /><span className="mm-uptime-pct">100%</span></div></td>
                       <td><span className="mm-response fast">89ms</span></td>
                       <td style={{ fontSize: '9px', color: 'var(--text-muted)' }}>3m ago</td>
                     </tr>
