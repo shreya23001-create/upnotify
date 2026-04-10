@@ -79,7 +79,8 @@ async function fetchOfficialStatus(domain: string): Promise<{ text: string; url:
 
 async function fetchGoogleNews(siteName: string): Promise<SourceArticle[]> {
   const query = encodeURIComponent(`${siteName} down outage`)
-  const url = `https://news.google.com/rss/search?q=${query}&hl=en-US&gl=US&ceid=US:en`
+  // tbs=qdr:d restricts results to the last 24 hours only
+  const url = `https://news.google.com/rss/search?q=${query}&hl=en-US&gl=US&ceid=US:en&tbs=qdr:d`
 
   try {
     const controller = new AbortController()
@@ -130,7 +131,8 @@ async function fetchGoogleNews(siteName: string): Promise<SourceArticle[]> {
 
 async function fetchReddit(siteName: string, domain: string): Promise<SourceArticle[]> {
   const query = encodeURIComponent(`${siteName} down OR outage OR not working`)
-  const url = `https://www.reddit.com/r/outages+sysadmin+webdev/search.json?q=${query}&sort=new&limit=10&restrict_sr=false&t=day`
+  // t=hour restricts results to the last hour only — most relevant for live outages
+  const url = `https://www.reddit.com/r/outages+sysadmin+webdev/search.json?q=${query}&sort=new&limit=10&restrict_sr=false&t=hour`
 
   try {
     const controller = new AbortController()

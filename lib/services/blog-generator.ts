@@ -27,6 +27,7 @@ export interface GeneratedBlogDraft {
   excerpt: string
   bodyMarkdown: string
   sourcesCount: number
+  sources: { title: string; url: string; source: string; publishedAt?: string }[]
   approveToken: string
   rejectToken: string
 }
@@ -152,7 +153,7 @@ Write the post in Markdown as Uptrue's honest opinion and observation. The post 
 8. Warm, human tone — conversational, helpful, never alarmist or sensational
 9. Do NOT include a title at the top (it is added separately)
 10. Cite sources with Markdown links: [source name](url)
-11. Do NOT fabricate anything. Do NOT include any personal usernames or social media handles.
+11. Do NOT fabricate anything. Every claim about cause, affected regions, user impact, or fix status must come directly from the research data provided above. If a section has no supporting data, say so explicitly — e.g. "we don't have details on what caused this yet" or "we haven't seen any official update on this". Do NOT include any personal usernames or social media handles.
 12. We have no connection to ${ctx.siteDisplayName} — mention this lightly and naturally if it fits ("as an independent monitoring service, all we can share is what our own checks detected")
 
 Also provide:
@@ -279,6 +280,12 @@ Format your response EXACTLY like this:
     excerpt: postExcerpt,
     bodyMarkdown: body,
     sourcesCount: ctx.research?.articles.length ?? 0,
+    sources: ctx.research?.articles.map(a => ({
+      title: a.title,
+      url: a.url,
+      source: a.source,
+      publishedAt: a.publishedAt,
+    })) ?? [],
     approveToken: tokens.approveToken,
     rejectToken: tokens.rejectToken,
   }

@@ -71,6 +71,7 @@ async function triggerOutageBlog(
       excerpt: draft.excerpt,
       bodyMarkdown: draft.bodyMarkdown,
       sourcesCount: draft.sourcesCount,
+      sources: draft.sources,
       approveUrl,
       rejectUrl,
     }),

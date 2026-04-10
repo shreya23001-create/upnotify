@@ -17,6 +17,7 @@ interface PublicConfig {
   }
   analytics: {
     gaMeasurementId: string
+    gtmId: string
   }
 }
 
@@ -91,6 +92,7 @@ export function getConfig(): PublicConfig {
   const appUrl = (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000').trim()
   const adminEmails = process.env.ADMIN_EMAILS || ''
   const gaMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? ''
+  const gtmId = process.env.NEXT_PUBLIC_GTM_ID ?? ''
 
   // NEXT_PUBLIC_* vars are only available in the browser at runtime, not during
   // static prerendering at build time. Don't throw server-side — the browser will
@@ -101,7 +103,7 @@ export function getConfig(): PublicConfig {
       throw new Error('Missing required Supabase environment variables (NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY)')
     }
     // During SSR/build: return config with empty strings — browser will get real values
-    return { supabase: { url: '', anonKey: '' }, app: { url: appUrl }, admin: { emails: adminEmails.split(',').map(e => e.trim()).filter(Boolean) }, analytics: { gaMeasurementId } }
+    return { supabase: { url: '', anonKey: '' }, app: { url: appUrl }, admin: { emails: adminEmails.split(',').map(e => e.trim()).filter(Boolean) }, analytics: { gaMeasurementId, gtmId } }
   }
 
   cachedPublicConfig = {
@@ -112,6 +114,7 @@ export function getConfig(): PublicConfig {
     },
     analytics: {
       gaMeasurementId,
+      gtmId,
     },
   }
 

@@ -427,6 +427,13 @@ export async function sendTeamInviteEmail(params: TeamInviteEmailParams): Promis
 // Blog approval email
 // ---------------------------------------------------------------------------
 
+interface BlogApprovalSource {
+  title: string
+  url: string
+  source: string
+  publishedAt?: string
+}
+
 interface BlogApprovalEmailParams {
   to: string
   blogTitle: string
@@ -435,6 +442,7 @@ interface BlogApprovalEmailParams {
   excerpt: string
   bodyMarkdown?: string   // Full blog body — rendered as plain text in email
   sourcesCount?: number   // How many sources were used
+  sources?: BlogApprovalSource[]  // Full source list with titles, URLs, publish dates
   approveUrl: string
   rejectUrl: string
 }
@@ -466,18 +474,39 @@ export async function sendBlogApprovalEmail(params: BlogApprovalEmailParams): Pr
         .replace(/\n\n/g, '</p><p style="margin:0 0 14px;font-size:14px;color:#374151;line-height:1.7;">')
     : ''
 
-  const sourcesNote = params.sourcesCount
-    ? `<p style="margin:0 0 20px;font-size:13px;color:#6b7280;">Research pulled from <strong>${params.sourcesCount} sources</strong> (official status page, Google News, Reddit, X).</p>`
-    : ''
+  // Build sources table — shown at the very top for quick review
+  let sourcesBlock = ''
+  if (params.sources && params.sources.length > 0) {
+    const rows = params.sources.map(s => {
+      const pubDate = s.publishedAt ? new Date(s.publishedAt).toLocaleString('en-GB', {
+        day: 'numeric', month: 'short', year: 'numeric',
+        hour: '2-digit', minute: '2-digit', timeZone: 'UTC',
+      }) + ' UTC' : 'Date unknown'
+      return `<tr>
+        <td style="padding:6px 8px;font-size:12px;color:#6b7280;white-space:nowrap;vertical-align:top;">${escapeHtml(s.source)}</td>
+        <td style="padding:6px 8px;font-size:13px;vertical-align:top;"><a href="${s.url}" style="color:#3b82f6;text-decoration:none;">${escapeHtml(s.title)}</a></td>
+        <td style="padding:6px 8px;font-size:12px;color:#9ca3af;white-space:nowrap;vertical-align:top;">${pubDate}</td>
+      </tr>`
+    }).join('')
+    sourcesBlock = `
+    <div style="margin:0 0 24px;padding:16px;background-color:#f0f9ff;border:1px solid #bae6fd;border-radius:6px;">
+      <p style="margin:0 0 10px;font-size:12px;font-weight:700;color:#0369a1;text-transform:uppercase;letter-spacing:0.5px;">Research Sources (${params.sources.length})</p>
+      <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;">
+        ${rows}
+      </table>
+    </div>`
+  } else if (params.sourcesCount) {
+    sourcesBlock = `<p style="margin:0 0 20px;font-size:13px;color:#6b7280;">Research pulled from <strong>${params.sourcesCount} sources</strong> (official status page, Google News, Reddit, X).</p>`
+  }
 
   const html = baseTemplate(`
     <h2 style="margin:0 0 4px;font-size:18px;color:#111827;">New Outage Blog Draft</h2>
     <p style="margin:0 0 20px;font-size:14px;color:#6b7280;line-height:1.6;">
       Uptrue auto-generated a blog post about the <strong>${escapeHtml(params.siteDisplayName)}</strong> outage.
-      Read the full post below, then approve or reject.
+      Review the sources below, read the full post, then approve or reject.
     </p>
 
-    ${sourcesNote}
+    ${sourcesBlock}
 
     <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;margin-bottom:24px;">
       <tr>
