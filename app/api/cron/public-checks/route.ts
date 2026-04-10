@@ -173,16 +173,20 @@ export async function GET(request: Request): Promise<NextResponse> {
   try {
     const allMonitors = await getActivePublicMonitors()
 
-    // In non-production, only check 15 random sites to avoid timeout on Hobby plan
-    const isProduction = process.env.VERCEL_ENV === 'production' || process.env.NEXT_PUBLIC_VERCEL_ENV === 'production'
-    const monitors = isProduction
-      ? allMonitors
-      : allMonitors.sort(() => Math.random() - 0.5).slice(0, 15)
+    // Check oldest-checked monitors first — rotates through all sites across cron fires
+    // Cap at 30 per run to stay well within 60s Vercel Pro timeout
+    const monitors = allMonitors
+      .sort((a, b) => {
+        const aTime = a.last_checked_at ? new Date(a.last_checked_at).getTime() : 0
+        const bTime = b.last_checked_at ? new Date(b.last_checked_at).getTime() : 0
+        return aTime - bTime
+      })
+      .slice(0, 30)
 
-    logger.info('Public check runner started', { total: allMonitors.length, checking: monitors.length, isProduction })
+    logger.info('Public check runner started', { total: allMonitors.length, checking: monitors.length })
 
-    // Run checks in batches of 20 — Vercel Pro allows 60s timeout
-    const BATCH_SIZE = 20
+    // Run checks in batches of 10
+    const BATCH_SIZE = 10
     const allResults: PromiseSettledResult<FirstCheckResult>[] = []
 
     for (let i = 0; i < monitors.length; i += BATCH_SIZE) {
