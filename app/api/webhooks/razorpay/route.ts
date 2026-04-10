@@ -105,7 +105,7 @@ async function handleSubscriptionActivated(sub: RzpSubscription): Promise<void> 
   // This prevents double-billing when a user switches payment providers or upgrades.
   const { data: existingActiveSubs } = await supabase
     .from('subscriptions')
-    .select('id, stripe_subscription_id, razorpay_subscription_id')
+    .select('id, stripe_subscription_id, razorpay_subscription_id, plan_id, billing_cycle, current_period_start, current_period_end')
     .eq('org_id', orgId)
     .in('status', ['active', 'cancelling'])
 
@@ -118,6 +118,98 @@ async function handleSubscriptionActivated(sub: RzpSubscription): Promise<void> 
         logger.warn('Razorpay activation: failed to cancel old Stripe sub', {
           stripeSubId: existingSub.stripe_subscription_id,
           error: err instanceof Error ? err.message : String(err),
+        })
+      }
+    }
+  }
+
+  // ── Detect annual upgrade and log credit record ──────────────────────────
+  // An annual upgrade is: old sub was Razorpay + annual, new sub is also annual.
+  // Log it non-fatally so it never blocks the main activation flow.
+  if (cycle === 'annual') {
+    const oldAnnualRzpSub = (existingActiveSubs ?? []).find(
+      s => s.razorpay_subscription_id && s.billing_cycle === 'annual'
+    )
+
+    if (oldAnnualRzpSub?.plan_id && oldAnnualRzpSub.razorpay_subscription_id && oldAnnualRzpSub.current_period_start && oldAnnualRzpSub.current_period_end) {
+      try {
+        const now = new Date()
+        const periodEnd = new Date(oldAnnualRzpSub.current_period_end)
+        const msRemaining = Math.max(0, periodEnd.getTime() - now.getTime())
+        const daysRemaining = Math.floor(msRemaining / (1000 * 60 * 60 * 24))
+
+        const [oldPlanRes, newPlanRes, orgRes, userRes] = await Promise.all([
+          supabase
+            .from('plans')
+            .select('id, name, slug, price_annual_inr')
+            .eq('id', oldAnnualRzpSub.plan_id)
+            .single(),
+          supabase
+            .from('plans')
+            .select('id, name, slug, price_annual_inr')
+            .eq('slug', planSlug)
+            .single(),
+          supabase
+            .from('organisations')
+            .select('name')
+            .eq('id', orgId)
+            .single(),
+          supabase
+            .from('users')
+            .select('email')
+            .eq('org_id', orgId)
+            .order('created_at', { ascending: true })
+            .limit(1)
+            .single(),
+        ])
+
+        const oldPlan = oldPlanRes.data
+        const newPlanData = newPlanRes.data
+        const orgData = orgRes.data
+        const userData = userRes.data
+
+        if (oldPlan && newPlanData && orgData && userData && daysRemaining > 0) {
+          const oldPriceInr  = oldPlan.price_annual_inr  ?? 0
+          const newPriceInr  = newPlanData.price_annual_inr ?? 0
+          const creditAmountInr = Math.floor((daysRemaining / 365) * oldPriceInr)
+
+          // Use intermediate variable to avoid TS excess-property literal check on insert overload
+          const upgradeLogEntry = {
+            org_id:                       orgId,
+            org_name:                     orgData.name,
+            user_email:                   userData.email,
+            old_razorpay_subscription_id: oldAnnualRzpSub.razorpay_subscription_id,
+            old_plan_id:                  oldPlan.id,
+            old_plan_name:                oldPlan.name,
+            old_plan_slug:                oldPlan.slug,
+            old_plan_price_annual_inr:    oldPriceInr,
+            old_subscription_started_at:  oldAnnualRzpSub.current_period_start,
+            old_subscription_period_end:  oldAnnualRzpSub.current_period_end,
+            new_razorpay_subscription_id: sub.id,
+            new_plan_id:                  newPlanData.id,
+            new_plan_name:                newPlanData.name,
+            new_plan_slug:                newPlanData.slug,
+            new_plan_price_annual_inr:    newPriceInr,
+            upgraded_at:                  now.toISOString(),
+            days_remaining:               daysRemaining,
+            credit_amount_inr:            creditAmountInr,
+            refund_status:                'pending' as const,
+          }
+          await supabase.from('razorpay_annual_upgrade_log').insert(upgradeLogEntry)
+
+          logger.info('Razorpay: annual upgrade credit logged', {
+            orgId,
+            oldPlan: oldPlan.slug,
+            newPlan: newPlanData.slug,
+            daysRemaining,
+            creditAmountInr,
+          })
+        }
+      } catch (logErr) {
+        // Non-fatal — credit logging must never block the activation
+        logger.error('Razorpay: failed to log annual upgrade credit (non-fatal)', {
+          orgId,
+          error: logErr instanceof Error ? logErr.message : String(logErr),
         })
       }
     }

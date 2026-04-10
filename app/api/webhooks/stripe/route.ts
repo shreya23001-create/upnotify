@@ -3,7 +3,6 @@ import { getStripe } from '@/lib/services/stripe'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
 import { getServerConfig } from '@/lib/utils/config'
-import { isProduction } from '@/lib/utils/environment'
 import { enforceDowngradeLimits, notifyPlanChange } from '@/lib/services/plan-enforcement'
 import type Stripe from 'stripe'
 
@@ -412,44 +411,27 @@ export async function POST(request: Request): Promise<NextResponse> {
   const { stripe } = getServerConfig()
   const webhookSecret = stripe.webhookSecret
 
-  // In production, webhook signature verification is mandatory
-  if (isProduction() && !webhookSecret) {
-    logger.error('STRIPE_WEBHOOK_SECRET is not configured in production — rejecting webhook')
-    return NextResponse.json(
-      { error: 'Webhook configuration error' },
-      { status: 500 }
-    )
+  // Signature verification is mandatory in all environments.
+  // For local testing use: stripe listen --forward-to localhost:3000/api/webhooks/stripe
+  if (!webhookSecret) {
+    logger.error('STRIPE_WEBHOOK_SECRET is not configured — rejecting webhook')
+    return NextResponse.json({ error: 'Webhook misconfigured' }, { status: 500 })
+  }
+
+  if (!signature) {
+    logger.error('Stripe webhook missing stripe-signature header')
+    return NextResponse.json({ error: 'Missing signature' }, { status: 400 })
   }
 
   let event: Stripe.Event
 
   try {
-    if (webhookSecret && signature) {
-      event = getStripe().webhooks.constructEvent(
-        body,
-        signature,
-        webhookSecret
-      )
-    } else if (!isProduction()) {
-      // Development/staging only: allow unverified parsing for local testing
-      logger.warn('Stripe webhook parsed without signature verification (non-production)')
-      event = JSON.parse(body) as Stripe.Event
-    } else {
-      // Production with missing signature — reject
-      logger.error('Stripe webhook missing signature in production')
-      return NextResponse.json(
-        { error: 'Missing signature' },
-        { status: 400 }
-      )
-    }
+    event = getStripe().webhooks.constructEvent(body, signature, webhookSecret)
   } catch (err) {
     logger.error('Stripe webhook signature verification failed', {
       error: err instanceof Error ? err.message : 'Unknown',
     })
-    return NextResponse.json(
-      { error: 'Invalid signature' },
-      { status: 400 }
-    )
+    return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
   }
 
   try {

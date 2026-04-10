@@ -2797,6 +2797,78 @@ export type Database = {
         }
         Relationships: []
       }
+      razorpay_annual_upgrade_log: {
+        Row: {
+          id: string
+          org_id: string
+          org_name: string
+          user_email: string
+          old_razorpay_subscription_id: string
+          old_plan_id: string | null
+          old_plan_name: string
+          old_plan_slug: string
+          old_plan_price_annual_inr: number
+          old_subscription_started_at: string
+          old_subscription_period_end: string
+          new_razorpay_subscription_id: string
+          new_plan_id: string | null
+          new_plan_name: string
+          new_plan_slug: string
+          new_plan_price_annual_inr: number
+          upgraded_at: string
+          days_remaining: number
+          credit_amount_inr: number
+          refund_status: string
+          refunded_at: string | null
+          refunded_amount_inr: number | null
+          refund_notes: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          org_id: string
+          org_name: string
+          user_email: string
+          old_razorpay_subscription_id: string
+          old_plan_id?: string | null
+          old_plan_name: string
+          old_plan_slug: string
+          old_plan_price_annual_inr: number
+          old_subscription_started_at: string
+          old_subscription_period_end: string
+          new_razorpay_subscription_id: string
+          new_plan_id?: string | null
+          new_plan_name: string
+          new_plan_slug: string
+          new_plan_price_annual_inr: number
+          upgraded_at?: string
+          days_remaining: number
+          credit_amount_inr: number
+          refund_status?: string
+          refunded_at?: string | null
+          refunded_amount_inr?: number | null
+          refund_notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          refund_status?: string
+          refunded_at?: string | null
+          refunded_amount_inr?: number | null
+          refund_notes?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "razorpay_annual_upgrade_log_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
     }
     Views: {
       [_ in never]: never

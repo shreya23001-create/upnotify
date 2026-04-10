@@ -10,8 +10,8 @@ import type { SupportTicket } from '@/lib/db/support'
 
 export async function alertAdminNewTicket(ticket: SupportTicket, userEmail: string): Promise<void> {
   const config = getServerConfig()
-  const adminEmail = config.adminEmails?.[0] ?? process.env.ADMIN_EMAILS?.split(',')[0]?.trim()
-  const dashboardUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? 'https://uptrue.io'}/admin/support/${ticket.id}`
+  const adminEmail = config.admin.emails[0] ?? process.env.ADMIN_EMAILS?.split(',')[0]?.trim()
+  const dashboardUrl = `${config.app.url}/admin/support/${ticket.id}`
 
   const priorityLabel = ticket.priority.toUpperCase()
   const categoryLabel = ticket.category.replace(/_/g, ' ')
