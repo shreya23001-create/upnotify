@@ -408,6 +408,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       )
     }
 
+    // Published blog posts (dynamic — auto-generated outage posts etc.)
+    const { data: blogData, error: blogError } = await supabase
+      .from('blog_posts')
+      .select('slug, updated_at')
+      .eq('status', 'published')
+
+    if (blogError) {
+      logger.error('Sitemap: failed to fetch blog posts', { error: blogError.message })
+    } else if (blogData) {
+      dynamicPages.push(
+        ...(blogData as { slug: string; updated_at: string | null }[]).map((post) => ({
+          url: `https://uptrue.io/blog/${post.slug}`,
+          lastModified: post.updated_at ? new Date(post.updated_at) : new Date(),
+          changeFrequency: 'weekly' as const,
+          priority: 0.8,
+        }))
+      )
+    }
+
     // Active public tracker sites
     const { data: trackerData, error: trackerError } = await supabase
       .from('public_monitors')

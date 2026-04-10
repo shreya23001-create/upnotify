@@ -4,6 +4,7 @@ import { getAlertChannelById } from '@/lib/db/alerts'
 import { sendAlertEmail } from '@/lib/services/email'
 import { sendSlackAlert } from '@/lib/services/slack'
 import { sendWebhookAlert } from '@/lib/services/webhook'
+import { sendTelegramAlert } from '@/lib/services/telegram'
 import { logger } from '@/lib/utils/logger'
 import { checkRateLimit, API_V1_RATE_LIMIT } from '@/lib/utils/rate-limiter'
 
@@ -16,6 +17,7 @@ interface AlertChannelConfig {
   slackChannel?: string
   webhookSecret?: string
   teamsWebhookUrl?: string
+  telegramChatId?: string
 }
 
 interface TestAlertRequestBody {
@@ -129,6 +131,17 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
             channel: { id: channel.id, name: channel.name, type: channel.type },
             timestamp: new Date().toISOString(),
           },
+        })
+        break
+
+      case 'telegram':
+        result = await sendTelegramAlert({
+          chatId: channelConfig.telegramChatId || '',
+          monitorName: 'Test Monitor',
+          monitorTarget: 'uptrue.io',
+          isResolved: false,
+          severity: 'P2',
+          monitorUrl: 'https://uptrue.io/dashboard/alerts',
         })
         break
 

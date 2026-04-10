@@ -90,7 +90,7 @@ export function OrgSettingsForm({ organisation }: { organisation: Organisation }
 
           <div className="form-group">
             <label className="form-label" htmlFor="org-type">Account Type</label>
-            <input className="form-input" id="org-type" defaultValue={organisation.type} disabled style={{ textTransform: 'capitalize', background: '#f8f9fc' }} />
+            <input className="form-input" id="org-type" defaultValue={organisation.type} disabled style={{ textTransform: 'capitalize', background: 'var(--bg-muted)' }} />
             <p style={{ fontSize: 12, color: '#94a3b8', marginTop: 4 }}>Contact support to change account type.</p>
           </div>
 

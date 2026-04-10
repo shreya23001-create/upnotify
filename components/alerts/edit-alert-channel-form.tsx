@@ -61,7 +61,7 @@ export function EditAlertChannelForm({ channel }: { channel: AlertChannel }) {
 
       <div className="form-group">
         <label className="form-label">Channel Type</label>
-        <div style={{ padding: '12px 16px', background: '#f8f9fc', borderRadius: 10, fontSize: 15, fontWeight: 600, color: '#64748b' }}>
+        <div style={{ padding: '12px 16px', background: 'var(--bg-muted)', borderRadius: 10, fontSize: 15, fontWeight: 600, color: 'var(--text-secondary)' }}>
           {typeLabels[channel.type] || channel.type}
           <span style={{ fontSize: 12, fontWeight: 400, marginLeft: 8, color: '#94a3b8' }}>(cannot be changed)</span>
         </div>
@@ -131,8 +131,8 @@ export function EditAlertChannelForm({ channel }: { channel: AlertChannel }) {
               onClick={() => toggleSeverity(sev.value)}
               style={{
                 padding: '6px 14px', borderRadius: 8, fontSize: 13, fontWeight: 600,
-                border: selectedSeverities.includes(sev.value) ? '2px solid #667eea' : '1.5px solid #e2e8f0',
-                background: selectedSeverities.includes(sev.value) ? '#f0f4ff' : '#fff',
+                border: selectedSeverities.includes(sev.value) ? '2px solid #667eea' : '1.5px solid var(--border-input)',
+                background: selectedSeverities.includes(sev.value) ? 'var(--bg-hover)' : 'var(--bg-card)',
                 color: selectedSeverities.includes(sev.value) ? '#667eea' : '#94a3b8',
                 cursor: 'pointer', transition: 'all 0.15s',
               }}

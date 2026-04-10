@@ -84,7 +84,7 @@ export function EditMonitorForm({ monitor, minCheckInterval = 600 }: { monitor: 
 
       <div className="form-group">
         <label className="form-label">Monitor Type</label>
-        <div style={{ padding: '12px 16px', background: '#f8f9fc', borderRadius: 10, display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div style={{ padding: '12px 16px', background: 'var(--bg-muted)', borderRadius: 10, display: 'flex', alignItems: 'center', gap: 8 }}>
           <MonitorTypeIcon type={monitor.type} />
           <span style={{ fontSize: 12, color: '#94a3b8', marginLeft: 8 }}>(cannot be changed)</span>
         </div>

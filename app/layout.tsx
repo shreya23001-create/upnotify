@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next"
 import { Inter, JetBrains_Mono } from "next/font/google"
 import { CookieConsent } from "@/components/ui/cookie-consent"
 import { GoogleTagManager } from "@/components/analytics/google-tag-manager"
+import { MicrosoftClarity } from "@/components/analytics/microsoft-clarity"
 import "./styles.css"
 
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"], display: "swap" })
@@ -56,7 +57,7 @@ export const metadata: Metadata = {
       "Monitor uptime, performance and infrastructure across all your sites. 10 monitor types, AI-powered reports, public status pages, and multi-channel alerts.",
     images: [
       {
-        url: "/og-image.svg",
+        url: "/opengraph-image",
         width: 1200,
         height: 630,
         alt: "Uptrue — Uptime Monitoring for Agencies & Teams",
@@ -68,7 +69,7 @@ export const metadata: Metadata = {
     title: "Uptrue — Uptime Monitoring for Agencies & Teams",
     description:
       "Monitor uptime, performance and infrastructure across all your sites. 10 monitor types, AI-powered reports, public status pages, and multi-channel alerts.",
-    images: ["/og-image.svg"],
+    images: ["/opengraph-image"],
   },
   icons: {
     icon: [
@@ -102,6 +103,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           })();
         ` }} />
         <GoogleTagManager />
+        <MicrosoftClarity />
         {children}
         <CookieConsent />
       </body>

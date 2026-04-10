@@ -48,8 +48,8 @@ export function EditStatusPageForm({ statusPage, monitors }: { statusPage: Statu
           {monitors.map(m => (
             <label key={m.id} style={{
               display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px',
-              border: selectedMonitors.has(m.id) ? '2px solid #667eea' : '1.5px solid #e2e8f0',
-              borderRadius: 10, cursor: 'pointer', background: selectedMonitors.has(m.id) ? '#f0f4ff' : '#fff',
+              border: selectedMonitors.has(m.id) ? '2px solid #667eea' : '1.5px solid var(--border-input)',
+              borderRadius: 10, cursor: 'pointer', background: selectedMonitors.has(m.id) ? 'var(--bg-hover)' : 'var(--bg-card)',
               transition: 'all 0.15s',
             }}>
               <input type="checkbox" checked={selectedMonitors.has(m.id)} onChange={() => toggleMonitor(m.id)} style={{ accentColor: '#667eea' }} />

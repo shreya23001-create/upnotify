@@ -64,11 +64,11 @@ export function CreateAlertChannelForm() {
                 display: 'flex',
                 flexDirection: 'column',
                 padding: '14px 16px',
-                border: type === ct.value ? '2px solid #667eea' : '1.5px solid #e2e8f0',
+                border: type === ct.value ? '2px solid #667eea' : '1.5px solid var(--border-input)',
                 borderRadius: 10,
                 cursor: 'pointer',
                 transition: 'all 0.15s',
-                background: type === ct.value ? '#f0f4ff' : '#fff',
+                background: type === ct.value ? 'var(--bg-hover)' : 'var(--bg-card)',
               }}
             >
               <input

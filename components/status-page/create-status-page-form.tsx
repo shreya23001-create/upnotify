@@ -42,7 +42,7 @@ export function CreateStatusPageForm({ monitors }: { monitors: Monitor[] }) {
         <label className="form-label">Slug (URL)</label>
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
           <span style={{ color: '#94a3b8', fontSize: 14 }}>/status/</span>
-          <input className="form-input" name="slug" value={name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')} readOnly style={{ flex: 1, background: '#f8f9fc' }} />
+          <input className="form-input" name="slug" value={name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')} readOnly style={{ flex: 1, background: 'var(--bg-muted)' }} />
         </div>
       </div>
 
@@ -53,8 +53,8 @@ export function CreateStatusPageForm({ monitors }: { monitors: Monitor[] }) {
           {monitors.map(m => (
             <label key={m.id} style={{
               display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px',
-              border: selectedMonitors.has(m.id) ? '2px solid #667eea' : '1.5px solid #e2e8f0',
-              borderRadius: 10, cursor: 'pointer', background: selectedMonitors.has(m.id) ? '#f0f4ff' : '#fff',
+              border: selectedMonitors.has(m.id) ? '2px solid #667eea' : '1.5px solid var(--border-input)',
+              borderRadius: 10, cursor: 'pointer', background: selectedMonitors.has(m.id) ? 'var(--bg-hover)' : 'var(--bg-card)',
               transition: 'all 0.15s',
             }}>
               <input type="checkbox" checked={selectedMonitors.has(m.id)} onChange={() => toggleMonitor(m.id)} style={{ accentColor: '#667eea' }} />
