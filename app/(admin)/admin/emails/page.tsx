@@ -177,7 +177,7 @@ export default function AdminEmailsPage(): React.ReactElement {
     // Wrap the body_html content in the nurture base template shell for preview
     const content = editBodyHtml
       .replace(/\{\{first_name\}\}/g, 'John')
-      .replace(/\{\{app_url\}\}/g, 'https://uptrue.io')
+      .replace(/\{\{app_url\}\}/g, process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000')
       .replace(/\{\{month_name\}\}/g, 'March 2026')
       .replace(/\{\{total_monitors\}\}/g, '12')
       .replace(/\{\{total_checks\}\}/g, '45,231')
