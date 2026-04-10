@@ -2,7 +2,11 @@
   "crons": [
     {
       "path": "/api/cron/check-runner",
-      "schedule": "0 0 * * *"
+      "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/cron/public-checks",
+      "schedule": "*/5 * * * *"
     },
     {
       "path": "/api/cron/nurture-emails",
@@ -14,7 +18,7 @@
     },
     {
       "path": "/api/cron/compete-checks",
-      "schedule": "0 0 * * *"
+      "schedule": "0 * * * *"
     },
     {
       "path": "/api/cron/compete-brief",
@@ -46,7 +50,11 @@
     },
     {
       "path": "/api/cron/competitor-checks",
-      "schedule": "0 0 * * *"
+      "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/cron/razorpay-recovery",
+      "schedule": "0 2 * * *"
     }
   ]
 }
