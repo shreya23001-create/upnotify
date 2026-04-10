@@ -25,11 +25,16 @@ vi.mock('@/lib/services/stripe', () => ({
 
 // Track all Supabase operations
 interface MockChain {
-  select: ReturnType<typeof vi.fn>
-  insert: ReturnType<typeof vi.fn>
-  update: ReturnType<typeof vi.fn>
-  eq: ReturnType<typeof vi.fn>
-  single: ReturnType<typeof vi.fn>
+  select:      ReturnType<typeof vi.fn>
+  insert:      ReturnType<typeof vi.fn>
+  update:      ReturnType<typeof vi.fn>
+  delete:      ReturnType<typeof vi.fn>
+  eq:          ReturnType<typeof vi.fn>
+  in:          ReturnType<typeof vi.fn>
+  order:       ReturnType<typeof vi.fn>
+  limit:       ReturnType<typeof vi.fn>
+  single:      ReturnType<typeof vi.fn>
+  maybeSingle: ReturnType<typeof vi.fn>
 }
 
 const mockDbOps: Record<string, MockChain> = {}
@@ -38,19 +43,29 @@ const mockUpdateData: Array<{ table: string; data: unknown }> = []
 
 function createMockChain(table: string): MockChain {
   const chain: MockChain = {
-    select: vi.fn(),
-    insert: vi.fn(),
-    update: vi.fn(),
-    eq: vi.fn(),
-    single: vi.fn(),
+    select:      vi.fn(),
+    insert:      vi.fn(),
+    update:      vi.fn(),
+    delete:      vi.fn(),
+    eq:          vi.fn(),
+    in:          vi.fn(),
+    order:       vi.fn(),
+    limit:       vi.fn(),
+    single:      vi.fn(),
+    maybeSingle: vi.fn(),
   }
 
-  // Default return values
+  // Terminal defaults
   chain.single.mockReturnValue({ data: null, error: null })
+  chain.maybeSingle.mockReturnValue({ data: null, error: null })
 
-  // Fluent returns
+  // All fluent methods return the chain
   chain.select.mockReturnValue(chain)
   chain.eq.mockReturnValue(chain)
+  chain.in.mockReturnValue(chain)
+  chain.order.mockReturnValue(chain)
+  chain.limit.mockReturnValue(chain)
+  chain.delete.mockReturnValue(chain)
 
   chain.insert.mockImplementation((data: unknown) => {
     mockInsertData.push({ table, data })
@@ -285,6 +300,8 @@ describe('Stripe webhook handler', () => {
           current_period_start: now,
           current_period_end: now + 30 * 86400,
           canceled_at: null,
+          cancel_at_period_end: false,
+          items: { data: [{ current_period_start: now, current_period_end: now + 30 * 86400 }] },
         },
       },
     }
@@ -300,7 +317,6 @@ describe('Stripe webhook handler', () => {
     expect(subUpdate?.data).toEqual(
       expect.objectContaining({
         status: 'active',
-        canceled_at: null,
       })
     )
   })
@@ -316,6 +332,8 @@ describe('Stripe webhook handler', () => {
           current_period_start: now,
           current_period_end: now + 30 * 86400,
           canceled_at: now,
+          cancel_at_period_end: false,
+          items: { data: [{ current_period_start: now, current_period_end: now + 30 * 86400 }] },
         },
       },
     }
@@ -358,7 +376,7 @@ describe('Stripe webhook handler', () => {
     expect(response.status).toBe(500)
 
     const body = await response.json()
-    expect(body.error).toBe('Webhook configuration error')
+    expect(body.error).toBe('Webhook misconfigured')
   })
 
   it('returns 400 when signature is missing in production', async () => {
@@ -384,29 +402,22 @@ describe('Stripe webhook handler', () => {
 
   // ── Allows unverified parsing in development ───────────────────────
 
-  it('allows unverified event parsing in non-production mode', async () => {
+  it('returns 500 when webhook secret is missing in any environment', async () => {
+    // Stripe webhook secret is mandatory in all environments — always reject without it
     mockIsProductionValue = false
     mockWebhookSecret = undefined
 
-    const event = {
-      type: 'checkout.session.completed',
-      data: {
-        object: {
-          metadata: {},
-          customer: null,
-        },
-      },
-    }
-
-    // No signature header
     const req = new Request('https://uptrue.io/api/webhooks/stripe', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(event),
+      body: JSON.stringify({ type: 'test' }),
     })
 
     const response = await POST(req)
-    expect(response.status).toBe(200)
+    expect(response.status).toBe(500)
+
+    const body = await response.json()
+    expect(body.error).toBe('Webhook misconfigured')
   })
 
   // ── Processing error does not crash the handler ────────────────────

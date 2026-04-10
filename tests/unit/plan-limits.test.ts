@@ -14,25 +14,33 @@ let mockCountResult: { count: number | null } = { count: 0 }
 
 vi.mock('@/lib/supabase/admin', () => ({
   createAdminClient: () => ({
-    from: (table: string) => {
-      // Subscriptions query (used by getPlanLimits): .select('*, plans(*)').eq(...).eq(...).single()
-      // Count queries (monitors, workspaces, users): .select('id', { count: 'exact', head: true }).eq(...)
+    from: (_table: string) => {
+      // Subscriptions query (used by getPlanLimits):
+      //   .select('*, plans(*)').eq('org_id', orgId).in('status', [...]).order(...).limit(1).maybeSingle()
+      // Count queries (monitors, workspaces, users):
+      //   .select('id', { count: 'exact', head: true }).eq(...)
       return {
         select: (_cols: string, opts?: { count?: string; head?: boolean }) => {
           if (opts?.count === 'exact') {
-            // Count query
+            // Count query — flat terminal
             return {
               eq: () => ({ count: mockCountResult.count }),
             }
           }
-          // Subscription query with join
-          return {
-            eq: (_col: string, _val: unknown) => ({
-              eq: (_col2: string, _val2: unknown) => ({
-                single: () => mockSubscriptionResult,
-              }),
-            }),
+          // Subscription query — full fluent chain
+          const chain: Record<string, unknown> = {}
+          const terminal = {
+            single:      () => mockSubscriptionResult,
+            maybeSingle: () => mockSubscriptionResult,
           }
+          Object.assign(chain, {
+            eq:    () => chain,
+            in:    () => chain,
+            order: () => chain,
+            limit: () => ({ ...terminal }),
+            ...terminal,
+          })
+          return chain
         },
       }
     },

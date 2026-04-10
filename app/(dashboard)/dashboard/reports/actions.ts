@@ -7,6 +7,7 @@ import { deleteReport } from '@/lib/db/reports'
 import { generateReport } from '@/lib/services/reports'
 import { logger } from '@/lib/utils/logger'
 import { impersonationGuard } from '@/lib/auth/impersonation-guard'
+import { getServerConfig } from '@/lib/utils/config'
 
 export async function generateReportAction(formData: FormData): Promise<{ error?: string }> {
   const guard = await impersonationGuard()
@@ -41,6 +42,7 @@ export async function generateReportAction(formData: FormData): Promise<{ error?
   if (!report) return { error: 'Failed to generate report. Make sure you have monitors with check data.' }
 
   // Handle delivery
+  const { app: { url: appUrl } } = getServerConfig()
   if (delivery === 'email' && deliveryEmails.trim()) {
     const emails = deliveryEmails.split(',').map(e => e.trim()).filter(Boolean)
     if (emails.length > 0) {
@@ -50,7 +52,7 @@ export async function generateReportAction(formData: FormData): Promise<{ error?
           await sendEmail(
             email,
             `Uptrue ${reportType.charAt(0).toUpperCase() + reportType.slice(1)} Report — ${periodStart} to ${periodEnd}`,
-            `Your ${reportType} report is ready. View it at: ${process.env.NEXT_PUBLIC_APP_URL || 'https://uptrue.io'}/dashboard/reports/${report.id}`
+            `Your ${reportType} report is ready. View it at: ${appUrl}/dashboard/reports/${report.id}`
           )
         }
         logger.info('Report delivered via email', { reportId: report.id, recipients: emails.length })
@@ -68,7 +70,7 @@ export async function generateReportAction(formData: FormData): Promise<{ error?
         periodEnd,
         orgId: user.org_id,
         generatedAt: new Date().toISOString(),
-        viewUrl: `${process.env.NEXT_PUBLIC_APP_URL || 'https://uptrue.io'}/dashboard/reports/${report.id}`,
+        viewUrl: `${appUrl}/dashboard/reports/${report.id}`,
       }
       await fetch(deliveryWebhook.trim(), {
         method: 'POST',
