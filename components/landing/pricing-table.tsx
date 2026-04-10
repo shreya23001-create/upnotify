@@ -2,114 +2,18 @@
 
 import { useState, useEffect } from 'react'
 import type { SupportedCurrency } from '@/lib/utils/currency'
-import { formatInr } from '@/lib/utils/currency'
-
-interface PlanData {
-  name: string
-  slug: string
-  price_monthly_gbp: number
-  price_annual_gbp: number | null
-  price_monthly_inr: number
-  price_annual_inr: number
-  monitor_limit: number | null
-  check_interval_seconds: number
-  max_team_members: number
-  has_email_alerts: boolean
-  has_slack_teams: boolean
-  has_webhooks: boolean
-  has_status_pages: boolean
-  status_page_limit: number
-  has_status_page_custom_domain: boolean
-  has_ai_predictive: boolean
-  ai_report_limit: number
-  has_api_access: boolean
-  data_retention_days: number | null
-  competitor_limit: number
-  is_visible: boolean
-  llms_txt_limit: number
-  citation_check_monthly_limit: number
-}
-
-function formatInterval(seconds: number): string {
-  if (seconds >= 300) return `${seconds / 60}-minute checks`
-  if (seconds === 60) return '1-minute checks'
-  return `${seconds}-second checks`
-}
-
-function formatRetention(days: number | null): string {
-  if (!days) return 'Unlimited data retention'
-  if (days >= 365) return `${Math.round(days / 365)}-year data retention`
-  return `${days}-day data retention`
-}
-
-function getFeatures(p: PlanData): { text: string; included: boolean }[] {
-  const features: { text: string; included: boolean }[] = []
-
-  features.push({ text: p.monitor_limit ? `${p.monitor_limit} monitors` : 'Unlimited monitors', included: true })
-  features.push({ text: formatInterval(p.check_interval_seconds), included: true })
-  features.push({ text: formatRetention(p.data_retention_days), included: true })
-  features.push({ text: 'Email alerts', included: p.has_email_alerts })
-
-  if (p.has_slack_teams) {
-    features.push({ text: 'Email + Slack + Teams', included: true })
-  } else {
-    features.push({ text: 'Slack / Teams', included: false })
-  }
-
-  if (p.has_status_page_custom_domain) {
-    features.push({ text: p.status_page_limit ? `${p.status_page_limit} custom domain status pages` : 'Unlimited status pages', included: true })
-  } else if (p.has_status_pages) {
-    features.push({ text: p.status_page_limit ? `${p.status_page_limit} status page${p.status_page_limit > 1 ? 's' : ''}` : 'Status pages', included: true })
-  } else {
-    features.push({ text: '1 status page', included: p.has_status_pages })
-  }
-
-  if (p.has_webhooks) {
-    features.push({ text: 'Webhooks', included: true })
-  }
-
-  if (p.has_ai_predictive || p.ai_report_limit > 0) {
-    features.push({ text: p.ai_report_limit > 0 ? `${p.ai_report_limit} AI reports/month` : 'Unlimited AI reports', included: true })
-  } else {
-    features.push({ text: 'AI reports', included: false })
-  }
-
-  const watchdogLimit = p.competitor_limit ?? 3
-  features.push({ text: `Watchdog — ${watchdogLimit} competitor${watchdogLimit === 1 ? '' : 's'}`, included: true })
-
-  // llms.txt Generator
-  if (p.llms_txt_limit === -1) {
-    features.push({ text: 'llms.txt Generator (unlimited)', included: true })
-  } else if (p.llms_txt_limit === 1) {
-    features.push({ text: 'llms.txt Generator (1 lifetime)', included: true })
-  } else if (p.llms_txt_limit === 0) {
-    features.push({ text: 'llms.txt Generator', included: false })
-  }
-
-  // AI Citation Monitor
-  if (p.citation_check_monthly_limit === -1) {
-    features.push({ text: 'AI Citation Monitor (unlimited)', included: true })
-  } else if (p.citation_check_monthly_limit > 0) {
-    features.push({ text: `AI Citation Monitor (${p.citation_check_monthly_limit}/month)`, included: true })
-  } else {
-    features.push({ text: 'AI Citation Monitor', included: false })
-  }
-
-  // API access — hidden until API feature is ready for public listing
-  // features.push({ text: p.has_api_access ? 'Full API access' : 'API access', included: p.has_api_access })
-
-  return features
-}
+import { getPlanFeatures, formatPlanPrice } from '@/lib/utils/plan-display'
+import type { PlanDisplayData } from '@/lib/utils/plan-display'
 
 export default function PricingTable({ defaultCurrency = 'gbp' }: { defaultCurrency?: SupportedCurrency }): React.ReactElement {
   const [isAnnual, setIsAnnual] = useState(true)
   const currency: SupportedCurrency = defaultCurrency
-  const [plans, setPlans] = useState<PlanData[]>([])
+  const [plans, setPlans] = useState<PlanDisplayData[]>([])
 
   useEffect(() => {
     fetch('/api/v1/plans')
       .then(r => r.json())
-      .then((data: { plans?: PlanData[] }) => {
+      .then((data: { plans?: PlanDisplayData[] }) => {
         if (data.plans) setPlans(data.plans.filter(p => p.is_visible))
       })
       .catch(() => {})
@@ -142,63 +46,15 @@ export default function PricingTable({ defaultCurrency = 'gbp' }: { defaultCurre
           </div>
         </div>
         {currency === 'inr' && (
-          <p style={{ textAlign: 'center', fontSize: 13, color: 'var(--text-muted)', marginBottom: 24 }}>+ 18% GST · Razorpay checkout coming soon</p>
+          <p style={{ textAlign: 'center', fontSize: 13, color: 'var(--text-muted)', marginBottom: 24 }}>+ 18% GST · Secure checkout via Razorpay</p>
         )}
 
         <div className="pricing-grid">
           {plans.map((plan) => {
-            const monthlyPence = plan.price_monthly_gbp
-            const annualPence  = plan.price_annual_gbp
-
-            const isFree = monthlyPence === 0 && (!annualPence || annualPence === 0)
+            const isFree = plan.price_monthly_gbp === 0 && (!plan.price_annual_gbp || plan.price_annual_gbp === 0)
             const isHighlighted = plan.slug === highlightedSlug
-            const features = getFeatures(plan)
-
-            // INR display
-            let displayPrice: string
-            let period: string
-            let note: string | undefined
-            let currencySymbol = '£'
-
-            if (currency === 'inr' && !isFree) {
-              currencySymbol = ''
-              const monthlyInr = plan.price_monthly_inr ?? 0
-              const annualInr  = plan.price_annual_inr ?? 0
-              if (isAnnual && annualInr > 0) {
-                displayPrice = formatInr(annualInr)
-                period = 'per year'
-                note = `Or ${formatInr(monthlyInr)}/mo`
-              } else {
-                displayPrice = formatInr(monthlyInr)
-                period = 'per month'
-                if (annualInr > 0) note = `Or ${formatInr(annualInr)}/yr`
-              }
-            } else {
-              // GBP display
-              const monthlyGbp = monthlyPence / 100
-              const annualGbp  = annualPence ? annualPence / 100 : null
-              const annualPerMonth = annualGbp ? annualGbp / 12 : null
-
-              if (isFree) {
-                displayPrice = '0'
-                period = 'forever'
-              } else if (isAnnual && annualGbp !== null) {
-                if (annualPerMonth !== null && annualPerMonth >= 1) {
-                  const perMo = Math.round(annualPerMonth)
-                  displayPrice = String(perMo)
-                  period = 'per month · billed annually'
-                  note = `Or £${monthlyGbp % 1 === 0 ? monthlyGbp.toFixed(0) : monthlyGbp.toFixed(2)}/mo billed monthly`
-                } else {
-                  displayPrice = annualGbp % 1 === 0 ? annualGbp.toFixed(0) : annualGbp.toFixed(2)
-                  period = 'per year'
-                  note = monthlyGbp > 0 ? `Or £${monthlyGbp % 1 === 0 ? monthlyGbp.toFixed(0) : monthlyGbp.toFixed(2)}/mo billed monthly` : undefined
-                }
-              } else {
-                displayPrice = monthlyGbp % 1 === 0 ? monthlyGbp.toFixed(0) : monthlyGbp.toFixed(2)
-                period = 'per month'
-                if (annualGbp !== null) note = `Or £${annualGbp % 1 === 0 ? annualGbp.toFixed(0) : annualGbp.toFixed(2)}/yr billed annually`
-              }
-            }
+            const features = getPlanFeatures(plan)
+            const price = formatPlanPrice(plan, isAnnual, currency)
 
             return (
               <div
@@ -212,10 +68,10 @@ export default function PricingTable({ defaultCurrency = 'gbp' }: { defaultCurre
                   {plan.name}
                 </div>
                 <div className="plan-price">
-                  {currencySymbol}<span>{displayPrice}</span>
+                  {price.symbol}<span>{price.amount}</span>
                 </div>
-                <div className="plan-period">{period}</div>
-                {note && <div className="plan-price-note">{note}</div>}
+                <div className="plan-period">{price.period}</div>
+                {price.note && <div className="plan-price-note">{price.note}</div>}
                 <hr className="plan-divider" />
                 <ul className="plan-features">
                   {features.map((feature, index) => (
@@ -227,19 +83,13 @@ export default function PricingTable({ defaultCurrency = 'gbp' }: { defaultCurre
                     </li>
                   ))}
                 </ul>
-                {currency === 'inr' && !isFree ? (
-                  <button className="btn btn-ghost" style={{ width: '100%', justifyContent: 'center' }} disabled>
-                    Razorpay coming soon
-                  </button>
-                ) : (
-                  <a
-                    href="/signup"
-                    className={`btn${isHighlighted ? ' btn-primary' : ' btn-ghost'}`}
-                    style={{ width: '100%', justifyContent: 'center' }}
-                  >
-                    {isFree ? 'Start Free' : `Get ${plan.name}`}
-                  </a>
-                )}
+                <a
+                  href="/signup"
+                  className={`btn${isHighlighted ? ' btn-primary' : ' btn-ghost'}`}
+                  style={{ width: '100%', justifyContent: 'center' }}
+                >
+                  {isFree ? 'Start Free' : `Get ${plan.name}`}
+                </a>
               </div>
             )
           })}
