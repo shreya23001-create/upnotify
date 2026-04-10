@@ -24,6 +24,10 @@ CREATE INDEX IF NOT EXISTS idx_competitor_monitors_checked_at
 -- RLS: users can only see their org's competitors
 ALTER TABLE competitor_monitors ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "competitor_monitors_org_select" ON competitor_monitors;
+DROP POLICY IF EXISTS "competitor_monitors_org_insert" ON competitor_monitors;
+DROP POLICY IF EXISTS "competitor_monitors_org_delete" ON competitor_monitors;
+
 CREATE POLICY "competitor_monitors_org_select"
   ON competitor_monitors FOR SELECT
   USING (org_id IN (SELECT org_id FROM users WHERE id = auth.uid()));
@@ -45,6 +49,7 @@ BEGIN
 END;
 $$;
 
+DROP TRIGGER IF EXISTS competitor_monitors_updated_at ON competitor_monitors;
 CREATE TRIGGER competitor_monitors_updated_at
   BEFORE UPDATE ON competitor_monitors
   FOR EACH ROW EXECUTE FUNCTION set_competitor_monitors_updated_at();

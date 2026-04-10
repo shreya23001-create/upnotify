@@ -101,7 +101,6 @@ export function InvoicePrint({ invoice, organisation, userEmail }: Props): React
             ))}
             {SELLER_GBP.reg && !isInr && <div className="invoice-party-detail">{SELLER_GBP.reg}</div>}
             {!isInr && <div className="invoice-party-detail">{SELLER_GBP.vat}</div>}
-            {isInr && <div className="invoice-party-detail invoice-gst-placeholder">{SELLER_INR.gst}</div>}
             <div className="invoice-party-detail">{seller.email}</div>
           </div>
           <div className="invoice-to">
