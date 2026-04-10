@@ -50,6 +50,13 @@ function isLastDayOfMonth(): boolean {
 // ---------------------------------------------------------------------------
 
 export async function GET(request: Request): Promise<NextResponse> {
+  // Hard guard — AOE must never send real emails outside production
+  const isProduction = process.env.VERCEL_ENV === 'production' || process.env.NEXT_PUBLIC_VERCEL_ENV === 'production'
+  if (!isProduction) {
+    logger.warn('AOE last-day-burst blocked — not production environment')
+    return NextResponse.json({ skipped: true, reason: 'Not production environment — AOE email sending is blocked' })
+  }
+
   const authHeader = request.headers.get('authorization')
   const { cron } = getServerConfig()
 
