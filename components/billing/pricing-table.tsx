@@ -4,7 +4,8 @@ import { useState, useTransition, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import type { Plan, Subscription } from '@/lib/types'
 import type { SupportedCurrency } from '@/lib/utils/currency'
-import { formatInr, formatGbp } from '@/lib/utils/currency'
+import { getPlanFeatures, formatPlanPrice } from '@/lib/utils/plan-display'
+import type { PlanDisplayData } from '@/lib/utils/plan-display'
 import { CancelPlanModal } from './cancel-plan-modal'
 
 // ─── Mock Razorpay Modal (dev/staging only — remove when real keys are set) ────
@@ -174,11 +175,6 @@ function loadRazorpayScript(): Promise<void> {
   })
 }
 
-interface PlanFeatureDisplay {
-  text: string
-  included: boolean
-}
-
 interface Props {
   plans: Plan[]
   currentPlanSlug?: string
@@ -187,117 +183,7 @@ interface Props {
   defaultCurrency?: SupportedCurrency
 }
 
-function getPlanFeatures(plan: Plan): PlanFeatureDisplay[] {
-  const p = plan as unknown as Record<string, unknown>
-  const features: PlanFeatureDisplay[] = []
-
-  features.push({
-    text: plan.monitor_limit ? `${plan.monitor_limit} monitors` : 'Unlimited monitors',
-    included: true,
-  })
-  features.push({
-    text: plan.check_interval_seconds >= 300
-      ? `${plan.check_interval_seconds / 60}-minute check interval`
-      : `${plan.check_interval_seconds}-second check interval`,
-    included: true,
-  })
-
-  features.push({ text: 'Email alerts', included: Boolean(p.has_email_alerts ?? true) })
-  features.push({ text: 'Slack & Teams alerts', included: Boolean(p.has_slack_teams) })
-  features.push({ text: 'Webhooks', included: Boolean(p.has_webhooks) })
-
-  // Status pages
-  const statusPageLimit = p.status_page_limit as number | undefined
-  if (plan.has_status_page_custom_domain) {
-    features.push({ text: statusPageLimit ? `${statusPageLimit} custom domain status pages` : 'Unlimited status pages', included: true })
-  } else if (p.has_status_pages) {
-    features.push({ text: statusPageLimit ? `${statusPageLimit} status page${statusPageLimit > 1 ? 's' : ''}` : 'Status pages', included: true })
-  } else {
-    features.push({ text: 'Status pages', included: false })
-  }
-
-  // AI reports
-  const aiLimit = p.ai_report_limit as number | undefined
-  if (plan.has_ai_predictive || (aiLimit && aiLimit > 0)) {
-    features.push({ text: aiLimit ? `AI reports (${aiLimit}/month)` : 'Unlimited AI reports', included: true })
-  } else {
-    features.push({ text: 'AI reports', included: false })
-  }
-
-  const watchdogLimit = (p.competitor_limit as number | undefined) ?? 3
-  features.push({ text: `Watchdog — ${watchdogLimit} competitor${watchdogLimit === 1 ? '' : 's'}`, included: true })
-
-  // AI Visibility
-  // llms_txt_limit: 0=disabled, 1=one lifetime generation, -1=unlimited
-  // citation_check_monthly_limit: 0=disabled, N=monthly runs, -1=unlimited
-  const llmsTxtLimit = p.llms_txt_limit as number | undefined
-  const citationLimit = p.citation_check_monthly_limit as number | undefined
-  if (llmsTxtLimit !== undefined && llmsTxtLimit !== 0) {
-    const llmsText = llmsTxtLimit === -1 ? 'llms.txt Generator (unlimited)' : `llms.txt Generator (${llmsTxtLimit}/month)`
-    features.push({ text: llmsText, included: true })
-  } else {
-    features.push({ text: 'llms.txt Generator', included: false })
-  }
-  if (citationLimit !== undefined && citationLimit !== 0) {
-    const citText = citationLimit === -1 ? 'AI Citation Monitor (unlimited)' : `AI Citation Monitor (${citationLimit}/month)`
-    features.push({ text: citText, included: true })
-  } else {
-    features.push({ text: 'AI Citation Monitor', included: false })
-  }
-
-  // API access — hidden until API feature is ready for public listing
-  // features.push({ text: 'API access', included: plan.has_api_access })
-
-  return features
-}
-
-function getPlanPrice(plan: Plan, isAnnual: boolean, currency: SupportedCurrency): { amount: string; period: string; note?: string } {
-  const p = plan as unknown as Record<string, number>
-
-  // INR pricing
-  if (currency === 'inr') {
-    const monthlyPaise = p.price_monthly_inr ?? 0
-    const annualPaise = p.price_annual_inr ?? 0
-    if (monthlyPaise === 0 && annualPaise === 0) return { amount: formatInr(0), period: 'forever' }
-    // Lite is annual-only in GBP but monthly available in INR
-    if (isAnnual && annualPaise > 0) {
-      return { amount: formatInr(annualPaise), period: '/year', note: '+ 18% GST' }
-    }
-    return { amount: formatInr(monthlyPaise), period: '/month', note: '+ 18% GST' }
-  }
-
-  // GBP pricing
-  const monthlyPence = plan.price_monthly_gbp
-  const annualPence = plan.price_annual_gbp
-
-  if (monthlyPence === 0 && (!annualPence || annualPence === 0)) {
-    return { amount: '\u00A30', period: 'forever' }
-  }
-
-  // Annual-only plan (no monthly price set, only annual)
-  if (monthlyPence === 0 && annualPence && annualPence > 0) {
-    const annualGbp = annualPence / 100
-    const monthlyEquiv = Math.round((annualPence / 12)) / 100
-    return {
-      amount: `\u00A3${annualGbp}`,
-      period: '/year',
-      note: `Just ${monthlyEquiv < 1 ? `${Math.round(monthlyEquiv * 100)}p` : `\u00A3${monthlyEquiv.toFixed(2)}`}/mo`,
-    }
-  }
-
-  if (isAnnual && annualPence && annualPence > 0) {
-    const annualGbp = annualPence / 100
-    const savings = Math.round(((monthlyPence * 12 - annualPence) / (monthlyPence * 12)) * 100)
-    return {
-      amount: `\u00A3${annualGbp.toFixed(2)}`,
-      period: '/year',
-      note: savings > 0 ? `Save ${savings}% vs monthly` : undefined,
-    }
-  }
-
-  const monthlyGbp = monthlyPence / 100
-  return { amount: `\u00A3${monthlyGbp.toFixed(2)}`, period: '/month' }
-}
+// Feature + price logic lives in lib/utils/plan-display.ts — single source of truth
 
 function getPlanCta(plan: Plan, isCurrent: boolean, isHigherTier: boolean): string {
   if (isCurrent) return 'Current Plan'
@@ -491,7 +377,7 @@ export function PricingTable({ plans, currentPlanSlug, subscription, creditBalan
 
       {currency === 'inr' && (
         <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 12 }}>
-          Razorpay checkout coming soon. Prices shown for reference.
+          + 18% GST · Secure checkout via Razorpay
         </p>
       )}
 
@@ -511,8 +397,8 @@ export function PricingTable({ plans, currentPlanSlug, subscription, creditBalan
           const isCurrent = plan.slug === currentPlanSlug || (plan.slug === 'free' && !currentPlanSlug)
           const isHigherTier = index > effectiveCurrentIndex
           const isFree = plan.price_monthly_gbp === 0 && (!plan.price_annual_gbp || plan.price_annual_gbp === 0)
-          const price = getPlanPrice(plan, isAnnual, currency)
-          const features = getPlanFeatures(plan)
+          const price = formatPlanPrice(plan as unknown as PlanDisplayData, isAnnual, currency)
+          const features = getPlanFeatures(plan as unknown as PlanDisplayData)
           const ctaText = getPlanCta(plan, isCurrent, isHigherTier)
           const isPopular = plan.slug === 'builder'
           const hasAnnual = plan.price_annual_gbp && plan.price_annual_gbp > 0 && plan.price_monthly_gbp > 0
@@ -530,7 +416,7 @@ export function PricingTable({ plans, currentPlanSlug, subscription, creditBalan
               <div className="pricing-card-header">
                 <h3 className="pricing-plan-name">{plan.name}</h3>
                 <div className="pricing-price">
-                  <span className="pricing-amount">{price.amount}</span>
+                  <span className="pricing-amount">{price.symbol}{price.amount}</span>
                   <span className="pricing-period">{price.period}</span>
                 </div>
                 {price.note && (
