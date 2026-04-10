@@ -73,6 +73,14 @@ function formatDateShort(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
 }
 
+// Strip any script tags or event handlers from SVG before rendering
+function sanitizeSvg(svg: string): string {
+  return svg
+    .replace(/<script[\s\S]*?<\/script>/gi, '')
+    .replace(/\bon\w+\s*=\s*["'][^"']*["']/gi, '')
+    .replace(/\bjavascript\s*:/gi, '')
+}
+
 function buildPriceChart(history: Array<{ price: number; checked_at: string; currency: string }>, currency: string): string {
   if (history.length < 2) return ''
 
@@ -279,7 +287,7 @@ export default async function ProductDetailPage({ params, searchParams }: PagePr
                 : 'Only one price point recorded. Chart will appear once more data is available.'}
             </div>
           ) : (
-            <div dangerouslySetInnerHTML={{ __html: chartSvg }} />
+            <div dangerouslySetInnerHTML={{ __html: sanitizeSvg(chartSvg) }} />
           )}
         </div>
       </div>
