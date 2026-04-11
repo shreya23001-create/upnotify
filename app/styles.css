@@ -6499,3 +6499,28 @@ section.hero .hero-mockup {
     padding: 24px 16px;
   }
 }
+
+/* ── CHANGELOG PAGE ─────────────────────────────────────────────────────── */
+.changelog-hero { background: var(--bg-card); border-bottom: 1px solid var(--border-primary); }
+.changelog-title { font-size: clamp(28px, 5vw, 42px); font-weight: 800; color: var(--text-primary); margin: 0 0 12px; }
+.changelog-subtitle { font-size: 18px; color: var(--text-muted); margin: 0; }
+
+.changelog-entry { margin-bottom: 56px; }
+.changelog-entry-header { margin-bottom: 20px; }
+.changelog-entry-meta { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+.changelog-date { font-size: 18px; font-weight: 700; color: var(--text-primary); }
+.changelog-version { font-size: 13px; font-weight: 600; color: var(--text-muted); background: var(--bg-muted); padding: 2px 8px; border-radius: 6px; }
+.changelog-badge { font-size: 11px; font-weight: 700; color: #fff; padding: 2px 8px; border-radius: 20px; letter-spacing: 0.5px; text-transform: uppercase; }
+.changelog-divider { height: 1px; background: var(--border-primary); }
+
+.changelog-items { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.changelog-item { display: flex; align-items: flex-start; gap: 10px; padding: 12px 16px; background: var(--bg-card); border: 1px solid var(--border-primary); border-radius: 10px; }
+.changelog-type-badge { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 6px; white-space: nowrap; flex-shrink: 0; margin-top: 1px; }
+.changelog-item-text { font-size: 14px; color: var(--text-secondary); line-height: 1.5; }
+
+.changelog-subscribe { display: flex; align-items: flex-start; gap: 16px; padding: 24px; background: var(--bg-muted); border: 1px solid var(--border-primary); border-radius: 14px; margin-top: 16px; }
+.changelog-subscribe-icon { font-size: 28px; flex-shrink: 0; }
+.changelog-subscribe-title { font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+.changelog-subscribe-desc { font-size: 14px; color: var(--text-muted); line-height: 1.5; }
+.changelog-link { color: #3b82f6; font-weight: 600; text-decoration: none; }
+.changelog-link:hover { text-decoration: underline; }
