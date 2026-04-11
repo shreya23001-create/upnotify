@@ -45,7 +45,7 @@ const STEPS = [
     number: '1',
     title: 'Add a Monitor',
     description:
-      'Enter your URL, choose a monitor type, and set a check interval as low as 30 seconds. No config files, no agents, no setup scripts.',
+      'Enter your URL, choose a monitor type, and set a check interval as low as 1 minute. No config files, no agents, no setup scripts.',
   },
   {
     number: '2',
@@ -116,7 +116,7 @@ export default async function LandingPage(): Promise<React.ReactElement> {
             <div className="hero-eyebrow fade-up">
               <div className="hero-eyebrow-text">
                 <span className="hero-eyebrow-dot" />
-                10 monitor types · 30-second checks · AI-powered reports
+                10 monitor types · 1-minute checks · AI-powered reports
               </div>
             </div>
             <h1 className="hero-headline fade-up delay-1">
@@ -147,7 +147,7 @@ export default async function LandingPage(): Promise<React.ReactElement> {
               <div className="trust-item">·</div>
               <div className="trust-item"><strong>3 monitors</strong> free forever</div>
               <div className="trust-item">·</div>
-              <div className="trust-item"><strong>30-second</strong> check intervals</div>
+              <div className="trust-item"><strong>1-minute</strong> check intervals</div>
               <div className="trust-item">·</div>
               <div className="trust-item"><strong>GDPR</strong> compliant · EU data</div>
             </div>
@@ -178,7 +178,7 @@ export default async function LandingPage(): Promise<React.ReactElement> {
             <div className="stat-label">Monitor types</div>
           </div>
           <div className="stat-item">
-            <div className="stat-value gradient-text">30s</div>
+            <div className="stat-value gradient-text">1 min</div>
             <div className="stat-label">Fastest check interval</div>
           </div>
           <div className="stat-item">
@@ -445,7 +445,7 @@ export default async function LandingPage(): Promise<React.ReactElement> {
               <tbody>
                 <tr>
                   <td>Fastest check interval</td>
-                  <td className="col-uptrue"><span className="comp-val highlight">30 seconds</span></td>
+                  <td className="col-uptrue"><span className="comp-val highlight">1 minute</span></td>
                   <td><span className="comp-val">30 seconds</span></td>
                   <td><span className="comp-val">5 minutes</span></td>
                 </tr>
@@ -593,7 +593,7 @@ export default async function LandingPage(): Promise<React.ReactElement> {
                 <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                   <polyline points="20 6 9 17 4 12" />
                 </svg>
-                30-second check intervals
+                1-minute check intervals
               </span>
             </div>
           </div>

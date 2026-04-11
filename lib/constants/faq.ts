@@ -38,7 +38,7 @@ export const FAQ_ITEMS: FaqItem[] = [
   },
   {
     question: 'What is Uptrue Compete?',
-    answer: 'Uptrue Compete is a separate add-on for tracking competitor prices and stock levels. It automatically extracts prices from any ecommerce site and alerts you to changes. Plans start from £9/month. You can set pricing rules to auto-update your own prices in response.',
+    answer: 'Uptrue Compete is an add-on for Builder and Scale plans. It tracks competitor prices and stock levels, alerts you to changes, and lets you react fast. Add it to your plan for +£19/month (+$24/month or +₹1,999/month).',
   },
   {
     question: 'Where is my data stored?',

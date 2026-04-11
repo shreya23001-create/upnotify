@@ -29,7 +29,7 @@ const FAQ_SCHEMA = {
       name: 'How often does Uptrue check my website?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Check intervals depend on your plan. Free plans check every 10 minutes. Lite and Builder plans check every 1 minute. Scale plans can check as frequently as every 30 seconds.',
+        text: 'Check intervals depend on your plan. Free plans check every 10 minutes. Lite, Builder, and Scale plans check every 1 minute.',
       },
     },
   ],
@@ -126,12 +126,12 @@ export default function MonitorsPage(): React.ReactElement {
             <ul className="help-list">
               <li><strong>Free</strong> -- every 10 minutes</li>
               <li><strong>Lite &amp; Builder</strong> -- every 1 minute</li>
-              <li><strong>Scale</strong> -- as fast as every 30 seconds</li>
+              <li><strong>Scale</strong> -- every 1 minute</li>
             </ul>
             <p>
               For most websites, 1-minute checks strike the right balance between speed and
-              efficiency. If you run a payment gateway or real-time service, 30-second checks
-              give you the fastest possible detection.
+              detection speed. Scale plan checks run continuously so you catch issues as fast
+              as possible.
             </p>
           </section>
 

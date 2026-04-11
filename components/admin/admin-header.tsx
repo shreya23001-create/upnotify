@@ -2,6 +2,7 @@
 
 import { IconMenu } from '@/components/icons'
 import { usePathname } from 'next/navigation'
+import { AdminSearch } from '@/components/admin/admin-search'
 
 interface AdminHeaderProps {
   userEmail: string
@@ -19,6 +20,16 @@ const PAGE_TITLES: Record<string, string> = {
   '/admin/blog': 'Blog',
   '/admin/emails': 'Email & Nurture',
   '/admin/settings': 'Settings',
+  '/admin/ai-engines': 'AI Engines',
+  '/admin/aoe': 'AOE Outreach',
+  '/admin/audit-log': 'Audit Log',
+  '/admin/system': 'System Health',
+  '/admin/revenue': 'Revenue',
+  '/admin/credits': 'Credit Approvals',
+  '/admin/messages': 'Messages',
+  '/admin/support': 'Support',
+  '/admin/agency-waitlist': 'Agency Waitlist',
+  '/admin/user360': 'User 360',
 }
 
 function getPageTitle(pathname: string): string {
@@ -45,6 +56,7 @@ export function AdminHeader({ userEmail, onMenuToggle }: AdminHeaderProps): Reac
         </div>
       </div>
       <div className="admin-topbar-right">
+        <AdminSearch />
         <div className="admin-topbar-user">
           <div className="admin-topbar-avatar">
             {userEmail.charAt(0).toUpperCase()}

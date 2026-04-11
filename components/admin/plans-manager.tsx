@@ -36,11 +36,30 @@ export function PlansManager({ plans, creditRules, subscriberCounts, competePlan
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
+  const [syncing, setSyncing] = useState(false)
 
   const clearMessages = useCallback((): void => {
     setError(null)
     setSuccess(null)
   }, [])
+
+  const handleRazorpaySync = useCallback(async (): Promise<void> => {
+    clearMessages()
+    setSyncing(true)
+    try {
+      const res = await fetch('/api/admin/razorpay/sync-plans', { method: 'POST' })
+      const data = await res.json()
+      if (!res.ok) {
+        setError(data.error ?? 'Razorpay sync failed')
+      } else {
+        setSuccess(`Razorpay sync complete — ${data.results?.length ?? 0} plans processed`)
+      }
+    } catch {
+      setError('Razorpay sync failed — check console')
+    } finally {
+      setSyncing(false)
+    }
+  }, [clearMessages])
 
   const handleTogglePlanVisibility = useCallback(async (id: string, currentVisible: boolean): Promise<void> => {
     clearMessages()
@@ -375,6 +394,15 @@ export function PlansManager({ plans, creditRules, subscriberCounts, competePlan
           <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 12 }}>
             Click <strong>Edit</strong> on any plan to set its Stripe price IDs. Checkout will not work until prices are configured.
           </p>
+          <div style={{ marginTop: 24, padding: 16, background: 'var(--bg-muted)', borderRadius: 10, border: '1px solid var(--border-primary)' }}>
+            <div style={{ fontWeight: 600, marginBottom: 4 }}>Razorpay Plan Sync</div>
+            <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 12 }}>
+              Creates INR plans in Razorpay for all paid plans and saves the plan IDs back to the database. Safe to re-run — skips plans already configured.
+            </p>
+            <button className="btn btn-primary btn-sm" onClick={handleRazorpaySync} disabled={syncing}>
+              {syncing ? 'Syncing...' : 'Sync Razorpay Plans'}
+            </button>
+          </div>
         </div>
       )}
 
