@@ -117,6 +117,9 @@ export async function GET(): Promise<NextResponse> {
     lastCompetitorCheck,
     lastRazorpayRecovery,
     lastIncidentCleanup,
+    lastAutoblogFeedFetcher,
+    lastAutoblogLlmDetector,
+    lastAutoblogTopicRunner,
   ] = await Promise.all([
     // check-runner
     supabase.from('check_results').select('checked_at').not('org_id', 'is', null)
@@ -175,6 +178,18 @@ export async function GET(): Promise<NextResponse> {
     untyped(supabase).from('cron_run_log').select('ran_at')
       .eq('cron_path', '/api/cron/public-incident-cleanup')
       .order('ran_at', { ascending: false }).limit(1).maybeSingle(),
+    // autoblog/feed-fetcher — via cron_run_log
+    untyped(supabase).from('cron_run_log').select('ran_at')
+      .eq('cron_path', '/api/cron/autoblog/feed-fetcher')
+      .order('ran_at', { ascending: false }).limit(1).maybeSingle(),
+    // autoblog/llm-detector — via cron_run_log
+    untyped(supabase).from('cron_run_log').select('ran_at')
+      .eq('cron_path', '/api/cron/autoblog/llm-detector')
+      .order('ran_at', { ascending: false }).limit(1).maybeSingle(),
+    // autoblog/topic-runner — via cron_run_log
+    untyped(supabase).from('cron_run_log').select('ran_at')
+      .eq('cron_path', '/api/cron/autoblog/topic-runner')
+      .order('ran_at', { ascending: false }).limit(1).maybeSingle(),
   ])
 
   // ── Compete stats ─────────────────────────────────────────────────────────
@@ -187,6 +202,9 @@ export async function GET(): Promise<NextResponse> {
   const snapshotDate = (lastAoeSnapshot?.data as Record<string, unknown> | null)?.snapshot_date as string | null ?? null
   const razorpayRecoveryAt = (lastRazorpayRecovery?.data as Record<string, unknown> | null)?.ran_at as string | null ?? null
   const incidentCleanupAt = (lastIncidentCleanup?.data as Record<string, unknown> | null)?.ran_at as string | null ?? null
+  const autoblogFeedFetcherAt = (lastAutoblogFeedFetcher?.data as Record<string, unknown> | null)?.ran_at as string | null ?? null
+  const autoblogLlmDetectorAt = (lastAutoblogLlmDetector?.data as Record<string, unknown> | null)?.ran_at as string | null ?? null
+  const autoblogTopicRunnerAt = (lastAutoblogTopicRunner?.data as Record<string, unknown> | null)?.ran_at as string | null ?? null
 
   const health = {
     database: { status: dbError ? 'error' : 'ok', latencyMs: dbLatency },
@@ -311,6 +329,30 @@ export async function GET(): Promise<NextResponse> {
         lastRun: incidentCleanupAt,
         status: cronStatus(incidentCleanupAt, 35, now),
         history: cronHistory['/api/cron/public-incident-cleanup'] ?? [],
+      },
+      autoblogFeedFetcher: {
+        label: 'Autoblog Feed Fetcher',
+        schedule: 'Every 6 hours',
+        path: '/api/cron/autoblog/feed-fetcher',
+        lastRun: autoblogFeedFetcherAt,
+        status: cronStatus(autoblogFeedFetcherAt, 370, now),
+        history: cronHistory['/api/cron/autoblog/feed-fetcher'] ?? [],
+      },
+      autoblogLlmDetector: {
+        label: 'Autoblog LLM Detector',
+        schedule: 'Daily 7am',
+        path: '/api/cron/autoblog/llm-detector',
+        lastRun: autoblogLlmDetectorAt,
+        status: cronStatus(autoblogLlmDetectorAt, 1500, now),
+        history: cronHistory['/api/cron/autoblog/llm-detector'] ?? [],
+      },
+      autoblogTopicRunner: {
+        label: 'Autoblog Topic Runner',
+        schedule: 'Every 2 hours',
+        path: '/api/cron/autoblog/topic-runner',
+        lastRun: autoblogTopicRunnerAt,
+        status: cronStatus(autoblogTopicRunnerAt, 130, now),
+        history: cronHistory['/api/cron/autoblog/topic-runner'] ?? [],
       },
     },
 

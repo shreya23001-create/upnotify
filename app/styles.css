@@ -6548,3 +6548,87 @@ section.hero .hero-mockup {
   .admin-search-input-row { width: 160px; }
   .admin-search-input-row:focus-within { width: 200px; }
 }
+
+/* ── AUTOBLOG ENGINE ─────────────────────────────────────────────────────── */
+.autoblog-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border-primary); margin-bottom: 24px; }
+.autoblog-tab { background: none; border: none; padding: 10px 16px; font-size: 14px; font-weight: 500; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: color 0.15s, border-color 0.15s; display: flex; align-items: center; gap: 6px; }
+.autoblog-tab:hover { color: var(--text-primary); }
+.autoblog-tab-active { color: #3b82f6; border-bottom-color: #3b82f6; }
+.autoblog-tab-count { font-size: 11px; font-weight: 700; background: var(--bg-muted); color: var(--text-muted); padding: 1px 6px; border-radius: 10px; }
+.autoblog-tab-active .autoblog-tab-count { background: #eff6ff; color: #3b82f6; }
+
+.autoblog-section { }
+.autoblog-section-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+.autoblog-section-desc { font-size: 14px; color: var(--text-muted); line-height: 1.6; margin: 0 0 20px; }
+.autoblog-section-header .autoblog-section-desc { margin: 0; }
+.autoblog-empty { padding: 48px; text-align: center; color: var(--text-muted); background: var(--bg-muted); border-radius: 12px; font-size: 14px; }
+
+/* Channel cards */
+.autoblog-channel-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; }
+.autoblog-channel-card { background: var(--bg-card); border: 1px solid var(--border-primary); border-radius: 12px; padding: 20px; transition: border-color 0.15s; }
+.autoblog-channel-card-enabled { border-color: #3b82f6; }
+.autoblog-channel-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+.autoblog-channel-name { font-size: 15px; font-weight: 700; color: var(--text-primary); }
+.autoblog-channel-cron { font-size: 11px; color: var(--text-muted); font-family: monospace; margin-top: 2px; }
+.autoblog-channel-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin: 0 0 16px; }
+.autoblog-channel-footer { border-top: 1px solid var(--border-primary); padding-top: 14px; }
+
+/* Toggle switch */
+.autoblog-toggle { position: relative; display: inline-block; width: 40px; height: 22px; flex-shrink: 0; }
+.autoblog-toggle input { opacity: 0; width: 0; height: 0; }
+.autoblog-toggle-slider { position: absolute; cursor: pointer; inset: 0; background: var(--bg-muted); border: 1px solid var(--border-primary); border-radius: 22px; transition: 0.2s; }
+.autoblog-toggle-slider:before { content: ''; position: absolute; height: 14px; width: 14px; left: 3px; bottom: 3px; background: var(--text-muted); border-radius: 50%; transition: 0.2s; }
+.autoblog-toggle input:checked + .autoblog-toggle-slider { background: #3b82f6; border-color: #3b82f6; }
+.autoblog-toggle input:checked + .autoblog-toggle-slider:before { transform: translateX(18px); background: #fff; }
+.autoblog-toggle-sm { width: 32px; height: 18px; }
+.autoblog-toggle-sm .autoblog-toggle-slider:before { height: 10px; width: 10px; }
+.autoblog-toggle-sm input:checked + .autoblog-toggle-slider:before { transform: translateX(14px); }
+
+.autoblog-social-toggle { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.autoblog-social-label { font-size: 13px; color: var(--text-secondary); }
+
+/* Topics */
+.autoblog-topics-list { display: flex; flex-direction: column; gap: 12px; }
+.autoblog-topic-row { background: var(--bg-card); border: 1px solid var(--border-primary); border-radius: 10px; padding: 16px; display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.autoblog-topic-main { flex: 1; min-width: 0; }
+.autoblog-topic-name { font-size: 15px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; }
+.autoblog-topic-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+.autoblog-badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; }
+.autoblog-badge-schedule { background: #eff6ff; color: #3b82f6; }
+.autoblog-topic-keywords { font-size: 12px; color: var(--text-muted); }
+.autoblog-topic-next { font-size: 12px; color: var(--text-muted); margin-left: auto; }
+.autoblog-topic-prompt { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+.autoblog-topic-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.autoblog-action-btn { background: none; border: 1px solid var(--border-primary); border-radius: 6px; padding: 5px 10px; font-size: 12px; font-weight: 500; color: var(--text-secondary); cursor: pointer; transition: all 0.15s; }
+.autoblog-action-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
+.autoblog-action-btn-danger:hover { border-color: #ef4444; color: #ef4444; background: #fef2f2; }
+
+/* Sources */
+.autoblog-source-group { margin-bottom: 24px; }
+.autoblog-source-group-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 8px; }
+.autoblog-sources-table { background: var(--bg-card); border: 1px solid var(--border-primary); border-radius: 10px; overflow: hidden; }
+.autoblog-source-row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--border-primary); }
+.autoblog-source-row:last-child { border-bottom: none; }
+.autoblog-source-info { flex: 1; min-width: 0; }
+.autoblog-source-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+.autoblog-source-url { font-size: 11px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 380px; }
+.autoblog-source-stats { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+.autoblog-source-last { font-size: 12px; color: var(--text-muted); }
+.autoblog-source-count { font-size: 12px; color: var(--text-muted); min-width: 60px; text-align: right; }
+.autoblog-source-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+/* Run log */
+.autoblog-run-source { font-size: 12px; font-weight: 600; color: var(--text-muted); background: var(--bg-muted); padding: 2px 8px; border-radius: 6px; white-space: nowrap; }
+.autoblog-run-title { max-width: 300px; }
+.autoblog-run-link { color: #3b82f6; text-decoration: none; font-size: 13px; }
+.autoblog-run-link:hover { text-decoration: underline; }
+.autoblog-run-error { font-size: 11px; color: #ef4444; margin-top: 2px; }
+.autoblog-run-time { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+.autoblog-confidence { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+
+@media (max-width: 640px) {
+  .autoblog-channel-grid { grid-template-columns: 1fr; }
+  .autoblog-topic-row { flex-direction: column; }
+  .autoblog-topic-actions { width: 100%; justify-content: flex-end; }
+  .autoblog-source-url { max-width: 180px; }
+}
