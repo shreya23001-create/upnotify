@@ -51,5 +51,6 @@ Allow: /
 # === Sitemap ===
 Sitemap: https://uptrue.io/sitemap.xml
 
-# === AI context file ===
-# LLMs context file: https://uptrue.io/llms.txt
+# === AI context files ===
+# LLMs index: https://uptrue.io/llms.txt
+# LLMs full detail: https://uptrue.io/llms-full.txt
