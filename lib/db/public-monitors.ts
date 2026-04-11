@@ -445,13 +445,16 @@ export async function createPublicIncident(data: {
   status_code?: number
 }): Promise<PublicIncident | null> {
   const supabase = createAdminClient()
+  const now = new Date()
+  const blogEligibleAfter = new Date(now.getTime() + 15 * 60 * 1000).toISOString()
   const { data: incident, error } = await supabase
     .from('public_incidents')
     .insert({
       monitor_id: data.monitor_id,
       cause: data.cause ?? null,
       status_code: data.status_code ?? null,
-      started_at: new Date().toISOString(),
+      started_at: now.toISOString(),
+      blog_eligible_after: blogEligibleAfter,
     })
     .select()
     .single()

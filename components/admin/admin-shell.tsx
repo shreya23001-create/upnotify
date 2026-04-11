@@ -7,9 +7,10 @@ import { AdminHeader } from '@/components/admin/admin-header'
 interface AdminShellProps {
   userEmail: string
   children: React.ReactNode
+  pendingBlogCount?: number
 }
 
-export function AdminShell({ userEmail, children }: AdminShellProps): React.ReactElement {
+export function AdminShell({ userEmail, children, pendingBlogCount }: AdminShellProps): React.ReactElement {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   const handleToggle = useCallback((): void => {
@@ -22,7 +23,7 @@ export function AdminShell({ userEmail, children }: AdminShellProps): React.Reac
 
   return (
     <div className="admin-shell">
-      <AdminSidebar isOpen={sidebarOpen} onClose={handleClose} />
+      <AdminSidebar isOpen={sidebarOpen} onClose={handleClose} pendingBlogCount={pendingBlogCount} />
       <div className="admin-main">
         <AdminHeader userEmail={userEmail} onMenuToggle={handleToggle} />
         <div className="admin-content">

@@ -13,6 +13,7 @@ import {
 interface AdminSidebarProps {
   isOpen: boolean
   onClose: () => void
+  pendingBlogCount?: number
 }
 
 interface NavItem {
@@ -91,8 +92,18 @@ function groupHasActive(pathname: string, items: NavItem[]): boolean {
   return items.some((item) => isActive(pathname, item.href))
 }
 
-export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps): React.ReactElement {
+export function AdminSidebar({ isOpen, onClose, pendingBlogCount }: AdminSidebarProps): React.ReactElement {
   const pathname = usePathname()
+
+  // Inject pending blog badge dynamically
+  const navGroups = NAV_GROUPS.map(group => ({
+    ...group,
+    items: group.items.map(item =>
+      item.href === '/admin/blog' && pendingBlogCount && pendingBlogCount > 0
+        ? { ...item, badge: String(pendingBlogCount) }
+        : item
+    ),
+  }))
 
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>(() => {
     const initial: Record<string, boolean> = {}
@@ -134,7 +145,7 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps): React.Reac
 
         {/* Navigation */}
         <nav className="admin-sidebar-nav">
-          {NAV_GROUPS.map((group) => {
+          {navGroups.map((group) => {
             const isGroupOpen = openGroups[group.label] ?? false
             const hasActive = groupHasActive(pathname, group.items)
 

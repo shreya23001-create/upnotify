@@ -9,11 +9,7 @@ import {
 } from '@/lib/db/public-monitors'
 import type { PublicMonitor } from '@/lib/db/public-monitors'
 import type { CheckerResult } from '@/lib/checkers/types'
-import { generateOutageBlogPost } from '@/lib/services/blog-generator'
-import { researchOutage } from '@/lib/services/outage-researcher'
-import { sendBlogApprovalEmail } from '@/lib/services/email'
-import { sendBlogApprovalTelegram } from '@/lib/services/telegram'
-import { getServerConfig, getConfig } from '@/lib/utils/config'
+import { getServerConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
 import { startCronRun, endCronRun, getTriggeredBy } from '@/lib/utils/cron-logger'
 
@@ -21,88 +17,9 @@ export const dynamic = 'force-dynamic'
 export const maxDuration = 60
 
 // ---------------------------------------------------------------------------
-// Outage blog trigger — runs async after incident creation
-// ---------------------------------------------------------------------------
-
-async function triggerOutageBlog(
-  monitor: PublicMonitor,
-  incidentId: string,
-  confirmation: CheckerResult
-): Promise<void> {
-  // Step 1: Research the outage from multiple sources in parallel
-  const research = await researchOutage(monitor.display_name, monitor.domain)
-
-  // Step 2: Generate blog post with research context
-  const draft = await generateOutageBlogPost({
-    siteDisplayName: monitor.display_name,
-    siteDomain: monitor.domain,
-    siteCategory: monitor.category ?? 'other',
-    errorMessage: confirmation.errorMessage ?? 'Site unreachable',
-    statusCode: confirmation.statusCode ?? null,
-    startedAt: new Date().toISOString(),
-    incidentId,
-    research,
-  })
-
-  if (!draft) {
-    logger.warn('Blog draft not generated for outage', { domain: monitor.domain, incidentId })
-    return
-  }
-
-  // Step 3: Send approval email to admin
-  const { app, admin } = getConfig()
-  const adminEmail = admin.emails[0]
-
-  if (!adminEmail) {
-    logger.warn('No admin email configured — blog approval email not sent', { blogPostId: draft.blogPostId })
-    return
-  }
-
-  const approveUrl = `${app.url}/api/admin/blog-approve?token=${draft.approveToken}`
-  const rejectUrl = `${app.url}/api/admin/blog-approve?token=${draft.rejectToken}`
-
-  // Send both email and Telegram in parallel
-  const [emailResult, telegramResult] = await Promise.allSettled([
-    sendBlogApprovalEmail({
-      to: adminEmail,
-      blogTitle: draft.title,
-      blogSlug: draft.slug,
-      siteDisplayName: monitor.display_name,
-      excerpt: draft.excerpt,
-      bodyMarkdown: draft.bodyMarkdown,
-      sourcesCount: draft.sourcesCount,
-      sources: draft.sources,
-      approveUrl,
-      rejectUrl,
-    }),
-    sendBlogApprovalTelegram({
-      blogTitle: draft.title,
-      siteDisplayName: monitor.display_name,
-      excerpt: draft.excerpt,
-      sourcesCount: draft.sourcesCount,
-      hasOfficialStatus: !!research.officialStatus,
-      approveUrl,
-      rejectUrl,
-    }),
-  ])
-
-  if (emailResult.status === 'rejected' || (emailResult.status === 'fulfilled' && !emailResult.value.success)) {
-    const err = emailResult.status === 'rejected' ? emailResult.reason : emailResult.value.error
-    logger.error('Blog approval email failed', { error: err, blogPostId: draft.blogPostId })
-  }
-  if (telegramResult.status === 'rejected' || (telegramResult.status === 'fulfilled' && !telegramResult.value.success)) {
-    const err = telegramResult.status === 'rejected' ? telegramResult.reason : telegramResult.value.error
-    logger.error('Blog approval Telegram failed', { error: err, blogPostId: draft.blogPostId })
-  }
-
-  logger.info('Blog approval notifications sent', {
-    to: adminEmail,
-    blogPostId: draft.blogPostId,
-    domain: monitor.domain,
-    sourcesFound: research.articles.length,
-    hasOfficialStatus: !!research.officialStatus,
-  })
-}
+// Blog generation is now handled by /api/cron/public-incident-cleanup
+// which runs every 30 min, waits 15 min after incident start, and
+// re-confirms the site is still down before generating.
 
 function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms))
@@ -264,22 +181,14 @@ export async function GET(request: Request): Promise<NextResponse> {
             // Two-confirmation: confirmed down
             const existingIncident = await getOpenPublicIncident(monitor.id)
             if (!existingIncident) {
-              const incident = await createPublicIncident({
+              await createPublicIncident({
                 monitor_id: monitor.id,
                 cause: confirmation.errorMessage ?? 'Site unreachable',
                 status_code: confirmation.statusCode,
               })
+              // Blog generation is handled by public-incident-cleanup cron
+              // which waits 15 min, re-confirms site is still down, then generates
               logger.warn('Public monitor confirmed down', { domain: monitor.domain })
-
-              // Trigger auto blog generation (fire-and-forget — does not block cron)
-              if (incident) {
-                triggerOutageBlog(monitor, incident.id, confirmation).catch(err => {
-                  logger.error('Outage blog trigger failed', {
-                    domain: monitor.domain,
-                    error: err instanceof Error ? err.message : 'Unknown',
-                  })
-                })
-              }
             }
 
             await updatePublicMonitorStatus(monitor.id, {
