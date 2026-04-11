@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { createClient } from '@/lib/supabase/client'
 import type { AiSeoCheckResult, CheckResult, CategoryScore } from '@/app/api/tools/ai-seo-check/route'
 
 function ScoreRing({ score }: { score: number }) {
@@ -56,6 +57,14 @@ export function AiSeoCheckerTool() {
   const [error, setError]     = useState('')
   const [activeTab, setActiveTab] = useState<'overview' | 'crawlers' | 'checklist' | 'llms'>('overview')
   const [copied, setCopied]   = useState(false)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsLoggedIn(!!session)
+    })
+  }, [])
 
   async function handleCheck(e: React.FormEvent) {
     e.preventDefault()
@@ -319,14 +328,27 @@ export function AiSeoCheckerTool() {
                 </div>
                 <div className="ai-llms-gate">
                   <div className="ai-llms-gate-inner">
-                    <div className="ai-llms-gate-icon">🔒</div>
-                    <h3 className="ai-llms-gate-title">Get your full customised llms.txt</h3>
-                    <p className="ai-llms-gate-desc">
-                      Sign up free to generate a complete llms.txt tailored to your site and
-                      selected AI engines — Perplexity, ChatGPT, Claude, Gemini, and more.
-                    </p>
-                    <a href="/register" className="ai-llms-gate-btn">Sign up free — it takes 30 seconds</a>
-                    <p className="ai-llms-gate-sub">No credit card. Free plan includes 1 generation.</p>
+                    {isLoggedIn ? (
+                      <>
+                        <div className="ai-llms-gate-icon">✨</div>
+                        <h3 className="ai-llms-gate-title">Generate your full llms.txt</h3>
+                        <p className="ai-llms-gate-desc">
+                          Generate a complete llms.txt tailored to your site from your Uptrue dashboard.
+                        </p>
+                        <a href="/dashboard/ai-visibility" className="ai-llms-gate-btn">Go to AI Visibility →</a>
+                      </>
+                    ) : (
+                      <>
+                        <div className="ai-llms-gate-icon">🔒</div>
+                        <h3 className="ai-llms-gate-title">Get your full customised llms.txt</h3>
+                        <p className="ai-llms-gate-desc">
+                          Sign up free to generate a complete llms.txt tailored to your site and
+                          selected AI engines — Perplexity, ChatGPT, Claude, Gemini, and more.
+                        </p>
+                        <a href="/signup" className="ai-llms-gate-btn">Sign up free — it takes 30 seconds</a>
+                        <p className="ai-llms-gate-sub">No credit card. Free plan includes 1 generation.</p>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
