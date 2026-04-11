@@ -120,7 +120,8 @@ export async function GET(request: Request): Promise<NextResponse> {
     // -------------------------------------------------------------------------
     // 2. Generate blogs for eligible incidents (15-min window passed, no blog yet)
     // -------------------------------------------------------------------------
-    const { data: eligibleIncidents } = await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: eligibleIncidents } = await (supabase as unknown as any)
       .from('public_incidents')
       .select(`
         id, monitor_id, cause, status_code, started_at,
@@ -129,7 +130,17 @@ export async function GET(request: Request): Promise<NextResponse> {
       .is('resolved_at', null)
       .is('blog_generated_at', null)
       .not('blog_eligible_after', 'is', null)
-      .lte('blog_eligible_after', now.toISOString())
+      .lte('blog_eligible_after', now.toISOString()) as {
+        data: Array<{
+          id: string
+          monitor_id: string
+          cause: string | null
+          status_code: number | null
+          started_at: string
+          blog_eligible_after: string | null
+          blog_generated_at: string | null
+        }> | null
+      }
 
     if (eligibleIncidents && eligibleIncidents.length > 0) {
       const monitorIds = [...new Set(eligibleIncidents.map(i => i.monitor_id))]
@@ -149,7 +160,8 @@ export async function GET(request: Request): Promise<NextResponse> {
         if (BLOCKED_DOMAINS.has(monitor.domain)) {
           logger.info('Skipping blog for IP-blocked domain', { domain: monitor.domain })
           // Mark as generated to prevent retrying
-          await supabase
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          await (supabase as unknown as any)
             .from('public_incidents')
             .update({ blog_generated_at: now.toISOString() })
             .eq('id', incident.id)
@@ -175,7 +187,8 @@ export async function GET(request: Request): Promise<NextResponse> {
 
         try {
           // Mark blog as generating immediately to prevent duplicate runs
-          await supabase
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          await (supabase as unknown as any)
             .from('public_incidents')
             .update({ blog_generated_at: now.toISOString() })
             .eq('id', incident.id)
