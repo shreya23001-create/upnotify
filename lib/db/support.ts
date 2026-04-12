@@ -26,6 +26,8 @@ export interface SupportTicket {
   resolved_at:    string | null
   created_at:     string
   updated_at:     string
+  // joined field — present on admin queries only
+  org_name:       string | null
 }
 
 export interface SupportMessage {
@@ -139,7 +141,7 @@ export async function getTicketById(
   orgId?: string
 ): Promise<SupportTicket | null> {
   const supabase = orgId ? await createClient() : createAdminClient()
-  let query = untyped(supabase).from('support_tickets').select('*').eq('id', id)
+  let query = untyped(supabase).from('support_tickets').select('*, organisations(name)').eq('id', id)
 
   if (orgId) query = query.eq('org_id', orgId)
 
@@ -148,7 +150,9 @@ export async function getTicketById(
     logger.error('Failed to get ticket', { error: error.message, id })
     return null
   }
-  return data as SupportTicket
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const row = data as any
+  return { ...row, org_name: row.organisations?.name ?? null, organisations: undefined } as SupportTicket
 }
 
 // ---------------------------------------------------------------------------
@@ -159,7 +163,7 @@ export async function getAllTickets(filter: TicketFilter = {}): Promise<SupportT
   const supabase = createAdminClient()
   let query = untyped(supabase)
     .from('support_tickets')
-    .select('*')
+    .select('*, organisations(name)')
     .order('updated_at', { ascending: false })
 
   if (filter.status   && filter.status   !== 'all') query = query.eq('status',   filter.status)
@@ -176,7 +180,13 @@ export async function getAllTickets(filter: TicketFilter = {}): Promise<SupportT
     logger.error('Failed to get all tickets', { error: error.message })
     return []
   }
-  return (data ?? []) as SupportTicket[]
+  // Flatten the joined organisations.name into org_name
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (data ?? []).map((row: any) => ({
+    ...row,
+    org_name: row.organisations?.name ?? null,
+    organisations: undefined,
+  })) as SupportTicket[]
 }
 
 export async function countTicketsByStatus(): Promise<Record<TicketStatus, number>> {

@@ -106,6 +106,7 @@ export default async function AdminSupportPage({ searchParams }: PageProps): Pro
               <thead>
                 <tr>
                   <th>Subject</th>
+                  <th>Customer</th>
                   <th>Status</th>
                   <th>Priority</th>
                   <th>Category</th>
@@ -120,6 +121,18 @@ export default async function AdminSupportPage({ searchParams }: PageProps): Pro
                     <td>
                       <Link href={`/admin/support/${ticket.id}`} className="support-admin-subject-link">
                         {ticket.subject}
+                      </Link>
+                    </td>
+                    <td>
+                      <Link
+                        href={`/admin/user360?org_id=${ticket.org_id}`}
+                        className="support-customer360-link"
+                        title="View Customer 360"
+                      >
+                        <span className="support-customer360-name">
+                          {ticket.org_name ?? 'Unknown'}
+                        </span>
+                        <span className="support-customer360-badge">360</span>
                       </Link>
                     </td>
                     <td>

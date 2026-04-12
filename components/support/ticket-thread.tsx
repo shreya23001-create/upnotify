@@ -155,6 +155,15 @@ export function TicketThread({ ticket, messages, isAdmin = false }: TicketThread
         {/* Admin controls */}
         {isAdmin && (
           <div className="support-admin-controls">
+            <a
+              href={`/admin/user360?org_id=${currentTicket.org_id}`}
+              className="btn btn-secondary support-thread-360-btn"
+              title="Open Customer 360"
+            >
+              <span>&#128100;</span>
+              {currentTicket.org_name ? currentTicket.org_name : 'Customer'}
+              <span className="support-customer360-badge">360</span>
+            </a>
             <div className="form-group" style={{ minWidth: 160 }}>
               <label className="form-label">Status</label>
               <select className="form-input" value={status} onChange={e => setStatus(e.target.value as typeof status)}>
