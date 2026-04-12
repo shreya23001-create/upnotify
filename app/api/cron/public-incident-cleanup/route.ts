@@ -224,6 +224,7 @@ export async function GET(request: Request): Promise<NextResponse> {
               blogSlug: draft.slug,
               siteDisplayName: monitor.display_name,
               excerpt: draft.excerpt,
+              category: 'down_alert',
               bodyMarkdown: draft.bodyMarkdown,
               sourcesCount: draft.sourcesCount,
               sources: draft.sources,

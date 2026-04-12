@@ -434,14 +434,24 @@ interface BlogApprovalSource {
   publishedAt?: string
 }
 
+type BlogCategory = 'down_alert' | 'llm_news' | 'topic' | 'custom'
+
+const BLOG_CATEGORY_LABELS: Record<BlogCategory, string> = {
+  down_alert: 'Down Alert',
+  llm_news:   'LLM News',
+  topic:      'Topic',
+  custom:     'Custom',
+}
+
 interface BlogApprovalEmailParams {
   to: string
   blogTitle: string
   blogSlug: string
   siteDisplayName: string
   excerpt: string
-  bodyMarkdown?: string   // Full blog body — rendered as plain text in email
-  sourcesCount?: number   // How many sources were used
+  category?: BlogCategory  // Used in subject prefix e.g. [Blog:LLM News]
+  bodyMarkdown?: string    // Full blog body — rendered as plain text in email
+  sourcesCount?: number    // How many sources were used
   sources?: BlogApprovalSource[]  // Full source list with titles, URLs, publish dates
   approveUrl: string
   rejectUrl: string
@@ -452,7 +462,8 @@ interface BlogApprovalEmailParams {
  * Opened in browser — clicking a button calls the approval endpoint.
  */
 export async function sendBlogApprovalEmail(params: BlogApprovalEmailParams): Promise<EmailResult> {
-  const subject = `Blog ready for approval: ${params.blogTitle}`
+  const categoryLabel = BLOG_CATEGORY_LABELS[params.category ?? 'custom']
+  const subject = `[Blog:${categoryLabel}] ${params.blogTitle}`
 
   // Convert markdown body to basic HTML for email rendering
   const bodyHtml = params.bodyMarkdown
@@ -499,10 +510,17 @@ export async function sendBlogApprovalEmail(params: BlogApprovalEmailParams): Pr
     sourcesBlock = `<p style="margin:0 0 20px;font-size:13px;color:#6b7280;">Research pulled from <strong>${params.sourcesCount} sources</strong> (official status page, Google News, Reddit, X).</p>`
   }
 
+  const headerTitle = `New Blog Draft — ${categoryLabel}`
+  const headerDesc = params.category === 'down_alert'
+    ? `Uptrue auto-generated a blog post about the <strong>${escapeHtml(params.siteDisplayName)}</strong> outage.`
+    : params.category === 'llm_news'
+    ? `Uptrue detected a new LLM launch: <strong>${escapeHtml(params.siteDisplayName)}</strong>.`
+    : `Uptrue auto-generated a blog post for topic: <strong>${escapeHtml(params.siteDisplayName)}</strong>.`
+
   const html = baseTemplate(`
-    <h2 style="margin:0 0 4px;font-size:18px;color:#111827;">New Outage Blog Draft</h2>
+    <h2 style="margin:0 0 4px;font-size:18px;color:#111827;">${escapeHtml(headerTitle)}</h2>
     <p style="margin:0 0 20px;font-size:14px;color:#6b7280;line-height:1.6;">
-      Uptrue auto-generated a blog post about the <strong>${escapeHtml(params.siteDisplayName)}</strong> outage.
+      ${headerDesc}
       Review the sources below, read the full post, then approve or reject.
     </p>
 

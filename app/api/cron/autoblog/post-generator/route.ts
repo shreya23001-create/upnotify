@@ -112,9 +112,25 @@ export async function GET(request: Request): Promise<NextResponse> {
     const approveUrl = `${app.url}/api/admin/blog-approve?token=${draft.approveToken}`
     const rejectUrl = `${app.url}/api/admin/blog-approve?token=${draft.rejectToken}`
 
-    const displayName = type === 'llm_launch'
-      ? `${(payload.llm as DetectedLLM).name} (LLM Launch)`
-      : `Topic: ${payload.topicName as string}`
+    const isLlm = type === 'llm_launch'
+    const displayName = isLlm
+      ? (payload.llm as DetectedLLM).name
+      : payload.topicName as string
+
+    // Build source list for email header from payload feed items
+    const emailSources = isLlm
+      ? ((payload.llm as DetectedLLM).sourceItems ?? []).map(s => ({
+          title: s.title,
+          url: s.url,
+          source: s.sourceName ?? 'Unknown',
+          publishedAt: s.publishedAt ?? undefined,
+        }))
+      : ((payload.feedItems as FeedItem[]) ?? []).map(s => ({
+          title: s.title,
+          url: s.url,
+          source: s.sourceName ?? 'Unknown',
+          publishedAt: s.publishedAt ?? undefined,
+        }))
 
     await Promise.allSettled([
       adminEmail ? sendBlogApprovalEmail({
@@ -123,9 +139,10 @@ export async function GET(request: Request): Promise<NextResponse> {
         blogSlug: draft.slug,
         siteDisplayName: displayName,
         excerpt: draft.excerpt,
+        category: isLlm ? 'llm_news' : 'topic',
         bodyMarkdown: draft.bodyMarkdown,
         sourcesCount: draft.sourcesCount,
-        sources: [],
+        sources: emailSources,
         approveUrl,
         rejectUrl,
       }) : Promise.resolve({ success: false }),
