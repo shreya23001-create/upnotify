@@ -15,7 +15,7 @@ export default function ToolsLayout({ children }: { children: React.ReactNode })
   return (
     <div className="tools-layout">
       <PublicNav />
-      <main style={{ paddingTop: 64 }}>
+      <main style={{ paddingTop: 0 }}>
         {children}
       </main>
       <PublicFooter />
