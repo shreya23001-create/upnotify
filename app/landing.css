@@ -8,6 +8,13 @@
 /* Primary tokens live in styles.css :root — we extend here */
 
 /* ============================================================
+   PAGE-LEVEL OVERFLOW CONTAINMENT
+   Clips horizontal overflow without creating a scroll context —
+   does not break position:sticky on the nav (which is outside this wrapper).
+   ============================================================ */
+.landing-content-wrap { overflow-x: hidden; width: 100%; }
+
+/* ============================================================
    SHARED UTILITIES (landing-page scope)
    ============================================================ */
 .container { max-width: 1160px; margin: 0 auto; padding: 0 var(--space-6); }
@@ -1289,7 +1296,7 @@ html.dark .pub-nav {
   .footer-top { grid-template-columns: 1fr; }
   .footer-bottom { flex-direction: column; align-items: center; text-align: center; }
   .cta-band h2 { font-size: 32px; }
-  .stats-bar-inner { gap: var(--space-8); }
+  .stats-bar-inner { gap: var(--space-8); flex-wrap: wrap; justify-content: center; }
   .hero-ctas { flex-direction: column; align-items: stretch; }
   .hero-ctas .btn { justify-content: center; }
   .blog-section-header { flex-direction: column; align-items: flex-start; gap: var(--space-4); }

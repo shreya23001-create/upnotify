@@ -103,6 +103,9 @@ export default async function LandingPage(): Promise<React.ReactElement> {
       {/* NAV */}
       <PublicNav />
 
+      {/* Wrapper: clips horizontal overflow from any section without breaking sticky nav */}
+      <div className="landing-content-wrap">
+
       {/* LIVE TICKER */}
       <Ticker />
 
@@ -602,6 +605,8 @@ export default async function LandingPage(): Promise<React.ReactElement> {
 
       {/* FOOTER */}
       <PublicFooter />
+
+      </div>{/* end landing-content-wrap */}
     </>
   )
 }
