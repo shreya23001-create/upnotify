@@ -14,7 +14,7 @@ export default function TrackerLayout({ children }: { children: React.ReactNode 
   return (
     <div className="tracker-layout">
       <PublicNav />
-      <main className="tracker-main" style={{ paddingTop: 80 }}>
+      <main className="tracker-main" style={{ paddingTop: 0 }}>
         {children}
       </main>
       <PublicFooter />

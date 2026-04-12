@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import { ThemeToggle } from '@/components/ui/theme-toggle'
 
 export function PublicNav(): React.ReactElement {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false)
@@ -78,6 +79,7 @@ export function PublicNav(): React.ReactElement {
         </ul>
 
         <div className="nav-actions">
+          <ThemeToggle />
           {isLoggedIn ? (
             <Link href="/dashboard" className="btn btn-primary btn-sm">Dashboard</Link>
           ) : (
@@ -128,6 +130,9 @@ export function PublicNav(): React.ReactElement {
                 <Link href="/signup" className="btn btn-primary" onClick={close} style={{ display: 'block', textAlign: 'center' }}>Start Free</Link>
               </>
             )}
+            <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 8 }}>
+              <ThemeToggle />
+            </div>
           </div>
         </div>
       )}
