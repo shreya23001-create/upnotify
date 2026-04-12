@@ -1002,14 +1002,16 @@ export async function getNextQueuedRun(): Promise<QueuedRun | null> {
 
   if (error || !data) return null
 
-  // Mark as generating so a concurrent call skips it
-  const { error: claimError } = await supabase
+  // Mark as generating — only proceeds if status still 'queued' (concurrent race protection)
+  const { data: claimed, error: claimError } = await supabase
     .from('autoblog_runs')
     .update({ status: 'generating' })
     .eq('id', data.id)
     .eq('status', 'queued')
+    .select('id')
 
-  if (claimError) return null
+  // No rows returned = another process already claimed it
+  if (claimError || !claimed || claimed.length === 0) return null
 
   return data as unknown as QueuedRun
 }

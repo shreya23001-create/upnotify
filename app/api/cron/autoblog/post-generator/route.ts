@@ -118,19 +118,19 @@ export async function GET(request: Request): Promise<NextResponse> {
       : payload.topicName as string
 
     // Build source list for email header from payload feed items
-    const emailSources = isLlm
-      ? ((payload.llm as DetectedLLM).sourceItems ?? []).map(s => ({
-          title: s.title,
-          url: s.url,
-          source: s.sourceName ?? 'Unknown',
-          publishedAt: s.publishedAt ?? undefined,
-        }))
-      : ((payload.feedItems as FeedItem[]) ?? []).map(s => ({
-          title: s.title,
-          url: s.url,
-          source: s.sourceName ?? 'Unknown',
-          publishedAt: s.publishedAt ?? undefined,
-        }))
+    const llmSourceItems = isLlm
+      ? ((payload.llm as DetectedLLM | null)?.sourceItems ?? [])
+      : []
+    const topicFeedItems = !isLlm
+      ? ((payload.feedItems as FeedItem[] | null) ?? [])
+      : []
+    const rawSources = isLlm ? llmSourceItems : topicFeedItems
+    const emailSources = rawSources.map(s => ({
+      title: s.title,
+      url: s.url,
+      source: s.sourceName ?? 'Unknown',
+      publishedAt: s.publishedAt ?? undefined,
+    }))
 
     await Promise.allSettled([
       adminEmail ? sendBlogApprovalEmail({
