@@ -6715,6 +6715,15 @@ section.hero .hero-mockup {
   .nav-mobile-menu { padding: 8px 12px; }
 }
 
+/* --- Auth Pages --- */
+@media (max-width: 480px) {
+  .auth-right { padding: 32px 20px; align-items: flex-start; }
+  .auth-form-wrap { max-width: 100%; }
+  .auth-form-heading { font-size: 22px; }
+  .auth-returning-banner { font-size: 12px; padding: 8px 12px; }
+  .auth-returning-text { white-space: normal; line-height: 1.4; }
+}
+
 /* --- Global: prevent horizontal overflow on all public pages --- */
 .tracker-directory, .leaderboard-page, .score-layout, .tools-page,
 .blog-index, .blog-article { max-width: 100%; overflow-x: hidden; }
