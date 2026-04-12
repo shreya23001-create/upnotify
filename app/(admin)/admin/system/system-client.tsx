@@ -80,6 +80,8 @@ export function AdminSystemClientPage(): React.ReactElement {
   const [simRunning, setSimRunning] = useState(false)
   const [simResult, setSimResult] = useState<string | null>(null)
   const simResultRef = useRef<HTMLDivElement>(null)
+  const [socialTesting, setSocialTesting] = useState<'linkedin' | 'x' | null>(null)
+  const [socialResult, setSocialResult] = useState<string | null>(null)
 
   const fetchHealth = useCallback(async (): Promise<void> => {
     try {
@@ -342,6 +344,69 @@ export function AdminSystemClientPage(): React.ReactElement {
           </div>
         </div>
       )}
+
+      {/* Social Posting Test */}
+      <div className="card" style={{ marginBottom: 16 }}>
+        <div className="card-header">
+          <div className="card-title">Social Posting Test</div>
+          <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>Fire a test post to LinkedIn and/or X using current env var credentials</div>
+        </div>
+        <div className="card-content" style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
+          <button
+            className="btn btn-secondary"
+            disabled={!!socialTesting}
+            onClick={async () => {
+              setSocialTesting('linkedin')
+              setSocialResult(null)
+              try {
+                const res = await fetch('/api/admin/test-social', { method: 'POST' })
+                const data = await res.json() as { linkedin?: { success: boolean; error?: string; postId?: string } }
+                const li = data.linkedin
+                if (li?.success) {
+                  setSocialResult(`LinkedIn: posted (ID: ${li.postId ?? 'unknown'})`)
+                } else {
+                  setSocialResult(`LinkedIn: failed — ${li?.error ?? 'unknown error'}`)
+                }
+              } catch {
+                setSocialResult('LinkedIn: network error')
+              } finally {
+                setSocialTesting(null)
+              }
+            }}
+          >
+            {socialTesting === 'linkedin' ? 'Posting...' : 'Test LinkedIn'}
+          </button>
+          <button
+            className="btn btn-secondary"
+            disabled={!!socialTesting}
+            onClick={async () => {
+              setSocialTesting('x')
+              setSocialResult(null)
+              try {
+                const res = await fetch('/api/admin/test-social', { method: 'POST' })
+                const data = await res.json() as { x?: { success: boolean; error?: string; postId?: string } }
+                const x = data.x
+                if (x?.success) {
+                  setSocialResult(`X: posted (ID: ${x.postId ?? 'unknown'})`)
+                } else {
+                  setSocialResult(`X: failed — ${x?.error ?? 'unknown error'}`)
+                }
+              } catch {
+                setSocialResult('X: network error')
+              } finally {
+                setSocialTesting(null)
+              }
+            }}
+          >
+            {socialTesting === 'x' ? 'Posting...' : 'Test X (Twitter)'}
+          </button>
+        </div>
+        {socialResult && (
+          <div style={{ padding: '8px 16px 16px', fontSize: 13, color: socialResult.includes('failed') || socialResult.includes('error') ? '#ef4444' : '#22c55e' }}>
+            {socialResult}
+          </div>
+        )}
+      </div>
 
       {/* Dev Simulation Panel */}
       <div className="card" style={{ marginBottom: 16, border: '2px dashed #f59e0b' }}>
