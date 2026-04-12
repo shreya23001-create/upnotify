@@ -3,6 +3,7 @@ import Link from 'next/link'
 
 export const metadata: Metadata = {
   title: 'Account Deactivated',
+  robots: { index: false, follow: false },
 }
 
 export default function DeactivatedPage(): React.ReactElement {

@@ -183,6 +183,7 @@ export function DataTable<T extends { id: string }>({
                 <input
                   type="checkbox"
                   className="data-table-checkbox"
+                  aria-label="Select all rows"
                   checked={paged.length > 0 && selectedIds.size === paged.length}
                   onChange={toggleSelectAll}
                 />
@@ -210,6 +211,7 @@ export function DataTable<T extends { id: string }>({
                   <input
                     type="checkbox"
                     className="data-table-checkbox"
+                    aria-label={`Select row ${row.id}`}
                     checked={selectedIds.has(row.id)}
                     onChange={() => toggleSelect(row.id)}
                   />

@@ -1,5 +1,10 @@
+import type { Metadata } from 'next'
 import { getPublishedBlogPosts, type PublishedBlogPostSummary } from '@/lib/db/blog-posts'
 import { BlogIndexClient } from './blog-index-client'
+
+export const metadata: Metadata = {
+  alternates: { canonical: 'https://uptrue.io/blog' },
+}
 
 // Static blog posts (hardcoded content)
 const STATIC_POSTS = [

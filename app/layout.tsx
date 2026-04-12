@@ -44,9 +44,7 @@ export const metadata: Metadata = {
   authors: [{ name: "Vision Software Solutions Limited" }],
   creator: "Uptrue",
   publisher: "Vision Software Solutions Limited",
-  alternates: {
-    canonical: "https://uptrue.io",
-  },
+
   openGraph: {
     type: "website",
     locale: "en_GB",

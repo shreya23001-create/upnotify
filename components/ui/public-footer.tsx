@@ -9,7 +9,7 @@ export function PublicFooter(): React.ReactElement {
 
           {/* Brand */}
           <div className="footer-brand">
-            <Link href="/" className="nav-logo" style={{ marginBottom: 'var(--space-4)', display: 'inline-flex' }}>
+            <Link href="/" className="nav-logo" aria-label="Uptrue home" style={{ marginBottom: 'var(--space-4)', display: 'inline-flex' }}>
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 50" height="28" aria-hidden="true">
                 <defs>
                   <linearGradient id="ftG" x1="0%" y1="0%" x2="100%" y2="100%">

@@ -78,6 +78,7 @@ export function DowntimeCalculator(): React.ReactElement {
                 <input
                   type="number"
                   className="calculator-input"
+                  aria-label="Your monthly revenue in pounds"
                   value={revenue}
                   min={1000}
                   max={10000000}
@@ -94,6 +95,7 @@ export function DowntimeCalculator(): React.ReactElement {
                 <input
                   type="range"
                   className="calculator-slider"
+                  aria-label="Average downtime per month in hours"
                   min={0}
                   max={24}
                   step={0.5}
