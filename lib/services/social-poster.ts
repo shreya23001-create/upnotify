@@ -137,22 +137,16 @@ async function postToX(post: OutageSocialPost): Promise<SocialPostResult> {
 
 async function postToLinkedIn(post: OutageSocialPost): Promise<SocialPostResult> {
   const config = getServerConfig()
-  const { accessToken, memberId } = config.linkedin
+  const { accessToken, memberId, organizationId } = config.linkedin
 
-  if (!accessToken || !memberId) {
-    // NOTE: Before go-live, switch to organizationId + w_organization_social scope
+  if (!accessToken || (!memberId && !organizationId)) {
     logger.warn('LinkedIn credentials not configured — skipping LinkedIn post')
     return { success: false, platform: 'linkedin', error: 'LinkedIn credentials not configured' }
   }
 
   const shareText = `🔴 ${post.siteDisplayName} may be experiencing an issue.\n\nUptrue detected a possible disruption. See the latest status report:\n${post.blogUrl}\n\n#uptime #outage #${post.siteDisplayName.replace(/\s+/g, '')} #monitoring`
 
-  // Use organisation posting when LINKEDIN_ORGANIZATION_ID is set (required for production).
-  // Falls back to member posting only if organizationId is missing — logs a warning.
-  const { organizationId } = config.linkedin
-  if (!organizationId) {
-    logger.warn('LINKEDIN_ORGANIZATION_ID not set — posting as member profile (not suitable for production)')
-  }
+  // Posts to company page if LINKEDIN_ORGANIZATION_ID is set, otherwise personal profile.
   const authorUrn = organizationId
     ? `urn:li:organization:${organizationId}`
     : `urn:li:person:${memberId}`
