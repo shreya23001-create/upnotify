@@ -225,7 +225,7 @@ export function FeatureCarousel(): React.ReactElement {
           <div className="carousel-track-bar">
             <div className="carousel-track-fill" style={{ width: `${pct}%` }} />
           </div>
-          <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Drag or use arrows</span>
+          <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>Drag or use arrows</span>
         </div>
       </div>
     </div>

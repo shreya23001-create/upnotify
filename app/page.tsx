@@ -104,7 +104,7 @@ export default async function LandingPage(): Promise<React.ReactElement> {
       <PublicNav />
 
       {/* Wrapper: clips horizontal overflow from any section without breaking sticky nav */}
-      <div className="landing-content-wrap">
+      <main className="landing-content-wrap">
 
       {/* LIVE TICKER */}
       <Ticker />
@@ -249,28 +249,28 @@ export default async function LandingPage(): Promise<React.ReactElement> {
                 <div className="ai-feature-item">
                   <div className="ai-feature-icon purple">🤖</div>
                   <div className="ai-feature-body">
-                    <h4>Executive AI Reports</h4>
+                    <h3>Executive AI Reports</h3>
                     <p>One click and Claude analyses 90 days of uptime data, incident patterns, and performance trends — generating a polished summary you can send to clients or stakeholders.</p>
                   </div>
                 </div>
                 <div className="ai-feature-item">
                   <div className="ai-feature-icon cyan">🔍</div>
                   <div className="ai-feature-body">
-                    <h4>Outage Pattern Detection</h4>
+                    <h3>Outage Pattern Detection</h3>
                     <p>Uptrue learns your monitor&apos;s normal behaviour and flags anomalies before they become incidents. Recurring issues are spotted and surfaced automatically.</p>
                   </div>
                 </div>
                 <div className="ai-feature-item">
                   <div className="ai-feature-icon pink">📰</div>
                   <div className="ai-feature-body">
-                    <h4>AI Outage News &amp; Blog</h4>
+                    <h3>AI Outage News &amp; Blog</h3>
                     <p>When a public service goes down, Uptrue researches and publishes an outage report automatically — with your logo and brand. Real-time SEO content on autopilot.</p>
                   </div>
                 </div>
                 <div className="ai-feature-item">
                   <div className="ai-feature-icon blue">💡</div>
                   <div className="ai-feature-body">
-                    <h4>Plain Language Incident Summaries</h4>
+                    <h3>Plain Language Incident Summaries</h3>
                     <p>Every incident automatically gets a human-readable summary. No log-diving, no decoding stack traces. Just &quot;your checkout was down for 8 minutes on Tuesday.&quot;</p>
                   </div>
                 </div>
@@ -533,7 +533,7 @@ export default async function LandingPage(): Promise<React.ReactElement> {
               </tbody>
             </table>
           </div>
-          <p style={{ textAlign: 'center', fontSize: '11px', color: 'var(--text-muted)', marginTop: 'var(--space-5)' }}>
+          <p style={{ textAlign: 'center', fontSize: '11px', color: 'var(--text-secondary)', marginTop: 'var(--space-5)' }}>
             Comparison based on publicly available information as of April 2026. Features may vary by plan.
           </p>
         </div>
@@ -606,7 +606,7 @@ export default async function LandingPage(): Promise<React.ReactElement> {
       {/* FOOTER */}
       <PublicFooter />
 
-      </div>{/* end landing-content-wrap */}
+      </main>{/* end landing-content-wrap */}
     </>
   )
 }
