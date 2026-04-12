@@ -6638,3 +6638,83 @@ section.hero .hero-mockup {
   .autoblog-topic-actions { width: 100%; justify-content: flex-end; }
   .autoblog-source-url { max-width: 180px; }
 }
+
+/* ==========================================================================
+   PUBLIC PAGES — MOBILE RESPONSIVENESS FIXES
+   ========================================================================== */
+
+/* --- Blog Article --- */
+@media (max-width: 768px) {
+  .blog-article { padding: 40px 16px; }
+  .blog-article-title { font-size: 26px; letter-spacing: -0.3px; }
+  .blog-article-subtitle { font-size: 16px; }
+  .blog-article-excerpt { font-size: 15px; }
+  .blog-article-body h2 { font-size: 20px; margin-top: 32px; }
+  .blog-article-body h3 { font-size: 16px; margin-top: 24px; }
+  .blog-article-body p { font-size: 15px; }
+  .blog-cta-box { padding: 20px 16px; }
+  .blog-post-card-title { font-size: 18px; }
+}
+/* Blog body tables — horizontal scroll on mobile */
+.blog-article-body table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; max-width: 100%; }
+
+/* --- Leaderboard --- */
+@media (max-width: 768px) {
+  .leaderboard-hero { padding: 72px 16px 32px; }
+  .leaderboard-hero-subtitle { font-size: 16px; }
+  .leaderboard-container { padding: 24px 16px 60px; }
+  .leaderboard-podium-card { padding: 20px 14px; }
+}
+@media (max-width: 480px) {
+  .leaderboard-hero-title { font-size: 26px; }
+  .leaderboard-hero-subtitle { font-size: 14px; }
+}
+
+/* --- Tools Pages --- */
+@media (max-width: 768px) {
+  .tools-hero { padding: 72px 16px 32px; }
+  .tools-hero-title { font-size: 28px; }
+  .tools-hero-subtitle { font-size: 16px; }
+  .tools-container { padding: 24px 16px; }
+}
+@media (max-width: 480px) {
+  .tools-hero-title { font-size: 24px; }
+}
+
+/* --- Contact Page --- */
+@media (max-width: 768px) {
+  .contact-channels { grid-template-columns: 1fr; gap: 16px; }
+  .contact-channel-card { padding: 24px 20px; }
+}
+
+/* --- Score Results --- */
+@media (max-width: 480px) {
+  .score-hero-title { font-size: 26px; }
+  .score-results-title { font-size: 22px; }
+  .score-overview-inner { padding: 16px; gap: 16px; }
+}
+
+/* --- Tracker Detail --- */
+@media (max-width: 768px) {
+  .tracker-detail { padding: 0; }
+  .tracker-hero-title { font-size: 24px; }
+}
+@media (max-width: 480px) {
+  .tracker-category-filter { flex-wrap: wrap; }
+}
+
+/* --- Status Page --- */
+@media (max-width: 640px) {
+  .sp-nav-inner { padding: 0 16px; }
+  .sp-nav-powered { display: none; }
+}
+
+/* --- Public Nav — tighter padding on small phones --- */
+@media (max-width: 480px) {
+  .pub-nav-inner { padding: 0 16px; }
+  .nav-mobile-menu { padding: 8px 12px; }
+}
+
+/* --- Global: prevent horizontal overflow on all public pages --- */
+.tracker-directory, .leaderboard-page, .score-layout, .tools-page,
+.blog-index, .blog-article { max-width: 100%; overflow-x: hidden; }
