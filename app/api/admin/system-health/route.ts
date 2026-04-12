@@ -120,6 +120,7 @@ export async function GET(): Promise<NextResponse> {
     lastAutoblogFeedFetcher,
     lastAutoblogLlmDetector,
     lastAutoblogTopicRunner,
+    lastAutoblogPostGenerator,
   ] = await Promise.all([
     // check-runner
     supabase.from('check_results').select('checked_at').not('org_id', 'is', null)
@@ -190,6 +191,10 @@ export async function GET(): Promise<NextResponse> {
     untyped(supabase).from('cron_run_log').select('ran_at')
       .eq('cron_path', '/api/cron/autoblog/topic-runner')
       .order('ran_at', { ascending: false }).limit(1).maybeSingle(),
+    // autoblog/post-generator — via cron_run_log
+    untyped(supabase).from('cron_run_log').select('ran_at')
+      .eq('cron_path', '/api/cron/autoblog/post-generator')
+      .order('ran_at', { ascending: false }).limit(1).maybeSingle(),
   ])
 
   // ── Compete stats ─────────────────────────────────────────────────────────
@@ -205,6 +210,7 @@ export async function GET(): Promise<NextResponse> {
   const autoblogFeedFetcherAt = (lastAutoblogFeedFetcher?.data as Record<string, unknown> | null)?.ran_at as string | null ?? null
   const autoblogLlmDetectorAt = (lastAutoblogLlmDetector?.data as Record<string, unknown> | null)?.ran_at as string | null ?? null
   const autoblogTopicRunnerAt = (lastAutoblogTopicRunner?.data as Record<string, unknown> | null)?.ran_at as string | null ?? null
+  const autoblogPostGeneratorAt = (lastAutoblogPostGenerator?.data as Record<string, unknown> | null)?.ran_at as string | null ?? null
 
   const health = {
     database: { status: dbError ? 'error' : 'ok', latencyMs: dbLatency },
@@ -353,6 +359,14 @@ export async function GET(): Promise<NextResponse> {
         lastRun: autoblogTopicRunnerAt,
         status: cronStatus(autoblogTopicRunnerAt, 130, now),
         history: cronHistory['/api/cron/autoblog/topic-runner'] ?? [],
+      },
+      autoblogPostGenerator: {
+        label: 'Autoblog Post Generator',
+        schedule: 'Every 10 minutes',
+        path: '/api/cron/autoblog/post-generator',
+        lastRun: autoblogPostGeneratorAt,
+        status: cronStatus(autoblogPostGeneratorAt, 15, now),
+        history: cronHistory['/api/cron/autoblog/post-generator'] ?? [],
       },
     },
 

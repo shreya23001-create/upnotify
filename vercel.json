@@ -71,6 +71,10 @@
     {
       "path": "/api/cron/autoblog/topic-runner",
       "schedule": "0 */2 * * *"
+    },
+    {
+      "path": "/api/cron/autoblog/post-generator",
+      "schedule": "*/10 * * * *"
     }
   ]
 }
