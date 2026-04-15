@@ -199,8 +199,8 @@ export default async function DynamicBlogPost({ params }: { params: Promise<{ sl
 
   return (
     <div className="blog-article-wrap">
-    <article className="blog-article">
       <div className="blog-article-hero" style={{ background: heroGradient }} aria-hidden="true" />
+    <article className="blog-article">
       <header className="blog-article-header">
         <div className="blog-article-meta-top">
           {post.category && (
