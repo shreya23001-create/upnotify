@@ -108,6 +108,11 @@ export async function GET(request: Request): Promise<NextResponse> {
         sourceName: item.sourceName,
       }))
 
+      if (feedItems.length === 0) {
+        logger.warn('No matching feed items for topic — skipping', { topic: topic.name, keywords: topic.keywords })
+        continue
+      }
+
       const id = await createQueuedAutoblogRun({
         topic_id: topic.id,
         post_to_social: topic.post_to_social,
