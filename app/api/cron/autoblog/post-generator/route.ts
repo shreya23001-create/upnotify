@@ -108,7 +108,6 @@ export async function GET(request: Request): Promise<NextResponse> {
 
     // Send approval notifications
     const { app, admin } = getConfig()
-    const adminEmail = admin.emails[0]
     const approveUrl = `${app.url}/api/admin/blog-approve?token=${draft.approveToken}`
     const rejectUrl = `${app.url}/api/admin/blog-approve?token=${draft.rejectToken}`
 
@@ -133,8 +132,8 @@ export async function GET(request: Request): Promise<NextResponse> {
     }))
 
     await Promise.allSettled([
-      adminEmail ? sendBlogApprovalEmail({
-        to: adminEmail,
+      ...admin.emails.map(to => sendBlogApprovalEmail({
+        to,
         blogTitle: draft.title,
         blogSlug: draft.slug,
         siteDisplayName: displayName,
@@ -145,7 +144,7 @@ export async function GET(request: Request): Promise<NextResponse> {
         sources: emailSources,
         approveUrl,
         rejectUrl,
-      }) : Promise.resolve({ success: false }),
+      })),
       sendBlogApprovalTelegram({
         blogTitle: draft.title,
         siteDisplayName: displayName,
