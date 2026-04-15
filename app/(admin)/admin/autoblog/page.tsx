@@ -23,7 +23,10 @@ export default async function AutoblogPage(): Promise<React.ReactElement> {
     getAutoblogRuns(50),
   ])
 
-  const cronPaths = channels.map(c => c.cron_path).filter(Boolean) as string[]
+  const cronPaths = [
+    ...channels.map(c => c.cron_path).filter(Boolean) as string[],
+    '/api/cron/autoblog/topic-runner',
+  ]
   const cronHistory = await getCronHistoryForPaths(cronPaths, 5)
 
   return (

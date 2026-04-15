@@ -170,6 +170,7 @@ export function AutoblogClient({ initialChannels, initialTopics, initialSources,
   const [cronHistory, setCronHistory] = useState<Record<string, ChannelCronRun[]>>(initialCronHistory)
   const [expandedChannel, setExpandedChannel] = useState<string | null>(null)
   const [triggerState, setTriggerState] = useState<Record<string, 'idle' | 'running' | 'ok' | 'error'>>({})
+  const [topicCronExpanded, setTopicCronExpanded] = useState(false)
 
   const triggerChannel = useCallback(async (cronPath: string): Promise<void> => {
     setTriggerState(prev => ({ ...prev, [cronPath]: 'running' }))
@@ -788,6 +789,100 @@ export function AutoblogClient({ initialChannels, initialTopics, initialSources,
             <button className="btn-primary" onClick={openAddTopic}>+ Add Topic</button>
 
           </div>
+
+          {/* Topic-runner cron control bar */}
+          {(() => {
+            const TOPIC_RUNNER = '/api/cron/autoblog/topic-runner'
+            const tState = triggerState[TOPIC_RUNNER] ?? 'idle'
+            const history = cronHistory[TOPIC_RUNNER] ?? []
+            const lastRun = history[0]
+            return (
+              <div style={{ border: '1px solid var(--border-color)', borderRadius: 8, padding: '12px 16px', marginBottom: 20, background: 'var(--bg-secondary)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>Topic Runner Cron</span>
+                  <code style={{ fontSize: 11, color: 'var(--text-muted)', background: 'var(--bg-card)', padding: '2px 6px', borderRadius: 4 }}>{TOPIC_RUNNER}</code>
+
+                  <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
+                    {lastRun && (
+                      <span
+                        title={`Last: ${lastRun.status} · ${timeAgo(lastRun.ran_at)}${lastRun.result_summary ? ' · ' + lastRun.result_summary : ''}${lastRun.error_message ? ' — ' + lastRun.error_message : ''}`}
+                        style={{
+                          width: 8, height: 8, borderRadius: '50%', flexShrink: 0, display: 'inline-block',
+                          background: lastRun.status === 'ok' ? '#22c55e' : lastRun.status === 'error' ? '#ef4444' : '#f59e0b',
+                          border: lastRun.triggered_by === 'manual' ? '2px solid #3b82f6' : '2px solid transparent',
+                        }}
+                      />
+                    )}
+                    <button
+                      className="autoblog-action-btn"
+                      style={{ fontWeight: 600, fontSize: 12, padding: '4px 10px' }}
+                      disabled={tState === 'running'}
+                      onClick={() => triggerChannel(TOPIC_RUNNER)}
+                    >
+                      {tState === 'running' ? 'Running…' : tState === 'ok' ? '✓ Done' : tState === 'error' ? '✗ Error' : '▶ Run now'}
+                    </button>
+                    {history.length > 0 && (
+                      <button
+                        className="autoblog-action-btn"
+                        style={{ fontSize: 11, padding: '3px 8px' }}
+                        onClick={() => setTopicCronExpanded(e => !e)}
+                      >
+                        {topicCronExpanded ? '▲ Hide history' : `▼ History (${history.length})`}
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {lastRun && (
+                  <div style={{ marginTop: 6, fontSize: 12, color: lastRun.status === 'error' ? '#ef4444' : 'var(--text-muted)' }}>
+                    Last run: {timeAgo(lastRun.ran_at)} · {lastRun.status}
+                    {lastRun.result_summary ? ` · ${lastRun.result_summary}` : ''}
+                    {lastRun.error_message ? ` — ${lastRun.error_message}` : ''}
+                  </div>
+                )}
+
+                {topicCronExpanded && history.length > 0 && (
+                  <div style={{ marginTop: 10, borderTop: '1px solid var(--border-color)', paddingTop: 8 }}>
+                    <table style={{ width: '100%', fontSize: 12, borderCollapse: 'collapse' }}>
+                      <thead>
+                        <tr style={{ color: 'var(--text-muted)', textAlign: 'left' }}>
+                          <th style={{ padding: '4px 8px' }}>When</th>
+                          <th style={{ padding: '4px 8px' }}>Status</th>
+                          <th style={{ padding: '4px 8px' }}>Result</th>
+                          <th style={{ padding: '4px 8px' }}>ms</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {history.map(run => (
+                          <tr key={run.id} style={{ borderTop: '1px solid var(--border-color)' }}>
+                            <td style={{ padding: '5px 8px', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
+                              {timeAgo(run.ran_at)}
+                              {run.triggered_by === 'manual' && (
+                                <span style={{ marginLeft: 4, fontSize: 10, color: '#3b82f6', fontWeight: 600 }}>manual</span>
+                              )}
+                            </td>
+                            <td style={{ padding: '5px 8px' }}>
+                              <span style={{
+                                display: 'inline-block', width: 8, height: 8, borderRadius: '50%', marginRight: 5,
+                                background: run.status === 'ok' ? '#22c55e' : run.status === 'error' ? '#ef4444' : '#f59e0b',
+                              }} />
+                              {run.status}
+                            </td>
+                            <td style={{ padding: '5px 8px', color: run.error_message ? '#ef4444' : 'var(--text-muted)' }}>
+                              {run.error_message ?? run.result_summary ?? '—'}
+                            </td>
+                            <td style={{ padding: '5px 8px', color: 'var(--text-muted)' }}>
+                              {run.duration_ms ?? '—'}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            )
+          })()}
 
 
 
