@@ -22,7 +22,7 @@ import type { TrackerContext } from '@/lib/services/autoblog-generator'
 import type { FeedItem } from '@/lib/services/feed-fetcher'
 
 export const dynamic = 'force-dynamic'
-export const maxDuration = 60
+export const maxDuration = 300
 
 export async function GET(request: Request): Promise<NextResponse> {
   const authHeader = request.headers.get('authorization')
