@@ -28,6 +28,8 @@ export interface User360Profile {
   currentPeriodEnd: string | null
   // Spend
   totalSpendGbp: number
+  totalSpendInr: number
+  billingCurrency: 'gbp' | 'inr'
   invoiceCount: number
   lastInvoiceAt: string | null
   // Usage
@@ -96,7 +98,7 @@ export async function GET(): Promise<NextResponse> {
     supabase.from('users').select('id, email, full_name, org_id, is_active, created_at').order('created_at', { ascending: false }),
     supabase.from('organisations').select('id, name, health_score, health_score_label, health_score_at'),
     supabase.from('subscriptions').select('org_id, status, billing_cycle, current_period_end, plan_id, plans(name, slug)'),
-    supabase.from('invoices').select('org_id, amount_gbp, status, created_at').eq('status', 'paid'),
+    supabase.from('invoices').select('org_id, amount_gbp, currency, status, created_at').eq('status', 'paid'),
     supabase.from('monitors').select('org_id, status'),
     supabase.from('alert_channels').select('org_id').eq('is_enabled', true),
     supabase.from('status_pages').select('org_id'),
@@ -127,11 +129,17 @@ export async function GET(): Promise<NextResponse> {
   }
 
   // Invoice aggregates by org_id
-  type InvRow = { org_id: string; amount_gbp: number; status: string; created_at: string }
-  const invoicesByOrg = new Map<string, { totalGbp: number; count: number; lastAt: string | null }>()
+  type InvRow = { org_id: string; amount_gbp: number; currency: string; status: string; created_at: string }
+  const invoicesByOrg = new Map<string, { totalGbp: number; totalInr: number; billingCurrency: 'gbp' | 'inr'; count: number; lastAt: string | null }>()
   for (const inv of (invoicesRaw ?? []) as InvRow[]) {
-    const existing = invoicesByOrg.get(inv.org_id) ?? { totalGbp: 0, count: 0, lastAt: null }
-    existing.totalGbp += (inv.amount_gbp ?? 0) / 100
+    const existing = invoicesByOrg.get(inv.org_id) ?? { totalGbp: 0, totalInr: 0, billingCurrency: 'gbp' as const, count: 0, lastAt: null }
+    const isInr = inv.currency === 'inr'
+    if (isInr) {
+      existing.totalInr += (inv.amount_gbp ?? 0) / 100
+      existing.billingCurrency = 'inr'
+    } else {
+      existing.totalGbp += (inv.amount_gbp ?? 0) / 100
+    }
     existing.count++
     if (!existing.lastAt || inv.created_at > existing.lastAt) existing.lastAt = inv.created_at
     invoicesByOrg.set(inv.org_id, existing)
@@ -169,7 +177,7 @@ export async function GET(): Promise<NextResponse> {
   for (const u of (usersRaw ?? []) as UserRow[]) {
     if (adminEmailSet.has(u.email.toLowerCase())) continue
     const sub = subByOrg.get(u.org_id)
-    const invoiceData = invoicesByOrg.get(u.org_id) ?? { totalGbp: 0, count: 0, lastAt: null }
+    const invoiceData = invoicesByOrg.get(u.org_id) ?? { totalGbp: 0, totalInr: 0, billingCurrency: 'gbp' as const, count: 0, lastAt: null }
     const monitors = monitorsByOrg.get(u.org_id) ?? { total: 0, active: 0 }
 
     const planName = sub?.plans?.name ?? 'Free'
@@ -190,6 +198,8 @@ export async function GET(): Promise<NextResponse> {
       subStatus: sub?.status ?? null,
       currentPeriodEnd: sub?.current_period_end ?? null,
       totalSpendGbp: invoiceData.totalGbp,
+      totalSpendInr: invoiceData.totalInr,
+      billingCurrency: invoiceData.billingCurrency,
       invoiceCount: invoiceData.count,
       lastInvoiceAt: invoiceData.lastAt,
       monitorCount: monitors.total,

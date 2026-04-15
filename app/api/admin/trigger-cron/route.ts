@@ -20,6 +20,11 @@ const ALLOWED_CRON_PATHS = new Set([
   '/api/cron/aoe/last-day-burst',
   '/api/cron/aoe/daily-snapshot',
   '/api/cron/competitor-checks',
+  '/api/cron/public-incident-cleanup',
+  '/api/cron/autoblog/feed-fetcher',
+  '/api/cron/autoblog/llm-detector',
+  '/api/cron/autoblog/topic-runner',
+  '/api/cron/autoblog/post-generator',
 ])
 
 async function isAdmin(): Promise<boolean> {

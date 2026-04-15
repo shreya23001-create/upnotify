@@ -20,7 +20,7 @@ import { sendBlogApprovalTelegram } from '@/lib/services/telegram'
 import type { PublicMonitor } from '@/lib/db/public-monitors'
 
 export const dynamic = 'force-dynamic'
-export const maxDuration = 60
+export const maxDuration = 300
 
 // Domains known to block Vercel/AWS IPs — never generate blogs for these
 const BLOCKED_DOMAINS = new Set([
@@ -120,23 +120,30 @@ export async function GET(request: Request): Promise<NextResponse> {
     // -------------------------------------------------------------------------
     // 2. Generate blogs for eligible incidents (15-min window passed, no blog yet)
     // -------------------------------------------------------------------------
+    // Fetch incidents eligible for blog generation:
+    // - eligibility window has passed (15-min confirmation)
+    // - no blog generated yet
+    // - either still open OR resolved within the last 2 hours (catches the common case where
+    //   a short outage resolves before the next cron run but was real enough to blog about)
+    const twoHoursAgoForBlog = new Date(now.getTime() - 2 * 60 * 60 * 1000).toISOString()
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: eligibleIncidents } = await (supabase as unknown as any)
       .from('public_incidents')
       .select(`
-        id, monitor_id, cause, status_code, started_at,
+        id, monitor_id, cause, status_code, started_at, resolved_at,
         blog_eligible_after, blog_generated_at
       `)
-      .is('resolved_at', null)
       .is('blog_generated_at', null)
       .not('blog_eligible_after', 'is', null)
-      .lte('blog_eligible_after', now.toISOString()) as {
+      .lte('blog_eligible_after', now.toISOString())
+      .or(`resolved_at.is.null,resolved_at.gte.${twoHoursAgoForBlog}`) as {
         data: Array<{
           id: string
           monitor_id: string
           cause: string | null
           status_code: number | null
           started_at: string
+          resolved_at: string | null
           blog_eligible_after: string | null
           blog_generated_at: string | null
         }> | null
@@ -168,31 +175,26 @@ export async function GET(request: Request): Promise<NextResponse> {
           continue
         }
 
-        // Re-confirm site is still down before generating blog
-        const stillDown = !(await checkSiteUp(monitor.domain))
-        if (!stillDown) {
-          logger.info('Site recovered before blog generation — skipping', { domain: monitor.domain })
-          // Close the incident too
-          await supabase
-            .from('public_incidents')
-            .update({ resolved_at: now.toISOString() })
-            .eq('id', incident.id)
-          await supabase
-            .from('public_monitors')
-            .update({ last_status: 'up', last_checked_at: now.toISOString() })
-            .eq('id', monitor.id)
-          autoClosed++
-          continue
+        // For ongoing incidents: re-confirm site is still down before generating blog.
+        // For already-resolved incidents: skip the live check — the outage was real, blog it.
+        if (!incident.resolved_at) {
+          const stillDown = !(await checkSiteUp(monitor.domain))
+          if (!stillDown) {
+            logger.info('Site recovered before blog generation — skipping', { domain: monitor.domain })
+            await supabase
+              .from('public_incidents')
+              .update({ resolved_at: now.toISOString() })
+              .eq('id', incident.id)
+            await supabase
+              .from('public_monitors')
+              .update({ last_status: 'up', last_checked_at: now.toISOString() })
+              .eq('id', monitor.id)
+            autoClosed++
+            continue
+          }
         }
 
         try {
-          // Mark blog as generating immediately to prevent duplicate runs
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          await (supabase as unknown as any)
-            .from('public_incidents')
-            .update({ blog_generated_at: now.toISOString() })
-            .eq('id', incident.id)
-
           const research = await researchOutage(monitor.display_name, monitor.domain)
           const draft = await generateOutageBlogPost({
             siteDisplayName: monitor.display_name,
@@ -210,6 +212,13 @@ export async function GET(request: Request): Promise<NextResponse> {
             blogsFailed++
             continue
           }
+
+          // Stamp only after blog post successfully created — prevents permanent lock on timeout
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          await (supabase as unknown as any)
+            .from('public_incidents')
+            .update({ blog_generated_at: now.toISOString() })
+            .eq('id', incident.id)
 
           // Send approval notifications
           const { app, admin } = getConfig()

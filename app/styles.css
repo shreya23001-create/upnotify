@@ -6578,6 +6578,7 @@ section.hero .hero-mockup {
 .autoblog-channel-cron { font-size: 11px; color: var(--text-muted); font-family: monospace; margin-top: 2px; }
 .autoblog-channel-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin: 0 0 16px; }
 .autoblog-channel-footer { border-top: 1px solid var(--border-primary); padding-top: 14px; }
+.autoblog-channel-history { margin-top: 12px; border-top: 1px solid var(--border-primary); padding-top: 8px; }
 
 /* Toggle switch */
 .autoblog-toggle { position: relative; display: inline-block; width: 40px; height: 22px; flex-shrink: 0; }

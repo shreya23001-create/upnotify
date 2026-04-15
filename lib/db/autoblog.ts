@@ -1037,3 +1037,39 @@ export async function updateAutoblogRunResult(id: string, result: {
     })
     .eq('id', id)
 }
+
+// =============================================================================
+// Cron run history (for channel cards)
+// =============================================================================
+
+export interface ChannelCronRun {
+  id: string
+  status: 'running' | 'ok' | 'error'
+  triggered_by: 'schedule' | 'manual'
+  duration_ms: number | null
+  result_summary: string | null
+  error_message: string | null
+  ran_at: string
+}
+
+export async function getCronHistoryForPaths(
+  paths: string[],
+  perPath = 5
+): Promise<Record<string, ChannelCronRun[]>> {
+  if (paths.length === 0) return {}
+  const supabase = db()
+  const { data } = await supabase
+    .from('cron_run_log')
+    .select('id, cron_path, status, triggered_by, duration_ms, result_summary, error_message, ran_at')
+    .in('cron_path', paths)
+    .order('ran_at', { ascending: false })
+    .limit(perPath * paths.length)
+
+  const result: Record<string, ChannelCronRun[]> = {}
+  for (const path of paths) result[path] = []
+  for (const row of (data ?? [])) {
+    const bucket = result[row.cron_path]
+    if (bucket && bucket.length < perPath) bucket.push(row as ChannelCronRun)
+  }
+  return result
+}
