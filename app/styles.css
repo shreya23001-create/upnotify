@@ -6727,4 +6727,5 @@ section.hero .hero-mockup {
 
 /* --- Global: prevent horizontal overflow on all public pages --- */
 .tracker-directory, .leaderboard-page, .score-layout, .tools-page,
-.blog-index, .blog-article { max-width: 100%; overflow-x: hidden; }
+.blog-index { max-width: 100%; overflow-x: hidden; }
+.blog-article { overflow-x: hidden; }
