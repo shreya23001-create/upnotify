@@ -191,10 +191,11 @@ export function AdminUsersContent(): React.ReactElement {
     })
   }, [profiles, search, planFilter, statusFilter, sortKey, sortDir])
 
-  const totalSpend = profiles.reduce((s, p) => s + p.totalSpendGbp, 0)
+  const totalGbpRevenue = profiles.reduce((s, p) => s + p.totalSpendGbp, 0)
+  const totalInrRevenue = profiles.reduce((s, p) => s + p.totalSpendInr, 0)
   const avgScore = profiles.length > 0 ? Math.round(profiles.reduce((s, p) => s + p.score, 0) / profiles.length) : 0
   const highValue = profiles.filter(p => p.score >= 70).length
-  const paying = profiles.filter(p => p.totalSpendGbp > 0).length
+  const paying = profiles.filter(p => p.totalSpendGbp > 0 || p.totalSpendInr > 0).length
 
   const handleImpersonate = useCallback(async (userId: string) => {
     setImpersonatingId(userId)
@@ -327,7 +328,8 @@ export function AdminUsersContent(): React.ReactElement {
       <div style={{ display: 'flex', gap: 12, marginBottom: 20, flexWrap: 'wrap' }}>
         {[
           { label: 'Total Users', value: profiles.length, color: undefined },
-          { label: 'Total Revenue', value: `£${totalSpend.toFixed(2)}`, color: 'var(--success)' },
+          { label: 'UK Revenue', value: `£${totalGbpRevenue.toFixed(2)}`, color: 'var(--success)' },
+          { label: 'INR Revenue', value: `₹${totalInrRevenue.toFixed(0)}`, color: '#f59e0b' },
           { label: 'Avg Score', value: avgScore, color: undefined },
           { label: 'High Value', value: highValue, color: '#16a34a' },
           { label: 'Paying', value: paying, color: undefined },
@@ -429,8 +431,8 @@ export function AdminUsersContent(): React.ReactElement {
                         {p.billingCycle && <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{p.billingCycle}</div>}
                       </td>
                       <td>
-                        <div style={{ fontWeight: 700, fontSize: 14, color: p.totalSpendGbp > 0 ? 'var(--success)' : 'var(--text-muted)' }}>
-                          £{p.totalSpendGbp.toFixed(2)}
+                        <div style={{ fontWeight: 700, fontSize: 14, color: (p.totalSpendGbp > 0 || p.totalSpendInr > 0) ? 'var(--success)' : 'var(--text-muted)' }}>
+                          {p.billingCurrency === 'inr' ? `₹${p.totalSpendInr.toFixed(0)}` : `£${p.totalSpendGbp.toFixed(2)}`}
                         </div>
                         {p.invoiceCount > 0 && <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{p.invoiceCount} inv</div>}
                       </td>
@@ -501,7 +503,7 @@ export function AdminUsersContent(): React.ReactElement {
                                   ['Billing', p.billingCycle ?? '—'],
                                   ['Sub status', p.subStatus ?? '—'],
                                   ['Period ends', fmtDate(p.currentPeriodEnd)],
-                                  ['Total spend', `£${p.totalSpendGbp.toFixed(2)}`],
+                                  ['Total spend', p.billingCurrency === 'inr' ? `₹${p.totalSpendInr.toFixed(0)}` : `£${p.totalSpendGbp.toFixed(2)}`],
                                   ['Invoices', String(p.invoiceCount)],
                                   ['Last invoice', fmtDate(p.lastInvoiceAt)],
                                 ].map(([label, val]) => (
