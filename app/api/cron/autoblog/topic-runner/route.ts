@@ -76,7 +76,7 @@ export async function GET(request: Request): Promise<NextResponse> {
 
     // Fetch shared data once for all topics
     const [rawFeedItems, allSources, trackerContext] = await Promise.all([
-      getRecentFeedItems(72, 300),
+      getRecentFeedItems(168, 300), // 7-day window — topics run weekly/monthly so items must survive longer
       getAutoblogSources(),
       getTrackerContext(),
     ])
