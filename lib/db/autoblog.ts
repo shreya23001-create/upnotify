@@ -786,6 +786,50 @@ export async function deleteAutoblogTopic(id: string): Promise<boolean> {
 
 
 
+// Get all sources assigned to a topic
+export async function getTopicSources(topicId: string): Promise<AutoblogSource[]> {
+  const supabase = db()
+  const { data, error } = await supabase
+    .from('autoblog_topic_sources')
+    .select('source_id, autoblog_sources(*)')
+    .eq('topic_id', topicId)
+
+  if (error) {
+    logger.error('Failed to get topic sources', { error: error.message, topicId })
+    return []
+  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return ((data ?? []) as any[]).map(row => row.autoblog_sources as AutoblogSource)
+}
+
+// Replace all sources assigned to a topic (delete + insert)
+export async function setTopicSources(topicId: string, sourceIds: string[]): Promise<boolean> {
+  const supabase = db()
+
+  const { error: deleteError } = await supabase
+    .from('autoblog_topic_sources')
+    .delete()
+    .eq('topic_id', topicId)
+
+  if (deleteError) {
+    logger.error('Failed to clear topic sources', { error: deleteError.message, topicId })
+    return false
+  }
+
+  if (sourceIds.length === 0) return true
+
+  const { error: insertError } = await supabase
+    .from('autoblog_topic_sources')
+    .insert(sourceIds.map(sid => ({ topic_id: topicId, source_id: sid })))
+
+  if (insertError) {
+    logger.error('Failed to set topic sources', { error: insertError.message, topicId })
+    return false
+  }
+
+  return true
+}
+
 export async function updateTopicLastRun(id: string): Promise<void> {
 
   const supabase = db()

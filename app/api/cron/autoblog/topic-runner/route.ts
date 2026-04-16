@@ -12,7 +12,8 @@ import { startCronRun, endCronRun, getTriggeredBy } from '@/lib/utils/cron-logge
 import {
   getEnabledAutoblogTopics,
   getRecentFeedItems,
-  getEnabledAutoblogSources,
+  getAutoblogSources,
+  getTopicSources,
   createQueuedAutoblogRun,
   updateTopicLastRun,
 } from '@/lib/db/autoblog'
@@ -39,18 +40,11 @@ function isTopicDue(topic: AutoblogTopic, now: Date): boolean {
   }
 }
 
-function filterItemsByKeywords(
+function filterItemsBySourceIds(
   items: Array<AutoblogFeedItem & { sourceName: string }>,
-  keywords: string[]
+  sourceIds: Set<string>
 ): typeof items {
-  if (keywords.length === 0) return items.slice(0, 15)
-  const kwLower = keywords.map(k => k.toLowerCase())
-  return items
-    .filter(item => {
-      const text = `${item.title} ${item.summary ?? ''}`.toLowerCase()
-      return kwLower.some(kw => text.includes(kw))
-    })
-    .slice(0, 15)
+  return items.filter(item => sourceIds.has(item.source_id)).slice(0, 15)
 }
 
 export async function GET(request: Request): Promise<NextResponse> {
@@ -81,13 +75,13 @@ export async function GET(request: Request): Promise<NextResponse> {
     logger.info('Due autoblog topics found', { count: dueTopics.length })
 
     // Fetch shared data once for all topics
-    const [rawFeedItems, sources, trackerContext] = await Promise.all([
+    const [rawFeedItems, allSources, trackerContext] = await Promise.all([
       getRecentFeedItems(72, 300),
-      getEnabledAutoblogSources(),
+      getAutoblogSources(),
       getTrackerContext(),
     ])
 
-    const sourceMap = new Map(sources.map(s => [s.id, s.name]))
+    const sourceMap = new Map(allSources.map(s => [s.id, s.name]))
     const annotatedItems = rawFeedItems.map((item: AutoblogFeedItem) => ({
       ...item,
       sourceName: sourceMap.get(item.source_id) ?? 'Unknown',
@@ -99,7 +93,15 @@ export async function GET(request: Request): Promise<NextResponse> {
       // Stamp last_run_at immediately to prevent duplicate queuing on next cron tick
       await updateTopicLastRun(topic.id)
 
-      const relevantItems = filterItemsByKeywords(annotatedItems, topic.keywords)
+      // Get this topic's assigned sources
+      const topicSources = await getTopicSources(topic.id)
+      if (topicSources.length === 0) {
+        logger.warn('No sources assigned to topic — skipping', { topic: topic.name })
+        continue
+      }
+
+      const assignedSourceIds = new Set(topicSources.map(s => s.id))
+      const relevantItems = filterItemsBySourceIds(annotatedItems, assignedSourceIds)
       const feedItems = relevantItems.map(item => ({
         title: item.title,
         url: item.url,
@@ -109,7 +111,7 @@ export async function GET(request: Request): Promise<NextResponse> {
       }))
 
       if (feedItems.length === 0) {
-        logger.warn('No matching feed items for topic — skipping', { topic: topic.name, keywords: topic.keywords })
+        logger.warn('No feed items from assigned sources — skipping', { topic: topic.name, assignedSources: topicSources.length })
         continue
       }
 
