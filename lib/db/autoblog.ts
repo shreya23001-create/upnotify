@@ -970,7 +970,7 @@ export async function sourceKeyAlreadyProcessed(sourceKey: string): Promise<bool
 
     .eq('source_key', sourceKey)
 
-    .in('status', ['generated', 'skipped', 'queued', 'generating'])
+    .in('status', ['generated', 'skipped', 'queued', 'generating', 'failed'])
 
 
 
