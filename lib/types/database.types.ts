@@ -2869,6 +2869,27 @@ export type Database = {
           }
         ]
       }
+      paywalled_domains: {
+        Row: {
+          id: number
+          domain: string
+          auto_detected: boolean
+          added_at: string
+        }
+        Insert: {
+          id?: number
+          domain: string
+          auto_detected?: boolean
+          added_at?: string
+        }
+        Update: {
+          id?: number
+          domain?: string
+          auto_detected?: boolean
+          added_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
