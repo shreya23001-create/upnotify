@@ -17,6 +17,7 @@ export interface OutageContext {
   statusCode: number | null // e.g. 503
   startedAt: string         // ISO timestamp
   incidentId: string        // public_incidents.id
+  monitorId?: string        // public_monitors.id — used for per-monitor daily dedup
   research?: OutageResearch // Optional — enriches the post if available
 }
 
@@ -101,6 +102,22 @@ async function blogExistsForIncident(incidentId: string): Promise<boolean> {
   return (count ?? 0) > 0
 }
 
+// One blog per monitor per UTC day — prevents 12 duplicate posts when a site flaps all day
+async function blogExistsForMonitorToday(monitorId: string): Promise<boolean> {
+  const supabase = createAdminClient()
+  const todayStart = new Date()
+  todayStart.setUTCHours(0, 0, 0, 0)
+
+  const { count } = await supabase
+    .from('public_incidents')
+    .select('id', { count: 'exact', head: true })
+    .eq('monitor_id', monitorId)
+    .not('blog_generated_at', 'is', null)
+    .gte('blog_generated_at', todayStart.toISOString())
+
+  return (count ?? 0) > 0
+}
+
 // ---------------------------------------------------------------------------
 // Main generation function
 // ---------------------------------------------------------------------------
@@ -108,13 +125,22 @@ async function blogExistsForIncident(incidentId: string): Promise<boolean> {
 /**
  * Generates an outage blog post using Claude + real-time research from
  * multiple sources. Saves as pending_approval and creates approval tokens
- * for admin email review. Safe to call multiple times — deduplicates by incident ID.
+ * for admin email review. One post per monitor per UTC day — deduplicates by
+ * incident ID and by monitor to prevent repeated posts when a site flaps.
  */
 export async function generateOutageBlogPost(ctx: OutageContext): Promise<GeneratedBlogDraft | null> {
   const exists = await blogExistsForIncident(ctx.incidentId)
   if (exists) {
     logger.info('Blog post already exists for incident — skipping', { incidentId: ctx.incidentId })
     return null
+  }
+
+  if (ctx.monitorId) {
+    const monitorBloggedToday = await blogExistsForMonitorToday(ctx.monitorId)
+    if (monitorBloggedToday) {
+      logger.info('Blog already generated for this monitor today — skipping', { monitorId: ctx.monitorId })
+      return null
+    }
   }
 
   const config = getServerConfig()
@@ -178,7 +204,7 @@ Format your response EXACTLY like this:
 
   try {
     const message = await client.messages.create({
-      model: 'claude-sonnet-4-6',
+      model: 'claude-haiku-4-5-20251001',
       max_tokens: 1500,
       messages: [{ role: 'user', content: prompt }],
     })

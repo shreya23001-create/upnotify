@@ -204,6 +204,7 @@ export async function GET(request: Request): Promise<NextResponse> {
             statusCode: incident.status_code ?? null,
             startedAt: incident.started_at,
             incidentId: incident.id,
+            monitorId: monitor.id,
             research,
           })
 

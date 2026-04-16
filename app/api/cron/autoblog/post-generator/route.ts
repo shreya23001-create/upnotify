@@ -85,7 +85,7 @@ export async function GET(request: Request): Promise<NextResponse> {
     if (!draft) {
       await updateAutoblogRunResult(queued.id, {
         status: 'failed',
-        error_message: 'Generator returned null - likely missing API key',
+        error_message: 'Generator returned null — check ANTHROPIC_API_KEY is set and account has credits',
       })
       await endCronRun(runId, cronStart, 'ok', { summary: 'generation_null' })
       return NextResponse.json({ ok: false, error: 'Draft was null' })
