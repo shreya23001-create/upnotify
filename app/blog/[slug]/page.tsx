@@ -218,7 +218,7 @@ export default async function DynamicBlogPost({ params }: { params: Promise<{ sl
         </div>
       </header>
 
-      {Boolean((post as unknown as Record<string, unknown>).auto_generated) && (
+      {Boolean((post as unknown as Record<string, unknown>).auto_generated) && post.category === 'outage' && (
         <div style={{
           background: 'var(--bg-secondary, #f8f9fa)',
           border: '1px solid var(--border, #e5e7eb)',
