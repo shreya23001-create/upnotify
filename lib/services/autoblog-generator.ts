@@ -690,9 +690,9 @@ export async function generateAutoblogPost(input: AutoblogInput): Promise<Autobl
 
     const message = await client.messages.create({
 
-      model: 'claude-sonnet-4-6',
+      model: 'claude-haiku-4-5-20251001',
 
-      max_tokens: 4000,
+      max_tokens: 2000,
 
       system: EDITORIAL_SYSTEM_PROMPT,
 
