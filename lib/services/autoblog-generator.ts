@@ -614,9 +614,7 @@ export async function generateAutoblogPost(input: AutoblogInput): Promise<Autobl
 
   if (!config.anthropic.apiKey) {
 
-    logger.warn('ANTHROPIC_API_KEY not set - skipping autoblog generation')
-
-    return null
+    throw new Error('ANTHROPIC_API_KEY is not configured in environment variables')
 
   }
 
@@ -712,23 +710,17 @@ export async function generateAutoblogPost(input: AutoblogInput): Promise<Autobl
 
     if (!parsed) {
 
-      logger.error('Autoblog generator returned unparseable response', { type: input.type })
-
-      return null
+      throw new Error('Claude API returned unparseable response — missing title or body tags')
 
     }
 
   } catch (err) {
 
-    logger.error('Autoblog Claude API call failed', {
+    const msg = err instanceof Error ? err.message : 'Unknown error'
 
-      type: input.type,
+    logger.error('Autoblog Claude API call failed', { type: input.type, error: msg })
 
-      error: err instanceof Error ? err.message : 'Unknown',
-
-    })
-
-    return null
+    throw new Error(`Claude API call failed: ${msg}`)
 
   }
 
@@ -840,9 +832,7 @@ export async function generateAutoblogPost(input: AutoblogInput): Promise<Autobl
 
   if (insertError || !post) {
 
-    logger.error('Failed to save autoblog post', { error: insertError?.message, type: input.type })
-
-    return null
+    throw new Error(`Failed to save autoblog post to DB: ${insertError?.message ?? 'unknown DB error'}`)
 
   }
 
@@ -856,9 +846,7 @@ export async function generateAutoblogPost(input: AutoblogInput): Promise<Autobl
 
   if (!tokens) {
 
-    logger.error('Failed to create autoblog approval tokens', { blogPostId: post.id })
-
-    return null
+    throw new Error(`Failed to create approval tokens for post ${post.id}`)
 
   }
 

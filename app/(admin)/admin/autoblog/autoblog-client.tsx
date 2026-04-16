@@ -30,6 +30,8 @@ const SCHEDULE_LABELS: Record<string, string> = {
 
 const CATEGORY_LABELS: Record<string, string> = {
 
+  wordpress:   'WordPress',
+
   press_wire:  'Press Wire',
 
   tech_news:   'Tech News',
@@ -138,8 +140,6 @@ interface TopicForm {
 
   schedule: string
 
-  keywords: string
-
   post_to_social: boolean
 
 }
@@ -148,7 +148,7 @@ interface TopicForm {
 
 const EMPTY_TOPIC_FORM: TopicForm = {
 
-  name: '', prompt: '', schedule: 'weekly_mon', keywords: '', post_to_social: true,
+  name: '', prompt: '', schedule: 'weekly_mon', post_to_social: true,
 
 }
 
@@ -171,6 +171,58 @@ export function AutoblogClient({ initialChannels, initialTopics, initialSources,
   const [expandedChannel, setExpandedChannel] = useState<string | null>(null)
   const [triggerState, setTriggerState] = useState<Record<string, 'idle' | 'running' | 'ok' | 'error'>>({})
   const [topicCronExpanded, setTopicCronExpanded] = useState(false)
+  const [topicFullRunState, setTopicFullRunState] = useState<'idle' | 'scanning' | 'generating' | 'ok' | 'error'>('idle')
+
+  const FEED_FETCHER_PATH = '/api/cron/autoblog/feed-fetcher'
+  const TOPIC_RUNNER_PATH = '/api/cron/autoblog/topic-runner'
+  const POST_GENERATOR_PATH = '/api/cron/autoblog/post-generator'
+
+  async function runTopicEndToEnd(): Promise<void> {
+    setTopicFullRunState('scanning')
+    try {
+      // Step 1: feed-fetcher — pull latest RSS items from assigned sources
+      const r0 = await fetch('/api/admin/trigger-cron', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ path: FEED_FETCHER_PATH }),
+      })
+      if (!r0.ok) throw new Error('feed-fetcher failed')
+
+      // Step 2: topic-runner — filter items by topic sources and queue
+      const r1 = await fetch('/api/admin/trigger-cron', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ path: TOPIC_RUNNER_PATH }),
+      })
+      if (!r1.ok) throw new Error('topic-runner failed')
+
+      // Step 3: post-generator — pick up queue, call Claude, send approval email
+      setTopicFullRunState('generating')
+      const r2 = await fetch('/api/admin/trigger-cron', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ path: POST_GENERATOR_PATH }),
+      })
+      if (!r2.ok) throw new Error('post-generator failed')
+
+      // Refresh cron history for all three
+      await Promise.all([FEED_FETCHER_PATH, TOPIC_RUNNER_PATH, POST_GENERATOR_PATH].map(async path => {
+        const h = await fetch(`/api/admin/autoblog/cron-history?path=${encodeURIComponent(path)}`)
+        if (h.ok) {
+          const { history } = await h.json() as { history: ChannelCronRun[] }
+          setCronHistory(prev => ({ ...prev, [path]: history }))
+        }
+      }))
+
+      setTopicFullRunState('ok')
+      showMsg('Done — check your email for the approval draft')
+      setTimeout(() => setTopicFullRunState('idle'), 5000)
+    } catch (err) {
+      setTopicFullRunState('error')
+      showMsg(err instanceof Error ? err.message : 'Run failed', true)
+      setTimeout(() => setTopicFullRunState('idle'), 4000)
+    }
+  }
 
   const triggerChannel = useCallback(async (cronPath: string): Promise<void> => {
     setTriggerState(prev => ({ ...prev, [cronPath]: 'running' }))
@@ -195,8 +247,7 @@ export function AutoblogClient({ initialChannels, initialTopics, initialSources,
     }
   }, [])
 
-  // Topic modal
-
+  // Topic modal — step wizard
   const [showTopicModal, setShowTopicModal] = useState(false)
 
   const [editingTopic, setEditingTopic] = useState<AutoblogTopic | null>(null)
@@ -204,6 +255,18 @@ export function AutoblogClient({ initialChannels, initialTopics, initialSources,
   const [topicForm, setTopicForm] = useState<TopicForm>(EMPTY_TOPIC_FORM)
 
   const [topicSaving, setTopicSaving] = useState(false)
+
+  const [topicStep, setTopicStep] = useState<1 | 2>(1)
+
+  const [selectedSourceIds, setSelectedSourceIds] = useState<Set<string>>(new Set())
+
+  const [sourceSearch, setSourceSearch] = useState('')
+
+  const [showInlineSourceForm, setShowInlineSourceForm] = useState(false)
+
+  const [inlineSourceForm, setInlineSourceForm] = useState({ name: '', url: '', category: 'wordpress' })
+
+  const [inlineSourceSaving, setInlineSourceSaving] = useState(false)
 
 
 
@@ -273,13 +336,23 @@ export function AutoblogClient({ initialChannels, initialTopics, initialSources,
 
     setTopicForm(EMPTY_TOPIC_FORM)
 
+    setTopicStep(1)
+
+    setSelectedSourceIds(new Set())
+
+    setSourceSearch('')
+
+    setShowInlineSourceForm(false)
+
+    setInlineSourceForm({ name: '', url: '', category: 'wordpress' })
+
     setShowTopicModal(true)
 
   }
 
 
 
-  function openEditTopic(topic: AutoblogTopic): void {
+  async function openEditTopic(topic: AutoblogTopic): Promise<void> {
 
     setEditingTopic(topic)
 
@@ -291,19 +364,44 @@ export function AutoblogClient({ initialChannels, initialTopics, initialSources,
 
       schedule: topic.schedule,
 
-      keywords: topic.keywords.join(', '),
-
       post_to_social: topic.post_to_social,
 
     })
 
+    setTopicStep(1)
+
+    setSourceSearch('')
+
+    setShowInlineSourceForm(false)
+
+    setInlineSourceForm({ name: '', url: '', category: 'wordpress' })
+
     setShowTopicModal(true)
+
+    // Load existing source assignments
+    try {
+
+      const res = await fetch(`/api/admin/autoblog/topics/${topic.id}/sources`)
+
+      if (res.ok) {
+
+        const { sources } = await res.json() as { sources: AutoblogSource[] }
+
+        setSelectedSourceIds(new Set(sources.map(s => s.id)))
+
+      }
+
+    } catch {
+
+      setSelectedSourceIds(new Set())
+
+    }
 
   }
 
 
 
-  async function saveTopic(): Promise<void> {
+  function goToStep2(): void {
 
     if (!topicForm.name.trim() || !topicForm.prompt.trim()) {
 
@@ -313,15 +411,37 @@ export function AutoblogClient({ initialChannels, initialTopics, initialSources,
 
     }
 
+    setTopicStep(2)
+
+  }
+
+
+
+  async function saveTopicWithSources(): Promise<void> {
+
     setTopicSaving(true)
 
-    const keywords = topicForm.keywords.split(',').map(k => k.trim()).filter(Boolean)
+    const payload = {
 
-    const payload = { ...topicForm, keywords }
+      name: topicForm.name,
+
+      prompt: topicForm.prompt,
+
+      schedule: topicForm.schedule,
+
+      post_to_social: topicForm.post_to_social,
+
+      keywords: [] as string[],
+
+    }
 
 
 
     try {
+
+      let topicId: string
+
+
 
       if (editingTopic) {
 
@@ -337,9 +457,9 @@ export function AutoblogClient({ initialChannels, initialTopics, initialSources,
 
         if (!res.ok) throw new Error('Failed to update')
 
-        setTopics(prev => prev.map(t => t.id === editingTopic.id ? { ...t, ...payload, keywords } : t))
+        setTopics(prev => prev.map(t => t.id === editingTopic.id ? { ...t, ...payload } : t))
 
-        showMsg('Topic updated')
+        topicId = editingTopic.id
 
       } else {
 
@@ -359,9 +479,26 @@ export function AutoblogClient({ initialChannels, initialTopics, initialSources,
 
         setTopics(prev => [topic, ...prev])
 
-        showMsg('Topic created')
+        topicId = topic.id
 
       }
+
+
+
+      // Save source assignments
+      await fetch(`/api/admin/autoblog/topics/${topicId}/sources`, {
+
+        method: 'PUT',
+
+        headers: { 'Content-Type': 'application/json' },
+
+        body: JSON.stringify({ sourceIds: Array.from(selectedSourceIds) }),
+
+      })
+
+
+
+      showMsg(editingTopic ? 'Topic updated' : 'Topic created')
 
       setShowTopicModal(false)
 
@@ -372,6 +509,64 @@ export function AutoblogClient({ initialChannels, initialTopics, initialSources,
     } finally {
 
       setTopicSaving(false)
+
+    }
+
+  }
+
+
+
+  async function addInlineSource(): Promise<void> {
+
+    if (!inlineSourceForm.name.trim() || !inlineSourceForm.url.trim()) {
+
+      showMsg('Name and URL are required', true)
+
+      return
+
+    }
+
+    setInlineSourceSaving(true)
+
+    try {
+
+      const res = await fetch('/api/admin/autoblog/sources', {
+
+        method: 'POST',
+
+        headers: { 'Content-Type': 'application/json' },
+
+        body: JSON.stringify(inlineSourceForm),
+
+      })
+
+      if (!res.ok) {
+
+        const data = await res.json() as { error: string }
+
+        throw new Error(data.error ?? 'Failed to add source')
+
+      }
+
+      const { source } = await res.json() as { source: AutoblogSource }
+
+      setSources(prev => [...prev, source])
+
+      setSelectedSourceIds(prev => new Set([...prev, source.id]))
+
+      setInlineSourceForm({ name: '', url: '', category: 'wordpress' })
+
+      setShowInlineSourceForm(false)
+
+      showMsg('Source added and selected')
+
+    } catch (err) {
+
+      showMsg(err instanceof Error ? err.message : 'Failed to add source', true)
+
+    } finally {
+
+      setInlineSourceSaving(false)
 
     }
 
@@ -792,15 +987,21 @@ export function AutoblogClient({ initialChannels, initialTopics, initialSources,
 
           {/* Topic-runner cron control bar */}
           {(() => {
-            const TOPIC_RUNNER = '/api/cron/autoblog/topic-runner'
-            const tState = triggerState[TOPIC_RUNNER] ?? 'idle'
-            const history = cronHistory[TOPIC_RUNNER] ?? []
+            const history = cronHistory[TOPIC_RUNNER_PATH] ?? []
             const lastRun = history[0]
+            const runLabel =
+              topicFullRunState === 'scanning'   ? '⟳ Scanning feeds…' :
+              topicFullRunState === 'generating' ? '⟳ Generating post…' :
+              topicFullRunState === 'ok'         ? '✓ Done — check email' :
+              topicFullRunState === 'error'      ? '✗ Error' :
+              '▶ Run now'
             return (
               <div style={{ border: '1px solid var(--border-color)', borderRadius: 8, padding: '12px 16px', marginBottom: 20, background: 'var(--bg-secondary)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>Topic Runner Cron</span>
-                  <code style={{ fontSize: 11, color: 'var(--text-muted)', background: 'var(--bg-card)', padding: '2px 6px', borderRadius: 4 }}>{TOPIC_RUNNER}</code>
+                  <div>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>Topic Runner</span>
+                    <span style={{ fontSize: 12, color: 'var(--text-muted)', marginLeft: 8 }}>Fetches RSS → scans topics → generates post → sends approval email</span>
+                  </div>
 
                   <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
                     {lastRun && (
@@ -815,11 +1016,11 @@ export function AutoblogClient({ initialChannels, initialTopics, initialSources,
                     )}
                     <button
                       className="autoblog-action-btn"
-                      style={{ fontWeight: 600, fontSize: 12, padding: '4px 10px' }}
-                      disabled={tState === 'running'}
-                      onClick={() => triggerChannel(TOPIC_RUNNER)}
+                      style={{ fontWeight: 600, fontSize: 12, padding: '4px 12px', minWidth: 160, textAlign: 'center' }}
+                      disabled={topicFullRunState === 'scanning' || topicFullRunState === 'generating'}
+                      onClick={() => { void runTopicEndToEnd() }}
                     >
-                      {tState === 'running' ? 'Running…' : tState === 'ok' ? '✓ Done' : tState === 'error' ? '✗ Error' : '▶ Run now'}
+                      {runLabel}
                     </button>
                     {history.length > 0 && (
                       <button
@@ -914,16 +1115,6 @@ export function AutoblogClient({ initialChannels, initialTopics, initialSources,
 
                       </span>
 
-                      {topic.keywords.length > 0 && (
-
-                        <span className="autoblog-topic-keywords">
-
-                          {topic.keywords.slice(0, 3).join(', ')}{topic.keywords.length > 3 ? ` +${topic.keywords.length - 3}` : ''}
-
-                        </span>
-
-                      )}
-
                       <span className="autoblog-topic-next">
 
                         Next: {nextRunLabel(topic.schedule, topic.last_run_at)}
@@ -954,7 +1145,7 @@ export function AutoblogClient({ initialChannels, initialTopics, initialSources,
 
                     </label>
 
-                    <button className="autoblog-action-btn" onClick={() => openEditTopic(topic)}>Edit</button>
+                    <button className="autoblog-action-btn" onClick={() => { void openEditTopic(topic) }}>Edit</button>
 
                     <button className="autoblog-action-btn autoblog-action-btn-danger" onClick={() => deleteTopic(topic.id, topic.name)}>Delete</button>
 
@@ -1198,14 +1389,15 @@ export function AutoblogClient({ initialChannels, initialTopics, initialSources,
 
 
 
-      {/* - TOPIC MODAL - */}
+      {/* - TOPIC MODAL (2-step wizard) - */}
 
       {showTopicModal && (
 
         <div className="modal-overlay" onClick={() => setShowTopicModal(false)}>
 
-          <div className="modal-box modal-box-lg" onClick={e => e.stopPropagation()}>
+          <div className="modal-box modal-box-lg" onClick={e => e.stopPropagation()} style={{ maxWidth: 580 }}>
 
+            {/* Header */}
             <div className="modal-header">
 
               <h2 className="modal-title">{editingTopic ? 'Edit Topic' : 'Add Topic'}</h2>
@@ -1214,121 +1406,403 @@ export function AutoblogClient({ initialChannels, initialTopics, initialSources,
 
             </div>
 
-            <div className="modal-body">
+            {/* Step indicator */}
+            <div style={{ display: 'flex', alignItems: 'center', padding: '12px 24px', borderBottom: '1px solid var(--border-color)' }}>
 
-              <div className="form-group">
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 600, color: topicStep === 1 ? '#3b82f6' : '#22c55e' }}>
 
-                <label className="form-label">Topic Name</label>
+                <span style={{ width: 24, height: 24, borderRadius: '50%', background: topicStep === 1 ? '#3b82f6' : '#22c55e', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, flexShrink: 0 }}>
 
-                <input
+                  {topicStep === 1 ? '1' : '✓'}
 
-                  className="form-input"
+                </span>
 
-                  value={topicForm.name}
-
-                  onChange={e => setTopicForm(f => ({ ...f, name: e.target.value }))}
-
-                  placeholder="e.g. Monthly Uptime Roundup"
-
-                />
+                Topic Details
 
               </div>
 
-              <div className="form-group">
+              <div style={{ flex: 1, height: 1, background: 'var(--border-color)', margin: '0 12px' }} />
 
-                <label className="form-label">Prompt / Instructions</label>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: topicStep === 2 ? 600 : 400, color: topicStep === 2 ? '#3b82f6' : 'var(--text-muted)' }}>
 
-                <textarea
+                <span style={{ width: 24, height: 24, borderRadius: '50%', border: `2px solid ${topicStep === 2 ? '#3b82f6' : 'var(--text-muted)'}`, background: topicStep === 2 ? '#3b82f6' : 'transparent', color: topicStep === 2 ? '#fff' : 'var(--text-muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, flexShrink: 0 }}>
 
-                  className="form-input form-textarea"
+                  2
 
-                  rows={6}
+                </span>
 
-                  value={topicForm.prompt}
-
-                  onChange={e => setTopicForm(f => ({ ...f, prompt: e.target.value }))}
-
-                  placeholder="Describe what the blog post should cover. Be specific - tone, angle, sections, CTA. The engine will follow your instructions faithfully."
-
-                />
-
-              </div>
-
-              <div className="form-group">
-
-                <label className="form-label">Schedule</label>
-
-                <select
-
-                  className="form-input form-select"
-
-                  value={topicForm.schedule}
-
-                  onChange={e => setTopicForm(f => ({ ...f, schedule: e.target.value }))}
-
-                >
-
-                  {Object.entries(SCHEDULE_LABELS).map(([val, label]) => (
-
-                    <option key={val} value={val}>{label}</option>
-
-                  ))}
-
-                </select>
-
-              </div>
-
-              <div className="form-group">
-
-                <label className="form-label">Keywords (comma-separated, optional)</label>
-
-                <input
-
-                  className="form-input"
-
-                  value={topicForm.keywords}
-
-                  onChange={e => setTopicForm(f => ({ ...f, keywords: e.target.value }))}
-
-                  placeholder="uptime, monitoring, downtime, SaaS"
-
-                />
-
-                <p className="form-hint">Used to filter relevant feed items for this topic</p>
-
-              </div>
-
-              <div className="form-group">
-
-                <label className="autoblog-social-toggle">
-
-                  <input
-
-                    type="checkbox"
-
-                    checked={topicForm.post_to_social}
-
-                    onChange={e => setTopicForm(f => ({ ...f, post_to_social: e.target.checked }))}
-
-                  />
-
-                  <span className="autoblog-social-label">Post to social media when approved</span>
-
-                </label>
+                Assign Sources
 
               </div>
 
             </div>
 
+            {/* Step 1 — Topic Details */}
+            {topicStep === 1 && (
+
+              <div className="modal-body">
+
+                <div className="form-group">
+
+                  <label className="form-label">Topic Name</label>
+
+                  <input
+
+                    className="form-input"
+
+                    value={topicForm.name}
+
+                    onChange={e => setTopicForm(f => ({ ...f, name: e.target.value }))}
+
+                    placeholder="e.g. WordPress Weekly Roundup"
+
+                    autoFocus
+
+                  />
+
+                </div>
+
+                <div className="form-group">
+
+                  <label className="form-label">Prompt / Instructions</label>
+
+                  <textarea
+
+                    className="form-input form-textarea"
+
+                    rows={6}
+
+                    value={topicForm.prompt}
+
+                    onChange={e => setTopicForm(f => ({ ...f, prompt: e.target.value }))}
+
+                    placeholder="Describe what the blog post should cover. Be specific — tone, angle, target audience, key sections, call to action. The engine follows your instructions faithfully."
+
+                  />
+
+                </div>
+
+                <div className="form-group">
+
+                  <label className="form-label">Schedule</label>
+
+                  <select
+
+                    className="form-input form-select"
+
+                    value={topicForm.schedule}
+
+                    onChange={e => setTopicForm(f => ({ ...f, schedule: e.target.value }))}
+
+                  >
+
+                    {Object.entries(SCHEDULE_LABELS).map(([val, label]) => (
+
+                      <option key={val} value={val}>{label}</option>
+
+                    ))}
+
+                  </select>
+
+                </div>
+
+                <div className="form-group">
+
+                  <label className="autoblog-social-toggle">
+
+                    <input
+
+                      type="checkbox"
+
+                      checked={topicForm.post_to_social}
+
+                      onChange={e => setTopicForm(f => ({ ...f, post_to_social: e.target.checked }))}
+
+                    />
+
+                    <span className="autoblog-social-label">Post to social media when approved</span>
+
+                  </label>
+
+                </div>
+
+              </div>
+
+            )}
+
+            {/* Step 2 — Assign Sources */}
+            {topicStep === 2 && (
+
+              <div className="modal-body" style={{ maxHeight: '55vh', overflowY: 'auto' }}>
+
+                {/* Count + inline add trigger */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+
+                  <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>
+
+                    <strong style={{ color: selectedSourceIds.size > 0 ? '#3b82f6' : 'var(--text-primary)' }}>{selectedSourceIds.size}</strong> sources selected
+
+                  </span>
+
+                  <button
+
+                    style={{ background: 'none', border: 'none', color: '#3b82f6', fontSize: 13, fontWeight: 600, cursor: 'pointer', padding: 0 }}
+
+                    onClick={() => setShowInlineSourceForm(v => !v)}
+
+                  >
+
+                    {showInlineSourceForm ? '✕ Cancel' : '+ Add new source'}
+
+                  </button>
+
+                </div>
+
+                {/* Inline add source form */}
+                {showInlineSourceForm && (
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 16, padding: 12, background: 'var(--bg-secondary)', border: '1px dashed #3b82f6', borderRadius: 8 }}>
+
+                    <div style={{ display: 'flex', gap: 8 }}>
+
+                      <input
+
+                        className="form-input"
+
+                        style={{ flex: 1, fontSize: 13, padding: '7px 10px' }}
+
+                        placeholder="Source name (e.g. WP Tavern)"
+
+                        value={inlineSourceForm.name}
+
+                        onChange={e => setInlineSourceForm(f => ({ ...f, name: e.target.value }))}
+
+                      />
+
+                      <input
+
+                        className="form-input"
+
+                        style={{ flex: 1, fontSize: 13, padding: '7px 10px' }}
+
+                        placeholder="RSS feed URL"
+
+                        value={inlineSourceForm.url}
+
+                        onChange={e => setInlineSourceForm(f => ({ ...f, url: e.target.value }))}
+
+                      />
+
+                    </div>
+
+                    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+
+                      <select
+
+                        className="form-input form-select"
+
+                        style={{ maxWidth: 160, fontSize: 13, padding: '7px 10px' }}
+
+                        value={inlineSourceForm.category}
+
+                        onChange={e => setInlineSourceForm(f => ({ ...f, category: e.target.value }))}
+
+                      >
+
+                        {Object.entries(CATEGORY_LABELS).map(([val, label]) => (
+
+                          <option key={val} value={val}>{label}</option>
+
+                        ))}
+
+                      </select>
+
+                      <div style={{ flex: 1 }} />
+
+                      <button
+
+                        className="btn-secondary"
+
+                        style={{ fontSize: 13, padding: '6px 12px' }}
+
+                        onClick={() => { setShowInlineSourceForm(false); setInlineSourceForm({ name: '', url: '', category: 'wordpress' }) }}
+
+                      >
+
+                        Cancel
+
+                      </button>
+
+                      <button
+
+                        className="btn-primary"
+
+                        style={{ fontSize: 13, padding: '6px 14px' }}
+
+                        onClick={() => { void addInlineSource() }}
+
+                        disabled={inlineSourceSaving}
+
+                      >
+
+                        {inlineSourceSaving ? 'Adding…' : 'Add source'}
+
+                      </button>
+
+                    </div>
+
+                  </div>
+
+                )}
+
+                {/* Search */}
+                <input
+
+                  className="form-input"
+
+                  style={{ marginBottom: 14, fontSize: 13 }}
+
+                  placeholder="Search sources…"
+
+                  value={sourceSearch}
+
+                  onChange={e => setSourceSearch(e.target.value)}
+
+                />
+
+                {/* Sources grouped by category */}
+                {(() => {
+
+                  const q = sourceSearch.toLowerCase()
+
+                  const filtered = sources.filter(s =>
+                    !q || s.name.toLowerCase().includes(q) || (s.category ?? '').includes(q)
+                  )
+
+                  const grouped = filtered.reduce<Record<string, AutoblogSource[]>>((acc, s) => {
+
+                    const cat = s.category ?? 'other'
+
+                    if (!acc[cat]) acc[cat] = []
+
+                    acc[cat].push(s)
+
+                    return acc
+
+                  }, {})
+
+                  if (filtered.length === 0) {
+
+                    return <p style={{ fontSize: 13, color: 'var(--text-muted)', textAlign: 'center', padding: '20px 0' }}>No sources found.</p>
+
+                  }
+
+                  return Object.entries(grouped).map(([cat, catSources]) => (
+
+                    <div key={cat} style={{ marginBottom: 16 }}>
+
+                      <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>
+
+                        {CATEGORY_LABELS[cat] ?? cat}
+
+                      </div>
+
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+
+                        {catSources.map(source => (
+
+                          <label
+
+                            key={source.id}
+
+                            style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', borderRadius: 6, cursor: 'pointer', background: selectedSourceIds.has(source.id) ? 'color-mix(in srgb, #3b82f6 12%, var(--bg-secondary))' : 'var(--bg-secondary)', border: `1px solid ${selectedSourceIds.has(source.id) ? '#3b82f6' : 'var(--border-color)'}`, transition: 'all 0.15s' }}
+
+                          >
+
+                            <input
+
+                              type="checkbox"
+
+                              checked={selectedSourceIds.has(source.id)}
+
+                              onChange={e => {
+
+                                setSelectedSourceIds(prev => {
+
+                                  const next = new Set(prev)
+
+                                  if (e.target.checked) next.add(source.id)
+
+                                  else next.delete(source.id)
+
+                                  return next
+
+                                })
+
+                              }}
+
+                              style={{ accentColor: '#3b82f6', width: 15, height: 15, flexShrink: 0 }}
+
+                            />
+
+                            <div style={{ flex: 1, minWidth: 0 }}>
+
+                              <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{source.name}</div>
+
+                              <div style={{ fontSize: 11, color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{source.url}</div>
+
+                            </div>
+
+                            {!source.is_enabled && (
+
+                              <span style={{ fontSize: 10, fontWeight: 600, color: '#f59e0b', flexShrink: 0 }}>disabled</span>
+
+                            )}
+
+                          </label>
+
+                        ))}
+
+                      </div>
+
+                    </div>
+
+                  ))
+
+                })()}
+
+              </div>
+
+            )}
+
+            {/* Footer */}
             <div className="modal-footer">
 
-              <button className="btn-secondary" onClick={() => setShowTopicModal(false)}>Cancel</button>
+              {topicStep === 1 ? (
 
-              <button className="btn-primary" onClick={saveTopic} disabled={topicSaving}>
+                <>
 
-                {topicSaving ? 'Saving...' : editingTopic ? 'Save Changes' : 'Create Topic'}
+                  <button className="btn-secondary" onClick={() => setShowTopicModal(false)}>Cancel</button>
 
-              </button>
+                  <button className="btn-primary" onClick={goToStep2}>Next: Assign Sources →</button>
+
+                </>
+
+              ) : (
+
+                <>
+
+                  <button className="btn-secondary" onClick={() => setTopicStep(1)}>← Back</button>
+
+                  <button className="btn-primary" onClick={() => { void saveTopicWithSources() }} disabled={topicSaving}>
+
+                    {topicSaving ? 'Saving...' : editingTopic ? 'Save Changes' : 'Create Topic'}
+
+                  </button>
+
+                </>
+
+              )}
 
             </div>
 
