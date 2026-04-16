@@ -171,6 +171,49 @@ export function AutoblogClient({ initialChannels, initialTopics, initialSources,
   const [expandedChannel, setExpandedChannel] = useState<string | null>(null)
   const [triggerState, setTriggerState] = useState<Record<string, 'idle' | 'running' | 'ok' | 'error'>>({})
   const [topicCronExpanded, setTopicCronExpanded] = useState(false)
+  const [topicFullRunState, setTopicFullRunState] = useState<'idle' | 'scanning' | 'generating' | 'ok' | 'error'>('idle')
+
+  const TOPIC_RUNNER_PATH = '/api/cron/autoblog/topic-runner'
+  const POST_GENERATOR_PATH = '/api/cron/autoblog/post-generator'
+
+  async function runTopicEndToEnd(): Promise<void> {
+    setTopicFullRunState('scanning')
+    try {
+      // Step 1: topic-runner — scan feed and queue
+      const r1 = await fetch('/api/admin/trigger-cron', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ path: TOPIC_RUNNER_PATH }),
+      })
+      if (!r1.ok) throw new Error('topic-runner failed')
+
+      // Step 2: post-generator — pick up queue, call Claude, send approval email
+      setTopicFullRunState('generating')
+      const r2 = await fetch('/api/admin/trigger-cron', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ path: POST_GENERATOR_PATH }),
+      })
+      if (!r2.ok) throw new Error('post-generator failed')
+
+      // Refresh cron history for both
+      await Promise.all([TOPIC_RUNNER_PATH, POST_GENERATOR_PATH].map(async path => {
+        const h = await fetch(`/api/admin/autoblog/cron-history?path=${encodeURIComponent(path)}`)
+        if (h.ok) {
+          const { history } = await h.json() as { history: ChannelCronRun[] }
+          setCronHistory(prev => ({ ...prev, [path]: history }))
+        }
+      }))
+
+      setTopicFullRunState('ok')
+      showMsg('Done — check your email for the approval draft')
+      setTimeout(() => setTopicFullRunState('idle'), 5000)
+    } catch (err) {
+      setTopicFullRunState('error')
+      showMsg(err instanceof Error ? err.message : 'Run failed', true)
+      setTimeout(() => setTopicFullRunState('idle'), 4000)
+    }
+  }
 
   const triggerChannel = useCallback(async (cronPath: string): Promise<void> => {
     setTriggerState(prev => ({ ...prev, [cronPath]: 'running' }))
@@ -935,15 +978,21 @@ export function AutoblogClient({ initialChannels, initialTopics, initialSources,
 
           {/* Topic-runner cron control bar */}
           {(() => {
-            const TOPIC_RUNNER = '/api/cron/autoblog/topic-runner'
-            const tState = triggerState[TOPIC_RUNNER] ?? 'idle'
-            const history = cronHistory[TOPIC_RUNNER] ?? []
+            const history = cronHistory[TOPIC_RUNNER_PATH] ?? []
             const lastRun = history[0]
+            const runLabel =
+              topicFullRunState === 'scanning'   ? '⟳ Scanning feeds…' :
+              topicFullRunState === 'generating' ? '⟳ Generating post…' :
+              topicFullRunState === 'ok'         ? '✓ Done — check email' :
+              topicFullRunState === 'error'      ? '✗ Error' :
+              '▶ Run now'
             return (
               <div style={{ border: '1px solid var(--border-color)', borderRadius: 8, padding: '12px 16px', marginBottom: 20, background: 'var(--bg-secondary)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>Topic Runner Cron</span>
-                  <code style={{ fontSize: 11, color: 'var(--text-muted)', background: 'var(--bg-card)', padding: '2px 6px', borderRadius: 4 }}>{TOPIC_RUNNER}</code>
+                  <div>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>Topic Runner</span>
+                    <span style={{ fontSize: 12, color: 'var(--text-muted)', marginLeft: 8 }}>Scans feeds → generates post → sends approval email</span>
+                  </div>
 
                   <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
                     {lastRun && (
@@ -958,11 +1007,11 @@ export function AutoblogClient({ initialChannels, initialTopics, initialSources,
                     )}
                     <button
                       className="autoblog-action-btn"
-                      style={{ fontWeight: 600, fontSize: 12, padding: '4px 10px' }}
-                      disabled={tState === 'running'}
-                      onClick={() => triggerChannel(TOPIC_RUNNER)}
+                      style={{ fontWeight: 600, fontSize: 12, padding: '4px 12px', minWidth: 160, textAlign: 'center' }}
+                      disabled={topicFullRunState === 'scanning' || topicFullRunState === 'generating'}
+                      onClick={() => { void runTopicEndToEnd() }}
                     >
-                      {tState === 'running' ? 'Running…' : tState === 'ok' ? '✓ Done' : tState === 'error' ? '✗ Error' : '▶ Run now'}
+                      {runLabel}
                     </button>
                     {history.length > 0 && (
                       <button
