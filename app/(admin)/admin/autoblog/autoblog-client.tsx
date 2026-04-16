@@ -173,13 +173,22 @@ export function AutoblogClient({ initialChannels, initialTopics, initialSources,
   const [topicCronExpanded, setTopicCronExpanded] = useState(false)
   const [topicFullRunState, setTopicFullRunState] = useState<'idle' | 'scanning' | 'generating' | 'ok' | 'error'>('idle')
 
+  const FEED_FETCHER_PATH = '/api/cron/autoblog/feed-fetcher'
   const TOPIC_RUNNER_PATH = '/api/cron/autoblog/topic-runner'
   const POST_GENERATOR_PATH = '/api/cron/autoblog/post-generator'
 
   async function runTopicEndToEnd(): Promise<void> {
     setTopicFullRunState('scanning')
     try {
-      // Step 1: topic-runner — scan feed and queue
+      // Step 1: feed-fetcher — pull latest RSS items from assigned sources
+      const r0 = await fetch('/api/admin/trigger-cron', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ path: FEED_FETCHER_PATH }),
+      })
+      if (!r0.ok) throw new Error('feed-fetcher failed')
+
+      // Step 2: topic-runner — filter items by topic sources and queue
       const r1 = await fetch('/api/admin/trigger-cron', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -187,7 +196,7 @@ export function AutoblogClient({ initialChannels, initialTopics, initialSources,
       })
       if (!r1.ok) throw new Error('topic-runner failed')
 
-      // Step 2: post-generator — pick up queue, call Claude, send approval email
+      // Step 3: post-generator — pick up queue, call Claude, send approval email
       setTopicFullRunState('generating')
       const r2 = await fetch('/api/admin/trigger-cron', {
         method: 'POST',
@@ -196,8 +205,8 @@ export function AutoblogClient({ initialChannels, initialTopics, initialSources,
       })
       if (!r2.ok) throw new Error('post-generator failed')
 
-      // Refresh cron history for both
-      await Promise.all([TOPIC_RUNNER_PATH, POST_GENERATOR_PATH].map(async path => {
+      // Refresh cron history for all three
+      await Promise.all([FEED_FETCHER_PATH, TOPIC_RUNNER_PATH, POST_GENERATOR_PATH].map(async path => {
         const h = await fetch(`/api/admin/autoblog/cron-history?path=${encodeURIComponent(path)}`)
         if (h.ok) {
           const { history } = await h.json() as { history: ChannelCronRun[] }
@@ -991,7 +1000,7 @@ export function AutoblogClient({ initialChannels, initialTopics, initialSources,
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
                   <div>
                     <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>Topic Runner</span>
-                    <span style={{ fontSize: 12, color: 'var(--text-muted)', marginLeft: 8 }}>Scans feeds → generates post → sends approval email</span>
+                    <span style={{ fontSize: 12, color: 'var(--text-muted)', marginLeft: 8 }}>Fetches RSS → scans topics → generates post → sends approval email</span>
                   </div>
 
                   <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
