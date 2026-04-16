@@ -17,6 +17,7 @@ import {
 import { generateAutoblogPost } from '@/lib/services/autoblog-generator'
 import { sendBlogApprovalEmail } from '@/lib/services/email'
 import { sendBlogApprovalTelegram } from '@/lib/services/telegram'
+import { scrapeArticles } from '@/lib/services/article-scraper'
 import type { DetectedLLM } from '@/lib/services/llm-detector'
 import type { TrackerContext } from '@/lib/services/autoblog-generator'
 import type { FeedItem } from '@/lib/services/feed-fetcher'
@@ -62,12 +63,26 @@ export async function GET(request: Request): Promise<NextResponse> {
           postToSocial: queued.post_to_social,
         })
       } else if (type === 'custom_topic') {
+        const rawItems = (payload.feedItems as FeedItem[]) ?? []
+
+        // Scrape full article text for each source URL in parallel
+        const scraped = await scrapeArticles(rawItems.map(i => i.url))
+        const enrichedItems = rawItems.map(item => ({
+          ...item,
+          fullContent: scraped.get(item.url) ?? null,
+        }))
+
+        logger.info('Feed items enriched with full content', {
+          total: rawItems.length,
+          withContent: enrichedItems.filter(i => i.fullContent).length,
+        })
+
         draft = await generateAutoblogPost({
           type: 'custom_topic',
           topicName: payload.topicName as string,
           topicPrompt: payload.topicPrompt as string,
           topicId: payload.topicId as string,
-          sourceItems: (payload.feedItems as FeedItem[]) ?? [],
+          sourceItems: enrichedItems,
           trackerContext: (payload.trackerContext as TrackerContext) ?? null,
           postToSocial: queued.post_to_social,
         })

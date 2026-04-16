@@ -324,11 +324,21 @@ function buildTopicPrompt(
 
     .slice(0, 12)
 
-    .map((item, i) =>
+    .map((item, i) => {
 
-      `[${i + 1}] ${item.sourceName}\nTitle: ${item.title}\nURL: ${item.url}\n${item.summary ? `Summary: ${item.summary.slice(0, 300)}` : ''}`
+      const content = item.fullContent
 
-    )
+        ? `Full article content:\n${item.fullContent.slice(0, 3000)}`
+
+        : item.summary
+
+          ? `Summary: ${item.summary.slice(0, 300)}`
+
+          : ''
+
+      return `[${i + 1}] ${item.sourceName}\nTitle: ${item.title}\nURL: ${item.url}\n${content}`
+
+    })
 
     .join('\n\n')
 

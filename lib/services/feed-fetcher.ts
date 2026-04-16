@@ -10,6 +10,7 @@ export interface FeedItem {
   summary: string | null
   publishedAt: string | null
   sourceName: string
+  fullContent?: string | null  // scraped full article text — populated at generation time
 }
 
 // =============================================================================
