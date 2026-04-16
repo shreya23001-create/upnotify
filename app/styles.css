@@ -6640,6 +6640,17 @@ section.hero .hero-mockup {
   .autoblog-source-url { max-width: 180px; }
 }
 
+/* ── SHARED MODAL OVERLAY ────────────────────────────────────────────────── */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 24px; }
+.modal-box { background: var(--bg-card); border: 1px solid var(--border-primary); border-radius: 14px; width: 100%; max-width: 520px; max-height: 90vh; display: flex; flex-direction: column; box-shadow: 0 24px 64px rgba(0,0,0,0.4); overflow: hidden; }
+.modal-box-lg { max-width: 600px; }
+.modal-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 24px; border-bottom: 1px solid var(--border-primary); flex-shrink: 0; }
+.modal-title { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+.modal-close { background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer; line-height: 1; padding: 0; }
+.modal-close:hover { color: var(--text-primary); }
+.modal-body { padding: 24px; overflow-y: auto; flex: 1; }
+.modal-footer { display: flex; align-items: center; justify-content: flex-end; gap: 10px; padding: 16px 24px; border-top: 1px solid var(--border-primary); flex-shrink: 0; }
+
 /* ==========================================================================
    PUBLIC PAGES — MOBILE RESPONSIVENESS FIXES
    ========================================================================== */
