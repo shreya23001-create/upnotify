@@ -78,9 +78,13 @@ async function fetchOfficialStatus(domain: string): Promise<{ text: string; url:
 // ---------------------------------------------------------------------------
 
 async function fetchGoogleNews(siteName: string): Promise<SourceArticle[]> {
-  const query = encodeURIComponent(`${siteName} down outage`)
-  // tbs=qdr:d restricts results to the last 24 hours only
-  const url = `https://news.google.com/rss/search?q=${query}&hl=en-US&gl=US&ceid=US:en&tbs=qdr:d`
+  // Include month+year in query — tbs=qdr:d is ignored by Google News RSS
+  const now = new Date()
+  const monthYear = now.toLocaleString('en-US', { month: 'long', year: 'numeric' })
+  const query = encodeURIComponent(`${siteName} down outage ${monthYear}`)
+  const url = `https://news.google.com/rss/search?q=${query}&hl=en-US&gl=US&ceid=US:en`
+
+  const cutoff = Date.now() - 48 * 60 * 60 * 1000 // discard anything older than 48 hours
 
   try {
     const controller = new AbortController()
@@ -96,10 +100,9 @@ async function fetchGoogleNews(siteName: string): Promise<SourceArticle[]> {
 
     const xml = await res.text()
 
-    // Parse RSS items
     const items = xml.match(/<item>([\s\S]*?)<\/item>/g) ?? []
 
-    return items.slice(0, 5).map(item => {
+    return items.slice(0, 10).map(item => {
       const title = item.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/)?.[1]
         ?? item.match(/<title>(.*?)<\/title>/)?.[1]
         ?? 'Untitled'
@@ -118,7 +121,14 @@ async function fetchGoogleNews(siteName: string): Promise<SourceArticle[]> {
         snippet: description.replace(/<[^>]+>/g, '').slice(0, 300),
         publishedAt: pubDate,
       }
-    }).filter(a => a.title && a.url)
+    })
+    .filter(a => a.title && a.url)
+    .filter(a => {
+      if (!a.publishedAt) return false
+      const published = new Date(a.publishedAt).getTime()
+      return !isNaN(published) && published >= cutoff
+    })
+    .slice(0, 5)
   } catch (error) {
     logger.warn('Google News fetch failed', { error: error instanceof Error ? error.message : 'Unknown' })
     return []
