@@ -90,9 +90,6 @@ export async function GET(request: Request): Promise<NextResponse> {
     let queued = 0
 
     for (const topic of dueTopics) {
-      // Stamp last_run_at immediately to prevent duplicate queuing on next cron tick
-      await updateTopicLastRun(topic.id)
-
       // Get this topic's assigned sources
       const topicSources = await getTopicSources(topic.id)
       if (topicSources.length === 0) {
@@ -114,6 +111,9 @@ export async function GET(request: Request): Promise<NextResponse> {
         logger.warn('No feed items from assigned sources — skipping', { topic: topic.name, assignedSources: topicSources.length })
         continue
       }
+
+      // Stamp last_run_at only once we know we have content to queue
+      await updateTopicLastRun(topic.id)
 
       const id = await createQueuedAutoblogRun({
         topic_id: topic.id,
