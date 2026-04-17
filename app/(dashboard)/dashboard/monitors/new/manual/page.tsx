@@ -20,7 +20,7 @@ export default async function NewMonitorManualPage({
     <div>
       <div className="page-header">
         <h1 className="page-title">Create Monitor</h1>
-        <Link href="/dashboard/monitors/new" className="btn btn-ghost">← Back</Link>
+        <Link href="/dashboard/monitors" className="btn btn-ghost">← Back</Link>
       </div>
       {isPaid ? (
         <PaidMonitorCreator />

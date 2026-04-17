@@ -151,7 +151,7 @@ export function DashboardCharts({ stats, incidents, checkResults = [] }: Dashboa
               <EmptyChartState
                 title="No uptime data yet"
                 message="Add a monitor and we'll start tracking uptime. Your first chart will appear within minutes."
-                cta="🔭 Scan Your Website"
+                cta="+ Add Your First Monitor"
                 href="/dashboard/monitors/scan"
               />
             )}

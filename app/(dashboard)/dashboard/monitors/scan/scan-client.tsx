@@ -151,16 +151,16 @@ export function ScanClient({
   const totalAfter = existingCount + selectedCount
 
   return (
-    <div style={{ maxWidth: 800 }}>
+    <div style={{ maxWidth: 760, margin: '0 auto' }}>
 
       {/* INPUT SCREEN */}
       {screen === 'input' && (
         <div style={{ textAlign: 'center', padding: '48px 0 32px' }}>
           <div style={{ fontSize: 52, marginBottom: 14 }}>🔭</div>
-          <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 8 }}>What does your website look like right now?</h2>
+          <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 8 }}>Set up your monitoring suite</h2>
           <p style={{ fontSize: 14, color: 'var(--text-secondary)', marginBottom: 32, lineHeight: 1.7 }}>
             Enter your domain and we'll run 18 health checks in parallel.<br />
-            Issues are pre-selected — you pick what to monitor.
+            We'll pre-select what needs monitoring — you decide what to track.
           </p>
           {scanError && <div className="form-error" style={{ maxWidth: 500, margin: '0 auto 16px' }}>{scanError}</div>}
           <div style={{ display: 'flex', gap: 10, maxWidth: 520, margin: '0 auto 12px' }}>
@@ -302,7 +302,7 @@ export function ScanClient({
           {/* Manual setup notice */}
           <div className="card" style={{ padding: '14px 18px', marginTop: 20, fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.7 }}>
             ⚙️ <strong style={{ color: 'var(--text-primary)' }}>Need more?</strong> Keyword Detection, API Endpoint, Heartbeat, Port Check, and Page Change Detection require individual configuration.{' '}
-            <a href="/dashboard/monitors/new" style={{ color: 'var(--accent)', textDecoration: 'underline' }}>Set up individually →</a>
+            <a href="/dashboard/monitors/new/manual" style={{ color: 'var(--accent)', textDecoration: 'underline' }}>Add individually →</a>
           </div>
 
           {/* Sticky create bar */}

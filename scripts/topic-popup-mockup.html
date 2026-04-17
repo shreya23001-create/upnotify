@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Topic Popup Mockup</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f1117; color: #e2e8f0; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 40px 20px; }
+
+  h1 { font-size: 14px; color: #6b7280; margin-bottom: 24px; letter-spacing: 0.05em; text-transform: uppercase; }
+
+  /* Trigger button */
+  .trigger-btn { background: #3b82f6; color: #fff; border: none; border-radius: 8px; padding: 10px 20px; font-size: 14px; font-weight: 600; cursor: pointer; }
+  .trigger-btn:hover { background: #2563eb; }
+
+  /* Overlay */
+  .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 100; align-items: center; justify-content: center; }
+  .overlay.open { display: flex; }
+
+  /* Popup */
+  .popup { background: #1a1d27; border: 1px solid #2d3148; border-radius: 14px; width: 100%; max-width: 560px; box-shadow: 0 24px 64px rgba(0,0,0,0.5); overflow: hidden; }
+
+  /* Popup header */
+  .popup-head { padding: 20px 24px 16px; border-bottom: 1px solid #2d3148; display: flex; align-items: center; justify-content: space-between; }
+  .popup-head h2 { font-size: 16px; font-weight: 700; color: #f1f5f9; }
+  .popup-close { background: none; border: none; color: #6b7280; font-size: 20px; cursor: pointer; line-height: 1; }
+  .popup-close:hover { color: #e2e8f0; }
+
+  /* Step indicator */
+  .steps { display: flex; align-items: center; gap: 0; padding: 16px 24px; border-bottom: 1px solid #2d3148; }
+  .step { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #6b7280; }
+  .step.active { color: #3b82f6; }
+  .step.done { color: #22c55e; }
+  .step-num { width: 24px; height: 24px; border-radius: 50%; border: 2px solid currentColor; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+  .step.done .step-num { background: #22c55e; border-color: #22c55e; color: #fff; }
+  .step.active .step-num { background: #3b82f6; border-color: #3b82f6; color: #fff; }
+  .step-divider { flex: 1; height: 1px; background: #2d3148; margin: 0 12px; }
+
+  /* Popup body */
+  .popup-body { padding: 24px; max-height: 60vh; overflow-y: auto; }
+
+  /* Form fields */
+  .field { margin-bottom: 18px; }
+  .field label { display: block; font-size: 12px; font-weight: 600; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .field input, .field textarea, .field select {
+    width: 100%; background: #0f1117; border: 1px solid #2d3148; border-radius: 8px;
+    color: #e2e8f0; font-size: 14px; padding: 10px 12px; outline: none;
+    font-family: inherit; transition: border-color 0.15s;
+  }
+  .field input:focus, .field textarea:focus, .field select:focus { border-color: #3b82f6; }
+  .field textarea { min-height: 110px; resize: vertical; line-height: 1.6; }
+  .field-hint { font-size: 12px; color: #6b7280; margin-top: 5px; }
+
+  /* Schedule row */
+  .schedule-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  /* Sources section */
+  .sources-search { margin-bottom: 14px; }
+  .sources-search input { width: 100%; background: #0f1117; border: 1px solid #2d3148; border-radius: 8px; color: #e2e8f0; font-size: 14px; padding: 9px 12px; outline: none; }
+  .sources-search input:focus { border-color: #3b82f6; }
+
+  .source-group { margin-bottom: 18px; }
+  .source-group-label { font-size: 11px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+  .source-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; cursor: pointer; transition: background 0.1s; }
+  .source-item:hover { background: #2d3148; }
+  .source-item input[type=checkbox] { width: 16px; height: 16px; accent-color: #3b82f6; cursor: pointer; flex-shrink: 0; }
+  .source-item-info { flex: 1; min-width: 0; }
+  .source-item-name { font-size: 13px; font-weight: 600; color: #e2e8f0; }
+  .source-item-url { font-size: 11px; color: #6b7280; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .source-item-count { font-size: 11px; color: #6b7280; flex-shrink: 0; }
+
+  .selected-count { font-size: 12px; color: #3b82f6; font-weight: 600; margin-bottom: 14px; }
+
+  /* Add source inline */
+  .add-source-bar { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; padding: 12px; background: #0f1117; border: 1px dashed #3b82f6; border-radius: 8px; }
+  .add-source-bar.hidden { display: none; }
+  .add-source-row1 { display: flex; gap: 8px; }
+  .add-source-row2 { display: flex; gap: 8px; align-items: center; }
+  .add-source-bar input { flex: 1; min-width: 0; background: #1a1d27; border: 1px solid #2d3148; border-radius: 6px; color: #e2e8f0; font-size: 13px; padding: 7px 10px; outline: none; }
+  .add-source-bar input:focus { border-color: #3b82f6; }
+  .add-source-bar select { flex: 1; min-width: 0; background: #1a1d27; border: 1px solid #2d3148; border-radius: 6px; color: #e2e8f0; font-size: 13px; padding: 7px 10px; outline: none; }
+  .add-source-bar .btn-add { background: #3b82f6; color: #fff; border: none; border-radius: 6px; padding: 7px 16px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+  .add-source-bar .btn-add:hover { background: #2563eb; }
+  .add-source-bar .btn-cancel { background: none; border: 1px solid #2d3148; border-radius: 6px; color: #6b7280; font-size: 13px; cursor: pointer; padding: 7px 12px; white-space: nowrap; flex-shrink: 0; }
+  .add-source-bar .btn-cancel:hover { color: #e2e8f0; border-color: #4b5563; }
+
+  .add-source-trigger { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #3b82f6; cursor: pointer; margin-bottom: 16px; background: none; border: none; font-weight: 600; padding: 0; }
+  .add-source-trigger:hover { color: #60a5fa; }
+
+  /* Newly added source highlight */
+  .source-item.new-source { background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.2); border-radius: 8px; }
+  .new-badge { font-size: 10px; font-weight: 700; color: #3b82f6; background: rgba(59,130,246,0.15); padding: 2px 6px; border-radius: 4px; flex-shrink: 0; }
+
+  /* Popup footer */
+  .popup-foot { padding: 16px 24px; border-top: 1px solid #2d3148; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .popup-foot-left { font-size: 13px; color: #6b7280; }
+  .popup-foot-right { display: flex; gap: 8px; }
+  .btn { border: none; border-radius: 8px; padding: 9px 18px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+  .btn-secondary { background: #2d3148; color: #e2e8f0; }
+  .btn-secondary:hover { background: #374264; }
+  .btn-primary { background: #3b82f6; color: #fff; }
+  .btn-primary:hover { background: #2563eb; }
+  .btn-success { background: #22c55e; color: #fff; }
+  .btn-success:hover { background: #16a34a; }
+
+  /* Success state */
+  .success-screen { text-align: center; padding: 20px 0; }
+  .success-icon { font-size: 48px; margin-bottom: 16px; }
+  .success-screen h3 { font-size: 18px; font-weight: 700; color: #f1f5f9; margin-bottom: 8px; }
+  .success-screen p { font-size: 14px; color: #6b7280; line-height: 1.6; }
+
+  /* Background page mock */
+  .page-mock { width: 100%; max-width: 860px; background: #1a1d27; border: 1px solid #2d3148; border-radius: 14px; padding: 24px; margin-top: 32px; }
+  .page-mock-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .page-mock-title { font-size: 15px; font-weight: 700; color: #f1f5f9; }
+  .page-mock-desc { font-size: 13px; color: #6b7280; }
+  .empty-state { text-align: center; padding: 40px; color: #6b7280; font-size: 14px; border: 1px dashed #2d3148; border-radius: 10px; }
+</style>
+</head>
+<body>
+
+<h1>Topic Popup — UX Mockup</h1>
+
+<!-- Trigger -->
+<div class="page-mock">
+  <div class="page-mock-header">
+    <div>
+      <div class="page-mock-title">Topics</div>
+      <div class="page-mock-desc">Add your own topics with custom prompts.</div>
+    </div>
+    <button class="trigger-btn" onclick="openStep1()">+ Add Topic</button>
+  </div>
+  <div class="empty-state">No topics yet. Click + Add Topic to get started.</div>
+</div>
+
+<!-- POPUP -->
+<div class="overlay" id="overlay">
+  <div class="popup">
+
+    <!-- Header -->
+    <div class="popup-head">
+      <h2 id="popup-title">New Topic</h2>
+      <button class="popup-close" onclick="closePopup()">✕</button>
+    </div>
+
+    <!-- Steps -->
+    <div class="steps">
+      <div class="step" id="step-indicator-1">
+        <div class="step-num">1</div>
+        <span>Topic Details</span>
+      </div>
+      <div class="step-divider"></div>
+      <div class="step" id="step-indicator-2">
+        <div class="step-num">2</div>
+        <span>Assign Sources</span>
+      </div>
+    </div>
+
+    <!-- Step 1: Topic Details -->
+    <div id="step1" class="popup-body">
+      <div class="field">
+        <label>Topic Name</label>
+        <input type="text" placeholder="e.g. WordPress Security News" value="WordPress Security News" />
+      </div>
+      <div class="field">
+        <label>Prompt</label>
+        <textarea placeholder="Tell the AI what to write about...">Pick the most interesting WordPress security story from the source articles. Focus on plugin vulnerabilities, core exploits, or active hacks. Name the plugin, version, CVE if available. Write for site owners who need to know what to do right now. Always end with how Uptrue can detect related downtime at https://uptrue.io</textarea>
+        <div class="field-hint">This is sent directly to the AI. Be specific about angle, audience, and what action the reader should take.</div>
+      </div>
+      <div class="schedule-row">
+        <div class="field">
+          <label>Schedule</label>
+          <select>
+            <option>Daily</option>
+            <option selected>Weekly — Monday</option>
+            <option>Weekly — Friday</option>
+            <option>Monthly — 1st</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Post to Social on Approval</label>
+          <select>
+            <option selected>Yes</option>
+            <option>No</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2: Assign Sources -->
+    <div id="step2" class="popup-body" style="display:none">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+        <div class="selected-count" id="selected-count" style="margin-bottom:0">0 sources selected</div>
+        <button class="add-source-trigger" onclick="toggleAddSource()">＋ Add new source</button>
+      </div>
+
+      <!-- Inline add source form -->
+      <div class="add-source-bar hidden" id="add-source-bar">
+        <div class="add-source-row1">
+          <input type="text" id="new-source-name" placeholder="Source name (e.g. WP Tavern)" />
+          <input type="text" id="new-source-url" placeholder="RSS feed URL" />
+        </div>
+        <div class="add-source-row2">
+          <select id="new-source-cat" style="max-width:160px">
+            <option value="wordpress">WordPress</option>
+            <option value="tech_news">Tech News</option>
+            <option value="ai_specific">AI Specific</option>
+            <option value="community">Community</option>
+            <option value="other">Other</option>
+          </select>
+          <div style="flex:1"></div>
+          <button class="btn-cancel" onclick="toggleAddSource()">Cancel</button>
+          <button class="btn-add" onclick="addNewSource()">Add source</button>
+        </div>
+      </div>
+
+      <div class="sources-search">
+        <input type="text" placeholder="Search sources…" oninput="filterSources(this.value)" />
+      </div>
+
+      <div id="sources-list">
+
+        <div class="source-group" data-group="wordpress">
+          <div class="source-group-label">WordPress</div>
+          <label class="source-item"><input type="checkbox" onchange="updateCount()" /> <div class="source-item-info"><div class="source-item-name">WP Tavern</div><div class="source-item-url">wptavern.com/feed</div></div><span class="source-item-count">—</span></label>
+          <label class="source-item"><input type="checkbox" onchange="updateCount()" checked /> <div class="source-item-info"><div class="source-item-name">Wordfence Blog</div><div class="source-item-url">wordfence.com/blog/feed</div></div><span class="source-item-count">—</span></label>
+          <label class="source-item"><input type="checkbox" onchange="updateCount()" checked /> <div class="source-item-info"><div class="source-item-name">Patchstack</div><div class="source-item-url">patchstack.com/feed</div></div><span class="source-item-count">—</span></label>
+          <label class="source-item"><input type="checkbox" onchange="updateCount()" /> <div class="source-item-info"><div class="source-item-name">WPBeginner</div><div class="source-item-url">wpbeginner.com/feed</div></div><span class="source-item-count">—</span></label>
+          <label class="source-item"><input type="checkbox" onchange="updateCount()" /> <div class="source-item-info"><div class="source-item-name">WPMU DEV Blog</div><div class="source-item-url">wpmudev.org/blog/feed</div></div><span class="source-item-count">—</span></label>
+        </div>
+
+        <div class="source-group" data-group="ai">
+          <div class="source-group-label">AI Specific</div>
+          <label class="source-item"><input type="checkbox" onchange="updateCount()" /> <div class="source-item-info"><div class="source-item-name">Hugging Face Blog</div><div class="source-item-url">huggingface.co/blog/feed.xml</div></div><span class="source-item-count">767 items</span></label>
+          <label class="source-item"><input type="checkbox" onchange="updateCount()" /> <div class="source-item-info"><div class="source-item-name">OpenAI Blog</div><div class="source-item-url">openai.com/blog/rss.xml</div></div><span class="source-item-count">837 items</span></label>
+        </div>
+
+        <div class="source-group" data-group="tech">
+          <div class="source-group-label">Tech News</div>
+          <label class="source-item"><input type="checkbox" onchange="updateCount()" /> <div class="source-item-info"><div class="source-item-name">TechCrunch</div><div class="source-item-url">techcrunch.com/feed</div></div><span class="source-item-count">—</span></label>
+          <label class="source-item"><input type="checkbox" onchange="updateCount()" /> <div class="source-item-info"><div class="source-item-name">The Verge</div><div class="source-item-url">theverge.com/rss/index.xml</div></div><span class="source-item-count">—</span></label>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Step 3: Success -->
+    <div id="step3" class="popup-body" style="display:none">
+      <div class="success-screen">
+        <div class="success-icon">✅</div>
+        <h3>Topic Created</h3>
+        <p>WordPress Security News is saved and active.<br/>It will run every <strong>Monday</strong> using <strong>2 sources</strong>.<br/>You'll get an approval email before anything goes live.</p>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="popup-foot">
+      <div class="popup-foot-left" id="foot-hint">Step 1 of 2 — fill in your topic details</div>
+      <div class="popup-foot-right">
+        <button class="btn btn-secondary" id="btn-back" style="display:none" onclick="goBack()">← Back</button>
+        <button class="btn btn-secondary" id="btn-cancel" onclick="closePopup()">Cancel</button>
+        <button class="btn btn-primary" id="btn-next" onclick="goNext()">Next: Assign Sources →</button>
+        <button class="btn btn-success" id="btn-save" style="display:none" onclick="goSave()">Save Topic</button>
+        <button class="btn btn-primary" id="btn-done" style="display:none" onclick="closePopup()">Done</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  let currentStep = 1
+
+  function openStep1() {
+    currentStep = 1
+    renderStep()
+    document.getElementById('overlay').classList.add('open')
+    updateCount()
+  }
+
+  function closePopup() {
+    document.getElementById('overlay').classList.remove('open')
+    currentStep = 1
+    renderStep()
+  }
+
+  function goNext() {
+    if (currentStep === 1) { currentStep = 2; renderStep() }
+  }
+
+  function goBack() {
+    if (currentStep === 2) { currentStep = 1; renderStep() }
+  }
+
+  function goSave() {
+    currentStep = 3; renderStep()
+  }
+
+  function renderStep() {
+    document.getElementById('step1').style.display = currentStep === 1 ? 'block' : 'none'
+    document.getElementById('step2').style.display = currentStep === 2 ? 'block' : 'none'
+    document.getElementById('step3').style.display = currentStep === 3 ? 'block' : 'none'
+
+    // Step indicators
+    const s1 = document.getElementById('step-indicator-1')
+    const s2 = document.getElementById('step-indicator-2')
+    s1.className = 'step' + (currentStep === 1 ? ' active' : currentStep > 1 ? ' done' : '')
+    s2.className = 'step' + (currentStep === 2 ? ' active' : currentStep > 2 ? ' done' : '')
+    if (currentStep > 1) s1.querySelector('.step-num').textContent = '✓'
+    else s1.querySelector('.step-num').textContent = '1'
+
+    // Title
+    const titles = { 1: 'New Topic', 2: 'Assign Sources', 3: 'Topic Saved' }
+    document.getElementById('popup-title').textContent = titles[currentStep]
+
+    // Footer hints
+    const hints = { 1: 'Step 1 of 2 — fill in your topic details', 2: 'Step 2 of 2 — choose which sources feed this topic', 3: '' }
+    document.getElementById('foot-hint').textContent = hints[currentStep]
+
+    // Buttons
+    document.getElementById('btn-back').style.display   = currentStep === 2 ? 'inline-block' : 'none'
+    document.getElementById('btn-cancel').style.display = currentStep < 3 ? 'inline-block' : 'none'
+    document.getElementById('btn-next').style.display   = currentStep === 1 ? 'inline-block' : 'none'
+    document.getElementById('btn-save').style.display   = currentStep === 2 ? 'inline-block' : 'none'
+    document.getElementById('btn-done').style.display   = currentStep === 3 ? 'inline-block' : 'none'
+  }
+
+  function updateCount() {
+    const checked = document.querySelectorAll('#sources-list input[type=checkbox]:checked').length
+    document.getElementById('selected-count').textContent = checked + ' source' + (checked === 1 ? '' : 's') + ' selected'
+  }
+
+  function filterSources(q) {
+    const items = document.querySelectorAll('.source-item')
+    items.forEach(item => {
+      const name = item.querySelector('.source-item-name').textContent.toLowerCase()
+      const url  = item.querySelector('.source-item-url').textContent.toLowerCase()
+      item.style.display = (name.includes(q.toLowerCase()) || url.includes(q.toLowerCase())) ? 'flex' : 'none'
+    })
+  }
+
+  function toggleAddSource() {
+    const bar = document.getElementById('add-source-bar')
+    bar.classList.toggle('hidden')
+    if (!bar.classList.contains('hidden')) {
+      document.getElementById('new-source-name').focus()
+    }
+  }
+
+  function addNewSource() {
+    const name = document.getElementById('new-source-name').value.trim()
+    const url  = document.getElementById('new-source-url').value.trim()
+    const cat  = document.getElementById('new-source-cat').value
+
+    if (!name || !url) {
+      alert('Please enter both a name and RSS URL.')
+      return
+    }
+
+    const catLabels = { wordpress: 'WordPress', tech_news: 'Tech News', ai_specific: 'AI Specific', community: 'Community', other: 'Other' }
+
+    // Find or create the group
+    let group = document.querySelector(`.source-group[data-group="${cat}"]`)
+    if (!group) {
+      group = document.createElement('div')
+      group.className = 'source-group'
+      group.dataset.group = cat
+      group.innerHTML = `<div class="source-group-label">${catLabels[cat] ?? cat}</div>`
+      document.getElementById('sources-list').prepend(group)
+    }
+
+    // Create the new source item — pre-checked and highlighted
+    const label = document.createElement('label')
+    label.className = 'source-item new-source'
+    label.innerHTML = `
+      <input type="checkbox" checked onchange="updateCount()" />
+      <div class="source-item-info">
+        <div class="source-item-name">${name}</div>
+        <div class="source-item-url">${url}</div>
+      </div>
+      <span class="new-badge">New</span>
+    `
+    group.appendChild(label)
+
+    // Reset form and hide bar
+    document.getElementById('new-source-name').value = ''
+    document.getElementById('new-source-url').value = ''
+    document.getElementById('add-source-bar').classList.add('hidden')
+
+    updateCount()
+  }
+
+  // Close on overlay click
+  document.getElementById('overlay').addEventListener('click', function(e) {
+    if (e.target === this) closePopup()
+  })
+</script>
+</body>
+</html>

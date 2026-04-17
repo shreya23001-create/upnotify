@@ -210,7 +210,7 @@ function MonitorsTable({ monitors, metrics, search, setSearch }: {
       {monitors.length === 0 ? (
         <div style={{ padding: '32px 20px', textAlign: 'center' }}>
           <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 12 }}>No monitors yet. Add your first one to start tracking uptime.</p>
-          <Link href="/dashboard/monitors/scan" className="btn btn-primary btn-sm">🔭 Scan Your Website</Link>
+          <Link href="/dashboard/monitors/scan" className="btn btn-primary btn-sm">+ Add Your First Monitor</Link>
         </div>
       ) : (
         <>
