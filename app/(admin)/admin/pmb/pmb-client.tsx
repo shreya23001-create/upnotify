@@ -795,11 +795,41 @@ function CronsTab({ cronHistory, expanded, setExpanded }: {
   expanded: Set<string>
   setExpanded: (s: Set<string>) => void
 }): React.ReactElement {
+  const [triggerState, setTriggerState] = useState<Record<string, 'idle' | 'running' | 'ok' | 'error'>>({})
+  const [triggerMsg,   setTriggerMsg]   = useState<Record<string, string>>({})
+
   const cronMeta: Record<string, { schedule: string; description: string }> = {
     '/api/cron/pmb/week-planner':      { schedule: 'Mon 5:00 UTC', description: 'Plans the week — spreads posts Mon–Sun, dedup by run_key' },
     '/api/cron/pmb/daily-publisher':   { schedule: 'Every 5 min',  description: 'Picks today\'s queued posts and generates via Claude' },
     '/api/cron/pmb/monthly-generator': { schedule: '1st 7:00 UTC', description: 'Queues monthly leaderboard for each active category' },
     '/api/cron/public-checks':         { schedule: 'Every 5 min',  description: 'HTTP checks on all public monitors' },
+  }
+
+  async function triggerCron(path: string): Promise<void> {
+    setTriggerState(s => ({ ...s, [path]: 'running' }))
+    setTriggerMsg(m => ({ ...m, [path]: '' }))
+    try {
+      const res  = await fetch('/api/admin/trigger-cron', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ path }),
+      })
+      const json = await res.json() as { success?: boolean; data?: unknown; error?: string }
+      if (res.ok && json.success) {
+        const summary = typeof json.data === 'object' && json.data !== null
+          ? JSON.stringify(json.data).slice(0, 120)
+          : String(json.data ?? 'ok')
+        setTriggerState(s => ({ ...s, [path]: 'ok' }))
+        setTriggerMsg(m => ({ ...m, [path]: summary }))
+      } else {
+        setTriggerState(s => ({ ...s, [path]: 'error' }))
+        setTriggerMsg(m => ({ ...m, [path]: json.error ?? 'Unknown error' }))
+      }
+    } catch (err) {
+      setTriggerState(s => ({ ...s, [path]: 'error' }))
+      setTriggerMsg(m => ({ ...m, [path]: String(err) }))
+    }
+    setTimeout(() => setTriggerState(s => ({ ...s, [path]: 'idle' })), 8000)
   }
 
   const anyError = Object.values(cronHistory).some(runs => runs[0]?.status === 'error')
@@ -871,12 +901,22 @@ function CronsTab({ cronHistory, expanded, setExpanded }: {
                       }
                     </td>
                     <td style={{ fontSize: 11, color: 'var(--text-muted)', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {last?.result_summary ?? last?.error_message ?? '—'}
+                      {triggerMsg[path]
+                        ? <span style={{ color: triggerState[path] === 'error' ? '#dc2626' : '#16a34a' }}>{triggerMsg[path]}</span>
+                        : (last?.result_summary ?? last?.error_message ?? '—')}
                     </td>
                     <td style={{ whiteSpace: 'nowrap' }} onClick={e => e.stopPropagation()}>
-                      <a href={path} target="_blank" rel="noreferrer" className="admin-action-link" style={{ fontSize: 11, whiteSpace: 'nowrap' }}>
-                        Run now ↗
-                      </a>
+                      <button
+                        className="admin-action-link"
+                        style={{ fontSize: 11, whiteSpace: 'nowrap', opacity: triggerState[path] === 'running' ? 0.5 : 1 }}
+                        disabled={triggerState[path] === 'running'}
+                        onClick={() => void triggerCron(path)}
+                      >
+                        {triggerState[path] === 'running' ? 'Running…'
+                          : triggerState[path] === 'ok'    ? '✓ Done'
+                          : triggerState[path] === 'error' ? '✗ Failed'
+                          : 'Run now'}
+                      </button>
                     </td>
                   </tr>
 
