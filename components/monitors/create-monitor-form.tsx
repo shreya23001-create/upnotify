@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { createMonitorAction } from '@/app/(dashboard)/dashboard/monitors/actions'
 import { KeywordTagInput } from './keyword-tag-input'
 import { getKeywordSuggestions } from '@/lib/utils/keyword-suggestions'
+import { MonitorTypeHelp } from './monitor-type-help'
 
 const monitorTypes = [
   { value: 'http', label: 'HTTP/HTTPS Uptime' },
@@ -102,7 +103,14 @@ export function CreateMonitorForm({ minCheckInterval = 600 }: { minCheckInterval
   }
 
   return (
-    <form action={handleSubmit}>
+    <div style={{
+      display: 'grid',
+      gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)',
+      gap: 32,
+      alignItems: 'start',
+    }} className="create-monitor-layout">
+      {/* Left — the form */}
+      <form action={handleSubmit}>
       {error && (
         <div className="form-error">
           {error.includes('Monitor limit reached') && (
@@ -282,5 +290,11 @@ export function CreateMonitorForm({ minCheckInterval = 600 }: { minCheckInterval
         {isPending ? 'Creating...' : 'Create Monitor'}
       </button>
     </form>
+
+      {/* Right — contextual help panel */}
+      <div style={{ position: 'sticky', top: 24 }}>
+        <MonitorTypeHelp type={type} />
+      </div>
+    </div>
   )
 }

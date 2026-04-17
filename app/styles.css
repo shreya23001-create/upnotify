@@ -6837,3 +6837,8 @@ section.hero .hero-mockup {
   .pmb-subscribe-cta { padding: 20px 16px; }
   .pmb-cta-title { font-size: 17px; }
 }
+
+/* ========== Create Monitor Layout ========== */
+@media (max-width: 900px) {
+  .create-monitor-layout { grid-template-columns: 1fr !important; }
+}
