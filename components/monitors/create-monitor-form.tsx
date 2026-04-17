@@ -17,6 +17,19 @@ const monitorTypes = [
   { value: 'api', label: 'API Endpoint' },
   { value: 'heartbeat', label: 'Heartbeat Monitor' },
   { value: 'competitor', label: 'Page Change Detection' },
+  { value: 'security-headers', label: 'Security Headers' },
+  { value: 'response-time', label: 'Response Time Threshold' },
+  { value: 'robots-txt', label: 'robots.txt Change' },
+  { value: 'ip-change', label: 'IP Address Change' },
+  { value: 'mx-health', label: 'MX Health' },
+  { value: 'whois-change', label: 'WHOIS Registrar Change' },
+  { value: 'sitemap', label: 'Sitemap Validity' },
+  { value: 'redirect-chain', label: 'Redirect Chain' },
+  { value: 'spf-dmarc', label: 'SPF / DMARC Validity' },
+  { value: 'blacklist', label: 'Blacklist Check' },
+  { value: 'page-size', label: 'Page Size' },
+  { value: 'cookie-consent', label: 'Cookie Consent Presence' },
+  { value: 'nameserver-change', label: 'Nameserver Change' },
 ]
 
 const ALL_INTERVALS = [
