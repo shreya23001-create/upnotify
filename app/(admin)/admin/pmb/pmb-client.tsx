@@ -685,21 +685,21 @@ function CronsTab({ cronHistory, expanded, setExpanded }: {
             <tr>
               <th style={{ width: 28 }}></th>
               <th>Cron</th>
-              <th>Schedule</th>
-              <th>Last run</th>
-              <th>Duration</th>
-              <th>Status</th>
+              <th style={{ width: 130 }}>Schedule</th>
+              <th style={{ width: 100 }}>Last run</th>
+              <th style={{ width: 90 }}>Duration</th>
+              <th style={{ width: 110 }}>Status</th>
               <th>Last output</th>
-              <th style={{ width: 80 }}></th>
+              <th style={{ width: 90 }}></th>
             </tr>
           </thead>
           <tbody>
             {Object.keys(cronMeta).map(path => {
-              const runs      = cronHistory[path] ?? []
-              const last      = runs[0]
-              const meta      = cronMeta[path]
+              const runs       = cronHistory[path] ?? []
+              const last       = runs[0]
+              const meta       = cronMeta[path]
               const isExpanded = expanded.has(path)
-              const ok        = !last || last.status === 'ok'
+              const ok         = !last || last.status === 'ok'
 
               const toggle = (): void => {
                 const next = new Set(expanded)
@@ -710,22 +710,34 @@ function CronsTab({ cronHistory, expanded, setExpanded }: {
               return (
                 <>
                   <tr key={path} style={{ cursor: 'pointer' }} onClick={toggle}>
-                    <td style={{ color: 'var(--text-muted)', fontSize: 12, textAlign: 'center' }}>{isExpanded ? '▼' : '▶'}</td>
-                    <td>
-                      <div style={{ fontWeight: 600, fontSize: 12 }}>{path.split('/').slice(-2).join('/')}</div>
-                      <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>{meta.description}</div>
+                    <td style={{ textAlign: 'center' }}>
+                      <span style={{ fontSize: 10, color: 'var(--text-muted)', display: 'inline-block', transition: 'transform 0.15s', transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)' }}>▶</span>
                     </td>
-                    <td><span className="admin-badge admin-badge-gray" style={{ fontFamily: 'monospace', fontSize: 11 }}>{meta.schedule}</span></td>
-                    <td style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{last ? timeAgo(last.started_at) : '—'}</td>
-                    <td style={{ fontSize: 12, color: 'var(--text-muted)' }}>{last ? fmtMs(last.duration_ms) : '—'}</td>
                     <td>
-                      {last ? statusBadge(last.status) : <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>Never run</span>}
+                      <div style={{ fontWeight: 600, fontSize: 13 }}>{path.split('/').slice(-2).join('/')}</div>
+                      <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>{meta.description}</div>
+                    </td>
+                    <td>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', padding: '3px 8px', background: 'var(--color-bg)', border: '1px solid var(--color-border)', borderRadius: 5, fontFamily: 'monospace', fontSize: 11, color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
+                        {meta.schedule}
+                      </span>
+                    </td>
+                    <td style={{ fontSize: 12, color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>{last ? timeAgo(last.started_at) : <span style={{ color: 'var(--text-muted)' }}>—</span>}</td>
+                    <td style={{ fontSize: 12, color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{last ? fmtMs(last.duration_ms) : '—'}</td>
+                    <td>
+                      {last
+                        ? statusBadge(last.status)
+                        : <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 12, color: 'var(--text-muted)' }}>
+                            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#94a3b8', display: 'inline-block' }} />
+                            Never run
+                          </span>
+                      }
                     </td>
                     <td style={{ fontSize: 11, color: 'var(--text-muted)', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {last?.result_summary ?? last?.error_message ?? '—'}
                     </td>
-                    <td onClick={e => e.stopPropagation()}>
-                      <a href={path} target="_blank" rel="noreferrer" className="admin-action-link" style={{ fontSize: 11 }}>
+                    <td style={{ whiteSpace: 'nowrap' }} onClick={e => e.stopPropagation()}>
+                      <a href={path} target="_blank" rel="noreferrer" className="admin-action-link" style={{ fontSize: 11, whiteSpace: 'nowrap' }}>
                         Run now ↗
                       </a>
                     </td>
