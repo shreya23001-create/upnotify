@@ -195,28 +195,98 @@ GROUP BY category
 ORDER BY total DESC;
 ```
 
+### Monitor health summary (are all sites being checked?)
+```sql
+SELECT
+  COUNT(*)                                                             AS total_active,
+  COUNT(*) FILTER (WHERE last_checked_at IS NULL)                      AS never_checked,
+  COUNT(*) FILTER (WHERE last_checked_at < now() - interval '10 min') AS stale_over_10min,
+  COUNT(*) FILTER (WHERE last_checked_at < now() - interval '1 hour') AS stale_over_1h,
+  COUNT(*) FILTER (WHERE last_status = 'down')                         AS currently_down,
+  COUNT(*) FILTER (WHERE last_status = 'degraded')                     AS currently_degraded,
+  COUNT(*) FILTER (WHERE last_status = 'unknown')                      AS unknown_status
+FROM public_monitors
+WHERE is_active = true;
+```
+
+### Monitors stale (not checked in 10 min) — find laggards
+```sql
+SELECT id, domain, display_name, last_checked_at, last_status
+FROM public_monitors
+WHERE is_active = true
+  AND (last_checked_at IS NULL OR last_checked_at < now() - interval '10 minutes')
+ORDER BY last_checked_at ASC NULLS FIRST;
+```
+
+### Open public incidents
+```sql
+SELECT pi.id, pm.domain, pm.display_name, pi.started_at, pi.cause,
+       pi.blog_generated_at, pi.blog_eligible_after
+FROM public_incidents pi
+JOIN public_monitors pm ON pm.id = pi.monitor_id
+WHERE pi.resolved_at IS NULL
+ORDER BY pi.started_at DESC;
+```
+
+### Incidents stuck in blog retry loop (eligible but never generated)
+```sql
+SELECT pi.id, pm.domain, pi.started_at, pi.blog_eligible_after, pi.blog_generated_at
+FROM public_incidents pi
+JOIN public_monitors pm ON pm.id = pi.monitor_id
+WHERE pi.blog_generated_at IS NULL
+  AND pi.blog_eligible_after IS NOT NULL
+  AND pi.blog_eligible_after < now()
+ORDER BY pi.blog_eligible_after ASC;
+```
+
+### Manually stamp blog_generated_at to stop retry for a stuck incident
+```sql
+UPDATE public_incidents
+SET blog_generated_at = now()
+WHERE id = 'incident-uuid-here';
+```
+
 ---
 
 ## Autoblog / Topic Runner
 
-### View recent autoblog topic runs
+### View all autoblog channels and status
 ```sql
-SELECT id, topic, status, error_message, created_at
-FROM autoblog_topics
-ORDER BY created_at DESC
+SELECT id, key, name, is_enabled, cron_path FROM autoblog_channels;
+```
+
+### View recent autoblog runs (all channels)
+```sql
+SELECT r.id, r.channel_key, r.title, r.status, r.error_message, r.ran_at,
+       r.sources_count, bp.title AS post_title, bp.status AS post_status
+FROM autoblog_runs r
+LEFT JOIN blog_posts bp ON bp.id = r.blog_post_id
+ORDER BY r.ran_at DESC
 LIMIT 20;
 ```
 
-### Re-queue a failed autoblog topic
+### View runs for a specific channel (e.g. llm_launches)
 ```sql
-UPDATE autoblog_topics
-SET status = 'queued', error_message = null
-WHERE id = 123;  -- replace with actual ID
+SELECT r.id, r.channel_key, r.title, r.status, r.error_message, r.ran_at,
+       bp.title AS post_title, bp.status AS post_status, bp.published_at
+FROM autoblog_runs r
+LEFT JOIN blog_posts bp ON bp.id = r.blog_post_id
+WHERE r.channel_key = 'llm_launches'
+ORDER BY r.ran_at DESC
+LIMIT 20;
+```
+
+### View queued items waiting to be generated
+```sql
+SELECT id, channel_key, status, ran_at
+FROM autoblog_runs
+WHERE status = 'queued'
+ORDER BY ran_at ASC;
 ```
 
 ### View feed items fetched for autoblog
 ```sql
-SELECT id, source_url, title, fetched_at
+SELECT id, title, url, published_at, is_processed, fetched_at
 FROM autoblog_feed_items
 ORDER BY fetched_at DESC
 LIMIT 20;
@@ -329,5 +399,5 @@ WHERE id = 'incident-uuid-here' AND resolved_at IS NULL;
 
 ---
 
-*Last updated: April 2026*
+*Last updated: 17 April 2026*
 *Add new queries here as the product grows — keep them organised by module.*
