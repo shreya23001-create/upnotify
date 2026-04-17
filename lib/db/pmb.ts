@@ -305,35 +305,75 @@ export async function updatePmbRunResult(
 }
 
 export async function approvePmbRun(id: number, approvedBy: string): Promise<boolean> {
-  const { error } = await db()
+  const now = new Date().toISOString()
+
+  // Fetch the run to get blog_post_id
+  const { data: run } = await db()
     .from('pmb_runs')
-    .update({ status: 'approved', approved_at: new Date().toISOString(), approved_by: approvedBy })
+    .select('blog_post_id')
     .eq('id', id)
     .in('status', ['generated'])
+    .single()
+
+  if (!run) return false
+
+  const { error } = await db()
+    .from('pmb_runs')
+    .update({ status: 'approved', approved_at: now, approved_by: approvedBy })
+    .eq('id', id)
 
   if (error) {
     logger.error('Failed to approve PMB run', { id, error: error.message })
     return false
   }
+
+  // Publish the linked blog post
+  if (run.blog_post_id) {
+    await db()
+      .from('blog_posts')
+      .update({ status: 'published', published_at: now })
+      .eq('id', run.blog_post_id)
+  }
+
   return true
 }
 
 export async function approvePmbRunsForDate(date: string, approvedBy: string): Promise<number> {
+  const now = new Date().toISOString()
+
   const { data, error } = await db()
     .from('pmb_runs')
-    .update({ status: 'approved', approved_at: new Date().toISOString(), approved_by: approvedBy })
+    .update({ status: 'approved', approved_at: now, approved_by: approvedBy })
     .eq('scheduled_for', date)
     .eq('status', 'generated')
-    .select('id')
+    .select('id, blog_post_id')
 
   if (error) {
     logger.error('Failed to bulk approve PMB runs', { date, error: error.message })
     return 0
   }
-  return (data ?? []).length
+
+  const rows = (data ?? []) as Array<{ id: number; blog_post_id: string | null }>
+  const postIds = rows.map(r => r.blog_post_id).filter(Boolean) as string[]
+
+  if (postIds.length > 0) {
+    await db()
+      .from('blog_posts')
+      .update({ status: 'published', published_at: now })
+      .in('id', postIds)
+  }
+
+  return rows.length
 }
 
 export async function discardPmbRun(id: number): Promise<boolean> {
+  // Fetch blog_post_id before discarding
+  const { data: run } = await db()
+    .from('pmb_runs')
+    .select('blog_post_id')
+    .eq('id', id)
+    .single()
+
   const { error } = await db()
     .from('pmb_runs')
     .update({ status: 'discarded' })
@@ -343,6 +383,15 @@ export async function discardPmbRun(id: number): Promise<boolean> {
     logger.error('Failed to discard PMB run', { id, error: error.message })
     return false
   }
+
+  // Archive the linked blog post so it doesn't appear publicly
+  if (run?.blog_post_id) {
+    await db()
+      .from('blog_posts')
+      .update({ status: 'archived' })
+      .eq('id', run.blog_post_id)
+  }
+
   return true
 }
 
