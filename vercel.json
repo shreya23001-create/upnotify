@@ -6,7 +6,7 @@
     },
     {
       "path": "/api/cron/public-checks",
-      "schedule": "*/5 * * * *"
+      "schedule": "* * * * *"
     },
     {
       "path": "/api/cron/nurture-emails",
