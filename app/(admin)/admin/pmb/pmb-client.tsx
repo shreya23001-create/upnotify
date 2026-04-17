@@ -196,7 +196,7 @@ function OverviewTab({ stats, monitors, categories, cronHistory, today, weekStar
           <span style={{ fontSize: 16 }}>⚠️</span>
           <div>
             <strong style={{ color: 'var(--color-danger)' }}>Cron failure detected</strong>
-            <span style={{ color: 'var(--text-secondary)', marginLeft: 8 }}>{latestError.cron_path} — {latestError.error_message ?? 'Unknown error'} · {timeAgo(latestError.started_at)}</span>
+            <span style={{ color: 'var(--text-secondary)', marginLeft: 8 }}>{latestError.cron_path} — {latestError.error_message ?? 'Unknown error'} · {timeAgo(latestError.ran_at)}</span>
           </div>
         </div>
       )}
@@ -304,7 +304,7 @@ function OverviewTab({ stats, monitors, categories, cronHistory, today, weekStar
               <div style={{ minWidth: 0 }}>
                 <div style={{ fontSize: 12, fontWeight: 700, color: ok ? 'var(--text-primary)' : '#dc2626', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{path.split('/').slice(-2).join('/')}</div>
                 <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
-                  {last ? `${timeAgo(last.started_at)} · ${fmtMs(last.duration_ms)}` : 'Never run'}
+                  {last ? `${timeAgo(last.ran_at)} · ${fmtMs(last.duration_ms)}` : 'Never run'}
                 </div>
                 {last?.result_summary && <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{last.result_summary}</div>}
               </div>
@@ -894,7 +894,7 @@ function CronsTab({ cronHistory, expanded, setExpanded }: {
                         {meta.schedule}
                       </span>
                     </td>
-                    <td style={{ fontSize: 12, color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>{last ? timeAgo(last.started_at) : <span style={{ color: 'var(--text-muted)' }}>—</span>}</td>
+                    <td style={{ fontSize: 12, color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>{last ? timeAgo(last.ran_at) : <span style={{ color: 'var(--text-muted)' }}>—</span>}</td>
                     <td style={{ fontSize: 12, color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{last ? fmtMs(last.duration_ms) : '—'}</td>
                     <td>
                       {last
@@ -937,7 +937,7 @@ function CronsTab({ cronHistory, expanded, setExpanded }: {
                             {runs.map(r => (
                               <div
                                 key={r.id}
-                                title={`${r.status} · ${fmtMs(r.duration_ms)} · ${timeAgo(r.started_at)}`}
+                                title={`${r.status} · ${fmtMs(r.duration_ms)} · ${timeAgo(r.ran_at)}`}
                                 style={{ width: 12, height: 12, borderRadius: '50%', background: r.status === 'ok' ? '#22c55e' : r.status === 'error' ? '#ef4444' : '#94a3b8', flexShrink: 0, cursor: 'default' }}
                               />
                             ))}
@@ -948,7 +948,7 @@ function CronsTab({ cronHistory, expanded, setExpanded }: {
                           {last && (
                             <>
                               <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 10 }}>
-                                Output — {last.started_at}
+                                Output — {last.ran_at}
                                 {!ok && <span style={{ color: '#ef4444', fontWeight: 700 }}>● FAILED</span>}
                               </div>
                               <div style={{ background: '#0d1117', border: `1px solid ${ok ? 'var(--color-border)' : 'rgba(239,68,68,0.3)'}`, borderRadius: 8, padding: '12px 16px', fontFamily: 'monospace', fontSize: 11, color: '#8b949e', lineHeight: 1.8, maxHeight: 180, overflowY: 'auto' }}>

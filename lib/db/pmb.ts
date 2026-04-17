@@ -429,7 +429,7 @@ export interface PmbCronRun {
   duration_ms: number | null
   result_summary: string | null
   error_message: string | null
-  started_at: string
+  ran_at: string
 }
 
 export async function getPmbCronHistory(
@@ -440,7 +440,7 @@ export async function getPmbCronHistory(
     .from('cron_run_log')
     .select('*')
     .in('cron_path', paths)
-    .order('started_at', { ascending: false })
+    .order('ran_at', { ascending: false })
     .limit(paths.length * perPath)
 
   const result: Record<string, PmbCronRun[]> = {}
