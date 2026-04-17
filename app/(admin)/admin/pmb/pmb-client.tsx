@@ -4,12 +4,14 @@ import { useState, useTransition } from 'react'
 import type { PmbCategory, PmbRun, PmbMonitor, PmbQueueStats, PmbCronRun } from '@/lib/db/pmb'
 import {
   togglePmbMonitorAction,
+  updateMonitorPmbAction,
   updateCategoryKeywordsAction,
   approvePmbRunAction,
   approveTodaysBatchAction,
   discardPmbRunAction,
   retryPmbRunAction,
   retryFailedTodayAction,
+  autoCategorizeMonitorsAction,
 } from './actions'
 
 // =============================================================================
@@ -329,9 +331,21 @@ function ProvidersTab({ monitors, categories, search, setSearch, catFilter, setC
   setPage: (p: number) => void
   startTransition: ReturnType<typeof useTransition>[1]
 }): React.ReactElement {
+  const [editingId,   setEditingId]   = useState<string | null>(null)
+  const [editCat,     setEditCat]     = useState('')
+  const [editEnabled, setEditEnabled] = useState(false)
+  const [editKeywords, setEditKeywords] = useState('')
+  const [editStatusUrl, setEditStatusUrl] = useState('')
+  const [autoMsg,     setAutoMsg]     = useState<string | null>(null)
+  const [autoRunning, setAutoRunning] = useState(false)
+
   const filtered = monitors.filter(m => {
-    const matchSearch = !search || m.display_name.toLowerCase().includes(search.toLowerCase()) || m.domain.toLowerCase().includes(search.toLowerCase())
-    const matchCat    = !catFilter || (catFilter === '__enabled' ? m.pmb_enabled : m.pmb_category === catFilter)
+    const q = search.toLowerCase()
+    const matchSearch = !search || m.display_name.toLowerCase().includes(q) || m.domain.toLowerCase().includes(q)
+    const matchCat    = !catFilter
+      || (catFilter === '__enabled'      ? m.pmb_enabled
+        : catFilter === '__uncategorised' ? !m.pmb_category
+        : m.pmb_category === catFilter)
     return matchSearch && matchCat
   })
 
@@ -339,33 +353,81 @@ function ProvidersTab({ monitors, categories, search, setSearch, catFilter, setC
   const safePage   = Math.min(page, totalPages)
   const slice      = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE)
 
-  const enabledCount = monitors.filter(m => m.pmb_enabled).length
+  const enabledCount      = monitors.filter(m => m.pmb_enabled).length
+  const uncategorisedCount = monitors.filter(m => !m.pmb_category).length
+
+  function openEdit(m: PmbMonitor): void {
+    setEditingId(m.id)
+    setEditCat(m.pmb_category ?? '')
+    setEditEnabled(m.pmb_enabled)
+    setEditKeywords(m.pmb_keywords.join(', '))
+    setEditStatusUrl(m.status_page_url ?? '')
+  }
+
+  function saveEdit(id: string): void {
+    const keywords = editKeywords.split(',').map(k => k.trim()).filter(Boolean)
+    startTransition(() => void updateMonitorPmbAction(id, {
+      pmb_category: editCat || null,
+      pmb_keywords: keywords,
+      status_page_url: editStatusUrl || null,
+    }))
+    // Also sync the enable toggle
+    startTransition(() => void togglePmbMonitorAction(id, editEnabled))
+    setEditingId(null)
+  }
+
+  async function runAutoCategory(): Promise<void> {
+    setAutoRunning(true)
+    setAutoMsg(null)
+    const result = await autoCategorizeMonitorsAction()
+    setAutoRunning(false)
+    if (result.success) {
+      setAutoMsg(`Done — ${result.assigned} providers categorised, ${result.skipped} couldn't be matched.`)
+    } else {
+      setAutoMsg(`Failed: ${result.error}`)
+    }
+  }
 
   return (
     <div>
+      {/* Auto-categorize banner */}
+      {uncategorisedCount > 0 && (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14, padding: '12px 16px', background: 'rgba(245,158,11,0.07)', border: '1px solid rgba(245,158,11,0.3)', borderRadius: 10 }}>
+          <div>
+            <div style={{ fontWeight: 700, fontSize: 13 }}>{uncategorisedCount} providers have no PMB category</div>
+            <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
+              {autoMsg ?? 'Auto-assign assigns based on domain + name keyword matching. You can override individually.'}
+            </div>
+          </div>
+          <button className="btn btn-ghost btn-sm" disabled={autoRunning} onClick={() => void runAutoCategory()} style={{ whiteSpace: 'nowrap' }}>
+            {autoRunning ? 'Running…' : '✨ Auto-assign categories'}
+          </button>
+        </div>
+      )}
+
       {/* Toolbar */}
       <div className="data-table-toolbar">
         <input
           placeholder="Search by name or domain…"
           value={search}
           onChange={e => setSearch(e.target.value)}
-          style={{ maxWidth: 280 }}
+          style={{ maxWidth: 260 }}
         />
         <select
           value={catFilter}
           onChange={e => setCatFilter(e.target.value)}
           style={{ height: 38, padding: '0 12px', border: '1.5px solid var(--border-input)', borderRadius: 8, fontSize: 13, background: 'var(--bg-card)', color: 'var(--text-primary)', cursor: 'pointer' }}
         >
-          <option value="">All categories</option>
+          <option value="">All providers</option>
           <option value="__enabled">PMB enabled only</option>
+          <option value="__uncategorised">Uncategorised</option>
           {categories.map(c => (
             <option key={c.slug} value={c.slug}>{c.emoji} {c.display_name}</option>
           ))}
-          <option value="">— uncategorised —</option>
         </select>
         <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 16, fontSize: 12, color: 'var(--text-muted)' }}>
-          <span><strong style={{ color: 'var(--text-primary)' }}>{enabledCount}</strong> enabled</span>
-          <span>{filtered.length} of {monitors.length} providers</span>
+          <span><strong style={{ color: 'var(--color-success)' }}>{enabledCount}</strong> enabled</span>
+          <span>{filtered.length} of {monitors.length}</span>
         </div>
       </div>
 
@@ -374,10 +436,10 @@ function ProvidersTab({ monitors, categories, search, setSearch, catFilter, setC
           <thead>
             <tr>
               <th>Provider</th>
-              <th>Category</th>
-              <th>Status</th>
-              <th>PMB</th>
-              <th style={{ width: 80 }}>Actions</th>
+              <th>PMB Category</th>
+              <th style={{ width: 90 }}>Status</th>
+              <th style={{ width: 120 }}>PMB</th>
+              <th style={{ width: 70 }}>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -385,37 +447,112 @@ function ProvidersTab({ monitors, categories, search, setSearch, catFilter, setC
               <tr><td colSpan={5} className="admin-empty">No providers match this filter.</td></tr>
             )}
             {slice.map(m => (
-              <tr key={m.id}>
-                <td>
-                  <div style={{ fontWeight: 600, fontSize: 13 }}>{m.display_name}</div>
-                  <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{m.domain}</div>
-                </td>
-                <td>
-                  {m.pmb_category
-                    ? <span className="admin-badge admin-badge-blue" style={{ fontSize: 11 }}>{categories.find(c => c.slug === m.pmb_category)?.display_name ?? m.pmb_category}</span>
-                    : <span style={{ color: 'var(--text-muted)', fontSize: 13 }}>—</span>
-                  }
-                </td>
-                <td>
-                  <span className={`admin-badge ${m.last_status === 'up' ? 'admin-badge-green' : m.last_status === 'down' ? 'admin-badge-red' : 'admin-badge-gray'}`}>
-                    {m.last_status ?? '—'}
-                  </span>
-                </td>
-                <td>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <ToggleSwitch
-                      checked={m.pmb_enabled}
-                      onChange={enabled => startTransition(() => void togglePmbMonitorAction(m.id, enabled))}
-                    />
-                    <span style={{ fontSize: 12, color: m.pmb_enabled ? 'var(--color-success)' : 'var(--text-muted)' }}>
-                      {m.pmb_enabled ? 'On' : 'Off'}
+              <>
+                <tr key={m.id} style={{ background: editingId === m.id ? 'var(--color-bg)' : undefined }}>
+                  <td>
+                    <div style={{ fontWeight: 600, fontSize: 13 }}>{m.display_name}</div>
+                    <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{m.domain}</div>
+                  </td>
+                  <td>
+                    {m.pmb_category
+                      ? <span className="admin-badge admin-badge-blue" style={{ fontSize: 11 }}>
+                          {categories.find(c => c.slug === m.pmb_category)?.emoji} {categories.find(c => c.slug === m.pmb_category)?.display_name ?? m.pmb_category}
+                        </span>
+                      : <span style={{ color: 'var(--text-muted)', fontSize: 12, fontStyle: 'italic' }}>Not set</span>
+                    }
+                  </td>
+                  <td>
+                    <span className={`admin-badge ${m.last_status === 'up' ? 'admin-badge-green' : m.last_status === 'down' ? 'admin-badge-red' : 'admin-badge-gray'}`}>
+                      {m.last_status ?? '—'}
                     </span>
-                  </div>
-                </td>
-                <td>
-                  <span className="admin-action-link" style={{ fontSize: 12 }}>Edit</span>
-                </td>
-              </tr>
+                  </td>
+                  <td>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <ToggleSwitch
+                        checked={m.pmb_enabled}
+                        onChange={enabled => startTransition(() => void togglePmbMonitorAction(m.id, enabled))}
+                      />
+                      <span style={{ fontSize: 12, color: m.pmb_enabled ? 'var(--color-success)' : 'var(--text-muted)' }}>
+                        {m.pmb_enabled ? 'On' : 'Off'}
+                      </span>
+                    </div>
+                  </td>
+                  <td>
+                    <button
+                      className="admin-action-link"
+                      style={{ fontSize: 12 }}
+                      onClick={() => editingId === m.id ? setEditingId(null) : openEdit(m)}
+                    >
+                      {editingId === m.id ? 'Cancel' : 'Edit'}
+                    </button>
+                  </td>
+                </tr>
+
+                {editingId === m.id && (
+                  <tr key={`${m.id}-edit`}>
+                    <td colSpan={5} style={{ padding: 0, background: 'var(--color-bg)', borderBottom: '2px solid var(--color-primary)' }}>
+                      <div style={{ padding: '16px 20px' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14, marginBottom: 14 }}>
+                          {/* Category */}
+                          <div>
+                            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 6 }}>PMB Category</label>
+                            <select
+                              value={editCat}
+                              onChange={e => setEditCat(e.target.value)}
+                              style={{ width: '100%', height: 36, padding: '0 10px', border: '1.5px solid var(--border-input)', borderRadius: 8, fontSize: 13, background: 'var(--bg-card)', color: 'var(--text-primary)' }}
+                            >
+                              <option value="">— None —</option>
+                              {categories.map(c => (
+                                <option key={c.slug} value={c.slug}>{c.emoji} {c.display_name}</option>
+                              ))}
+                            </select>
+                          </div>
+
+                          {/* Status page URL */}
+                          <div>
+                            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 6 }}>Status Page URL</label>
+                            <input
+                              value={editStatusUrl}
+                              onChange={e => setEditStatusUrl(e.target.value)}
+                              placeholder="https://status.example.com"
+                              style={{ width: '100%', height: 36, padding: '0 10px', border: '1.5px solid var(--border-input)', borderRadius: 8, fontSize: 13, background: 'var(--bg-card)', color: 'var(--text-primary)', boxSizing: 'border-box' }}
+                            />
+                          </div>
+
+                          {/* PMB enabled */}
+                          <div>
+                            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 6 }}>PMB Enabled</label>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 10, height: 36 }}>
+                              <ToggleSwitch checked={editEnabled} onChange={setEditEnabled} />
+                              <span style={{ fontSize: 13, color: editEnabled ? 'var(--color-success)' : 'var(--text-muted)' }}>
+                                {editEnabled ? 'Enabled — will appear in weekly posts' : 'Disabled'}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Keywords */}
+                        <div style={{ marginBottom: 14 }}>
+                          <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 6 }}>
+                            Custom Keywords <span style={{ fontSize: 10, fontWeight: 400, textTransform: 'none', letterSpacing: 0 }}>(comma-separated, used in blog post SEO)</span>
+                          </label>
+                          <input
+                            value={editKeywords}
+                            onChange={e => setEditKeywords(e.target.value)}
+                            placeholder="e.g. uptime monitoring, reliability, SLA"
+                            style={{ width: '100%', height: 36, padding: '0 10px', border: '1.5px solid var(--border-input)', borderRadius: 8, fontSize: 13, background: 'var(--bg-card)', color: 'var(--text-primary)', boxSizing: 'border-box' }}
+                          />
+                        </div>
+
+                        <div style={{ display: 'flex', gap: 8 }}>
+                          <button className="btn btn-primary btn-sm" onClick={() => saveEdit(m.id)}>Save changes</button>
+                          <button className="btn btn-ghost btn-sm" onClick={() => setEditingId(null)}>Cancel</button>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </>
             ))}
           </tbody>
         </table>

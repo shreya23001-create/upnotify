@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
 import {
   updateMonitorPmbSettings,
@@ -12,6 +13,29 @@ import {
   retryPmbRun,
   retryFailedRunsForDate,
 } from '@/lib/db/pmb'
+
+// ── Auto-categorize keyword map ───────────────────────────────────────────────
+
+const CATEGORY_KEYWORDS: Record<string, string[]> = {
+  'ai-tools':            ['openai', 'anthropic', 'gemini', 'mistral', 'cohere', 'hugging', 'replicate', 'perplexity', 'groq', 'together', 'claude', 'gpt', 'llm', 'ai', 'stability', 'midjourney', 'runpod', 'deepmind', 'inflection', 'xai', 'grok'],
+  'cloud-providers':     ['aws', 'amazon web', 'azure', 'google cloud', 'gcp', 'digitalocean', 'linode', 'akamai cloud', 'vultr', 'hetzner', 'ovh', 'scaleway', 'vercel', 'netlify', 'render', 'railway', 'fly.io', 'heroku', 'oracle cloud', 'ibm cloud'],
+  'payment-processors':  ['stripe', 'paypal', 'square', 'braintree', 'adyen', 'razorpay', 'paddle', 'chargebee', 'klarna', 'afterpay', 'affirm', 'checkout.com', 'worldpay', 'cybersource', 'mollie', 'payoneer', 'wise', 'payment', 'billing'],
+  'ecommerce':           ['shopify', 'woocommerce', 'magento', 'bigcommerce', 'wix stores', 'squarespace commerce', 'prestashop', 'opencart', 'etsy', 'amazon seller', 'walmart seller', 'ebay', 'alibaba'],
+  'collaboration':       ['slack', 'notion', 'asana', 'trello', 'jira', 'monday', 'basecamp', 'zoom', 'linear', 'figma', 'miro', 'confluence', 'clickup', 'airtable', 'dropbox', 'box.com', 'google workspace', 'microsoft 365', 'teams', 'webex', 'loom'],
+  'devtools':            ['github', 'gitlab', 'bitbucket', 'jenkins', 'travis', 'circleci', 'docker', 'kubernetes', 'terraform', 'hashicorp', 'datadog', 'sentry', 'npm', 'pypi', 'rubygems', 'sonar', 'snyk', 'jfrog', 'atlassian', 'postman', 'supabase', 'firebase', 'planetscale', 'neon', 'turso'],
+  'email-marketing':     ['mailchimp', 'sendgrid', 'mailgun', 'postmark', 'resend', 'hubspot', 'klaviyo', 'activecampaign', 'convertkit', 'beehiiv', 'substack', 'brevo', 'sendinblue', 'campaign monitor', 'constantcontact', 'drip', 'email', 'newsletter', 'marketing cloud'],
+  'cdn-security':        ['cloudflare', 'fastly', 'akamai', 'imperva', 'sucuri', 'zscaler', 'okta', 'auth0', 'ping identity', 'crowdstrike', 'palo alto', 'fortinet', 'barracuda', 'qualys', 'tenable', 'cdn77', 'bunny.net', 'cdn', 'ddos', 'waf', 'firewall', 'vpn', 'zero trust'],
+  'cms-builders':        ['wordpress', 'contentful', 'strapi', 'sanity', 'ghost', 'webflow', 'framer', 'drupal', 'builder.io', 'prismic', 'storyblok', 'directus', 'payload', 'craft cms', 'kentico', 'sitecore', 'umbraco', 'squarespace', 'wix'],
+  'monitoring':          ['datadog', 'new relic', 'grafana', 'prometheus', 'pagerduty', 'statuspage', 'pingdom', 'uptimerobot', 'better uptime', 'freshping', 'site24x7', 'dynatrace', 'elastic', 'splunk', 'logz', 'honeycomb', 'lightstep', 'monitor', 'uptime', 'observability'],
+}
+
+function guessPmbCategory(displayName: string, domain: string, existingCategory: string): string | null {
+  const haystack = `${displayName} ${domain} ${existingCategory}`.toLowerCase()
+  for (const [slug, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
+    if (keywords.some(kw => haystack.includes(kw))) return slug
+  }
+  return null
+}
 
 async function getAdminEmail(): Promise<string | null> {
   const supabase = await createClient()
@@ -124,4 +148,50 @@ export async function retryFailedTodayAction(date: string): Promise<{ success: b
   logger.info('PMB: bulk retry failed', { date, count, by: email })
   revalidatePath('/admin/pmb')
   return { success: true, count }
+}
+
+// ── Auto-categorize ───────────────────────────────────────────────────────────
+
+export async function autoCategorizeMonitorsAction(): Promise<{ success: boolean; assigned: number; skipped: number; error?: string }> {
+  const email = await getAdminEmail()
+  if (!email) return { success: false, assigned: 0, skipped: 0, error: 'Unauthorised' }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const db = createAdminClient() as any
+
+  // Fetch all monitors that haven't been manually categorised yet
+  const { data, error } = await db
+    .from('public_monitors')
+    .select('id, display_name, domain, category, pmb_category')
+    .is('pmb_category', null)
+
+  if (error) {
+    logger.error('PMB: auto-categorize fetch failed', { error: error.message })
+    return { success: false, assigned: 0, skipped: 0, error: error.message }
+  }
+
+  const rows = (data ?? []) as { id: string; display_name: string; domain: string; category: string; pmb_category: string | null }[]
+
+  let assigned = 0
+  let skipped  = 0
+
+  for (const row of rows) {
+    const guess = guessPmbCategory(row.display_name, row.domain, row.category ?? '')
+    if (!guess) { skipped++; continue }
+
+    const { error: updateErr } = await db
+      .from('public_monitors')
+      .update({ pmb_category: guess })
+      .eq('id', row.id)
+
+    if (updateErr) {
+      logger.error('PMB: auto-categorize update failed', { id: row.id, error: updateErr.message })
+    } else {
+      assigned++
+    }
+  }
+
+  logger.info('PMB: auto-categorize complete', { assigned, skipped, by: email })
+  revalidatePath('/admin/pmb')
+  return { success: true, assigned, skipped }
 }
