@@ -822,8 +822,13 @@ function CronsTab({ cronHistory, expanded, setExpanded }: {
         setTriggerState(s => ({ ...s, [path]: 'ok' }))
         setTriggerMsg(m => ({ ...m, [path]: summary }))
       } else {
+        // error detail may be in json.error (trigger-cron level) or json.data (cron level)
+        const detail = json.error
+          ?? (typeof json.data === 'object' && json.data !== null && 'error' in json.data
+              ? String((json.data as { error: unknown }).error)
+              : JSON.stringify(json.data ?? 'error'))
         setTriggerState(s => ({ ...s, [path]: 'error' }))
-        setTriggerMsg(m => ({ ...m, [path]: json.error ?? 'Unknown error' }))
+        setTriggerMsg(m => ({ ...m, [path]: detail }))
       }
     } catch (err) {
       setTriggerState(s => ({ ...s, [path]: 'error' }))

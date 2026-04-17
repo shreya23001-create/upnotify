@@ -65,6 +65,7 @@ export async function POST(request: Request): Promise<NextResponse> {
 
   const headers: Record<string, string> = {
     'x-cron-trigger': 'manual',
+    'x-vercel-cron':  '1',           // satisfies the x-vercel-cron auth check in all cron routes
   }
   if (cronSecret) {
     headers['Authorization'] = `Bearer ${cronSecret}`
