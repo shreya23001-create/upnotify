@@ -17,7 +17,7 @@ import {
 // ── Auto-categorize keyword map ───────────────────────────────────────────────
 
 const CATEGORY_KEYWORDS: Record<string, string[]> = {
-  'ai-tools':            ['openai', 'anthropic', 'gemini', 'mistral', 'cohere', 'hugging', 'replicate', 'perplexity', 'groq', 'together', 'claude', 'gpt', 'llm', 'ai', 'stability', 'midjourney', 'runpod', 'deepmind', 'inflection', 'xai', 'grok'],
+  'ai-tools':            ['openai', 'anthropic', 'gemini', 'mistral', 'cohere', 'hugging', 'replicate', 'perplexity', 'groq', 'together', 'claude', 'gpt', 'llm', 'stability', 'midjourney', 'runpod', 'deepmind', 'inflection', 'xai', 'grok'],
   'cloud-providers':     ['aws', 'amazon web', 'azure', 'google cloud', 'gcp', 'digitalocean', 'linode', 'akamai cloud', 'vultr', 'hetzner', 'ovh', 'scaleway', 'vercel', 'netlify', 'render', 'railway', 'fly.io', 'heroku', 'oracle cloud', 'ibm cloud'],
   'payment-processors':  ['stripe', 'paypal', 'square', 'braintree', 'adyen', 'razorpay', 'paddle', 'chargebee', 'klarna', 'afterpay', 'affirm', 'checkout.com', 'worldpay', 'cybersource', 'mollie', 'payoneer', 'wise', 'payment', 'billing'],
   'ecommerce':           ['shopify', 'woocommerce', 'magento', 'bigcommerce', 'wix stores', 'squarespace commerce', 'prestashop', 'opencart', 'etsy', 'amazon seller', 'walmart seller', 'ebay', 'alibaba'],
