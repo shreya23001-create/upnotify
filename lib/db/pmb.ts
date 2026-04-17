@@ -381,24 +381,12 @@ export async function createPmbRuns(runs: CreatePmbRunInput[]): Promise<number> 
 
   const { data, error } = await db()
     .from('pmb_runs')
-    .insert(runs)
+    .upsert(runs, { onConflict: 'run_key', ignoreDuplicates: true })
     .select('id')
-    .on_conflict('run_key')
-    .ignore()
 
-  // Supabase JS v2 uses onConflict
   if (error) {
-    // Try with onConflict syntax
-    const { data: data2, error: error2 } = await db()
-      .from('pmb_runs')
-      .upsert(runs, { onConflict: 'run_key', ignoreDuplicates: true })
-      .select('id')
-
-    if (error2) {
-      logger.error('Failed to create PMB runs', { error: error2.message })
-      return 0
-    }
-    return (data2 ?? []).length
+    logger.error('Failed to create PMB runs', { error: error.message })
+    return 0
   }
 
   return (data ?? []).length
