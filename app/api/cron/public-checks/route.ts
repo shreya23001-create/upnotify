@@ -92,14 +92,14 @@ export async function GET(request: Request): Promise<NextResponse> {
     const allMonitors = await getActivePublicMonitors()
 
     // Check oldest-checked monitors first — rotates through all sites across cron fires
-    // Cap at 30 per run to stay well within 60s Vercel Pro timeout
+    // 50 per run × every 1 min = ~10 min full cycle for 469 monitors
     const monitors = allMonitors
       .sort((a, b) => {
         const aTime = a.last_checked_at ? new Date(a.last_checked_at).getTime() : 0
         const bTime = b.last_checked_at ? new Date(b.last_checked_at).getTime() : 0
         return aTime - bTime
       })
-      .slice(0, 30)
+      .slice(0, 50)
 
     logger.info('Public check runner started', { total: allMonitors.length, checking: monitors.length })
 
