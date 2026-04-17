@@ -25,6 +25,9 @@ const ALLOWED_CRON_PATHS = new Set([
   '/api/cron/autoblog/llm-detector',
   '/api/cron/autoblog/topic-runner',
   '/api/cron/autoblog/post-generator',
+  '/api/cron/pmb/week-planner',
+  '/api/cron/pmb/daily-publisher',
+  '/api/cron/pmb/monthly-generator',
 ])
 
 async function isAdmin(): Promise<boolean> {
@@ -62,6 +65,7 @@ export async function POST(request: Request): Promise<NextResponse> {
 
   const headers: Record<string, string> = {
     'x-cron-trigger': 'manual',
+    'x-vercel-cron':  '1',           // satisfies the x-vercel-cron auth check in all cron routes
   }
   if (cronSecret) {
     headers['Authorization'] = `Bearer ${cronSecret}`

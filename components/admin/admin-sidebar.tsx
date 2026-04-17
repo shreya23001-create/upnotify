@@ -68,6 +68,7 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { href: '/admin/blog', label: 'Blog', icon: IconEdit },
       { href: '/admin/autoblog', label: 'Autoblog Engine', icon: IconActivity },
+      { href: '/admin/pmb', label: 'Monitor Blogging', icon: IconActivity },
       { href: '/admin/aoe', label: 'AOE Outreach', icon: IconMail },
       { href: '/admin/emails', label: 'Email & Nurture', icon: IconMail },
       { href: '/admin/messages', label: 'Messages', icon: IconBell },
