@@ -694,9 +694,10 @@ function CronsTab({ cronHistory, expanded, setExpanded }: {
             </tr>
           </thead>
           <tbody>
-            {Object.entries(cronHistory).map(([path, runs]) => {
+            {Object.keys(cronMeta).map(path => {
+              const runs      = cronHistory[path] ?? []
               const last      = runs[0]
-              const meta      = cronMeta[path] ?? { schedule: '—', description: path }
+              const meta      = cronMeta[path]
               const isExpanded = expanded.has(path)
               const ok        = !last || last.status === 'ok'
 

@@ -455,13 +455,13 @@ export async function getPmbCronHistory(
     .order('started_at', { ascending: false })
     .limit(paths.length * perPath)
 
-  if (error) {
-    logger.error('Failed to get PMB cron history', { error: error.message })
-    return {}
-  }
-
   const result: Record<string, PmbCronRun[]> = {}
   for (const path of paths) result[path] = []
+
+  if (error) {
+    logger.error('Failed to get PMB cron history', { error: error.message })
+    return result
+  }
 
   for (const row of (data ?? []) as PmbCronRun[]) {
     if (result[row.cron_path] && result[row.cron_path].length < perPath) {
