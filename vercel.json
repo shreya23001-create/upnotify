@@ -75,6 +75,18 @@
     {
       "path": "/api/cron/autoblog/post-generator",
       "schedule": "*/10 * * * *"
+    },
+    {
+      "path": "/api/cron/pmb/week-planner",
+      "schedule": "0 5 * * 1"
+    },
+    {
+      "path": "/api/cron/pmb/daily-publisher",
+      "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/cron/pmb/monthly-generator",
+      "schedule": "0 7 1 * *"
     }
   ]
 }
