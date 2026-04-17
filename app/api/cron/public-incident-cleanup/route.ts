@@ -67,6 +67,7 @@ export async function GET(request: Request): Promise<NextResponse> {
   let autoClosed = 0
   let blogsTriggered = 0
   let blogsFailed = 0
+  let blogsSkipped = 0
 
   try {
     // -------------------------------------------------------------------------
@@ -209,8 +210,8 @@ export async function GET(request: Request): Promise<NextResponse> {
           })
 
           if (!draft) {
-            logger.warn('Blog draft not generated', { domain: monitor.domain })
-            blogsFailed++
+            // null = dedup/skip — blog-generator already stamped blog_generated_at to stop retrying
+            blogsSkipped++
             continue
           }
 
@@ -263,14 +264,24 @@ export async function GET(request: Request): Promise<NextResponse> {
             domain: monitor.domain,
             error: err instanceof Error ? err.message : 'Unknown',
           })
+          // Give up after 2 hours of retrying — stamp to prevent infinite loop
+          const eligibleAt = new Date(incident.blog_eligible_after!).getTime()
+          if (Date.now() - eligibleAt > 2 * 60 * 60 * 1000) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            await (supabase as unknown as any)
+              .from('public_incidents')
+              .update({ blog_generated_at: now.toISOString() })
+              .eq('id', incident.id)
+            logger.warn('Blog generation gave up after 2h — stamping to stop retry', { domain: monitor.domain, incidentId: incident.id })
+          }
         }
       }
     }
 
-    const summary = `auto_closed: ${autoClosed}, blogs_triggered: ${blogsTriggered}, blogs_failed: ${blogsFailed}`
-    logger.info('public-incident-cleanup completed', { autoClosed, blogsTriggered, blogsFailed })
+    const summary = `auto_closed: ${autoClosed}, blogs_triggered: ${blogsTriggered}, blogs_skipped: ${blogsSkipped}, blogs_failed: ${blogsFailed}`
+    logger.info('public-incident-cleanup completed', { autoClosed, blogsTriggered, blogsSkipped, blogsFailed })
     await endCronRun(runId, cronStart, 'ok', { summary })
-    return NextResponse.json({ ok: true, autoClosed, blogsTriggered, blogsFailed })
+    return NextResponse.json({ ok: true, autoClosed, blogsTriggered, blogsSkipped, blogsFailed })
 
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Unknown error'
