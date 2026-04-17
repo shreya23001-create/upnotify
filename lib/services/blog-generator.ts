@@ -122,23 +122,39 @@ async function blogExistsForMonitorToday(monitorId: string): Promise<boolean> {
 // Main generation function
 // ---------------------------------------------------------------------------
 
+const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+async function stampIncidentSkipped(incidentId: string): Promise<void> {
+  if (!uuidPattern.test(incidentId)) return
+  const supabase = createAdminClient()
+  await supabase
+    .from('public_incidents')
+    .update({ blog_generated_at: new Date().toISOString() })
+    .eq('id', incidentId)
+}
+
 /**
  * Generates an outage blog post using Claude + real-time research from
  * multiple sources. Saves as pending_approval and creates approval tokens
  * for admin email review. One post per monitor per UTC day — deduplicates by
  * incident ID and by monitor to prevent repeated posts when a site flaps.
+ *
+ * Returns null and stamps blog_generated_at on the incident for all skip/dedup
+ * cases — this prevents the cleanup cron from retrying indefinitely.
  */
 export async function generateOutageBlogPost(ctx: OutageContext): Promise<GeneratedBlogDraft | null> {
   const exists = await blogExistsForIncident(ctx.incidentId)
   if (exists) {
-    logger.info('Blog post already exists for incident — skipping', { incidentId: ctx.incidentId })
+    logger.info('Blog post already exists for incident — stamping to stop retry', { incidentId: ctx.incidentId })
+    await stampIncidentSkipped(ctx.incidentId)
     return null
   }
 
   if (ctx.monitorId) {
     const monitorBloggedToday = await blogExistsForMonitorToday(ctx.monitorId)
     if (monitorBloggedToday) {
-      logger.info('Blog already generated for this monitor today — skipping', { monitorId: ctx.monitorId })
+      logger.info('Monitor already blogged today — stamping to stop retry', { monitorId: ctx.monitorId, incidentId: ctx.incidentId })
+      await stampIncidentSkipped(ctx.incidentId)
       return null
     }
   }
