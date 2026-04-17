@@ -24,8 +24,9 @@ export default async function ScanPage(): Promise<React.ReactElement> {
   return (
     <div>
       <div className="page-header">
-        <h1 className="page-title">Scan a Website</h1>
-        <a href="/dashboard/monitors" className="btn btn-ghost">← Back to Monitors</a>
+        <h1 className="page-title">Add Monitors</h1>
+        <a href="/dashboard/monitors/new/manual" className="btn btn-ghost" style={{ fontSize: 13 }}>✏️ Add specific monitor instead</a>
+        <a href="/dashboard/monitors" className="btn btn-ghost">← Back</a>
       </div>
       <ScanClient
         remaining={remaining}

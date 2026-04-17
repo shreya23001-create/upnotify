@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useRef } from 'react'
 import Link from 'next/link'
 import { useWorkspace } from '@/components/providers/workspace-provider'
 import type { Monitor, Incident } from '@/lib/types'
@@ -111,6 +111,50 @@ function StatCards({ stats }: { stats: MonitorStats }) {
   )
 }
 
+function AddBtn({ hasMonitors }: { hasMonitors: boolean }): React.ReactElement {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    function handler(e: MouseEvent): void {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  if (!hasMonitors) {
+    return (
+      <Link href="/dashboard/monitors/scan" className="btn btn-primary btn-sm">
+        <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add Monitor
+      </Link>
+    )
+  }
+
+  return (
+    <div ref={ref} style={{ position: 'relative', display: 'inline-block' }}>
+      <button className="btn btn-primary btn-sm" onClick={() => setOpen(o => !o)}>
+        <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add Monitor
+        <svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" style={{ marginLeft: 4 }}><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      {open && (
+        <div style={{ position: 'absolute', top: 'calc(100% + 6px)', right: 0, background: 'var(--bg-card)', border: '1px solid var(--border-primary)', borderRadius: 10, boxShadow: '0 8px 28px rgba(0,0,0,0.14)', zIndex: 100, minWidth: 210, overflow: 'hidden' }}>
+          <Link href="/dashboard/monitors/scan" onClick={() => setOpen(false)} style={{ display: 'block', padding: '11px 14px', textDecoration: 'none', borderBottom: '1px solid var(--border-primary)' }}>
+            <div style={{ fontWeight: 600, fontSize: 13, color: 'var(--text-primary)', marginBottom: 2 }}>🔭 Scan a domain</div>
+            <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Auto-detect what needs monitoring</div>
+          </Link>
+          <Link href="/dashboard/monitors/new/manual" onClick={() => setOpen(false)} style={{ display: 'block', padding: '11px 14px', textDecoration: 'none' }}>
+            <div style={{ fontWeight: 600, fontSize: 13, color: 'var(--text-primary)', marginBottom: 2 }}>✏️ Add a specific monitor</div>
+            <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Choose a type and configure manually</div>
+          </Link>
+        </div>
+      )}
+    </div>
+  )
+}
+
 function MonitorsTable({ monitors, metrics, search, setSearch }: {
   monitors: Monitor[]
   metrics: Record<string, { uptime: number; latestMs: number | null }>
@@ -159,10 +203,7 @@ function MonitorsTable({ monitors, metrics, search, setSearch }: {
             <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             <input placeholder="Search monitors…" value={search} onChange={e => setSearch(e.target.value)} />
           </div>
-          <Link href="/dashboard/monitors/new" className="btn btn-primary btn-sm">
-            <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Add
-          </Link>
+          <AddBtn hasMonitors={monitors.length > 0} />
         </div>
       </div>
 
