@@ -170,8 +170,9 @@ export default async function DynamicBlogPost({ params }: { params: Promise<{ sl
   if (!post) notFound()
 
   const content = parseContent(post.content)
-  const body = content?.body ?? ''
   const isStatic = content?.type === 'static'
+  const rawHtml = (content as Record<string, unknown> | null)?.html as string | undefined
+  const body = rawHtml ?? (content?.body ?? '')
 
   // Static posts live in their own .tsx files — let Next.js fall through to the static route
   if (isStatic || !body) notFound()
@@ -183,7 +184,7 @@ export default async function DynamicBlogPost({ params }: { params: Promise<{ sl
     ? new Date(post.published_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
     : ''
 
-  const bodyHtml = markdownToHtml(body)
+  const bodyHtml = rawHtml ? body : markdownToHtml(body)
 
   return (
     <div className="blog-article-wrap">
