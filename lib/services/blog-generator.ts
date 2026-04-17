@@ -126,7 +126,8 @@ const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{1
 
 async function stampIncidentSkipped(incidentId: string): Promise<void> {
   if (!uuidPattern.test(incidentId)) return
-  const supabase = createAdminClient()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const supabase = createAdminClient() as any
   await supabase
     .from('public_incidents')
     .update({ blog_generated_at: new Date().toISOString() })
