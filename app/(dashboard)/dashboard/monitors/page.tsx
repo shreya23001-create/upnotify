@@ -24,6 +24,7 @@ export default async function MonitorsPage() {
     <div>
       <div className="page-header">
         <h1 className="page-title">Monitors</h1>
+        <Link href="/dashboard/monitors/scan" className="btn btn-ghost">🔭 Scan a Website</Link>
         <Link href="/dashboard/monitors/new" className="btn btn-primary">+ Add Monitor</Link>
       </div>
       <MonitorTable monitors={monitors} uptimeData={uptimeData} />
