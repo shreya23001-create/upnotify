@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup 1 — Bundle Wizard</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f1117; color: #e2e8f0; min-height: 100vh; }
+
+  .header { background: #1a1d27; border-bottom: 1px solid #2d3148; padding: 16px 32px; display: flex; align-items: center; gap: 12px; }
+  .logo { font-size: 18px; font-weight: 700; color: #fff; }
+  .badge { background: #1e3a5f; color: #60a5fa; font-size: 11px; padding: 3px 8px; border-radius: 12px; font-weight: 600; }
+
+  .container { max-width: 900px; margin: 0 auto; padding: 40px 24px; }
+
+  /* Steps */
+  .steps { display: flex; align-items: center; gap: 0; margin-bottom: 40px; }
+  .step { display: flex; align-items: center; gap: 8px; flex: 1; }
+  .step-num { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+  .step.active .step-num { background: #3b82f6; color: #fff; }
+  .step.done .step-num { background: #10b981; color: #fff; }
+  .step.inactive .step-num { background: #2d3148; color: #64748b; }
+  .step-label { font-size: 13px; font-weight: 500; }
+  .step.active .step-label { color: #e2e8f0; }
+  .step.done .step-label { color: #10b981; }
+  .step.inactive .step-label { color: #64748b; }
+  .step-line { flex: 1; height: 1px; background: #2d3148; margin: 0 8px; }
+  .step-line.done { background: #10b981; }
+
+  /* Step panels */
+  .step-panel { display: none; }
+  .step-panel.active { display: block; }
+
+  /* Step 1 — domain */
+  .step-title { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+  .step-sub { font-size: 14px; color: #94a3b8; margin-bottom: 28px; }
+
+  .domain-input-wrap { display: flex; gap: 12px; margin-bottom: 16px; }
+  .domain-input { flex: 1; background: #1a1d27; border: 1px solid #2d3148; border-radius: 10px; padding: 14px 18px; font-size: 15px; color: #e2e8f0; outline: none; transition: border 0.2s; }
+  .domain-input:focus { border-color: #3b82f6; }
+  .btn-primary { background: #3b82f6; color: #fff; border: none; border-radius: 10px; padding: 14px 24px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.2s; white-space: nowrap; }
+  .btn-primary:hover { background: #2563eb; }
+  .btn-ghost { background: transparent; border: 1px solid #2d3148; color: #94a3b8; border-radius: 10px; padding: 14px 24px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+  .btn-ghost:hover { border-color: #3b82f6; color: #3b82f6; }
+
+  /* Step 2 — bundles */
+  .bundles-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+  .bundle-card { background: #1a1d27; border: 2px solid #2d3148; border-radius: 14px; padding: 20px; cursor: pointer; transition: all 0.2s; position: relative; }
+  .bundle-card:hover { border-color: #3b82f6; }
+  .bundle-card.selected { border-color: #3b82f6; background: #1e2d4a; }
+  .bundle-card.recommended::before { content: 'Most Popular'; position: absolute; top: -1px; left: 50%; transform: translateX(-50%); background: #3b82f6; color: #fff; font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 0 0 8px 8px; }
+  .bundle-icon { font-size: 28px; margin-bottom: 10px; }
+  .bundle-name { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+  .bundle-desc { font-size: 12px; color: #94a3b8; margin-bottom: 12px; line-height: 1.5; }
+  .bundle-count { font-size: 12px; color: #60a5fa; font-weight: 600; }
+  .bundle-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 10px; }
+  .bundle-tag { background: #1e3a5f20; border: 1px solid #3b82f630; color: #60a5fa; font-size: 10px; padding: 2px 7px; border-radius: 6px; }
+
+  .or-divider { text-align: center; color: #64748b; font-size: 13px; margin: 20px 0; position: relative; }
+  .or-divider::before, .or-divider::after { content: ''; position: absolute; top: 50%; width: 42%; height: 1px; background: #2d3148; }
+  .or-divider::before { left: 0; }
+  .or-divider::after { right: 0; }
+
+  .custom-link { text-align: center; }
+  .custom-link a { color: #60a5fa; font-size: 14px; cursor: pointer; text-decoration: none; }
+  .custom-link a:hover { text-decoration: underline; }
+
+  /* Step 3 — review + extra config */
+  .review-layout { display: grid; grid-template-columns: 1fr 320px; gap: 24px; align-items: start; }
+
+  .monitor-list { background: #1a1d27; border: 1px solid #2d3148; border-radius: 14px; overflow: hidden; }
+  .monitor-list-header { padding: 14px 20px; border-bottom: 1px solid #2d3148; font-size: 13px; font-weight: 600; color: #94a3b8; display: flex; justify-content: space-between; }
+  .monitor-item { padding: 14px 20px; border-bottom: 1px solid #1e2235; display: flex; align-items: flex-start; gap: 12px; }
+  .monitor-item:last-child { border-bottom: none; }
+  .monitor-check { width: 18px; height: 18px; border-radius: 4px; background: #3b82f6; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+  .monitor-check svg { width: 11px; height: 11px; fill: #fff; }
+  .monitor-info { flex: 1; }
+  .monitor-name { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+  .monitor-desc { font-size: 12px; color: #64748b; }
+  .config-badge { background: #f59e0b20; border: 1px solid #f59e0b40; color: #f59e0b; font-size: 10px; padding: 2px 7px; border-radius: 5px; font-weight: 600; cursor: pointer; }
+  .config-badge:hover { background: #f59e0b30; }
+
+  .config-panel { background: #1e2a1a; border: 1px solid #22543d; border-radius: 10px; padding: 14px; margin-top: 10px; }
+  .config-panel-title { font-size: 12px; font-weight: 600; color: #4ade80; margin-bottom: 10px; }
+  .config-row { margin-bottom: 10px; }
+  .config-label { font-size: 11px; color: #94a3b8; margin-bottom: 4px; }
+  .config-input { width: 100%; background: #111827; border: 1px solid #2d3148; border-radius: 7px; padding: 8px 12px; font-size: 13px; color: #e2e8f0; outline: none; }
+
+  /* Sidebar */
+  .plan-sidebar { position: sticky; top: 24px; }
+  .plan-box { background: #1a1d27; border: 1px solid #2d3148; border-radius: 14px; padding: 20px; margin-bottom: 16px; }
+  .plan-box-title { font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 14px; }
+  .plan-name { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+  .plan-limit { font-size: 13px; color: #94a3b8; margin-bottom: 14px; }
+
+  .limit-bar { background: #2d3148; border-radius: 4px; height: 6px; margin-bottom: 6px; overflow: hidden; }
+  .limit-fill { height: 100%; border-radius: 4px; background: #3b82f6; transition: width 0.3s; }
+  .limit-fill.warn { background: #f59e0b; }
+  .limit-fill.over { background: #ef4444; }
+  .limit-text { font-size: 12px; color: #94a3b8; }
+  .limit-text span { color: #e2e8f0; font-weight: 600; }
+
+  .selected-summary { margin-top: 16px; }
+  .selected-item { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #1e2235; font-size: 13px; }
+  .selected-item:last-child { border-bottom: none; }
+  .selected-name { color: #e2e8f0; }
+  .selected-type { color: #64748b; font-size: 11px; }
+
+  .upgrade-nudge { background: #f59e0b10; border: 1px solid #f59e0b30; border-radius: 10px; padding: 14px; margin-top: 12px; }
+  .upgrade-nudge p { font-size: 12px; color: #fbbf24; margin-bottom: 8px; line-height: 1.5; }
+  .upgrade-nudge a { color: #f59e0b; font-size: 12px; font-weight: 600; cursor: pointer; }
+
+  .btn-create { width: 100%; background: #10b981; color: #fff; border: none; border-radius: 10px; padding: 14px; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 8px; transition: background 0.2s; }
+  .btn-create:hover { background: #059669; }
+  .btn-create:disabled { background: #2d3148; color: #64748b; cursor: not-allowed; }
+
+  .nav-row { display: flex; gap: 12px; margin-top: 24px; }
+
+  .label-tag { display: inline-block; background: #2d3148; color: #94a3b8; font-size: 10px; padding: 2px 7px; border-radius: 5px; margin-left: 6px; vertical-align: middle; }
+  .label-tag.needs-config { background: #f59e0b20; color: #f59e0b; }
+
+  /* Custom mode */
+  .categories-section { margin-bottom: 24px; }
+  .category-header { display: flex; align-items: center; gap: 10px; padding: 14px 0; border-bottom: 1px solid #2d3148; cursor: pointer; }
+  .category-title { font-size: 14px; font-weight: 700; flex: 1; }
+  .category-count { font-size: 12px; color: #60a5fa; }
+  .category-toggle { color: #64748b; font-size: 14px; transition: transform 0.2s; }
+  .category-items { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 14px 0; }
+  .cat-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: #1a1d27; border: 1px solid #2d3148; border-radius: 9px; cursor: pointer; transition: all 0.15s; }
+  .cat-item:hover { border-color: #3b82f6; }
+  .cat-item.checked { background: #1e2d4a; border-color: #3b82f6; }
+  .cat-item input[type=checkbox] { accent-color: #3b82f6; width: 15px; height: 15px; flex-shrink: 0; }
+  .cat-item-name { font-size: 13px; font-weight: 500; flex: 1; }
+  .cat-item-icon { font-size: 16px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">Uptrue</div>
+  <div class="badge">Monitoring Suite</div>
+  <div style="margin-left:auto; font-size:13px; color:#64748b;">Monitor a Website</div>
+</div>
+
+<div class="container">
+
+  <!-- Steps indicator -->
+  <div class="steps">
+    <div class="step done" id="s1">
+      <div class="step-num">✓</div>
+      <div class="step-label">Domain</div>
+    </div>
+    <div class="step-line done"></div>
+    <div class="step active" id="s2">
+      <div class="step-num">2</div>
+      <div class="step-label">Choose Bundle</div>
+    </div>
+    <div class="step-line"></div>
+    <div class="step inactive" id="s3">
+      <div class="step-num">3</div>
+      <div class="step-label">Review & Create</div>
+    </div>
+  </div>
+
+  <!-- Step 1: Domain -->
+  <div class="step-panel" id="panel-1">
+    <div class="step-title">Which website do you want to monitor?</div>
+    <div class="step-sub">We'll set up everything for this domain in one go.</div>
+    <div class="domain-input-wrap">
+      <input class="domain-input" type="text" value="example.com" placeholder="example.com or https://example.com" id="domainInput">
+      <button class="btn-primary" onclick="goStep(2)">Continue →</button>
+    </div>
+  </div>
+
+  <!-- Step 2: Bundle selection -->
+  <div class="step-panel active" id="panel-2">
+    <div class="step-title">Choose a monitoring bundle</div>
+    <div class="step-sub">Pick a preset that fits your needs, or build your own.</div>
+
+    <div class="bundles-grid">
+      <div class="bundle-card" onclick="selectBundle(this, 'essential')">
+        <div class="bundle-icon">🛡️</div>
+        <div class="bundle-name">Essential</div>
+        <div class="bundle-desc">The basics every website needs. Uptime, SSL, DNS, and domain expiry covered.</div>
+        <div class="bundle-count">5 monitors</div>
+        <div class="bundle-tags">
+          <span class="bundle-tag">HTTP Uptime</span>
+          <span class="bundle-tag">SSL</span>
+          <span class="bundle-tag">DNS</span>
+          <span class="bundle-tag">Domain Expiry</span>
+          <span class="bundle-tag">Ping</span>
+        </div>
+      </div>
+
+      <div class="bundle-card recommended selected" onclick="selectBundle(this, 'standard')">
+        <div class="bundle-icon">⚡</div>
+        <div class="bundle-name">Standard</div>
+        <div class="bundle-desc">Essential plus security and email health. Recommended for most websites.</div>
+        <div class="bundle-count">10 monitors</div>
+        <div class="bundle-tags">
+          <span class="bundle-tag">Everything in Essential</span>
+          <span class="bundle-tag">Security Headers</span>
+          <span class="bundle-tag">SPF/DMARC</span>
+          <span class="bundle-tag">Blacklist</span>
+          <span class="bundle-tag">MX Health</span>
+          <span class="bundle-tag">Redirect Chain</span>
+        </div>
+      </div>
+
+      <div class="bundle-card" onclick="selectBundle(this, 'full')">
+        <div class="bundle-icon">🔭</div>
+        <div class="bundle-name">Full Suite</div>
+        <div class="bundle-desc">Every monitor type applied. Nothing missed. For agencies and power users.</div>
+        <div class="bundle-count">18 monitors <span class="label-tag">Builder plan+</span></div>
+        <div class="bundle-tags">
+          <span class="bundle-tag">Everything in Standard</span>
+          <span class="bundle-tag">Response Time</span>
+          <span class="bundle-tag">Page Size</span>
+          <span class="bundle-tag">robots.txt</span>
+          <span class="bundle-tag">Sitemap</span>
+          <span class="bundle-tag">IP Change</span>
+          <span class="bundle-tag">WHOIS Change</span>
+          <span class="bundle-tag">Cookie Consent</span>
+          <span class="bundle-tag">Nameserver Change</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="or-divider">or</div>
+    <div class="custom-link"><a onclick="goStep('custom')">Build your own →  choose individual monitors</a></div>
+
+    <div class="nav-row">
+      <button class="btn-ghost" onclick="goStep(1)">← Back</button>
+      <button class="btn-primary" onclick="goStep(3)" style="margin-left:auto;">Review →</button>
+    </div>
+  </div>
+
+  <!-- Custom picker -->
+  <div class="step-panel" id="panel-custom">
+    <div class="step-title">Build your own bundle</div>
+    <div class="step-sub">Select the monitor types you want for <strong id="domainLabel2">example.com</strong></div>
+
+    <div class="categories-section">
+      <div class="category-header" onclick="toggleCat('essential')">
+        <span style="font-size:18px">🛡️</span>
+        <span class="category-title">Essential <span style="color:#64748b; font-weight:400; font-size:13px">— core uptime &amp; availability</span></span>
+        <span class="category-count">5 monitors</span>
+        <span class="category-toggle" id="tog-essential">▼</span>
+      </div>
+      <div id="cat-essential">
+        <div class="category-items">
+          <label class="cat-item checked"><input type="checkbox" checked> <span class="cat-item-icon">🌐</span><span class="cat-item-name">HTTP Uptime</span></label>
+          <label class="cat-item checked"><input type="checkbox" checked> <span class="cat-item-icon">🔒</span><span class="cat-item-name">SSL Certificate</span></label>
+          <label class="cat-item checked"><input type="checkbox" checked> <span class="cat-item-icon">📡</span><span class="cat-item-name">DNS Records</span></label>
+          <label class="cat-item checked"><input type="checkbox" checked> <span class="cat-item-icon">📅</span><span class="cat-item-name">Domain Expiry</span></label>
+          <label class="cat-item checked"><input type="checkbox" checked> <span class="cat-item-icon">📶</span><span class="cat-item-name">Ping / Reachability</span></label>
+        </div>
+      </div>
+
+      <div class="category-header" onclick="toggleCat('security')">
+        <span style="font-size:18px">🔐</span>
+        <span class="category-title">Security <span style="color:#64748b; font-weight:400; font-size:13px">— headers, email auth &amp; reputation</span></span>
+        <span class="category-count">5 monitors</span>
+        <span class="category-toggle" id="tog-security">▼</span>
+      </div>
+      <div id="cat-security">
+        <div class="category-items">
+          <label class="cat-item"><input type="checkbox"> <span class="cat-item-icon">🛡️</span><span class="cat-item-name">Security Headers</span></label>
+          <label class="cat-item"><input type="checkbox"> <span class="cat-item-icon">📧</span><span class="cat-item-name">SPF / DMARC</span></label>
+          <label class="cat-item"><input type="checkbox"> <span class="cat-item-icon">🚫</span><span class="cat-item-name">Blacklist Check</span></label>
+          <label class="cat-item"><input type="checkbox"> <span class="cat-item-icon">📮</span><span class="cat-item-name">MX Health</span></label>
+          <label class="cat-item"><input type="checkbox"> <span class="cat-item-icon">📋</span><span class="cat-item-name">WHOIS Change</span></label>
+        </div>
+      </div>
+
+      <div class="category-header" onclick="toggleCat('perf')">
+        <span style="font-size:18px">⚡</span>
+        <span class="category-title">Performance <span style="color:#64748b; font-weight:400; font-size:13px">— speed, size &amp; redirects</span></span>
+        <span class="category-count">3 monitors</span>
+        <span class="category-toggle" id="tog-perf">▼</span>
+      </div>
+      <div id="cat-perf">
+        <div class="category-items">
+          <label class="cat-item"><input type="checkbox"> <span class="cat-item-icon">⏱️</span><span class="cat-item-name">Response Time</span></label>
+          <label class="cat-item"><input type="checkbox"> <span class="cat-item-icon">📦</span><span class="cat-item-name">Page Size</span></label>
+          <label class="cat-item"><input type="checkbox"> <span class="cat-item-icon">↪️</span><span class="cat-item-name">Redirect Chain</span></label>
+        </div>
+      </div>
+
+      <div class="category-header" onclick="toggleCat('content')">
+        <span style="font-size:18px">📄</span>
+        <span class="category-title">Content &amp; Compliance <span style="color:#64748b; font-weight:400; font-size:13px">— robots, sitemap &amp; consent</span></span>
+        <span class="category-count">3 monitors</span>
+        <span class="category-toggle" id="tog-content">▼</span>
+      </div>
+      <div id="cat-content">
+        <div class="category-items">
+          <label class="cat-item"><input type="checkbox"> <span class="cat-item-icon">🤖</span><span class="cat-item-name">robots.txt Change</span></label>
+          <label class="cat-item"><input type="checkbox"> <span class="cat-item-icon">🗺️</span><span class="cat-item-name">Sitemap Validity</span></label>
+          <label class="cat-item"><input type="checkbox"> <span class="cat-item-icon">🍪</span><span class="cat-item-name">Cookie Consent</span></label>
+        </div>
+      </div>
+
+      <div class="category-header" onclick="toggleCat('dns')">
+        <span style="font-size:18px">🌍</span>
+        <span class="category-title">DNS &amp; Network <span style="color:#64748b; font-weight:400; font-size:13px">— IP, nameservers &amp; change detection</span></span>
+        <span class="category-count">2 monitors</span>
+        <span class="category-toggle" id="tog-dns">▼</span>
+      </div>
+      <div id="cat-dns">
+        <div class="category-items">
+          <label class="cat-item"><input type="checkbox"> <span class="cat-item-icon">🔄</span><span class="cat-item-name">IP Address Change</span></label>
+          <label class="cat-item"><input type="checkbox"> <span class="cat-item-icon">🖥️</span><span class="cat-item-name">Nameserver Change</span></label>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn-ghost" onclick="goStep(2)">← Back to bundles</button>
+      <button class="btn-primary" onclick="goStep(3)" style="margin-left:auto;">Review →</button>
+    </div>
+  </div>
+
+  <!-- Step 3: Review -->
+  <div class="step-panel" id="panel-3">
+    <div class="step-title">Review your monitoring setup</div>
+    <div class="step-sub">Setting up <strong id="domainLabel3">example.com</strong> with the <strong>Standard Bundle</strong> — 10 monitors</div>
+
+    <div class="review-layout">
+      <div>
+        <div class="monitor-list">
+          <div class="monitor-list-header">
+            <span>Monitors to create (10)</span>
+            <span style="color:#10b981">✓ All configured</span>
+          </div>
+
+          <div class="monitor-item">
+            <div class="monitor-check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="2" fill="none"/></svg></div>
+            <div class="monitor-info"><div class="monitor-name">🌐 HTTP Uptime</div><div class="monitor-desc">example.com — checks every 5 min</div></div>
+          </div>
+          <div class="monitor-item">
+            <div class="monitor-check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="2" fill="none"/></svg></div>
+            <div class="monitor-info"><div class="monitor-name">🔒 SSL Certificate</div><div class="monitor-desc">example.com — alerts 14 days before expiry</div></div>
+          </div>
+          <div class="monitor-item">
+            <div class="monitor-check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="2" fill="none"/></svg></div>
+            <div class="monitor-info"><div class="monitor-name">📡 DNS Records</div><div class="monitor-desc">example.com — alerts on any change</div></div>
+          </div>
+          <div class="monitor-item">
+            <div class="monitor-check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="2" fill="none"/></svg></div>
+            <div class="monitor-info"><div class="monitor-name">📅 Domain Expiry</div><div class="monitor-desc">example.com — alerts 30 days before expiry</div></div>
+          </div>
+          <div class="monitor-item">
+            <div class="monitor-check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="2" fill="none"/></svg></div>
+            <div class="monitor-info"><div class="monitor-name">📶 Ping</div><div class="monitor-desc">example.com — checks every 5 min</div></div>
+          </div>
+          <div class="monitor-item">
+            <div class="monitor-check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="2" fill="none"/></svg></div>
+            <div class="monitor-info"><div class="monitor-name">🛡️ Security Headers</div><div class="monitor-desc">example.com — daily check</div></div>
+          </div>
+          <div class="monitor-item">
+            <div class="monitor-check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="2" fill="none"/></svg></div>
+            <div class="monitor-info"><div class="monitor-name">📧 SPF / DMARC</div><div class="monitor-desc">example.com — daily check</div></div>
+          </div>
+          <div class="monitor-item">
+            <div class="monitor-check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="2" fill="none"/></svg></div>
+            <div class="monitor-info"><div class="monitor-name">🚫 Blacklist Check</div><div class="monitor-desc">example.com — daily against 4 DNSBLs</div></div>
+          </div>
+          <div class="monitor-item">
+            <div class="monitor-check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="2" fill="none"/></svg></div>
+            <div class="monitor-info"><div class="monitor-name">📮 MX Health</div><div class="monitor-desc">example.com — checks MX records are reachable</div></div>
+          </div>
+          <div class="monitor-item">
+            <div class="monitor-check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="2" fill="none"/></svg></div>
+            <div class="monitor-info"><div class="monitor-name">↪️ Redirect Chain</div><div class="monitor-desc">example.com — max 5 hops</div></div>
+          </div>
+
+          <!-- Needs config items -->
+          <div style="padding: 12px 20px; background: #1a1610; border-top: 1px solid #2d3148;">
+            <div style="font-size:12px; color:#f59e0b; font-weight:600; margin-bottom:10px;">⚙️ These monitors need extra configuration — set them up individually after:</div>
+            <div style="display:flex; flex-wrap:wrap; gap:8px;">
+              <span style="background:#1a1d27; border:1px solid #2d3148; border-radius:7px; padding:6px 12px; font-size:12px; color:#94a3b8;">🔍 Keyword Detection <span style="color:#64748b">→ Set up</span></span>
+              <span style="background:#1a1d27; border:1px solid #2d3148; border-radius:7px; padding:6px 12px; font-size:12px; color:#94a3b8;">🔗 API Endpoint <span style="color:#64748b">→ Set up</span></span>
+              <span style="background:#1a1d27; border:1px solid #2d3148; border-radius:7px; padding:6px 12px; font-size:12px; color:#94a3b8;">💓 Heartbeat <span style="color:#64748b">→ Set up</span></span>
+              <span style="background:#1a1d27; border:1px solid #2d3148; border-radius:7px; padding:6px 12px; font-size:12px; color:#94a3b8;">📸 Page Change <span style="color:#64748b">→ Set up</span></span>
+              <span style="background:#1a1d27; border:1px solid #2d3148; border-radius:7px; padding:6px 12px; font-size:12px; color:#94a3b8;">🔌 Port Check <span style="color:#64748b">→ Set up</span></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="nav-row">
+          <button class="btn-ghost" onclick="goStep(2)">← Change bundle</button>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="plan-sidebar">
+        <div class="plan-box">
+          <div class="plan-box-title">Your Plan</div>
+          <div class="plan-name">Builder</div>
+          <div class="plan-limit">50 monitors total</div>
+          <div class="limit-bar"><div class="limit-fill" style="width:28%"></div></div>
+          <div class="limit-text">Using <span>14</span> of <span>50</span> after this setup</div>
+          <div style="font-size:11px; color:#10b981; margin-top:6px;">✓ 36 monitors remaining after creation</div>
+        </div>
+
+        <div class="plan-box">
+          <div class="plan-box-title">Creating</div>
+          <div style="font-size:24px; font-weight:800; color:#3b82f6; margin-bottom:4px;">10</div>
+          <div style="font-size:13px; color:#94a3b8; margin-bottom:14px;">monitors for example.com</div>
+          <div style="font-size:12px; color:#64748b; margin-bottom:8px;">Check interval: Every 5 minutes</div>
+          <div style="font-size:12px; color:#64748b;">Severity: P2 — High</div>
+          <button class="btn-create" onclick="showSuccess()">Create 10 Monitors →</button>
+          <div style="font-size:11px; color:#64748b; margin-top:10px; text-align:center;">Monitors start running immediately</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Success -->
+  <div class="step-panel" id="panel-success">
+    <div style="text-align:center; padding: 60px 0;">
+      <div style="font-size:56px; margin-bottom:16px;">🎉</div>
+      <div class="step-title" style="margin-bottom:8px;">10 monitors created</div>
+      <div class="step-sub" style="margin-bottom:32px;">example.com is now fully monitored. First checks running now.</div>
+      <div style="display:flex; gap:12px; justify-content:center;">
+        <button class="btn-primary" onclick="">View Dashboard →</button>
+        <button class="btn-ghost" onclick="goStep(1)">Monitor another website</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div style="position:fixed; bottom:16px; right:16px; background:#1a1d27; border:1px solid #2d3148; border-radius:10px; padding:12px 16px; font-size:12px; color:#64748b; max-width:200px; line-height:1.5;">
+  <strong style="color:#e2e8f0; display:block; margin-bottom:4px;">Mockup 1 — Bundle Wizard</strong>
+  Step-by-step: domain → pick bundle → review & create. Extra-config monitors shown at bottom of review, not blocking.
+</div>
+
+<script>
+let currentBundle = 'standard';
+
+function goStep(n) {
+  document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+  if (n === 'custom') {
+    document.getElementById('panel-custom').classList.add('active');
+  } else if (n === 'success') {
+    document.getElementById('panel-success').classList.add('active');
+  } else {
+    document.getElementById('panel-' + n).classList.add('active');
+  }
+}
+
+function selectBundle(el, name) {
+  document.querySelectorAll('.bundle-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  currentBundle = name;
+}
+
+function toggleCat(id) {
+  const el = document.getElementById('cat-' + id);
+  const tog = document.getElementById('tog-' + id);
+  el.style.display = el.style.display === 'none' ? '' : 'none';
+  tog.textContent = el.style.display === 'none' ? '▶' : '▼';
+}
+
+function showSuccess() {
+  goStep('success');
+}
+</script>
+</body>
+</html>

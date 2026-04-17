@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup 2 — Category Grid (Single Page)</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f1117; color: #e2e8f0; min-height: 100vh; }
+
+  .header { background: #1a1d27; border-bottom: 1px solid #2d3148; padding: 16px 32px; display: flex; align-items: center; gap: 12px; }
+  .logo { font-size: 18px; font-weight: 700; color: #fff; }
+  .badge { background: #1e3a5f; color: #60a5fa; font-size: 11px; padding: 3px 8px; border-radius: 12px; font-weight: 600; }
+
+  .layout { display: grid; grid-template-columns: 1fr 300px; gap: 0; max-width: 1100px; margin: 0 auto; min-height: calc(100vh - 57px); }
+
+  /* Left - main */
+  .main { padding: 32px; border-right: 1px solid #2d3148; }
+
+  .page-title { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+  .page-sub { font-size: 14px; color: #94a3b8; margin-bottom: 24px; }
+
+  .domain-row { display: flex; gap: 12px; align-items: center; background: #1a1d27; border: 1px solid #2d3148; border-radius: 12px; padding: 12px 16px; margin-bottom: 28px; }
+  .domain-icon { font-size: 18px; }
+  .domain-text { flex: 1; }
+  .domain-name { font-size: 15px; font-weight: 600; }
+  .domain-hint { font-size: 12px; color: #64748b; }
+  .domain-change { font-size: 12px; color: #3b82f6; cursor: pointer; }
+  .domain-change:hover { text-decoration: underline; }
+
+  /* Quick presets */
+  .presets { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+  .preset-btn { background: #1a1d27; border: 1px solid #2d3148; border-radius: 20px; padding: 7px 14px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; color: #94a3b8; display: flex; align-items: center; gap: 5px; }
+  .preset-btn:hover { border-color: #3b82f6; color: #60a5fa; }
+  .preset-btn.active { background: #1e2d4a; border-color: #3b82f6; color: #60a5fa; }
+  .preset-label { font-size: 11px; color: #64748b; margin-right: 4px; align-self: center; }
+
+  /* Category sections */
+  .category { margin-bottom: 4px; border: 1px solid #2d3148; border-radius: 12px; overflow: hidden; }
+  .category-head { display: flex; align-items: center; gap: 12px; padding: 14px 18px; background: #1a1d27; cursor: pointer; user-select: none; }
+  .category-head:hover { background: #1e2235; }
+  .cat-emoji { font-size: 18px; }
+  .cat-name { font-weight: 700; font-size: 14px; flex: 1; }
+  .cat-desc { font-size: 12px; color: #64748b; }
+  .cat-selected { font-size: 12px; color: #3b82f6; font-weight: 600; margin-right: 4px; }
+  .cat-chevron { color: #64748b; font-size: 12px; transition: transform 0.2s; }
+  .cat-chevron.open { transform: rotate(180deg); }
+  .cat-select-all { font-size: 11px; color: #64748b; border: 1px solid #2d3148; background: transparent; border-radius: 6px; padding: 3px 8px; cursor: pointer; }
+  .cat-select-all:hover { color: #3b82f6; border-color: #3b82f6; }
+
+  .category-body { display: none; padding: 12px; background: #0f1117; }
+  .category-body.open { display: block; }
+
+  .monitor-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+  .monitor-tile { border: 1.5px solid #2d3148; border-radius: 10px; padding: 12px 14px; cursor: pointer; transition: all 0.15s; background: #1a1d27; position: relative; }
+  .monitor-tile:hover { border-color: #3b82f6; }
+  .monitor-tile.checked { background: #1e2d4a; border-color: #3b82f6; }
+  .monitor-tile.disabled { opacity: 0.45; cursor: not-allowed; border-color: #1e2235; }
+  .monitor-tile.already { background: #141f14; border-color: #22543d; cursor: not-allowed; }
+  .tile-top { display: flex; align-items: center; gap: 8px; margin-bottom: 3px; }
+  .tile-icon { font-size: 16px; }
+  .tile-name { font-size: 13px; font-weight: 600; flex: 1; }
+  .tile-check { width: 16px; height: 16px; border-radius: 4px; border: 1.5px solid #2d3148; background: #0f1117; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; }
+  .monitor-tile.checked .tile-check { background: #3b82f6; border-color: #3b82f6; }
+  .tile-desc { font-size: 11px; color: #64748b; line-height: 1.4; }
+  .already-badge { position: absolute; top: 8px; right: 8px; background: #22543d; color: #4ade80; font-size: 9px; padding: 2px 6px; border-radius: 4px; font-weight: 700; }
+
+  /* Extra config inline expansion */
+  .config-required-badge { display: inline-flex; align-items: center; gap: 3px; background: #92400e20; border: 1px solid #92400e50; color: #fbbf24; font-size: 10px; padding: 2px 6px; border-radius: 5px; font-weight: 600; margin-top: 4px; }
+  .config-expand { background: #1a1610; border: 1px solid #92400e40; border-radius: 8px; padding: 12px; margin-top: 8px; display: none; }
+  .config-expand.open { display: block; }
+  .config-expand-title { font-size: 11px; color: #f59e0b; font-weight: 700; margin-bottom: 8px; }
+  .config-field { margin-bottom: 8px; }
+  .config-field label { display: block; font-size: 11px; color: #94a3b8; margin-bottom: 3px; }
+  .config-field input, .config-field select { width: 100%; background: #0f1117; border: 1px solid #2d3148; border-radius: 6px; padding: 7px 10px; font-size: 12px; color: #e2e8f0; outline: none; }
+  .config-field input:focus { border-color: #3b82f6; }
+
+  /* Special monitors section */
+  .special-section { margin-top: 20px; background: #1a1d27; border: 1px solid #2d3148; border-radius: 12px; padding: 16px; }
+  .special-title { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+  .special-sub { font-size: 12px; color: #64748b; margin-bottom: 14px; }
+  .special-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .special-tile { border: 1px dashed #2d3148; border-radius: 8px; padding: 10px 12px; display: flex; align-items: center; gap: 10px; cursor: pointer; }
+  .special-tile:hover { border-color: #f59e0b; background: #1a1610; }
+  .special-icon { font-size: 16px; }
+  .special-name { font-size: 12px; font-weight: 600; flex: 1; }
+  .special-cta { font-size: 11px; color: #f59e0b; }
+
+  /* Right sidebar */
+  .sidebar { padding: 24px; position: sticky; top: 0; height: calc(100vh - 57px); overflow-y: auto; display: flex; flex-direction: column; }
+  .sidebar-title { font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 14px; }
+
+  /* Limit meter */
+  .limit-box { background: #1a1d27; border: 1px solid #2d3148; border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+  .limit-plan { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+  .limit-numbers { font-size: 12px; color: #94a3b8; margin-bottom: 10px; }
+  .limit-bar { background: #2d3148; border-radius: 4px; height: 8px; overflow: hidden; margin-bottom: 6px; }
+  .limit-fill { height: 100%; border-radius: 4px; background: #3b82f6; transition: width 0.3s; }
+  .limit-fill.warn { background: #f59e0b; }
+  .limit-fill.over { background: #ef4444; }
+  .limit-caption { font-size: 11px; color: #94a3b8; }
+  .limit-caption b { color: #e2e8f0; }
+
+  .over-limit-alert { background: #ef444410; border: 1px solid #ef444440; border-radius: 8px; padding: 12px; margin-top: 10px; font-size: 12px; color: #f87171; line-height: 1.5; display: none; }
+  .over-limit-alert.show { display: block; }
+  .over-limit-alert a { color: #ef4444; font-weight: 700; cursor: pointer; text-decoration: underline; }
+
+  /* Selected list */
+  .selected-box { flex: 1; background: #1a1d27; border: 1px solid #2d3148; border-radius: 12px; padding: 16px; margin-bottom: 16px; overflow-y: auto; }
+  .selected-empty { text-align: center; padding: 24px 0; color: #64748b; font-size: 13px; }
+  .sel-item { display: flex; align-items: center; gap: 8px; padding: 7px 0; border-bottom: 1px solid #1e2235; font-size: 12px; }
+  .sel-item:last-child { border: none; }
+  .sel-icon { font-size: 14px; }
+  .sel-name { flex: 1; }
+  .sel-remove { color: #64748b; cursor: pointer; font-size: 14px; }
+  .sel-remove:hover { color: #ef4444; }
+
+  .create-btn { background: #3b82f6; color: #fff; border: none; border-radius: 10px; padding: 14px; font-size: 14px; font-weight: 700; cursor: pointer; width: 100%; margin-top: auto; transition: background 0.2s; }
+  .create-btn:hover { background: #2563eb; }
+  .create-btn:disabled { background: #2d3148; color: #64748b; cursor: not-allowed; }
+  .create-count { font-size: 11px; color: rgba(255,255,255,0.7); margin-top: 6px; text-align: center; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">Uptrue</div>
+  <div class="badge">Monitoring Suite</div>
+  <div style="margin-left:auto; font-size:13px; color:#64748b;">Monitor a Website</div>
+</div>
+
+<div class="layout">
+  <!-- Main -->
+  <div class="main">
+    <div class="page-title">Monitor a Website</div>
+    <div class="page-sub">Select which monitors to set up for this domain. Everything runs from one dashboard.</div>
+
+    <div class="domain-row">
+      <div class="domain-icon">🌐</div>
+      <div class="domain-text">
+        <div class="domain-name">example.com</div>
+        <div class="domain-hint">All monitors will use this as target unless configured otherwise</div>
+      </div>
+      <div class="domain-change">Change</div>
+    </div>
+
+    <!-- Quick presets -->
+    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:18px;">
+      <span class="preset-label">Quick select:</span>
+      <button class="preset-btn" onclick="applyPreset('essential')">🛡️ Essential (5)</button>
+      <button class="preset-btn active" onclick="applyPreset('standard')">⚡ Standard (10)</button>
+      <button class="preset-btn" onclick="applyPreset('full')">🔭 Full Suite (18)</button>
+      <button class="preset-btn" onclick="applyPreset('none')" style="margin-left:auto;">Clear all</button>
+    </div>
+
+    <!-- Category: Essential -->
+    <div class="category" style="margin-bottom:8px;">
+      <div class="category-head" onclick="toggleCategory('essential')">
+        <span class="cat-emoji">🛡️</span>
+        <div style="flex:1">
+          <div class="cat-name">Essential <span style="font-weight:400; color:#64748b; font-size:12px">— uptime, SSL, DNS, domain</span></div>
+        </div>
+        <span class="cat-selected" id="sel-essential">5/5</span>
+        <button class="cat-select-all" onclick="event.stopPropagation(); selectAll('essential')">Select all</button>
+        <span class="cat-chevron open" id="chev-essential">▼</span>
+      </div>
+      <div class="category-body open" id="body-essential">
+        <div class="monitor-grid">
+          <div class="monitor-tile checked" onclick="toggleTile(this, 'http-uptime', '🌐 HTTP Uptime')">
+            <div class="tile-top"><span class="tile-icon">🌐</span><span class="tile-name">HTTP Uptime</span><div class="tile-check"><svg width="9" height="9" viewBox="0 0 9 9"><polyline points="1,4.5 3.5,7 8,1.5" stroke="#fff" stroke-width="1.5" fill="none"/></svg></div></div>
+            <div class="tile-desc">Is your website loading correctly?</div>
+          </div>
+          <div class="monitor-tile checked already" title="Already monitoring this">
+            <div class="already-badge">Active</div>
+            <div class="tile-top"><span class="tile-icon">🔒</span><span class="tile-name">SSL Certificate</span><div class="tile-check" style="background:#22543d; border-color:#22543d;"><svg width="9" height="9" viewBox="0 0 9 9"><polyline points="1,4.5 3.5,7 8,1.5" stroke="#4ade80" stroke-width="1.5" fill="none"/></svg></div></div>
+            <div class="tile-desc">Already monitoring — skip</div>
+          </div>
+          <div class="monitor-tile checked" onclick="toggleTile(this, 'dns', '📡 DNS Records')">
+            <div class="tile-top"><span class="tile-icon">📡</span><span class="tile-name">DNS Records</span><div class="tile-check"><svg width="9" height="9" viewBox="0 0 9 9"><polyline points="1,4.5 3.5,7 8,1.5" stroke="#fff" stroke-width="1.5" fill="none"/></svg></div></div>
+            <div class="tile-desc">Alerts on any DNS record change</div>
+          </div>
+          <div class="monitor-tile checked" onclick="toggleTile(this, 'domain', '📅 Domain Expiry')">
+            <div class="tile-top"><span class="tile-icon">📅</span><span class="tile-name">Domain Expiry</span><div class="tile-check"><svg width="9" height="9" viewBox="0 0 9 9"><polyline points="1,4.5 3.5,7 8,1.5" stroke="#fff" stroke-width="1.5" fill="none"/></svg></div></div>
+            <div class="tile-desc">Alerts 30 days before expiry</div>
+          </div>
+          <div class="monitor-tile checked" onclick="toggleTile(this, 'ping', '📶 Ping')">
+            <div class="tile-top"><span class="tile-icon">📶</span><span class="tile-name">Ping</span><div class="tile-check"><svg width="9" height="9" viewBox="0 0 9 9"><polyline points="1,4.5 3.5,7 8,1.5" stroke="#fff" stroke-width="1.5" fill="none"/></svg></div></div>
+            <div class="tile-desc">Basic reachability check</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Category: Security -->
+    <div class="category" style="margin-bottom:8px;">
+      <div class="category-head" onclick="toggleCategory('security')">
+        <span class="cat-emoji">🔐</span>
+        <div style="flex:1">
+          <div class="cat-name">Security <span style="font-weight:400; color:#64748b; font-size:12px">— headers, email auth, reputation</span></div>
+        </div>
+        <span class="cat-selected" id="sel-security">5/5</span>
+        <button class="cat-select-all" onclick="event.stopPropagation(); selectAll('security')">Select all</button>
+        <span class="cat-chevron open" id="chev-security">▼</span>
+      </div>
+      <div class="category-body open" id="body-security">
+        <div class="monitor-grid">
+          <div class="monitor-tile checked" onclick="toggleTile(this, 'security-headers', '🛡️ Security Headers')">
+            <div class="tile-top"><span class="tile-icon">🛡️</span><span class="tile-name">Security Headers</span><div class="tile-check"><svg width="9" height="9" viewBox="0 0 9 9"><polyline points="1,4.5 3.5,7 8,1.5" stroke="#fff" stroke-width="1.5" fill="none"/></svg></div></div>
+            <div class="tile-desc">CSP, HSTS, X-Frame and more</div>
+          </div>
+          <div class="monitor-tile checked" onclick="toggleTile(this, 'spf-dmarc', '📧 SPF / DMARC')">
+            <div class="tile-top"><span class="tile-icon">📧</span><span class="tile-name">SPF / DMARC</span><div class="tile-check"><svg width="9" height="9" viewBox="0 0 9 9"><polyline points="1,4.5 3.5,7 8,1.5" stroke="#fff" stroke-width="1.5" fill="none"/></svg></div></div>
+            <div class="tile-desc">Email authentication validity</div>
+          </div>
+          <div class="monitor-tile checked" onclick="toggleTile(this, 'blacklist', '🚫 Blacklist Check')">
+            <div class="tile-top"><span class="tile-icon">🚫</span><span class="tile-name">Blacklist Check</span><div class="tile-check"><svg width="9" height="9" viewBox="0 0 9 9"><polyline points="1,4.5 3.5,7 8,1.5" stroke="#fff" stroke-width="1.5" fill="none"/></svg></div></div>
+            <div class="tile-desc">Daily DNSBL check across 4 zones</div>
+          </div>
+          <div class="monitor-tile checked" onclick="toggleTile(this, 'mx-health', '📮 MX Health')">
+            <div class="tile-top"><span class="tile-icon">📮</span><span class="tile-name">MX Health</span><div class="tile-check"><svg width="9" height="9" viewBox="0 0 9 9"><polyline points="1,4.5 3.5,7 8,1.5" stroke="#fff" stroke-width="1.5" fill="none"/></svg></div></div>
+            <div class="tile-desc">Are mail servers reachable?</div>
+          </div>
+          <div class="monitor-tile checked" onclick="toggleTile(this, 'whois-change', '📋 WHOIS Change')">
+            <div class="tile-top"><span class="tile-icon">📋</span><span class="tile-name">WHOIS Change</span><div class="tile-check"><svg width="9" height="9" viewBox="0 0 9 9"><polyline points="1,4.5 3.5,7 8,1.5" stroke="#fff" stroke-width="1.5" fill="none"/></svg></div></div>
+            <div class="tile-desc">Registrar or ownership changes</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Category: Performance -->
+    <div class="category" style="margin-bottom:8px;">
+      <div class="category-head" onclick="toggleCategory('perf')">
+        <span class="cat-emoji">⚡</span>
+        <div style="flex:1">
+          <div class="cat-name">Performance <span style="font-weight:400; color:#64748b; font-size:12px">— speed, size, redirects</span></div>
+        </div>
+        <span class="cat-selected" id="sel-perf">0/3</span>
+        <button class="cat-select-all" onclick="event.stopPropagation(); selectAll('perf')">Select all</button>
+        <span class="cat-chevron" id="chev-perf">▼</span>
+      </div>
+      <div class="category-body" id="body-perf">
+        <div class="monitor-grid">
+          <div class="monitor-tile" onclick="toggleTile(this, 'response-time', '⏱️ Response Time')">
+            <div class="tile-top"><span class="tile-icon">⏱️</span><span class="tile-name">Response Time</span><div class="tile-check"></div></div>
+            <div class="tile-desc">Alerts when slower than threshold</div>
+          </div>
+          <div class="monitor-tile" onclick="toggleTile(this, 'page-size', '📦 Page Size')">
+            <div class="tile-top"><span class="tile-icon">📦</span><span class="tile-name">Page Size</span><div class="tile-check"></div></div>
+            <div class="tile-desc">Alerts when page grows too large</div>
+          </div>
+          <div class="monitor-tile" onclick="toggleTile(this, 'redirect-chain', '↪️ Redirect Chain')">
+            <div class="tile-top"><span class="tile-icon">↪️</span><span class="tile-name">Redirect Chain</span><div class="tile-check"></div></div>
+            <div class="tile-desc">Too many hops or redirect loops</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Category: Content & Compliance -->
+    <div class="category" style="margin-bottom:8px;">
+      <div class="category-head" onclick="toggleCategory('content')">
+        <span class="cat-emoji">📄</span>
+        <div style="flex:1">
+          <div class="cat-name">Content & Compliance <span style="font-weight:400; color:#64748b; font-size:12px">— robots, sitemap, consent</span></div>
+        </div>
+        <span class="cat-selected" id="sel-content">0/3</span>
+        <button class="cat-select-all" onclick="event.stopPropagation(); selectAll('content')">Select all</button>
+        <span class="cat-chevron" id="chev-content">▼</span>
+      </div>
+      <div class="category-body" id="body-content">
+        <div class="monitor-grid">
+          <div class="monitor-tile" onclick="toggleTile(this, 'robots-txt', '🤖 robots.txt')">
+            <div class="tile-top"><span class="tile-icon">🤖</span><span class="tile-name">robots.txt Change</span><div class="tile-check"></div></div>
+            <div class="tile-desc">Alerts if robots.txt is modified</div>
+          </div>
+          <div class="monitor-tile" onclick="toggleTile(this, 'sitemap', '🗺️ Sitemap')">
+            <div class="tile-top"><span class="tile-icon">🗺️</span><span class="tile-name">Sitemap Validity</span><div class="tile-check"></div></div>
+            <div class="tile-desc">Valid XML, URL count changes</div>
+          </div>
+          <div class="monitor-tile" onclick="toggleTile(this, 'cookie-consent', '🍪 Cookie Consent')">
+            <div class="tile-top"><span class="tile-icon">🍪</span><span class="tile-name">Cookie Consent</span><div class="tile-check"></div></div>
+            <div class="tile-desc">Consent banner present on page</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Category: DNS & Network -->
+    <div class="category" style="margin-bottom:20px;">
+      <div class="category-head" onclick="toggleCategory('dnsnet')">
+        <span class="cat-emoji">🌍</span>
+        <div style="flex:1">
+          <div class="cat-name">DNS & Network <span style="font-weight:400; color:#64748b; font-size:12px">— IP and nameserver changes</span></div>
+        </div>
+        <span class="cat-selected" id="sel-dnsnet">0/2</span>
+        <button class="cat-select-all" onclick="event.stopPropagation(); selectAll('dnsnet')">Select all</button>
+        <span class="cat-chevron" id="chev-dnsnet">▼</span>
+      </div>
+      <div class="category-body" id="body-dnsnet">
+        <div class="monitor-grid">
+          <div class="monitor-tile" onclick="toggleTile(this, 'ip-change', '🔄 IP Change')">
+            <div class="tile-top"><span class="tile-icon">🔄</span><span class="tile-name">IP Address Change</span><div class="tile-check"></div></div>
+            <div class="tile-desc">Alerts if the IP changes unexpectedly</div>
+          </div>
+          <div class="monitor-tile" onclick="toggleTile(this, 'nameserver-change', '🖥️ Nameserver Change')">
+            <div class="tile-top"><span class="tile-icon">🖥️</span><span class="tile-name">Nameserver Change</span><div class="tile-check"></div></div>
+            <div class="tile-desc">Alerts if NS records change</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Needs individual setup -->
+    <div class="special-section">
+      <div class="special-title">⚙️ Monitors needing individual setup</div>
+      <div class="special-sub">These require extra configuration and can't be bulk-created. Set them up from the Add Monitor page.</div>
+      <div class="special-grid">
+        <div class="special-tile"><span class="special-icon">🔍</span><span class="special-name">Keyword Detection</span><span class="special-cta">Set up →</span></div>
+        <div class="special-tile"><span class="special-icon">🔗</span><span class="special-name">API Endpoint</span><span class="special-cta">Set up →</span></div>
+        <div class="special-tile"><span class="special-icon">💓</span><span class="special-name">Heartbeat Monitor</span><span class="special-cta">Set up →</span></div>
+        <div class="special-tile"><span class="special-icon">📸</span><span class="special-name">Page Change Detection</span><span class="special-cta">Set up →</span></div>
+        <div class="special-tile"><span class="special-icon">🔌</span><span class="special-name">Port Check</span><span class="special-cta">Set up →</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-title">Your selection</div>
+
+    <div class="limit-box">
+      <div class="limit-plan">Builder Plan</div>
+      <div class="limit-numbers">4 existing + <span id="adding-count" style="color:#3b82f6; font-weight:700">10</span> new = <span id="total-count" style="font-weight:700">14</span> of 50</div>
+      <div class="limit-bar"><div class="limit-fill" id="limit-fill" style="width:28%"></div></div>
+      <div class="limit-caption">After creation: <b id="remaining">36</b> monitors remaining</div>
+      <div class="over-limit-alert" id="over-alert">
+        You've selected too many monitors for your plan. <a>Upgrade to Scale (250 monitors) →</a> or deselect some.
+      </div>
+    </div>
+
+    <div class="selected-box" id="selected-box">
+      <div class="selected-empty" id="sel-empty" style="display:none">No monitors selected yet</div>
+      <div id="sel-list">
+        <div class="sel-item"><span class="sel-icon">🌐</span><span class="sel-name">HTTP Uptime</span><span class="sel-remove" onclick="removeItem('http-uptime')">×</span></div>
+        <div class="sel-item"><span class="sel-icon">📡</span><span class="sel-name">DNS Records</span><span class="sel-remove" onclick="removeItem('dns')">×</span></div>
+        <div class="sel-item"><span class="sel-icon">📅</span><span class="sel-name">Domain Expiry</span><span class="sel-remove" onclick="removeItem('domain')">×</span></div>
+        <div class="sel-item"><span class="sel-icon">📶</span><span class="sel-name">Ping</span><span class="sel-remove" onclick="removeItem('ping')">×</span></div>
+        <div class="sel-item"><span class="sel-icon">🛡️</span><span class="sel-name">Security Headers</span><span class="sel-remove" onclick="removeItem('security-headers')">×</span></div>
+        <div class="sel-item"><span class="sel-icon">📧</span><span class="sel-name">SPF / DMARC</span><span class="sel-remove" onclick="removeItem('spf-dmarc')">×</span></div>
+        <div class="sel-item"><span class="sel-icon">🚫</span><span class="sel-name">Blacklist Check</span><span class="sel-remove" onclick="removeItem('blacklist')">×</span></div>
+        <div class="sel-item"><span class="sel-icon">📮</span><span class="sel-name">MX Health</span><span class="sel-remove" onclick="removeItem('mx-health')">×</span></div>
+        <div class="sel-item"><span class="sel-icon">📋</span><span class="sel-name">WHOIS Change</span><span class="sel-remove" onclick="removeItem('whois-change')">×</span></div>
+      </div>
+    </div>
+
+    <button class="create-btn" id="create-btn">Create 9 Monitors →</button>
+    <div class="create-count">Monitors start running immediately</div>
+  </div>
+</div>
+
+<div style="position:fixed; bottom:16px; left:16px; background:#1a1d27; border:1px solid #2d3148; border-radius:10px; padding:12px 16px; font-size:12px; color:#64748b; max-width:220px; line-height:1.5;">
+  <strong style="color:#e2e8f0; display:block; margin-bottom:4px;">Mockup 2 — Category Grid</strong>
+  All-on-one-page. Categories collapsed/expanded. Live sidebar shows selection + plan limit meter. No steps needed.
+</div>
+
+<script>
+let selected = new Set(['http-uptime','dns','domain','ping','security-headers','spf-dmarc','blacklist','mx-health','whois-change']);
+const existing = 4;
+const planLimit = 50;
+
+function toggleTile(el, id, name) {
+  if (el.classList.contains('already') || el.classList.contains('disabled')) return;
+  if (el.classList.contains('checked')) {
+    el.classList.remove('checked');
+    el.querySelector('.tile-check').innerHTML = '';
+    selected.delete(id);
+  } else {
+    el.classList.add('checked');
+    el.querySelector('.tile-check').innerHTML = '<svg width="9" height="9" viewBox="0 0 9 9"><polyline points="1,4.5 3.5,7 8,1.5" stroke="#fff" stroke-width="1.5" fill="none"/></svg>';
+    selected.add(id);
+  }
+  updateSidebar();
+}
+
+function updateSidebar() {
+  const count = selected.size;
+  const total = existing + count;
+  const pct = Math.min((total / planLimit) * 100, 100);
+  const remaining = planLimit - total;
+
+  document.getElementById('adding-count').textContent = count;
+  document.getElementById('total-count').textContent = total;
+  document.getElementById('remaining').textContent = Math.max(remaining, 0);
+  document.getElementById('limit-fill').style.width = pct + '%';
+  document.getElementById('create-btn').textContent = `Create ${count} Monitor${count !== 1 ? 's' : ''} →`;
+
+  const fill = document.getElementById('limit-fill');
+  fill.className = 'limit-fill';
+  if (pct > 100) fill.classList.add('over');
+  else if (pct > 80) fill.classList.add('warn');
+
+  document.getElementById('over-alert').classList.toggle('show', total > planLimit);
+  document.getElementById('create-btn').disabled = total > planLimit;
+}
+
+function toggleCategory(id) {
+  const body = document.getElementById('body-' + id);
+  const chev = document.getElementById('chev-' + id);
+  body.classList.toggle('open');
+  chev.classList.toggle('open');
+}
+
+function selectAll(cat) { updateSidebar(); }
+function applyPreset(name) {
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+}
+function removeItem(id) { selected.delete(id); updateSidebar(); }
+</script>
+</body>
+</html>

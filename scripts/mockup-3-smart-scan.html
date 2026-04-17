@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup 3 — Smart Scan First</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f1117; color: #e2e8f0; min-height: 100vh; }
+
+  .header { background: #1a1d27; border-bottom: 1px solid #2d3148; padding: 16px 32px; display: flex; align-items: center; gap: 12px; }
+  .logo { font-size: 18px; font-weight: 700; color: #fff; }
+  .badge { background: #1e3a5f; color: #60a5fa; font-size: 11px; padding: 3px 8px; border-radius: 12px; font-weight: 600; }
+
+  .container { max-width: 860px; margin: 0 auto; padding: 40px 24px; }
+
+  /* Scan screen */
+  .scan-screen { text-align: center; padding: 60px 0 40px; }
+  .scan-title { font-size: 28px; font-weight: 800; margin-bottom: 10px; }
+  .scan-sub { font-size: 15px; color: #94a3b8; margin-bottom: 36px; line-height: 1.6; }
+  .scan-input-wrap { display: flex; gap: 12px; max-width: 560px; margin: 0 auto 16px; }
+  .scan-input { flex: 1; background: #1a1d27; border: 1.5px solid #2d3148; border-radius: 12px; padding: 16px 20px; font-size: 15px; color: #e2e8f0; outline: none; transition: border 0.2s; }
+  .scan-input:focus { border-color: #3b82f6; }
+  .scan-btn { background: #3b82f6; color: #fff; border: none; border-radius: 12px; padding: 16px 28px; font-size: 15px; font-weight: 700; cursor: pointer; transition: background 0.2s; white-space: nowrap; }
+  .scan-btn:hover { background: #2563eb; }
+  .scan-hint { font-size: 12px; color: #64748b; }
+
+  /* Loading */
+  .loading-screen { text-align: center; padding: 60px 0; display: none; }
+  .spinner { width: 48px; height: 48px; border: 3px solid #2d3148; border-top-color: #3b82f6; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 20px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-checks { list-style: none; max-width: 320px; margin: 20px auto 0; text-align: left; }
+  .loading-check { padding: 8px 0; font-size: 13px; color: #94a3b8; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #1e2235; }
+  .loading-check:last-child { border: none; }
+  .loading-dot { width: 8px; height: 8px; border-radius: 50%; background: #2d3148; flex-shrink: 0; transition: background 0.3s; }
+  .loading-dot.done { background: #10b981; }
+  .loading-dot.running { background: #3b82f6; animation: pulse 0.6s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { opacity:1 } 50% { opacity:0.3 } }
+
+  /* Results screen */
+  .results-screen { display: none; }
+  .results-header { display: flex; align-items: center; gap: 16px; margin-bottom: 28px; background: #1a1d27; border: 1px solid #2d3148; border-radius: 14px; padding: 18px 22px; }
+  .results-domain { font-size: 18px; font-weight: 700; }
+  .results-sub { font-size: 13px; color: #94a3b8; margin-top: 2px; }
+  .scan-again { margin-left: auto; font-size: 13px; color: #3b82f6; cursor: pointer; }
+  .scan-again:hover { text-decoration: underline; }
+
+  /* Status summary pills */
+  .status-pills { display: flex; gap: 10px; margin-bottom: 28px; flex-wrap: wrap; }
+  .pill { display: flex; align-items: center; gap: 6px; background: #1a1d27; border: 1px solid #2d3148; border-radius: 20px; padding: 8px 14px; font-size: 13px; font-weight: 600; }
+  .pill.red { border-color: #ef444440; background: #ef444410; color: #f87171; }
+  .pill.amber { border-color: #f59e0b40; background: #f59e0b10; color: #fbbf24; }
+  .pill.green { border-color: #10b98140; background: #10b98110; color: #34d399; }
+
+  /* The results list */
+  .section-title { font-size: 13px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 12px; margin-top: 28px; }
+  .results-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
+
+  .result-card { border-radius: 12px; border: 1.5px solid #2d3148; overflow: hidden; transition: border-color 0.15s; }
+  .result-card.issue { border-color: #ef444440; }
+  .result-card.warn { border-color: #f59e0b40; }
+  .result-card.ok { border-color: #10b98130; }
+
+  .result-row { display: flex; align-items: center; gap: 14px; padding: 14px 18px; background: #1a1d27; cursor: pointer; }
+  .result-row:hover { background: #1e2235; }
+
+  .result-status { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .result-status.red { background: #ef444420; }
+  .result-status.amber { background: #f59e0b20; }
+  .result-status.green { background: #10b98120; }
+
+  .result-info { flex: 1; }
+  .result-name { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+  .result-finding { font-size: 12px; color: #94a3b8; }
+  .result-finding.red { color: #f87171; }
+  .result-finding.amber { color: #fbbf24; }
+  .result-finding.green { color: #4ade80; }
+
+  .result-toggle { display: flex; align-items: center; gap: 8px; }
+  .result-checkbox { width: 20px; height: 20px; border-radius: 5px; border: 1.5px solid #2d3148; background: #0f1117; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s; }
+  .result-checkbox.on { background: #3b82f6; border-color: #3b82f6; }
+  .result-label { font-size: 12px; color: #64748b; }
+
+  /* Sticky bottom CTA */
+  .sticky-cta { position: fixed; bottom: 0; left: 0; right: 0; background: #1a1d27; border-top: 1px solid #2d3148; padding: 16px 24px; display: none; }
+  .sticky-cta.show { display: block; }
+  .cta-inner { max-width: 860px; margin: 0 auto; display: flex; align-items: center; gap: 16px; }
+  .cta-left { flex: 1; }
+  .cta-title { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+  .cta-sub { font-size: 12px; color: #94a3b8; }
+
+  .limit-inline { display: flex; align-items: center; gap: 10px; margin: 0 16px; }
+  .limit-bar-sm { width: 120px; height: 6px; background: #2d3148; border-radius: 3px; overflow: hidden; }
+  .limit-fill-sm { height: 100%; background: #3b82f6; border-radius: 3px; width: 28%; }
+  .limit-text-sm { font-size: 12px; color: #94a3b8; white-space: nowrap; }
+
+  .cta-btn { background: #3b82f6; color: #fff; border: none; border-radius: 10px; padding: 13px 28px; font-size: 14px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+  .cta-btn:hover { background: #2563eb; }
+  .cta-btn-ghost { background: transparent; border: 1px solid #2d3148; color: #94a3b8; border-radius: 10px; padding: 13px 20px; font-size: 14px; font-weight: 600; cursor: pointer; }
+
+  .info-banner { background: #1e3a5f20; border: 1px solid #3b82f630; border-radius: 10px; padding: 14px 18px; font-size: 13px; color: #93c5fd; margin-top: 24px; line-height: 1.6; margin-bottom: 80px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">Uptrue</div>
+  <div class="badge">Monitoring Suite</div>
+  <div style="margin-left:auto; font-size:13px; color:#64748b;">Monitor a Website</div>
+</div>
+
+<!-- SCREEN 1: Scan input -->
+<div class="container" id="screen-scan">
+  <div class="scan-screen">
+    <div style="font-size:48px; margin-bottom:16px;">🔭</div>
+    <div class="scan-title">What does your website look like right now?</div>
+    <div class="scan-sub">Enter your domain and we'll run a quick health scan.<br>Then you pick what to monitor — no guessing required.</div>
+    <div class="scan-input-wrap">
+      <input class="scan-input" type="text" value="example.com" placeholder="example.com" id="scanDomain">
+      <button class="scan-btn" onclick="startScan()">Scan Now →</button>
+    </div>
+    <div class="scan-hint">Takes about 10 seconds. No signup required for the scan.</div>
+
+    <div style="margin-top: 48px; display:grid; grid-template-columns:repeat(3,1fr); gap:16px; text-align:left;">
+      <div style="background:#1a1d27; border:1px solid #2d3148; border-radius:12px; padding:16px;">
+        <div style="font-size:20px; margin-bottom:8px;">🔒</div>
+        <div style="font-size:13px; font-weight:700; margin-bottom:4px;">Security Check</div>
+        <div style="font-size:12px; color:#64748b;">SSL, headers, SPF/DMARC, blacklist status</div>
+      </div>
+      <div style="background:#1a1d27; border:1px solid #2d3148; border-radius:12px; padding:16px;">
+        <div style="font-size:20px; margin-bottom:8px;">⚡</div>
+        <div style="font-size:13px; font-weight:700; margin-bottom:4px;">Performance Check</div>
+        <div style="font-size:12px; color:#64748b;">Response time, redirect chain, page size</div>
+      </div>
+      <div style="background:#1a1d27; border:1px solid #2d3148; border-radius:12px; padding:16px;">
+        <div style="font-size:20px; margin-bottom:8px;">📄</div>
+        <div style="font-size:13px; font-weight:700; margin-bottom:4px;">Content Check</div>
+        <div style="font-size:12px; color:#64748b;">Sitemap, robots.txt, cookie consent</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 2: Loading -->
+<div class="container" id="screen-loading" style="display:none;">
+  <div class="loading-screen" style="display:block;">
+    <div class="spinner"></div>
+    <div style="font-size:16px; font-weight:600; margin-bottom:6px;">Scanning <span id="scanningDomain">example.com</span>...</div>
+    <div style="font-size:13px; color:#64748b; margin-bottom:20px;">Running health checks across your domain</div>
+    <ul class="loading-checks">
+      <li class="loading-check" id="lc-1"><div class="loading-dot done" id="ld-1"></div>HTTP uptime & response time</li>
+      <li class="loading-check" id="lc-2"><div class="loading-dot done" id="ld-2"></div>SSL certificate validity</li>
+      <li class="loading-check" id="lc-3"><div class="loading-dot running" id="ld-3"></div>Security headers</li>
+      <li class="loading-check" id="lc-4"><div class="loading-dot" id="ld-4"></div>SPF / DMARC configuration</li>
+      <li class="loading-check" id="lc-5"><div class="loading-dot" id="ld-5"></div>DNS & blacklist check</li>
+      <li class="loading-check" id="lc-6"><div class="loading-dot" id="ld-6"></div>Redirect chain & page health</li>
+    </ul>
+  </div>
+</div>
+
+<!-- SCREEN 3: Results -->
+<div class="container" id="screen-results" style="display:none;">
+  <div class="results-screen" style="display:block;">
+
+    <div class="results-header">
+      <div style="font-size:28px;">🔭</div>
+      <div>
+        <div class="results-domain">example.com — Health Scan Complete</div>
+        <div class="results-sub">Scanned 12 checks • 3 issues found • 4 warnings</div>
+      </div>
+      <div class="scan-again" onclick="resetToScan()">← Scan different domain</div>
+    </div>
+
+    <!-- Status pills -->
+    <div class="status-pills">
+      <div class="pill red">🔴 3 Issues — action needed</div>
+      <div class="pill amber">🟡 4 Warnings — review recommended</div>
+      <div class="pill green">✅ 5 Passing</div>
+    </div>
+
+    <!-- Issues -->
+    <div class="section-title">🔴 Issues Found — Pre-selected for monitoring</div>
+    <div class="results-list">
+
+      <div class="result-card issue">
+        <div class="result-row" onclick="toggleCard(this)">
+          <div class="result-status red">🛡️</div>
+          <div class="result-info">
+            <div class="result-name">Security Headers</div>
+            <div class="result-finding red">Missing: Content-Security-Policy, X-Frame-Options, HSTS not enforced</div>
+          </div>
+          <div class="result-toggle">
+            <div class="result-checkbox on"><svg width="11" height="11" viewBox="0 0 11 11"><polyline points="1.5,5.5 4,8 9.5,1.5" stroke="#fff" stroke-width="1.5" fill="none"/></svg></div>
+            <div class="result-label">Monitor</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="result-card issue">
+        <div class="result-row" onclick="toggleCard(this)">
+          <div class="result-status red">📧</div>
+          <div class="result-info">
+            <div class="result-name">SPF / DMARC</div>
+            <div class="result-finding red">DMARC policy is p=none — no enforcement. Emails can be spoofed.</div>
+          </div>
+          <div class="result-toggle">
+            <div class="result-checkbox on"><svg width="11" height="11" viewBox="0 0 11 11"><polyline points="1.5,5.5 4,8 9.5,1.5" stroke="#fff" stroke-width="1.5" fill="none"/></svg></div>
+            <div class="result-label">Monitor</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="result-card issue">
+        <div class="result-row" onclick="toggleCard(this)">
+          <div class="result-status red">🚫</div>
+          <div class="result-info">
+            <div class="result-name">Blacklist Check</div>
+            <div class="result-finding red">Listed on bl.spamcop.net — may affect email deliverability</div>
+          </div>
+          <div class="result-toggle">
+            <div class="result-checkbox on"><svg width="11" height="11" viewBox="0 0 11 11"><polyline points="1.5,5.5 4,8 9.5,1.5" stroke="#fff" stroke-width="1.5" fill="none"/></svg></div>
+            <div class="result-label">Monitor</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Warnings -->
+    <div class="section-title">🟡 Warnings — Recommended monitoring</div>
+    <div class="results-list">
+      <div class="result-card warn">
+        <div class="result-row" onclick="toggleCard(this)">
+          <div class="result-status amber">🔒</div>
+          <div class="result-info">
+            <div class="result-name">SSL Certificate</div>
+            <div class="result-finding amber">Valid but expires in 23 days — renew soon</div>
+          </div>
+          <div class="result-toggle">
+            <div class="result-checkbox on"><svg width="11" height="11" viewBox="0 0 11 11"><polyline points="1.5,5.5 4,8 9.5,1.5" stroke="#fff" stroke-width="1.5" fill="none"/></svg></div>
+            <div class="result-label">Monitor</div>
+          </div>
+        </div>
+      </div>
+      <div class="result-card warn">
+        <div class="result-row" onclick="toggleCard(this)">
+          <div class="result-status amber">↪️</div>
+          <div class="result-info">
+            <div class="result-name">Redirect Chain</div>
+            <div class="result-finding amber">4 redirects before final page — near the recommended limit</div>
+          </div>
+          <div class="result-toggle">
+            <div class="result-checkbox on"><svg width="11" height="11" viewBox="0 0 11 11"><polyline points="1.5,5.5 4,8 9.5,1.5" stroke="#fff" stroke-width="1.5" fill="none"/></svg></div>
+            <div class="result-label">Monitor</div>
+          </div>
+        </div>
+      </div>
+      <div class="result-card warn">
+        <div class="result-row" onclick="toggleCard(this)">
+          <div class="result-status amber">📦</div>
+          <div class="result-info">
+            <div class="result-name">Page Size</div>
+            <div class="result-finding amber">Homepage is 3.8MB — larger than recommended 3MB</div>
+          </div>
+          <div class="result-toggle">
+            <div class="result-checkbox"></div>
+            <div class="result-label">Monitor</div>
+          </div>
+        </div>
+      </div>
+      <div class="result-card warn">
+        <div class="result-row" onclick="toggleCard(this)">
+          <div class="result-status amber">📅</div>
+          <div class="result-info">
+            <div class="result-name">Domain Expiry</div>
+            <div class="result-finding amber">Expires in 67 days — renew to avoid disruption</div>
+          </div>
+          <div class="result-toggle">
+            <div class="result-checkbox on"><svg width="11" height="11" viewBox="0 0 11 11"><polyline points="1.5,5.5 4,8 9.5,1.5" stroke="#fff" stroke-width="1.5" fill="none"/></svg></div>
+            <div class="result-label">Monitor</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Passing -->
+    <div class="section-title">✅ Passing — Add monitoring anyway?</div>
+    <div class="results-list">
+      <div class="result-card ok">
+        <div class="result-row" onclick="toggleCard(this)">
+          <div class="result-status green">🌐</div>
+          <div class="result-info">
+            <div class="result-name">HTTP Uptime</div>
+            <div class="result-finding green">Responding in 312ms — healthy</div>
+          </div>
+          <div class="result-toggle">
+            <div class="result-checkbox on"><svg width="11" height="11" viewBox="0 0 11 11"><polyline points="1.5,5.5 4,8 9.5,1.5" stroke="#fff" stroke-width="1.5" fill="none"/></svg></div>
+            <div class="result-label">Monitor</div>
+          </div>
+        </div>
+      </div>
+      <div class="result-card ok">
+        <div class="result-row" onclick="toggleCard(this)">
+          <div class="result-status green">📡</div>
+          <div class="result-info">
+            <div class="result-name">DNS Records</div>
+            <div class="result-finding green">All records resolving correctly</div>
+          </div>
+          <div class="result-toggle">
+            <div class="result-checkbox on"><svg width="11" height="11" viewBox="0 0 11 11"><polyline points="1.5,5.5 4,8 9.5,1.5" stroke="#fff" stroke-width="1.5" fill="none"/></svg></div>
+            <div class="result-label">Monitor</div>
+          </div>
+        </div>
+      </div>
+      <div class="result-card ok">
+        <div class="result-row" onclick="toggleCard(this)">
+          <div class="result-status green">📮</div>
+          <div class="result-info">
+            <div class="result-name">MX Health</div>
+            <div class="result-finding green">Mail server reachable and responding</div>
+          </div>
+          <div class="result-toggle">
+            <div class="result-checkbox"></div>
+            <div class="result-label">Monitor</div>
+          </div>
+        </div>
+      </div>
+      <div class="result-card ok">
+        <div class="result-row" onclick="toggleCard(this)">
+          <div class="result-status green">🗺️</div>
+          <div class="result-info">
+            <div class="result-name">Sitemap</div>
+            <div class="result-finding green">Valid XML — 847 URLs indexed</div>
+          </div>
+          <div class="result-toggle">
+            <div class="result-checkbox"></div>
+            <div class="result-label">Monitor</div>
+          </div>
+        </div>
+      </div>
+      <div class="result-card ok">
+        <div class="result-row" onclick="toggleCard(this)">
+          <div class="result-status green">📶</div>
+          <div class="result-info">
+            <div class="result-name">Ping / Reachability</div>
+            <div class="result-finding green">Host reachable — 8ms average</div>
+          </div>
+          <div class="result-toggle">
+            <div class="result-checkbox on"><svg width="11" height="11" viewBox="0 0 11 11"><polyline points="1.5,5.5 4,8 9.5,1.5" stroke="#fff" stroke-width="1.5" fill="none"/></svg></div>
+            <div class="result-label">Monitor</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-banner">
+      ⚙️ <strong>Monitors needing individual setup:</strong> Keyword Detection, API Endpoint, Heartbeat, Port Check, and Page Change Detection require extra configuration. You can set these up from <strong>Add Monitor →</strong> after creating this batch.
+    </div>
+  </div>
+</div>
+
+<!-- Sticky CTA -->
+<div class="sticky-cta show" id="sticky-cta">
+  <div class="cta-inner">
+    <div class="cta-left">
+      <div class="cta-title">8 monitors selected for example.com</div>
+      <div class="cta-sub">3 issues + 4 warnings being monitored</div>
+    </div>
+    <div class="limit-inline">
+      <div style="font-size:12px; color:#94a3b8; white-space:nowrap;">Builder plan:</div>
+      <div class="limit-bar-sm"><div class="limit-fill-sm"></div></div>
+      <div class="limit-text-sm">12 / 50 monitors</div>
+    </div>
+    <button class="cta-btn-ghost" onclick="resetToScan()">Cancel</button>
+    <button class="cta-btn">Create 8 Monitors →</button>
+  </div>
+</div>
+
+<div style="position:fixed; bottom:90px; right:16px; background:#1a1d27; border:1px solid #2d3148; border-radius:10px; padding:12px 16px; font-size:12px; color:#64748b; max-width:220px; line-height:1.5; z-index:100;">
+  <strong style="color:#e2e8f0; display:block; margin-bottom:4px;">Mockup 3 — Smart Scan</strong>
+  Scan first, select second. Issues pre-selected. User sees real findings before choosing monitors. Highest conversion potential.
+</div>
+
+<script>
+function startScan() {
+  document.getElementById('screen-scan').style.display = 'none';
+  document.getElementById('screen-loading').style.display = 'block';
+  document.getElementById('scanningDomain').textContent = document.getElementById('scanDomain').value || 'example.com';
+
+  let step = 3;
+  const dots = ['ld-4','ld-5','ld-6'];
+  let i = 0;
+  const interval = setInterval(() => {
+    if (i < dots.length) {
+      document.getElementById(dots[i]).className = 'loading-dot done';
+      if (i + 1 < dots.length) document.getElementById(dots[i+1]).className = 'loading-dot running';
+      i++;
+    } else {
+      clearInterval(interval);
+      setTimeout(showResults, 600);
+    }
+  }, 900);
+}
+
+function showResults() {
+  document.getElementById('screen-loading').style.display = 'none';
+  document.getElementById('screen-results').style.display = 'block';
+}
+
+function resetToScan() {
+  document.getElementById('screen-scan').style.display = 'block';
+  document.getElementById('screen-loading').style.display = 'none';
+  document.getElementById('screen-results').style.display = 'none';
+}
+
+function toggleCard(row) {
+  const cb = row.querySelector('.result-checkbox');
+  if (cb.classList.contains('on')) {
+    cb.classList.remove('on');
+    cb.innerHTML = '';
+  } else {
+    cb.classList.add('on');
+    cb.innerHTML = '<svg width="11" height="11" viewBox="0 0 11 11"><polyline points="1.5,5.5 4,8 9.5,1.5" stroke="#fff" stroke-width="1.5" fill="none"/></svg>';
+  }
+}
+</script>
+</body>
+</html>
