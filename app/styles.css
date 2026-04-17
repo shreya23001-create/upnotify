@@ -6741,6 +6741,33 @@ section.hero .hero-mockup {
 .blog-index { max-width: 100%; overflow-x: hidden; }
 .blog-article { overflow-x: hidden; }
 
+/* ── Blog Share + Subscribe ──────────────────────────────────────────────────── */
+.blog-share-subscribe { margin: 40px 0 8px; display: flex; flex-direction: column; gap: 20px; }
+
+.blog-share-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.blog-share-label { font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.6px; margin-right: 4px; }
+.blog-share-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; color: var(--text-primary); background: var(--bg-secondary); border: 1px solid var(--border-primary); cursor: pointer; text-decoration: none; transition: background 0.15s, border-color 0.15s; white-space: nowrap; }
+.blog-share-btn:hover { background: var(--bg-tertiary, #f1f5f9); border-color: var(--accent); color: var(--accent); }
+
+.blog-subscribe-box { background: linear-gradient(135deg, rgba(59,130,246,0.06) 0%, rgba(139,92,246,0.06) 100%); border: 1px solid rgba(59,130,246,0.2); border-radius: 14px; padding: 28px 32px; }
+.blog-subscribe-text { margin-bottom: 16px; }
+.blog-subscribe-title { font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; }
+.blog-subscribe-sub { font-size: 14px; color: var(--text-secondary); line-height: 1.5; }
+.blog-subscribe-form { display: flex; gap: 10px; flex-wrap: wrap; }
+.blog-subscribe-input { flex: 1; min-width: 200px; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border-primary); background: var(--bg-primary); color: var(--text-primary); font-size: 14px; outline: none; }
+.blog-subscribe-input:focus { border-color: var(--accent); }
+.blog-subscribe-btn { padding: 10px 20px; border-radius: 8px; background: var(--accent); color: #fff; font-size: 14px; font-weight: 600; border: none; cursor: pointer; white-space: nowrap; transition: opacity 0.15s; }
+.blog-subscribe-btn:hover { opacity: 0.88; }
+.blog-subscribe-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.blog-subscribe-success { font-size: 14px; color: #16a34a; font-weight: 500; margin: 0; }
+.blog-subscribe-error { font-size: 13px; color: var(--color-danger); margin: 6px 0 0; width: 100%; }
+
+@media (max-width: 640px) {
+  .blog-subscribe-box { padding: 20px 16px; }
+  .blog-subscribe-form { flex-direction: column; }
+  .blog-subscribe-input { min-width: unset; }
+}
+
 /* ── PMB Post Styles ─────────────────────────────────────────────────────────── */
 .pmb-post { font-size: 16px; line-height: 1.8; color: var(--text-secondary); }
 

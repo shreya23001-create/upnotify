@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { BlogCardImage } from '@/components/ui/blog-card-image'
+import { BlogShareSubscribe } from '@/components/blog/blog-share-subscribe'
 
 export const revalidate = 300 // ISR: revalidate every 5 minutes
 
@@ -242,6 +243,12 @@ export default async function DynamicBlogPost({ params }: { params: Promise<{ sl
       <div
         className="blog-article-body"
         dangerouslySetInnerHTML={{ __html: bodyHtml }}
+      />
+
+      <BlogShareSubscribe
+        title={post.title}
+        url={`https://uptrue.io/blog/${post.slug}`}
+        category={post.category}
       />
 
       {endCta && (
