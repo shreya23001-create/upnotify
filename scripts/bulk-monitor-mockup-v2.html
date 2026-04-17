@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Uptrue — Monitor a Website v2 (Mockup)</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f5f6fa;
+    --bg-card: #fff;
+    --bg-muted: #f8fafc;
+    --border: #e5e7eb;
+    --text: #111827;
+    --text-secondary: #6b7280;
+    --text-muted: #9ca3af;
+    --accent: #0ea5e9;
+    --accent-light: #e0f2fe;
+    --accent-dark: #0284c7;
+    --green: #10b981;
+    --green-light: #d1fae5;
+    --amber: #f59e0b;
+    --amber-light: #fef3c7;
+    --red: #ef4444;
+    --red-light: #fee2e2;
+    --purple: #8b5cf6;
+    --purple-light: #ede9fe;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08);
+    --radius: 10px;
+  }
+
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding-bottom: 90px; }
+
+  .topbar { background:#fff; border-bottom:1px solid var(--border); padding:0 28px; height:54px; display:flex; align-items:center; gap:8px; }
+  .topbar-logo { font-weight:800; font-size:17px; color:var(--accent); letter-spacing:-0.5px; }
+  .topbar-sep { color:var(--border); margin:0 4px; }
+  .topbar-crumb { font-size:13px; color:var(--text-secondary); }
+  .topbar-crumb.active { color:var(--text); font-weight:600; }
+
+  .main { max-width:920px; margin:0 auto; padding:36px 24px 60px; }
+
+  .page-header { margin-bottom:28px; }
+  .page-title { font-size:26px; font-weight:800; letter-spacing:-0.5px; margin-bottom:6px; }
+  .page-subtitle { font-size:14px; color:var(--text-secondary); line-height:1.6; }
+
+  /* domain box */
+  .domain-box { background:#fff; border:1.5px solid var(--border); border-radius:var(--radius); padding:20px 24px; margin-bottom:24px; box-shadow:var(--shadow); }
+  .domain-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color:var(--text-muted); margin-bottom:8px; }
+  .domain-row { display:flex; gap:10px; align-items:center; }
+  .domain-input { flex:1; height:42px; border:1.5px solid var(--border); border-radius:8px; padding:0 14px; font-size:15px; outline:none; transition:border-color 0.15s; }
+  .domain-input:focus { border-color:var(--accent); }
+  .domain-input::placeholder { color:var(--text-muted); }
+  .domain-existing-note { font-size:12px; color:var(--text-secondary); display:flex; align-items:center; gap:5px; margin-top:10px; padding:8px 12px; background:var(--amber-light); border-radius:6px; border:1px solid #fde68a; }
+
+  /* section label */
+  .section-label { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color:var(--text-muted); margin-bottom:12px; }
+
+  /* bundles */
+  .bundles-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin-bottom:28px; }
+  .bundle-card { background:#fff; border:1.5px solid var(--border); border-radius:var(--radius); padding:14px 14px 12px; cursor:pointer; transition:all 0.15s; text-align:left; user-select:none; }
+  .bundle-card:hover { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-light); }
+  .bundle-card.active { border-color:var(--accent); background:var(--accent-light); box-shadow:0 0 0 3px rgba(14,165,233,.15); }
+  .bundle-emoji { font-size:22px; margin-bottom:8px; display:block; }
+  .bundle-name { font-size:13px; font-weight:700; margin-bottom:3px; }
+  .bundle-count { font-size:12px; color:var(--text-secondary); }
+  .bundle-card.active .bundle-count { color:var(--accent-dark); font-weight:600; }
+  .bundle-card.custom { border-style:dashed; }
+
+  /* types card */
+  .types-card { background:#fff; border:1.5px solid var(--border); border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow); margin-bottom:16px; }
+  .types-category { border-bottom:1px solid var(--border); }
+  .types-category:last-child { border-bottom:none; }
+  .category-header { padding:10px 20px; background:var(--bg-muted); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+  .category-name { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-secondary); display:flex; align-items:center; gap:6px; }
+  .category-toggle { font-size:12px; color:var(--accent); cursor:pointer; font-weight:600; background:none; border:none; padding:2px 6px; border-radius:4px; }
+  .category-toggle:hover { background:var(--accent-light); }
+
+  .select-all-row { display:flex; align-items:center; justify-content:space-between; padding:10px 20px; background:var(--bg-muted); border-bottom:1px solid var(--border); }
+  .select-all-label { font-size:13px; color:var(--text-secondary); }
+  .select-links { display:flex; gap:10px; }
+  .select-link { font-size:12px; font-weight:600; color:var(--accent); cursor:pointer; background:none; border:none; }
+  .select-link:hover { text-decoration:underline; }
+
+  .types-row { display:grid; grid-template-columns:repeat(3,1fr); gap:0; }
+
+  /* selectable type */
+  .type-item { display:flex; align-items:flex-start; gap:10px; padding:13px 20px; border-right:1px solid var(--border); border-bottom:1px solid var(--border); cursor:pointer; transition:background 0.1s; }
+  .type-item:nth-child(3n) { border-right:none; }
+  .type-item:nth-child(3n+1):nth-last-child(-n+3), .type-item:nth-child(3n+2):nth-last-child(-n+2), .type-item:last-child { border-bottom:none; }
+  .type-item:hover:not(.disabled):not(.already) { background:var(--bg-muted); }
+  .type-item.checked { background:#f0fdf4; }
+  .type-item.checked:hover:not(.disabled) { background:#dcfce7; }
+
+  /* already monitoring */
+  .type-item.already { background:#fafafa; cursor:not-allowed; opacity:0.7; }
+  .type-item.already .type-check { background:#e5e7eb; border-color:#d1d5db; }
+  .type-item.already .type-name { color:var(--text-muted); }
+
+  /* checkbox */
+  .type-check { width:18px; height:18px; border:2px solid var(--border); border-radius:5px; flex-shrink:0; margin-top:1px; display:flex; align-items:center; justify-content:center; transition:all 0.15s; background:#fff; }
+  .type-item.checked .type-check { background:var(--green); border-color:var(--green); }
+  .type-item.already .type-check-tick { display:block !important; color:var(--text-muted); }
+  .type-check-tick { color:#fff; font-size:11px; font-weight:900; display:none; }
+  .type-item.checked .type-check-tick { display:block; }
+
+  .type-info { flex:1; min-width:0; }
+  .type-name { font-size:13px; font-weight:600; color:var(--text); display:flex; align-items:center; gap:5px; margin-bottom:2px; flex-wrap:wrap; }
+  .type-emoji { font-size:13px; }
+  .type-desc { font-size:12px; color:var(--text-muted); line-height:1.4; }
+
+  /* badges */
+  .badge { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.3px; padding:1px 5px; border-radius:3px; white-space:nowrap; }
+  .badge-rec { background:var(--green-light); color:#065f46; }
+  .badge-existing { background:#f3f4f6; color:#6b7280; }
+
+  /* warning bar */
+  .warning-bar { display:none; background:var(--amber-light); border:1px solid #fde68a; border-radius:8px; padding:10px 16px; font-size:13px; color:#92400e; margin-bottom:16px; align-items:center; gap:8px; }
+  .warning-bar.visible { display:flex; }
+
+  /* needs-config section */
+  .needs-config-card { background:#fff; border:1.5px solid var(--border); border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow); margin-bottom:24px; }
+  .needs-config-header { padding:12px 20px; background:#fafafa; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+  .needs-config-title { font-size:13px; font-weight:700; color:var(--text-secondary); display:flex; align-items:center; gap:7px; }
+  .needs-config-subtitle { font-size:12px; color:var(--text-muted); margin-top:1px; }
+  .needs-config-row { display:grid; grid-template-columns:repeat(5,1fr); gap:0; }
+  .config-type { padding:14px 18px; border-right:1px solid var(--border); opacity:0.6; }
+  .config-type:last-child { border-right:none; }
+  .config-type-name { font-size:13px; font-weight:600; color:var(--text); margin-bottom:3px; display:flex; align-items:center; gap:5px; }
+  .config-type-desc { font-size:12px; color:var(--text-muted); line-height:1.4; margin-bottom:8px; }
+  .config-type-link { font-size:12px; font-weight:600; color:var(--accent); text-decoration:none; }
+  .config-type-link:hover { text-decoration:underline; }
+  .badge-config { background:var(--purple-light); color:#5b21b6; }
+
+  /* sticky bottom */
+  .sticky-bottom { position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1.5px solid var(--border); padding:14px 32px; display:flex; align-items:center; justify-content:space-between; z-index:100; box-shadow:0 -4px 16px rgba(0,0,0,.06); }
+  .cta-count { font-size:20px; font-weight:800; display:flex; align-items:baseline; gap:6px; }
+  .cta-count span { font-size:14px; font-weight:400; color:var(--text-secondary); }
+  .cta-note { font-size:12px; color:var(--text-muted); margin-top:2px; }
+  .cta-actions { display:flex; gap:10px; align-items:center; }
+  .btn { height:42px; padding:0 22px; border-radius:8px; font-size:14px; font-weight:700; cursor:pointer; border:none; transition:all 0.15s; display:flex; align-items:center; gap:7px; }
+  .btn-primary { background:var(--accent); color:#fff; }
+  .btn-primary:hover { background:var(--accent-dark); }
+  .btn-primary:disabled { background:var(--border); color:var(--text-muted); cursor:not-allowed; }
+  .btn-ghost { background:none; border:1.5px solid var(--border); color:var(--text-secondary); }
+  .btn-ghost:hover { border-color:var(--text-secondary); }
+
+  .or-link { text-align:center; font-size:13px; color:var(--text-muted); margin-top:4px; }
+  .or-link a { color:var(--accent); text-decoration:none; font-weight:600; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="topbar-logo">Uptrue</span>
+  <span class="topbar-sep">/</span>
+  <span class="topbar-crumb">Monitors</span>
+  <span class="topbar-sep">/</span>
+  <span class="topbar-crumb active">Monitor a Website</span>
+</div>
+
+<div class="main">
+
+  <div class="page-header">
+    <h1 class="page-title">Monitor a Website</h1>
+    <p class="page-subtitle">Enter a domain, pick a bundle, and we create all the monitors at once. You can edit each one after setup.</p>
+  </div>
+
+  <!-- Domain -->
+  <div class="domain-box">
+    <div class="domain-label">Website domain</div>
+    <div class="domain-row">
+      <input class="domain-input" type="text" id="domain-input" value="github.com" oninput="onDomainChange()" />
+    </div>
+    <!-- Shown when existing monitors detected -->
+    <div class="domain-existing-note" id="existing-note">
+      ⚠️ You already have <strong>2 monitors</strong> for github.com — those types are greyed out below and won't be duplicated.
+    </div>
+  </div>
+
+  <!-- Bundles -->
+  <div class="section-label">Start with a preset bundle</div>
+  <div class="bundles-grid">
+    <div class="bundle-card" onclick="selectBundle(this,'essentials')">
+      <span class="bundle-emoji">🚀</span>
+      <div class="bundle-name">Essentials</div>
+      <div class="bundle-count">4 monitors</div>
+    </div>
+    <div class="bundle-card active" onclick="selectBundle(this,'standard')">
+      <span class="bundle-emoji">⭐</span>
+      <div class="bundle-name">Standard</div>
+      <div class="bundle-count">9 monitors</div>
+    </div>
+    <div class="bundle-card" onclick="selectBundle(this,'email')">
+      <span class="bundle-emoji">📧</span>
+      <div class="bundle-name">Email Health</div>
+      <div class="bundle-count">3 monitors</div>
+    </div>
+    <div class="bundle-card" onclick="selectBundle(this,'security')">
+      <span class="bundle-emoji">🛡️</span>
+      <div class="bundle-name">Security Audit</div>
+      <div class="bundle-count">5 monitors</div>
+    </div>
+    <div class="bundle-card custom" onclick="selectBundle(this,'custom')">
+      <span class="bundle-emoji">🎛️</span>
+      <div class="bundle-name">Custom</div>
+      <div class="bundle-count">Pick manually</div>
+    </div>
+  </div>
+
+  <!-- Too-many warning -->
+  <div class="warning-bar" id="warning-bar">
+    ⚠️ You've selected more than 12 monitors — that's a lot for one domain. Consider starting with <strong>Standard</strong> and adding more later.
+  </div>
+
+  <!-- 18 bulk-eligible types -->
+  <div class="types-card">
+
+    <div class="select-all-row">
+      <span class="select-all-label" id="selected-summary">7 of 18 eligible types selected</span>
+      <div class="select-links">
+        <button class="select-link" onclick="selectAll()">Select all</button>
+        <button class="select-link" onclick="clearAll()">Clear all</button>
+      </div>
+    </div>
+
+    <!-- Availability -->
+    <div class="types-category">
+      <div class="category-header">
+        <span class="category-name">🌐 Availability</span>
+        <button class="category-toggle" onclick="toggleCategory('availability', this)">Select all</button>
+      </div>
+      <div class="types-row" id="cat-availability">
+
+        <div class="type-item already" data-id="http">
+          <div class="type-check"><span class="type-check-tick">✓</span></div>
+          <div class="type-info">
+            <div class="type-name"><span class="type-emoji">🌐</span> HTTP Uptime <span class="badge badge-existing">Already monitoring</span></div>
+            <div class="type-desc">Already set up for this domain</div>
+          </div>
+        </div>
+
+        <div class="type-item checked" data-id="response-time" onclick="toggle(this)">
+          <div class="type-check"><span class="type-check-tick">✓</span></div>
+          <div class="type-info">
+            <div class="type-name"><span class="type-emoji">⏱️</span> Response Time</div>
+            <div class="type-desc">Alert when response exceeds threshold</div>
+          </div>
+        </div>
+
+        <div class="type-item" data-id="redirect-chain" onclick="toggle(this)">
+          <div class="type-check"><span class="type-check-tick">✓</span></div>
+          <div class="type-info">
+            <div class="type-name"><span class="type-emoji">🔗</span> Redirect Chain</div>
+            <div class="type-desc">Detect redirect loops & long chains</div>
+          </div>
+        </div>
+
+        <div class="type-item" data-id="page-size" onclick="toggle(this)">
+          <div class="type-check"><span class="type-check-tick">✓</span></div>
+          <div class="type-info">
+            <div class="type-name"><span class="type-emoji">📦</span> Page Size</div>
+            <div class="type-desc">Alert when page weight grows too large</div>
+          </div>
+        </div>
+
+        <div class="type-item" data-id="ping" onclick="toggle(this)">
+          <div class="type-check"><span class="type-check-tick">✓</span></div>
+          <div class="type-info">
+            <div class="type-name"><span class="type-emoji">📶</span> Ping</div>
+            <div class="type-desc">Basic reachability check</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SSL & Domain -->
+    <div class="types-category">
+      <div class="category-header">
+        <span class="category-name">🔒 SSL & Domain</span>
+        <button class="category-toggle" onclick="toggleCategory('ssl', this)">Select all</button>
+      </div>
+      <div class="types-row" id="cat-ssl">
+
+        <div class="type-item already" data-id="ssl">
+          <div class="type-check"><span class="type-check-tick">✓</span></div>
+          <div class="type-info">
+            <div class="type-name"><span class="type-emoji">🔒</span> SSL Certificate <span class="badge badge-existing">Already monitoring</span></div>
+            <div class="type-desc">Already set up for this domain</div>
+          </div>
+        </div>
+
+        <div class="type-item checked" data-id="domain" onclick="toggle(this)">
+          <div class="type-check"><span class="type-check-tick">✓</span></div>
+          <div class="type-info">
+            <div class="type-name"><span class="type-emoji">📅</span> Domain Expiry <span class="badge badge-rec">Recommended</span></div>
+            <div class="type-desc">Never let your domain lapse</div>
+          </div>
+        </div>
+
+        <div class="type-item" data-id="whois" onclick="toggle(this)">
+          <div class="type-check"><span class="type-check-tick">✓</span></div>
+          <div class="type-info">
+            <div class="type-name"><span class="type-emoji">📋</span> WHOIS Change</div>
+            <div class="type-desc">Detect registrar / ownership changes</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- DNS -->
+    <div class="types-category">
+      <div class="category-header">
+        <span class="category-name">📡 DNS</span>
+        <button class="category-toggle" onclick="toggleCategory('dns', this)">Select all</button>
+      </div>
+      <div class="types-row" id="cat-dns">
+
+        <div class="type-item checked" data-id="dns" onclick="toggle(this)">
+          <div class="type-check"><span class="type-check-tick">✓</span></div>
+          <div class="type-info">
+            <div class="type-name"><span class="type-emoji">📡</span> DNS Records <span class="badge badge-rec">Recommended</span></div>
+            <div class="type-desc">Alert on any A, MX, NS, TXT changes</div>
+          </div>
+        </div>
+
+        <div class="type-item" data-id="ip-change" onclick="toggle(this)">
+          <div class="type-check"><span class="type-check-tick">✓</span></div>
+          <div class="type-info">
+            <div class="type-name"><span class="type-emoji">🗺️</span> IP Change</div>
+            <div class="type-desc">Detect unexpected IP address changes</div>
+          </div>
+        </div>
+
+        <div class="type-item" data-id="nameserver" onclick="toggle(this)">
+          <div class="type-check"><span class="type-check-tick">✓</span></div>
+          <div class="type-info">
+            <div class="type-name"><span class="type-emoji">🖥️</span> Nameserver Change</div>
+            <div class="type-desc">Alert if authoritative NS changes</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Email -->
+    <div class="types-category">
+      <div class="category-header">
+        <span class="category-name">📧 Email</span>
+        <button class="category-toggle" onclick="toggleCategory('email', this)">Select all</button>
+      </div>
+      <div class="types-row" id="cat-email">
+
+        <div class="type-item checked" data-id="mx-health" onclick="toggle(this)">
+          <div class="type-check"><span class="type-check-tick">✓</span></div>
+          <div class="type-info">
+            <div class="type-name"><span class="type-emoji">📧</span> MX Health <span class="badge badge-rec">Recommended</span></div>
+            <div class="type-desc">Verify mail server is reachable</div>
+          </div>
+        </div>
+
+        <div class="type-item" data-id="spf-dmarc" onclick="toggle(this)">
+          <div class="type-check"><span class="type-check-tick">✓</span></div>
+          <div class="type-info">
+            <div class="type-name"><span class="type-emoji">✉️</span> SPF / DMARC</div>
+            <div class="type-desc">Email auth records correctly set</div>
+          </div>
+        </div>
+
+        <div class="type-item" data-id="blacklist" onclick="toggle(this)">
+          <div class="type-check"><span class="type-check-tick">✓</span></div>
+          <div class="type-info">
+            <div class="type-name"><span class="type-emoji">🚫</span> Blacklist</div>
+            <div class="type-desc">Check IP against spam block lists</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Security & Compliance -->
+    <div class="types-category">
+      <div class="category-header">
+        <span class="category-name">🛡️ Security & Compliance</span>
+        <button class="category-toggle" onclick="toggleCategory('security-cat', this)">Select all</button>
+      </div>
+      <div class="types-row" id="cat-security-cat">
+
+        <div class="type-item checked" data-id="security-headers" onclick="toggle(this)">
+          <div class="type-check"><span class="type-check-tick">✓</span></div>
+          <div class="type-info">
+            <div class="type-name"><span class="type-emoji">🛡️</span> Security Headers</div>
+            <div class="type-desc">HSTS, CSP, X-Frame-Options & more</div>
+          </div>
+        </div>
+
+        <div class="type-item" data-id="cookie-consent" onclick="toggle(this)">
+          <div class="type-check"><span class="type-check-tick">✓</span></div>
+          <div class="type-info">
+            <div class="type-name"><span class="type-emoji">🍪</span> Cookie Consent</div>
+            <div class="type-desc">Verify GDPR consent banner present</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SEO -->
+    <div class="types-category">
+      <div class="category-header">
+        <span class="category-name">🔎 SEO & Crawlability</span>
+        <button class="category-toggle" onclick="toggleCategory('seo', this)">Select all</button>
+      </div>
+      <div class="types-row" id="cat-seo">
+
+        <div class="type-item" data-id="robots-txt" onclick="toggle(this)">
+          <div class="type-check"><span class="type-check-tick">✓</span></div>
+          <div class="type-info">
+            <div class="type-name"><span class="type-emoji">🤖</span> robots.txt</div>
+            <div class="type-desc">Detect changes that could de-index site</div>
+          </div>
+        </div>
+
+        <div class="type-item" data-id="sitemap" onclick="toggle(this)">
+          <div class="type-check"><span class="type-check-tick">✓</span></div>
+          <div class="type-info">
+            <div class="type-name"><span class="type-emoji">🗺️</span> Sitemap Validity</div>
+            <div class="type-desc">sitemap.xml accessible & valid XML</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div><!-- /types-card -->
+
+  <!-- ── Needs extra setup ── -->
+  <div class="section-label" style="margin-top:24px;">Monitors that need individual setup</div>
+  <div class="needs-config-card">
+    <div class="needs-config-header">
+      <div>
+        <div class="needs-config-title">
+          🎛️ These 5 types need extra configuration — set them up one at a time
+        </div>
+        <div class="needs-config-subtitle">Keyword needs words to watch · Port needs a port number · API needs assertions · Heartbeat is inverted · Page Change needs a target URL</div>
+      </div>
+    </div>
+    <div class="needs-config-row">
+
+      <div class="config-type">
+        <div class="config-type-name"><span>🔍</span> Keyword</div>
+        <div class="config-type-desc">Verify specific text is present or absent</div>
+        <a href="#" class="config-type-link">Set up →</a>
+      </div>
+
+      <div class="config-type">
+        <div class="config-type-name"><span>🔌</span> Port Check</div>
+        <div class="config-type-desc">Check a specific TCP port is open</div>
+        <a href="#" class="config-type-link">Set up →</a>
+      </div>
+
+      <div class="config-type">
+        <div class="config-type-name"><span>⚡</span> API Endpoint</div>
+        <div class="config-type-desc">Test an API with custom assertions</div>
+        <a href="#" class="config-type-link">Set up →</a>
+      </div>
+
+      <div class="config-type">
+        <div class="config-type-name"><span>💓</span> Heartbeat</div>
+        <div class="config-type-desc">Monitor cron jobs & background tasks</div>
+        <a href="#" class="config-type-link">Set up →</a>
+      </div>
+
+      <div class="config-type">
+        <div class="config-type-name"><span>👁️</span> Page Change</div>
+        <div class="config-type-desc">Detect changes on any URL</div>
+        <a href="#" class="config-type-link">Set up →</a>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="or-link">
+    Prefer the classic one-at-a-time form? <a href="#">Create a single monitor →</a>
+  </div>
+
+</div><!-- /main -->
+
+<!-- Sticky CTA -->
+<div class="sticky-bottom">
+  <div>
+    <div class="cta-count" id="cta-count">7 <span>monitors will be created for <strong>github.com</strong></span></div>
+    <div class="cta-note" id="cta-note">Response Time · Domain Expiry · DNS · MX Health · Security Headers · +2 more</div>
+  </div>
+  <div class="cta-actions">
+    <button class="btn btn-ghost">Cancel</button>
+    <button class="btn btn-primary" id="create-btn">⚡ Create 7 monitors</button>
+  </div>
+</div>
+
+<script>
+  const BUNDLES = {
+    essentials: ['http','ssl','domain','dns'],
+    standard:   ['http','response-time','ssl','domain','dns','mx-health','robots-txt','sitemap','security-headers'],
+    email:      ['mx-health','spf-dmarc','blacklist'],
+    security:   ['ssl','security-headers','cookie-consent','blacklist','spf-dmarc'],
+    custom:     null,
+  }
+
+  // Types already monitored for this domain (simulated)
+  const ALREADY_MONITORED = new Set(['http','ssl'])
+
+  function getSelectableItems() {
+    return [...document.querySelectorAll('.type-item:not(.already)')]
+  }
+
+  function getChecked() {
+    return [...document.querySelectorAll('.type-item.checked:not(.already)')]
+  }
+
+  function toggle(el) {
+    if (el.classList.contains('already')) return
+    el.classList.toggle('checked')
+    updateSummary()
+    // mark as custom
+    document.querySelectorAll('.bundle-card').forEach(b => b.classList.remove('active'))
+    document.querySelector('.bundle-card.custom').classList.add('active')
+  }
+
+  function selectAll() {
+    getSelectableItems().forEach(el => el.classList.add('checked'))
+    updateSummary()
+    document.querySelectorAll('.bundle-card').forEach(b => b.classList.remove('active'))
+  }
+
+  function clearAll() {
+    getSelectableItems().forEach(el => el.classList.remove('checked'))
+    updateSummary()
+    document.querySelectorAll('.bundle-card').forEach(b => b.classList.remove('active'))
+    document.querySelector('.bundle-card.custom').classList.add('active')
+  }
+
+  function toggleCategory(catId, btn) {
+    const container = document.getElementById('cat-' + catId)
+    if (!container) return
+    const items = [...container.querySelectorAll('.type-item:not(.already)')]
+    const allChecked = items.every(el => el.classList.contains('checked'))
+    items.forEach(el => allChecked ? el.classList.remove('checked') : el.classList.add('checked'))
+    btn.textContent = allChecked ? 'Select all' : 'Clear'
+    updateSummary()
+  }
+
+  function selectBundle(card, key) {
+    document.querySelectorAll('.bundle-card').forEach(b => b.classList.remove('active'))
+    card.classList.add('active')
+    if (key === 'custom') { updateSummary(); return }
+
+    const bundle = BUNDLES[key] || []
+    getSelectableItems().forEach(el => {
+      const id = el.dataset.id
+      bundle.includes(id) ? el.classList.add('checked') : el.classList.remove('checked')
+    })
+    updateSummary()
+  }
+
+  function updateSummary() {
+    const checked = getChecked()
+    const n = checked.length
+    const eligible = getSelectableItems().length
+    const domain = document.getElementById('domain-input').value.trim() || 'your domain'
+
+    document.getElementById('selected-summary').textContent = `${n} of ${eligible} eligible types selected`
+
+    // Warning
+    const warn = document.getElementById('warning-bar')
+    warn.classList.toggle('visible', n > 12)
+
+    // CTA
+    document.getElementById('cta-count').innerHTML =
+      `${n} <span>monitors will be created for <strong>${domain}</strong></span>`
+    const btn = document.getElementById('create-btn')
+    btn.textContent = n > 0 ? `⚡ Create ${n} monitor${n !== 1 ? 's' : ''}` : 'Select at least one type'
+    btn.disabled = n === 0
+
+    // Note line
+    const names = checked.slice(0, 5).map(el => {
+      const nameEl = el.querySelector('.type-name')
+      return nameEl.childNodes[1]?.textContent?.trim() || nameEl.textContent.trim().split(' ')[1]
+    })
+    const extra = n > 5 ? ` · +${n - 5} more` : ''
+    document.getElementById('cta-note').textContent = names.join(' · ') + extra
+  }
+
+  function onDomainChange() {
+    // In real app: debounce + API call to fetch existing monitors for this domain
+    updateSummary()
+  }
+
+  updateSummary()
+</script>
+</body>
+</html>

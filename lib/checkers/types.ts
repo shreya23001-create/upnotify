@@ -27,4 +27,19 @@ export interface CheckerConfig {
   }>
   // Heartbeat
   expectedIntervalSeconds?: number
+  // Response time thresholds
+  thresholdMs?: number
+  degradedMs?: number
+  // Redirect chain
+  maxRedirects?: number
+  // Page size
+  maxSizeKb?: number
+  warnSizeKb?: number
+  // Change-detection baselines (written back by check runner after each run)
+  lastRobotsHash?: string
+  lastIp?: string
+  lastWhoisSnapshot?: string
+  lastNameservers?: string[]
+  // DNS change detection (existing)
+  lastDnsRecords?: Record<string, unknown>
 }

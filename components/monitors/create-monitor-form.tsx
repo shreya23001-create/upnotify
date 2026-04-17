@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { createMonitorAction } from '@/app/(dashboard)/dashboard/monitors/actions'
 import { KeywordTagInput } from './keyword-tag-input'
 import { getKeywordSuggestions } from '@/lib/utils/keyword-suggestions'
+import { MonitorTypeHelp } from './monitor-type-help'
 
 const monitorTypes = [
   { value: 'http', label: 'HTTP/HTTPS Uptime' },
@@ -17,6 +18,19 @@ const monitorTypes = [
   { value: 'api', label: 'API Endpoint' },
   { value: 'heartbeat', label: 'Heartbeat Monitor' },
   { value: 'competitor', label: 'Page Change Detection' },
+  { value: 'security-headers', label: 'Security Headers' },
+  { value: 'response-time', label: 'Response Time Threshold' },
+  { value: 'robots-txt', label: 'robots.txt Change' },
+  { value: 'ip-change', label: 'IP Address Change' },
+  { value: 'mx-health', label: 'MX Health' },
+  { value: 'whois-change', label: 'WHOIS Registrar Change' },
+  { value: 'sitemap', label: 'Sitemap Validity' },
+  { value: 'redirect-chain', label: 'Redirect Chain' },
+  { value: 'spf-dmarc', label: 'SPF / DMARC Validity' },
+  { value: 'blacklist', label: 'Blacklist Check' },
+  { value: 'page-size', label: 'Page Size' },
+  { value: 'cookie-consent', label: 'Cookie Consent Presence' },
+  { value: 'nameserver-change', label: 'Nameserver Change' },
 ]
 
 const ALL_INTERVALS = [
@@ -89,7 +103,14 @@ export function CreateMonitorForm({ minCheckInterval = 600 }: { minCheckInterval
   }
 
   return (
-    <form action={handleSubmit}>
+    <div style={{
+      display: 'grid',
+      gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)',
+      gap: 32,
+      alignItems: 'start',
+    }} className="create-monitor-layout">
+      {/* Left — the form */}
+      <form action={handleSubmit}>
       {error && (
         <div className="form-error">
           {error.includes('Monitor limit reached') && (
@@ -269,5 +290,11 @@ export function CreateMonitorForm({ minCheckInterval = 600 }: { minCheckInterval
         {isPending ? 'Creating...' : 'Create Monitor'}
       </button>
     </form>
+
+      {/* Right — contextual help panel */}
+      <div style={{ position: 'sticky', top: 24 }}>
+        <MonitorTypeHelp type={type} />
+      </div>
+    </div>
   )
 }

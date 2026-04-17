@@ -1,8 +1,6 @@
-/**
- * Security headers checker for Uptrue Score.
- * Performs a single HTTP GET and evaluates security-related response headers.
- */
-
+import type { Monitor } from '@/lib/types'
+import type { CheckerResult } from './types'
+import { isSafeUrl } from './ssrf-guard'
 import { logger } from '@/lib/utils/logger'
 
 export interface SecurityHeadersResult {
@@ -68,4 +66,41 @@ export async function checkSecurityHeaders(url: string, timeoutMs: number = 1000
   }
 
   return result
+}
+
+// Monitor checker interface — wraps checkSecurityHeaders for the dispatch registry
+export async function check(monitor: Monitor): Promise<CheckerResult> {
+  const url = monitor.target.startsWith('http') ? monitor.target : `https://${monitor.target}`
+  if (!isSafeUrl(url)) {
+    return { status: 'down', responseTimeMs: 0, errorMessage: 'Monitor target URL is not permitted' }
+  }
+  const start = Date.now()
+
+  try {
+    const result = await checkSecurityHeaders(url, monitor.timeout_ms)
+    const responseTimeMs = Date.now() - start
+    const missing = HEADER_CHECKS
+      .filter(h => !result[h.key])
+      .map(h => h.header)
+
+    const metadata = {
+      score: result.score,
+      headers: result.headers,
+      missing,
+    }
+
+    if (result.score === 0) {
+      return { status: 'down', responseTimeMs, errorMessage: 'No security headers found', metadata }
+    }
+    if (missing.length > 0) {
+      return { status: 'degraded', responseTimeMs, errorMessage: `Missing security headers: ${missing.join(', ')}`, metadata }
+    }
+    return { status: 'up', responseTimeMs, metadata }
+  } catch (error) {
+    return {
+      status: 'down',
+      responseTimeMs: Date.now() - start,
+      errorMessage: error instanceof Error ? error.message : 'Security headers check failed',
+    }
+  }
 }
