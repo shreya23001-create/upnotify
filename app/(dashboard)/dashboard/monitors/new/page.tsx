@@ -17,15 +17,13 @@ export default async function NewMonitorPage({
 
   return (
     <div>
-      <h1 className="page-title" style={{ marginBottom: 24 }}>Create Monitor</h1>
+      <div className="page-header">
+        <h1 className="page-title">Create Monitor</h1>
+      </div>
       {isPaid ? (
         <PaidMonitorCreator />
       ) : (
-        <div className="card">
-          <div className="card-content">
-            <CreateMonitorForm minCheckInterval={minCheckInterval} />
-          </div>
-        </div>
+        <CreateMonitorForm minCheckInterval={minCheckInterval} />
       )}
     </div>
   )
