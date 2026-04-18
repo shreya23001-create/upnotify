@@ -11,9 +11,11 @@ export interface SecurityHeadersResult {
   hasReferrerPolicy: boolean
   headers: Record<string, string>
   score: number
+  fetchFailed?: boolean
+  fetchError?: string
 }
 
-const HEADER_CHECKS: { header: string; key: keyof Omit<SecurityHeadersResult, 'headers' | 'score'> }[] = [
+const HEADER_CHECKS: { header: string; key: keyof Omit<SecurityHeadersResult, 'headers' | 'score' | 'fetchFailed' | 'fetchError'> }[] = [
   { header: 'strict-transport-security', key: 'hasHSTS' },
   { header: 'content-security-policy', key: 'hasCSP' },
   { header: 'x-frame-options', key: 'hasXFrameOptions' },
@@ -59,10 +61,10 @@ export async function checkSecurityHeaders(url: string, timeoutMs: number = 1000
 
     result.score = totalScore
   } catch (error) {
-    logger.warn('Security headers check failed', {
-      url,
-      error: error instanceof Error ? error.message : String(error),
-    })
+    const msg = error instanceof Error ? error.message : String(error)
+    logger.warn('Security headers fetch failed', { url, error: msg })
+    result.fetchFailed = true
+    result.fetchError = msg
   }
 
   return result
@@ -79,6 +81,12 @@ export async function check(monitor: Monitor): Promise<CheckerResult> {
   try {
     const result = await checkSecurityHeaders(url, monitor.timeout_ms)
     const responseTimeMs = Date.now() - start
+
+    // Fetch failed entirely — report the real error, not a misleading "no headers" message
+    if (result.fetchFailed) {
+      return { status: 'down', responseTimeMs, errorMessage: result.fetchError ?? 'Fetch failed' }
+    }
+
     const missing = HEADER_CHECKS
       .filter(h => !result[h.key])
       .map(h => h.header)
@@ -89,11 +97,12 @@ export async function check(monitor: Monitor): Promise<CheckerResult> {
       missing,
     }
 
+    // Site reachable but no security headers at all — degraded, not down
     if (result.score === 0) {
-      return { status: 'down', responseTimeMs, errorMessage: 'No security headers found', metadata }
+      return { status: 'degraded', responseTimeMs, errorMessage: 'No security headers found', metadata }
     }
     if (missing.length > 0) {
-      return { status: 'degraded', responseTimeMs, errorMessage: `Missing security headers: ${missing.join(', ')}`, metadata }
+      return { status: 'degraded', responseTimeMs, errorMessage: `Missing: ${missing.join(', ')}`, metadata }
     }
     return { status: 'up', responseTimeMs, metadata }
   } catch (error) {

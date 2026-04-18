@@ -39,10 +39,7 @@ export async function check(monitor: Monitor): Promise<CheckerResult> {
 
     const metadata = { spfRecord: spfRecord ?? null, dmarcRecord: dmarcRecord ?? null, issues }
 
-    if (issues.length === 2) {
-      return { status: 'down', responseTimeMs, errorMessage: issues.join('; '), metadata }
-    }
-
+    // Missing records = security gap (degraded), not an outage (down)
     if (issues.length > 0) {
       return { status: 'degraded', responseTimeMs, errorMessage: issues.join('; '), metadata }
     }
