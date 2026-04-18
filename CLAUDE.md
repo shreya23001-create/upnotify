@@ -41,6 +41,20 @@ Code only. The `uptrue-io/uptrue-app` repository. Dev team only.
 
 ---
 
+## 🚨 DEPLOYMENT RULE — READ BEFORE EVERY GIT PUSH 🚨
+
+**`git push origin master` is a production deployment. It is NEVER allowed without the Boss explicitly saying "deploy to prod" or "push to master".**
+
+- All work goes to `dev` only: `git push origin dev`
+- If you are about to run any command containing `origin master` — STOP. Ask first.
+- "Deploy it", "push it", "ship it" = `dev` only. Not master.
+- The only words that authorise a master push: **"deploy to prod"** or **"push to master"** — explicit, in that session, for that commit.
+- One approval does NOT carry forward to future commits or sessions.
+
+**Before every `git push`, state out loud which branch you are pushing to and why.**
+
+---
+
 ## CORE RULES
 
 - TypeScript strict mode always — no `any`, no exceptions
