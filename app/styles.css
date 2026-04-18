@@ -1003,115 +1003,139 @@ html.dark .data-table-bulk-bar span { color: #93c5fd; }
    Public Status Page
    ========================================================================== */
 
-.status-page-layout { min-height: 100vh; background: var(--bg-primary); }
-.status-page { max-width: 720px; margin: 0 auto; padding: 48px 24px; }
-.status-page-header { text-align: center; margin-bottom: 32px; }
-.status-page-logo { margin-bottom: 16px; }
-.status-page-logo-img { max-height: 56px; max-width: 200px; object-fit: contain; }
-.status-page-logo-favicon { width: 32px; height: 32px; object-fit: contain; opacity: 0.7; }
-.status-page-title { font-size: 28px; font-weight: 800; color: var(--text-primary); letter-spacing: -0.5px; }
-.status-page-section { margin-bottom: 32px; }
-.status-page-section-title { font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid var(--border-primary); }
+.sp-wrap { background: var(--bg-primary); min-height: 100vh; }
 
-/* Overall status banner */
-.status-banner { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 20px; border-radius: 12px; font-size: 18px; font-weight: 700; margin-bottom: 32px; }
-.status-banner-up { background: linear-gradient(135deg, #ecfdf5, #d1fae5); color: #059669; }
-.status-banner-down { background: linear-gradient(135deg, #fef2f2, #fecaca); color: #dc2626; }
-.status-banner-degraded { background: linear-gradient(135deg, #fffbeb, #fde68a); color: #d97706; }
-.status-banner-dot { width: 12px; height: 12px; border-radius: 50%; }
-.status-banner-up .status-banner-dot { background: #22c55e; box-shadow: 0 0 8px rgba(34,197,94,0.5); }
-.status-banner-down .status-banner-dot { background: #ef4444; box-shadow: 0 0 8px rgba(239,68,68,0.5); animation: pulse-red 2s infinite; }
-.status-banner-degraded .status-banner-dot { background: #f59e0b; box-shadow: 0 0 8px rgba(245,158,11,0.5); }
+/* Nav */
+.sp-nav {
+  background: var(--bg-card); border-bottom: 1px solid var(--border-primary);
+  padding: 0 var(--space-6); height: 56px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 50;
+}
+.sp-nav-brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 15px; color: var(--text-primary); text-decoration: none; }
+.sp-nav-logo { width: 30px; height: 30px; border-radius: 8px; background: var(--accent-gradient); display: flex; align-items: center; justify-content: center; }
+.sp-nav-brand-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+/* Hero */
+.sp-hero {
+  text-align: center; padding: var(--space-16) var(--space-6) var(--space-12);
+  background: var(--bg-card); border-bottom: 1px solid var(--border-primary);
+}
+.sp-overall-status {
+  display: inline-flex; align-items: center; gap: var(--space-3);
+  padding: var(--space-4) var(--space-8); border-radius: var(--radius-xl);
+  margin-bottom: var(--space-6);
+}
+.sp-overall-status.all-up  { background: var(--color-up-bg);   border: 1px solid var(--color-up-border); }
+.sp-overall-status.incident { background: var(--color-warn-bg); border: 1px solid var(--color-warn-border); }
+.sp-overall-status.outage   { background: var(--color-down-bg); border: 1px solid var(--color-down-border); }
+.sp-overall-icon { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.sp-overall-icon.up   { background: var(--color-up);   color: white; }
+.sp-overall-icon.warn { background: var(--color-warn); color: white; }
+.sp-overall-icon.down { background: var(--color-down); color: white; }
+.sp-overall-text { font-size: 18px; font-weight: 700; color: var(--text-primary); }
+.sp-overall-sub  { font-size: 14px; color: var(--text-muted); }
+.sp-updated      { font-size: 12px; color: var(--text-muted); }
+
+/* Content area */
+.sp-content { max-width: 800px; margin: 0 auto; padding: var(--space-10) var(--space-6); }
+.sp-section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: var(--space-3); }
+.sp-card { background: var(--bg-card); border: 1px solid var(--border-primary); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); margin-bottom: var(--space-5); overflow: hidden; }
 
 /* Monitor rows */
-.status-monitor-list { display: flex; flex-direction: column; gap: 0; overflow: hidden; }
-.status-monitor-row {
+.sp-monitor-row {
   display: grid;
-  grid-template-columns: 200px 1fr 160px;
+  grid-template-columns: 170px 1fr 140px;
   align-items: center;
-  gap: 20px;
-  padding: 16px 20px;
-  background: var(--bg-card);
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
   border-bottom: 1px solid var(--border-primary);
-  transition: background 0.15s;
 }
-.status-monitor-row:last-child { border-bottom: none; }
-.status-monitor-row:hover { background: var(--bg-muted); }
-.status-monitor-info { display: flex; align-items: center; gap: 10px; min-width: 0; }
-.status-monitor-name { font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.status-monitor-url-txt { font-size: 11px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.status-monitor-bars-wrap { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-.status-monitor-bars-label { font-size: 10px; color: var(--text-muted); text-align: right; }
-.status-monitor-uptime { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
-.status-monitor-uptime-bar { display: flex; gap: 2px; align-items: stretch; height: 24px; width: 100%; }
-.status-uptime-tick { flex: 1; min-width: 2px; border-radius: 2px; }
-.status-uptime-tick-up { background: #10b981; }
-.status-uptime-tick-down { background: #ef4444; }
-.status-uptime-tick-degraded { background: #f59e0b; }
-.status-uptime-tick-none { background: var(--border-primary); }
-.status-uptime-insufficient { font-size: 11px; color: var(--text-tertiary); font-style: italic; white-space: nowrap; }
-.status-monitor-right { display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
-.status-monitor-percent { font-size: 13px; font-weight: 700; min-width: 44px; text-align: right; font-family: var(--font-mono, monospace); }
-.percent-good { color: #10b981; }
-.percent-ok { color: #f59e0b; }
-.percent-bad { color: #ef4444; }
-.status-pill {
-  display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px;
-  border-radius: 9999px; font-size: 11px; font-weight: 700; white-space: nowrap;
+.sp-monitor-row:last-child { border-bottom: none; }
+.sp-monitor-info { min-width: 0; }
+.sp-monitor-name { font-size: 14px; font-weight: 600; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sp-monitor-url  { font-size: 11px; color: var(--text-muted); font-family: var(--font-mono, monospace); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sp-bars-wrap { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.sp-bars-range-label { font-size: 10px; color: var(--text-muted); text-align: right; }
+.sp-uptime-bars { display: flex; gap: 2px; align-items: stretch; height: 24px; width: 100%; }
+.sp-uptime-tick        { flex: 1; min-width: 2px; border-radius: 2px; }
+.sp-uptime-tick.ok     { background: var(--color-up); }
+.sp-uptime-tick.down-t { background: var(--color-down); }
+.sp-uptime-tick.warn-t { background: var(--color-warn); }
+.sp-uptime-tick.none   { background: var(--border-primary); }
+.sp-monitor-right { display: flex; align-items: center; justify-content: flex-end; gap: var(--space-2); }
+.sp-uptime-pct { font-size: 12px; font-weight: 700; font-family: var(--font-mono, monospace); min-width: 36px; text-align: right; }
+
+/* Status pills on status page */
+.sp-status-pill { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: var(--radius-full); font-size: 11px; font-weight: 700; white-space: nowrap; }
+.sp-status-pill.up     { background: var(--color-up-bg);   color: var(--color-up);   border: 1px solid var(--color-up-border); }
+.sp-status-pill.down   { background: var(--color-down-bg); color: var(--color-down); border: 1px solid var(--color-down-border); }
+.sp-status-pill.warn   { background: var(--color-warn-bg); color: var(--color-warn); border: 1px solid var(--color-warn-border); }
+.sp-status-pill.paused { background: var(--bg-muted); color: var(--text-muted); border: 1px solid var(--border-primary); }
+
+/* Range filter */
+.sp-range-filter { display: flex; gap: 4px; margin-bottom: var(--space-3); flex-wrap: wrap; }
+.sp-range-btn {
+  padding: 5px 12px; border-radius: var(--radius-full); font-size: 11px; font-weight: 600;
+  color: var(--text-muted); background: var(--bg-card); border: 1px solid var(--border-primary);
+  cursor: pointer; transition: all 0.15s; text-decoration: none; display: inline-flex; align-items: center;
 }
-.status-pill-up { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
-.status-pill-down { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+.sp-range-btn:hover  { border-color: #3b82f6; color: #3b82f6; }
+.sp-range-btn.active { background: #3b82f6; color: white; border-color: #3b82f6; }
+
+/* Incident cards on status page */
+.sp-incident-card { background: var(--bg-card); border: 1px solid var(--color-warn-border); border-radius: var(--radius-lg); overflow: hidden; }
+.sp-incident-header { background: var(--color-warn-bg); padding: var(--space-4) var(--space-5); display: flex; align-items: center; gap: var(--space-3); }
+.sp-incident-title { font-size: 14px; font-weight: 700; color: #92400e; }
+.sp-incident-body { padding: var(--space-4) var(--space-5); }
+.sp-incident-update { display: flex; gap: var(--space-3); margin-bottom: var(--space-4); }
+.sp-incident-update:last-child { margin-bottom: 0; }
+.sp-incident-timeline { display: flex; flex-direction: column; align-items: center; }
+.sp-timeline-dot  { width: 8px; height: 8px; border-radius: 50%; background: var(--color-warn); flex-shrink: 0; margin-top: 4px; }
+.sp-timeline-line { width: 1px; flex: 1; background: var(--border-primary); margin-top: 4px; }
+.sp-incident-update-time   { font-size: 11px; color: var(--text-muted); }
+.sp-incident-update-msg    { font-size: 14px; color: var(--text-primary); }
+.sp-incident-update-status { font-size: 11px; font-weight: 600; margin-top: 3px; }
+
+/* Subscribe card */
+.sp-subscribe { background: var(--bg-card); border: 1px solid var(--border-primary); border-radius: var(--radius-lg); padding: var(--space-6); text-align: center; margin-bottom: var(--space-5); }
+.sp-subscribe h3 { font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+.sp-subscribe p  { font-size: 14px; color: var(--text-muted); margin-bottom: var(--space-4); }
+.sp-subscribe-row { display: flex; gap: var(--space-2); max-width: 360px; margin: 0 auto; }
+.sp-subscribe-input {
+  flex: 1; padding: 9px 12px; border: 1px solid var(--border-primary); border-radius: var(--radius-md);
+  font-size: 14px; color: var(--text-primary); background: var(--bg-input); outline: none; font-family: inherit;
+}
+.sp-subscribe-input:focus { border-color: #3b82f6; }
+
+/* Footer (inside sp-content) */
+.sp-footer      { text-align: center; padding: var(--space-8) 0; }
+.sp-footer-text { font-size: 12px; color: var(--text-muted); }
+.sp-footer-brand { font-weight: 700; color: #3b82f6; }
+.sp-footer-text a { color: var(--text-muted); text-decoration: none; }
+.sp-footer-text a:hover { color: var(--text-primary); }
+
+/* Shared status pills (used across dashboard too) */
+.status-pill { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+.status-pill-up       { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
+.status-pill-down     { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
 .status-pill-degraded { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
-.status-pill-paused { background: #f1f5f9; color: #94a3b8; border: 1px solid #e2e8f0; }
-html.dark .status-pill-up { background: rgba(5,150,105,0.15); border-color: rgba(167,243,208,0.2); color: #34d399; }
-html.dark .status-pill-down { background: rgba(220,38,38,0.15); border-color: rgba(254,202,202,0.2); color: #f87171; }
+.status-pill-paused   { background: #f1f5f9; color: #94a3b8; border: 1px solid #e2e8f0; }
+html.dark .status-pill-up       { background: rgba(5,150,105,0.15); border-color: rgba(167,243,208,0.2); color: #34d399; }
+html.dark .status-pill-down     { background: rgba(220,38,38,0.15); border-color: rgba(254,202,202,0.2); color: #f87171; }
 html.dark .status-pill-degraded { background: rgba(217,119,6,0.15); border-color: rgba(253,230,138,0.2); color: #fbbf24; }
-html.dark .status-pill-paused { background: rgba(148,163,184,0.1); border-color: rgba(226,232,240,0.15); }
-.percent-good { color: #059669; }
-.percent-ok { color: #d97706; }
-.percent-bad { color: #dc2626; }
+html.dark .status-pill-paused   { background: rgba(148,163,184,0.1); border-color: rgba(226,232,240,0.15); }
 
-/* Incident list */
-.status-incidents { display: flex; flex-direction: column; gap: 20px; }
-.status-incident-group { }
-.status-incident-date { font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
-.status-incident-item { padding: 14px 16px; background: var(--bg-card); border: 1px solid var(--border-primary); border-radius: 10px; margin-bottom: 8px; }
-.status-incident-header { display: flex; gap: 8px; margin-bottom: 6px; }
-.status-incident-title { font-weight: 600; font-size: 15px; color: var(--text-primary); }
-.status-incident-time { font-size: 13px; color: var(--text-muted); }
-
-/* Subscribe form */
-.status-subscribe-form { max-width: 400px; }
-
-/* Footer */
-.status-page-footer { text-align: center; padding: 32px 0; font-size: 13px; color: var(--text-muted); border-top: 1px solid var(--border-primary); margin-top: 48px; }
-.status-page-footer a { color: var(--accent); font-weight: 600; }
-.status-page-footer a:hover { text-decoration: underline; }
-
-/* Status page time range */
-.status-time-range { display: flex; gap: 4px; }
-.status-time-range-btn { padding: 5px 14px; border-radius: 9999px; font-size: 12px; font-weight: 600; border: 1.5px solid var(--border-input); background: var(--bg-card); color: var(--text-muted); cursor: pointer; transition: all 0.15s; text-decoration: none; display: inline-flex; align-items: center; }
-.status-time-range-btn:hover { border-color: #3b82f6; color: #3b82f6; }
-.status-time-range-btn.active { background: #3b82f6; color: #fff; border-color: #3b82f6; }
-
-/* Uptime bar legend */
-.uptime-legend { display: flex; gap: 16px; margin-bottom: 16px; font-size: 12px; color: var(--text-muted); }
-.uptime-legend-item { display: flex; align-items: center; gap: 6px; }
-.uptime-legend-dot { width: 10px; height: 10px; border-radius: 2px; }
-
-/* Subscribe tabs */
-.status-subscribe-tabs { display: flex; gap: 4px; margin-bottom: 12px; }
-.status-subscribe-tab { padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; border: 1.5px solid var(--border-input); background: var(--bg-card); color: var(--text-muted); cursor: pointer; transition: all 0.15s; }
-.status-subscribe-tab:hover { border-color: #cbd5e1; }
-.status-subscribe-tab.active { background: #3b82f6; color: #fff; border-color: #3b82f6; }
-
-/* Webhook info box */
-.status-webhook-info { margin-top: 12px; padding: 16px; background: var(--bg-muted); border: 1px solid var(--border-primary); border-radius: 10px; font-size: 13px; color: var(--text-secondary); }
-.status-webhook-info p { margin-bottom: 8px; font-weight: 600; color: var(--text-primary); }
-.status-webhook-info pre { background: #1a1a2e; color: #e2e8f0; padding: 14px; border-radius: 8px; overflow-x: auto; font-size: 12px; line-height: 1.6; font-family: monospace; }
-
-/* Last updated */
-.status-last-updated { text-align: center; font-size: 13px; color: var(--text-muted); margin-bottom: 24px; }
+/* Status page — mobile */
+@media (max-width: 640px) {
+  .sp-nav { padding: 0 var(--space-4); }
+  .sp-hero { padding: var(--space-10) var(--space-4) var(--space-8); }
+  .sp-overall-status { padding: var(--space-3) var(--space-5); }
+  .sp-content { padding: var(--space-6) var(--space-4); }
+  .sp-monitor-row { grid-template-columns: 1fr; gap: var(--space-2); }
+  .sp-monitor-right { justify-content: flex-start; }
+  .sp-subscribe-row { flex-direction: column; }
+}
 
 /* Report AI card highlight */
 .report-ai-card .card { border-left: 4px solid var(--accent); }
@@ -4821,42 +4845,7 @@ html.dark .monitor-stat-icon.icon-red { background: rgba(239,68,68,0.15); }
 .mon-config-item-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
 .mon-config-item-full { grid-column: 1 / -1; border-right: none; border-top: 1px solid var(--border-primary); }
 
-/* ==========================================================================
-   Status Page — Top Navigation Bar
-   ========================================================================== */
-
-.sp-nav {
-  position: sticky; top: 0; z-index: 50;
-  background: var(--bg-card); border-bottom: 1px solid var(--border-primary);
-  box-shadow: var(--shadow-sm);
-}
-.sp-nav-inner {
-  max-width: 720px; margin: 0 auto; padding: 0 24px;
-  display: flex; align-items: center; justify-content: space-between; height: 56px;
-}
-.sp-nav-brand { display: flex; align-items: center; gap: 8px; text-decoration: none; }
-.sp-nav-logo {
-  width: 28px; height: 28px; border-radius: 7px;
-  background: var(--accent-gradient); display: flex; align-items: center; justify-content: center;
-}
-.sp-nav-name { font-size: 15px; font-weight: 800; color: var(--text-primary); letter-spacing: -0.3px; }
-.sp-nav-actions { display: flex; align-items: center; gap: 8px; }
-.sp-nav-subscribe {
-  padding: 7px 16px; border-radius: 8px; background: var(--accent); color: white;
-  font-size: 13px; font-weight: 700; border: none; cursor: pointer; font-family: inherit;
-  text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
-  transition: background 0.2s;
-}
-.sp-nav-subscribe:hover { background: var(--accent-hover); }
-.sp-nav-powered {
-  font-size: 12px; color: var(--text-muted);
-}
-.sp-nav-powered a { color: var(--text-muted); font-weight: 600; }
-.sp-nav-powered a:hover { color: var(--accent); }
-.sp-footer { border-top: 1px solid var(--border-primary); padding: 20px 0; margin-top: 40px; background: var(--bg-card); }
-.sp-footer-inner { max-width: 720px; margin: 0 auto; padding: 0 24px; text-align: center; font-size: 13px; color: var(--text-muted); }
-.sp-footer-inner a { color: var(--accent); font-weight: 600; }
-.sp-footer-inner a:hover { text-decoration: underline; }
+/* Status Page nav/footer styles are in the "Public Status Page" section above */
 
 /* ==========================================================================
    PUBLIC PAGES — Exact CSS from Preview (uptrue-preview.html)
@@ -6715,11 +6704,7 @@ section.hero .hero-mockup {
   .tracker-category-filter { flex-wrap: wrap; }
 }
 
-/* --- Status Page --- */
-@media (max-width: 640px) {
-  .sp-nav-inner { padding: 0 16px; }
-  .sp-nav-powered { display: none; }
-}
+/* Status Page responsive — handled inline in the sp-* block above */
 
 /* --- Public Nav — tighter padding on small phones --- */
 @media (max-width: 480px) {
