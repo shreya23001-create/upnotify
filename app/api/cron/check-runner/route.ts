@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getDueMonitors, getAllActiveMonitors, updateMonitorStatus, incrementFlapCount } from '@/lib/db/monitors'
+import { getDueMonitors, getAllActiveMonitors, updateMonitorStatus, incrementFlapCount, patchMonitorConfig } from '@/lib/db/monitors'
 import { writeCheckResult } from '@/lib/db/check-results'
 import { createIncident, resolveIncident, getOpenIncidentForMonitor } from '@/lib/db/incidents'
 import { isMonitorInMaintenance } from '@/lib/db/maintenance-windows'
@@ -87,6 +87,14 @@ export async function GET(request: Request): Promise<NextResponse> {
           error_message: result.errorMessage,
           metadata: result.metadata,
         })
+        // Persist baseline values for change-detection monitors (ip-change, dns, robots-txt, etc.)
+        if (result.configUpdates && Object.keys(result.configUpdates).length > 0) {
+          await patchMonitorConfig(
+            monitor.id,
+            (monitor.config as Record<string, unknown>) ?? {},
+            result.configUpdates as Record<string, unknown>
+          )
+        }
         return { monitor, result }
       })
     )

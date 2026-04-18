@@ -4,6 +4,7 @@ export interface CheckerResult {
   statusCode?: number
   errorMessage?: string
   metadata?: Record<string, unknown>
+  configUpdates?: Partial<CheckerConfig>
 }
 
 export interface CheckerConfig {

@@ -139,6 +139,23 @@ export async function updateMonitorStatus(
   }
 }
 
+export async function patchMonitorConfig(
+  id: string,
+  currentConfig: Record<string, unknown>,
+  patch: Record<string, unknown>
+): Promise<void> {
+  const supabase = createAdminClient()
+  const merged = { ...currentConfig, ...patch }
+  const { error } = await supabase
+    .from('monitors')
+    .update({ config: merged as import('@/lib/types/database.types').Json })
+    .eq('id', id)
+
+  if (error) {
+    logger.error('Failed to patch monitor config', { error: error.message, monitorId: id })
+  }
+}
+
 export async function incrementFlapCount(id: string): Promise<void> {
   const supabase = createAdminClient()
   const { data } = await supabase.from('monitors').select('flap_count').eq('id', id).single()

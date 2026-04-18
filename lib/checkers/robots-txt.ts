@@ -34,6 +34,7 @@ export async function check(monitor: Monitor): Promise<CheckerResult> {
       status: changed ? 'degraded' : 'up',
       responseTimeMs,
       metadata: { hash, changed, length: text.length },
+      configUpdates: { lastRobotsHash: hash },
       ...(changed && { errorMessage: 'robots.txt content has changed' }),
     }
   } catch (error) {

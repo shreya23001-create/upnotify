@@ -18,6 +18,7 @@ export async function check(monitor: Monitor): Promise<CheckerResult> {
       status: changed ? 'degraded' : 'up',
       responseTimeMs,
       metadata: { currentNs, previousNs: previousNs ?? null, changed },
+      configUpdates: { lastNameservers: currentNs },
       ...(changed && { errorMessage: `Nameservers changed from [${previousNs?.join(', ')}] to [${currentNs.join(', ')}]` }),
     }
   } catch (error) {

@@ -30,6 +30,7 @@ export async function check(monitor: Monitor): Promise<CheckerResult> {
       status: changed ? 'degraded' : 'up',
       responseTimeMs,
       metadata: { soa, nsServers, changed },
+      configUpdates: { lastWhoisSnapshot: currentSnapshot },
       ...(changed && { errorMessage: 'WHOIS/registrar data has changed' }),
     }
   } catch (error) {
