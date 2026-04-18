@@ -2,7 +2,7 @@
 
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
-import { createStatusPage, updateStatusPage, deleteStatusPage, bulkDeleteStatusPages, bulkUpdateStatusPageVisibility, getStatusPageById } from '@/lib/db/status-pages'
+import { createStatusPage, updateStatusPage, deleteStatusPage, bulkDeleteStatusPages, bulkUpdateStatusPageVisibility, getStatusPageById, isSlugTaken } from '@/lib/db/status-pages'
 import { getCurrentUser } from '@/lib/db/users'
 import { getWorkspacesByOrg } from '@/lib/db/workspaces'
 import { logger } from '@/lib/utils/logger'
@@ -34,6 +34,10 @@ export async function createStatusPageAction(formData: FormData): Promise<{ erro
   const normSlug = slug.toLowerCase().replace(/[^a-z0-9-]/g, '-')
   if (RESERVED_SLUGS.includes(normSlug)) {
     return { error: `"${normSlug}" is a reserved name. Please choose a different slug.` }
+  }
+
+  if (await isSlugTaken(normSlug)) {
+    return { error: `The URL "uptrue.io/status/${normSlug}" is already taken. Please choose a different slug.` }
   }
 
   // Enforce plan limits on status pages
@@ -88,6 +92,10 @@ export async function updateStatusPageAction(pageId: string, formData: FormData)
   const normSlugUpdate = slug.toLowerCase().replace(/[^a-z0-9-]/g, '-')
   if (RESERVED_SLUGS_UPDATE.includes(normSlugUpdate)) {
     return { error: `"${normSlugUpdate}" is a reserved name. Please choose a different slug.` }
+  }
+
+  if (normSlugUpdate !== existing.slug && await isSlugTaken(normSlugUpdate, pageId)) {
+    return { error: `The URL "uptrue.io/status/${normSlugUpdate}" is already taken. Please choose a different slug.` }
   }
 
   const monitorIds = monitorIdsStr ? monitorIdsStr.split(',').filter(Boolean) : []
