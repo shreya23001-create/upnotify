@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { MonitorNudge, toolDomain } from './monitor-nudge'
 
 interface SpeedTestResult {
   url: string
@@ -24,7 +25,7 @@ function gradeColor(grade: string): string {
     case 'C': return '#f59e0b'
     case 'D': return '#f97316'
     case 'F': return '#ef4444'
-    default: return '#6b7280'
+    default: return 'var(--text-muted)'
   }
 }
 
@@ -108,7 +109,7 @@ export function WebsiteSpeedTestTool(): React.ReactElement {
       </div>
 
       {loading && (
-        <div style={{ textAlign: 'center', padding: '20px', color: '#6b7280', fontSize: '14px' }}>
+        <div style={{ textAlign: 'center', padding: '20px', color: 'var(--text-muted)', fontSize: '14px' }}>
           Running speed test — measuring TTFB and total load time...
         </div>
       )}
@@ -154,7 +155,7 @@ export function WebsiteSpeedTestTool(): React.ReactElement {
             <div style={{ flex: 1, minWidth: '180px' }}>
               <div style={{ marginBottom: '16px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                  <span style={{ fontSize: '13px', color: '#6b7280' }}>
+                  <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
                     TTFB (Time to First Byte)
                   </span>
                   <span style={{ fontWeight: 700, color: gradeColor(result.grade) }}>
@@ -179,14 +180,14 @@ export function WebsiteSpeedTestTool(): React.ReactElement {
                     }}
                   />
                 </div>
-                <div style={{ fontSize: '12px', color: '#9ca3af', marginTop: '2px' }}>
+                <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>
                   {ttfbLabel(result.ttfbMs)}
                 </div>
               </div>
 
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                  <span style={{ fontSize: '13px', color: '#6b7280' }}>Total Response Time</span>
+                  <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Total Response Time</span>
                   <span style={{ fontWeight: 700 }}>{result.totalMs}ms</span>
                 </div>
                 <div
@@ -201,7 +202,7 @@ export function WebsiteSpeedTestTool(): React.ReactElement {
                     style={{
                       height: '100%',
                       width: `${totalBarPct}%`,
-                      background: '#94a3b8',
+                      background: 'var(--text-secondary)',
                       borderRadius: '999px',
                       transition: 'width 0.6s ease',
                     }}
@@ -280,6 +281,7 @@ export function WebsiteSpeedTestTool(): React.ReactElement {
           )}
         </div>
       )}
+      {result && <MonitorNudge toolType="speed" domain={toolDomain(result.url)} detail={`${result.ttfbMs}ms`} />}
     </div>
   )
 }

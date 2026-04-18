@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { MonitorNudge } from './monitor-nudge'
 
 interface PortCheckResult {
   host: string
@@ -72,7 +73,7 @@ export function PortCheckerTool(): React.ReactElement {
     ? result.open
       ? '#10b981'
       : '#ef4444'
-    : '#6b7280'
+    : 'var(--text-muted)'
 
   return (
     <div className="ssl-checker">
@@ -167,7 +168,7 @@ export function PortCheckerTool(): React.ReactElement {
             </div>
 
             {result.error && !result.open && (
-              <p style={{ color: '#6b7280', fontSize: '14px', marginTop: '8px' }}>
+              <p style={{ color: 'var(--text-muted)', fontSize: '14px', marginTop: '8px' }}>
                 {result.error}
               </p>
             )}
@@ -205,6 +206,7 @@ export function PortCheckerTool(): React.ReactElement {
           </div>
         </div>
       )}
+      {result && <MonitorNudge toolType="port" domain={result.host} />}
     </div>
   )
 }

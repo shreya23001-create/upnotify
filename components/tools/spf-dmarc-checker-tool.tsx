@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { MonitorNudge } from './monitor-nudge'
 
 type SpfGrade = 'pass' | 'warn' | 'fail'
 type DmarcGrade = 'pass' | 'warn' | 'fail'
@@ -90,8 +91,8 @@ function RecordPanel({
     <div className="card spf-panel">
       <div className="spf-panel-header">
         <div>
-          <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#f3f4f6' }}>{title}</h3>
-          <span style={{ fontSize: 12, color: '#9ca3af', marginTop: 2, display: 'block' }}>
+          <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: 'var(--text-primary)' }}>{title}</h3>
+          <span style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2, display: 'block' }}>
             {data.found ? 'Record found' : 'No record found'}
           </span>
         </div>
@@ -100,16 +101,16 @@ function RecordPanel({
 
       {data.found && data.record && (
         <div style={{ margin: '12px 0' }}>
-          <span style={{ fontSize: 11, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+          <span style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
             Raw Record
           </span>
           <code style={{
             display: 'block',
             fontFamily: 'Fira Code, Cascadia Code, Consolas, monospace',
             fontSize: 12,
-            color: '#e2e8f0',
-            background: 'rgba(255,255,255,0.04)',
-            border: '1px solid rgba(255,255,255,0.06)',
+            color: 'var(--text-primary)',
+            background: 'var(--bg-muted)',
+            border: '1px solid var(--border-primary)',
             borderRadius: 6,
             padding: '8px 12px',
             marginTop: 6,
@@ -133,7 +134,7 @@ function RecordPanel({
                   ? '#10b981'
                   : dmarcData.policy === 'quarantine'
                   ? '#f59e0b'
-                  : '#9ca3af',
+                  : 'var(--text-muted)',
               }}>
                 {dmarcData.policy}
               </span>
@@ -142,13 +143,13 @@ function RecordPanel({
           {dmarcData.pct !== null && (
             <div className="spf-detail-item">
               <span className="ssl-detail-label">Coverage</span>
-              <span style={{ fontSize: 13, color: '#e2e8f0' }}>{dmarcData.pct}%</span>
+              <span style={{ fontSize: 13, color: 'var(--text-primary)' }}>{dmarcData.pct}%</span>
             </div>
           )}
           {dmarcData.rua && (
             <div className="spf-detail-item">
               <span className="ssl-detail-label">Reports To</span>
-              <span style={{ fontSize: 12, color: '#e2e8f0', wordBreak: 'break-all' }}>{dmarcData.rua}</span>
+              <span style={{ fontSize: 12, color: 'var(--text-primary)', wordBreak: 'break-all' }}>{dmarcData.rua}</span>
             </div>
           )}
         </div>
@@ -243,8 +244,8 @@ export function SpfDmarcCheckerTool(): React.ReactElement {
           {/* Overall grade */}
           <div className="card spf-overall-grade">
             <div>
-              <span style={{ fontSize: 13, color: '#9ca3af' }}>Overall Email Security Grade</span>
-              <div style={{ fontSize: 12, color: '#6b7280', marginTop: 2 }}>
+              <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>Overall Email Security Grade</span>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
                 {result.domain} &middot; {result.responseTimeMs}ms
               </div>
             </div>
@@ -273,6 +274,8 @@ export function SpfDmarcCheckerTool(): React.ReactElement {
           </div>
         </div>
       )}
+
+      {result && <MonitorNudge toolType="spf-dmarc" domain={result.domain} />}
 
       <style>{`
         .spf-overall-grade {

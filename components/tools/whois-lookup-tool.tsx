@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { MonitorNudge } from './monitor-nudge'
 
 interface RdapData {
   registrar: string | null
@@ -171,8 +172,8 @@ export function WhoisLookupTool(): React.ReactElement {
         <div className="ssl-checker-results">
           {/* Header */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
-            <span style={{ fontSize: 13, color: '#9ca3af' }}>
-              Results for <strong style={{ color: '#f3f4f6' }}>{result.domain}</strong>
+            <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>
+              Results for <strong style={{ color: 'var(--text-primary)' }}>{result.domain}</strong>
             </span>
             <span style={{
               fontSize: 12,
@@ -200,7 +201,7 @@ export function WhoisLookupTool(): React.ReactElement {
 
           {!result.rdapAvailable && !result.dns && (
             <div className="card" style={{ padding: 16 }}>
-              <p style={{ color: '#9ca3af', margin: 0, fontSize: 14 }}>
+              <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: 14 }}>
                 Full WHOIS data not available via RDAP for this TLD — showing DNS data only.
               </p>
             </div>
@@ -209,7 +210,7 @@ export function WhoisLookupTool(): React.ReactElement {
           {/* Registration details */}
           {result.rdap && (
             <div className="card" style={{ padding: '16px 20px', marginBottom: 12 }}>
-              <h3 style={{ margin: '0 0 14px', fontSize: 15, fontWeight: 600, color: '#f3f4f6' }}>
+              <h3 style={{ margin: '0 0 14px', fontSize: 15, fontWeight: 600, color: 'var(--text-primary)' }}>
                 Registration Details
               </h3>
               <div className="whois-table">
@@ -249,10 +250,10 @@ export function WhoisLookupTool(): React.ReactElement {
           {/* DNS fallback (no RDAP) */}
           {!result.rdapAvailable && result.dns && (
             <div className="card" style={{ padding: '16px 20px', marginBottom: 12 }}>
-              <h3 style={{ margin: '0 0 4px', fontSize: 15, fontWeight: 600, color: '#f3f4f6' }}>
+              <h3 style={{ margin: '0 0 4px', fontSize: 15, fontWeight: 600, color: 'var(--text-primary)' }}>
                 DNS Data
               </h3>
-              <p style={{ margin: '0 0 14px', fontSize: 12, color: '#9ca3af' }}>
+              <p style={{ margin: '0 0 14px', fontSize: 12, color: 'var(--text-muted)' }}>
                 Full WHOIS data not available via RDAP for this TLD — showing DNS data only.
               </p>
               <div className="whois-table">
@@ -265,7 +266,7 @@ export function WhoisLookupTool(): React.ReactElement {
           {/* Nameservers */}
           {nameservers.length > 0 && (
             <div className="card" style={{ padding: '16px 20px' }}>
-              <h3 style={{ margin: '0 0 12px', fontSize: 15, fontWeight: 600, color: '#f3f4f6' }}>
+              <h3 style={{ margin: '0 0 12px', fontSize: 15, fontWeight: 600, color: 'var(--text-primary)' }}>
                 Nameservers
               </h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -274,9 +275,9 @@ export function WhoisLookupTool(): React.ReactElement {
                     display: 'block',
                     fontFamily: 'Fira Code, Cascadia Code, Consolas, monospace',
                     fontSize: 13,
-                    color: '#e2e8f0',
-                    background: 'rgba(255,255,255,0.04)',
-                    border: '1px solid rgba(255,255,255,0.06)',
+                    color: 'var(--text-primary)',
+                    background: 'var(--bg-muted)',
+                    border: '1px solid var(--border-primary)',
                     borderRadius: 6,
                     padding: '6px 10px',
                   }}>
@@ -289,6 +290,8 @@ export function WhoisLookupTool(): React.ReactElement {
         </div>
       )}
 
+      {result && <MonitorNudge toolType="dns" domain={result.domain} />}
+
       <style>{`
         .whois-table {
           display: flex;
@@ -300,7 +303,7 @@ export function WhoisLookupTool(): React.ReactElement {
           align-items: flex-start;
           gap: 12px;
           padding: 6px 0;
-          border-bottom: 1px solid rgba(255,255,255,0.04);
+          border-bottom: 1px solid var(--bg-muted);
         }
         .whois-row:last-child { border-bottom: none; }
         .whois-row .ssl-detail-label {
@@ -310,7 +313,7 @@ export function WhoisLookupTool(): React.ReactElement {
         }
         .whois-value {
           font-size: 14px;
-          color: #e2e8f0;
+          color: var(--text-primary);
           display: flex;
           align-items: center;
           flex-wrap: wrap;

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { MonitorNudge } from './monitor-nudge'
 
 interface BlacklistEntry {
   list: string
@@ -96,7 +97,7 @@ export function BlacklistCheckerTool(): React.ReactElement {
       </div>
 
       {loading && (
-        <div style={{ textAlign: 'center', padding: '20px', color: '#6b7280', fontSize: '14px' }}>
+        <div style={{ textAlign: 'center', padding: '20px', color: 'var(--text-muted)', fontSize: '14px' }}>
           Checking 10 blacklists — this may take a few seconds...
         </div>
       )}
@@ -150,13 +151,13 @@ export function BlacklistCheckerTool(): React.ReactElement {
             </div>
 
             {result.error && (
-              <p style={{ color: '#6b7280', fontSize: '14px', marginTop: '8px' }}>
+              <p style={{ color: 'var(--text-muted)', fontSize: '14px', marginTop: '8px' }}>
                 {result.error}
               </p>
             )}
 
             {result.ip && (
-              <p style={{ color: '#6b7280', fontSize: '13px', marginTop: '6px' }}>
+              <p style={{ color: 'var(--text-muted)', fontSize: '13px', marginTop: '6px' }}>
                 IP checked: <code style={{ fontFamily: 'monospace' }}>{result.ip}</code>
                 {' · '}{result.responseTimeMs}ms
               </p>
@@ -225,7 +226,7 @@ export function BlacklistCheckerTool(): React.ReactElement {
                     </span>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontWeight: 600, fontSize: '14px' }}>{entry.displayName}</div>
-                      <div style={{ fontSize: '12px', color: '#6b7280', fontFamily: 'monospace' }}>
+                      <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontFamily: 'monospace' }}>
                         {entry.list}
                       </div>
                     </div>
@@ -246,6 +247,7 @@ export function BlacklistCheckerTool(): React.ReactElement {
           )}
         </div>
       )}
+      {result && <MonitorNudge toolType="blacklist" domain={result.domain} />}
     </div>
   )
 }

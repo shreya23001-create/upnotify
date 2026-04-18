@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { MonitorNudge, toolDomain } from './monitor-nudge'
 
 interface ChainStep {
   step: number
@@ -313,6 +314,7 @@ export function RedirectChainCheckerTool(): React.ReactElement {
           )}
         </div>
       )}
+      {result && <MonitorNudge toolType="redirect-chain" domain={toolDomain(result.originalUrl)} detail={String(result.totalHops)} />}
     </div>
   )
 }

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { MonitorNudge, toolDomain } from './monitor-nudge'
 
 interface Hop {
   url: string
@@ -27,7 +28,7 @@ function statusColor(code: number): string {
   if (code >= 300 && code < 400) return '#3b82f6'
   if (code >= 400 && code < 500) return '#f59e0b'
   if (code >= 500) return '#ef4444'
-  return '#6b7280'
+  return 'var(--text-muted)'
 }
 
 function statusExplanation(code: number): string {
@@ -282,6 +283,7 @@ export function HttpStatusCheckerTool(): React.ReactElement {
           )}
         </div>
       )}
+      {result && <MonitorNudge toolType="http-status" domain={toolDomain(result.originalUrl)} detail={String(result.finalStatus)} />}
     </div>
   )
 }

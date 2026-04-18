@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { MonitorNudge, toolDomain } from './monitor-nudge'
 
 interface SecurityHeaderEntry {
   name: string
@@ -274,6 +275,7 @@ export function SecurityHeadersCheckerTool(): React.ReactElement {
           )}
         </div>
       )}
+      {result && <MonitorNudge toolType="security-headers" domain={toolDomain(result.url)} detail={String(result.headers.filter(h => !h.present).length)} />}
     </div>
   )
 }

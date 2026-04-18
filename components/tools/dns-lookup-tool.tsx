@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { MonitorNudge } from './monitor-nudge'
 
 interface DnsRecords {
   A: string[]
@@ -37,7 +38,7 @@ function recordCount(tab: RecordTab, records: DnsRecords): number {
 
 function RecordContent({ tab, records }: { tab: RecordTab; records: DnsRecords }): React.ReactElement {
   const none = (
-    <p style={{ color: '#9ca3af', fontStyle: 'italic', fontSize: 14, margin: 0 }}>No records found</p>
+    <p style={{ color: 'var(--text-muted)', fontStyle: 'italic', fontSize: 14, margin: 0 }}>No records found</p>
   )
 
   switch (tab) {
@@ -181,8 +182,8 @@ export function DnsLookupTool(): React.ReactElement {
         <div className="ssl-checker-results">
           {/* Response time badge */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-            <span style={{ fontSize: 13, color: '#9ca3af' }}>
-              DNS records for <strong style={{ color: '#f3f4f6' }}>{result.domain}</strong>
+            <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>
+              DNS records for <strong style={{ color: 'var(--text-primary)' }}>{result.domain}</strong>
             </span>
             <span style={{
               fontSize: 12,
@@ -224,12 +225,14 @@ export function DnsLookupTool(): React.ReactElement {
         </div>
       )}
 
+      {result && <MonitorNudge toolType="dns" domain={result.domain} />}
+
       <style>{`
         .dns-tabs {
           display: flex;
           flex-wrap: wrap;
           gap: 0;
-          border-bottom: 1px solid rgba(255,255,255,0.08);
+          border-bottom: 1px solid var(--border-primary);
         }
         .dns-tab {
           display: flex;
@@ -241,19 +244,19 @@ export function DnsLookupTool(): React.ReactElement {
           background: transparent;
           border: none;
           border-bottom: 2px solid transparent;
-          color: #9ca3af;
+          color: var(--text-muted);
           cursor: pointer;
           transition: color 0.15s, border-color 0.15s;
           margin-bottom: -1px;
         }
-        .dns-tab:hover { color: #f3f4f6; }
+        .dns-tab:hover { color: var(--text-primary); }
         .dns-tab-active {
-          color: #f3f4f6;
+          color: var(--text-primary);
           border-bottom-color: #3b82f6;
         }
         .dns-tab-count {
           font-size: 11px;
-          background: rgba(255,255,255,0.08);
+          background: var(--border-primary);
           border-radius: 10px;
           padding: 1px 6px;
           min-width: 18px;
@@ -269,9 +272,9 @@ export function DnsLookupTool(): React.ReactElement {
           display: block;
           font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
           font-size: 13px;
-          color: #e2e8f0;
-          background: rgba(255,255,255,0.04);
-          border: 1px solid rgba(255,255,255,0.06);
+          color: var(--text-primary);
+          background: var(--bg-muted);
+          border: 1px solid var(--border-primary);
           border-radius: 6px;
           padding: 6px 10px;
           word-break: break-all;

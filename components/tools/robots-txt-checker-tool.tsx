@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { MonitorNudge, toolDomain } from './monitor-nudge'
 
 interface RobotsRule {
   userAgent: string
@@ -207,11 +208,11 @@ export function RobotsTxtCheckerTool(): React.ReactElement {
                     }}
                     aria-expanded={expandedAgents.has(rule.userAgent)}
                   >
-                    <span style={{ fontSize: '12px', color: '#9ca3af' }}>
+                    <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
                       {expandedAgents.has(rule.userAgent) ? '▼' : '▶'}
                     </span>
                     <code style={{ fontSize: '14px', fontWeight: 600 }}>User-agent: {rule.userAgent}</code>
-                    <span style={{ fontSize: '12px', color: '#6b7280', marginLeft: 'auto' }}>
+                    <span style={{ fontSize: '12px', color: 'var(--text-muted)', marginLeft: 'auto' }}>
                       {rule.disallowed.length} disallow · {rule.allowed.length} allow
                       {rule.crawlDelay !== null ? ` · delay: ${rule.crawlDelay}s` : ''}
                     </span>
@@ -246,7 +247,7 @@ export function RobotsTxtCheckerTool(): React.ReactElement {
             <div className="card" style={{ padding: '16px 20px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
                 <h3 style={{ margin: 0, fontSize: '15px', fontWeight: 600 }}>Raw robots.txt</h3>
-                <span style={{ fontSize: '12px', color: '#6b7280' }}>{formatBytes(result.contentLength)}</span>
+                <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{formatBytes(result.contentLength)}</span>
               </div>
               <pre
                 style={{
@@ -269,6 +270,7 @@ export function RobotsTxtCheckerTool(): React.ReactElement {
           )}
         </div>
       )}
+      {result && <MonitorNudge toolType="robots-txt" domain={toolDomain(result.url)} />}
     </div>
   )
 }
