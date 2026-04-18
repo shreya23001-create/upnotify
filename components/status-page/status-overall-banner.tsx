@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import type { Monitor } from '@/lib/types'
 
 interface Props {
@@ -23,10 +24,13 @@ export function StatusOverallBanner({ monitors, openIncidents }: Props): React.R
     : isWarn ? 'Some systems may be experiencing degraded performance.'
     : 'No incidents reported recently.'
 
-  const lastUpdated = new Date().toLocaleString('en-GB', {
-    day: 'numeric', month: 'short', year: 'numeric',
-    hour: '2-digit', minute: '2-digit', timeZoneName: 'short',
-  })
+  const [lastUpdated, setLastUpdated] = useState<string>('')
+  useEffect(() => {
+    setLastUpdated(new Date().toLocaleString('en-GB', {
+      day: 'numeric', month: 'short', year: 'numeric',
+      hour: '2-digit', minute: '2-digit', timeZoneName: 'short',
+    }))
+  }, [])
 
   return (
     <div className="sp-hero">
