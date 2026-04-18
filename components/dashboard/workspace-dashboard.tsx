@@ -150,14 +150,17 @@ function extractDomain(target: string): string {
 const STATUS_ORDER = ['down', 'degraded', 'paused', 'up', 'unknown'] as const
 type AggStatus = typeof STATUS_ORDER[number]
 
+// Only these types being 'down' means the site is truly unreachable
+const AVAILABILITY_TYPES = new Set(['http', 'ping', 'ssl', 'heartbeat', 'api', 'port'])
+
 function worstStatus(monitors: Monitor[]): AggStatus {
-  for (const s of STATUS_ORDER) {
-    if (s === 'paused') {
-      if (monitors.some(m => m.is_paused)) return 'paused'
-    } else if (monitors.some(m => !m.is_paused && m.status === s)) {
-      return s
-    }
-  }
+  const active = monitors.filter(m => !m.is_paused)
+  // True outage — an availability monitor is down
+  if (active.some(m => m.status === 'down' && AVAILABILITY_TYPES.has(m.type))) return 'down'
+  // Degraded — any monitor has issues (change detected, slow, config problem)
+  if (active.some(m => m.status === 'down' || m.status === 'degraded')) return 'degraded'
+  if (monitors.some(m => m.is_paused)) return 'paused'
+  if (active.some(m => m.status === 'up')) return 'up'
   return 'unknown'
 }
 
