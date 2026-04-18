@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { PublicNav } from '@/components/ui/public-nav'
 import { PublicFooter } from '@/components/ui/public-footer'
+import { getAllSlugs } from '@/lib/constants/monitor-types'
 
 // ---------------------------------------------------------------------------
 // Monitor type definitions
@@ -396,7 +397,7 @@ const pages: MonitorTypePage[] = [
 const pageMap = new Map(pages.map(p => [p.slug, p]))
 
 export async function generateStaticParams() {
-  return pages.map(p => ({ slug: p.slug }))
+  return getAllSlugs().map(slug => ({ slug }))
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -404,11 +405,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const page = pageMap.get(slug)
   if (!page) return {}
   return {
-    title: `${page.name} | Uptrue`,
+    title: `${page.name} | Uptrue — Website Monitoring Suite`,
     description: page.description,
     alternates: { canonical: `https://uptrue.io/monitoring/${slug}` },
     openGraph: {
-      title: `${page.name} | Uptrue`,
+      title: `${page.name} | Uptrue — Website Monitoring Suite`,
       description: page.description,
     },
   }

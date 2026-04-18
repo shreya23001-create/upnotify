@@ -13,7 +13,7 @@ const FAQ_SCHEMA = {
       name: 'What types of monitors does Uptrue support?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Uptrue supports 10 monitor types: HTTP, SSL Certificate, Domain Expiry, DNS Record, Keyword, Port, API Endpoint, Ping, Heartbeat, and Competitor.',
+        text: 'Uptrue supports 23 monitor types across two tiers. Core monitors: HTTP/HTTPS Uptime, SSL Certificate, DNS Records, Keyword Detection, Domain Expiry, Port Check, Ping/Reachability, API Endpoint, Heartbeat, and Page Change Detection. Advanced monitors: Security Headers, Response Time Threshold, robots.txt Change, IP Address Change, MX Health, WHOIS Registrar Change, Sitemap Validity, Redirect Chain, SPF/DMARC Validity, Blacklist Check, Page Size, Cookie Consent Presence, and Nameserver Change.',
       },
     },
     {
@@ -61,58 +61,120 @@ export default function MonitorsPage(): React.ReactElement {
           </p>
 
           <section className="help-section">
-            <h2 className="help-section-title">The 10 monitor types</h2>
+            <h2 className="help-section-title">The 23 monitor types</h2>
             <p>
               Different things can go wrong with a website, so Uptrue gives you different tools
-              to catch them. Here is what each type does:
+              to catch them. Monitors are grouped into two tiers: core monitors that every site
+              needs, and advanced monitors for security, compliance, and change detection.
             </p>
+
+            <h3 style={{ fontSize: 17, fontWeight: 700, marginTop: 24, marginBottom: 12 }}>Core monitors</h3>
             <ol className="help-steps">
               <li>
-                <strong>HTTP</strong> -- The bread and butter. Loads your page and checks for a
-                successful response (status 200). Use this for any website or web app.
+                <strong>🌐 HTTP/HTTPS Uptime</strong> — The bread and butter. Checks if your page
+                is reachable and returning a healthy status code. Use this for any website or web app.
               </li>
               <li>
-                <strong>SSL Certificate</strong> -- Checks whether your HTTPS certificate is valid
-                and warns you before it expires. An expired SSL certificate scares visitors away
-                with browser warnings.
+                <strong>🔒 SSL Certificate</strong> — Checks whether your HTTPS certificate is valid
+                and warns you before it expires. An expired SSL certificate shows a full-screen browser
+                warning to every visitor.
               </li>
               <li>
-                <strong>Domain Expiry</strong> -- Tracks when your domain name expires. Forgetting
-                to renew a domain can take your entire site offline.
+                <strong>📡 DNS Records</strong> — Watches your DNS records (A, MX, NS, TXT) and
+                alerts you if they change unexpectedly. Catches hijacking and misconfiguration.
               </li>
               <li>
-                <strong>DNS Record</strong> -- Watches your DNS records (A, CNAME, MX, etc.) and
-                alerts you if they change unexpectedly. Useful for catching hijacking or
-                misconfiguration.
+                <strong>🔍 Keyword Detection</strong> — Loads your page and checks for words or phrases
+                that should (or should not) be there. Great for catching broken checkouts, injected
+                spam, error pages, and content changes.
               </li>
               <li>
-                <strong>Keyword</strong> -- Loads your page and checks for words or phrases
-                that should (or should not) be there. You can set <em>positive keywords</em>
-                (must exist on the page) and <em>negative keywords</em> (must not exist). If
-                any positive keyword disappears or any negative keyword appears, Uptrue alerts
-                you immediately. Great for catching broken checkouts, injected spam, error
-                pages, and content changes.
+                <strong>📅 Domain Expiry</strong> — Tracks when your domain name expires. Forgetting
+                to renew a domain can take your entire site offline and give it to squatters.
               </li>
               <li>
-                <strong>Port</strong> -- Checks whether a specific port (like 3306 for MySQL or
-                5432 for PostgreSQL) is open and accepting connections.
+                <strong>🔌 Port Check</strong> — Checks whether a specific TCP port (like 3306 for
+                MySQL or 5432 for PostgreSQL) is open and accepting connections.
               </li>
               <li>
-                <strong>API Endpoint</strong> -- Sends a request to your API and validates the
-                response status, body, or headers. Great for making sure your backend is healthy.
+                <strong>📶 Ping / Reachability</strong> — Sends an ICMP ping to confirm basic network
+                reachability. The simplest possible check — useful for servers and infrastructure.
               </li>
               <li>
-                <strong>Ping</strong> -- Sends an ICMP ping to check basic network reachability.
-                The simplest possible check.
+                <strong>⚡ API Endpoint</strong> — Sends a request to your API with custom headers and
+                method, and validates the response status or body. Great for keeping your backend healthy.
               </li>
               <li>
-                <strong>Heartbeat</strong> -- Works the other way round. Instead of Uptrue
-                checking your server, your server pings Uptrue at regular intervals. If the
-                heartbeat stops, you get alerted. Perfect for cron jobs and background tasks.
+                <strong>💓 Heartbeat</strong> — Works in reverse: your server pings Uptrue at regular
+                intervals. If the heartbeat stops, you get alerted. Perfect for cron jobs and
+                background tasks.
               </li>
               <li>
-                <strong>Competitor</strong> -- Monitors a competitor&rsquo;s site so you know when
-                they go down. Not for anything nefarious -- just good situational awareness.
+                <strong>👁️ Page Change Detection</strong> — Takes a snapshot of any page and alerts you
+                when the content changes. Monitor your own pages for unexpected edits, or track
+                competitor pricing and announcements.
+              </li>
+            </ol>
+
+            <h3 style={{ fontSize: 17, fontWeight: 700, marginTop: 28, marginBottom: 12 }}>Advanced monitors</h3>
+            <ol className="help-steps">
+              <li>
+                <strong>🛡️ Security Headers</strong> — Checks your HTTP response headers for critical
+                security settings like CSP, HSTS, and X-Frame-Options. Missing headers leave your site
+                vulnerable to clickjacking and XSS attacks.
+              </li>
+              <li>
+                <strong>⏱️ Response Time Threshold</strong> — Measures your page response time and alerts
+                when it exceeds your threshold. Slow pages hurt SEO rankings and conversion rates.
+              </li>
+              <li>
+                <strong>🤖 robots.txt Change</strong> — Monitors your robots.txt file and alerts when it
+                changes. An accidental &ldquo;Disallow: /&rdquo; can block all search engines within hours.
+              </li>
+              <li>
+                <strong>📍 IP Address Change</strong> — Tracks which IP your domain resolves to. Alerts
+                you when it changes — catching DNS hijacking, CDN misconfigurations, and unexpected
+                server migrations.
+              </li>
+              <li>
+                <strong>📬 MX Health</strong> — Checks your MX records and mail server connectivity.
+                Silent email failures — missed enquiries, failed password resets — often go unnoticed
+                for days.
+              </li>
+              <li>
+                <strong>🏛️ WHOIS Registrar Change</strong> — Monitors your WHOIS record and alerts if
+                registrar or ownership details change. Domain theft is real — detect it before it is
+                too late.
+              </li>
+              <li>
+                <strong>🗺️ Sitemap Validity</strong> — Fetches and validates your XML sitemap. A broken
+                sitemap means search engines discover your new pages more slowly or miss them entirely.
+              </li>
+              <li>
+                <strong>🔗 Redirect Chain</strong> — Follows your URL&rsquo;s redirect hops and alerts on
+                chains that are too long, end in errors, or form loops. Excessive redirects slow your
+                site and dilute PageRank.
+              </li>
+              <li>
+                <strong>✉️ SPF / DMARC Validity</strong> — Validates your email authentication DNS records.
+                Without valid SPF and DMARC, anyone can send emails pretending to be from your domain.
+              </li>
+              <li>
+                <strong>🚫 Blacklist Check</strong> — Checks your domain and IP against major email and
+                web blacklists (Spamhaus, SpamCop, Barracuda). Being listed silently destroys email
+                deliverability.
+              </li>
+              <li>
+                <strong>📦 Page Size</strong> — Monitors your page&rsquo;s transfer size and alerts when it
+                grows beyond your threshold. Page bloat hurts Core Web Vitals and mobile load times.
+              </li>
+              <li>
+                <strong>🍪 Cookie Consent Presence</strong> — Checks that your cookie consent banner is
+                present on every check. A missing banner is a potential GDPR compliance failure.
+              </li>
+              <li>
+                <strong>🌐 Nameserver Change</strong> — Monitors the authoritative nameservers for your
+                domain. A nameserver change gives attackers full control over all your DNS records.
               </li>
             </ol>
           </section>
