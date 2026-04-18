@@ -4,7 +4,7 @@
 
 import { useState, useCallback } from 'react'
 
-import type { AutoblogChannel, AutoblogTopic, AutoblogSource, AutoblogRun, ChannelCronRun } from '@/lib/db/autoblog'
+import type { AutoblogChannel, AutoblogTopic, AutoblogSource, AutoblogRun, ChannelCronRun, AutoblogTodayDiag } from '@/lib/db/autoblog'
 
 
 
@@ -126,6 +126,8 @@ interface Props {
 
   initialCronHistory: Record<string, ChannelCronRun[]>
 
+  initialTodayDiag: AutoblogTodayDiag
+
 }
 
 
@@ -156,9 +158,9 @@ const EMPTY_TOPIC_FORM: TopicForm = {
 
 // - Main component -
 
-export function AutoblogClient({ initialChannels, initialTopics, initialSources, initialRuns, initialCronHistory }: Props): React.ReactElement {
+export function AutoblogClient({ initialChannels, initialTopics, initialSources, initialRuns, initialCronHistory, initialTodayDiag }: Props): React.ReactElement {
 
-  const [activeTab, setActiveTab] = useState<'channels' | 'topics' | 'sources' | 'runs'>('channels')
+  const [activeTab, setActiveTab] = useState<'today' | 'channels' | 'topics' | 'sources' | 'runs'>('today')
 
   const [channels, setChannels] = useState(initialChannels)
 
@@ -746,6 +748,8 @@ export function AutoblogClient({ initialChannels, initialTopics, initialSources,
 
   const tabs: Array<{ key: typeof activeTab; label: string; count?: number }> = [
 
+    { key: 'today',    label: 'Today',    count: initialTodayDiag.generatedToday + initialTodayDiag.failedToday },
+
     { key: 'channels', label: 'Channels', count: channels.filter(c => c.is_enabled).length },
 
     { key: 'topics',   label: 'Topics',   count: topics.length },
@@ -821,6 +825,114 @@ export function AutoblogClient({ initialChannels, initialTopics, initialSources,
       </div>
 
 
+
+      {/* - TODAY TAB - */}
+
+      {activeTab === 'today' && (
+        <div className="autoblog-section">
+          <p className="autoblog-section-desc">Pipeline activity in the last 24 hours. Use this to diagnose why a post wasn&apos;t generated or an email wasn&apos;t sent.</p>
+
+          {/* Summary stats */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: 12, marginBottom: 28 }}>
+            {[
+              { label: 'Generated', value: initialTodayDiag.generatedToday, color: 'var(--color-up)' },
+              { label: 'Failed', value: initialTodayDiag.failedToday, color: 'var(--color-down)' },
+              { label: 'Skipped', value: initialTodayDiag.skippedToday, color: 'var(--color-warn)' },
+              { label: 'Pending', value: initialTodayDiag.pendingToday, color: 'var(--text-muted)' },
+            ].map(s => (
+              <div key={s.label} className="card" style={{ padding: '14px 16px', textAlign: 'center' }}>
+                <div style={{ fontSize: 26, fontWeight: 800, color: s.color, lineHeight: 1 }}>{s.value}</div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginTop: 4 }}>{s.label}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Pipeline steps */}
+          <h3 style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 12 }}>Pipeline Steps (last 24h)</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 32 }}>
+            {initialTodayDiag.steps.map((step, i) => {
+              const ranToday = step.runsToday > 0
+              const hasError = step.errorsToday > 0
+              const dotColor = !ranToday ? 'var(--text-muted)' : hasError ? 'var(--color-down)' : 'var(--color-up)'
+              const statusLabel = !ranToday ? 'No runs today' : hasError ? `${step.errorsToday} error(s)` : `${step.runsToday} run(s) — ok`
+              return (
+                <div key={step.key} style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+                  {/* Connector */}
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0, paddingTop: 2 }}>
+                    <div style={{ width: 10, height: 10, borderRadius: '50%', background: dotColor, flexShrink: 0 }} />
+                    {i < initialTodayDiag.steps.length - 1 && (
+                      <div style={{ width: 2, flex: 1, minHeight: 24, background: 'var(--border-primary)', marginTop: 3 }} />
+                    )}
+                  </div>
+                  <div className="card" style={{ flex: 1, padding: '12px 16px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 4 }}>
+                      <span style={{ fontWeight: 700, fontSize: 14, color: 'var(--text-primary)' }}>{step.label}</span>
+                      <span style={{ fontSize: 12, color: dotColor, background: dotColor + '18', padding: '2px 8px', borderRadius: 6, fontWeight: 600 }}>{statusLabel}</span>
+                      {step.lastRunAt && (
+                        <span style={{ fontSize: 12, color: 'var(--text-muted)', marginLeft: 'auto' }}>
+                          Last: {new Date(step.lastRunAt).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      )}
+                    </div>
+                    <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginBottom: step.lastError ? 6 : 0 }}>{step.desc}</div>
+                    {step.lastSummary && (
+                      <div style={{ fontSize: 12, color: 'var(--text-muted)', fontFamily: 'monospace', background: 'var(--bg-muted)', borderRadius: 6, padding: '4px 8px', marginTop: 6 }}>{step.lastSummary}</div>
+                    )}
+                    {step.lastError && (
+                      <div style={{ fontSize: 12, color: 'var(--color-down)', background: 'var(--color-down-bg)', border: '1px solid var(--color-down-border)', borderRadius: 6, padding: '6px 10px', marginTop: 6 }}>
+                        ⚠ {step.lastError}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+
+          {/* Today's generation runs */}
+          {initialTodayDiag.recentRuns.length > 0 && (
+            <>
+              <h3 style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 12 }}>Today&apos;s Generation Attempts</h3>
+              <div className="admin-table-wrapper">
+                <table className="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Source</th>
+                      <th>Title</th>
+                      <th>Status</th>
+                      <th>Error</th>
+                      <th>When</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {initialTodayDiag.recentRuns.map(run => (
+                      <tr key={run.id}>
+                        <td><span style={{ fontSize: 12, background: 'var(--bg-muted)', padding: '2px 8px', borderRadius: 6 }}>{run.channel_key ?? 'Topic'}</span></td>
+                        <td style={{ maxWidth: 300 }}>
+                          {run.blog_post_id ? (
+                            <a href={`/admin/blog/${run.blog_post_id}`} style={{ color: 'var(--accent)', fontWeight: 500 }}>{run.title ?? '—'}</a>
+                          ) : (run.title ?? '—')}
+                        </td>
+                        <td>
+                          <span style={{ fontSize: 12, fontWeight: 600, color: RUN_STATUS_COLOURS[run.status] ?? 'var(--text-muted)' }}>{run.status}</span>
+                        </td>
+                        <td style={{ fontSize: 12, color: 'var(--color-down)', maxWidth: 200 }}>{run.error_message ?? '—'}</td>
+                        <td style={{ fontSize: 12, color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{timeAgo(run.ran_at)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
+
+          {initialTodayDiag.recentRuns.length === 0 && (
+            <div className="autoblog-empty">
+              <p>No generation attempts in the last 24 hours. Check the pipeline steps above for the likely cause.</p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* - CHANNELS TAB - */}
 

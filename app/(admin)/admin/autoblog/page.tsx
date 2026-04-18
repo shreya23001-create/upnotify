@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic'
 
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { getAutoblogChannels, getAutoblogTopics, getAutoblogSources, getAutoblogRuns, getCronHistoryForPaths } from '@/lib/db/autoblog'
+import { getAutoblogChannels, getAutoblogTopics, getAutoblogSources, getAutoblogRuns, getCronHistoryForPaths, getAutoblogTodayDiag } from '@/lib/db/autoblog'
 import { AutoblogClient } from './autoblog-client'
 
 async function isAdmin(): Promise<boolean> {
@@ -16,11 +16,12 @@ async function isAdmin(): Promise<boolean> {
 export default async function AutoblogPage(): Promise<React.ReactElement> {
   if (!(await isAdmin())) redirect('/admin')
 
-  const [channels, topics, sources, runs] = await Promise.all([
+  const [channels, topics, sources, runs, todayDiag] = await Promise.all([
     getAutoblogChannels(),
     getAutoblogTopics(),
     getAutoblogSources(),
     getAutoblogRuns(50),
+    getAutoblogTodayDiag(),
   ])
 
   const cronPaths = [
@@ -36,6 +37,7 @@ export default async function AutoblogPage(): Promise<React.ReactElement> {
       initialSources={sources}
       initialRuns={runs}
       initialCronHistory={cronHistory}
+      initialTodayDiag={todayDiag}
     />
   )
 }
