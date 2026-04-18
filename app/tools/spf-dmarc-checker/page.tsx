@@ -120,10 +120,10 @@ export default function SpfDmarcCheckerPage(): React.ReactElement {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               {faqItems.map((item, i) => (
                 <div key={i} className="card" style={{ padding: '16px 20px' }}>
-                  <h3 style={{ margin: '0 0 8px', fontSize: 15, fontWeight: 600, color: '#f3f4f6' }}>
+                  <h3 style={{ margin: '0 0 8px', fontSize: 15, fontWeight: 600, color: 'var(--text-primary)' }}>
                     {item.question}
                   </h3>
-                  <p style={{ margin: 0, fontSize: 14, color: '#9ca3af', lineHeight: 1.6 }}>
+                  <p style={{ margin: 0, fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
                     {item.answer}
                   </p>
                 </div>
