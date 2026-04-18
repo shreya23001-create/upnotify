@@ -18,6 +18,8 @@ export interface MonitorTypeDefinition {
   description: string     // 2–3 sentence explanation
   whatItCatches: string[] // bullet list
   whyItMatters: string    // business impact sentence
+  defaultInterval: number // seconds — pre-selected in create form
+  minInterval: number     // seconds — lowest sensible interval for this type
   alertCopy: AlertCopyTemplate
   recoveryCopy: AlertCopyTemplate
 }
@@ -54,6 +56,8 @@ export const MONITOR_TYPES: MonitorTypeDefinition[] = [
     name: 'HTTP/HTTPS Uptime',
     emoji: '🌐',
     tagline: 'Know the instant your website goes down',
+    defaultInterval: 60,
+    minInterval: 30,
     description:
       'Sends an HTTP request to your URL every few minutes and alerts you the moment it stops responding or returns an error. Catches outages before your users do.',
     whatItCatches: [
@@ -89,6 +93,8 @@ export const MONITOR_TYPES: MonitorTypeDefinition[] = [
     name: 'SSL Certificate',
     emoji: '🔒',
     tagline: 'Never let an expired SSL certificate take down your site',
+    defaultInterval: 86400,
+    minInterval: 3600,
     description:
       'Monitors your SSL certificate expiry date and alerts you before it expires. Also detects invalid, self-signed, or revoked certificates that could trigger browser warnings.',
     whatItCatches: [
@@ -124,6 +130,8 @@ export const MONITOR_TYPES: MonitorTypeDefinition[] = [
     name: 'DNS Records',
     emoji: '📡',
     tagline: 'Catch DNS hijacking and misconfiguration instantly',
+    defaultInterval: 21600,
+    minInterval: 3600,
     description:
       'Checks your DNS records at every interval and alerts you when they change unexpectedly. Detects hijacking, misconfiguration, and propagation issues.',
     whatItCatches: [
@@ -159,6 +167,8 @@ export const MONITOR_TYPES: MonitorTypeDefinition[] = [
     name: 'Keyword Detection',
     emoji: '🔍',
     tagline: 'Alert when critical words appear or vanish from your page',
+    defaultInterval: 60,
+    minInterval: 30,
     description:
       'Scans your page content at every check interval and alerts you if required keywords disappear or forbidden keywords appear. Ideal for e-commerce, SaaS, and content monitoring.',
     whatItCatches: [
@@ -194,6 +204,8 @@ export const MONITOR_TYPES: MonitorTypeDefinition[] = [
     name: 'Domain Expiry',
     emoji: '📅',
     tagline: "Don't lose your domain because you forgot to renew it",
+    defaultInterval: 86400,
+    minInterval: 3600,
     description:
       'Monitors your domain registration expiry date and alerts you well in advance. Losing a domain means losing your website, email, and brand — often irreversibly.',
     whatItCatches: [
@@ -229,6 +241,8 @@ export const MONITOR_TYPES: MonitorTypeDefinition[] = [
     name: 'Port Check',
     emoji: '🔌',
     tagline: 'Know when a critical service port goes silent',
+    defaultInterval: 60,
+    minInterval: 30,
     description:
       'Connects to a specific port on your server and alerts you when it stops accepting connections. Essential for databases, mail servers, and custom services.',
     whatItCatches: [
@@ -264,6 +278,8 @@ export const MONITOR_TYPES: MonitorTypeDefinition[] = [
     name: 'Ping / Reachability',
     emoji: '📶',
     tagline: 'Confirm your server is reachable at the network level',
+    defaultInterval: 60,
+    minInterval: 30,
     description:
       'Sends ICMP ping requests to your server and alerts you when it stops responding. The most basic uptime check — confirms your server is alive on the network.',
     whatItCatches: [
@@ -299,6 +315,8 @@ export const MONITOR_TYPES: MonitorTypeDefinition[] = [
     name: 'API Endpoint',
     emoji: '⚡',
     tagline: 'Monitor any API endpoint with custom headers and methods',
+    defaultInterval: 60,
+    minInterval: 30,
     description:
       'Makes authenticated HTTP requests to your API endpoints with custom headers and body. Validates response status and alerts you when the API fails or returns unexpected responses.',
     whatItCatches: [
@@ -334,6 +352,8 @@ export const MONITOR_TYPES: MonitorTypeDefinition[] = [
     name: 'Heartbeat Monitor',
     emoji: '💓',
     tagline: 'Know when your cron jobs and background tasks stop running',
+    defaultInterval: 60,
+    minInterval: 30,
     description:
       'Your server pings Uptrue at regular intervals. If the ping stops arriving, we alert you. Ideal for cron jobs, backup scripts, queue workers, and any scheduled task.',
     whatItCatches: [
@@ -369,6 +389,8 @@ export const MONITOR_TYPES: MonitorTypeDefinition[] = [
     name: 'Page Change Detection',
     emoji: '👁️',
     tagline: 'Get notified when any page changes — yours or a competitor\'s',
+    defaultInterval: 3600,
+    minInterval: 300,
     description:
       'Captures a snapshot of any webpage and alerts you when the content changes. Monitor your own pages for unexpected edits, or track competitor pricing and announcements.',
     whatItCatches: [
@@ -404,6 +426,8 @@ export const MONITOR_TYPES: MonitorTypeDefinition[] = [
     name: 'Security Headers',
     emoji: '🛡️',
     tagline: 'Catch missing HTTP security headers before hackers do',
+    defaultInterval: 21600,
+    minInterval: 3600,
     description:
       'Checks your HTTP response headers for critical security settings like CSP, HSTS, X-Frame-Options, and more. Missing headers leave your site vulnerable to clickjacking and XSS attacks.',
     whatItCatches: [
@@ -440,6 +464,8 @@ export const MONITOR_TYPES: MonitorTypeDefinition[] = [
     name: 'Response Time Threshold',
     emoji: '⏱️',
     tagline: 'Alert when your site gets too slow to convert',
+    defaultInterval: 60,
+    minInterval: 30,
     description:
       'Measures your page response time at every check and alerts you when it exceeds your defined threshold. Slow pages hurt SEO rankings and conversion rates.',
     whatItCatches: [
@@ -475,6 +501,8 @@ export const MONITOR_TYPES: MonitorTypeDefinition[] = [
     name: 'robots.txt Change',
     emoji: '🤖',
     tagline: 'Catch accidental robots.txt changes before Google does',
+    defaultInterval: 3600,
+    minInterval: 300,
     description:
       'Monitors your robots.txt file and alerts you the moment it changes. An accidentally blocked site can disappear from search results within days.',
     whatItCatches: [
@@ -510,6 +538,8 @@ export const MONITOR_TYPES: MonitorTypeDefinition[] = [
     name: 'IP Address Change',
     emoji: '📍',
     tagline: 'Detect unexpected server migrations and DNS hijacking',
+    defaultInterval: 21600,
+    minInterval: 3600,
     description:
       'Tracks the IP address your domain resolves to and alerts you when it changes. Catches unauthorised server migrations, DNS hijacking, and CDN misconfigurations.',
     whatItCatches: [
@@ -545,6 +575,8 @@ export const MONITOR_TYPES: MonitorTypeDefinition[] = [
     name: 'MX Health',
     emoji: '📬',
     tagline: 'Ensure your email infrastructure never silently breaks',
+    defaultInterval: 21600,
+    minInterval: 3600,
     description:
       'Checks your MX records, mail server connectivity, and SPF/DMARC alignment to ensure email delivery is working correctly. Silent email failures cost leads and revenue.',
     whatItCatches: [
@@ -580,6 +612,8 @@ export const MONITOR_TYPES: MonitorTypeDefinition[] = [
     name: 'WHOIS Registrar Change',
     emoji: '🏛️',
     tagline: 'Know immediately if your domain ownership changes',
+    defaultInterval: 86400,
+    minInterval: 3600,
     description:
       'Monitors your WHOIS record and alerts you if the registrar, registrant, or ownership details change. Domain theft is real — detect it before it is too late.',
     whatItCatches: [
@@ -615,6 +649,8 @@ export const MONITOR_TYPES: MonitorTypeDefinition[] = [
     name: 'Sitemap Validity',
     emoji: '🗺️',
     tagline: 'Ensure Google can always find and crawl your pages',
+    defaultInterval: 3600,
+    minInterval: 300,
     description:
       'Fetches and validates your XML sitemap, checking for malformed XML, missing pages, and unreachable URLs. A broken sitemap silently hurts your SEO crawl coverage.',
     whatItCatches: [
@@ -650,6 +686,8 @@ export const MONITOR_TYPES: MonitorTypeDefinition[] = [
     name: 'Redirect Chain',
     emoji: '🔗',
     tagline: 'Detect redirect loops and excessive hops hurting your SEO',
+    defaultInterval: 3600,
+    minInterval: 300,
     description:
       'Follows the full redirect chain from your URL and alerts you if it changes, creates a loop, or adds too many hops. Long redirect chains slow your site and dilute PageRank.',
     whatItCatches: [
@@ -685,6 +723,8 @@ export const MONITOR_TYPES: MonitorTypeDefinition[] = [
     name: 'SPF / DMARC Validity',
     emoji: '✉️',
     tagline: 'Stop email spoofing before it damages your brand',
+    defaultInterval: 21600,
+    minInterval: 3600,
     description:
       'Validates your SPF and DMARC DNS records and alerts you when they become invalid, are removed, or are misconfigured. Without these, anyone can send emails pretending to be you.',
     whatItCatches: [
@@ -720,6 +760,8 @@ export const MONITOR_TYPES: MonitorTypeDefinition[] = [
     name: 'Blacklist Check',
     emoji: '🚫',
     tagline: 'Know immediately if your IP or domain is blacklisted',
+    defaultInterval: 86400,
+    minInterval: 3600,
     description:
       'Checks your domain and server IP against major email and web blacklists (DNSBL, SURBL, Spamhaus, and more). Being blacklisted silently destroys email deliverability.',
     whatItCatches: [
@@ -755,6 +797,8 @@ export const MONITOR_TYPES: MonitorTypeDefinition[] = [
     name: 'Page Size',
     emoji: '📦',
     tagline: 'Catch bloated page sizes before they hurt Core Web Vitals',
+    defaultInterval: 3600,
+    minInterval: 300,
     description:
       'Monitors the total transfer size of your page and alerts you when it grows beyond your threshold. Large pages load slowly on mobile, hurting user experience and SEO.',
     whatItCatches: [
@@ -790,6 +834,8 @@ export const MONITOR_TYPES: MonitorTypeDefinition[] = [
     name: 'Cookie Consent Presence',
     emoji: '🍪',
     tagline: 'Ensure your cookie banner never disappears and risks GDPR fines',
+    defaultInterval: 3600,
+    minInterval: 300,
     description:
       'Checks that your cookie consent banner is present and functional on every page load. A missing cookie banner is a GDPR compliance failure.',
     whatItCatches: [
@@ -825,6 +871,8 @@ export const MONITOR_TYPES: MonitorTypeDefinition[] = [
     name: 'Nameserver Change',
     emoji: '🌐',
     tagline: 'Detect unauthorised nameserver changes instantly',
+    defaultInterval: 21600,
+    minInterval: 3600,
     description:
       'Monitors the authoritative nameservers for your domain and alerts you when they change. Nameserver hijacking gives attackers full control over all your DNS records.',
     whatItCatches: [
