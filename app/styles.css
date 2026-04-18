@@ -1042,29 +1042,62 @@ html.dark .data-table-bulk-bar span { color: #93c5fd; }
 .sp-section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: var(--space-3); }
 .sp-card { background: var(--bg-card); border: 1px solid var(--border-primary); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); margin-bottom: var(--space-5); overflow: hidden; }
 
-/* Monitor rows */
+/* Monitor rows — 2-row layout */
 .sp-monitor-row {
-  display: grid;
-  grid-template-columns: 170px 1fr 140px;
-  align-items: center;
-  gap: var(--space-4);
-  padding: var(--space-4) var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 20px;
   border-bottom: 1px solid var(--border-primary);
 }
 .sp-monitor-row:last-child { border-bottom: none; }
-.sp-monitor-info { min-width: 0; }
-.sp-monitor-name { font-size: 14px; font-weight: 600; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.sp-monitor-url  { font-size: 11px; color: var(--text-muted); font-family: var(--font-mono, monospace); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.sp-bars-wrap { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
-.sp-bars-range-label { font-size: 10px; color: var(--text-muted); text-align: right; }
-.sp-uptime-bars { display: flex; gap: 2px; align-items: stretch; height: 24px; width: 100%; }
+
+/* Row 1: icon + name left, status pill right */
+.sp-monitor-row-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sp-monitor-type-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: var(--bg-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+.sp-monitor-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sp-monitor-row-pill { flex-shrink: 0; }
+
+/* Row 2: bars + percentage + range label */
+.sp-monitor-row-bottom {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-left: 30px;
+}
+.sp-uptime-bars { flex: 1; display: flex; gap: 2px; align-items: stretch; height: 20px; }
 .sp-uptime-tick        { flex: 1; min-width: 2px; border-radius: 2px; }
 .sp-uptime-tick.ok     { background: var(--color-up); }
 .sp-uptime-tick.down-t { background: var(--color-down); }
 .sp-uptime-tick.warn-t { background: var(--color-warn); }
 .sp-uptime-tick.none   { background: var(--border-primary); }
-.sp-monitor-right { display: flex; align-items: center; justify-content: flex-end; gap: var(--space-2); }
-.sp-uptime-pct { font-size: 12px; font-weight: 700; font-family: var(--font-mono, monospace); min-width: 36px; text-align: right; }
+.sp-uptime-pct { font-size: 12px; font-weight: 700; font-family: var(--font-mono, monospace); min-width: 52px; text-align: right; }
+.sp-bars-range-label { font-size: 10px; color: var(--text-muted); white-space: nowrap; }
+.sp-monitor-collecting { font-size: 12px; color: var(--text-muted); font-style: italic; }
 
 /* Status pills on status page */
 .sp-status-pill { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: var(--radius-full); font-size: 11px; font-weight: 700; white-space: nowrap; }
@@ -1132,8 +1165,8 @@ html.dark .status-pill-paused   { background: rgba(148,163,184,0.1); border-colo
   .sp-hero { padding: var(--space-10) var(--space-4) var(--space-8); }
   .sp-overall-status { padding: var(--space-3) var(--space-5); }
   .sp-content { padding: var(--space-6) var(--space-4); }
-  .sp-monitor-row { grid-template-columns: 1fr; gap: var(--space-2); }
-  .sp-monitor-right { justify-content: flex-start; }
+  .sp-monitor-row { padding: 12px 16px; }
+  .sp-monitor-row-bottom { padding-left: 0; }
   .sp-subscribe-row { flex-direction: column; }
 }
 
