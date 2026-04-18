@@ -603,6 +603,7 @@ export default async function MonitoringTypePage({ params }: { params: Promise<{
                 <Link
                   key={r.slug}
                   href={`/monitoring/${r.slug}`}
+                  className="related-monitor-card"
                   style={{
                     display: 'flex', alignItems: 'center', gap: 12,
                     padding: '14px 16px',
@@ -611,17 +612,6 @@ export default async function MonitoringTypePage({ params }: { params: Promise<{
                     borderRadius: 10,
                     textDecoration: 'none',
                     color: 'inherit',
-                    transition: 'border-color 0.15s, box-shadow 0.15s',
-                  }}
-                  onMouseEnter={e => {
-                    const el = e.currentTarget as HTMLAnchorElement
-                    el.style.borderColor = 'rgba(59,130,246,0.35)'
-                    el.style.boxShadow = '0 4px 12px rgba(59,130,246,0.08)'
-                  }}
-                  onMouseLeave={e => {
-                    const el = e.currentTarget as HTMLAnchorElement
-                    el.style.borderColor = 'var(--border)'
-                    el.style.boxShadow = 'none'
                   }}
                 >
                   <span style={{

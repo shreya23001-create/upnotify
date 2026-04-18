@@ -34,25 +34,6 @@ function fmtTime(dateStr: string): string {
   return new Date(dateStr).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
 }
 
-/** Per-monitor: latest response time and 30-day uptime % */
-function buildMonitorMetrics(checkResults: CheckResult[]): Record<string, { uptime: number; latestMs: number | null }> {
-  const byMonitor: Record<string, CheckResult[]> = {}
-  for (const r of checkResults) {
-    if (!byMonitor[r.monitor_id]) byMonitor[r.monitor_id] = []
-    byMonitor[r.monitor_id].push(r)
-  }
-  const out: Record<string, { uptime: number; latestMs: number | null }> = {}
-  for (const [id, results] of Object.entries(byMonitor)) {
-    const sorted = [...results].sort((a, b) => new Date(b.checked_at).getTime() - new Date(a.checked_at).getTime())
-    const upCount = results.filter(r => r.status === 'up').length
-    out[id] = {
-      uptime: results.length > 0 ? Math.round((upCount / results.length) * 10000) / 100 : 100,
-      latestMs: sorted[0]?.response_time_ms ?? null,
-    }
-  }
-  return out
-}
-
 /** Average response times grouped by day for last 7 days */
 function buildResponseChart(checkResults: CheckResult[]): { label: string; avg: number }[] {
   const dayMap: Record<string, { sum: number; count: number }> = {}
@@ -155,110 +136,144 @@ function AddBtn({ hasMonitors }: { hasMonitors: boolean }): React.ReactElement {
   )
 }
 
-function MonitorsTable({ monitors, metrics, search, setSearch }: {
+// ─── Domain grouping helpers ──────────────────────────────────────────────────
+
+function extractDomain(target: string): string {
+  try {
+    const withProto = target.startsWith('http') ? target : `https://${target}`
+    return new URL(withProto).hostname
+  } catch {
+    return target.split('/')[0] ?? target
+  }
+}
+
+const STATUS_ORDER = ['down', 'degraded', 'paused', 'up', 'unknown'] as const
+type AggStatus = typeof STATUS_ORDER[number]
+
+function worstStatus(monitors: Monitor[]): AggStatus {
+  for (const s of STATUS_ORDER) {
+    if (s === 'paused') {
+      if (monitors.some(m => m.is_paused)) return 'paused'
+    } else if (monitors.some(m => !m.is_paused && m.status === s)) {
+      return s
+    }
+  }
+  return 'unknown'
+}
+
+interface DomainGroup {
+  domain: string
   monitors: Monitor[]
-  metrics: Record<string, { uptime: number; latestMs: number | null }>
-  search: string
-  setSearch: (v: string) => void
-}) {
-  const filtered = monitors.filter(m =>
-    m.name.toLowerCase().includes(search.toLowerCase()) ||
-    m.target.toLowerCase().includes(search.toLowerCase())
+  status: AggStatus
+}
+
+function groupByDomain(monitors: Monitor[]): DomainGroup[] {
+  const map: Record<string, Monitor[]> = {}
+  for (const m of monitors) {
+    const d = extractDomain(m.target)
+    if (!map[d]) map[d] = []
+    map[d].push(m)
+  }
+  return Object.entries(map)
+    .map(([domain, mons]) => ({ domain, monitors: mons, status: worstStatus(mons) }))
+    .sort((a, b) => STATUS_ORDER.indexOf(a.status) - STATUS_ORDER.indexOf(b.status))
+}
+
+// ─── Domain cards ─────────────────────────────────────────────────────────────
+
+function DomainStatusDot({ status }: { status: AggStatus }) {
+  const colors: Record<AggStatus, string> = {
+    down:     'var(--color-down)',
+    degraded: 'var(--color-warn)',
+    paused:   'var(--text-muted)',
+    up:       'var(--color-up)',
+    unknown:  'var(--text-muted)',
+  }
+  return (
+    <span style={{
+      display: 'inline-block',
+      width: 8,
+      height: 8,
+      borderRadius: '50%',
+      background: colors[status],
+      flexShrink: 0,
+      animation: status === 'down' ? 'pulse 1.5s infinite' : undefined,
+    }} />
   )
+}
 
-  function statusBadge(m: Monitor) {
-    if (m.is_paused) return <span className="db-badge db-badge-outline"><span className="db-dot" style={{ background: 'var(--text-muted)' }} /> Paused</span>
-    if (m.status === 'up')       return <span className="db-badge db-badge-up"><span className="db-dot" style={{ background: 'var(--color-up)' }} /> Up</span>
-    if (m.status === 'down')     return <span className="db-badge db-badge-down"><span className="db-dot db-dot-pulse" style={{ background: 'var(--color-down)' }} /> Down</span>
-    if (m.status === 'degraded') return <span className="db-badge db-badge-warn"><span className="db-dot" style={{ background: 'var(--color-warn)' }} /> Slow</span>
-    return <span className="db-badge db-badge-outline">{m.status}</span>
+function DomainCards({ monitors }: { monitors: Monitor[] }) {
+  const groups = useMemo(() => groupByDomain(monitors), [monitors])
+
+  const statusLabel: Record<AggStatus, string> = {
+    down: 'Down', degraded: 'Degraded', paused: 'Paused', up: 'All Up', unknown: 'Unknown',
   }
-
-  function responseCell(m: Monitor) {
-    const ms = metrics[m.id]?.latestMs
-    if (m.status === 'down') return <span className="db-response-time slow">timeout</span>
-    if (!ms) return <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>—</span>
-    const cls = ms < 500 ? 'fast' : ms < 1500 ? 'med' : 'slow'
-    return <span className={`db-response-time ${cls}`}>{ms.toLocaleString()}ms</span>
-  }
-
-  function uptimeCell(m: Monitor) {
-    const pct = metrics[m.id]?.uptime ?? 100
-    const cls = pct >= 99 ? '' : pct >= 95 ? ' partial' : ' partial'
-    return <span className={`db-uptime-pct${cls}`}>{pct.toFixed(2)}%</span>
-  }
-
-  const rowBg = (m: Monitor) => {
-    if (m.status === 'down') return { background: 'rgba(239,68,68,0.03)' }
-    if (m.status === 'degraded') return { background: 'rgba(245,158,11,0.03)' }
-    return undefined
+  const statusBadgeClass: Record<AggStatus, string> = {
+    down: 'db-badge-down', degraded: 'db-badge-warn', paused: 'db-badge-outline', up: 'db-badge-up', unknown: 'db-badge-outline',
   }
 
   return (
     <div className="db-card" style={{ marginBottom: 20 }}>
       <div className="db-card-header">
-        <div className="db-card-title">Monitors</div>
+        <div className="db-card-title">Domains</div>
         <div className="db-card-actions">
-          <div className="db-search">
-            <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input placeholder="Search monitors…" value={search} onChange={e => setSearch(e.target.value)} />
-          </div>
           <AddBtn hasMonitors={monitors.length > 0} />
+          <Link href="/dashboard/monitors" className="btn btn-ghost btn-sm" style={{ fontSize: 11 }}>View all monitors →</Link>
         </div>
       </div>
 
-      {monitors.length === 0 ? (
+      {groups.length === 0 ? (
         <div style={{ padding: '32px 20px', textAlign: 'center' }}>
           <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 12 }}>No monitors yet. Add your first one to start tracking uptime.</p>
           <Link href="/dashboard/monitors/scan" className="btn btn-primary btn-sm">+ Add Your First Monitor</Link>
         </div>
       ) : (
-        <>
-          <div className="table-wrapper">
-            <table className="db-table">
-              <thead>
-                <tr>
-                  <th>Monitor</th>
-                  <th>Type</th>
-                  <th>Status</th>
-                  <th>Uptime (30d)</th>
-                  <th>Response</th>
-                  <th>Last Check</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map(m => (
-                  <tr key={m.id} style={rowBg(m)}>
-                    <td>
-                      <div className="monitor-name">{m.name}</div>
-                      <div className="monitor-url">{m.target}</div>
-                    </td>
-                    <td><span className="monitor-type-tag">{m.type}</span></td>
-                    <td>{statusBadge(m)}</td>
-                    <td>{uptimeCell(m)}</td>
-                    <td>{responseCell(m)}</td>
-                    <td style={{ fontSize: 11, color: m.status === 'down' ? 'var(--color-down)' : 'var(--text-muted)' }}>
-                      {m.status === 'down' && metrics[m.id] ? `Down · ${timeAgo(m.last_checked_at)}` : timeAgo(m.last_checked_at)}
-                    </td>
-                    <td>
-                      <Link href={`/dashboard/monitors/${m.id}`} className="btn btn-ghost btn-sm" style={{ padding: '4px 8px' }}>
-                        <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
-                {filtered.length === 0 && (
-                  <tr><td colSpan={7} style={{ textAlign: 'center', padding: '20px', color: 'var(--text-muted)', fontSize: 13 }}>No monitors match your search.</td></tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-          <div className="db-table-footer">
-            <span>Showing {filtered.length} of {monitors.length} monitors</span>
-            <Link href="/dashboard/monitors" className="btn btn-ghost btn-sm" style={{ fontSize: 11 }}>View all →</Link>
-          </div>
-        </>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 12, padding: '16px 20px 20px' }}>
+          {groups.map(g => (
+            <Link
+              key={g.domain}
+              href={`/dashboard/monitors?search=${encodeURIComponent(g.domain)}`}
+              style={{ textDecoration: 'none', display: 'block' }}
+            >
+              <div style={{
+                border: `1px solid ${g.status === 'down' ? 'rgba(239,68,68,0.3)' : g.status === 'degraded' ? 'rgba(245,158,11,0.3)' : 'var(--border-primary)'}`,
+                borderRadius: 10,
+                padding: '14px 16px',
+                background: g.status === 'down' ? 'rgba(239,68,68,0.04)' : g.status === 'degraded' ? 'rgba(245,158,11,0.04)' : 'var(--bg-card)',
+                cursor: 'pointer',
+                transition: 'box-shadow 0.15s, border-color 0.15s',
+              }}
+              onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.boxShadow = '0 4px 16px rgba(0,0,0,0.1)' }}
+              onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.boxShadow = 'none' }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                  <DomainStatusDot status={g.status} />
+                  <span style={{ fontWeight: 600, fontSize: 13, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
+                    {g.domain}
+                  </span>
+                  <span className={`db-badge ${statusBadgeClass[g.status]}`} style={{ fontSize: 10, flexShrink: 0 }}>
+                    {statusLabel[g.status]}
+                  </span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+                    {g.monitors.length} monitor{g.monitors.length !== 1 ? 's' : ''}
+                  </span>
+                  <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                    {[...new Set(g.monitors.map(m => m.type))].slice(0, 5).map(t => (
+                      <span key={t} style={{ fontSize: 10, background: 'var(--bg-subtle)', color: 'var(--text-muted)', borderRadius: 4, padding: '1px 5px' }}>
+                        {t}
+                      </span>
+                    ))}
+                    {new Set(g.monitors.map(m => m.type)).size > 5 && (
+                      <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>+{new Set(g.monitors.map(m => m.type)).size - 5}</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
       )}
     </div>
   )
@@ -402,7 +417,6 @@ export function WorkspaceDashboard(): React.ReactElement {
   const { currentWorkspace } = useWorkspace()
   const [data, setData]     = useState<DashboardData | null>(null)
   const [loading, setLoading] = useState(true)
-  const [search, setSearch]   = useState('')
 
   useEffect(() => {
     let cancelled = false
@@ -426,8 +440,6 @@ export function WorkspaceDashboard(): React.ReactElement {
     return () => { cancelled = true }
   }, [currentWorkspace])
 
-  const metrics = useMemo(() => buildMonitorMetrics(data?.checkResults ?? []), [data?.checkResults])
-
   if (loading) return <Skeleton />
 
   const stats        = data?.stats        ?? { total: 0, up: 0, down: 0, degraded: 0, paused: 0 }
@@ -438,7 +450,7 @@ export function WorkspaceDashboard(): React.ReactElement {
   return (
     <>
       <StatCards stats={stats} />
-      <MonitorsTable monitors={monitors} metrics={metrics} search={search} setSearch={setSearch} />
+      <DomainCards monitors={monitors} />
       <div className="db-two-col">
         <IncidentsPanel incidents={incidents} />
         <ResponseChart checkResults={checkResults} />

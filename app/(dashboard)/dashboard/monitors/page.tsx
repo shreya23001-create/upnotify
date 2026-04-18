@@ -6,9 +6,15 @@ import { MonitorTable } from '@/components/monitors/monitor-table'
 import { AddMonitorButton } from '@/components/monitors/add-monitor-button'
 import { redirect } from 'next/navigation'
 
-export default async function MonitorsPage() {
+export default async function MonitorsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ search?: string }>
+}) {
   const user = await getCurrentUser()
   if (!user) redirect('/login')
+
+  const { search } = await searchParams
 
   const workspaces = await getWorkspacesByOrg(user.org_id)
   const defaultWorkspace = workspaces[0]
@@ -25,7 +31,7 @@ export default async function MonitorsPage() {
         <h1 className="page-title">Monitors</h1>
         <AddMonitorButton hasMonitors={monitors.length > 0} />
       </div>
-      <MonitorTable monitors={monitors} uptimeData={uptimeData} />
+      <MonitorTable monitors={monitors} uptimeData={uptimeData} initialSearch={search ?? ''} />
     </div>
   )
 }

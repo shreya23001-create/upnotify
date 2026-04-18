@@ -87,7 +87,7 @@ export default async function MonitorDetailPage({
         <div className="monitor-header-v2-left">
           <div className="monitor-header-v2-title-row">
             <h1 className="monitor-header-v2-name">{monitor.name}</h1>
-            <MonitorStatusBadge status={monitor.status} />
+            <MonitorStatusBadge status={monitor.status} monitorType={monitor.type} />
             <span className="monitor-type-badge">{monitor.type}</span>
           </div>
           <div className="monitor-target-row">

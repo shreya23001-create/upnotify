@@ -66,6 +66,25 @@
 .btn-lg { padding: 14px 28px; font-size: 16px; border-radius: var(--radius-lg); }
 
 /* ============================================================
+   MONITORING PAGES — card hover effects (CSS-only, no JS handlers)
+   ============================================================ */
+.monitor-type-card {
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+}
+.monitor-type-card:hover {
+  border-color: rgba(59,130,246,0.35) !important;
+  box-shadow: 0 6px 24px rgba(59,130,246,0.10);
+  transform: translateY(-2px);
+}
+.related-monitor-card {
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.related-monitor-card:hover {
+  border-color: rgba(59,130,246,0.35) !important;
+  box-shadow: 0 4px 12px rgba(59,130,246,0.08);
+}
+
+/* ============================================================
    NAV
    ============================================================ */
 .pub-nav {

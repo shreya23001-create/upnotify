@@ -134,6 +134,7 @@ function MonitorCard({ t }: { t: typeof MONITOR_TYPES[number] }) {
   return (
     <Link
       href={`/monitoring/${t.slug}`}
+      className="monitor-type-card"
       style={{
         display: 'block',
         padding: '20px 22px',
@@ -142,21 +143,6 @@ function MonitorCard({ t }: { t: typeof MONITOR_TYPES[number] }) {
         background: 'var(--bg-card)',
         textDecoration: 'none',
         color: 'inherit',
-        transition: 'border-color 0.15s, box-shadow 0.15s, transform 0.15s',
-        position: 'relative',
-        overflow: 'hidden',
-      }}
-      onMouseEnter={e => {
-        const el = e.currentTarget as HTMLAnchorElement
-        el.style.borderColor = 'rgba(59,130,246,0.35)'
-        el.style.boxShadow = '0 6px 24px rgba(59,130,246,0.1)'
-        el.style.transform = 'translateY(-2px)'
-      }}
-      onMouseLeave={e => {
-        const el = e.currentTarget as HTMLAnchorElement
-        el.style.borderColor = 'var(--border)'
-        el.style.boxShadow = 'none'
-        el.style.transform = 'translateY(0)'
       }}
     >
       <div style={{
