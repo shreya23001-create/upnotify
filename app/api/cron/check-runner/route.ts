@@ -12,7 +12,7 @@ import type { Monitor } from '@/lib/types'
 import type { CheckerResult } from '@/lib/checkers/types'
 
 export const dynamic = 'force-dynamic'
-export const maxDuration = 60
+export const maxDuration = 300
 
 function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms))
@@ -45,21 +45,33 @@ export async function GET(request: Request): Promise<NextResponse> {
     const allMonitors = force ? await getAllActiveMonitors() : await getDueMonitors()
     logger.info('Check runner started', { dueMonitors: allMonitors.length, force })
 
-    // Filter out monitors in maintenance
+    // Filter out monitors in maintenance (parallel DB calls)
+    const maintenanceChecks = await Promise.allSettled(
+      allMonitors.map(async (m) => ({
+        monitor: m,
+        inMaintenance: await isMonitorInMaintenance(m.id, m.org_id),
+      }))
+    )
+
     const monitors: Monitor[] = []
-    for (const m of allMonitors) {
-      const inMaintenance = await isMonitorInMaintenance(m.id, m.org_id)
+    const maintenanceUpdates: Promise<void>[] = []
+
+    for (const r of maintenanceChecks) {
+      if (r.status !== 'fulfilled') continue
+      const { monitor: m, inMaintenance } = r.value
       if (inMaintenance) {
         const now = new Date()
-        await updateMonitorStatus(m.id, {
+        maintenanceUpdates.push(updateMonitorStatus(m.id, {
           status: m.status,
           last_checked_at: now.toISOString(),
           next_check_at: new Date(now.getTime() + m.check_interval_seconds * 1000).toISOString(),
-        })
+        }))
       } else {
         monitors.push(m)
       }
     }
+
+    await Promise.allSettled(maintenanceUpdates)
 
     // Phase 1: Run ALL first checks in parallel
     const firstChecks = await Promise.allSettled(
