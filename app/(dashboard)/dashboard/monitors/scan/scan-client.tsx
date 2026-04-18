@@ -48,6 +48,8 @@ function findingLabel(finding: ScanFinding): string {
   return 'Passing'
 }
 
+type FilterTab = 'all' | 'issues' | 'warnings' | 'passing'
+
 export function ScanClient({
   remaining,
   planLimit,
@@ -68,6 +70,7 @@ export function ScanClient({
   const [createResult, setCreateResult] = useState<{ created: number; skipped: number } | null>(null)
   const [isPending, startTransition] = useTransition()
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false)
+  const [activeFilter, setActiveFilter] = useState<FilterTab>('all')
 
   async function handleScan(): Promise<void> {
     const d = domain.trim().replace(/^https?:\/\//, '').split('/')[0]
@@ -150,6 +153,20 @@ export function ScanClient({
   const selectedCount = selected.size
   const totalAfter = existingCount + selectedCount
 
+  function visibleFindings(): ScanFinding[] {
+    if (activeFilter === 'issues') return issues
+    if (activeFilter === 'warnings') return warnings
+    if (activeFilter === 'passing') return [...passing, ...alreadyMonitored]
+    return [...issues, ...warnings, ...passing, ...alreadyMonitored]
+  }
+
+  function filterLabel(f: ScanFinding): string {
+    if (f.alreadyMonitored) return 'Already monitoring'
+    if (f.status === 'down') return '🔴 Issue'
+    if (f.status === 'degraded') return '🟡 Warning'
+    return '✅ Passing'
+  }
+
   return (
     <div style={{ maxWidth: 760, margin: '0 auto' }}>
 
@@ -174,7 +191,7 @@ export function ScanClient({
               autoFocus
             />
             <button className="btn btn-primary" onClick={handleScan} disabled={!domain.trim()} style={{ whiteSpace: 'nowrap', padding: '0 24px' }}>
-              Scan Now →
+              Check Now →
             </button>
           </div>
           <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>Checks SSL, security headers, DNS, blacklists, email auth, performance and more</p>
@@ -204,38 +221,65 @@ export function ScanClient({
             animation: 'spin 0.8s linear infinite', margin: '0 auto 20px',
           }} />
           <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-          <p style={{ fontSize: 16, fontWeight: 600, marginBottom: 4 }}>Scanning {scanDomain}...</p>
-          <p style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Running 18 checks in parallel — usually takes 10–15 seconds</p>
+          <p style={{ fontSize: 16, fontWeight: 600, marginBottom: 4 }}>Checking {scanDomain}...</p>
+          <p style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Running 18 monitors in parallel — usually takes 10–15 seconds</p>
         </div>
       )}
 
       {/* RESULTS SCREEN */}
       {screen === 'results' && (
-        <div>
+        <div style={{ paddingBottom: 100 }}>
+
           {/* Header */}
-          <div className="card" style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 20, padding: '16px 20px' }}>
-            <div style={{ fontSize: 28 }}>🔭</div>
+          <div className="card" style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 16, padding: '14px 20px' }}>
+            <div style={{ fontSize: 24 }}>🔭</div>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 16, fontWeight: 700 }}>{scanDomain} — Scan Complete</div>
+              <div style={{ fontSize: 15, fontWeight: 700 }}>{scanDomain} — Health Check Complete</div>
               <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
                 {issues.length} issue{issues.length !== 1 ? 's' : ''} · {warnings.length} warning{warnings.length !== 1 ? 's' : ''} · {passing.length} passing
               </div>
             </div>
-            <button className="btn btn-ghost" style={{ fontSize: 13 }} onClick={() => setScreen('input')}>← Scan another</button>
+            <button className="btn btn-ghost btn-sm" onClick={() => { setScreen('input'); setActiveFilter('all') }}>← Check another</button>
           </div>
 
-          {/* Status pills */}
-          <div style={{ display: 'flex', gap: 10, marginBottom: 24, flexWrap: 'wrap' }}>
-            {issues.length > 0 && <span style={{ background: '#ef444410', border: '1px solid #ef444440', color: '#f87171', borderRadius: 20, padding: '6px 14px', fontSize: 13, fontWeight: 600 }}>🔴 {issues.length} Issue{issues.length !== 1 ? 's' : ''}</span>}
-            {warnings.length > 0 && <span style={{ background: '#f59e0b10', border: '1px solid #f59e0b40', color: '#fbbf24', borderRadius: 20, padding: '6px 14px', fontSize: 13, fontWeight: 600 }}>🟡 {warnings.length} Warning{warnings.length !== 1 ? 's' : ''}</span>}
-            {passing.length > 0 && <span style={{ background: '#10b98110', border: '1px solid #10b98130', color: '#34d399', borderRadius: 20, padding: '6px 14px', fontSize: 13, fontWeight: 600 }}>✅ {passing.length} Passing</span>}
+          {/* Filter pills */}
+          <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap' }}>
+            {(
+              [
+                { key: 'all', label: `All (${findings.length})`, activeColor: 'var(--accent)', activeBg: 'var(--accent)' },
+                { key: 'issues', label: `🔴 ${issues.length} Issue${issues.length !== 1 ? 's' : ''}`, activeColor: '#f87171', activeBg: '#ef444415' },
+                { key: 'warnings', label: `🟡 ${warnings.length} Warning${warnings.length !== 1 ? 's' : ''}`, activeColor: '#fbbf24', activeBg: '#f59e0b15' },
+                { key: 'passing', label: `✅ ${passing.length} Passing`, activeColor: '#34d399', activeBg: '#10b98115' },
+              ] as { key: FilterTab; label: string; activeColor: string; activeBg: string }[]
+            ).map(tab => {
+              const isActive = activeFilter === tab.key
+              return (
+                <button
+                  key={tab.key}
+                  onClick={() => setActiveFilter(tab.key)}
+                  style={{
+                    border: `1.5px solid ${isActive ? tab.activeColor : 'var(--border-primary)'}`,
+                    borderRadius: 20,
+                    padding: '6px 16px',
+                    fontSize: 13,
+                    fontWeight: isActive ? 700 : 500,
+                    color: isActive ? (tab.key === 'all' ? '#fff' : tab.activeColor) : 'var(--text-secondary)',
+                    background: isActive ? (tab.key === 'all' ? 'var(--accent)' : tab.activeBg) : 'transparent',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s',
+                  }}
+                >
+                  {tab.label}
+                </button>
+              )
+            })}
           </div>
 
           {/* Plan limit bar */}
           {planLimit !== null && (
-            <div className="card" style={{ padding: '14px 18px', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 16 }}>
-              <div style={{ fontSize: 13, color: 'var(--text-secondary)', flexShrink: 0 }}>{planName} plan</div>
-              <div style={{ flex: 1, background: 'var(--border-primary)', borderRadius: 4, height: 6, overflow: 'hidden' }}>
+            <div className="card" style={{ padding: '12px 18px', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 16 }}>
+              <div style={{ fontSize: 12, color: 'var(--text-secondary)', flexShrink: 0 }}>{planName} plan</div>
+              <div style={{ flex: 1, background: 'var(--border-primary)', borderRadius: 4, height: 5, overflow: 'hidden' }}>
                 <div style={{
                   height: '100%', borderRadius: 4,
                   background: totalAfter > planLimit ? '#ef4444' : totalAfter / planLimit > 0.8 ? '#f59e0b' : 'var(--accent)',
@@ -243,161 +287,142 @@ export function ScanClient({
                   transition: 'width 0.3s',
                 }} />
               </div>
-              <div style={{ fontSize: 12, color: 'var(--text-secondary)', flexShrink: 0 }}>
+              <div style={{ fontSize: 12, color: totalAfter > planLimit ? '#f87171' : 'var(--text-secondary)', flexShrink: 0, fontWeight: totalAfter > planLimit ? 700 : 400 }}>
                 {existingCount + selectedCount} / {planLimit} monitors
+                {totalAfter > planLimit && ' — over limit'}
               </div>
             </div>
           )}
 
-          {/* Upgrade prompt */}
+          {/* Alerts */}
           {showUpgradePrompt && (
-            <div style={{ background: '#f59e0b10', border: '1px solid #f59e0b40', borderRadius: 10, padding: '14px 18px', marginBottom: 16, fontSize: 13, color: '#fbbf24' }}>
-              ⚠️ You've reached your selection limit ({remaining} monitor{remaining !== 1 ? 's' : ''} remaining on your plan).{' '}
-              <a href="/dashboard/settings?tab=billing" style={{ color: '#f59e0b', fontWeight: 700, textDecoration: 'underline' }}>Upgrade your plan →</a>
-              {' '}to add more.
+            <div style={{ background: '#f59e0b10', border: '1px solid #f59e0b40', borderRadius: 10, padding: '12px 16px', marginBottom: 14, fontSize: 13, color: '#fbbf24' }}>
+              ⚠️ You've reached your limit ({remaining} remaining).{' '}
+              <a href="/dashboard/settings?tab=billing" style={{ color: '#f59e0b', fontWeight: 700, textDecoration: 'underline' }}>Upgrade →</a>
             </div>
           )}
-
-          {/* Success message */}
           {createResult && (
-            <div style={{ background: '#10b98110', border: '1px solid #10b98140', borderRadius: 10, padding: '14px 18px', marginBottom: 16, fontSize: 13, color: '#34d399' }}>
-              ✅ {createResult.created} monitor{createResult.created !== 1 ? 's' : ''} created successfully.
+            <div style={{ background: '#10b98110', border: '1px solid #10b98140', borderRadius: 10, padding: '12px 16px', marginBottom: 14, fontSize: 13, color: '#34d399' }}>
+              ✅ {createResult.created} monitor{createResult.created !== 1 ? 's' : ''} created.
               {createResult.skipped > 0 && ` ${createResult.skipped} skipped (plan limit).`}
-              {' '}<a href="/dashboard/monitors" style={{ color: '#10b981', fontWeight: 700, textDecoration: 'underline' }}>View all monitors →</a>
+              {' '}<a href="/dashboard/monitors" style={{ color: '#10b981', fontWeight: 700, textDecoration: 'underline' }}>View monitors →</a>
             </div>
           )}
 
-          {/* Issues */}
-          {issues.length > 0 && (
-            <>
-              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>🔴 Issues — pre-selected</div>
-              <FindingList findings={issues} selected={selected} onToggle={toggleSelect} />
-            </>
-          )}
+          {/* Card grid */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            {visibleFindings().map(f => {
+              const sev = statusToSeverity(f.status)
+              const isSelected = selected.has(f.type)
+              const accentColor = f.alreadyMonitored ? 'var(--border-primary)' : sev === 'issue' ? '#ef4444' : sev === 'warn' ? '#f59e0b' : '#10b981'
+              const labelColor = f.alreadyMonitored ? 'var(--text-muted)' : sev === 'issue' ? '#f87171' : sev === 'warn' ? '#fbbf24' : '#4ade80'
 
-          {/* Warnings */}
-          {warnings.length > 0 && (
-            <>
-              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '20px 0 10px' }}>🟡 Warnings — recommended</div>
-              <FindingList findings={warnings} selected={selected} onToggle={toggleSelect} />
-            </>
-          )}
+              return (
+                <div
+                  key={f.type}
+                  onClick={() => toggleSelect(f.type, f.alreadyMonitored)}
+                  style={{
+                    border: `1.5px solid ${isSelected ? 'var(--accent)' : f.alreadyMonitored ? 'var(--border-primary)' : `${accentColor}40`}`,
+                    borderRadius: 12,
+                    padding: '14px 16px',
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: 12,
+                    cursor: f.alreadyMonitored ? 'default' : 'pointer',
+                    background: isSelected ? 'var(--bg-secondary)' : 'var(--bg-card)',
+                    opacity: f.alreadyMonitored ? 0.55 : 1,
+                    transition: 'border-color 0.15s, background 0.15s',
+                    position: 'relative',
+                  }}
+                >
+                  <div style={{ fontSize: 20, flexShrink: 0, marginTop: 1 }}>{f.emoji}</div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 3 }}>{f.label}</div>
+                    <div style={{ fontSize: 11, color: labelColor, lineHeight: 1.4 }}>
+                      {f.alreadyMonitored ? 'Already monitoring' : findingLabel(f)}
+                    </div>
+                    {f.responseTimeMs != null && !f.alreadyMonitored && (
+                      <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 4 }}>{f.responseTimeMs}ms</div>
+                    )}
+                    <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 4 }}>{filterLabel(f)}</div>
+                  </div>
+                  <div style={{ flexShrink: 0, marginTop: 2 }}>
+                    {f.alreadyMonitored ? (
+                      <div style={{ fontSize: 10, background: '#22543d', color: '#4ade80', padding: '2px 7px', borderRadius: 5, fontWeight: 700 }}>Active</div>
+                    ) : (
+                      <div style={{
+                        width: 18, height: 18, borderRadius: 4,
+                        border: `1.5px solid ${isSelected ? 'var(--accent)' : 'var(--border-primary)'}`,
+                        background: isSelected ? 'var(--accent)' : 'transparent',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      }}>
+                        {isSelected && <svg width="10" height="10" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,1.5" stroke="#fff" strokeWidth="1.5" fill="none" /></svg>}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
 
-          {/* Passing */}
-          {passing.length > 0 && (
-            <>
-              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '20px 0 10px' }}>✅ Passing — monitor anyway?</div>
-              <FindingList findings={passing} selected={selected} onToggle={toggleSelect} />
-            </>
-          )}
-
-          {/* Already monitored */}
-          {alreadyMonitored.length > 0 && (
-            <>
-              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '20px 0 10px' }}>Already Monitoring</div>
-              <FindingList findings={alreadyMonitored} selected={selected} onToggle={toggleSelect} />
-            </>
+          {visibleFindings().length === 0 && (
+            <div style={{ textAlign: 'center', padding: '32px 0', fontSize: 13, color: 'var(--text-muted)' }}>
+              No results in this category.
+            </div>
           )}
 
           {/* Manual setup notice */}
-          <div className="card" style={{ padding: '14px 18px', marginTop: 20, fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.7 }}>
-            ⚙️ <strong style={{ color: 'var(--text-primary)' }}>Need more?</strong> Keyword Detection, API Endpoint, Heartbeat, Port Check, and Page Change Detection require individual configuration.{' '}
+          <div style={{ marginTop: 20, padding: '12px 16px', borderRadius: 10, border: '1px solid var(--border-primary)', fontSize: 13, color: 'var(--text-secondary)' }}>
+            ⚙️ <strong style={{ color: 'var(--text-primary)' }}>Need more?</strong> Keyword, API Endpoint, Heartbeat, Port Check require manual setup.{' '}
             <a href="/dashboard/monitors/new/manual" style={{ color: 'var(--accent)', textDecoration: 'underline' }}>Add individually →</a>
           </div>
+        </div>
+      )}
 
-          {/* Sticky create bar */}
-          <div style={{
-            position: 'sticky', bottom: 0, background: 'var(--bg-card)',
-            borderTop: '1px solid var(--border-primary)', padding: '16px 0',
-            display: 'flex', alignItems: 'center', gap: 14, marginTop: 24,
-          }}>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 14, fontWeight: 700 }}>
-                {selectedCount > 0 ? `${selectedCount} monitor${selectedCount !== 1 ? 's' : ''} selected` : 'Select monitors above'}
-              </div>
-              <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
-                {selectedCount > 0 ? `Will use ${totalAfter} of ${planLimit ?? '∞'} monitor slots` : 'Click a result to select it for monitoring'}
-              </div>
+      {/* FLOATING ACTION BAR — only when results visible */}
+      {screen === 'results' && (
+        <div style={{
+          position: 'fixed',
+          bottom: 24,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          background: 'var(--bg-card)',
+          border: '1.5px solid var(--border-primary)',
+          borderRadius: 14,
+          boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
+          padding: '14px 20px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 16,
+          minWidth: 420,
+          zIndex: 200,
+        }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 14, fontWeight: 700 }}>
+              {selectedCount > 0 ? `${selectedCount} monitor${selectedCount !== 1 ? 's' : ''} selected` : 'Select monitors above'}
             </div>
-            <button
-              className="btn btn-ghost"
-              onClick={() => { setSelected(new Set()); setShowUpgradePrompt(false) }}
-              disabled={selectedCount === 0}
-            >
-              Clear
-            </button>
-            <button
-              className="btn btn-primary"
-              onClick={handleCreate}
-              disabled={selectedCount === 0 || isPending}
-            >
-              {isPending ? 'Creating...' : `Create ${selectedCount} Monitor${selectedCount !== 1 ? 's' : ''} →`}
-            </button>
+            <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 1 }}>
+              {selectedCount > 0 ? `${totalAfter} of ${planLimit ?? '∞'} monitor slots used` : 'Click any card to include it'}
+            </div>
           </div>
+          <button
+            className="btn btn-ghost btn-sm"
+            onClick={() => { setSelected(new Set()); setShowUpgradePrompt(false) }}
+            disabled={selectedCount === 0}
+          >
+            Clear
+          </button>
+          <button
+            className="btn btn-primary"
+            onClick={handleCreate}
+            disabled={selectedCount === 0 || isPending}
+            style={{ whiteSpace: 'nowrap', padding: '10px 20px', fontSize: 14, fontWeight: 700 }}
+          >
+            {isPending ? 'Creating...' : `Create ${selectedCount > 0 ? selectedCount : ''} Monitor${selectedCount !== 1 ? 's' : ''} →`}
+          </button>
         </div>
       )}
     </div>
   )
 }
 
-function FindingList({
-  findings,
-  selected,
-  onToggle,
-}: {
-  findings: ScanFinding[]
-  selected: Set<string>
-  onToggle: (type: string, alreadyMonitored: boolean) => void
-}): React.ReactElement {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 4 }}>
-      {findings.map(f => {
-        const sev = statusToSeverity(f.status)
-        const isSelected = selected.has(f.type)
-        const borderColor = f.alreadyMonitored ? 'var(--border-primary)' : sev === 'issue' ? '#ef444440' : sev === 'warn' ? '#f59e0b40' : '#10b98130'
-        const labelColor = f.alreadyMonitored ? 'var(--text-muted)' : sev === 'issue' ? '#f87171' : sev === 'warn' ? '#fbbf24' : '#4ade80'
-
-        return (
-          <div
-            key={f.type}
-            onClick={() => onToggle(f.type, f.alreadyMonitored)}
-            style={{
-              border: `1.5px solid ${isSelected ? 'var(--accent)' : borderColor}`,
-              borderRadius: 10,
-              padding: '12px 16px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 12,
-              cursor: f.alreadyMonitored ? 'default' : 'pointer',
-              background: isSelected ? 'var(--bg-secondary)' : 'var(--bg-card)',
-              opacity: f.alreadyMonitored ? 0.55 : 1,
-              transition: 'border-color 0.15s, background 0.15s',
-            }}
-          >
-            <div style={{ fontSize: 22, flexShrink: 0 }}>{f.emoji}</div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 2 }}>{f.label}</div>
-              <div style={{ fontSize: 12, color: labelColor }}>{f.alreadyMonitored ? 'Already monitoring' : findingLabel(f)}</div>
-            </div>
-            {f.responseTimeMs != null && !f.alreadyMonitored && (
-              <div style={{ fontSize: 11, color: 'var(--text-muted)', flexShrink: 0 }}>{f.responseTimeMs}ms</div>
-            )}
-            {!f.alreadyMonitored && (
-              <div style={{
-                width: 20, height: 20, borderRadius: 5, flexShrink: 0,
-                border: `1.5px solid ${isSelected ? 'var(--accent)' : 'var(--border-primary)'}`,
-                background: isSelected ? 'var(--accent)' : 'transparent',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                {isSelected && <svg width="11" height="11" viewBox="0 0 11 11"><polyline points="1.5,5.5 4,8 9.5,1.5" stroke="#fff" strokeWidth="1.5" fill="none" /></svg>}
-              </div>
-            )}
-            {f.alreadyMonitored && (
-              <div style={{ fontSize: 10, background: '#22543d', color: '#4ade80', padding: '2px 8px', borderRadius: 5, fontWeight: 700, flexShrink: 0 }}>Active</div>
-            )}
-          </div>
-        )
-      })}
-    </div>
-  )
-}
