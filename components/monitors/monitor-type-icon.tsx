@@ -62,9 +62,12 @@ const displayNames: Record<string, string> = {
   'nameserver-change': 'Nameservers',
 }
 
-export function MonitorTypeIcon({ type }: { type: string }) {
+export function MonitorTypeIcon({ type, iconOnly = false }: { type: string; iconOnly?: boolean }) {
   const Icon = iconMap[type]
   const label = displayNames[type] ?? type
+  if (iconOnly) {
+    return Icon ? <Icon size={14} /> : <span style={{ fontSize: 10 }}>{label.slice(0, 2)}</span>
+  }
   return (
     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
       {Icon && <Icon size={16} />}

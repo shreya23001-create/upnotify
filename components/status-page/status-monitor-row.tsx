@@ -56,7 +56,7 @@ export function StatusMonitorRow({ monitor, uptimeSlots, uptimePercent, range }:
       {/* Row 1: icon + name + status pill */}
       <div className="sp-monitor-row-top">
         <div className="sp-monitor-type-icon">
-          <MonitorTypeIcon type={monitor.type} />
+          <MonitorTypeIcon type={monitor.type} iconOnly />
         </div>
         <div className="sp-monitor-name">{monitor.name}</div>
         <div className="sp-monitor-row-pill">
