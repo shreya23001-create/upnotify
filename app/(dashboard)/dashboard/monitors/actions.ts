@@ -10,6 +10,7 @@ import { logger } from '@/lib/utils/logger'
 import { devAuditLog } from '@/lib/db/audit'
 import { impersonationGuard } from '@/lib/auth/impersonation-guard'
 import { resolveIncident, getOpenIncidentForMonitor } from '@/lib/db/incidents'
+import { MONITOR_TYPES } from '@/lib/constants/monitor-types'
 
 // Types that require a URL target (need SSRF + protocol validation)
 const URL_TARGET_TYPES = ['http', 'https', 'keyword', 'api', 'ssl', 'domain']
@@ -462,7 +463,10 @@ export async function bulkCreateMonitorsAction(items: BulkCreateItem[]): Promise
       name: item.name,
       type: item.type,
       target: normalisedTarget,
-      check_interval_seconds: planLimits.checkIntervalSeconds,
+      check_interval_seconds: Math.max(
+        MONITOR_TYPES.find(t => t.type === item.type)?.defaultInterval ?? planLimits.checkIntervalSeconds,
+        planLimits.checkIntervalSeconds
+      ),
       severity: 'P2',
       config: {},
     })
