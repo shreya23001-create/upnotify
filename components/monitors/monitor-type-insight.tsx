@@ -392,32 +392,46 @@ export function MonitorTypeInsight({
   monitor: Pick<Monitor, 'type'>
   latestMetadata: Record<string, unknown> | undefined | null
 }): React.ReactElement | null {
-  if (!latestMetadata) return null
-
-  const meta = latestMetadata
   const title = TITLES[monitor.type]
   if (!title) return null
 
+  if (!latestMetadata) {
+    return (
+      <div className="card" style={{ marginBottom: 24 }}>
+        <div className="card-header">
+          <div className="card-title">{title} — Latest Reading</div>
+        </div>
+        <div style={{ padding: '16px 20px', fontSize: 13, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 10 }}>
+          <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" style={{ flexShrink: 0 }}>
+            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+          </svg>
+          Waiting for the first check to complete — data will appear here shortly.
+        </div>
+      </div>
+    )
+  }
+
+  const meta = latestMetadata
   let body: React.ReactNode = null
   switch (monitor.type) {
-    case 'ssl':             body = <SslInsight meta={meta} />; break
+    case 'ssl':               body = <SslInsight meta={meta} />; break
     case 'domain':
-    case 'whois-change':    body = <DomainInsight meta={meta} />; break
-    case 'security-headers': body = <SecurityHeadersInsight meta={meta} />; break
-    case 'spf-dmarc':       body = <SpfDmarcInsight meta={meta} />; break
-    case 'blacklist':       body = <BlacklistInsight meta={meta} />; break
-    case 'mx-health':       body = <MxHealthInsight meta={meta} />; break
-    case 'dns':             body = <DnsInsight meta={meta} />; break
-    case 'redirect-chain':  body = <RedirectChainInsight meta={meta} />; break
-    case 'ip-change':       body = <IpChangeInsight meta={meta} />; break
-    case 'sitemap':         body = <SitemapInsight meta={meta} />; break
-    case 'robots-txt':      body = <RobotsTxtInsight meta={meta} />; break
-    case 'cookie-consent':  body = <CookieConsentInsight meta={meta} />; break
+    case 'whois-change':      body = <DomainInsight meta={meta} />; break
+    case 'security-headers':  body = <SecurityHeadersInsight meta={meta} />; break
+    case 'spf-dmarc':         body = <SpfDmarcInsight meta={meta} />; break
+    case 'blacklist':         body = <BlacklistInsight meta={meta} />; break
+    case 'mx-health':         body = <MxHealthInsight meta={meta} />; break
+    case 'dns':               body = <DnsInsight meta={meta} />; break
+    case 'redirect-chain':    body = <RedirectChainInsight meta={meta} />; break
+    case 'ip-change':         body = <IpChangeInsight meta={meta} />; break
+    case 'sitemap':           body = <SitemapInsight meta={meta} />; break
+    case 'robots-txt':        body = <RobotsTxtInsight meta={meta} />; break
+    case 'cookie-consent':    body = <CookieConsentInsight meta={meta} />; break
     case 'nameserver-change': body = <NameserverInsight meta={meta} />; break
-    case 'response-time':   body = <ResponseTimeInsight meta={meta} />; break
-    case 'page-size':       body = <PageSizeInsight meta={meta} />; break
-    case 'heartbeat':       body = <HeartbeatInsight meta={meta} />; break
-    default:                return null
+    case 'response-time':     body = <ResponseTimeInsight meta={meta} />; break
+    case 'page-size':         body = <PageSizeInsight meta={meta} />; break
+    case 'heartbeat':         body = <HeartbeatInsight meta={meta} />; break
+    default:                  return null
   }
 
   return (
