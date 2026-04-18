@@ -1,9 +1,10 @@
 import * as dns from 'dns/promises'
 import type { Monitor } from '@/lib/types'
 import type { CheckerResult } from './types'
+import { apexDomain } from './utils'
 
 export async function check(monitor: Monitor): Promise<CheckerResult> {
-  const domain = monitor.target.replace(/^https?:\/\//, '').split('/')[0]
+  const domain = apexDomain(monitor.target)
   const start = Date.now()
 
   try {
