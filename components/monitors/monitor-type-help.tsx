@@ -293,9 +293,9 @@ function Accordion({ q, a }: { q: string; a: string }) {
           justifyContent: 'space-between', alignItems: 'flex-start', gap: 8,
         }}
       >
-        <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary, #111)', lineHeight: 1.4 }}>{q}</span>
+        <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', lineHeight: 1.4 }}>{q}</span>
         <span style={{
-          fontSize: 16, color: 'var(--text-muted, #888)',
+          fontSize: 16, color: 'var(--text-muted)',
           flexShrink: 0, marginTop: 1,
           transform: open ? 'rotate(45deg)' : 'none',
           transition: 'transform 0.15s',
@@ -304,7 +304,7 @@ function Accordion({ q, a }: { q: string; a: string }) {
       </button>
       {open && (
         <p style={{
-          fontSize: 13, color: 'var(--text-secondary, #555)',
+          fontSize: 13, color: 'var(--text-secondary)',
           lineHeight: 1.65, margin: '0 0 10px',
         }}>{a}</p>
       )}
@@ -318,8 +318,8 @@ export function MonitorTypeHelp({ type }: { type: string }) {
 
   return (
     <div style={{
-      background: 'var(--bg-secondary, #f8fafc)',
-      border: '1.5px solid var(--border-primary, #e5e7eb)',
+      background: 'var(--bg-subtle)',
+      border: '1.5px solid var(--border-primary)',
       borderRadius: 12,
       padding: '24px 24px 20px',
       height: '100%',
@@ -328,34 +328,34 @@ export function MonitorTypeHelp({ type }: { type: string }) {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
         <span style={{ fontSize: 28 }}>{help.emoji}</span>
-        <span style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary, #111)' }}>{help.name}</span>
+        <span style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)' }}>{help.name}</span>
       </div>
 
       {/* What it does */}
       <p style={{
         fontSize: 13, lineHeight: 1.7,
-        color: 'var(--text-secondary, #555)',
+        color: 'var(--text-secondary)',
         marginBottom: 18,
       }}>{help.what}</p>
 
       {/* Target hint */}
       <div style={{
-        background: 'var(--bg-card, #fff)',
-        border: '1px solid var(--border-primary, #e5e7eb)',
+        background: 'var(--bg-card)',
+        border: '1px solid var(--border-primary)',
         borderRadius: 8,
         padding: '10px 14px',
         marginBottom: 20,
       }}>
-        <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, color: 'var(--text-muted, #888)', marginBottom: 4 }}>
+        <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, color: 'var(--text-muted)', marginBottom: 4 }}>
           {help.targetLabel}
         </div>
-        <div style={{ fontSize: 13, color: 'var(--text-secondary, #555)', fontFamily: 'monospace' }}>
+        <div style={{ fontSize: 13, color: 'var(--text-secondary)', fontFamily: 'monospace' }}>
           {help.targetHint}
         </div>
       </div>
 
       {/* FAQs */}
-      <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, color: 'var(--text-muted, #888)', marginBottom: 4 }}>
+      <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, color: 'var(--text-muted)', marginBottom: 4 }}>
         Common questions
       </div>
       <div>
