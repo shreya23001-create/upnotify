@@ -37,7 +37,11 @@ export async function GET(request: Request): Promise<NextResponse> {
   }
 
   const cronStart = Date.now()
-  const scheduleBase = new Date(cronStart) // fixed reference for next_check_at — avoids drift from Phase 1 duration
+  // Round down to the cron fire minute so next_check_at lands exactly on the next cron boundary.
+  // Without this, a 3s function startup delay shifts next_check_at past the next :00 mark and
+  // causes monitors to be skipped for an entire minute (effectively 2× their configured interval).
+  const scheduleBase = new Date(cronStart)
+  scheduleBase.setSeconds(0, 0)
   const runId = await startCronRun('/api/cron/check-runner', getTriggeredBy(request))
 
   try {
