@@ -22,7 +22,7 @@ export default function MonitoringIndexPage() {
 
       {/* Hero */}
       <section style={{
-        background: 'linear-gradient(135deg, #f0f5ff 0%, #eaf6fd 40%, #f3eeff 70%, #e8f8fc 100%)',
+        background: 'var(--bg-subtle)',
         padding: '72px 24px 64px',
         textAlign: 'center',
         borderBottom: '1px solid var(--border)',

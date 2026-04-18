@@ -431,7 +431,7 @@ export default async function MonitoringTypePage({ params }: { params: Promise<{
 
       {/* Hero */}
       <section style={{
-        background: 'linear-gradient(135deg, #f0f5ff 0%, #eaf6fd 40%, #f3eeff 70%, #e8f8fc 100%)',
+        background: 'var(--bg-subtle)',
         borderBottom: '1px solid var(--border)',
         padding: '56px 24px 52px',
       }}>
