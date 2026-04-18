@@ -5,6 +5,7 @@ import { createIncident, resolveIncident, getOpenIncidentForMonitor } from '@/li
 import { isMonitorInMaintenance } from '@/lib/db/maintenance-windows'
 import { dispatchChecker } from '@/lib/services/checker'
 import { dispatchAlerts, dispatchRecoveryAlerts } from '@/lib/services/alert-dispatcher'
+import { getAlertCopy } from '@/lib/utils/alert-copy'
 import { getServerConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
 import { startCronRun, endCronRun, getTriggeredBy } from '@/lib/utils/cron-logger'
@@ -154,11 +155,11 @@ export async function GET(request: Request): Promise<NextResponse> {
           if (confirmation.status === 'down') {
             const existingIncident = await getOpenIncidentForMonitor(monitor.id)
             if (!existingIncident) {
-              // Build incident title with keyword details if applicable
-              let incidentTitle = `${monitor.name} is down`
-              if (monitor.type === 'keyword' && confirmation.errorMessage) {
-                incidentTitle = `${monitor.name} — ${confirmation.errorMessage}`
-              }
+              const alertCopy = getAlertCopy(monitor, { severity: monitor.severity }, {
+                variant: 'alert',
+                metadata: confirmation.metadata as Record<string, unknown> | undefined,
+              })
+              const incidentTitle = alertCopy.headline
 
               const newIncident = await createIncident({
                 org_id: monitor.org_id,

@@ -35,12 +35,40 @@ const iconMap: Record<string, React.ComponentType<{ size?: number }>> = {
   'nameserver-change': IconNameserverChange,
 }
 
+const displayNames: Record<string, string> = {
+  http: 'HTTP Uptime',
+  ssl: 'SSL Certificate',
+  dns: 'DNS Records',
+  keyword: 'Keyword',
+  domain: 'Domain Expiry',
+  port: 'Port Check',
+  ping: 'Ping',
+  api: 'API Endpoint',
+  heartbeat: 'Heartbeat',
+  competitor: 'Competitor',
+  server: 'Server',
+  'security-headers': 'Security Headers',
+  'response-time': 'Response Time',
+  'robots-txt': 'robots.txt',
+  'ip-change': 'IP Change',
+  'mx-health': 'MX Health',
+  'whois-change': 'WHOIS Change',
+  sitemap: 'Sitemap',
+  'redirect-chain': 'Redirect Chain',
+  'spf-dmarc': 'SPF / DMARC',
+  blacklist: 'Blacklist',
+  'page-size': 'Page Size',
+  'cookie-consent': 'Cookie Consent',
+  'nameserver-change': 'Nameservers',
+}
+
 export function MonitorTypeIcon({ type }: { type: string }) {
   const Icon = iconMap[type]
+  const label = displayNames[type] ?? type
   return (
-    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, textTransform: 'capitalize' }}>
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
       {Icon && <Icon size={16} />}
-      {type}
+      {label}
     </span>
   )
 }

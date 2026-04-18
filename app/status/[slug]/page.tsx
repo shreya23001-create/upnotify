@@ -117,15 +117,12 @@ export default async function PublicStatusPage({
 
     <div className="status-page">
       <div className="status-page-header">
-        <div className="status-page-logo">
-          {orgLogoUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
+        {orgLogoUrl && (
+          <div className="status-page-logo">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={orgLogoUrl} alt={`${statusPage.name} logo`} className="status-page-logo-img" />
-          ) : (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src="/favicon.ico" alt="Uptrue" className="status-page-logo-favicon" />
-          )}
-        </div>
+          </div>
+        )}
         <h1 className="status-page-title">{statusPage.name}</h1>
         <p className="status-last-updated">Last updated: {new Date().toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' })}</p>
       </div>

@@ -1,3 +1,4 @@
+import '../../landing.css'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
@@ -427,130 +428,235 @@ export default async function MonitoringTypePage({ params }: { params: Promise<{
   return (
     <>
       <PublicNav />
-      <main style={{ maxWidth: 860, margin: '0 auto', padding: '48px 24px 80px' }}>
 
-        {/* Breadcrumb */}
-        <nav style={{ fontSize: 14, color: 'var(--color-muted)', marginBottom: 32 }}>
-          <Link href="/monitoring" style={{ color: 'var(--color-accent)', textDecoration: 'none' }}>All Monitor Types</Link>
-          {' → '}
-          {page.name}
-        </nav>
+      {/* Hero */}
+      <section style={{
+        background: 'linear-gradient(135deg, #f0f5ff 0%, #eaf6fd 40%, #f3eeff 70%, #e8f8fc 100%)',
+        borderBottom: '1px solid var(--border)',
+        padding: '56px 24px 52px',
+      }}>
+        <div style={{ maxWidth: 780, margin: '0 auto' }}>
+          {/* Breadcrumb */}
+          <nav style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 28, display: 'flex', alignItems: 'center', gap: 6 }}>
+            <Link href="/monitoring" style={{ color: 'var(--accent)', fontWeight: 500 }}>All Monitor Types</Link>
+            <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+            <span>{page.name}</span>
+          </nav>
 
-        {/* Header */}
-        <div style={{ marginBottom: 48 }}>
-          <div style={{ fontSize: 48, marginBottom: 16 }}>{page.emoji}</div>
-          <h1 style={{ fontSize: 36, fontWeight: 800, marginBottom: 12, letterSpacing: -0.5 }}>{page.name}</h1>
-          <p style={{ fontSize: 20, color: 'var(--color-muted)', marginBottom: 24, lineHeight: 1.5 }}>{page.tagline}</p>
-          <p style={{ fontSize: 16, lineHeight: 1.7 }}>{page.description}</p>
+          <div style={{
+            width: 56, height: 56,
+            background: 'var(--brand-gradient-soft)',
+            border: '1px solid rgba(59,130,246,0.2)',
+            borderRadius: 14,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 28, marginBottom: 20,
+          }}>
+            {page.emoji}
+          </div>
+
+          <h1 style={{
+            fontSize: 'clamp(28px, 4vw, 44px)',
+            fontWeight: 900,
+            letterSpacing: '-0.03em',
+            color: 'var(--text-primary)',
+            lineHeight: 1.15,
+            marginBottom: 14,
+          }}>
+            {page.name}
+          </h1>
+          <p style={{ fontSize: 18, color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: 28, maxWidth: 620 }}>
+            {page.tagline}
+          </p>
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+            <Link href="/signup" className="btn btn-primary">
+              <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              Start Monitoring Free
+            </Link>
+            <Link href="/monitoring" className="btn btn-ghost">← All Monitor Types</Link>
+          </div>
+        </div>
+      </section>
+
+      <main style={{ maxWidth: 780, margin: '0 auto', padding: '52px 24px 80px' }}>
+
+        {/* Description */}
+        <p style={{ fontSize: 16, lineHeight: 1.75, color: 'var(--text-secondary)', marginBottom: 48, borderBottom: '1px solid var(--border)', paddingBottom: 48 }}>
+          {page.description}
+        </p>
+
+        {/* How it works */}
+        <Section title="How it works" icon="⚙️">
+          <p style={{ fontSize: 15, lineHeight: 1.75, color: 'var(--text-secondary)' }}>{page.howItWorks}</p>
+        </Section>
+
+        {/* What we check */}
+        <Section title="What Uptrue checks" icon="✓">
+          <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {page.whatWeCheck.map((item, i) => (
+              <li key={i} style={{
+                display: 'flex', gap: 12, alignItems: 'flex-start',
+                padding: '10px 14px',
+                background: 'var(--color-up-bg)',
+                border: '1px solid var(--color-up-border)',
+                borderRadius: 8,
+                fontSize: 14,
+              }}>
+                <svg width="14" height="14" fill="none" stroke="var(--color-up)" strokeWidth="2.5" viewBox="0 0 24 24" style={{ flexShrink: 0, marginTop: 1 }}>
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+                <span style={{ color: 'var(--text-primary)' }}>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </Section>
+
+        {/* Alert conditions */}
+        <Section title="Alert conditions" icon="⚠">
+          <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {page.alertConditions.map((item, i) => (
+              <li key={i} style={{
+                display: 'flex', gap: 12, alignItems: 'flex-start',
+                padding: '10px 14px',
+                background: 'var(--color-down-bg)',
+                border: '1px solid var(--color-down-border)',
+                borderRadius: 8,
+                fontSize: 14,
+              }}>
+                <svg width="14" height="14" fill="none" stroke="var(--color-down)" strokeWidth="2.5" viewBox="0 0 24 24" style={{ flexShrink: 0, marginTop: 1 }}>
+                  <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+                <span style={{ color: 'var(--text-primary)' }}>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </Section>
+
+        {/* Why it matters */}
+        <div style={{
+          marginBottom: 48,
+          padding: '20px 24px',
+          background: 'var(--bg-subtle)',
+          borderRadius: '0 10px 10px 0',
+          border: '1px solid var(--border)',
+          borderLeft: '3px solid var(--accent)',
+        }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Why this matters</div>
+          <p style={{ fontSize: 15, lineHeight: 1.75, color: 'var(--text-secondary)', margin: 0 }}>{page.whyItMatters}</p>
         </div>
 
-        {/* CTA */}
-        <div style={{ background: 'var(--color-surface-2, #f5f5f5)', borderRadius: 12, padding: '24px 28px', marginBottom: 48, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
+        {/* CTA inline */}
+        <div style={{
+          background: 'var(--brand-gradient)',
+          borderRadius: 14,
+          padding: '28px 32px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: 20,
+          marginBottom: 48,
+        }}>
           <div>
-            <div style={{ fontWeight: 700, fontSize: 16 }}>Start monitoring in 60 seconds</div>
-            <div style={{ color: 'var(--color-muted)', fontSize: 14 }}>Free plan includes 5 monitors. No credit card required.</div>
+            <div style={{ fontWeight: 700, fontSize: 16, color: '#fff', marginBottom: 4 }}>Set up in 60 seconds</div>
+            <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)' }}>Free plan · 3 monitors · No credit card required</div>
           </div>
-          <Link
-            href="https://app.uptrue.io/signup"
-            style={{
-              background: 'var(--color-accent)', color: '#fff',
-              padding: '10px 24px', borderRadius: 8, fontWeight: 600,
-              textDecoration: 'none', fontSize: 15, whiteSpace: 'nowrap',
-            }}
-          >
-            Get Started Free
+          <Link href="/signup" style={{
+            background: '#fff',
+            color: 'var(--brand-blue)',
+            padding: '10px 22px',
+            borderRadius: 8,
+            fontWeight: 700,
+            fontSize: 14,
+            textDecoration: 'none',
+            whiteSpace: 'nowrap',
+            flexShrink: 0,
+          }}>
+            Get Started Free →
           </Link>
         </div>
 
-        {/* How it works */}
-        <section style={{ marginBottom: 40 }}>
-          <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 12 }}>How it works</h2>
-          <p style={{ fontSize: 15, lineHeight: 1.7, color: 'var(--color-fg)' }}>{page.howItWorks}</p>
-        </section>
-
-        {/* What we check */}
-        <section style={{ marginBottom: 40 }}>
-          <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 16 }}>What Uptrue checks</h2>
-          <ul style={{ paddingLeft: 0, listStyle: 'none', margin: 0 }}>
-            {page.whatWeCheck.map((item, i) => (
-              <li key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', marginBottom: 10, fontSize: 15 }}>
-                <span style={{ color: 'var(--color-accent)', marginTop: 1 }}>✓</span>
-                <span>{item}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        {/* Alert conditions */}
-        <section style={{ marginBottom: 40 }}>
-          <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 16 }}>Alert conditions</h2>
-          <ul style={{ paddingLeft: 0, listStyle: 'none', margin: 0 }}>
-            {page.alertConditions.map((item, i) => (
-              <li key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', marginBottom: 10, fontSize: 15 }}>
-                <span style={{ color: '#e55', marginTop: 1 }}>⚠</span>
-                <span>{item}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        {/* Why it matters */}
-        <section style={{ marginBottom: 40, padding: '24px 28px', borderLeft: '3px solid var(--color-accent)', background: 'var(--color-surface-2, #f9f9f9)', borderRadius: '0 8px 8px 0' }}>
-          <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 10 }}>Why this matters</h2>
-          <p style={{ fontSize: 15, lineHeight: 1.7, margin: 0 }}>{page.whyItMatters}</p>
-        </section>
-
         {/* FAQ */}
-        <section style={{ marginBottom: 56 }}>
-          <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 24 }}>Frequently asked questions</h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+        <Section title="Frequently asked questions" icon="?">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {page.faq.map((item, i) => (
-              <div key={i}>
-                <div style={{ fontWeight: 600, marginBottom: 6 }}>{item.q}</div>
-                <div style={{ color: 'var(--color-muted)', fontSize: 15, lineHeight: 1.65 }}>{item.a}</div>
+              <div key={i} style={{
+                padding: '16px 20px',
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border)',
+                borderRadius: 10,
+              }}>
+                <div style={{ fontWeight: 600, fontSize: 15, color: 'var(--text-primary)', marginBottom: 6 }}>{item.q}</div>
+                <div style={{ fontSize: 14, lineHeight: 1.7, color: 'var(--text-secondary)' }}>{item.a}</div>
               </div>
             ))}
           </div>
-        </section>
+        </Section>
 
-        {/* Related */}
+        {/* Related monitors */}
         {relatedPages.length > 0 && (
-          <section style={{ marginBottom: 56 }}>
-            <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 16 }}>Related monitor types</h2>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 16 }}>
+          <div style={{ marginBottom: 48 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 16 }}>Related Monitor Types</div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 12 }}>
               {relatedPages.map(r => (
                 <Link
                   key={r.slug}
                   href={`/monitoring/${r.slug}`}
                   style={{
-                    display: 'block', padding: '16px 20px', borderRadius: 10,
-                    border: '1.5px solid var(--color-border)',
-                    textDecoration: 'none', color: 'inherit',
+                    display: 'flex', alignItems: 'center', gap: 12,
+                    padding: '14px 16px',
+                    background: 'var(--bg-card)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 10,
+                    textDecoration: 'none',
+                    color: 'inherit',
+                    transition: 'border-color 0.15s, box-shadow 0.15s',
+                  }}
+                  onMouseEnter={e => {
+                    const el = e.currentTarget as HTMLAnchorElement
+                    el.style.borderColor = 'rgba(59,130,246,0.35)'
+                    el.style.boxShadow = '0 4px 12px rgba(59,130,246,0.08)'
+                  }}
+                  onMouseLeave={e => {
+                    const el = e.currentTarget as HTMLAnchorElement
+                    el.style.borderColor = 'var(--border)'
+                    el.style.boxShadow = 'none'
                   }}
                 >
-                  <div style={{ fontSize: 24, marginBottom: 6 }}>{r.emoji}</div>
-                  <div style={{ fontWeight: 600, fontSize: 14 }}>{r.name}</div>
+                  <span style={{
+                    width: 36, height: 36,
+                    background: 'var(--brand-gradient-soft)',
+                    borderRadius: 8,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 18, flexShrink: 0,
+                  }}>{r.emoji}</span>
+                  <span style={{ fontWeight: 600, fontSize: 13, color: 'var(--text-primary)' }}>{r.name}</span>
                 </Link>
               ))}
             </div>
-          </section>
+          </div>
         )}
 
         {/* Final CTA */}
-        <div style={{ textAlign: 'center', padding: '40px 24px', border: '1.5px solid var(--color-border)', borderRadius: 12 }}>
-          <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 8 }}>Ready to set up {page.name.split(' ')[0]} monitoring?</h2>
-          <p style={{ color: 'var(--color-muted)', marginBottom: 24 }}>
-            Join thousands of teams who monitor their infrastructure with Uptrue.
-            Free plan. No credit card.
+        <div style={{
+          textAlign: 'center',
+          padding: '44px 32px',
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border)',
+          borderRadius: 16,
+        }}>
+          <div style={{ fontSize: 24, marginBottom: 12 }}>{page.emoji}</div>
+          <h2 style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--text-primary)', marginBottom: 8 }}>
+            Ready to set up {page.name}?
+          </h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: 14, marginBottom: 24, maxWidth: 400, margin: '0 auto 24px' }}>
+            Join teams who monitor their infrastructure with Uptrue. Free plan, no credit card required.
           </p>
-          <Link
-            href="https://app.uptrue.io/signup"
-            style={{
-              display: 'inline-block', background: 'var(--color-accent)', color: '#fff',
-              padding: '12px 32px', borderRadius: 8, fontWeight: 700,
-              textDecoration: 'none', fontSize: 16,
-            }}
-          >
+          <Link href="/signup" className="btn btn-primary btn-lg">
+            <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
             Start Monitoring Free
           </Link>
         </div>
@@ -558,5 +664,32 @@ export default async function MonitoringTypePage({ params }: { params: Promise<{
       </main>
       <PublicFooter />
     </>
+  )
+}
+
+function Section({ title, icon, children }: { title: string; icon: string; children: React.ReactNode }) {
+  return (
+    <div style={{ marginBottom: 48 }}>
+      <h2 style={{
+        fontSize: 18,
+        fontWeight: 700,
+        color: 'var(--text-primary)',
+        marginBottom: 16,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 8,
+      }}>
+        <span style={{
+          width: 28, height: 28,
+          background: 'var(--bg-subtle)',
+          border: '1px solid var(--border)',
+          borderRadius: 7,
+          display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: 13, flexShrink: 0,
+        }}>{icon}</span>
+        {title}
+      </h2>
+      {children}
+    </div>
   )
 }
