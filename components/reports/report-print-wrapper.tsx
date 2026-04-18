@@ -1,0 +1,52 @@
+'use client'
+
+interface ReportPrintWrapperProps {
+  title: string
+  period: string
+  generatedAt: string
+  children: React.ReactNode
+}
+
+export function ReportPrintWrapper({ title, period, generatedAt, children }: ReportPrintWrapperProps): React.ReactElement {
+  const formatted = new Date(generatedAt).toLocaleDateString('en-GB', {
+    day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit',
+  })
+
+  return (
+    <div className="report-a4">
+      {/* Download button — hidden when printing */}
+      <div className="no-print" style={{ marginBottom: 16, display: 'flex', justifyContent: 'flex-end' }}>
+        <button
+          className="btn btn-primary"
+          onClick={() => window.print()}
+        >
+          Download PDF
+        </button>
+      </div>
+
+      {/* Printable page */}
+      <div className="report-page">
+        {/* Page header */}
+        <div className="report-page-header">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.svg" alt="Uptrue" height={28} style={{ display: 'block' }} />
+          <div style={{ textAlign: 'right' }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: '#1a1a2e' }}>{title}</div>
+            <div style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>{period}</div>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="report-page-body">
+          {children}
+        </div>
+
+        {/* Footer */}
+        <div className="report-page-footer">
+          <span>Generated {formatted}</span>
+          <span style={{ fontWeight: 500 }}>Powered by Uptrue · uptrue.io</span>
+        </div>
+      </div>
+    </div>
+  )
+}

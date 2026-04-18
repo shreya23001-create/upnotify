@@ -88,7 +88,6 @@ export function MonitorTable({ monitors, uptimeData, initialSearch = '' }: Monit
     { key: 'uptime', label: 'Uptime (12h)', sortable: false, searchable: false, render: (m) => <UptimeBar slots={uptimeData[m.id] || []} /> },
     { key: 'status', label: 'Status', render: (m) => <MonitorStatusBadge status={m.status} monitorType={m.type} /> },
     { key: 'last_checked_at', label: 'Last Checked', render: (m) => <span className="table-muted">{m.last_checked_at ? timeAgo(m.last_checked_at) : 'Never'}</span> },
-    { key: 'next_check_at', label: 'Next Run', render: (m) => <span className="table-muted">{m.is_paused ? '—' : m.next_check_at ? timeUntil(m.next_check_at) : '—'}</span> },
     {
       key: 'actions',
       label: '',
@@ -204,13 +203,4 @@ function timeAgo(dateStr: string): string {
   if (seconds < 3600) return `${Math.floor(seconds / 60)} min ago`
   if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`
   return `${Math.floor(seconds / 86400)}d ago`
-}
-
-function timeUntil(dateStr: string): string {
-  const seconds = Math.floor((new Date(dateStr).getTime() - Date.now()) / 1000)
-  if (seconds <= 0) return 'Overdue'
-  if (seconds < 60) return `${seconds}s`
-  if (seconds < 3600) return `${Math.floor(seconds / 60)} min`
-  if (seconds < 86400) return `${Math.floor(seconds / 3600)}h`
-  return `${Math.floor(seconds / 86400)}d`
 }

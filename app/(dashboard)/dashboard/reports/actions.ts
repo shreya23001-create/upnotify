@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation'
 import { getCurrentUser } from '@/lib/db/users'
 import { getWorkspacesByOrg } from '@/lib/db/workspaces'
 import { deleteReport } from '@/lib/db/reports'
-import { generateReport } from '@/lib/services/reports'
+import { generateReport, type ReportType } from '@/lib/services/reports'
 import { logger } from '@/lib/utils/logger'
 import { impersonationGuard } from '@/lib/auth/impersonation-guard'
 import { getServerConfig } from '@/lib/utils/config'
@@ -36,7 +36,7 @@ export async function generateReportAction(formData: FormData): Promise<{ error?
     new Date(periodStart).toISOString(),
     new Date(periodEnd).toISOString(),
     type as 'monthly' | 'custom' | 'on_demand',
-    reportType as 'uptime' | 'performance' | 'incident' | 'sla'
+    reportType as ReportType
   )
 
   if (!report) return { error: 'Failed to generate report. Make sure you have monitors with check data.' }
