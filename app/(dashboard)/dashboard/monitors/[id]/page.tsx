@@ -12,6 +12,7 @@ import { MonitorUptimeBars } from '@/components/monitors/monitor-uptime-bars'
 import { BadgeEmbed } from '@/components/monitors/badge-embed'
 import { KeywordResultsDisplay } from '@/components/monitors/keyword-results-display'
 import { CopyUrlButton } from '@/components/monitors/copy-url-button'
+import { MonitorTypeInsight } from '@/components/monitors/monitor-type-insight'
 
 interface KeywordMonitorConfig {
   positiveKeywords?: string[]
@@ -160,6 +161,9 @@ export default async function MonitorDetailPage({
 
       {/* 90-day uptime bars */}
       <MonitorUptimeBars slots={uptimeSlots} uptimePercent={uptimePercent} rangeLabel="30 days" />
+
+      {/* Type-specific insight */}
+      <MonitorTypeInsight monitor={monitor} latestMetadata={latestMetadata as Record<string, unknown> | undefined} />
 
       {/* Config + incidents */}
       <div className="grid-2" style={{ marginBottom: 24 }}>

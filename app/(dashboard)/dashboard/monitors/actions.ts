@@ -413,3 +413,73 @@ export async function bulkResumeMonitorsAction(ids: string[]): Promise<{ error?:
   revalidatePath('/dashboard/monitors')
   return {}
 }
+
+export interface BulkCreateItem {
+  type: string
+  name: string
+  target: string
+}
+
+export interface BulkCreateResult {
+  created: number
+  skipped: number
+  error?: string
+}
+
+export async function bulkCreateMonitorsAction(items: BulkCreateItem[]): Promise<BulkCreateResult> {
+  const guard = await impersonationGuard()
+  if (guard.isBlocked) return { created: 0, skipped: 0, error: guard.error }
+
+  const user = await getCurrentUser()
+  if (!user) return { created: 0, skipped: 0, error: 'Not authenticated' }
+
+  const workspaces = await getWorkspacesByOrg(user.org_id)
+  const workspace = workspaces[0]
+  if (!workspace) return { created: 0, skipped: 0, error: 'No workspace found' }
+
+  const [limitCheck, planLimits] = await Promise.all([
+    checkMonitorLimit(user.org_id),
+    getPlanLimits(user.org_id),
+  ])
+
+  if (!limitCheck.allowed) {
+    return { created: 0, skipped: items.length, error: `Monitor limit reached (${limitCheck.currentCount}/${limitCheck.limit}). Upgrade your plan to add more monitors.` }
+  }
+
+  const remaining = limitCheck.limit === null ? Infinity : limitCheck.limit - limitCheck.currentCount
+  const toCreate = items.slice(0, remaining)
+  const skipped = items.length - toCreate.length
+
+  let created = 0
+  for (const item of toCreate) {
+    const normalisedTarget = normaliseTarget(item.target, item.type)
+    const safetyCheck = isSafeMonitorTarget(normalisedTarget, item.type)
+    if (!safetyCheck.safe) continue
+
+    const monitor = await createMonitor({
+      org_id: user.org_id,
+      workspace_id: workspace.id,
+      name: item.name,
+      type: item.type,
+      target: normalisedTarget,
+      check_interval_seconds: planLimits.checkIntervalSeconds,
+      severity: 'P2',
+      config: {},
+    })
+
+    if (monitor) {
+      created++
+      logger.info('Bulk scan monitor created', { monitorId: monitor.id, type: item.type })
+    }
+  }
+
+  await devAuditLog({
+    orgId: user.org_id,
+    userId: user.id,
+    action: 'monitor.bulk_created',
+    metadata: { created, skipped, source: 'scan' },
+  })
+
+  revalidatePath('/dashboard/monitors')
+  return { created, skipped }
+}

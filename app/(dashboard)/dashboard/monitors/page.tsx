@@ -3,8 +3,8 @@ import { getMonitorsByWorkspace } from '@/lib/db/monitors'
 import { getWorkspacesByOrg } from '@/lib/db/workspaces'
 import { getUptimeBarData } from '@/lib/db/check-results'
 import { MonitorTable } from '@/components/monitors/monitor-table'
+import { AddMonitorButton } from '@/components/monitors/add-monitor-button'
 import { redirect } from 'next/navigation'
-import Link from 'next/link'
 
 export default async function MonitorsPage() {
   const user = await getCurrentUser()
@@ -14,7 +14,6 @@ export default async function MonitorsPage() {
   const defaultWorkspace = workspaces[0]
   const monitors = defaultWorkspace ? await getMonitorsByWorkspace(defaultWorkspace.id) : []
 
-  // Fetch uptime data for all monitors in parallel
   const uptimeEntries = await Promise.all(
     monitors.map(async (m) => [m.id, await getUptimeBarData(m.id)] as const)
   )
@@ -24,7 +23,7 @@ export default async function MonitorsPage() {
     <div>
       <div className="page-header">
         <h1 className="page-title">Monitors</h1>
-        <Link href="/dashboard/monitors/new" className="btn btn-primary">+ Add Monitor</Link>
+        <AddMonitorButton hasMonitors={monitors.length > 0} />
       </div>
       <MonitorTable monitors={monitors} uptimeData={uptimeData} />
     </div>

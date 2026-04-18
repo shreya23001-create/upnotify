@@ -1,0 +1,1784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PMB — Public Monitor Blogging — Mockup</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --bg-card: #161b27;
+    --bg-hover: #1e2535;
+    --border: #2a3044;
+    --border-light: #1e2535;
+    --text: #f1f5f9;
+    --text-muted: #64748b;
+    --text-secondary: #94a3b8;
+    --accent: #3b82f6;
+    --accent-hover: #2563eb;
+    --cyan: #06b6d4;
+    --green: #10b981;
+    --red: #ef4444;
+    --yellow: #f59e0b;
+    --purple: #8b5cf6;
+    --radius: 8px;
+    --sidebar-w: 220px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); font-size: 14px; display: flex; min-height: 100vh; }
+
+  /* ── Sidebar ── */
+  .sidebar { width: var(--sidebar-w); background: var(--bg-card); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; position: fixed; top: 0; left: 0; height: 100vh; z-index: 100; }
+  .sidebar-logo { padding: 20px 16px 16px; border-bottom: 1px solid var(--border); }
+  .sidebar-logo .logo { font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #3b82f6, #06b6d4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .sidebar-logo .sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .sidebar-nav { flex: 1; padding: 12px 8px; display: flex; flex-direction: column; gap: 2px; }
+  .nav-section { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; padding: 12px 8px 6px; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 6px; cursor: pointer; color: var(--text-secondary); font-size: 13px; font-weight: 500; transition: all 0.15s; border: none; background: none; width: 100%; text-align: left; }
+  .nav-item:hover { background: var(--bg-hover); color: var(--text); }
+  .nav-item.active { background: rgba(59,130,246,0.15); color: var(--accent); }
+  .nav-item .icon { width: 16px; flex-shrink: 0; opacity: 0.7; }
+  .nav-item.active .icon { opacity: 1; }
+  .nav-badge { margin-left: auto; background: var(--accent); color: white; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 10px; }
+  .nav-badge.yellow { background: var(--yellow); }
+
+  /* ── Main ── */
+  .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; }
+  .topbar { background: var(--bg-card); border-bottom: 1px solid var(--border); padding: 0 24px; height: 56px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+  .topbar-left { display: flex; align-items: center; gap: 12px; }
+  .topbar-title { font-size: 16px; font-weight: 700; }
+  .topbar-badge { background: rgba(59,130,246,0.15); color: var(--accent); font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 20px; border: 1px solid rgba(59,130,246,0.3); }
+  .topbar-right { display: flex; align-items: center; gap: 8px; }
+
+  .content { padding: 24px; flex: 1; }
+
+  /* ── Tabs ── */
+  .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+  .tab { padding: 10px 18px; font-size: 13px; font-weight: 500; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.15s; white-space: nowrap; }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* ── Cards & Stats ── */
+  .stats-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 24px; }
+  .stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
+  .stat-label { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+  .stat-value { font-size: 28px; font-weight: 800; color: var(--text); line-height: 1; }
+  .stat-sub { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+  .stat-card.green .stat-value { color: var(--green); }
+  .stat-card.yellow .stat-value { color: var(--yellow); }
+  .stat-card.red .stat-value { color: var(--red); }
+  .stat-card.blue .stat-value { color: var(--accent); }
+
+  /* ── Section header ── */
+  .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .section-title { font-size: 14px; font-weight: 700; color: var(--text); }
+  .section-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+  /* ── Cron Health Grid ── */
+  .cron-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
+  .cron-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; display: flex; align-items: center; gap: 12px; }
+  .cron-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .cron-dot.green { background: var(--green); box-shadow: 0 0 6px var(--green); }
+  .cron-dot.yellow { background: var(--yellow); }
+  .cron-dot.red { background: var(--red); }
+  .cron-dot.grey { background: var(--text-muted); }
+  .cron-info { flex: 1; min-width: 0; }
+  .cron-name { font-size: 12px; font-weight: 600; color: var(--text); }
+  .cron-detail { font-size: 11px; color: var(--text-muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cron-status { font-size: 11px; font-weight: 600; }
+  .cron-status.green { color: var(--green); }
+  .cron-status.yellow { color: var(--yellow); }
+  .cron-status.grey { color: var(--text-muted); }
+
+  /* ── Table ── */
+  .table-wrap { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .table-toolbar { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+  table { width: 100%; border-collapse: collapse; }
+  th { padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; background: rgba(255,255,255,0.02); border-bottom: 1px solid var(--border); white-space: nowrap; }
+  td { padding: 11px 14px; border-bottom: 1px solid var(--border-light); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  /* ── Badges ── */
+  .badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+  .badge.green { background: rgba(16,185,129,0.15); color: var(--green); }
+  .badge.red { background: rgba(239,68,68,0.15); color: var(--red); }
+  .badge.yellow { background: rgba(245,158,11,0.15); color: var(--yellow); }
+  .badge.blue { background: rgba(59,130,246,0.15); color: var(--accent); }
+  .badge.purple { background: rgba(139,92,246,0.15); color: var(--purple); }
+  .badge.grey { background: rgba(100,116,139,0.15); color: var(--text-muted); }
+  .badge.cyan { background: rgba(6,182,212,0.15); color: var(--cyan); }
+
+  /* ── Buttons ── */
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: all 0.15s; white-space: nowrap; }
+  .btn-primary { background: var(--accent); color: white; }
+  .btn-primary:hover { background: var(--accent-hover); }
+  .btn-secondary { background: var(--bg-hover); color: var(--text); border: 1px solid var(--border); }
+  .btn-secondary:hover { background: var(--border); }
+  .btn-ghost { background: none; color: var(--text-muted); border: 1px solid var(--border); }
+  .btn-ghost:hover { color: var(--text); background: var(--bg-hover); }
+  .btn-sm { padding: 4px 10px; font-size: 12px; }
+  .btn-danger { background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
+
+  /* ── Inputs ── */
+  input, select, textarea { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 13px; padding: 8px 12px; outline: none; width: 100%; transition: border 0.15s; }
+  input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+  input::placeholder { color: var(--text-muted); }
+  select option { background: var(--bg-card); }
+
+  /* ── Category Cards ── */
+  .category-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .category-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
+  .cat-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
+  .cat-name { font-size: 14px; font-weight: 700; color: var(--text); }
+  .cat-count { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .cat-keywords { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .keyword-tag { background: var(--bg-hover); border: 1px solid var(--border); border-radius: 4px; padding: 2px 8px; font-size: 11px; color: var(--text-secondary); }
+  .keyword-tag.add { border-style: dashed; color: var(--text-muted); cursor: pointer; }
+  .keyword-tag.add:hover { color: var(--accent); border-color: var(--accent); }
+
+  /* ── Blog Queue ── */
+  .queue-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 10px; display: flex; align-items: center; gap: 14px; }
+  .queue-icon { width: 36px; height: 36px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .queue-icon.weekly { background: rgba(59,130,246,0.15); }
+  .queue-icon.monthly { background: rgba(139,92,246,0.15); }
+  .queue-icon.leaderboard { background: rgba(245,158,11,0.15); }
+  .queue-info { flex: 1; min-width: 0; }
+  .queue-title { font-size: 13px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .queue-meta { font-size: 11px; color: var(--text-muted); margin-top: 3px; display: flex; gap: 10px; }
+  .queue-actions { display: flex; gap: 6px; flex-shrink: 0; }
+
+  /* ── Blog Preview ── */
+  .blog-preview { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .blog-hero { height: 200px; background: linear-gradient(135deg, #1d4ed8, #0e7490); display: flex; align-items: center; justify-content: center; position: relative; }
+  .blog-hero-content { text-align: center; z-index: 1; }
+  .blog-hero-label { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 1px; }
+  .blog-hero-title { font-size: 22px; font-weight: 800; color: white; margin-top: 8px; line-height: 1.3; max-width: 500px; }
+  .blog-body { padding: 24px; }
+  .blog-meta { display: flex; gap: 16px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
+
+  /* ── Chart ── */
+  .chart-wrap { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 16px; margin: 16px 0; }
+  .chart-title { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 14px; }
+  .bar-chart { display: flex; flex-direction: column; gap: 8px; }
+  .bar-row { display: flex; align-items: center; gap: 10px; }
+  .bar-label { width: 120px; font-size: 12px; color: var(--text-secondary); text-align: right; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bar-track { flex: 1; height: 22px; background: var(--bg-hover); border-radius: 4px; overflow: hidden; position: relative; }
+  .bar-fill { height: 100%; border-radius: 4px; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; font-size: 11px; font-weight: 700; color: white; transition: width 0.5s; }
+  .bar-fill.green { background: linear-gradient(90deg, #059669, #10b981); }
+  .bar-fill.blue { background: linear-gradient(90deg, #1d4ed8, #3b82f6); }
+  .bar-fill.yellow { background: linear-gradient(90deg, #b45309, #f59e0b); }
+  .bar-fill.red { background: linear-gradient(90deg, #b91c1c, #ef4444); }
+  .bar-fill.purple { background: linear-gradient(90deg, #5b21b6, #8b5cf6); }
+  .bar-fill.cyan { background: linear-gradient(90deg, #0e7490, #06b6d4); }
+
+  /* ── Toggle ── */
+  .toggle { position: relative; width: 36px; height: 20px; }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: var(--border); border-radius: 20px; transition: 0.2s; }
+  .toggle-slider:before { content: ''; position: absolute; height: 14px; width: 14px; left: 3px; top: 3px; background: white; border-radius: 50%; transition: 0.2s; }
+  input:checked + .toggle-slider { background: var(--accent); }
+  input:checked + .toggle-slider:before { transform: translateX(16px); }
+
+  /* ── Modal ── */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; display: flex; align-items: center; justify-content: center; }
+  .modal { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; width: 560px; max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 80px rgba(0,0,0,0.5); }
+  .modal-header { padding: 20px 24px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  .modal-title { font-size: 16px; font-weight: 700; }
+  .modal-body { padding: 20px 24px; display: flex; flex-direction: column; gap: 16px; }
+  .modal-footer { padding: 16px 24px 20px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-label { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+  .form-hint { font-size: 11px; color: var(--text-muted); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .keyword-input-wrap { display: flex; flex-wrap: wrap; gap: 6px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 8px; min-height: 60px; }
+  .keyword-chip { background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.3); color: var(--accent); border-radius: 4px; padding: 2px 8px; font-size: 12px; display: flex; align-items: center; gap: 4px; }
+  .keyword-chip .remove { cursor: pointer; opacity: 0.6; }
+  .keyword-chip .remove:hover { opacity: 1; }
+
+  /* ── Screen nav ── */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ── Activity Feed ── */
+  .activity-feed { display: flex; flex-direction: column; gap: 0; }
+  .activity-item { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border-light); }
+  .activity-item:last-child { border-bottom: none; }
+  .activity-dot-wrap { display: flex; flex-direction: column; align-items: center; gap: 0; flex-shrink: 0; padding-top: 4px; }
+  .activity-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .activity-text { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+  .activity-text strong { color: var(--text); font-weight: 600; }
+  .activity-time { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+  /* ── Uptime pill ── */
+  .uptime { font-size: 12px; font-weight: 700; }
+  .uptime.good { color: var(--green); }
+  .uptime.warn { color: var(--yellow); }
+  .uptime.bad { color: var(--red); }
+
+  /* ── Pagination ── */
+  .pagination { display: flex; align-items: center; gap: 4px; padding: 12px 16px; border-top: 1px solid var(--border); justify-content: flex-end; }
+  .page-btn { width: 28px; height: 28px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; cursor: pointer; border: 1px solid var(--border); background: none; color: var(--text-muted); }
+  .page-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+  .page-btn:hover:not(.active) { background: var(--bg-hover); color: var(--text); }
+
+  /* ── Two-col layout ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); }
+  .card-header { padding: 14px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  .card-body { padding: 16px; }
+
+  /* ── Scrollbar ── */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  .screen-title { font-size: 22px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+  .screen-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 24px; }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+
+  /* ── Blog post meta tags row ── */
+  .post-tags { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0; }
+
+  /* ── Schema badge ── */
+  .schema-badges { display: flex; gap: 6px; margin-top: 8px; }
+  .schema-badge { background: rgba(6,182,212,0.1); border: 1px solid rgba(6,182,212,0.25); color: var(--cyan); font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; letter-spacing: 0.3px; }
+
+  /* ── Donut mini ── */
+  .mini-donut { display: flex; align-items: center; gap: 8px; }
+
+  /* ── Progress bar ── */
+  .progress-wrap { height: 6px; background: var(--bg-hover); border-radius: 3px; overflow: hidden; flex: 1; }
+  .progress-fill { height: 100%; border-radius: 3px; background: var(--green); }
+  .progress-fill.yellow { background: var(--yellow); }
+  .progress-fill.red { background: var(--red); }
+
+  /* ── Alert notice ── */
+  .notice { padding: 10px 14px; border-radius: 6px; font-size: 12px; line-height: 1.6; margin-bottom: 16px; }
+  .notice.blue { background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.25); color: #93c5fd; }
+  .notice.yellow { background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.25); color: #fcd34d; }
+  .notice strong { font-weight: 700; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════ SIDEBAR ══════════════════ -->
+<div class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo">uptrue</div>
+    <div class="sub">Admin Panel</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">Main</div>
+    <button class="nav-item" onclick="showScreen('dashboard')">
+      <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>
+      Overview
+    </button>
+    <button class="nav-item" onclick="showScreen('providers')">
+      <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 2v6l3 3"/></svg>
+      Providers
+      <span class="nav-badge">200</span>
+    </button>
+    <button class="nav-item" onclick="showScreen('categories')">
+      <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 4h14M1 8h8M1 12h6"/></svg>
+      Categories
+    </button>
+    <button class="nav-item active" onclick="showScreen('queue')">
+      <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12M2 8h9M2 12h6"/><circle cx="13" cy="11" r="2.5"/></svg>
+      Blog Queue
+      <span class="nav-badge yellow">66</span>
+    </button>
+    <button class="nav-item" onclick="showScreen('crons')">
+      <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 4v4l2.5 2.5"/></svg>
+      Cron Health
+    </button>
+    <button class="nav-item" onclick="showScreen('blog')">
+      <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="12" rx="1.5"/><path d="M5 6h6M5 9h4"/></svg>
+      Blog Preview
+    </button>
+    <div class="nav-section">Other</div>
+    <button class="nav-item" onclick="showScreen('modal')">
+      <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 2"/></svg>
+      Add Provider
+    </button>
+  </nav>
+</div>
+
+<!-- ══════════════════ MAIN ══════════════════ -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <span class="topbar-title">Public Monitor Blogging</span>
+      <span class="topbar-badge">PMB</span>
+    </div>
+    <div class="topbar-right">
+      <button class="btn btn-secondary btn-sm">📥 Import CSV</button>
+      <button class="btn btn-primary btn-sm" onclick="showScreen('modal')">+ Add Provider</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ══════ SCREEN: OVERVIEW ══════ -->
+    <div class="screen" id="screen-dashboard">
+      <div class="screen-title">PMB Overview</div>
+      <div class="screen-sub">Public Monitor Blogging — 10 categories × 20 providers. ~29,430 posts/year automated.</div>
+
+      <div class="stats-grid">
+        <div class="stat-card blue">
+          <div class="stat-label">Total Providers</div>
+          <div class="stat-value">200</div>
+          <div class="stat-sub">10 categories × 20 each</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-label">PMB Active</div>
+          <div class="stat-value">187</div>
+          <div class="stat-sub">13 pending verification</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Posts Generated</div>
+          <div class="stat-value">0</div>
+          <div class="stat-sub">Engine starts Week 3</div>
+        </div>
+        <div class="stat-card yellow">
+          <div class="stat-label">Today's Queue</div>
+          <div class="stat-value">66</div>
+          <div class="stat-sub">394 remaining this week</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Data Since</div>
+          <div class="stat-value" style="font-size:18px">Day 1</div>
+          <div class="stat-sub">13 days to first post</div>
+        </div>
+      </div>
+
+      <div class="notice blue">
+        <strong>⏳ Data accumulation in progress.</strong> The content engine starts generating posts after 2 weeks of monitoring data. First batch: Monday 2 May 2026. Providers are being monitored from today.
+      </div>
+
+      <!-- Cron Health -->
+      <div class="section-header">
+        <div>
+          <div class="section-title">PMB Cron Health</div>
+          <div class="section-sub">All crons specific to Public Monitor Blogging</div>
+        </div>
+        <button class="btn btn-ghost btn-sm">View Logs</button>
+      </div>
+      <div class="cron-grid">
+        <div class="cron-card">
+          <div class="cron-dot green"></div>
+          <div class="cron-info">
+            <div class="cron-name">Public Checks</div>
+            <div class="cron-detail">Every 5 min · Last: 2 min ago · 30 sites/run</div>
+          </div>
+          <div class="cron-status green">OK</div>
+        </div>
+        <div class="cron-card">
+          <div class="cron-dot grey"></div>
+          <div class="cron-info">
+            <div class="cron-name">Weekly Generator</div>
+            <div class="cron-detail">Every Mon 6am · Next: Mon 28 Apr</div>
+          </div>
+          <div class="cron-status grey">Waiting</div>
+        </div>
+        <div class="cron-card">
+          <div class="cron-dot grey"></div>
+          <div class="cron-info">
+            <div class="cron-name">Monthly Generator</div>
+            <div class="cron-detail">1st of month · Next: 1 May 2026</div>
+          </div>
+          <div class="cron-status grey">Waiting</div>
+        </div>
+        <div class="cron-card">
+          <div class="cron-dot grey"></div>
+          <div class="cron-info">
+            <div class="cron-name">Post Processor</div>
+            <div class="cron-detail">Every 10 min · Processes Batch API results</div>
+          </div>
+          <div class="cron-status grey">Idle</div>
+        </div>
+        <div class="cron-card">
+          <div class="cron-dot grey"></div>
+          <div class="cron-info">
+            <div class="cron-name">Quarterly Generator</div>
+            <div class="cron-detail">1st Jan/Apr/Jul/Oct · Next: 1 Jul 2026</div>
+          </div>
+          <div class="cron-status grey">Waiting</div>
+        </div>
+        <div class="cron-card">
+          <div class="cron-dot green"></div>
+          <div class="cron-info">
+            <div class="cron-name">Status Page Monitor</div>
+            <div class="cron-detail">Every 15 min · Keyword detection on status pages</div>
+          </div>
+          <div class="cron-status green">OK</div>
+        </div>
+      </div>
+
+      <!-- Category breakdown -->
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header">
+            <span class="section-title">By Category</span>
+            <span class="badge blue">10 active</span>
+          </div>
+          <div class="card-body">
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div class="bar-row">
+                <span class="bar-label">AI Tools</span>
+                <div class="bar-track"><div class="bar-fill blue" style="width:100%">20</div></div>
+              </div>
+              <div class="bar-row">
+                <span class="bar-label">Cloud Providers</span>
+                <div class="bar-track"><div class="bar-fill blue" style="width:100%">20</div></div>
+              </div>
+              <div class="bar-row">
+                <span class="bar-label">Payment Processors</span>
+                <div class="bar-track"><div class="bar-fill blue" style="width:90%">18</div></div>
+              </div>
+              <div class="bar-row">
+                <span class="bar-label">E-commerce</span>
+                <div class="bar-track"><div class="bar-fill yellow" style="width:70%">14</div></div>
+              </div>
+              <div class="bar-row">
+                <span class="bar-label">Collaboration</span>
+                <div class="bar-track"><div class="bar-fill blue" style="width:100%">20</div></div>
+              </div>
+              <div class="bar-row">
+                <span class="bar-label">Dev Tools / CI-CD</span>
+                <div class="bar-track"><div class="bar-fill blue" style="width:100%">20</div></div>
+              </div>
+              <div class="bar-row">
+                <span class="bar-label">Email Marketing</span>
+                <div class="bar-track"><div class="bar-fill blue" style="width:100%">20</div></div>
+              </div>
+              <div class="bar-row">
+                <span class="bar-label">CDN / Security</span>
+                <div class="bar-track"><div class="bar-fill yellow" style="width:75%">15</div></div>
+              </div>
+              <div class="bar-row">
+                <span class="bar-label">CMS / Builders</span>
+                <div class="bar-track"><div class="bar-fill yellow" style="width:80%">16</div></div>
+              </div>
+              <div class="bar-row">
+                <span class="bar-label">Monitoring Tools</span>
+                <div class="bar-track"><div class="bar-fill yellow" style="width:75%">15</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <span class="section-title">Recent Activity</span>
+          </div>
+          <div class="card-body">
+            <div class="activity-feed">
+              <div class="activity-item">
+                <div class="activity-dot-wrap"><div class="activity-dot" style="background:var(--green)"></div></div>
+                <div>
+                  <div class="activity-text"><strong>Stripe</strong> added to Payment Processors</div>
+                  <div class="activity-time">2 min ago</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot-wrap"><div class="activity-dot" style="background:var(--green)"></div></div>
+                <div>
+                  <div class="activity-text"><strong>OpenAI</strong> · PMB enabled · status.openai.com verified</div>
+                  <div class="activity-time">4 min ago</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot-wrap"><div class="activity-dot" style="background:var(--accent)"></div></div>
+                <div>
+                  <div class="activity-text"><strong>200 providers</strong> imported from CSV · 187 active</div>
+                  <div class="activity-time">18 Apr, 09:12</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot-wrap"><div class="activity-dot" style="background:var(--yellow)"></div></div>
+                <div>
+                  <div class="activity-text"><strong>PayU</strong> flagged · no public status page · replaced with Paysafe</div>
+                  <div class="activity-time">18 Apr, 09:08</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot-wrap"><div class="activity-dot" style="background:var(--purple)"></div></div>
+                <div>
+                  <div class="activity-text">PMB module initialised · 10 categories seeded</div>
+                  <div class="activity-time">18 Apr, 09:00</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════ SCREEN: PROVIDERS ══════ -->
+    <div class="screen" id="screen-providers">
+      <div class="screen-title">Providers</div>
+      <div class="screen-sub">Manage the 200 monitored providers across 10 PMB categories.</div>
+
+      <div class="table-wrap">
+        <div class="table-toolbar">
+          <input placeholder="Search provider or domain…" style="max-width:240px">
+          <select style="width:160px">
+            <option>All Categories</option>
+            <option>AI Tools</option>
+            <option>Cloud Providers</option>
+            <option>Payment Processors</option>
+            <option>E-commerce</option>
+            <option>Collaboration</option>
+            <option>Dev Tools / CI-CD</option>
+            <option>Email Marketing</option>
+            <option>CDN / Security</option>
+            <option>CMS / Builders</option>
+            <option>Monitoring Tools</option>
+          </select>
+          <select style="width:130px">
+            <option>All Status</option>
+            <option>✅ Live</option>
+            <option>⚠️ Issues</option>
+            <option>❌ Dead</option>
+          </select>
+          <div style="margin-left:auto;display:flex;gap:6px">
+            <button class="btn btn-secondary btn-sm">📥 Import CSV</button>
+            <button class="btn btn-primary btn-sm" onclick="showScreen('modal')">+ Add Provider</button>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th style="width:32px"><input type="checkbox" style="width:14px"></th>
+              <th>Provider</th>
+              <th>PMB Category</th>
+              <th>Status Page</th>
+              <th>Uptime (7d)</th>
+              <th>Avg Response</th>
+              <th>Keywords</th>
+              <th>PMB Active</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><input type="checkbox" style="width:14px"></td>
+              <td>
+                <div style="font-weight:600;color:var(--text)">OpenAI (ChatGPT)</div>
+                <div style="font-size:11px;color:var(--text-muted)">openai.com</div>
+              </td>
+              <td><span class="badge purple">AI Tools</span></td>
+              <td><span style="font-size:11px;color:var(--green)">✅ status.openai.com</span></td>
+              <td><span class="uptime good">99.94%</span></td>
+              <td><span style="font-size:12px;color:var(--text-secondary)">312ms</span></td>
+              <td>
+                <div style="display:flex;gap:4px;flex-wrap:wrap">
+                  <span class="keyword-tag">chatgpt down</span>
+                  <span class="keyword-tag">openai outage</span>
+                  <span class="keyword-tag" style="color:var(--text-muted)">+3</span>
+                </div>
+              </td>
+              <td><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></td>
+              <td><button class="btn btn-ghost btn-sm">Edit</button></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" style="width:14px"></td>
+              <td>
+                <div style="font-weight:600;color:var(--text)">Anthropic (Claude)</div>
+                <div style="font-size:11px;color:var(--text-muted)">anthropic.com</div>
+              </td>
+              <td><span class="badge purple">AI Tools</span></td>
+              <td><span style="font-size:11px;color:var(--green)">✅ status.claude.com</span></td>
+              <td><span class="uptime good">99.91%</span></td>
+              <td><span style="font-size:12px;color:var(--text-secondary)">287ms</span></td>
+              <td>
+                <div style="display:flex;gap:4px;flex-wrap:wrap">
+                  <span class="keyword-tag">claude down</span>
+                  <span class="keyword-tag">anthropic outage</span>
+                </div>
+              </td>
+              <td><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></td>
+              <td><button class="btn btn-ghost btn-sm">Edit</button></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" style="width:14px"></td>
+              <td>
+                <div style="font-weight:600;color:var(--text)">Stripe</div>
+                <div style="font-size:11px;color:var(--text-muted)">stripe.com</div>
+              </td>
+              <td><span class="badge green">Payments</span></td>
+              <td><span style="font-size:11px;color:var(--green)">✅ status.stripe.com</span></td>
+              <td><span class="uptime good">99.97%</span></td>
+              <td><span style="font-size:12px;color:var(--text-secondary)">198ms</span></td>
+              <td>
+                <div style="display:flex;gap:4px;flex-wrap:wrap">
+                  <span class="keyword-tag">stripe down</span>
+                  <span class="keyword-tag">payments failing</span>
+                  <span class="keyword-tag" style="color:var(--text-muted)">+2</span>
+                </div>
+              </td>
+              <td><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></td>
+              <td><button class="btn btn-ghost btn-sm">Edit</button></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" style="width:14px"></td>
+              <td>
+                <div style="font-weight:600;color:var(--text)">GitHub</div>
+                <div style="font-size:11px;color:var(--text-muted)">github.com</div>
+              </td>
+              <td><span class="badge cyan">Dev Tools</span></td>
+              <td><span style="font-size:11px;color:var(--green)">✅ githubstatus.com</span></td>
+              <td><span class="uptime good">99.89%</span></td>
+              <td><span style="font-size:12px;color:var(--text-secondary)">445ms</span></td>
+              <td>
+                <div style="display:flex;gap:4px;flex-wrap:wrap">
+                  <span class="keyword-tag">github down</span>
+                  <span class="keyword-tag">git push failing</span>
+                </div>
+              </td>
+              <td><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></td>
+              <td><button class="btn btn-ghost btn-sm">Edit</button></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" style="width:14px"></td>
+              <td>
+                <div style="font-weight:600;color:var(--text)">Revolut</div>
+                <div style="font-size:11px;color:var(--text-muted)">revolut.com</div>
+              </td>
+              <td><span class="badge green">Payments</span></td>
+              <td><span style="font-size:11px;color:var(--red)">❌ No public status page</span></td>
+              <td><span class="uptime warn">—</span></td>
+              <td><span style="font-size:12px;color:var(--text-muted)">—</span></td>
+              <td><span style="font-size:11px;color:var(--text-muted)">None</span></td>
+              <td><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label></td>
+              <td><button class="btn btn-danger btn-sm">Replace</button></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" style="width:14px"></td>
+              <td>
+                <div style="font-weight:600;color:var(--text)">Shopify</div>
+                <div style="font-size:11px;color:var(--text-muted)">shopify.com</div>
+              </td>
+              <td><span class="badge yellow">E-commerce</span></td>
+              <td><span style="font-size:11px;color:var(--green)">✅ shopifystatus.com</span></td>
+              <td><span class="uptime good">99.95%</span></td>
+              <td><span style="font-size:12px;color:var(--text-secondary)">356ms</span></td>
+              <td>
+                <div style="display:flex;gap:4px;flex-wrap:wrap">
+                  <span class="keyword-tag">shopify down</span>
+                  <span class="keyword-tag">checkout failing</span>
+                </div>
+              </td>
+              <td><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></td>
+              <td><button class="btn btn-ghost btn-sm">Edit</button></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="pagination">
+          <span style="font-size:12px;color:var(--text-muted);margin-right:8px">Showing 1–6 of 200</span>
+          <button class="page-btn active">1</button>
+          <button class="page-btn">2</button>
+          <button class="page-btn">3</button>
+          <span style="color:var(--text-muted);font-size:12px;padding:0 4px">…</span>
+          <button class="page-btn">34</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════ SCREEN: CATEGORIES ══════ -->
+    <div class="screen" id="screen-categories">
+      <div class="screen-title">Categories</div>
+      <div class="screen-sub">10 PMB categories. Each has default keywords used in all generated blog posts. Add custom keywords per category or per provider.</div>
+
+      <div class="category-grid">
+        <!-- AI Tools -->
+        <div class="category-card">
+          <div class="cat-header">
+            <div>
+              <div class="cat-name">🤖 AI Tools</div>
+              <div class="cat-count">20 providers · 450 pairwise/week</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+              <button class="btn btn-ghost btn-sm">Edit</button>
+            </div>
+          </div>
+          <div class="cat-keywords">
+            <span class="keyword-tag">ai tools uptime</span>
+            <span class="keyword-tag">chatgpt vs claude</span>
+            <span class="keyword-tag">llm reliability</span>
+            <span class="keyword-tag">ai api downtime</span>
+            <span class="keyword-tag">best ai tool uptime</span>
+            <span class="keyword-tag" style="border-style:dashed;color:var(--text-muted);cursor:pointer">+ add keyword</span>
+          </div>
+        </div>
+
+        <!-- Cloud -->
+        <div class="category-card">
+          <div class="cat-header">
+            <div>
+              <div class="cat-name">☁️ Cloud Providers</div>
+              <div class="cat-count">20 providers · 450 pairwise/week</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+              <button class="btn btn-ghost btn-sm">Edit</button>
+            </div>
+          </div>
+          <div class="cat-keywords">
+            <span class="keyword-tag">cloud provider uptime</span>
+            <span class="keyword-tag">aws vs azure</span>
+            <span class="keyword-tag">cloud reliability 2026</span>
+            <span class="keyword-tag">cloud outage</span>
+            <span class="keyword-tag">best cloud provider</span>
+            <span class="keyword-tag" style="border-style:dashed;color:var(--text-muted);cursor:pointer">+ add keyword</span>
+          </div>
+        </div>
+
+        <!-- Payments -->
+        <div class="category-card">
+          <div class="cat-header">
+            <div>
+              <div class="cat-name">💳 Payment Processors</div>
+              <div class="cat-count">18 providers · 306 pairwise/week</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+              <button class="btn btn-ghost btn-sm">Edit</button>
+            </div>
+          </div>
+          <div class="cat-keywords">
+            <span class="keyword-tag">payment processor uptime</span>
+            <span class="keyword-tag">stripe vs paypal</span>
+            <span class="keyword-tag">payment gateway reliability</span>
+            <span class="keyword-tag">checkout downtime</span>
+            <span class="keyword-tag" style="border-style:dashed;color:var(--text-muted);cursor:pointer">+ add keyword</span>
+          </div>
+        </div>
+
+        <!-- Ecommerce -->
+        <div class="category-card">
+          <div class="cat-header">
+            <div>
+              <div class="cat-name">🛒 E-commerce Platforms</div>
+              <div class="cat-count">14 providers · 91 pairwise/week</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+              <button class="btn btn-ghost btn-sm">Edit</button>
+            </div>
+          </div>
+          <div class="cat-keywords">
+            <span class="keyword-tag">ecommerce platform uptime</span>
+            <span class="keyword-tag">shopify vs wix</span>
+            <span class="keyword-tag">online store reliability</span>
+            <span class="keyword-tag">ecommerce downtime cost</span>
+            <span class="keyword-tag" style="border-style:dashed;color:var(--text-muted);cursor:pointer">+ add keyword</span>
+          </div>
+        </div>
+
+        <!-- Collaboration -->
+        <div class="category-card">
+          <div class="cat-header">
+            <div>
+              <div class="cat-name">💬 Collaboration Tools</div>
+              <div class="cat-count">20 providers · 450 pairwise/week</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+              <button class="btn btn-ghost btn-sm">Edit</button>
+            </div>
+          </div>
+          <div class="cat-keywords">
+            <span class="keyword-tag">slack vs teams uptime</span>
+            <span class="keyword-tag">collaboration tool reliability</span>
+            <span class="keyword-tag">zoom outage history</span>
+            <span class="keyword-tag">remote work tool downtime</span>
+            <span class="keyword-tag" style="border-style:dashed;color:var(--text-muted);cursor:pointer">+ add keyword</span>
+          </div>
+        </div>
+
+        <!-- Dev Tools -->
+        <div class="category-card">
+          <div class="cat-header">
+            <div>
+              <div class="cat-name">⚙️ Dev Tools / CI-CD</div>
+              <div class="cat-count">20 providers · 450 pairwise/week</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+              <button class="btn btn-ghost btn-sm">Edit</button>
+            </div>
+          </div>
+          <div class="cat-keywords">
+            <span class="keyword-tag">github vs gitlab uptime</span>
+            <span class="keyword-tag">cicd reliability 2026</span>
+            <span class="keyword-tag">devops tool downtime</span>
+            <span class="keyword-tag">deployment pipeline uptime</span>
+            <span class="keyword-tag" style="border-style:dashed;color:var(--text-muted);cursor:pointer">+ add keyword</span>
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="category-card">
+          <div class="cat-header">
+            <div>
+              <div class="cat-name">📧 Email Marketing</div>
+              <div class="cat-count">20 providers · 450 pairwise/week</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+              <button class="btn btn-ghost btn-sm">Edit</button>
+            </div>
+          </div>
+          <div class="cat-keywords">
+            <span class="keyword-tag">mailchimp vs sendgrid uptime</span>
+            <span class="keyword-tag">email platform reliability</span>
+            <span class="keyword-tag">email delivery downtime</span>
+            <span class="keyword-tag">best email marketing uptime</span>
+            <span class="keyword-tag" style="border-style:dashed;color:var(--text-muted);cursor:pointer">+ add keyword</span>
+          </div>
+        </div>
+
+        <!-- CDN -->
+        <div class="category-card">
+          <div class="cat-header">
+            <div>
+              <div class="cat-name">🛡️ CDN / Security</div>
+              <div class="cat-count">15 providers · 105 pairwise/week</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label>
+              <span style="font-size:11px;color:var(--yellow)">Pending verification</span>
+            </div>
+          </div>
+          <div class="cat-keywords">
+            <span class="keyword-tag">cdn uptime comparison</span>
+            <span class="keyword-tag">cloudflare vs fastly</span>
+            <span class="keyword-tag">cdn reliability score</span>
+            <span class="keyword-tag" style="border-style:dashed;color:var(--text-muted);cursor:pointer">+ add keyword</span>
+          </div>
+        </div>
+
+        <!-- CMS -->
+        <div class="category-card">
+          <div class="cat-header">
+            <div>
+              <div class="cat-name">🌐 CMS / Website Builders</div>
+              <div class="cat-count">16 providers · 120 pairwise/week</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+              <button class="btn btn-ghost btn-sm">Edit</button>
+            </div>
+          </div>
+          <div class="cat-keywords">
+            <span class="keyword-tag">cms uptime comparison</span>
+            <span class="keyword-tag">wordpress vs webflow</span>
+            <span class="keyword-tag">website builder reliability</span>
+            <span class="keyword-tag">cms downtime 2026</span>
+            <span class="keyword-tag" style="border-style:dashed;color:var(--text-muted);cursor:pointer">+ add keyword</span>
+          </div>
+        </div>
+
+        <!-- Monitoring -->
+        <div class="category-card">
+          <div class="cat-header">
+            <div>
+              <div class="cat-name">📊 Monitoring & Observability</div>
+              <div class="cat-count">15 providers · 105 pairwise/week</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label>
+              <span style="font-size:11px;color:var(--yellow)">Pending verification</span>
+            </div>
+          </div>
+          <div class="cat-keywords">
+            <span class="keyword-tag">monitoring tool uptime</span>
+            <span class="keyword-tag">datadog vs newrelic</span>
+            <span class="keyword-tag">observability platform reliability</span>
+            <span class="keyword-tag" style="border-style:dashed;color:var(--text-muted);cursor:pointer">+ add keyword</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════ SCREEN: BLOG QUEUE ══════ -->
+    <div class="screen active" id="screen-queue">
+      <div class="screen-title">Blog Queue</div>
+      <div class="screen-sub">This week's 460 posts are spread evenly across 7 days. Today's batch is ready. Monthly+ posts are reviewed individually.</div>
+
+      <!-- Week planner -->
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;margin-bottom:20px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--text)">Week of 18 April 2026 &nbsp;·&nbsp; 460 posts planned</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:3px">Monday planner calculated 66/day (460 ÷ 7). Dedup tracker: unique per provider + category + week. Est. cost: £0.46 (Batch API).</div>
+          </div>
+          <div style="font-size:11px;color:var(--text-muted)">Generated <strong style="color:var(--green)">66</strong> &nbsp;·&nbsp; Pending <strong style="color:var(--yellow)">328</strong> &nbsp;·&nbsp; Remaining <strong style="color:var(--text-secondary)">66</strong></div>
+        </div>
+        <!-- Day-by-day progress bar -->
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px">
+          <!-- Mon (today) -->
+          <div style="text-align:center">
+            <div style="font-size:10px;font-weight:700;color:var(--accent);margin-bottom:4px">MON</div>
+            <div style="background:var(--bg-hover);border-radius:4px;height:6px;overflow:hidden"><div style="background:var(--green);height:100%;width:100%"></div></div>
+            <div style="font-size:10px;color:var(--green);margin-top:3px;font-weight:700">66 ✓</div>
+          </div>
+          <!-- Tue (today — generating) -->
+          <div style="text-align:center">
+            <div style="font-size:10px;font-weight:700;color:var(--accent);margin-bottom:4px;border:1px solid var(--accent);border-radius:3px;background:rgba(59,130,246,0.1)">TUE ◀ today</div>
+            <div style="background:var(--bg-hover);border-radius:4px;height:6px;overflow:hidden"><div style="background:var(--accent);height:100%;width:0%"></div></div>
+            <div style="font-size:10px;color:var(--accent);margin-top:3px;font-weight:700">66 queued</div>
+          </div>
+          <!-- Wed -->
+          <div style="text-align:center">
+            <div style="font-size:10px;font-weight:600;color:var(--text-muted);margin-bottom:4px">WED</div>
+            <div style="background:var(--bg-hover);border-radius:4px;height:6px;overflow:hidden"><div style="background:var(--text-muted);height:100%;width:0%"></div></div>
+            <div style="font-size:10px;color:var(--text-muted);margin-top:3px">66 scheduled</div>
+          </div>
+          <!-- Thu -->
+          <div style="text-align:center">
+            <div style="font-size:10px;font-weight:600;color:var(--text-muted);margin-bottom:4px">THU</div>
+            <div style="background:var(--bg-hover);border-radius:4px;height:6px;overflow:hidden"></div>
+            <div style="font-size:10px;color:var(--text-muted);margin-top:3px">66 scheduled</div>
+          </div>
+          <!-- Fri -->
+          <div style="text-align:center">
+            <div style="font-size:10px;font-weight:600;color:var(--text-muted);margin-bottom:4px">FRI</div>
+            <div style="background:var(--bg-hover);border-radius:4px;height:6px;overflow:hidden"></div>
+            <div style="font-size:10px;color:var(--text-muted);margin-top:3px">66 scheduled</div>
+          </div>
+          <!-- Sat -->
+          <div style="text-align:center">
+            <div style="font-size:10px;font-weight:600;color:var(--text-muted);margin-bottom:4px">SAT</div>
+            <div style="background:var(--bg-hover);border-radius:4px;height:6px;overflow:hidden"></div>
+            <div style="font-size:10px;color:var(--text-muted);margin-top:3px">64 scheduled</div>
+          </div>
+          <!-- Sun -->
+          <div style="text-align:center">
+            <div style="font-size:10px;font-weight:600;color:var(--text-muted);margin-bottom:4px">SUN</div>
+            <div style="background:var(--bg-hover);border-radius:4px;height:6px;overflow:hidden"></div>
+            <div style="font-size:10px;color:var(--text-muted);margin-top:3px">66 scheduled</div>
+          </div>
+        </div>
+        <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border-light);font-size:11px;color:var(--text-muted)">
+          🔒 <strong style="color:var(--text-secondary)">Dedup tracker active.</strong> Each post keyed on <code style="background:var(--bg-hover);padding:1px 5px;border-radius:3px;font-size:10px">monitor_id + category + week_start</code>. Monday planner skips any row that already exists — no duplicates ever queued.
+        </div>
+      </div>
+
+      <!-- Today's batch -->
+      <div class="section-header" style="margin-bottom:12px">
+        <div>
+          <div class="section-title">Today's Batch — Tuesday 22 Apr 2026 <span class="badge blue" style="margin-left:8px">66 posts</span></div>
+          <div class="section-sub" style="margin-top:3px">Generated at 6:00am · Haiku 4.5 + Batch API · AI Tools (18) · Cloud (12) · Payments (10) · CDN (8) · Other (18)</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-ghost btn-sm">👁 Preview Sample</button>
+          <button class="btn btn-primary btn-sm">✅ Approve Today's 66</button>
+        </div>
+      </div>
+
+      <!-- Today's batch breakdown card -->
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:20px;display:flex;align-items:center;gap:20px">
+        <div style="flex:1">
+          <div style="display:flex;gap:16px;flex-wrap:wrap">
+            <div style="display:flex;align-items:center;gap:6px"><span style="font-size:16px">🤖</span><div><div style="font-size:11px;font-weight:700;color:var(--text)">AI Tools</div><div style="font-size:10px;color:var(--text-muted)">17 pairwise · 1 leaderboard</div></div></div>
+            <div style="display:flex;align-items:center;gap:6px"><span style="font-size:16px">☁️</span><div><div style="font-size:11px;font-weight:700;color:var(--text)">Cloud</div><div style="font-size:10px;color:var(--text-muted)">12 pairwise</div></div></div>
+            <div style="display:flex;align-items:center;gap:6px"><span style="font-size:16px">💳</span><div><div style="font-size:11px;font-weight:700;color:var(--text)">Payments</div><div style="font-size:10px;color:var(--text-muted)">10 pairwise</div></div></div>
+            <div style="display:flex;align-items:center;gap:6px"><span style="font-size:16px">🌐</span><div><div style="font-size:11px;font-weight:700;color:var(--text)">CDN / Edge</div><div style="font-size:10px;color:var(--text-muted)">8 pairwise</div></div></div>
+            <div style="display:flex;align-items:center;gap:6px"><span style="font-size:16px">📦</span><div><div style="font-size:11px;font-weight:700;color:var(--text)">Other</div><div style="font-size:10px;color:var(--text-muted)">18 pairwise</div></div></div>
+          </div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-size:22px;font-weight:800;color:var(--accent)">66</div>
+          <div style="font-size:10px;color:var(--text-muted)">posts today</div>
+        </div>
+      </div>
+
+      <div class="section-title" style="margin-bottom:12px">Individual Posts — Today's Batch</div>
+
+      <!-- Queue items -->
+      <div class="queue-item">
+        <div class="queue-icon leaderboard">🏆</div>
+        <div class="queue-info">
+          <div class="queue-title">AI Tools Reliability Leaderboard — Week of 22 Apr 2026</div>
+          <div class="queue-meta">
+            <span class="badge purple">Weekly · Leaderboard</span>
+            <span>AI Tools · 10 providers ranked</span>
+            <span>Sonnet 4.6 · 580 words</span>
+            <span>Generated 6:03am</span>
+          </div>
+        </div>
+        <div class="queue-actions">
+          <button class="btn btn-ghost btn-sm">👁 Preview</button>
+          <button class="btn btn-primary btn-sm">✅ Approve</button>
+          <button class="btn btn-danger btn-sm">✗</button>
+        </div>
+      </div>
+
+      <div class="queue-item">
+        <div class="queue-icon weekly">⚖️</div>
+        <div class="queue-info">
+          <div class="queue-title">OpenAI vs Anthropic Uptime — Week of 22 Apr 2026</div>
+          <div class="queue-meta">
+            <span class="badge blue">Weekly · Pairwise</span>
+            <span>AI Tools · 2 providers</span>
+            <span>Haiku 4.5 · 410 words</span>
+            <span>Generated 6:04am</span>
+          </div>
+        </div>
+        <div class="queue-actions">
+          <button class="btn btn-ghost btn-sm">👁 Preview</button>
+          <button class="btn btn-primary btn-sm">✅ Approve</button>
+          <button class="btn btn-danger btn-sm">✗</button>
+        </div>
+      </div>
+
+      <div class="queue-item">
+        <div class="queue-icon weekly">⚖️</div>
+        <div class="queue-info">
+          <div class="queue-title">Stripe vs PayPal Uptime — Week of 22 Apr 2026</div>
+          <div class="queue-meta">
+            <span class="badge blue">Weekly · Pairwise</span>
+            <span>Payments · 2 providers</span>
+            <span>Haiku 4.5 · 390 words</span>
+            <span>Generated 6:04am</span>
+          </div>
+        </div>
+        <div class="queue-actions">
+          <button class="btn btn-ghost btn-sm">👁 Preview</button>
+          <button class="btn btn-primary btn-sm">✅ Approve</button>
+          <button class="btn btn-danger btn-sm">✗</button>
+        </div>
+      </div>
+
+      <div style="text-align:center;padding:14px;color:var(--text-muted);font-size:12px">
+        Showing 3 of 66 · <a href="#" style="color:var(--accent);text-decoration:none">View all today's posts →</a>
+      </div>
+
+      <div class="section-title" style="margin-bottom:12px;margin-top:8px">Monthly & Quarterly — Review Individually</div>
+
+      <div class="queue-item">
+        <div class="queue-icon monthly">📊</div>
+        <div class="queue-info">
+          <div class="queue-title">Cloud Provider Reliability Report — April 2026</div>
+          <div class="queue-meta">
+            <span class="badge cyan">Monthly · Category Report</span>
+            <span>Cloud Providers · All 20 ranked</span>
+            <span>Sonnet 4.6 · 820 words</span>
+            <span>Generated 6:05am</span>
+          </div>
+        </div>
+        <div class="queue-actions">
+          <button class="btn btn-ghost btn-sm">👁 Preview</button>
+          <button class="btn btn-primary btn-sm">✅ Approve</button>
+          <button class="btn btn-danger btn-sm">✗</button>
+        </div>
+      </div>
+
+      <div class="queue-item">
+        <div class="queue-icon monthly">📝</div>
+        <div class="queue-info">
+          <div class="queue-title">Stripe Uptime Report — April 2026</div>
+          <div class="queue-meta">
+            <span class="badge green">Monthly · Provider Report</span>
+            <span>Payments · Stripe</span>
+            <span>Haiku 4.5 · 460 words</span>
+            <span>Generated 6:06am</span>
+          </div>
+        </div>
+        <div class="queue-actions">
+          <button class="btn btn-ghost btn-sm">👁 Preview</button>
+          <button class="btn btn-primary btn-sm">✅ Approve</button>
+          <button class="btn btn-danger btn-sm">✗</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════ SCREEN: CRON HEALTH ══════ -->
+    <div class="screen" id="screen-crons">
+      <div class="screen-title">Cron Health</div>
+      <div class="screen-sub">All PMB cron jobs · part of the main admin system · click any row to expand run history and output logs.</div>
+
+      <style>
+        .cron-row-main { cursor:pointer; }
+        .cron-row-main:hover td { background: rgba(255,255,255,0.03); }
+        .cron-expand { display:none; background:var(--bg); }
+        .cron-expand.open { display:table-row; }
+        .cron-expand td { padding:0 !important; border-bottom:1px solid var(--border); }
+        .cron-expand-inner { padding:14px 16px; }
+        .run-history { display:flex; gap:4px; align-items:center; margin-bottom:10px; }
+        .run-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; cursor:default; position:relative; }
+        .run-dot.ok { background:var(--green); }
+        .run-dot.fail { background:var(--red); }
+        .run-dot.idle { background:var(--text-muted); }
+        .log-block { background:#0a0d14; border:1px solid var(--border); border-radius:6px; padding:10px 14px; font-family:'Courier New',monospace; font-size:11px; color:#94a3b8; line-height:1.7; max-height:160px; overflow-y:auto; }
+        .log-block .log-ok { color:var(--green); }
+        .log-block .log-err { color:var(--red); }
+        .log-block .log-warn { color:var(--yellow); }
+        .log-block .log-info { color:#60a5fa; }
+        .log-block .log-dim { color:#475569; }
+        .history-label { font-size:10px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px; }
+      </style>
+
+      <!-- Alert banner for failed cron -->
+      <div class="notice" style="background:rgba(239,68,68,0.08);border-color:rgba(239,68,68,0.3);color:var(--red);margin-bottom:16px">
+        <strong>⚠ /api/cron/pmb/daily-publisher failed</strong> at 06:01am today · 3 posts not generated · <a href="#" style="color:var(--red);text-decoration:underline">Jump to details ↓</a>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:32px"></th>
+              <th>Cron</th>
+              <th>Schedule</th>
+              <th>Last Run</th>
+              <th>Duration</th>
+              <th>Status</th>
+              <th>Last Output</th>
+              <th>Next Run</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+
+            <!-- ── public-checks ── -->
+            <tr class="cron-row-main" onclick="toggleExpand('c1')">
+              <td style="color:var(--text-muted);font-size:11px;text-align:center">▶</td>
+              <td>
+                <div style="font-weight:600;color:var(--text)">/api/cron/public-checks</div>
+                <div style="font-size:11px;color:var(--text-muted)">HTTP checks on all PMB providers</div>
+              </td>
+              <td><span class="badge grey">Every 5 min</span></td>
+              <td><span style="font-size:12px;color:var(--text-secondary)">2 min ago</span></td>
+              <td><span style="font-size:12px">14.2s</span></td>
+              <td><span class="badge green">✓ OK</span></td>
+              <td><span style="font-size:11px;color:var(--text-muted)">checked: 200, down: 0</span></td>
+              <td><span style="font-size:11px;color:var(--text-secondary)">3 min</span></td>
+              <td><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation()">▶ Run Now</button></td>
+            </tr>
+            <tr class="cron-expand" id="c1">
+              <td colspan="9">
+                <div class="cron-expand-inner">
+                  <div class="history-label">Last 10 runs</div>
+                  <div class="run-history" style="margin-bottom:12px">
+                    <div class="run-dot ok" title="OK · 13.9s · 2 min ago"></div>
+                    <div class="run-dot ok" title="OK · 14.1s · 7 min ago"></div>
+                    <div class="run-dot ok" title="OK · 13.7s · 12 min ago"></div>
+                    <div class="run-dot ok" title="OK · 14.4s · 17 min ago"></div>
+                    <div class="run-dot ok" title="OK · 14.0s · 22 min ago"></div>
+                    <div class="run-dot ok" title="OK · 13.8s"></div>
+                    <div class="run-dot ok" title="OK · 14.3s"></div>
+                    <div class="run-dot ok" title="OK · 14.1s"></div>
+                    <div class="run-dot ok" title="OK · 13.9s"></div>
+                    <div class="run-dot ok" title="OK · 14.2s"></div>
+                    <span style="font-size:10px;color:var(--text-muted);margin-left:6px">All OK · avg 14.1s</span>
+                  </div>
+                  <div class="history-label">Output — last run (06:18:04 UTC)</div>
+                  <div class="log-block">
+<span class="log-info">[INFO]</span> PMB public-checks started · 200 providers<br>
+<span class="log-info">[INFO]</span> Batch 1/40 complete · 5 providers checked<br>
+<span class="log-dim">...</span><br>
+<span class="log-info">[INFO]</span> Batch 40/40 complete<br>
+<span class="log-ok">[OK]</span> All 200 providers UP · 0 incidents opened · 14.2s
+                  </div>
+                </div>
+              </td>
+            </tr>
+
+            <!-- ── daily-publisher (FAILED) ── -->
+            <tr class="cron-row-main" onclick="toggleExpand('c2')" id="daily-publisher-row">
+              <td style="color:var(--red);font-size:11px;text-align:center">▶</td>
+              <td>
+                <div style="font-weight:600;color:var(--red)">/api/cron/pmb/daily-publisher</div>
+                <div style="font-size:11px;color:var(--text-muted)">Generates today's scheduled posts from queue</div>
+              </td>
+              <td><span class="badge grey">Daily 6:00 UTC</span></td>
+              <td><span style="font-size:12px;color:var(--red)">06:01am today</span></td>
+              <td><span style="font-size:12px;color:var(--red)">47.3s</span></td>
+              <td><span class="badge red">✗ Failed</span></td>
+              <td><span style="font-size:11px;color:var(--red)">3 failed · 63 OK</span></td>
+              <td><span style="font-size:11px;color:var(--text-secondary)">Tomorrow 6am</span></td>
+              <td><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation()">▶ Run Now</button></td>
+            </tr>
+            <tr class="cron-expand open" id="c2">
+              <td colspan="9">
+                <div class="cron-expand-inner">
+                  <div class="history-label">Last 10 runs</div>
+                  <div class="run-history" style="margin-bottom:12px">
+                    <div class="run-dot fail" title="Failed · 3 errors · today 6am"></div>
+                    <div class="run-dot ok" title="OK · 66 posts · yesterday"></div>
+                    <div class="run-dot ok" title="OK · 66 posts"></div>
+                    <div class="run-dot ok" title="OK · 66 posts"></div>
+                    <div class="run-dot ok" title="OK · 66 posts"></div>
+                    <div class="run-dot ok" title="OK · 66 posts"></div>
+                    <div class="run-dot ok" title="OK · 66 posts"></div>
+                    <div class="run-dot idle" title="Idle — no posts scheduled"></div>
+                    <div class="run-dot idle" title="Idle — no posts scheduled"></div>
+                    <div class="run-dot idle" title="Idle — no posts scheduled"></div>
+                    <span style="font-size:10px;color:var(--text-muted);margin-left:6px">1 failure in last 10 runs</span>
+                  </div>
+                  <div class="history-label">Output — last run (06:00:12 UTC) — <span style="color:var(--red)">FAILED</span></div>
+                  <div class="log-block">
+<span class="log-info">[INFO]</span> PMB daily-publisher started · 66 posts scheduled for 22 Apr<br>
+<span class="log-info">[INFO]</span> Processing post pmb_run#1041 · "OpenAI vs Anthropic — Week of 22 Apr"<br>
+<span class="log-ok">[OK]</span> pmb_run#1041 generated · 412 words · saved to blog_posts<br>
+<span class="log-dim">...</span><br>
+<span class="log-warn">[WARN]</span> pmb_run#1087 · Anthropic API timeout after 30s · retrying (1/2)<br>
+<span class="log-warn">[WARN]</span> pmb_run#1087 · retry 1 failed · retrying (2/2)<br>
+<span class="log-err">[ERROR]</span> pmb_run#1087 · all retries exhausted · status set to "failed"<br>
+<span class="log-err">[ERROR]</span> pmb_run#1091 · Anthropic API timeout after 30s · all retries exhausted<br>
+<span class="log-err">[ERROR]</span> pmb_run#1094 · Anthropic API timeout after 30s · all retries exhausted<br>
+<span class="log-info">[INFO]</span> Run complete · 63 OK · <span class="log-err">3 failed</span> · 47.3s<br>
+<span class="log-warn">[WARN]</span> Failed runs remain in queue with status="failed" · will NOT be retried automatically · admin alert sent
+                  </div>
+                  <div style="margin-top:10px;display:flex;gap:8px">
+                    <button class="btn btn-primary btn-sm">↺ Retry 3 Failed Posts</button>
+                    <button class="btn btn-ghost btn-sm">🗑 Discard Failed</button>
+                  </div>
+                </div>
+              </td>
+            </tr>
+
+            <!-- ── week-planner ── -->
+            <tr class="cron-row-main" onclick="toggleExpand('c3')">
+              <td style="color:var(--text-muted);font-size:11px;text-align:center">▶</td>
+              <td>
+                <div style="font-weight:600;color:var(--text)">/api/cron/pmb/week-planner</div>
+                <div style="font-size:11px;color:var(--text-muted)">Calculates week total, spreads posts Mon–Sun, dedup check</div>
+              </td>
+              <td><span class="badge grey">Mon 5:00 UTC</span></td>
+              <td><span style="font-size:12px;color:var(--text-secondary)">Mon 5:00am</span></td>
+              <td><span style="font-size:12px">2.1s</span></td>
+              <td><span class="badge green">✓ OK</span></td>
+              <td><span style="font-size:11px;color:var(--text-muted)">460 queued · 66/day</span></td>
+              <td><span style="font-size:11px;color:var(--text-secondary)">Mon 28 Apr</span></td>
+              <td><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation()">▶ Run Now</button></td>
+            </tr>
+            <tr class="cron-expand" id="c3">
+              <td colspan="9">
+                <div class="cron-expand-inner">
+                  <div class="history-label">Last 5 runs (Mondays)</div>
+                  <div class="run-history" style="margin-bottom:12px">
+                    <div class="run-dot ok" title="OK · 460 queued · 21 Apr"></div>
+                    <div class="run-dot ok" title="OK · 452 queued · 14 Apr"></div>
+                    <div class="run-dot ok" title="OK · 448 queued · 7 Apr"></div>
+                    <div class="run-dot idle" title="Idle — insufficient data (Week 2)"></div>
+                    <div class="run-dot idle" title="Idle — insufficient data (Week 1)"></div>
+                    <span style="font-size:10px;color:var(--text-muted);margin-left:6px">All OK since data accumulation complete</span>
+                  </div>
+                  <div class="history-label">Output — last run (Mon 21 Apr 05:00 UTC)</div>
+                  <div class="log-block">
+<span class="log-info">[INFO]</span> PMB week-planner started · week_start: 2026-04-21<br>
+<span class="log-info">[INFO]</span> Eligible providers: 200 · Active categories: 10<br>
+<span class="log-info">[INFO]</span> Total posts this week: 460 (450 pairwise + 10 leaderboards)<br>
+<span class="log-info">[INFO]</span> Daily target: 66 (Mon–Sat) + 64 (Sun) = 460<br>
+<span class="log-info">[INFO]</span> Dedup check: 0 rows already existed for week 2026-04-21<br>
+<span class="log-ok">[OK]</span> 460 pmb_run rows inserted · scheduled_for dates assigned<br>
+<span class="log-ok">[OK]</span> Week plan complete · 2.1s
+                  </div>
+                </div>
+              </td>
+            </tr>
+
+            <!-- ── post-processor ── -->
+            <tr class="cron-row-main" onclick="toggleExpand('c4')">
+              <td style="color:var(--text-muted);font-size:11px;text-align:center">▶</td>
+              <td>
+                <div style="font-weight:600;color:var(--text)">/api/cron/pmb/post-processor</div>
+                <div style="font-size:11px;color:var(--text-muted)">Polls Batch API, saves completed posts to blog_posts</div>
+              </td>
+              <td><span class="badge grey">Every 10 min</span></td>
+              <td><span style="font-size:12px;color:var(--text-secondary)">4 min ago</span></td>
+              <td><span style="font-size:12px">0.3s</span></td>
+              <td><span class="badge grey">Idle</span></td>
+              <td><span style="font-size:11px;color:var(--text-muted)">No batches pending</span></td>
+              <td><span style="font-size:11px;color:var(--text-secondary)">6 min</span></td>
+              <td><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation()">▶ Run Now</button></td>
+            </tr>
+            <tr class="cron-expand" id="c4">
+              <td colspan="9">
+                <div class="cron-expand-inner">
+                  <div class="history-label">Last 10 runs</div>
+                  <div class="run-history" style="margin-bottom:12px">
+                    <div class="run-dot idle" title="Idle · 4 min ago"></div>
+                    <div class="run-dot ok" title="OK · 63 posts saved · 06:10am"></div>
+                    <div class="run-dot idle" title="Idle"></div>
+                    <div class="run-dot idle" title="Idle"></div>
+                    <div class="run-dot idle" title="Idle"></div>
+                    <div class="run-dot idle" title="Idle"></div>
+                    <div class="run-dot idle" title="Idle"></div>
+                    <div class="run-dot idle" title="Idle"></div>
+                    <div class="run-dot idle" title="Idle"></div>
+                    <div class="run-dot idle" title="Idle"></div>
+                    <span style="font-size:10px;color:var(--text-muted);margin-left:6px">Idle when no Batch API jobs pending</span>
+                  </div>
+                  <div class="history-label">Output — last active run (06:10:05 UTC)</div>
+                  <div class="log-block">
+<span class="log-info">[INFO]</span> post-processor started · checking Batch API<br>
+<span class="log-info">[INFO]</span> 1 batch job found · batch_id: msgbatch_abc123 · status: ended<br>
+<span class="log-info">[INFO]</span> Downloading results · 63 succeeded · 3 errored<br>
+<span class="log-ok">[OK]</span> 63 posts saved to blog_posts · status="generated"<br>
+<span class="log-err">[ERROR]</span> 3 posts marked "failed" · pmb_run IDs: 1087, 1091, 1094<br>
+<span class="log-warn">[WARN]</span> Admin alert dispatched for failed posts<br>
+<span class="log-ok">[OK]</span> post-processor complete · 0.3s
+                  </div>
+                </div>
+              </td>
+            </tr>
+
+            <!-- ── monthly-generator ── -->
+            <tr class="cron-row-main" onclick="toggleExpand('c5')">
+              <td style="color:var(--text-muted);font-size:11px;text-align:center">▶</td>
+              <td>
+                <div style="font-weight:600;color:var(--text)">/api/cron/pmb/monthly-generator</div>
+                <div style="font-size:11px;color:var(--text-muted)">Category + provider monthly reports, 1st of month</div>
+              </td>
+              <td><span class="badge grey">1st 7:00 UTC</span></td>
+              <td><span style="font-size:12px;color:var(--text-muted)">1 Apr 2026</span></td>
+              <td><span style="font-size:12px">3.8s</span></td>
+              <td><span class="badge green">✓ OK</span></td>
+              <td><span style="font-size:11px;color:var(--text-muted)">220 queued · Apr</span></td>
+              <td><span style="font-size:11px;color:var(--text-secondary)">1 May 2026</span></td>
+              <td><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation()">▶ Run Now</button></td>
+            </tr>
+            <tr class="cron-expand" id="c5">
+              <td colspan="9">
+                <div class="cron-expand-inner">
+                  <div class="history-label">Last 3 runs (monthly)</div>
+                  <div class="run-history" style="margin-bottom:12px">
+                    <div class="run-dot ok" title="OK · 220 queued · 1 Apr"></div>
+                    <div class="run-dot ok" title="OK · 214 queued · 1 Mar"></div>
+                    <div class="run-dot idle" title="Idle — insufficient data (1 Feb)"></div>
+                    <span style="font-size:10px;color:var(--text-muted);margin-left:6px">All OK</span>
+                  </div>
+                  <div class="history-label">Output — 1 Apr 07:00 UTC</div>
+                  <div class="log-block">
+<span class="log-info">[INFO]</span> monthly-generator started · month: April 2026<br>
+<span class="log-info">[INFO]</span> 10 category reports + 210 provider reports = 220 total<br>
+<span class="log-info">[INFO]</span> Dedup check: 0 rows exist for April 2026<br>
+<span class="log-ok">[OK]</span> 220 pmb_run rows inserted · status=queued<br>
+<span class="log-ok">[OK]</span> monthly-generator complete · 3.8s
+                  </div>
+                </div>
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+
+      <script>
+        function toggleExpand(id) {
+          const el = document.getElementById(id);
+          el.classList.toggle('open');
+        }
+      </script>
+    </div>
+
+    <!-- ══════ SCREEN: BLOG PREVIEW ══════ -->
+    <div class="screen" id="screen-blog">
+      <div class="screen-title">Blog Post Preview</div>
+      <div class="screen-sub">Sample PMB-generated post: weekly pairwise comparison with inline SVG charts. This is the public-facing article as it appears on uptrue.io/blog.</div>
+
+      <!-- Render as a centred article column like the real site -->
+      <div style="max-width:760px;margin:0 auto">
+      <div class="blog-preview">
+
+        <!-- ── Feature Image ── -->
+        <div class="blog-hero">
+          <svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0;width:100%;height:100%" viewBox="0 0 900 260" preserveAspectRatio="xMidYMid slice">
+            <defs>
+              <!-- Left panel gradient (blue) -->
+              <linearGradient id="gleft" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#0f2460"/>
+                <stop offset="100%" stop-color="#1d4ed8"/>
+              </linearGradient>
+              <!-- Right panel gradient (teal) -->
+              <linearGradient id="gright" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#065f46"/>
+                <stop offset="100%" stop-color="#0891b2"/>
+              </linearGradient>
+              <!-- Centre vignette -->
+              <radialGradient id="gvig" cx="50%" cy="50%" r="55%">
+                <stop offset="0%" stop-color="rgba(0,0,0,0)"/>
+                <stop offset="100%" stop-color="rgba(0,0,0,0.35)"/>
+              </radialGradient>
+            </defs>
+
+            <!-- Background halves -->
+            <rect x="0"   y="0" width="450" height="260" fill="url(#gleft)"/>
+            <rect x="450" y="0" width="450" height="260" fill="url(#gright)"/>
+            <rect width="900" height="260" fill="url(#gvig)"/>
+
+            <!-- Subtle dot-grid background -->
+            <pattern id="dots" x="0" y="0" width="22" height="22" patternUnits="userSpaceOnUse">
+              <circle cx="1" cy="1" r="1" fill="rgba(255,255,255,0.07)"/>
+            </pattern>
+            <rect width="900" height="260" fill="url(#dots)"/>
+
+            <!-- Left side: uptime sparkline -->
+            <g transform="translate(60,80)">
+              <text x="0" y="0" font-size="11" font-weight="600" fill="rgba(255,255,255,0.5)" font-family="system-ui,sans-serif" letter-spacing="1">UPTIME</text>
+              <text x="0" y="28" font-size="36" font-weight="800" fill="rgba(255,255,255,0.95)" font-family="system-ui,sans-serif">99.94%</text>
+              <!-- Sparkline -->
+              <polyline points="0,70 28,68 56,72 84,69 112,71 140,67 168,70 196,68 224,72 252,67 280,70" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="1.5" stroke-linecap="round"/>
+              <polyline points="0,70 28,68 56,72 84,69 112,71 140,67 168,70 196,68 224,72 252,67 280,70" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-dasharray="1000" stroke-dashoffset="0"/>
+              <!-- Highlight dot -->
+              <circle cx="280" cy="70" r="4" fill="#60a5fa"/>
+              <!-- Uptime bar mini -->
+              <rect x="0" y="86" width="280" height="6" rx="3" fill="rgba(255,255,255,0.1)"/>
+              <rect x="0" y="86" width="272" height="6" rx="3" fill="#60a5fa" opacity="0.8"/>
+              <text x="0" y="104" font-size="10" fill="rgba(255,255,255,0.45)" font-family="system-ui,sans-serif">1 incident · 18 min downtime</text>
+            </g>
+
+            <!-- Centre VS badge -->
+            <g transform="translate(450,130)">
+              <circle cx="0" cy="0" r="32" fill="rgba(0,0,0,0.55)" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>
+              <text x="0" y="-2" text-anchor="middle" dominant-baseline="central" font-size="15" font-weight="900" fill="white" font-family="system-ui,sans-serif">VS</text>
+              <!-- Tick marks around circle -->
+              <line x1="0" y1="-36" x2="0" y2="-42" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+              <line x1="0" y1="36"  x2="0" y2="42"  stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+              <line x1="-36" y1="0" x2="-42" y2="0" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+              <line x1="36"  y1="0" x2="42"  y2="0" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+            </g>
+
+            <!-- Right side: uptime sparkline -->
+            <g transform="translate(560,80)">
+              <text x="280" y="0" text-anchor="end" font-size="11" font-weight="600" fill="rgba(255,255,255,0.5)" font-family="system-ui,sans-serif" letter-spacing="1">UPTIME</text>
+              <text x="280" y="28" text-anchor="end" font-size="36" font-weight="800" fill="rgba(255,255,255,0.95)" font-family="system-ui,sans-serif">99.91%</text>
+              <!-- Sparkline (with a dip to show incident) -->
+              <polyline points="0,68 28,70 56,69 84,72 112,68 140,105 168,103 196,69 224,71 252,70 280,68" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="1.5" stroke-linecap="round"/>
+              <polyline points="0,68 28,70 56,69 84,72 112,68 140,105 168,103 196,69 224,71 252,70 280,68" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round"/>
+              <!-- Incident dot -->
+              <circle cx="140" cy="105" r="4" fill="#f87171"/>
+              <circle cx="280" cy="68" r="4" fill="#34d399"/>
+              <!-- Uptime bar mini -->
+              <rect x="0" y="86" width="280" height="6" rx="3" fill="rgba(255,255,255,0.1)"/>
+              <rect x="0" y="86" width="269" height="6" rx="3" fill="#34d399" opacity="0.8"/>
+              <text x="0" y="104" font-size="10" fill="rgba(255,255,255,0.45)" font-family="system-ui,sans-serif">2 incidents · 42 min downtime</text>
+            </g>
+
+            <!-- Category + week label strip at bottom -->
+            <rect x="0" y="228" width="900" height="32" fill="rgba(0,0,0,0.4)"/>
+            <text x="24" y="249" font-size="11" font-weight="700" fill="rgba(255,255,255,0.6)" font-family="system-ui,sans-serif" letter-spacing="0.5">🤖 AI TOOLS · WEEKLY RELIABILITY COMPARISON · UPTRUE.IO</text>
+            <text x="876" y="249" text-anchor="end" font-size="11" fill="rgba(255,255,255,0.4)" font-family="system-ui,sans-serif">Week of 18 Apr 2026</text>
+          </svg>
+        </div>
+
+        <div class="blog-body">
+          <div class="blog-meta">
+            <span class="badge purple">AI Tools</span>
+            <span class="badge blue">Weekly Comparison</span>
+            <span style="font-size:12px;color:var(--text-muted)">22 April 2026 · Uptrue Team · 7 min read</span>
+          </div>
+
+          <h1 style="font-size:26px;font-weight:800;color:var(--text);margin-bottom:10px;line-height:1.3">OpenAI vs Anthropic Uptime — Week of 18 April 2026</h1>
+
+          <!-- Intro / TL;DR -->
+          <p style="font-size:15px;color:var(--text-secondary);line-height:1.8;margin-bottom:12px">
+            If you're building on top of an AI API, reliability isn't just a nice-to-have — it directly affects your users. Every week, Uptrue's monitoring infrastructure runs independent HTTP checks every 5 minutes across the leading AI providers. This week we're looking at <strong style="color:var(--text)">OpenAI</strong> and <strong style="color:var(--text)">Anthropic</strong> head to head.
+          </p>
+
+          <!-- TL;DR box -->
+          <div style="background:rgba(59,130,246,0.08);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;padding:12px 16px;margin-bottom:20px">
+            <div style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">TL;DR</div>
+            <ul style="font-size:13px;color:var(--text-secondary);line-height:1.9;padding-left:16px;margin:0">
+              <li>OpenAI edged out Anthropic on uptime: <strong style="color:var(--green)">99.94%</strong> vs <strong style="color:var(--green)">99.91%</strong></li>
+              <li>Anthropic was <strong style="color:var(--text)">25ms faster</strong> on average response time (287ms vs 312ms)</li>
+              <li>OpenAI had 1 incident (18 min); Anthropic had 2 incidents totalling 42 min</li>
+              <li>Neither provider had a major outage — both performed well this week</li>
+            </ul>
+          </div>
+
+          <div class="schema-badges">
+            <span class="schema-badge">Article Schema</span>
+            <span class="schema-badge">Dataset Schema</span>
+            <span class="schema-badge">FAQPage Schema</span>
+            <span class="schema-badge">llms.txt Visible</span>
+          </div>
+
+          <hr class="divider">
+
+          <!-- CHART 1: Uptime -->
+          <h2 style="font-size:17px;font-weight:700;color:var(--text);margin-bottom:12px">Uptime This Week</h2>
+          <p style="font-size:13px;color:var(--text-secondary);line-height:1.7;margin-bottom:12px">
+            Both providers maintained strong availability this week. OpenAI's single incident on Tuesday (18 minutes, 06:12–06:30 UTC) was caught by Uptrue's two-confirmation system and logged as a confirmed outage. Anthropic experienced two shorter interruptions on Monday and Thursday.
+          </p>
+          <div class="chart-wrap">
+            <div class="chart-title">📊 Uptime — Week of 18 April 2026</div>
+            <div class="bar-chart">
+              <div class="bar-row">
+                <span class="bar-label">OpenAI</span>
+                <div class="bar-track"><div class="bar-fill green" style="width:99.94%">99.94%</div></div>
+              </div>
+              <div class="bar-row">
+                <span class="bar-label">Anthropic</span>
+                <div class="bar-track"><div class="bar-fill blue" style="width:99.91%">99.91%</div></div>
+              </div>
+            </div>
+            <div style="font-size:10px;color:var(--text-muted);margin-top:10px">HTTP checks every 5 min · 2,016 data points per provider · Uptrue monitoring infrastructure</div>
+          </div>
+          <p style="font-size:13px;color:var(--text-secondary);line-height:1.7;margin-bottom:16px">
+            A difference of 0.03 percentage points sounds small, but at scale it translates to roughly 4 minutes of additional downtime per week for Anthropic users. For AI-powered applications with SLA commitments, that gap matters. Both providers remain within what most teams would consider "four nines" territory.
+          </p>
+
+          <!-- CHART 2: Response Time -->
+          <h2 style="font-size:17px;font-weight:700;color:var(--text);margin-bottom:12px">Response Time</h2>
+          <p style="font-size:13px;color:var(--text-secondary);line-height:1.7;margin-bottom:12px">
+            Response time tells a different story. Anthropic's Claude API endpoints responded consistently faster this week, with a median of 287ms compared to OpenAI's 312ms. This is the time from request initiation to first byte — not including model inference time — so it primarily reflects infrastructure latency and routing efficiency.
+          </p>
+          <div class="chart-wrap">
+            <div class="chart-title">⚡ Median Response Time — Week of 18 April 2026</div>
+            <div class="bar-chart">
+              <div class="bar-row">
+                <span class="bar-label">Anthropic</span>
+                <div class="bar-track"><div class="bar-fill green" style="width:57.4%">287ms ✓ faster</div></div>
+              </div>
+              <div class="bar-row">
+                <span class="bar-label">OpenAI</span>
+                <div class="bar-track"><div class="bar-fill blue" style="width:62.4%">312ms</div></div>
+              </div>
+            </div>
+            <div style="font-size:10px;color:var(--text-muted);margin-top:10px">Lower is better · Median TTFB · Uptrue monitoring nodes · Excludes model inference time</div>
+          </div>
+          <p style="font-size:13px;color:var(--text-secondary);line-height:1.7;margin-bottom:16px">
+            The 25ms difference held steady throughout the week, suggesting it reflects a structural routing advantage rather than a one-off measurement. If your application is latency-sensitive — for example, streaming completions in a real-time chat interface — Anthropic's infrastructure edge may be worth factoring into your provider decision.
+          </p>
+
+          <!-- CHART 3: Incidents -->
+          <h2 style="font-size:17px;font-weight:700;color:var(--text);margin-bottom:12px">Incidents & Downtime</h2>
+          <p style="font-size:13px;color:var(--text-secondary);line-height:1.7;margin-bottom:12px">
+            Uptrue defines an incident as two or more consecutive failed checks from the same monitoring node — this prevents false positives from transient network hiccups. Only confirmed, sustained failures are counted.
+          </p>
+          <div class="chart-wrap">
+            <div class="chart-title">🚨 Confirmed Incidents — Week of 18 April 2026</div>
+            <div class="bar-chart">
+              <div class="bar-row">
+                <span class="bar-label">OpenAI</span>
+                <div class="bar-track"><div class="bar-fill yellow" style="width:30%">1 incident · 18 min total</div></div>
+              </div>
+              <div class="bar-row">
+                <span class="bar-label">Anthropic</span>
+                <div class="bar-track"><div class="bar-fill red" style="width:45%">2 incidents · 42 min total</div></div>
+              </div>
+            </div>
+            <div style="font-size:10px;color:var(--text-muted);margin-top:10px">Incident = 2+ consecutive failed checks from Uptrue nodes · Both providers self-reported issues within 10 min of Uptrue detection</div>
+          </div>
+          <p style="font-size:13px;color:var(--text-secondary);line-height:1.7;margin-bottom:16px">
+            OpenAI's single incident on Tuesday morning was resolved within 18 minutes — faster than their historical average of 23 minutes. Anthropic's two incidents were shorter individually (21 min and 21 min) but added up to more total downtime. Notably, both providers updated their official status pages within 10 minutes of Uptrue detecting the outage, which is a good sign for their incident communication maturity.
+          </p>
+
+          <!-- Historical context box -->
+          <div style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:16px;margin:20px 0">
+            <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">4-Week Context</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+              <div>
+                <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:6px">OpenAI — Last 4 Weeks</div>
+                <div style="font-size:12px;color:var(--text-secondary);line-height:1.8">
+                  Apr 18: 99.94% ← this week<br>
+                  Apr 11: 99.98% · 0 incidents<br>
+                  Apr 4: 99.87% · 2 incidents<br>
+                  Mar 28: 99.95% · 1 incident
+                </div>
+              </div>
+              <div>
+                <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:6px">Anthropic — Last 4 Weeks</div>
+                <div style="font-size:12px;color:var(--text-secondary);line-height:1.8">
+                  Apr 18: 99.91% ← this week<br>
+                  Apr 11: 99.96% · 1 incident<br>
+                  Apr 4: 99.99% · 0 incidents<br>
+                  Mar 28: 99.89% · 3 incidents
+                </div>
+              </div>
+            </div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:10px">Both providers are trending toward improvement. OpenAI's worst week (Apr 4) had them below Anthropic's current performance. Anthropic's best week (Apr 4) was near-perfect. The gap between these two providers narrows week by week.</div>
+          </div>
+
+          <!-- Who should use which -->
+          <h2 style="font-size:17px;font-weight:700;color:var(--text);margin-bottom:12px">Which Should You Choose?</h2>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+            <div style="background:rgba(59,130,246,0.07);border:1px solid rgba(59,130,246,0.25);border-radius:6px;padding:14px">
+              <div style="font-size:13px;font-weight:700;color:var(--accent);margin-bottom:8px">OpenAI — Better for</div>
+              <ul style="font-size:12px;color:var(--text-secondary);line-height:1.9;padding-left:14px;margin:0">
+                <li>Higher uptime priority</li>
+                <li>Teams already in the OpenAI ecosystem</li>
+                <li>Production workloads where uptime SLA matters more than speed</li>
+                <li>GPT-4 feature requirements</li>
+              </ul>
+            </div>
+            <div style="background:rgba(16,185,129,0.07);border:1px solid rgba(16,185,129,0.25);border-radius:6px;padding:14px">
+              <div style="font-size:13px;font-weight:700;color:var(--green);margin-bottom:8px">Anthropic — Better for</div>
+              <ul style="font-size:12px;color:var(--text-secondary);line-height:1.9;padding-left:14px;margin:0">
+                <li>Latency-sensitive applications</li>
+                <li>Real-time streaming interfaces</li>
+                <li>Claude's longer context window use cases</li>
+                <li>Teams that prioritise response speed</li>
+              </ul>
+            </div>
+          </div>
+          <p style="font-size:13px;color:var(--text-secondary);line-height:1.7;margin-bottom:20px">
+            Neither provider dominates on every metric. The pragmatic answer for high-stakes applications is to implement failover between both — monitor each independently (Uptrue can alert you within 10 minutes of either going down), and route to the backup automatically when the primary is unavailable. This is increasingly common practice for AI-native startups.
+          </p>
+
+          <!-- Internal links -->
+          <div style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:14px;margin:20px 0">
+            <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">Related Reports</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <a href="#" style="font-size:13px;color:var(--accent);text-decoration:none;line-height:1.5">→ <strong>AI Tools Reliability Leaderboard</strong> — April 2026 · All 10 AI providers ranked</a>
+              <a href="#" style="font-size:13px;color:var(--accent);text-decoration:none;line-height:1.5">→ <strong>OpenAI Monthly Uptime Report</strong> — April 2026 · 30-day breakdown with incident log</a>
+              <a href="#" style="font-size:13px;color:var(--accent);text-decoration:none;line-height:1.5">→ <strong>Google Gemini vs OpenAI</strong> — Week of 18 April 2026 · Third comparison in this category</a>
+              <a href="#" style="font-size:13px;color:var(--accent);text-decoration:none;line-height:1.5">→ <strong>Is OpenAI Down?</strong> · Real-time status and 90-day incident history</a>
+              <a href="#" style="font-size:13px;color:var(--accent);text-decoration:none;line-height:1.5">→ <strong>Anthropic vs Google Gemini</strong> — Week of 18 April 2026</a>
+            </div>
+          </div>
+
+          <!-- Methodology -->
+          <div style="background:rgba(59,130,246,0.05);border:1px solid rgba(59,130,246,0.15);border-radius:6px;padding:16px;margin:20px 0;font-size:12px;color:var(--text-secondary);line-height:1.8">
+            <strong style="color:var(--text);font-size:13px">About This Data</strong><br><br>
+            All uptime, response time, and incident data in this report is collected exclusively by Uptrue's independent monitoring infrastructure. We perform HTTP checks every 5 minutes from monitoring nodes and run keyword detection against each provider's official status page every 15 minutes.<br><br>
+            An incident is recorded only after 2 consecutive failed checks from the same node, eliminating single-packet-loss false positives. Uptrue is not affiliated with, sponsored by, or endorsed by any of the services monitored here. Data represents external availability as experienced from our monitoring nodes and may differ from internal metrics reported by the providers themselves.<br><br>
+            Found an error or want to flag a correction? Email <a href="mailto:reports@uptrue.io" style="color:var(--accent)">reports@uptrue.io</a> — we review and update within 24 hours.
+          </div>
+
+          <!-- FAQ -->
+          <h2 style="font-size:17px;font-weight:700;color:var(--text);margin-bottom:12px">Frequently Asked Questions</h2>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
+            <div style="border:1px solid var(--border);border-radius:6px;overflow:hidden">
+              <div style="padding:12px 14px;background:var(--bg-hover);font-size:13px;font-weight:600;color:var(--text)">Which is more reliable — OpenAI or Anthropic?</div>
+              <div style="padding:12px 14px;font-size:13px;color:var(--text-secondary);line-height:1.7">This week, OpenAI achieved 99.94% uptime versus Anthropic's 99.91%, giving OpenAI a narrow reliability edge. However, Anthropic had a faster median response time (287ms vs 312ms). The right choice depends on whether uptime consistency or response speed matters more for your application.</div>
+            </div>
+            <div style="border:1px solid var(--border);border-radius:6px;overflow:hidden">
+              <div style="padding:12px 14px;background:var(--bg-hover);font-size:13px;font-weight:600;color:var(--text)">How often does OpenAI go down?</div>
+              <div style="padding:12px 14px;font-size:13px;color:var(--text-secondary);line-height:1.7">Based on Uptrue's 4-week tracking, OpenAI has experienced between 0 and 2 confirmed incidents per week, with most weeks recording 1 or fewer. Their average incident duration is approximately 23 minutes. You can monitor OpenAI's live status and full incident history on Uptrue's real-time status page.</div>
+            </div>
+            <div style="border:1px solid var(--border);border-radius:6px;overflow:hidden">
+              <div style="padding:12px 14px;background:var(--bg-hover);font-size:13px;font-weight:600;color:var(--text)">How does Uptrue collect this monitoring data?</div>
+              <div style="padding:12px 14px;font-size:13px;color:var(--text-secondary);line-height:1.7">Uptrue performs HTTP checks every 5 minutes on each provider's primary API endpoints, and keyword checks every 15 minutes on their official status pages. A failure is only confirmed after 2+ consecutive failed checks from our monitoring node, preventing false positives from transient network issues.</div>
+            </div>
+            <div style="border:1px solid var(--border);border-radius:6px;overflow:hidden">
+              <div style="padding:12px 14px;background:var(--bg-hover);font-size:13px;font-weight:600;color:var(--text)">Can I get alerted when OpenAI or Anthropic goes down?</div>
+              <div style="padding:12px 14px;font-size:13px;color:var(--text-secondary);line-height:1.7">Yes — Uptrue's free plan lets you monitor any public URL and receive instant alerts via email when it goes down. You can set up monitoring for OpenAI, Anthropic, or any other service in under 2 minutes. Alerts fire within 10 minutes of an incident starting.</div>
+            </div>
+            <div style="border:1px solid var(--border);border-radius:6px;overflow:hidden">
+              <div style="padding:12px 14px;background:var(--bg-hover);font-size:13px;font-weight:600;color:var(--text)">Where can I see historical uptime data for AI providers?</div>
+              <div style="padding:12px 14px;font-size:13px;color:var(--text-secondary);line-height:1.7">Uptrue publishes weekly and monthly reliability reports for all 10 AI providers we monitor. Each report includes uptime percentage, response time trends, and a full incident log. Browse all AI Tools reports at uptrue.io/blog/ai-tools or check the monthly leaderboard for a ranked summary.</div>
+            </div>
+          </div>
+
+          <!-- Subscribe CTA -->
+          <div style="background:linear-gradient(135deg,rgba(59,130,246,0.15),rgba(6,182,212,0.1));border:1px solid rgba(59,130,246,0.25);border-radius:10px;padding:24px;margin-top:24px;text-align:center">
+            <div style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:6px">📬 Get weekly reliability reports in your inbox</div>
+            <div style="font-size:13px;color:var(--text-secondary);margin-bottom:16px;line-height:1.6">Every Monday: uptime rankings, incident summaries, and response time trends across 200 monitored providers. Written for engineers and architects. No marketing fluff.</div>
+            <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:10px">
+              <input placeholder="your@email.com" style="max-width:240px;width:100%;font-size:13px">
+              <button class="btn btn-primary">Subscribe Free →</button>
+            </div>
+            <div style="font-size:11px;color:var(--text-muted)">Join 1,200+ engineers · Unsubscribe any time · No spam, ever</div>
+          </div>
+
+          <!-- Share + Monitor CTA -->
+          <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap;align-items:center">
+            <button class="btn btn-ghost btn-sm">🐦 Share on X</button>
+            <button class="btn btn-ghost btn-sm">💼 Share on LinkedIn</button>
+            <button class="btn btn-ghost btn-sm">🔗 Copy link</button>
+            <button class="btn btn-primary btn-sm" style="margin-left:auto">Monitor Your Own Services Free →</button>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+
+    <!-- ══════ SCREEN: ADD PROVIDER MODAL ══════ -->
+    <div class="screen" id="screen-modal">
+      <div class="screen-title">Add / Edit Provider</div>
+      <div class="screen-sub">This is how the modal looks when adding a new PMB provider.</div>
+
+      <div style="max-width:560px">
+        <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;overflow:hidden">
+          <div class="modal-header">
+            <div class="modal-title">Add Provider to PMB</div>
+            <button class="btn btn-ghost btn-sm">✕ Close</button>
+          </div>
+          <div class="modal-body">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Display Name *</label>
+                <input placeholder="e.g. OpenAI (ChatGPT)" value="Paysafe">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Domain *</label>
+                <input placeholder="e.g. openai.com" value="paysafe.com">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Service URL</label>
+                <input placeholder="https://paysafe.com" value="https://paysafe.com">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Status Page URL</label>
+                <input placeholder="https://status.paysafe.com" value="https://status.paysafe.com">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">PMB Category *</label>
+              <select>
+                <option>Select category…</option>
+                <option>AI Tools</option>
+                <option selected>Payment Processors</option>
+                <option>Cloud Providers</option>
+                <option>E-commerce Platforms</option>
+                <option>Collaboration Tools</option>
+                <option>Dev Tools / CI-CD</option>
+                <option>Email Marketing</option>
+                <option>CDN / Security</option>
+                <option>CMS / Website Builders</option>
+                <option>Monitoring & Observability</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Custom Keywords <span style="font-weight:400;color:var(--text-muted)">(optional — adds to category defaults)</span></label>
+              <div class="keyword-input-wrap">
+                <span class="keyword-chip">paysafe down <span class="remove">×</span></span>
+                <span class="keyword-chip">paysafe outage <span class="remove">×</span></span>
+                <input placeholder="Type keyword + Enter…" style="border:none;background:none;flex:1;min-width:140px;padding:0">
+              </div>
+              <div class="form-hint">Category default keywords are applied automatically. Only add provider-specific terms here.</div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:12px">
+              <div>
+                <div style="font-size:13px;font-weight:600;color:var(--text)">Enable PMB Blogging</div>
+                <div style="font-size:11px;color:var(--text-muted)">Include in weekly/monthly comparison posts</div>
+              </div>
+              <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-ghost">Cancel</button>
+            <button class="btn btn-primary">Save Provider</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<script>
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'))
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'))
+  const screen = document.getElementById('screen-' + id)
+  if (screen) screen.classList.add('active')
+  event.currentTarget.classList.add('active')
+}
+// Activate first nav item
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelector('.nav-item').classList.remove('active')
+})
+</script>
+</body>
+</html>

@@ -241,7 +241,7 @@ export function CreateMonitorForm({ minCheckInterval = 600 }: { minCheckInterval
 
       {type === 'heartbeat' && (
         <>
-          <div style={{ background: 'var(--bg-secondary, #f0f4ff)', border: '1px solid var(--border-primary)', borderRadius: 10, padding: 16, marginBottom: 16 }}>
+          <div style={{ background: 'var(--bg-subtle)', border: '1px solid var(--border-primary)', borderRadius: 10, padding: 16, marginBottom: 16 }}>
             <h4 style={{ fontSize: 14, fontWeight: 700, marginBottom: 8 }}>How Heartbeat Monitoring Works</h4>
             <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.7, marginBottom: 10 }}>
               Unlike other monitors where Uptrue checks your server, heartbeat monitoring works the other way around:
