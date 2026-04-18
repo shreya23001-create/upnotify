@@ -37,6 +37,7 @@ export async function GET(request: Request): Promise<NextResponse> {
   }
 
   const cronStart = Date.now()
+  const scheduleBase = new Date(cronStart) // fixed reference for next_check_at — avoids drift from Phase 1 duration
   const runId = await startCronRun('/api/cron/check-runner', getTriggeredBy(request))
 
   try {
@@ -117,7 +118,7 @@ export async function GET(request: Request): Promise<NextResponse> {
     await Promise.allSettled(
       upResults.map(async ({ monitor, result }) => {
         const now = new Date()
-        const nextCheck = new Date(now.getTime() + monitor.check_interval_seconds * 1000)
+        const nextCheck = new Date(scheduleBase.getTime() + monitor.check_interval_seconds * 1000)
 
         if (monitor.status === 'down') {
           const openIncident = await getOpenIncidentForMonitor(monitor.id)
@@ -148,7 +149,7 @@ export async function GET(request: Request): Promise<NextResponse> {
         downResults.map(async ({ monitor }) => {
           const confirmation = await dispatchChecker(monitor)
           const now = new Date()
-          const nextCheck = new Date(now.getTime() + monitor.check_interval_seconds * 1000)
+          const nextCheck = new Date(scheduleBase.getTime() + monitor.check_interval_seconds * 1000)
 
           await writeCheckResult({
             org_id: monitor.org_id,
