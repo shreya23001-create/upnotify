@@ -209,7 +209,7 @@ export async function createMonitorAfterPaymentAction(formData: FormData): Promi
   redirect('/dashboard/monitors')
 }
 
-export async function updateMonitorAction(monitorId: string, formData: FormData): Promise<{ error?: string }> {
+export async function updateMonitorAction(monitorId: string, formData: FormData): Promise<{ error?: string; success?: boolean }> {
   const guardUpdate = await impersonationGuard()
   if (guardUpdate.isBlocked) return { error: guardUpdate.error }
 
@@ -296,7 +296,8 @@ export async function updateMonitorAction(monitorId: string, formData: FormData)
 
   logger.info('Monitor updated', { monitorId })
   await devAuditLog({ orgId: user.org_id, userId: user.id, action: 'monitor.updated', resourceType: 'monitor', resourceId: monitorId, metadata: { name } })
-  redirect(`/dashboard/monitors/${monitorId}`)
+  revalidatePath('/dashboard/monitors')
+  return { success: true }
 }
 
 export async function deleteMonitorAction(monitorId: string): Promise<{ error?: string }> {

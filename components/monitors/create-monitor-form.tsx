@@ -119,7 +119,7 @@ export function CreateMonitorForm({ minCheckInterval = 600 }: { minCheckInterval
 
       <div className="form-group">
         <label className="form-label" htmlFor="name">Monitor Name</label>
-        <input className="form-input" id="name" name="name" required placeholder="My Website" disabled={isPending} />
+        <input className="form-input" id="name" name="name" required placeholder="My Website" disabled={isPending} maxLength={500} />
       </div>
 
       <div className="form-group">

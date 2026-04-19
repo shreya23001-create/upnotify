@@ -6936,3 +6936,26 @@ section.hero .hero-mockup {
   tr { page-break-inside: avoid; break-inside: avoid; }
   thead { display: table-header-group; }
 }
+
+
+/* Back to Top button */
+.back-to-top {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 999;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--color-primary, #667eea);
+  color: #fff;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  transition: opacity 0.2s, transform 0.2s;
+}
+.back-to-top:hover { transform: translateY(-2px); opacity: 0.9; }

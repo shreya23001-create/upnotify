@@ -21,6 +21,10 @@ export function CreateStatusPageForm({ monitors }: { monitors: Monitor[] }) {
 
   function handleSubmit(formData: FormData): void {
     setError(null)
+    if (selectedMonitors.size === 0) {
+      setError('Please select at least one monitor to display on this status page.')
+      return
+    }
     formData.set('slug', name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''))
     formData.set('monitor_ids', Array.from(selectedMonitors).join(','))
     startTransition(async () => {

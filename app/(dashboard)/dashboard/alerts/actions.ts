@@ -10,6 +10,15 @@ import { logger } from '@/lib/utils/logger'
 import { devAuditLog } from '@/lib/db/audit'
 import { impersonationGuard } from '@/lib/auth/impersonation-guard'
 
+function isValidWebhookUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url)
+    return parsed.protocol === 'https:' || parsed.protocol === 'http:'
+  } catch {
+    return false
+  }
+}
+
 export async function createAlertChannelAction(formData: FormData): Promise<{ error?: string }> {
   const guard = await impersonationGuard()
   if (guard.isBlocked) return { error: guard.error }
@@ -43,17 +52,20 @@ export async function createAlertChannelAction(formData: FormData): Promise<{ er
     config.slackWebhookUrl = formData.get('slackWebhookUrl') as string
     config.slackChannel = formData.get('slackChannel') as string
     if (!config.slackWebhookUrl) return { error: 'Slack webhook URL is required' }
+    if (!isValidWebhookUrl(config.slackWebhookUrl as string)) return { error: 'Slack webhook URL must be a valid https:// URL' }
   }
 
   if (type === 'teams') {
     config.teamsWebhookUrl = formData.get('teamsWebhookUrl') as string
     if (!config.teamsWebhookUrl) return { error: 'Teams webhook URL is required' }
+    if (!isValidWebhookUrl(config.teamsWebhookUrl as string)) return { error: 'Teams webhook URL must be a valid https:// URL' }
   }
 
   if (type === 'webhook') {
     config.webhookUrl = formData.get('webhookUrl') as string
     config.webhookSecret = formData.get('webhookSecret') as string
     if (!config.webhookUrl) return { error: 'Webhook URL is required' }
+    if (!isValidWebhookUrl(config.webhookUrl as string)) return { error: 'Webhook URL must be a valid http:// or https:// URL' }
   }
 
   if (type === 'telegram') {
@@ -106,13 +118,16 @@ export async function updateAlertChannelAction(channelId: string, formData: Form
   if (type === 'slack') {
     config.slackWebhookUrl = formData.get('slackWebhookUrl') as string
     config.slackChannel = formData.get('slackChannel') as string
+    if (config.slackWebhookUrl && !isValidWebhookUrl(config.slackWebhookUrl as string)) return { error: 'Slack webhook URL must be a valid https:// URL' }
   }
   if (type === 'teams') {
     config.teamsWebhookUrl = formData.get('teamsWebhookUrl') as string
+    if (config.teamsWebhookUrl && !isValidWebhookUrl(config.teamsWebhookUrl as string)) return { error: 'Teams webhook URL must be a valid https:// URL' }
   }
   if (type === 'webhook') {
     config.webhookUrl = formData.get('webhookUrl') as string
     config.webhookSecret = formData.get('webhookSecret') as string
+    if (config.webhookUrl && !isValidWebhookUrl(config.webhookUrl as string)) return { error: 'Webhook URL must be a valid http:// or https:// URL' }
   }
 
   if (type === 'telegram') {
@@ -130,7 +145,7 @@ export async function updateAlertChannelAction(channelId: string, formData: Form
   redirect('/dashboard/alerts')
 }
 
-export async function deleteAlertChannelAction(channelId: string): Promise<{ error?: string }> {
+export async function deleteAlertChannelAction(channelId: string): Promise<{ error?: string; success?: boolean }> {
   const guardDel = await impersonationGuard()
   if (guardDel.isBlocked) return { error: guardDel.error }
 
@@ -146,7 +161,8 @@ export async function deleteAlertChannelAction(channelId: string): Promise<{ err
   const success = await deleteAlertChannel(channelId)
   if (!success) return { error: 'Failed to delete alert channel' }
   await devAuditLog({ orgId: user.org_id, userId: user.id, action: 'alert_channel.deleted', resourceType: 'alert_channel', resourceId: channelId })
-  redirect('/dashboard/alerts')
+  revalidatePath('/dashboard/alerts')
+  return { success: true }
 }
 
 export async function toggleAlertChannelAction(channelId: string, enabled: boolean): Promise<{ error?: string } | void> {
