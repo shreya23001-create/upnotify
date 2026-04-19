@@ -1,6 +1,8 @@
 import { Resend } from 'resend'
 import { getServerConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
+import { resolveProviderForType } from '@/lib/db/email-providers'
+import type { EmailType, EmailProvider } from '@/lib/db/email-providers'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -105,78 +107,184 @@ function incrementAndCheckRate(): { allowed: boolean; remaining: number } {
 }
 
 // ---------------------------------------------------------------------------
-// Resend client (lazy singleton)
+// Provider-specific send functions
 // ---------------------------------------------------------------------------
 
-let resendClient: Resend | null = null
+async function sendViaResend(
+  provider: EmailProvider,
+  to: string,
+  subject: string,
+  html: string
+): Promise<EmailResult> {
+  const cfg = provider.config as { api_key?: string }
+  const apiKey = cfg.api_key
+  if (!apiKey) return { success: false, error: 'Resend: api_key not configured' }
 
-function getResendClient(): Resend | null {
-  if (resendClient) return resendClient
+  const client = new Resend(apiKey)
+  const { error } = await client.emails.send({
+    from: `${provider.from_name} <${provider.from_email}>`,
+    to: [to],
+    subject,
+    html,
+  })
+  if (error) return { success: false, error: error.message }
+  return { success: true }
+}
 
-  const config = getServerConfig()
+async function sendViaSendGrid(
+  provider: EmailProvider,
+  to: string,
+  subject: string,
+  html: string
+): Promise<EmailResult> {
+  const cfg = provider.config as { api_key?: string }
+  if (!cfg.api_key) return { success: false, error: 'SendGrid: api_key not configured' }
 
-  if (!config.resend.apiKey) {
-    logger.warn('RESEND_API_KEY is not configured — emails will be logged only')
-    return null
+  const sgMail = (await import('@sendgrid/mail')).default
+  sgMail.setApiKey(cfg.api_key)
+  await sgMail.send({
+    from: { name: provider.from_name, email: provider.from_email },
+    to,
+    subject,
+    html,
+  })
+  return { success: true }
+}
+
+async function sendViaSmtp(
+  provider: EmailProvider,
+  to: string,
+  subject: string,
+  html: string
+): Promise<EmailResult> {
+  const cfg = provider.config as {
+    host?: string
+    port?: number
+    secure?: boolean
+    user?: string
+    pass?: string
+  }
+  if (!cfg.host || !cfg.user || !cfg.pass) {
+    return { success: false, error: 'SMTP: host, user, and pass are required' }
   }
 
-  resendClient = new Resend(config.resend.apiKey)
-  return resendClient
+  const nodemailer = await import('nodemailer')
+  const transporter = nodemailer.default.createTransport({
+    host: cfg.host,
+    port: cfg.port ?? 587,
+    secure: cfg.secure ?? false,
+    auth: { user: cfg.user, pass: cfg.pass },
+  })
+
+  await transporter.sendMail({
+    from: `"${provider.from_name}" <${provider.from_email}>`,
+    to,
+    subject,
+    html,
+  })
+  return { success: true }
+}
+
+async function sendViaProvider(
+  provider: EmailProvider,
+  to: string,
+  subject: string,
+  html: string
+): Promise<EmailResult> {
+  try {
+    if (provider.type === 'resend') return await sendViaResend(provider, to, subject, html)
+    if (provider.type === 'sendgrid') return await sendViaSendGrid(provider, to, subject, html)
+    if (provider.type === 'smtp') return await sendViaSmtp(provider, to, subject, html)
+    return { success: false, error: `Unknown provider type: ${provider.type}` }
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    return { success: false, error: message }
+  }
 }
 
 // ---------------------------------------------------------------------------
-// Core send function
+// Env-var Resend fallback (used when no DB provider is configured)
 // ---------------------------------------------------------------------------
 
-export async function sendEmail(
+function getEnvResendClient(): Resend | null {
+  const config = getServerConfig()
+  if (!config.resend.apiKey) return null
+  return new Resend(config.resend.apiKey)
+}
+
+async function sendViaEnvResend(
   to: string,
   subject: string,
   html: string
 ): Promise<EmailResult> {
   const config = getServerConfig()
-  const client = getResendClient()
-
+  const client = getEnvResendClient()
   if (!client) {
-    logger.warn('Email send skipped — RESEND_API_KEY is not configured. Set the RESEND_API_KEY environment variable to enable email delivery.', { to, subject })
-    return { success: false, error: 'Email not sent — RESEND_API_KEY is not configured' }
+    logger.warn('No email provider configured and RESEND_API_KEY is not set', { to, subject })
+    return { success: false, error: 'No email provider configured' }
   }
 
   const rateCheck = incrementAndCheckRate()
   if (!rateCheck.allowed) {
-    return {
-      success: false,
-      error: 'Daily email limit exceeded (100/day free tier). Email not sent.',
-    }
+    return { success: false, error: 'Daily email limit exceeded (100/day free tier). Email not sent.' }
   }
 
-  try {
-    const { error } = await client.emails.send({
-      from: `${config.resend.fromName} <${config.resend.fromEmail}>`,
-      to: [to],
-      subject,
-      html,
-    })
+  const { error } = await client.emails.send({
+    from: `${config.resend.fromName} <${config.resend.fromEmail}>`,
+    to: [to],
+    subject,
+    html,
+  })
+  if (error) return { success: false, error: error.message }
+  return { success: true }
+}
 
-    if (error) {
-      logger.error('Resend API error', {
-        to,
-        subject,
-        error: error.message,
-      })
-      return { success: false, error: error.message }
+// ---------------------------------------------------------------------------
+// Core send function — routes by email type, falls back to env Resend
+// ---------------------------------------------------------------------------
+
+export async function sendEmail(
+  to: string,
+  subject: string,
+  html: string,
+  emailType: EmailType = 'system'
+): Promise<EmailResult> {
+  try {
+    const provider = await resolveProviderForType(emailType)
+
+    if (provider) {
+      const result = await sendViaProvider(provider, to, subject, html)
+      if (result.success) {
+        logger.info('Email sent', { to, subject, provider: provider.name, type: emailType })
+      } else {
+        logger.error('Email send failed', { to, subject, provider: provider.name, error: result.error })
+      }
+      return result
     }
 
-    logger.info('Email sent successfully', {
-      to,
-      subject,
-      remaining: rateCheck.remaining,
-    })
-    return { success: true }
-  } catch (err: unknown) {
+    // No DB provider — fall back to env var Resend
+    return await sendViaEnvResend(to, subject, html)
+  } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown email send error'
     logger.error('Email send exception', { to, subject, error: message })
     return { success: false, error: message }
   }
+}
+
+// ---------------------------------------------------------------------------
+// Test send — used by admin UI to verify a provider works
+// ---------------------------------------------------------------------------
+
+export async function testEmailProvider(
+  provider: EmailProvider,
+  testTo: string
+): Promise<EmailResult> {
+  return sendViaProvider(provider, testTo, 'Uptrue — Email Provider Test', `
+    <p style="font-family:sans-serif;font-size:15px;color:#111;">
+      ✅ <strong>${provider.name}</strong> is working correctly.<br><br>
+      This is a test email from your Uptrue admin panel.
+    </p>
+  `)
 }
 
 // ---------------------------------------------------------------------------
@@ -257,7 +365,7 @@ export async function sendAlertEmail(params: AlertEmailParams): Promise<EmailRes
     <pre style="margin:0;padding:16px;background-color:#f9fafb;border-radius:6px;font-size:13px;color:#374151;white-space:pre-wrap;word-break:break-word;line-height:1.6;font-family:monospace;">${escapeHtml(params.body)}</pre>
   `)
 
-  return sendEmail(params.to, params.subject, html)
+  return sendEmail(params.to, params.subject, html, 'monitor_alert')
 }
 
 /**
@@ -284,7 +392,7 @@ export async function sendMonitorDownEmail(params: MonitorDownEmailParams): Prom
     ${actionButton('View Monitor', params.dashboardUrl)}
   `)
 
-  return sendEmail(params.to, subject, html)
+  return sendEmail(params.to, subject, html, 'monitor_alert')
 }
 
 /**
@@ -310,7 +418,7 @@ export async function sendMonitorUpEmail(params: MonitorUpEmailParams): Promise<
     ${actionButton('View Monitor', params.dashboardUrl)}
   `)
 
-  return sendEmail(params.to, subject, html)
+  return sendEmail(params.to, subject, html, 'monitor_alert')
 }
 
 /**
@@ -336,7 +444,7 @@ export async function sendIncidentCreatedEmail(params: IncidentCreatedEmailParam
     ${actionButton('View Incident', params.dashboardUrl)}
   `)
 
-  return sendEmail(params.to, subject, html)
+  return sendEmail(params.to, subject, html, 'incident_notification')
 }
 
 /**
@@ -363,7 +471,7 @@ export async function sendIncidentResolvedEmail(params: IncidentResolvedEmailPar
     ${actionButton('View Incident', params.dashboardUrl)}
   `)
 
-  return sendEmail(params.to, subject, html)
+  return sendEmail(params.to, subject, html, 'incident_notification')
 }
 
 // ---------------------------------------------------------------------------
@@ -420,7 +528,7 @@ export async function sendTeamInviteEmail(params: TeamInviteEmailParams): Promis
     </p>
   `)
 
-  return sendEmail(params.to, subject, html)
+  return sendEmail(params.to, subject, html, 'team_invite')
 }
 
 // ---------------------------------------------------------------------------
@@ -570,10 +678,9 @@ export async function sendBlogApprovalEmail(params: BlogApprovalEmailParams): Pr
     </p>
   `)
 
-  return sendEmail(params.to, subject, html)
+  return sendEmail(params.to, subject, html, 'blog_approval')
 }
 
-// ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // AI Visibility — Citation report email
 // ---------------------------------------------------------------------------
@@ -619,7 +726,7 @@ export async function sendCitationReportEmail(params: CitationReportEmailParams)
     </p>
   `)
 
-  return sendEmail(params.to, `AI Citation Check: ${params.domain} — Score ${params.score}/100`, html)
+  return sendEmail(params.to, `AI Citation Check: ${params.domain} — Score ${params.score}/100`, html, 'citation_report')
 }
 
 // ---------------------------------------------------------------------------

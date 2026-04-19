@@ -1,4 +1,5 @@
 import { AdminTrustedLogos } from '@/components/admin/admin-trusted-logos'
+import { EmailProvidersContent } from '@/components/admin/email-providers-content'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
 
@@ -33,6 +34,14 @@ export default async function AdminSettingsPage(): Promise<React.ReactElement> {
 
       <div style={{ marginTop: 32 }}>
         <AdminTrustedLogos initialLogos={logos} />
+      </div>
+
+      <div style={{ marginTop: 32 }}>
+        <h2 style={{ fontSize: 15, fontWeight: 700, marginBottom: 4 }}>Email Configuration</h2>
+        <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 16 }}>
+          Manage email providers and control which service handles each type of outgoing email.
+        </p>
+        <EmailProvidersContent />
       </div>
     </div>
   )
