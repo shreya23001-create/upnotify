@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { Suspense } from 'react'
 import {
   OrganizationJsonLd,
 } from '@/components/seo/json-ld'
@@ -86,7 +87,9 @@ export default function ContactPage(): React.ReactElement {
           <p className="landing-section-subtitle">
             Fill out the form below and we will get back to you as soon as possible.
           </p>
-          <ContactForm />
+          <Suspense fallback={null}>
+            <ContactForm />
+          </Suspense>
         </div>
       </section>
 
