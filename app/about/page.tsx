@@ -85,11 +85,11 @@ export default function AboutPage(): React.ReactElement {
                 and direct businesses. Our platform covers:
               </p>
               <ul className="about-list">
-                <li><strong>Uptime monitoring</strong> across 10 check types including HTTP, SSL, DNS, keyword, port, ping, API endpoint, and heartbeat</li>
-                <li><strong>Competitive intelligence</strong> to track competitor pricing, stock levels, and performance</li>
-                <li><strong>Public status tracking</strong> with branded status pages and real-time incident updates</li>
+                <li><strong>23 monitor types</strong> covering uptime, SSL, DNS, performance, security headers, SPF/DMARC, redirect chains, sitemaps, blacklists, cookie consent, and more</li>
+                <li><strong>Public status pages</strong> with branded pages, real-time incident feed, and subscriber notifications</li>
                 <li><strong>AI-powered reports</strong> that turn raw monitoring data into executive-ready insights</li>
-                <li><strong>Multi-channel alerting</strong> via email, Slack, Microsoft Teams, and webhooks</li>
+                <li><strong>Multi-channel alerting</strong> via email, Slack, Microsoft Teams, Telegram, and signed webhooks</li>
+                <li><strong>Website health scoring</strong> with a free public score tool and AI visibility tracking</li>
               </ul>
             </div>
           </div>
