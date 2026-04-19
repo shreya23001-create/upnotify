@@ -35,6 +35,7 @@ export async function check(monitor: Monitor): Promise<CheckerResult> {
       status: changed ? 'degraded' : 'up',
       responseTimeMs,
       metadata: { records, changed },
+      configUpdates: { lastDnsRecords: records },
       ...(changed && { errorMessage: 'DNS records have changed' }),
     }
   } catch (error) {

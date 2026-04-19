@@ -115,20 +115,23 @@ export async function checkMonitorLimit(orgId: string): Promise<{
   limit: number | null
 }> {
   const supabase = createAdminClient()
-  const limits = await getPlanLimits(orgId)
 
-  const { count } = await supabase
-    .from('monitors')
-    .select('id', { count: 'exact', head: true })
-    .eq('org_id', orgId)
+  const [limits, orgResult, countResult] = await Promise.all([
+    getPlanLimits(orgId),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (supabase as any).from('organisations').select('monitor_limit_override').eq('id', orgId).single() as Promise<{ data: { monitor_limit_override: number | null } | null }>,
+    supabase.from('monitors').select('id', { count: 'exact', head: true }).eq('org_id', orgId),
+  ])
 
-  const currentCount = count ?? 0
-  const allowed =
-    limits.monitors === null || currentCount < limits.monitors
-  const shouldNudge =
-    limits.monitors === null && currentCount >= UPGRADE_NUDGE_THRESHOLD
+  const override = (orgResult.data?.monitor_limit_override as number | null) ?? null
+  // Override takes precedence over plan limit; null override falls back to plan
+  const effectiveLimit = override !== null ? override : limits.monitors
 
-  return { allowed, shouldNudge, currentCount, limit: limits.monitors }
+  const currentCount = countResult.count ?? 0
+  const allowed = effectiveLimit === null || currentCount < effectiveLimit
+  const shouldNudge = effectiveLimit === null && currentCount >= UPGRADE_NUDGE_THRESHOLD
+
+  return { allowed, shouldNudge, currentCount, limit: effectiveLimit }
 }
 
 /** Check if the org can create another workspace */

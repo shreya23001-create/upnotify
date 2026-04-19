@@ -18,6 +18,14 @@ export async function getStatusPagesByWorkspace(workspaceId: string): Promise<St
   return data ?? []
 }
 
+export async function isSlugTaken(slug: string, excludeId?: string): Promise<boolean> {
+  const supabase = createAdminClient()
+  let query = supabase.from('status_pages').select('id').eq('slug', slug)
+  if (excludeId) query = query.neq('id', excludeId)
+  const { data } = await query.limit(1)
+  return (data?.length ?? 0) > 0
+}
+
 export async function getStatusPageBySlug(slug: string): Promise<StatusPage | null> {
   const supabase = createAdminClient()
   const { data, error } = await supabase
@@ -42,7 +50,11 @@ export async function createStatusPage(input: {
 }): Promise<StatusPage | null> {
   const supabase = createAdminClient()
   const { data: page, error } = await supabase.from('status_pages').insert(input).select().single()
-  if (error) { logger.error('Failed to create status page', { error: error.message }); return null }
+  if (error) {
+    if (error.code === '23505') { logger.warn('Slug already taken', { slug: input.slug }); return null }
+    logger.error('Failed to create status page', { error: error.message })
+    return null
+  }
   return page
 }
 

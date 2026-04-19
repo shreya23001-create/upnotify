@@ -85,17 +85,23 @@ export function AlertChannelsTable({ channels }: { channels: AlertChannel[] }) {
 
     startTransition(async () => {
       switch (type) {
-        case 'delete':
-          await deleteAlertChannelAction(ids[0])
+        case 'delete': {
+          const result = await deleteAlertChannelAction(ids[0])
+          if (result?.error) toast.addToast(result.error, 'error')
+          else toast.addToast('Alert channel deleted.', 'success')
           break
+        }
         case 'bulk-delete':
           await bulkDeleteAlertChannelsAction(ids)
+          toast.addToast(`${ids.length} alert channel(s) deleted.`, 'success')
           break
         case 'bulk-enable':
           await bulkEnableAlertChannelsAction(ids)
+          toast.addToast(`${ids.length} alert channel(s) enabled.`, 'success')
           break
         case 'bulk-disable':
           await bulkDisableAlertChannelsAction(ids)
+          toast.addToast(`${ids.length} alert channel(s) disabled.`, 'success')
           break
       }
     })

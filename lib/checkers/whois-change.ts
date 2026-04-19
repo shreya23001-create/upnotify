@@ -1,10 +1,11 @@
 import * as dns from 'dns/promises'
 import type { Monitor } from '@/lib/types'
 import type { CheckerResult, CheckerConfig } from './types'
+import { apexDomain } from './utils'
 
 // Lightweight WHOIS-like check via DNS SOA record (registrar changes affect SOA)
 export async function check(monitor: Monitor): Promise<CheckerResult> {
-  const domain = monitor.target.replace(/^https?:\/\//, '').split('/')[0]
+  const domain = apexDomain(monitor.target)
   const start = Date.now()
 
   try {
@@ -30,6 +31,7 @@ export async function check(monitor: Monitor): Promise<CheckerResult> {
       status: changed ? 'degraded' : 'up',
       responseTimeMs,
       metadata: { soa, nsServers, changed },
+      configUpdates: { lastWhoisSnapshot: currentSnapshot },
       ...(changed && { errorMessage: 'WHOIS/registrar data has changed' }),
     }
   } catch (error) {

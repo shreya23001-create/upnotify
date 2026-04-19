@@ -18,6 +18,7 @@ export async function check(monitor: Monitor): Promise<CheckerResult> {
       status: changed ? 'degraded' : 'up',
       responseTimeMs,
       metadata: { currentIp, previousIp: previousIp ?? null, allAddresses: addresses, changed },
+      configUpdates: { lastIp: currentIp },
       ...(changed && { errorMessage: `IP changed from ${previousIp} to ${currentIp}` }),
     }
   } catch (error) {

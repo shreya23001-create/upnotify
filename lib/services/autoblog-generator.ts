@@ -441,23 +441,41 @@ interface ParsedResponse {
 
 
 function parseResponse(text: string): ParsedResponse | null {
+  // Primary: strict delimiters with optional whitespace around the marker line
+  const delimRe = (a: string, b: string) =>
+    new RegExp(`---${a}---\\s*\\n([\\s\\S]*?)\\s*---${b}---`)
+  const tailRe = (a: string) =>
+    new RegExp(`---${a}---\\s*\\n([\\s\\S]*)$`)
 
-  const title = text.match(/---TITLE---\n([\s\S]*?)---META---/)?.[1]?.trim() ?? ''
+  let title = text.match(delimRe('TITLE', 'META'))?.[1]?.trim() ?? ''
+  let metaDescription = text.match(delimRe('META', 'KEYWORD'))?.[1]?.trim() ?? ''
+  let primaryKeyword = text.match(delimRe('KEYWORD', 'BODY'))?.[1]?.trim() ?? ''
+  let body = text.match(delimRe('BODY', 'EXCERPT'))?.[1]?.trim() ?? ''
+  let excerpt = text.match(tailRe('EXCERPT'))?.[1]?.trim() ?? ''
 
-  const metaDescription = text.match(/---META---\n([\s\S]*?)---KEYWORD---/)?.[1]?.trim() ?? ''
+  // Fallback: if body missing, capture everything after ---BODY--- to end
+  if (!body) {
+    body = text.match(tailRe('BODY'))?.[1]?.trim() ?? ''
+    // strip excerpt block from body if present
+    const excerptIdx = body.indexOf('---EXCERPT---')
+    if (excerptIdx !== -1) {
+      const rest = body.slice(excerptIdx + 13).trim()
+      if (!excerpt) excerpt = rest
+      body = body.slice(0, excerptIdx).trim()
+    }
+  }
 
-  const primaryKeyword = text.match(/---KEYWORD---\n([\s\S]*?)---BODY---/)?.[1]?.trim() ?? ''
-
-  const body = text.match(/---BODY---\n([\s\S]*?)---EXCERPT---/)?.[1]?.trim() ?? ''
-
-  const excerpt = text.match(/---EXCERPT---\n([\s\S]*?)$/)?.[1]?.trim() ?? ''
-
-
+  // Fallback: if title missing, try first markdown heading in body or text
+  if (!title) {
+    title =
+      text.match(/^#\s+(.+)$/m)?.[1]?.trim() ??
+      body.match(/^#\s+(.+)$/m)?.[1]?.trim() ??
+      ''
+  }
 
   if (!title || !body) return null
 
   return { title, metaDescription, primaryKeyword, body, excerpt }
-
 }
 
 
@@ -719,9 +737,12 @@ export async function generateAutoblogPost(input: AutoblogInput): Promise<Autobl
 
 
     if (!parsed) {
-
+      logger.error('Autoblog Claude parse failed — raw response', {
+        type: input.type,
+        rawLength: text.length,
+        rawPreview: text.slice(0, 500),
+      })
       throw new Error('Claude API returned unparseable response — missing title or body tags')
-
     }
 
   } catch (err) {

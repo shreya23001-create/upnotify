@@ -230,7 +230,7 @@ export default function CookiePolicyPage(): React.ReactElement {
         If you have any questions about this Cookie Policy, please contact us at:
       </p>
       <ul>
-        <li><strong>Email:</strong> privacy@uptrue.io</li>
+        <li><strong>Email:</strong> <a href="mailto:privacy@uptrue.io">privacy@uptrue.io</a></li>
         <li><strong>Post:</strong> Vision Software Solutions Limited, C/O Benison Solvers Limited, 1000 Great West Road, Brentford, United Kingdom, TW8 9DW</li>
       </ul>
     </>

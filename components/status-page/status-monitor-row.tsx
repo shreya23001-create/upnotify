@@ -9,59 +9,83 @@ interface Props {
   monitor: Monitor
   uptimeSlots: UptimeSlot[]
   uptimePercent: number
+  range: string
 }
 
-const STATUS_LABELS: Record<string, string> = {
-  up: 'Operational',
-  down: 'Down',
+const RANGE_LABELS: Record<string, string> = {
+  '24h': '24 hours',
+  '7d':  '7 days',
+  '30d': '30 days',
+  '90d': '90 days',
+}
+
+const PILL_CLASS: Record<string, string> = {
+  up:       'sp-status-pill up',
+  down:     'sp-status-pill down',
+  degraded: 'sp-status-pill warn',
+  paused:   'sp-status-pill paused',
+}
+
+const PILL_LABEL: Record<string, string> = {
+  up:       'Up',
+  down:     'Down',
   degraded: 'Degraded',
-  paused: 'Paused',
+  paused:   'Paused',
 }
 
-export function StatusMonitorRow({ monitor, uptimeSlots, uptimePercent }: Props): React.ReactElement {
-  const status = monitor.status ?? 'up'
-  const pillClass = status === 'up' ? 'status-pill status-pill-up'
-    : status === 'down' ? 'status-pill status-pill-down'
-    : status === 'degraded' ? 'status-pill status-pill-degraded'
-    : 'status-pill status-pill-paused'
+const PCT_COLOR: Record<string, string> = {
+  good: 'var(--color-up)',
+  ok:   'var(--color-warn)',
+  bad:  'var(--color-down)',
+}
 
-  const pctClass = uptimePercent >= 99.9 ? 'status-monitor-percent percent-good'
-    : uptimePercent >= 99 ? 'status-monitor-percent percent-ok'
-    : 'status-monitor-percent percent-bad'
+export function StatusMonitorRow({ monitor, uptimeSlots, uptimePercent, range }: Props): React.ReactElement {
+  const status = monitor.status ?? 'up'
+  const pillClass = PILL_CLASS[status] ?? 'sp-status-pill paused'
+  const pillLabel = PILL_LABEL[status] ?? status
+
+  const pctColor = uptimePercent >= 99.9 ? PCT_COLOR.good
+    : uptimePercent >= 99 ? PCT_COLOR.ok
+    : PCT_COLOR.bad
+
+  const rangeLabel = RANGE_LABELS[range] ?? '30 days'
+  const hasData = uptimeSlots.filter(s => s.status !== 'none').length >= 2
 
   return (
-    <div className="status-monitor-row">
-      {/* Left — name + URL */}
-      <div className="status-monitor-info">
-        <MonitorTypeIcon type={monitor.type} />
-        <div style={{ minWidth: 0 }}>
-          <div className="status-monitor-name">{monitor.name}</div>
-          <div className="status-monitor-url-txt">{monitor.target}</div>
+    <div className="sp-monitor-row">
+      {/* Row 1: icon + name + status pill */}
+      <div className="sp-monitor-row-top">
+        <div className="sp-monitor-type-icon">
+          <MonitorTypeIcon type={monitor.type} iconOnly />
+        </div>
+        <div className="sp-monitor-name">{monitor.name}</div>
+        <div className="sp-monitor-row-pill">
+          <div className={pillClass}>
+            <svg width="7" height="7" viewBox="0 0 10 10"><circle cx="5" cy="5" r="5" fill="currentColor" /></svg>
+            {pillLabel}
+          </div>
         </div>
       </div>
 
-      {/* Middle — uptime bars */}
-      <div className="status-monitor-uptime">
-        {/* Show "Insufficient data" when fewer than 2 days have real check data */}
-        {uptimeSlots.filter(s => s.status !== 'none').length < 2 ? (
-          <div className="status-uptime-insufficient">Collecting data…</div>
+      {/* Row 2: uptime bars + percentage + range label */}
+      <div className="sp-monitor-row-bottom">
+        {!hasData ? (
+          <div className="sp-monitor-collecting">Collecting data…</div>
         ) : (
-          <div className="status-monitor-uptime-bar">
-            {uptimeSlots.map((slot, i) => {
-              const tickClass = slot.status === 'up' ? 'status-uptime-tick status-uptime-tick-up'
-                : slot.status === 'down' ? 'status-uptime-tick status-uptime-tick-down'
-                : slot.status === 'degraded' ? 'status-uptime-tick status-uptime-tick-degraded'
-                : 'status-uptime-tick status-uptime-tick-none'
-              return <div key={i} className={tickClass} title={`${slot.slot}: ${slot.status}`} />
-            })}
-          </div>
+          <>
+            <div className="sp-uptime-bars">
+              {uptimeSlots.map((slot, i) => {
+                const tickClass = slot.status === 'up' ? 'sp-uptime-tick ok'
+                  : slot.status === 'down' ? 'sp-uptime-tick down-t'
+                  : slot.status === 'degraded' ? 'sp-uptime-tick warn-t'
+                  : 'sp-uptime-tick none'
+                return <div key={i} className={tickClass} title={`${slot.slot}: ${slot.status}`} />
+              })}
+            </div>
+            <span className="sp-uptime-pct" style={{ color: pctColor }}>{uptimePercent.toFixed(2)}%</span>
+            <span className="sp-bars-range-label">{rangeLabel}</span>
+          </>
         )}
-      </div>
-
-      {/* Right — percentage + status pill */}
-      <div className="status-monitor-right">
-        <span className={pctClass}>{uptimePercent.toFixed(2)}%</span>
-        <span className={pillClass}>{STATUS_LABELS[status] ?? status}</span>
       </div>
     </div>
   )

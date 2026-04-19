@@ -6,6 +6,8 @@ import {
   createBlogPost,
   updateBlogPost,
   deleteBlogPost,
+  bulkDeleteBlogPosts,
+  bulkUpdateBlogPostStatus,
 } from '@/lib/db/blog-posts'
 import { logger } from '@/lib/utils/logger'
 
@@ -110,6 +112,33 @@ export async function updateBlogPostAction(formData: FormData): Promise<ActionRe
   revalidatePath('/admin/blog')
   revalidatePath(`/admin/blog/${id}`)
   return { success: true, id: post.id }
+}
+
+/** Bulk delete blog posts */
+export async function bulkDeleteBlogPostsAction(ids: string[]): Promise<ActionResult & { deleted?: number }> {
+  const user = await getCurrentUser()
+  if (!user?.is_super_admin) return { success: false, error: 'Unauthorised' }
+  if (!ids.length) return { success: false, error: 'No posts selected' }
+
+  const result = await bulkDeleteBlogPosts(ids)
+  logger.info('Admin: Bulk delete blog posts', { count: result.deleted })
+  revalidatePath('/admin/blog')
+  return { success: result.failed === 0, deleted: result.deleted }
+}
+
+/** Bulk update blog post status */
+export async function bulkUpdateBlogPostStatusAction(ids: string[], status: string): Promise<ActionResult & { updated?: number }> {
+  const user = await getCurrentUser()
+  if (!user?.is_super_admin) return { success: false, error: 'Unauthorised' }
+  if (!ids.length) return { success: false, error: 'No posts selected' }
+
+  const allowed = ['draft', 'published', 'archived']
+  if (!allowed.includes(status)) return { success: false, error: 'Invalid status' }
+
+  const result = await bulkUpdateBlogPostStatus(ids, status)
+  logger.info('Admin: Bulk update blog post status', { count: result.updated, status })
+  revalidatePath('/admin/blog')
+  return { success: result.failed === 0, updated: result.updated }
 }
 
 /** Delete a blog post */

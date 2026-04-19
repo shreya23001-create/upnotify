@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import { useRouter } from 'next/navigation'
 import type { Organisation } from '@/lib/types'
 
 const timezones = [
@@ -37,6 +38,7 @@ export function OrgSettingsForm({ organisation }: { organisation: Organisation }
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
   const [isPending, startTransition] = useTransition()
+  const router = useRouter()
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>): void {
     e.preventDefault()
@@ -62,6 +64,7 @@ export function OrgSettingsForm({ organisation }: { organisation: Organisation }
           setError(data.error || 'Failed to save')
         } else {
           setSuccess(true)
+          router.refresh()
         }
       } catch {
         setError('Something went wrong')

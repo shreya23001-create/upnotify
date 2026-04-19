@@ -1,6 +1,7 @@
 import { createAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
 import { getConfig } from '@/lib/utils/config'
+import { getAlertCopy } from '@/lib/utils/alert-copy'
 import { sendAlertEmail } from './email'
 import { sendSlackAlert } from './slack'
 import { sendWebhookAlert } from './webhook'
@@ -18,51 +19,6 @@ interface AlertChannelConfig {
   telegramChatId?: string
 }
 
-interface KeywordMonitorConfig {
-  positiveKeywords?: string[]
-  negativeKeywords?: string[]
-  keyword?: string
-  shouldExist?: boolean
-}
-
-/**
- * Builds keyword-specific context for alert messages.
- * Returns a string like: "Missing: 'Place Order', 'Secure Payment'. Found: 'error'"
- * Returns empty string for non-keyword monitors.
- */
-function buildKeywordAlertContext(monitor: Monitor): string {
-  if (monitor.type !== 'keyword') return ''
-
-  const monitorConfig = monitor.config as KeywordMonitorConfig | undefined
-  if (!monitorConfig) return ''
-
-  const parts: string[] = []
-
-  // Resolve positive keywords (backward compat)
-  let positiveKeywords: string[] = []
-  if (Array.isArray(monitorConfig.positiveKeywords) && monitorConfig.positiveKeywords.length > 0) {
-    positiveKeywords = monitorConfig.positiveKeywords
-  } else if (monitorConfig.keyword && monitorConfig.shouldExist !== false) {
-    positiveKeywords = [monitorConfig.keyword]
-  }
-
-  // Resolve negative keywords (backward compat)
-  let negativeKeywords: string[] = []
-  if (Array.isArray(monitorConfig.negativeKeywords) && monitorConfig.negativeKeywords.length > 0) {
-    negativeKeywords = monitorConfig.negativeKeywords
-  } else if (monitorConfig.keyword && monitorConfig.shouldExist === false) {
-    negativeKeywords = [monitorConfig.keyword]
-  }
-
-  if (positiveKeywords.length > 0) {
-    parts.push(`Watching for: ${positiveKeywords.map(k => `'${k}'`).join(', ')}`)
-  }
-  if (negativeKeywords.length > 0) {
-    parts.push(`Blocking: ${negativeKeywords.map(k => `'${k}'`).join(', ')}`)
-  }
-
-  return parts.join('. ')
-}
 
 export async function dispatchAlerts(incident: Incident, monitor: Monitor): Promise<void> {
   const supabase = createAdminClient()
@@ -93,8 +49,12 @@ export async function dispatchAlerts(incident: Incident, monitor: Monitor): Prom
   const config = getConfig()
   const monitorUrl = `${config.app.url}/dashboard/monitors/${monitor.id}`
 
-  // Build keyword-specific context for the alert message
-  const keywordContext = buildKeywordAlertContext(monitor)
+  const isResolved = incident.status === 'resolved'
+  const metadata = (incident as Record<string, unknown>).metadata as Record<string, unknown> | undefined ?? {}
+  const copy = getAlertCopy(monitor, incident, {
+    variant: isResolved ? 'recovery' : 'alert',
+    metadata,
+  })
 
   // Dispatch to each channel in parallel
   const results = await Promise.allSettled(
@@ -103,22 +63,13 @@ export async function dispatchAlerts(incident: Incident, monitor: Monitor): Prom
       let success = false
       let errorMessage: string | undefined
 
-      const isResolved = incident.status === 'resolved'
-      const alertMessage = `${isResolved ? 'Recovered' : 'Alert'}: ${monitor.name} is ${isResolved ? 'back up' : 'down'}!\n` +
-        `Severity: ${incident.severity}\n` +
-        `Status: ${incident.status}\n` +
-        `Target: ${monitor.target}\n` +
-        (keywordContext ? `${keywordContext}\n` : '') +
-        `Time: ${new Date().toISOString()}\n` +
-        `Details: ${monitorUrl}`
-
       try {
         switch (channel.type) {
           case 'email': {
             const result = await sendAlertEmail({
               to: channelConfig.email || '',
-              subject: `[${incident.severity}] ${monitor.name} is ${isResolved ? 'up' : 'down'}`,
-              body: alertMessage,
+              subject: copy.subject,
+              body: `${copy.headline}\n\n${copy.detail}\n\nView monitor: ${monitorUrl}`,
             })
             success = result.success
             errorMessage = result.error
@@ -128,13 +79,13 @@ export async function dispatchAlerts(incident: Incident, monitor: Monitor): Prom
           case 'slack': {
             const result = await sendSlackAlert({
               webhookUrl: channelConfig.slackWebhookUrl || '',
-              text: alertMessage,
+              text: copy.shortText,
               blocks: [
                 {
                   type: 'section',
                   text: {
                     type: 'mrkdwn',
-                    text: `*${isResolved ? 'Recovered' : 'Down'}* — *${monitor.name}* is *${isResolved ? 'back up' : 'down'}*`,
+                    text: `*${copy.headline}*\n${copy.detail}`,
                   },
                 },
                 {
@@ -169,9 +120,10 @@ export async function dispatchAlerts(incident: Incident, monitor: Monitor): Prom
               payload: {
                 '@type': 'MessageCard',
                 '@context': 'http://schema.org/extensions',
-                summary: `${monitor.name} is ${isResolved ? 'up' : 'down'}`,
+                summary: copy.subject,
                 themeColor: isResolved ? '00FF00' : 'FF0000',
-                title: `${isResolved ? 'Recovered' : 'Down'} — ${monitor.name} is ${isResolved ? 'back up' : 'down'}`,
+                title: copy.headline,
+                text: copy.detail,
                 sections: [{
                   facts: [
                     { name: 'Severity', value: incident.severity },
@@ -275,12 +227,8 @@ export async function dispatchAlerts(incident: Incident, monitor: Monitor): Prom
       await sendUserMessage({
         userId: owner.id,
         orgId: incident.org_id,
-        title: isResolved
-          ? `Recovered: ${monitor.name} is back up`
-          : `Down: ${monitor.name} is not responding`,
-        body: isResolved
-          ? `${monitor.name} (${monitor.target}) has recovered and is back online.`
-          : `${monitor.name} (${monitor.target}) is down. Severity: ${incident.severity}. Check your dashboard for details.`,
+        title: copy.headline,
+        body: copy.detail,
         type: isResolved ? 'success' : 'error',
         category: 'system',
         actionUrl: `/dashboard/monitors/${monitor.id}`,

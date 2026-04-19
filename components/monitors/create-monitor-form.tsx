@@ -6,32 +6,9 @@ import { createMonitorAction } from '@/app/(dashboard)/dashboard/monitors/action
 import { KeywordTagInput } from './keyword-tag-input'
 import { getKeywordSuggestions } from '@/lib/utils/keyword-suggestions'
 import { MonitorTypeHelp } from './monitor-type-help'
+import { MONITOR_TYPES } from '@/lib/constants/monitor-types'
 
-const monitorTypes = [
-  { value: 'http', label: 'HTTP/HTTPS Uptime' },
-  { value: 'ssl', label: 'SSL Certificate' },
-  { value: 'dns', label: 'DNS Records' },
-  { value: 'keyword', label: 'Keyword Detection' },
-  { value: 'domain', label: 'Domain Expiry' },
-  { value: 'port', label: 'Port Check' },
-  { value: 'ping', label: 'Ping/Reachability' },
-  { value: 'api', label: 'API Endpoint' },
-  { value: 'heartbeat', label: 'Heartbeat Monitor' },
-  { value: 'competitor', label: 'Page Change Detection' },
-  { value: 'security-headers', label: 'Security Headers' },
-  { value: 'response-time', label: 'Response Time Threshold' },
-  { value: 'robots-txt', label: 'robots.txt Change' },
-  { value: 'ip-change', label: 'IP Address Change' },
-  { value: 'mx-health', label: 'MX Health' },
-  { value: 'whois-change', label: 'WHOIS Registrar Change' },
-  { value: 'sitemap', label: 'Sitemap Validity' },
-  { value: 'redirect-chain', label: 'Redirect Chain' },
-  { value: 'spf-dmarc', label: 'SPF / DMARC Validity' },
-  { value: 'blacklist', label: 'Blacklist Check' },
-  { value: 'page-size', label: 'Page Size' },
-  { value: 'cookie-consent', label: 'Cookie Consent Presence' },
-  { value: 'nameserver-change', label: 'Nameserver Change' },
-]
+const monitorTypes = MONITOR_TYPES.map(t => ({ value: t.type, label: t.name }))
 
 const ALL_INTERVALS = [
   { value: 30, label: 'Every 30 seconds' },
@@ -41,17 +18,29 @@ const ALL_INTERVALS = [
   { value: 600, label: 'Every 10 minutes' },
   { value: 1800, label: 'Every 30 minutes' },
   { value: 3600, label: 'Every 1 hour' },
+  { value: 21600, label: 'Every 6 hours' },
+  { value: 86400, label: 'Every 24 hours' },
 ]
 
+function getDefaultIntervalForType(type: string, minCheckInterval: number): number {
+  const def = MONITOR_TYPES.find(t => t.type === type)
+  const recommended = def?.defaultInterval ?? 60
+  return Math.max(recommended, minCheckInterval)
+}
+
 export function CreateMonitorForm({ minCheckInterval = 600 }: { minCheckInterval?: number }): React.ReactElement {
-  // Only show intervals allowed by the plan
-  const intervals = ALL_INTERVALS.filter(i => i.value >= minCheckInterval)
   const [type, setType] = useState('http')
+  const [interval, setInterval] = useState(() => getDefaultIntervalForType('http', minCheckInterval))
   const [target, setTarget] = useState('')
   const [positiveKeywords, setPositiveKeywords] = useState<string[]>([])
   const [negativeKeywords, setNegativeKeywords] = useState<string[]>([])
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
+
+  // Only show intervals allowed by the plan and the type's minInterval
+  const typeDef = MONITOR_TYPES.find(t => t.type === type)
+  const typeMinInterval = typeDef?.minInterval ?? 30
+  const intervals = ALL_INTERVALS.filter(i => i.value >= minCheckInterval && i.value >= typeMinInterval)
 
   const localSuggestions = useMemo(() => getKeywordSuggestions(target), [target])
   const [dbSuggestions, setDbSuggestions] = useState<{ positive: string[]; negative: string[] }>({ positive: [], negative: [] })
@@ -130,12 +119,16 @@ export function CreateMonitorForm({ minCheckInterval = 600 }: { minCheckInterval
 
       <div className="form-group">
         <label className="form-label" htmlFor="name">Monitor Name</label>
-        <input className="form-input" id="name" name="name" required placeholder="My Website" disabled={isPending} />
+        <input className="form-input" id="name" name="name" required placeholder="My Website" disabled={isPending} maxLength={500} />
       </div>
 
       <div className="form-group">
         <label className="form-label" htmlFor="type">Monitor Type</label>
-        <select className="form-select" id="type" name="type" value={type} onChange={e => setType(e.target.value)} disabled={isPending}>
+        <select className="form-select" id="type" name="type" value={type} onChange={e => {
+          const newType = e.target.value
+          setType(newType)
+          setInterval(getDefaultIntervalForType(newType, minCheckInterval))
+        }} disabled={isPending}>
           {monitorTypes.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
         </select>
       </div>
@@ -181,13 +174,19 @@ export function CreateMonitorForm({ minCheckInterval = 600 }: { minCheckInterval
           className="form-select"
           id="check_interval_seconds"
           name="check_interval_seconds"
-          defaultValue={String(minCheckInterval)}
+          value={String(interval)}
+          onChange={e => setInterval(Number(e.target.value))}
           disabled={isPending}
         >
           {intervals.map(i => (
             <option key={i.value} value={String(i.value)}>{i.label}</option>
           ))}
         </select>
+        {typeDef && typeDef.defaultInterval >= 3600 && (
+          <span className="form-helper-text">
+            Recommended every {typeDef.defaultInterval === 86400 ? '24 hours' : typeDef.defaultInterval === 21600 ? '6 hours' : '1 hour'} — this type changes slowly so frequent checks waste quota.
+          </span>
+        )}
         {minCheckInterval > 60 && (
           <span className="form-helper-text">
             Your plan supports a minimum of {minCheckInterval >= 60 ? `${minCheckInterval / 60} minute${minCheckInterval > 60 ? 's' : ''}` : `${minCheckInterval}s`} intervals.{' '}

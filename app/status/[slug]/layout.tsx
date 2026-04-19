@@ -1,7 +1,3 @@
 export default function StatusLayout({ children }: { children: React.ReactNode }): React.ReactElement {
-  return (
-    <div className="status-page-layout">
-      {children}
-    </div>
-  )
+  return <div style={{ minHeight: '100vh' }}>{children}</div>
 }

@@ -1117,3 +1117,84 @@ export async function getCronHistoryForPaths(
   }
   return result
 }
+
+// ---------------------------------------------------------------------------
+// Today's pipeline diagnostic
+// ---------------------------------------------------------------------------
+
+const PIPELINE_STEPS = [
+  { key: 'feed-fetcher',   path: '/api/cron/autoblog/feed-fetcher',   label: 'Feed Fetcher',   desc: 'Pulls RSS/Atom items from all enabled sources' },
+  { key: 'llm-detector',  path: '/api/cron/autoblog/llm-detector',   label: 'LLM Detector',   desc: 'Scans items for LLM-related content signals' },
+  { key: 'topic-runner',  path: '/api/cron/autoblog/topic-runner',   label: 'Topic Runner',   desc: 'Routes feed items to matching topics and queues them' },
+  { key: 'post-generator',path: '/api/cron/autoblog/post-generator', label: 'Post Generator', desc: 'Picks up the queue, calls Claude, sends approval email' },
+]
+
+export interface PipelineStepDiag {
+  key: string
+  path: string
+  label: string
+  desc: string
+  lastRunAt: string | null
+  lastStatus: string | null
+  lastSummary: string | null
+  lastError: string | null
+  runsToday: number
+  errorsToday: number
+}
+
+export interface AutoblogTodayDiag {
+  steps: PipelineStepDiag[]
+  generatedToday: number
+  failedToday: number
+  skippedToday: number
+  pendingToday: number
+  recentRuns: AutoblogRun[]
+}
+
+export async function getAutoblogTodayDiag(): Promise<AutoblogTodayDiag> {
+  const supabase = db()
+  const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+
+  const paths = PIPELINE_STEPS.map(s => s.path)
+
+  const [cronData, runsData] = await Promise.all([
+    supabase
+      .from('cron_run_log')
+      .select('cron_path, status, result_summary, error_message, ran_at')
+      .in('cron_path', paths)
+      .order('ran_at', { ascending: false })
+      .limit(200),
+    supabase
+      .from('autoblog_runs')
+      .select('*')
+      .gte('ran_at', since)
+      .order('ran_at', { ascending: false })
+      .limit(100),
+  ])
+
+  type CronRow = { cron_path: string; status: string; result_summary: string | null; error_message: string | null; ran_at: string }
+  const cronRows: CronRow[] = (cronData.data ?? []) as CronRow[]
+  const runRows = (runsData.data ?? []) as unknown as AutoblogRun[]
+
+  const steps: PipelineStepDiag[] = PIPELINE_STEPS.map(step => {
+    const stepRows = cronRows.filter(r => r.cron_path === step.path)
+    const latest = stepRows[0] ?? null
+    const todayRows = stepRows.filter(r => r.ran_at >= since)
+    return {
+      ...step,
+      lastRunAt: latest?.ran_at ?? null,
+      lastStatus: latest?.status ?? null,
+      lastSummary: latest?.result_summary ?? null,
+      lastError: latest?.error_message ?? null,
+      runsToday: todayRows.length,
+      errorsToday: todayRows.filter(r => r.status === 'error').length,
+    }
+  })
+
+  const generatedToday = runRows.filter(r => r.status === 'generated').length
+  const failedToday    = runRows.filter(r => r.status === 'failed').length
+  const skippedToday   = runRows.filter(r => r.status === 'skipped' || r.status === 'duplicate').length
+  const pendingToday   = runRows.filter(r => r.status === 'queued' || r.status === 'generating').length
+
+  return { steps, generatedToday, failedToday, skippedToday, pendingToday, recentRuns: runRows.slice(0, 20) }
+}

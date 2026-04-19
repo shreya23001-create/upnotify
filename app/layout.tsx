@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next"
 import { Inter, JetBrains_Mono } from "next/font/google"
 import { CookieConsent } from "@/components/ui/cookie-consent"
+import { BackToTop } from "@/components/ui/back-to-top"
 import { GoogleTagManager } from "@/components/analytics/google-tag-manager"
 import { MicrosoftClarity } from "@/components/analytics/microsoft-clarity"
 import "./styles.css"
@@ -103,6 +104,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <GoogleTagManager />
         <MicrosoftClarity />
         {children}
+        <BackToTop />
         <CookieConsent />
       </body>
     </html>

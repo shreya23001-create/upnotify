@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server'
-import { getDueMonitors, getAllActiveMonitors, updateMonitorStatus, incrementFlapCount } from '@/lib/db/monitors'
+import { getDueMonitors, getAllActiveMonitors, updateMonitorStatus, incrementFlapCount, patchMonitorConfig } from '@/lib/db/monitors'
 import { writeCheckResult } from '@/lib/db/check-results'
 import { createIncident, resolveIncident, getOpenIncidentForMonitor } from '@/lib/db/incidents'
 import { isMonitorInMaintenance } from '@/lib/db/maintenance-windows'
 import { dispatchChecker } from '@/lib/services/checker'
 import { dispatchAlerts, dispatchRecoveryAlerts } from '@/lib/services/alert-dispatcher'
+import { getAlertCopy } from '@/lib/utils/alert-copy'
 import { getServerConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
 import { startCronRun, endCronRun, getTriggeredBy } from '@/lib/utils/cron-logger'
@@ -12,7 +13,7 @@ import type { Monitor } from '@/lib/types'
 import type { CheckerResult } from '@/lib/checkers/types'
 
 export const dynamic = 'force-dynamic'
-export const maxDuration = 60
+export const maxDuration = 300
 
 function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms))
@@ -36,6 +37,11 @@ export async function GET(request: Request): Promise<NextResponse> {
   }
 
   const cronStart = Date.now()
+  // Round down to the cron fire minute so next_check_at lands exactly on the next cron boundary.
+  // Without this, a 3s function startup delay shifts next_check_at past the next :00 mark and
+  // causes monitors to be skipped for an entire minute (effectively 2× their configured interval).
+  const scheduleBase = new Date(cronStart)
+  scheduleBase.setSeconds(0, 0)
   const runId = await startCronRun('/api/cron/check-runner', getTriggeredBy(request))
 
   try {
@@ -45,21 +51,33 @@ export async function GET(request: Request): Promise<NextResponse> {
     const allMonitors = force ? await getAllActiveMonitors() : await getDueMonitors()
     logger.info('Check runner started', { dueMonitors: allMonitors.length, force })
 
-    // Filter out monitors in maintenance
+    // Filter out monitors in maintenance (parallel DB calls)
+    const maintenanceChecks = await Promise.allSettled(
+      allMonitors.map(async (m) => ({
+        monitor: m,
+        inMaintenance: await isMonitorInMaintenance(m.id, m.org_id),
+      }))
+    )
+
     const monitors: Monitor[] = []
-    for (const m of allMonitors) {
-      const inMaintenance = await isMonitorInMaintenance(m.id, m.org_id)
+    const maintenanceUpdates: Promise<void>[] = []
+
+    for (const r of maintenanceChecks) {
+      if (r.status !== 'fulfilled') continue
+      const { monitor: m, inMaintenance } = r.value
       if (inMaintenance) {
         const now = new Date()
-        await updateMonitorStatus(m.id, {
+        maintenanceUpdates.push(updateMonitorStatus(m.id, {
           status: m.status,
           last_checked_at: now.toISOString(),
           next_check_at: new Date(now.getTime() + m.check_interval_seconds * 1000).toISOString(),
-        })
+        }))
       } else {
         monitors.push(m)
       }
     }
+
+    await Promise.allSettled(maintenanceUpdates)
 
     // Phase 1: Run ALL first checks in parallel
     const firstChecks = await Promise.allSettled(
@@ -74,6 +92,14 @@ export async function GET(request: Request): Promise<NextResponse> {
           error_message: result.errorMessage,
           metadata: result.metadata,
         })
+        // Persist baseline values for change-detection monitors (ip-change, dns, robots-txt, etc.)
+        if (result.configUpdates && Object.keys(result.configUpdates).length > 0) {
+          await patchMonitorConfig(
+            monitor.id,
+            (monitor.config as Record<string, unknown>) ?? {},
+            result.configUpdates as Record<string, unknown>
+          )
+        }
         return { monitor, result }
       })
     )
@@ -96,7 +122,7 @@ export async function GET(request: Request): Promise<NextResponse> {
     await Promise.allSettled(
       upResults.map(async ({ monitor, result }) => {
         const now = new Date()
-        const nextCheck = new Date(now.getTime() + monitor.check_interval_seconds * 1000)
+        const nextCheck = new Date(scheduleBase.getTime() + monitor.check_interval_seconds * 1000)
 
         if (monitor.status === 'down') {
           const openIncident = await getOpenIncidentForMonitor(monitor.id)
@@ -127,7 +153,7 @@ export async function GET(request: Request): Promise<NextResponse> {
         downResults.map(async ({ monitor }) => {
           const confirmation = await dispatchChecker(monitor)
           const now = new Date()
-          const nextCheck = new Date(now.getTime() + monitor.check_interval_seconds * 1000)
+          const nextCheck = new Date(scheduleBase.getTime() + monitor.check_interval_seconds * 1000)
 
           await writeCheckResult({
             org_id: monitor.org_id,
@@ -142,11 +168,11 @@ export async function GET(request: Request): Promise<NextResponse> {
           if (confirmation.status === 'down') {
             const existingIncident = await getOpenIncidentForMonitor(monitor.id)
             if (!existingIncident) {
-              // Build incident title with keyword details if applicable
-              let incidentTitle = `${monitor.name} is down`
-              if (monitor.type === 'keyword' && confirmation.errorMessage) {
-                incidentTitle = `${monitor.name} — ${confirmation.errorMessage}`
-              }
+              const alertCopy = getAlertCopy(monitor, { severity: monitor.severity }, {
+                variant: 'alert',
+                metadata: confirmation.metadata as Record<string, unknown> | undefined,
+              })
+              const incidentTitle = alertCopy.headline
 
               const newIncident = await createIncident({
                 org_id: monitor.org_id,

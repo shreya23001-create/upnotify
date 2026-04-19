@@ -26,6 +26,7 @@ interface DataTableProps<T extends { id: string }> {
   columns: Column<T>[]
   data: T[]
   searchPlaceholder?: string
+  initialSearch?: string
   filters?: { key: string; label: string; options: FilterOption[] }[]
   bulkActions?: BulkAction[]
   pageSize?: number
@@ -38,6 +39,7 @@ export function DataTable<T extends { id: string }>({
   columns,
   data,
   searchPlaceholder = 'Search...',
+  initialSearch = '',
   filters = [],
   bulkActions = [],
   pageSize: initialPageSize = 10,
@@ -45,7 +47,7 @@ export function DataTable<T extends { id: string }>({
   emptyAction,
   emptyIcon = '📊',
 }: DataTableProps<T>) {
-  const [search, setSearch] = useState('')
+  const [search, setSearch] = useState(initialSearch)
   const [filterValues, setFilterValues] = useState<Record<string, string>>({})
   const [sortKey, setSortKey] = useState<string | null>(null)
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc')

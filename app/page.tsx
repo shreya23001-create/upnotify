@@ -21,6 +21,7 @@ import {
   FaqPageJsonLd,
 } from '@/components/seo/json-ld'
 import { FAQ_ITEMS } from '@/lib/constants/faq'
+import { getHomepageFeatureTypes } from '@/lib/constants/monitor-types'
 
 // force-dynamic: homepage fetches live DB data (Ticker, BlogPreview, TrustedLogos).
 // revalidate=300 would fail local builds without env vars. Revisit when local
@@ -28,14 +29,14 @@ import { FAQ_ITEMS } from '@/lib/constants/faq'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Uptrue — Uptime Monitoring for Agencies & Teams',
+  title: 'Uptrue — Website Monitoring Suite for Agencies & Teams',
   description:
-    'Monitor uptime, performance and infrastructure across all your sites. 10 monitor types, AI-powered reports, public status pages, multi-channel alerts, and agency white-label — all in one platform. Free plan available.',
+    'Monitor uptime, performance and infrastructure across all your sites. 23 monitor types, AI-powered reports, public status pages, multi-channel alerts, and agency white-label — all in one platform. Free plan available.',
   alternates: { canonical: 'https://uptrue.io' },
   openGraph: {
-    title: 'Uptrue — Uptime Monitoring for Agencies & Teams',
+    title: 'Uptrue — Website Monitoring Suite for Agencies & Teams',
     description:
-      'Monitor uptime, performance and infrastructure across all your sites. 10 monitor types, AI-powered reports, public status pages, and multi-channel alerts.',
+      'Monitor uptime, performance and infrastructure across all your sites. 23 monitor types, AI-powered reports, public status pages, and multi-channel alerts.',
     url: 'https://uptrue.io',
   },
 }
@@ -119,7 +120,7 @@ export default async function LandingPage(): Promise<React.ReactElement> {
             <div className="hero-eyebrow fade-up">
               <div className="hero-eyebrow-text">
                 <span className="hero-eyebrow-dot" />
-                10 monitor types · 1-minute checks · AI-powered reports
+                23 monitor types · 1-minute checks · AI-powered reports
               </div>
             </div>
             <h1 className="hero-headline fade-up delay-1">
@@ -177,7 +178,7 @@ export default async function LandingPage(): Promise<React.ReactElement> {
       <div className="stats-bar">
         <div className="stats-bar-inner">
           <div className="stat-item">
-            <div className="stat-value gradient-text">10</div>
+            <div className="stat-value gradient-text">23</div>
             <div className="stat-label">Monitor types</div>
           </div>
           <div className="stat-item">
@@ -208,6 +209,65 @@ export default async function LandingPage(): Promise<React.ReactElement> {
             </p>
           </div>
           <FeatureCarousel />
+        </div>
+      </section>
+
+      {/* ================================================================
+          MONITOR TYPE FEATURE CARDS
+          ================================================================ */}
+      <section className="section" id="monitor-types">
+        <div className="container">
+          <div className="section-header">
+            <div className="section-eyebrow">Website Monitoring Suite</div>
+            <h2 className="section-title">23 things that can go wrong.<br />We check them all.</h2>
+            <p className="section-sub">
+              Most tools only check if your site loads. Uptrue monitors every layer —
+              uptime, security, DNS, email, compliance, and more.
+            </p>
+          </div>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
+            gap: 16,
+            marginBottom: 32,
+          }}>
+            {getHomepageFeatureTypes().map(t => (
+              <a
+                key={t.slug}
+                href={`/monitoring/${t.slug}`}
+                style={{
+                  display: 'block',
+                  padding: '20px 22px',
+                  borderRadius: 12,
+                  border: '1.5px solid var(--border-primary)',
+                  textDecoration: 'none',
+                  color: 'inherit',
+                  background: 'var(--bg-card)',
+                  transition: 'border-color 0.15s',
+                }}
+              >
+                <div style={{ fontSize: 26, marginBottom: 10 }}>{t.emoji}</div>
+                <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 6 }}>{t.name}</div>
+                <div style={{ color: 'var(--text-secondary)', fontSize: 13, lineHeight: 1.55 }}>{t.tagline}</div>
+              </a>
+            ))}
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            <a
+              href="/monitoring"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                color: 'var(--accent)',
+                fontWeight: 600,
+                fontSize: 15,
+                textDecoration: 'none',
+              }}
+            >
+              See all 23 monitor types →
+            </a>
+          </div>
         </div>
       </section>
 
@@ -483,8 +543,8 @@ export default async function LandingPage(): Promise<React.ReactElement> {
                   <td><span className="comp-yes">✓</span></td>
                 </tr>
                 <tr>
-                  <td>Monitor types (HTTP, SSL, DNS, Keyword…)</td>
-                  <td className="col-uptrue"><span className="comp-val highlight">10 types</span></td>
+                  <td>Monitor types (HTTP, SSL, DNS, Security Headers…)</td>
+                  <td className="col-uptrue"><span className="comp-val highlight">23 types</span></td>
                   <td><span className="comp-val">7 types</span></td>
                   <td><span className="comp-val">6 types</span></td>
                 </tr>

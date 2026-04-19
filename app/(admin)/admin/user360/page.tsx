@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getCurrentUser } from '@/lib/db/users'
 import { canAccessAdminModule } from '@/lib/db/admin-roles'
+import { MonitorLimitOverrideForm } from '@/components/admin/monitor-limit-override-form'
 
 export const dynamic = 'force-dynamic'
 
@@ -58,7 +59,7 @@ export default async function User360Page({
   const [orgResult, usersResult, subsResult, invoicesResult, monitorsResult, incidentsResult, statusPagesResult, alertChannelsResult, auditLogResult, checkResultsResult, competeSubResult, ecomProductsResult, apiKeysResult] =
     orgId
       ? await Promise.all([
-          supabase.from('organisations').select('*').eq('id', orgId).single(),
+          supabase.from('organisations').select('*, monitor_limit_override').eq('id', orgId).single(),
           supabase.from('users').select('id, email, full_name, created_at, last_sign_in_at, is_super_admin').eq('org_id', orgId),
           supabase.from('subscriptions').select('id, status, billing_cycle, current_period_end, created_at, plans(name, slug, price_monthly_gbp, price_annual_gbp, monitor_limit, check_interval_seconds, status_page_limit, has_slack_teams, has_webhooks, has_api_access, ai_report_limit, max_team_members)').eq('org_id', orgId).order('created_at', { ascending: false }),
           supabase.from('invoices').select('id, amount_gbp, currency, status, invoice_pdf_url, created_at, period_start').eq('org_id', orgId).order('created_at', { ascending: false }).limit(10),
@@ -75,6 +76,7 @@ export default async function User360Page({
       : Array(13).fill({ data: null, error: null, count: null })
 
   const org = orgResult.data as Record<string, unknown> | null
+  const monitorLimitOverride = (orgResult.data?.monitor_limit_override as number | null) ?? null
   const users = (usersResult.data ?? []) as Array<{ id: string; email: string; full_name: string | null; created_at: string; last_sign_in_at: string | null; is_super_admin: boolean }>
   const subs = (subsResult.data ?? []) as Array<{ id: string; status: string; billing_cycle: string; current_period_end: string | null; created_at: string; plans: { name: string; slug: string; price_monthly_gbp: number; price_annual_gbp: number | null; monitor_limit: number | null; check_interval_seconds: number; status_page_limit: number | null; has_slack_teams: boolean; has_webhooks: boolean; has_api_access: boolean; ai_report_limit: number | null; max_team_members: number | null } | null }>
   const invoices = (invoicesResult.data ?? []) as Array<{ id: string; amount_gbp: number; currency: string; status: string; invoice_pdf_url: string | null; created_at: string; period_start: string | null }>
@@ -912,9 +914,13 @@ export default async function User360Page({
                   {[
                     {
                       feature: 'Monitors',
-                      limit: activePlan.monitor_limit ? String(activePlan.monitor_limit) : 'Unlimited',
+                      limit: monitorLimitOverride !== null
+                        ? `${monitorLimitOverride} (override)`
+                        : activePlan.monitor_limit ? String(activePlan.monitor_limit) : 'Unlimited',
                       used: String(monitors.length),
-                      ok: !activePlan.monitor_limit || monitors.length <= activePlan.monitor_limit,
+                      ok: monitorLimitOverride !== null
+                        ? monitors.length <= monitorLimitOverride
+                        : !activePlan.monitor_limit || monitors.length <= activePlan.monitor_limit,
                     },
                     {
                       feature: 'Check Interval',
@@ -974,6 +980,26 @@ export default async function User360Page({
               </table>
             )}
           </div>
+
+          {/* Monitor Limit Override */}
+          {orgId && (
+            <div className="card" style={{ padding: 16, marginBottom: 16, borderLeft: '3px solid #f59e0b' }}>
+              <h3 style={{ fontSize: 13, fontWeight: 700, marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-muted)' }}>
+                Monitor Limit Override
+              </h3>
+              <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 12 }}>
+                Override this org&apos;s monitor limit regardless of their plan.
+                Plan limit: <strong>{activePlan?.monitor_limit ?? 'Unlimited'}</strong>.
+                Current monitors: <strong>{monitors.length}</strong>.
+                Leave blank to clear and revert to plan limit.
+              </p>
+              <MonitorLimitOverrideForm
+                orgId={orgId}
+                currentOverride={monitorLimitOverride}
+                planLimit={activePlan?.monitor_limit ?? null}
+              />
+            </div>
+          )}
 
           {/* Activity Log */}
           <div className="card" style={{ padding: 16, marginBottom: 16 }}>

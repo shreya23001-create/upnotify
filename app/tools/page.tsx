@@ -2,14 +2,14 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: 'Free Website Monitoring Tools',
+  title: 'Free Website Monitoring Tools — DNS, SSL, Speed, Security Headers | Uptrue',
   description:
-    'Free tools for website owners: SSL certificate checker, uptime calculator, and more. No signup required.',
+    'Free tools for website owners and developers: SSL checker, DNS lookup, WHOIS, security headers, HTTP status checker, redirect chain tracer, SPF/DMARC checker, blacklist checker, speed test, and more. No signup required.',
   alternates: { canonical: 'https://uptrue.io/tools' },
   openGraph: {
     title: 'Free Website Monitoring Tools | Uptrue',
     description:
-      'Free SSL checker, uptime calculator, and more tools for website owners.',
+      'DNS lookup, SSL checker, security headers, WHOIS, SPF/DMARC, speed test, and more — all free.',
     url: 'https://uptrue.io/tools',
     type: 'website',
   },
@@ -31,6 +31,76 @@ const TOOLS = [
     tag: 'Popular',
   },
   {
+    slug: 'dns-lookup',
+    title: 'DNS Lookup',
+    description:
+      'Look up A, AAAA, MX, NS, TXT, CNAME, and SOA records for any domain. Instant results with response time. No signup required.',
+    tag: '',
+  },
+  {
+    slug: 'whois-lookup',
+    title: 'WHOIS Lookup',
+    description:
+      'Look up domain registration details, expiry date, registrar, nameservers, and RDAP data for any domain.',
+    tag: '',
+  },
+  {
+    slug: 'security-headers-checker',
+    title: 'Security Headers Checker',
+    description:
+      'Check your website\'s security headers — HSTS, CSP, X-Frame-Options, CORS, Referrer-Policy, and more. Get a letter grade with missing header details.',
+    tag: '',
+  },
+  {
+    slug: 'spf-dmarc-checker',
+    title: 'SPF & DMARC Checker',
+    description:
+      'Check your domain\'s SPF and DMARC email authentication records. See if your domain is protected against email spoofing and phishing.',
+    tag: '',
+  },
+  {
+    slug: 'http-status-checker',
+    title: 'HTTP Status Code Checker',
+    description:
+      'Check any URL\'s HTTP response code, follow redirect chains, and inspect response headers. See 200, 301, 404, 500 and everything in between.',
+    tag: '',
+  },
+  {
+    slug: 'redirect-chain-checker',
+    title: 'Redirect Chain Checker',
+    description:
+      'Trace the full redirect chain for any URL. Detect redirect loops, excessive hops, and SEO-damaging 302 redirects.',
+    tag: '',
+  },
+  {
+    slug: 'port-checker',
+    title: 'Port Checker',
+    description:
+      'Check if any TCP port is open on any host. Test SSH, HTTP, HTTPS, SMTP, MySQL, PostgreSQL, Redis, and custom ports.',
+    tag: '',
+  },
+  {
+    slug: 'robots-txt-checker',
+    title: 'robots.txt Checker',
+    description:
+      'Fetch and analyse the robots.txt file for any website. See all rules, detect Googlebot blocks, missing sitemaps, and crawl issues.',
+    tag: '',
+  },
+  {
+    slug: 'blacklist-checker',
+    title: 'Blacklist Checker',
+    description:
+      'Check if your domain or IP is listed on major email blacklists — Spamhaus, SpamCop, Barracuda, SORBS, and more. Identify deliverability problems instantly.',
+    tag: '',
+  },
+  {
+    slug: 'website-speed-test',
+    title: 'Website Speed Test',
+    description:
+      'Test your website\'s speed. Measure TTFB, total load time, page size, compression, and CDN cache status. Get a grade and actionable performance tips.',
+    tag: '',
+  },
+  {
     slug: 'uptime-calculator',
     title: 'Uptime & SLA Calculator',
     description:
@@ -45,7 +115,7 @@ export default function ToolsIndexPage(): React.ReactElement {
       <div className="tools-hero">
         <h1 className="tools-hero-title">Free Website Tools</h1>
         <p className="tools-hero-subtitle">
-          Useful tools for developers, sysadmins, and website owners. No signup required.
+          13 free tools for developers, sysadmins, and website owners — DNS, SSL, security headers, WHOIS, speed test, and more. No signup required.
         </p>
       </div>
 
@@ -61,14 +131,6 @@ export default function ToolsIndexPage(): React.ReactElement {
               <span className="tools-card-link">Use this tool &rarr;</span>
             </Link>
           ))}
-        </div>
-
-        <div className="tools-coming-soon">
-          <h3>More tools coming soon</h3>
-          <p>
-            DNS lookup, header checker, WHOIS lookup, website speed test, and more.
-            Sign up for free to be notified when new tools are available.
-          </p>
         </div>
 
         <div className="tools-cta">

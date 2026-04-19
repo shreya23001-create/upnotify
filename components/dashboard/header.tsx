@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useAuth } from '@/components/providers/auth-provider'
 import { useWorkspace } from '@/components/providers/workspace-provider'
 import { WorkspaceSwitcher } from './workspace-switcher'
-import { IconSettings, IconLogOut, IconUser } from '@/components/icons'
+import { IconLogOut, IconUser } from '@/components/icons'
 import { MobileSidebar } from './mobile-sidebar'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { MessagesBell } from './messages-bell'
@@ -53,10 +53,7 @@ export function Header() {
             </div>
             <div className="header-dropdown-divider" />
             <Link href="/dashboard/settings" className="header-dropdown-item" onClick={() => setDropdownOpen(false)}>
-              <IconSettings size={15} /> Settings
-            </Link>
-            <Link href="/dashboard/settings" className="header-dropdown-item" onClick={() => setDropdownOpen(false)}>
-              <IconUser size={15} /> Profile
+              <IconUser size={15} /> Profile &amp; Settings
             </Link>
             <div className="header-dropdown-divider" />
             <button className="header-dropdown-item header-dropdown-item-danger" onClick={() => signOut()}>

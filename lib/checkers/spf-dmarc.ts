@@ -1,9 +1,10 @@
 import * as dns from 'dns/promises'
 import type { Monitor } from '@/lib/types'
 import type { CheckerResult } from './types'
+import { apexDomain } from './utils'
 
 export async function check(monitor: Monitor): Promise<CheckerResult> {
-  const domain = monitor.target.replace(/^https?:\/\//, '').split('/')[0]
+  const domain = apexDomain(monitor.target)
   const start = Date.now()
 
   const issues: string[] = []
@@ -38,10 +39,7 @@ export async function check(monitor: Monitor): Promise<CheckerResult> {
 
     const metadata = { spfRecord: spfRecord ?? null, dmarcRecord: dmarcRecord ?? null, issues }
 
-    if (issues.length === 2) {
-      return { status: 'down', responseTimeMs, errorMessage: issues.join('; '), metadata }
-    }
-
+    // Missing records = security gap (degraded), not an outage (down)
     if (issues.length > 0) {
       return { status: 'degraded', responseTimeMs, errorMessage: issues.join('; '), metadata }
     }

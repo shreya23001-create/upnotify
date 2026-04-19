@@ -7,7 +7,6 @@ import { StatusOverallBanner } from '@/components/status-page/status-overall-ban
 import { StatusMonitorRow } from '@/components/status-page/status-monitor-row'
 import { StatusIncidentList } from '@/components/status-page/status-incident-list'
 import { StatusSubscribeForm } from '@/components/status-page/status-subscribe-form'
-import { UptimeBarLegend } from '@/components/status-page/uptime-bar-legend'
 import { StatusTimeRangeLinks } from '@/components/status-page/status-time-range-links'
 import type { Monitor, Incident } from '@/lib/types'
 
@@ -55,7 +54,6 @@ export default async function PublicStatusPage({
 
   const supabase = createAdminClient()
 
-  // Fetch org logo if available
   let orgLogoUrl: string | null = null
   if (statusPage.org_id) {
     const { data: org } = await supabase
@@ -96,86 +94,112 @@ export default async function PublicStatusPage({
 
   const openIncidents = incidents.filter(i => i.status !== 'resolved')
 
+  const anyDown = monitors.some(m => m.status === 'down')
+  const navDotColor = anyDown ? 'var(--color-down)'
+    : openIncidents.length > 0 ? 'var(--color-warn)'
+    : 'var(--color-up)'
+  const navStatusText = anyDown ? 'Major Outage'
+    : openIncidents.length > 0 ? 'Partial Outage'
+    : 'All Systems Operational'
+
   return (
-    <div className="status-page-layout">
-      {/* Top navigation bar */}
+    <div className="sp-wrap">
+
+      {/* Nav */}
       <nav className="sp-nav">
-        <div className="sp-nav-inner">
-          <a href="https://uptrue.io" target="_blank" rel="noopener noreferrer" className="sp-nav-brand">
-            <div className="sp-nav-logo">
+        <div className="sp-nav-brand">
+          <div className="sp-nav-logo">
+            {orgLogoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={orgLogoUrl} alt={statusPage.name} style={{ width: 22, height: 22, objectFit: 'contain' }} />
+            ) : (
               <svg width="16" height="16" fill="none" stroke="white" strokeWidth="2.5" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
               </svg>
-            </div>
-            <span className="sp-nav-name">{statusPage.name}</span>
-          </a>
-          <div className="sp-nav-actions">
-            <span className="sp-nav-powered">Powered by <a href="https://uptrue.io" target="_blank" rel="noopener noreferrer">Uptrue</a></span>
+            )}
           </div>
+          {statusPage.name} — Status
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div className="sp-nav-brand-dot" style={{ background: navDotColor }} />
+          <span style={{ fontSize: 12, fontWeight: 600, color: navDotColor }}>{navStatusText}</span>
         </div>
       </nav>
 
-    <div className="status-page">
-      <div className="status-page-header">
-        <div className="status-page-logo">
-          {orgLogoUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={orgLogoUrl} alt={`${statusPage.name} logo`} className="status-page-logo-img" />
-          ) : (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src="/favicon.ico" alt="Uptrue" className="status-page-logo-favicon" />
-          )}
-        </div>
-        <h1 className="status-page-title">{statusPage.name}</h1>
-        <p className="status-last-updated">Last updated: {new Date().toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' })}</p>
-      </div>
-
+      {/* Hero — overall status */}
       <StatusOverallBanner monitors={monitors} openIncidents={openIncidents.length} />
 
-      <div className="status-page-section">
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 16 }}>
-          <h2 className="status-page-section-title" style={{ margin: 0, border: 'none', padding: 0 }}>Monitors</h2>
-          <StatusTimeRangeLinks slug={slug} currentRange={range} />
-        </div>
-        <UptimeBarLegend />
-        {monitors.length === 0 ? (
-          <p style={{ color: '#94a3b8', fontSize: 14 }}>No monitors configured for this status page.</p>
-        ) : (
-          <div className="status-card-wrap">
-            <div className="status-monitor-list">
-              {monitors.map(m => (
-                <StatusMonitorRow
-                  key={m.id}
-                  monitor={m}
-                  uptimeSlots={uptimeData[m.id] || []}
-                  uptimePercent={uptimePercent[m.id] ?? 100}
-                />
-              ))}
-            </div>
-          </div>
+      {/* Main content */}
+      <div className="sp-content">
+
+        {/* Active incidents */}
+        {openIncidents.length > 0 && (
+          <>
+            <div className="sp-section-title" style={{ marginBottom: 'var(--space-3)' }}>Active Incident</div>
+            {openIncidents.map(inc => (
+              <div key={inc.id} className="sp-incident-card" style={{ marginBottom: 'var(--space-5)' }}>
+                <div className="sp-incident-header">
+                  <svg width="16" height="16" fill="none" stroke="#92400e" strokeWidth="2.5" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                  <div className="sp-incident-title">{inc.title}</div>
+                </div>
+              </div>
+            ))}
+          </>
         )}
-      </div>
 
-      {incidents.length > 0 && (
-        <div className="status-page-section">
-          <h2 className="status-page-section-title">Incident History</h2>
-          <StatusIncidentList incidents={incidents} />
+        {/* Current Status */}
+        <div className="sp-section-title">Current Status</div>
+        <StatusTimeRangeLinks slug={slug} currentRange={range} />
+        <div className="sp-card">
+          {monitors.length === 0 ? (
+            <div style={{ padding: 'var(--space-5)', color: 'var(--text-muted)', fontSize: 14 }}>
+              No monitors configured for this status page.
+            </div>
+          ) : (
+            monitors.map(m => (
+              <StatusMonitorRow
+                key={m.id}
+                monitor={m}
+                uptimeSlots={uptimeData[m.id] || []}
+                uptimePercent={uptimePercent[m.id] ?? 100}
+                range={range}
+              />
+            ))
+          )}
         </div>
-      )}
 
-      <div className="status-page-section">
-        <h2 className="status-page-section-title">Subscribe to Updates</h2>
+        {/* Incident History */}
+        <div className="sp-section-title">Incident History</div>
+        <div className="sp-card">
+          {incidents.length === 0 ? (
+            <div style={{ padding: 'var(--space-4) var(--space-5)', textAlign: 'center', color: 'var(--text-muted)', fontSize: 12 }}>
+              No incidents recorded in this period.
+            </div>
+          ) : (
+            <>
+              <StatusIncidentList incidents={incidents} />
+              <div style={{ padding: 'var(--space-4) var(--space-5)', textAlign: 'center', color: 'var(--text-muted)', fontSize: 12, borderTop: '1px solid var(--border-primary)' }}>
+                No other incidents in this period
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* Subscribe */}
         <StatusSubscribeForm statusPageId={statusPage.id} />
-      </div>
 
-    </div>
+        {/* Footer */}
+        <div className="sp-footer">
+          <div className="sp-footer-text">
+            Powered by <span className="sp-footer-brand">Uptrue</span>{' \u00b7 '}
+            <a href="/privacy">Privacy</a>{' \u00b7 '}
+            <a href="https://uptrue.io" target="_blank" rel="noopener noreferrer">uptrue.io</a>
+          </div>
+        </div>
 
-    {/* Footer */}
-    <footer className="sp-footer">
-      <div className="sp-footer-inner">
-        <span>Powered by <a href="https://uptrue.io" target="_blank" rel="noopener noreferrer">Uptrue</a> — uptime monitoring &amp; status pages</span>
       </div>
-    </footer>
     </div>
   )
 }

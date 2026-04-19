@@ -44,14 +44,22 @@ export function GenerateReportForm(): React.ReactElement {
         <div className="form-group">
           <label className="form-label">Report Type</label>
           <select className="form-select" name="report_type" disabled={isPending}>
-            <option value="uptime">Uptime Report</option>
-            <option value="performance">Performance Report</option>
-            <option value="incident">Incident Report</option>
-            <option value="sla">SLA Compliance Report</option>
+            <optgroup label="Monitoring Reports">
+              <option value="uptime">Uptime Report</option>
+              <option value="performance">Performance Report</option>
+              <option value="incident">Incident Report</option>
+              <option value="sla">SLA Compliance Report</option>
+            </optgroup>
+            <optgroup label="Advanced Reports">
+              <option value="site-health">Site Health Report</option>
+              <option value="security-audit">Security Audit Report</option>
+              <option value="availability-summary">Availability Summary</option>
+              <option value="change-digest">Change Detection Digest</option>
+              <option value="response-trend">Response Time Trends</option>
+            </optgroup>
           </select>
           <span className="form-hint">
-            {/* Description updates based on selection would need JS; keep static hint */}
-            Uptime: monthly uptime % and incidents. Performance: response time trends. Incident: full timeline. SLA: compliance vs target.
+            Site Health: all checks per domain in one card. Security Audit: posture score + risk analysis. Availability: uptime per domain. Change Digest: all changes detected. Response Trend: daily performance charts.
           </span>
         </div>
       </div>

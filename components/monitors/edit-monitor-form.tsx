@@ -1,10 +1,12 @@
 'use client'
 
 import { useState, useTransition, useMemo } from 'react'
+import { useRouter } from 'next/navigation'
 import { updateMonitorAction } from '@/app/(dashboard)/dashboard/monitors/actions'
 import { MonitorTypeIcon } from './monitor-type-icon'
 import { KeywordTagInput } from './keyword-tag-input'
 import { getKeywordSuggestions } from '@/lib/utils/keyword-suggestions'
+import { useToast } from '@/components/ui/toast'
 import type { Monitor } from '@/lib/types'
 
 const ALL_INTERVALS = [
@@ -58,6 +60,8 @@ export function EditMonitorForm({ monitor, minCheckInterval = 600 }: { monitor: 
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
   const [target, setTarget] = useState(monitor.target)
+  const router = useRouter()
+  const toast = useToast()
   const [positiveKeywords, setPositiveKeywords] = useState<string[]>(resolved.positive)
   const [negativeKeywords, setNegativeKeywords] = useState<string[]>(resolved.negative)
 
@@ -74,7 +78,12 @@ export function EditMonitorForm({ monitor, minCheckInterval = 600 }: { monitor: 
 
     startTransition(async () => {
       const result = await updateMonitorAction(monitor.id, formData)
-      if (result?.error) setError(result.error)
+      if (result?.error) {
+        setError(result.error)
+      } else if (result?.success) {
+        toast.addToast('Monitor updated successfully.', 'success')
+        router.push('/dashboard/monitors')
+      }
     })
   }
 
@@ -92,7 +101,7 @@ export function EditMonitorForm({ monitor, minCheckInterval = 600 }: { monitor: 
 
       <div className="form-group">
         <label className="form-label" htmlFor="name">Monitor Name</label>
-        <input className="form-input" id="name" name="name" required defaultValue={monitor.name} disabled={isPending} />
+        <input className="form-input" id="name" name="name" required defaultValue={monitor.name} disabled={isPending} maxLength={500} />
       </div>
 
       <div className="form-group">

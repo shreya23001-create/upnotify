@@ -1,8 +1,9 @@
 import type { Monitor } from '@/lib/types'
 import type { CheckerResult } from './types'
+import { apexDomain } from './utils'
 
 export async function check(monitor: Monitor): Promise<CheckerResult> {
-  const domain = monitor.target.replace(/^https?:\/\//, '').split('/')[0]
+  const domain = apexDomain(monitor.target)
   const start = Date.now()
 
   try {
@@ -14,11 +15,11 @@ export async function check(monitor: Monitor): Promise<CheckerResult> {
     const responseTimeMs = Date.now() - start
 
     if (!response.ok) {
-      return {
-        status: 'down',
-        responseTimeMs,
-        errorMessage: `RDAP lookup failed: ${response.status}`,
+      // 404 means the registry doesn't support RDAP for this TLD — not an expiry problem
+      if (response.status === 404) {
+        return { status: 'degraded', responseTimeMs, errorMessage: 'RDAP data unavailable for this domain (unsupported TLD or registry)' }
       }
+      return { status: 'down', responseTimeMs, errorMessage: `RDAP lookup failed: ${response.status}` }
     }
 
     const data = (await response.json()) as Record<string, unknown>

@@ -3,45 +3,64 @@
 import type { Incident } from '@/lib/types'
 
 export function StatusIncidentList({ incidents }: { incidents: Incident[] }): React.ReactElement {
-  const grouped = groupByDate(incidents)
-
   return (
-    <div className="status-incidents">
-      {Object.entries(grouped).map(([date, items]) => (
-        <div key={date} className="status-incident-group">
-          <div className="status-incident-date">{date}</div>
-          {items.map(inc => (
-            <div key={inc.id} className="status-incident-item">
-              <div className="status-incident-header">
-                <span className={`badge ${inc.status === 'resolved' ? 'badge-success' : 'badge-danger'}`}>
-                  {inc.status}
-                </span>
-                <span className={`badge ${inc.severity === 'P1' || inc.severity === 'P2' ? 'badge-danger' : 'badge-muted'}`}>
-                  {inc.severity}
-                </span>
-              </div>
-              <div className="status-incident-title">{inc.title}</div>
-              <div className="status-incident-time">
-                {new Date(inc.started_at).toLocaleTimeString()}
-                {inc.resolved_at && ` — Resolved at ${new Date(inc.resolved_at).toLocaleTimeString()}`}
-                {inc.duration_seconds != null && ` (${formatDuration(inc.duration_seconds)})`}
+    <>
+      {incidents.map(inc => (
+        <div key={inc.id} className="sp-incident-card" style={{ margin: 'var(--space-4)', borderRadius: 'var(--radius-md)' }}>
+          <div className="sp-incident-header" style={{ borderRadius: 'var(--radius-md) var(--radius-md) 0 0' }}>
+            <svg width="14" height="14" fill="none" stroke="#92400e" strokeWidth="2.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <div>
+              <div className="sp-incident-title">{inc.title}</div>
+              <div style={{ fontSize: 11, color: '#b45309', marginTop: 2 }}>
+                {new Date(inc.started_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+                {inc.status === 'resolved' ? ' · Resolved' : ''}
+                {inc.duration_seconds ? ` · Duration: ${formatDuration(inc.duration_seconds)}` : ''}
               </div>
             </div>
-          ))}
+            {inc.status === 'resolved' && (
+              <div style={{ marginLeft: 'auto', flexShrink: 0 }}>
+                <span style={{ display: 'inline-block', padding: '3px 10px', borderRadius: 'var(--radius-full)', fontSize: 10, fontWeight: 700, background: 'var(--color-up-bg)', color: 'var(--color-up)', border: '1px solid var(--color-up-border)' }}>
+                  RESOLVED
+                </span>
+              </div>
+            )}
+          </div>
+          <div className="sp-incident-body">
+            {inc.resolved_at && (
+              <div className="sp-incident-update">
+                <div className="sp-incident-timeline">
+                  <div className="sp-timeline-dot" style={{ background: 'var(--color-up)' }} />
+                  <div className="sp-timeline-line" />
+                </div>
+                <div>
+                  <div className="sp-incident-update-time">
+                    {new Date(inc.resolved_at).toLocaleString('en-GB', { timeStyle: 'short', timeZoneName: 'short' })}
+                  </div>
+                  <div className="sp-incident-update-msg">Services returned to normal operation.</div>
+                  <div className="sp-incident-update-status" style={{ color: 'var(--color-up)' }}>Status: Resolved</div>
+                </div>
+              </div>
+            )}
+            <div className="sp-incident-update">
+              <div className="sp-incident-timeline">
+                <div className="sp-timeline-dot" />
+                <div className="sp-timeline-line" />
+              </div>
+              <div>
+                <div className="sp-incident-update-time">
+                  {new Date(inc.started_at).toLocaleString('en-GB', { timeStyle: 'short', timeZoneName: 'short' })}
+                </div>
+                <div className="sp-incident-update-msg">Incident detected. Our team began investigating.</div>
+                <div className="sp-incident-update-status" style={{ color: 'var(--color-warn)' }}>Status: Investigating</div>
+              </div>
+            </div>
+          </div>
         </div>
       ))}
-    </div>
+    </>
   )
-}
-
-function groupByDate(incidents: Incident[]): Record<string, Incident[]> {
-  const groups: Record<string, Incident[]> = {}
-  for (const inc of incidents) {
-    const date = new Date(inc.started_at).toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
-    if (!groups[date]) groups[date] = []
-    groups[date].push(inc)
-  }
-  return groups
 }
 
 function formatDuration(seconds: number): string {

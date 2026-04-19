@@ -78,6 +78,7 @@ const NAV_GROUPS: NavGroup[] = [
     label: 'System',
     items: [
       { href: '/admin/system', label: 'System Health', icon: IconActivity },
+      { href: '/admin/monitor-health', label: 'Monitor Type Health', icon: IconActivity },
       { href: '/admin/audit-log', label: 'Audit Log', icon: IconFileText },
       { href: '/admin/team', label: 'Admin Team', icon: IconShield },
       { href: '/admin/settings', label: 'Settings', icon: IconSettings },
