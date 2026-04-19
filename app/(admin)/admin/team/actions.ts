@@ -7,6 +7,7 @@ import {
   getAdminRoleByEmail,
 } from '@/lib/db/admin-roles'
 import { logger } from '@/lib/utils/logger'
+import { writeAuditLog } from '@/lib/db/audit'
 
 interface ActionResult {
   success: boolean
@@ -49,6 +50,7 @@ export async function addAdminAction(formData: FormData): Promise<ActionResult> 
     }
 
     logger.info('Admin role created', { email, role, addedBy: user.id })
+    await writeAuditLog({ orgId: 'system', userId: user.id, action: 'admin.role_created', resourceType: 'admin_role', metadata: { email, role } })
     return { success: true }
   } catch {
     return { success: false, error: 'An unexpected error occurred.' }
@@ -89,6 +91,7 @@ export async function updateAdminAction(formData: FormData): Promise<ActionResul
     }
 
     logger.info('Admin role updated', { id, role, isActive, updatedBy: user.id })
+    await writeAuditLog({ orgId: 'system', userId: user.id, action: 'admin.role_updated', resourceType: 'admin_role', resourceId: id, metadata: { role, isActive } })
     return { success: true }
   } catch {
     return { success: false, error: 'An unexpected error occurred.' }

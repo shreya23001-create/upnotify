@@ -1,9 +1,11 @@
 'use server'
 
 import { redirect } from 'next/navigation'
+import { headers } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import { getConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
+import { writeAuditLog } from '@/lib/db/audit'
 
 /**
  * Send a magic-link OTP to the given email address.
@@ -29,6 +31,10 @@ export async function signInWithEmail(
   const queryStr = params.toString()
   const callbackUrl = queryStr ? `${baseUrl}/auth/callback?${queryStr}` : `${baseUrl}/auth/callback`
 
+  const hdrs = await headers()
+  const ip = hdrs.get('x-forwarded-for')?.split(',')[0].trim() ?? undefined
+  const userAgent = hdrs.get('user-agent') ?? undefined
+
   const { error } = await supabase.auth.signInWithOtp({
     email,
     options: { emailRedirectTo: callbackUrl },
@@ -36,9 +42,11 @@ export async function signInWithEmail(
 
   if (error) {
     logger.error('Magic link sign in failed', { error: error.message })
+    await writeAuditLog({ orgId: 'system', userId: null, action: 'auth.magic_link_failed', ipAddress: ip, userAgent, metadata: { email } })
     return { error: 'Failed to send magic link. Please try again.' }
   }
 
+  await writeAuditLog({ orgId: 'system', userId: null, action: 'auth.magic_link_requested', ipAddress: ip, userAgent, metadata: { email } })
   return {}
 }
 
@@ -66,6 +74,7 @@ export async function signInWithGoogle(origin: string, ref?: string, next?: stri
 
   if (error || !data.url) {
     logger.error('Google sign in failed', { error: error?.message })
+    await writeAuditLog({ orgId: 'system', userId: null, action: 'auth.google_oauth_failed', metadata: { error: error?.message } })
     return { error: 'Failed to initiate Google sign in.' }
   }
 
@@ -77,6 +86,11 @@ export async function signInWithGoogle(origin: string, ref?: string, next?: stri
  */
 export async function signOut(): Promise<void> {
   const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  const hdrs = await headers()
+  const ip = hdrs.get('x-forwarded-for')?.split(',')[0].trim() ?? undefined
+  const userAgent = hdrs.get('user-agent') ?? undefined
+  await writeAuditLog({ orgId: 'system', userId: user?.id ?? null, action: 'auth.logout', ipAddress: ip, userAgent, metadata: { email: user?.email } })
   await supabase.auth.signOut()
   redirect('/login')
 }

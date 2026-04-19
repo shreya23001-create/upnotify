@@ -4,6 +4,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { getCurrentUser } from '@/lib/db/users'
 import { canAccessAdminModule } from '@/lib/db/admin-roles'
 import { MonitorLimitOverrideForm } from '@/components/admin/monitor-limit-override-form'
+import { MonitorDomainCards } from '@/components/admin/monitor-domain-cards'
 
 export const dynamic = 'force-dynamic'
 
@@ -874,28 +875,7 @@ export default async function User360Page({
             <h3 style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-muted)' }}>
               Monitors ({monitors.length})
             </h3>
-            {monitors.length === 0 ? (
-              <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>No monitors set up.</p>
-            ) : (
-              <table className="table">
-                <thead><tr><th>Name</th><th>URL</th><th>Type</th><th>Status</th><th>Created</th></tr></thead>
-                <tbody>
-                  {monitors.map(m => (
-                    <tr key={m.id}>
-                      <td style={{ fontWeight: 600, fontSize: 13 }}>{m.name}</td>
-                      <td style={{ fontSize: 12, color: 'var(--text-muted)', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.target}</td>
-                      <td style={{ fontSize: 12 }}>{m.type}</td>
-                      <td>
-                        <span className={`badge ${m.status === 'up' ? 'badge-success' : m.status === 'down' ? 'badge-danger' : 'badge-neutral'}`}>
-                          {m.status}
-                        </span>
-                      </td>
-                      <td style={{ fontSize: 12, color: 'var(--text-muted)' }}>{fmtDate(m.created_at)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
+            <MonitorDomainCards monitors={monitors} />
           </div>
 
           {/* Plan Enforcement Panel */}

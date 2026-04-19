@@ -5,6 +5,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { getCurrentUser } from '@/lib/db/users'
 import { canAccessAdminModule } from '@/lib/db/admin-roles'
 import { logger } from '@/lib/utils/logger'
+import { writeAuditLog } from '@/lib/db/audit'
 
 export async function setMonitorLimitOverrideAction(
   orgId: string,
@@ -25,9 +26,8 @@ export async function setMonitorLimitOverrideAction(
 
   if (error) return { error: error.message }
 
-  logger.info('Admin set monitor limit override', {
-    orgId, override, adminEmail: user.email,
-  })
+  logger.info('Admin set monitor limit override', { orgId, override, adminEmail: user.email })
+  await writeAuditLog({ orgId: 'system', userId: user.id, action: 'admin.monitor_limit_override', resourceType: 'organisation', resourceId: orgId, metadata: { override, adminEmail: user.email } })
 
   revalidatePath('/admin/user360')
   return {}
