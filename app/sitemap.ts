@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
+import { getAllSlugs } from '@/lib/constants/monitor-types'
 
 interface StatusPageRow {
   slug: string
@@ -383,6 +384,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ]
 
+  // Monitor type landing pages — static, one per monitor type
+  const monitoringPages: MetadataRoute.Sitemap = [
+    {
+      url: 'https://uptrue.io/monitoring',
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.9,
+    },
+    ...getAllSlugs().map(slug => ({
+      url: `https://uptrue.io/monitoring/${slug}`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly' as const,
+      priority: 0.8,
+    })),
+  ]
+
   // Dynamic pages from database
   const dynamicPages: MetadataRoute.Sitemap = []
 
@@ -451,5 +468,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })
   }
 
-  return [...staticPages, ...dynamicPages]
+  return [...staticPages, ...monitoringPages, ...dynamicPages]
 }

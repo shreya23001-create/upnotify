@@ -187,3 +187,45 @@ export async function deleteBlogPost(id: string): Promise<boolean> {
 
   return true
 }
+
+/** Bulk delete blog posts by ID list */
+export async function bulkDeleteBlogPosts(ids: string[]): Promise<{ deleted: number; failed: number }> {
+  if (ids.length === 0) return { deleted: 0, failed: 0 }
+  const supabase = createAdminClient()
+  const { error } = await supabase
+    .from('blog_posts')
+    .delete()
+    .in('id', ids)
+
+  if (error) {
+    logger.error('Bulk delete blog posts failed', { error: error.message, count: ids.length })
+    return { deleted: 0, failed: ids.length }
+  }
+
+  return { deleted: ids.length, failed: 0 }
+}
+
+/** Bulk update status for a list of blog post IDs */
+export async function bulkUpdateBlogPostStatus(ids: string[], status: string): Promise<{ updated: number; failed: number }> {
+  if (ids.length === 0) return { updated: 0, failed: 0 }
+  const supabase = createAdminClient()
+
+  const updateData: Record<string, unknown> = {
+    status,
+    updated_at: new Date().toISOString(),
+  }
+  if (status === 'published') updateData.published_at = new Date().toISOString()
+  if (status === 'draft') updateData.published_at = null
+
+  const { error } = await supabase
+    .from('blog_posts')
+    .update(updateData)
+    .in('id', ids)
+
+  if (error) {
+    logger.error('Bulk update blog post status failed', { error: error.message, count: ids.length, status })
+    return { updated: 0, failed: ids.length }
+  }
+
+  return { updated: ids.length, failed: 0 }
+}

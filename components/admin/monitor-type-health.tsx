@@ -240,7 +240,14 @@ export function MonitorTypeHealthDashboard(): React.ReactElement {
 
               {/* Uptime bar */}
               <div style={{ padding: '12px 16px 0' }}>
-                <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 6 }}>Uptime ({window}h window)</div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                  <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Uptime ({window}h window)</span>
+                  {d.totalChecks > 0 && (
+                    <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+                      {(100 - d.uptimePercent).toFixed(1)}% failure rate
+                    </span>
+                  )}
+                </div>
                 <UptimeBar percent={d.uptimePercent} status={d.status} />
               </div>
 
@@ -286,7 +293,7 @@ export function MonitorTypeHealthDashboard(): React.ReactElement {
 
       {/* Info footer */}
       <div style={{ marginTop: 32, padding: 16, borderRadius: 8, background: 'var(--bg-muted)', fontSize: 13, color: 'var(--text-muted)' }}>
-        <strong>Status thresholds:</strong> Healthy ≥ 95% uptime · Warning 80–94% · Critical &lt; 80% · Daily email report sent at 8:00 AM UTC
+        <strong>Status thresholds (failure rate across all checks for that type):</strong> 🟢 Healthy &lt;75% failing · 🟡 Warning 75–85% failing · 🔴 Critical &gt;85% failing — high failure rates indicate a checker or infra issue, not just sites being down · Daily email report sent at 8:00 AM UTC
       </div>
     </div>
   )

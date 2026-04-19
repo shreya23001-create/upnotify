@@ -425,8 +425,33 @@ export default async function MonitoringTypePage({ params }: { params: Promise<{
     .map(s => pages.find(p => p.slug === s))
     .filter(Boolean) as MonitorTypePage[]
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: `${page.name} — Uptrue`,
+    description: page.description,
+    url: `https://uptrue.io/monitoring/${page.slug}`,
+    applicationCategory: 'BusinessApplication',
+    operatingSystem: 'Web',
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'GBP',
+      description: 'Free plan available',
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'Uptrue',
+      url: 'https://uptrue.io',
+    },
+  }
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <PublicNav />
 
       {/* Hero */}

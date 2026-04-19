@@ -117,9 +117,16 @@ export async function computeMonitorTypeHealth(windowHours: number): Promise<Mon
       .slice(0, 3)
       .map(([msg, count]) => `${msg} (×${count})`)
 
+    // Status reflects checker health, not site health.
+    // If >85% of checks for a type are failing, that's a platform/infra issue — not just sites being down.
+    // Thresholds based on failure rate (100 - uptimePercent):
+    //   < 75% failure rate → healthy (normal — individual sites go down)
+    //   75–85% failure rate → warning (unusual pattern, worth investigating)
+    //   > 85% failure rate → critical (checker likely broken or infra issue)
+    const failureRate = 100 - uptimePercent
     const status: MonitorTypeHealth['status'] =
-      uptimePercent >= 95 ? 'healthy' :
-      uptimePercent >= 80 ? 'warning' : 'critical'
+      failureRate < 75 ? 'healthy' :
+      failureRate <= 85 ? 'warning' : 'critical'
 
     results.push({
       type, totalMonitors: monitorCount, totalChecks,

@@ -15,9 +15,26 @@ const coreTypes = ['http', 'ssl', 'dns', 'keyword', 'domain', 'port', 'ping', 'a
 const coreMonitorTypes = MONITOR_TYPES.filter(t => coreTypes.includes(t.type))
 const advancedTypes = MONITOR_TYPES.filter(t => !coreTypes.includes(t.type))
 
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: 'Website Monitoring Suite — 23 Monitor Types',
+  description: 'Uptrue monitors 23 types of infrastructure — HTTP uptime, SSL certificates, DNS records, security headers, MX health, SPF/DMARC, blacklists, and more.',
+  url: 'https://uptrue.io/monitoring',
+  publisher: {
+    '@type': 'Organization',
+    name: 'Uptrue',
+    url: 'https://uptrue.io',
+  },
+}
+
 export default function MonitoringIndexPage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <PublicNav />
 
       {/* Hero */}

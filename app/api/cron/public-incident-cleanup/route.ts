@@ -22,11 +22,25 @@ import type { PublicMonitor } from '@/lib/db/public-monitors'
 export const dynamic = 'force-dynamic'
 export const maxDuration = 300
 
-// Domains known to block Vercel/AWS IPs — never generate blogs for these
+// Domains known to block Vercel/AWS IPs — never generate blogs for these.
+// Evidence: incidents show status_code=null + "Timeout after 15000ms" or "fetch failed"
+// repeatedly at identical timestamps across multiple sites = IP block, not real outage.
 const BLOCKED_DOMAINS = new Set([
+  // Streaming / media
   'netflix.com', 'spotify.com', 'disneyplus.com', 'hulu.com',
-  'primevideo.com', 'peacocktv.com', 'tiktok.com', 'airbnb.com',
-  'amazon.com', 'youtube.com',
+  'primevideo.com', 'peacocktv.com', 'tiktok.com', 'youtube.com',
+  'engadget.com',
+  // E-commerce / retail (block Vercel AWS IPs aggressively)
+  'amazon.com', 'airbnb.com',
+  'johnlewis.com', 'asos.com', 'bestbuy.com',
+  // Travel (heavy bot protection)
+  'emirates.com', 'jet2.com',
+  // Delivery / postal (government-adjacent, block cloud IPs)
+  'royalmail.com', 'parcelforce.com',
+  // Finance / SaaS (strict WAF rules)
+  'quickbooks.intuit.com', 'bankofbaroda.in',
+  // Social / review platforms
+  'yelp.com', 'mixcloud.com',
 ])
 
 async function checkSiteUp(domain: string): Promise<boolean> {
@@ -163,6 +177,21 @@ export async function GET(request: Request): Promise<NextResponse> {
       for (const incident of eligibleIncidents) {
         const monitor = monitorMap.get(incident.monitor_id) as PublicMonitor | undefined
         if (!monitor) continue
+
+        // Skip incidents with no HTTP status code — these are connection timeouts or
+        // "fetch failed" errors caused by the site blocking Vercel's IP range, not real outages.
+        if (!incident.status_code) {
+          logger.info('Skipping blog — no HTTP status code (likely IP block or timeout)', {
+            domain: monitor.domain, cause: incident.cause,
+          })
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          await (supabase as unknown as any)
+            .from('public_incidents')
+            .update({ blog_generated_at: now.toISOString() })
+            .eq('id', incident.id)
+          blogsSkipped++
+          continue
+        }
 
         // Skip known IP-blocked domains
         if (BLOCKED_DOMAINS.has(monitor.domain)) {

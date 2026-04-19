@@ -238,6 +238,7 @@ export async function getPublicMonitorByDomain(domain: string): Promise<PublicMo
     .from('public_monitors')
     .select('*')
     .eq('domain', domain)
+    .eq('is_active', true)
     .single()
 
   if (error) {
