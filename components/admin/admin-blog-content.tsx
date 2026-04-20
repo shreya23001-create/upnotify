@@ -351,6 +351,15 @@ export function AdminBlogContent({ posts }: AdminBlogContentProps): React.ReactE
                   <td style={{ textAlign: 'right' }}>
                     <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
                       <Link
+                        href={`/admin/blog/${post.id}/preview`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-sm btn-outline"
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}
+                      >
+                        Preview
+                      </Link>
+                      <Link
                         href={`/admin/blog/${post.id}`}
                         className="btn btn-sm btn-outline"
                         style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}
