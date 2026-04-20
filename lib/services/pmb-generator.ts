@@ -67,6 +67,38 @@ async function getMonitorStats(monitorId: string, domain: string, displayName: s
   return { id: monitorId, domain, display_name: displayName, uptime_pct: uptime, avg_response_ms: avgResponse, incident_count: incidentCount, total_downtime_min: totalDowntimeMin }
 }
 
+async function fetchStatusPageSummary(domain: string, statusPageUrl?: string): Promise<string | null> {
+  const clean = domain.replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0]
+  const candidates = statusPageUrl
+    ? [statusPageUrl, `https://status.${clean}`, `https://${clean}/status`]
+    : [`https://status.${clean}`, `https://${clean}/status`]
+
+  for (const url of candidates) {
+    try {
+      const controller = new AbortController()
+      const timeout = setTimeout(() => controller.abort(), 8000)
+      const res = await fetch(url, {
+        signal: controller.signal,
+        headers: { 'User-Agent': 'Uptrue/1.0 (uptime monitor; contact@uptrue.io)' },
+      })
+      clearTimeout(timeout)
+      if (!res.ok) continue
+      const html = await res.text()
+      const text = html
+        .replace(/<script[\s\S]*?<\/script>/gi, '')
+        .replace(/<style[\s\S]*?<\/style>/gi, '')
+        .replace(/<[^>]+>/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .slice(0, 1000)
+      if (text.length > 80) return text
+    } catch {
+      // try next
+    }
+  }
+  return null
+}
+
 // =============================================================================
 // Inline SVG chart builders
 // =============================================================================
@@ -314,19 +346,21 @@ function buildPostHtml(sections: {
 // =============================================================================
 
 async function generatePairwisePost(run: PmbRun, category: PmbCategory): Promise<PmbGenerateResult> {
-  const monitorA = await db().from('public_monitors').select('id, domain, display_name').eq('id', run.monitor_id).single()
-  const monitorB = await db().from('public_monitors').select('id, domain, display_name').eq('id', run.compare_monitor_id).single()
+  const monitorA = await db().from('public_monitors').select('id, domain, display_name, status_page_url').eq('id', run.monitor_id).single()
+  const monitorB = await db().from('public_monitors').select('id, domain, display_name, status_page_url').eq('id', run.compare_monitor_id).single()
 
   if (monitorA.error || monitorB.error || !monitorA.data || !monitorB.data) {
     return { success: false, blog_post_id: null, word_count: null, error: 'Monitor not found' }
   }
 
-  const mA = monitorA.data as { id: string; domain: string; display_name: string }
-  const mB = monitorB.data as { id: string; domain: string; display_name: string }
+  const mA = monitorA.data as { id: string; domain: string; display_name: string; status_page_url: string | null }
+  const mB = monitorB.data as { id: string; domain: string; display_name: string; status_page_url: string | null }
 
-  const [statsA, statsB] = await Promise.all([
+  const [statsA, statsB, statusPageA, statusPageB] = await Promise.all([
     getMonitorStats(mA.id, mA.domain, mA.display_name),
     getMonitorStats(mB.id, mB.domain, mB.display_name),
+    fetchStatusPageSummary(mA.domain, mA.status_page_url ?? undefined),
+    fetchStatusPageSummary(mB.domain, mB.status_page_url ?? undefined),
   ])
 
   const periodLabel = `Week of ${new Date(run.period_start).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}`
@@ -337,11 +371,13 @@ Provider A: ${mA.display_name} (${mA.domain})
 - Uptime: ${statsA.uptime_pct}%
 - Avg response: ${statsA.avg_response_ms ?? 'N/A'}ms
 - Incidents: ${statsA.incident_count}, total downtime: ${statsA.total_downtime_min} min
+- Official status page: ${statusPageA ? `"${statusPageA}"` : 'Not available'}
 
 Provider B: ${mB.display_name} (${mB.domain})
 - Uptime: ${statsB.uptime_pct}%
 - Avg response: ${statsB.avg_response_ms ?? 'N/A'}ms
 - Incidents: ${statsB.incident_count}, total downtime: ${statsB.total_downtime_min} min
+- Official status page: ${statusPageB ? `"${statusPageB}"` : 'Not available'}
 
 Category: ${category.display_name}
 Period: ${periodLabel}

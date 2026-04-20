@@ -166,12 +166,13 @@ export async function GET(request: Request): Promise<NextResponse> {
 
     if (eligibleIncidents && eligibleIncidents.length > 0) {
       const monitorIds = [...new Set(eligibleIncidents.map(i => i.monitor_id))]
-      const { data: monitors } = await supabase
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: monitors } = await (supabase as unknown as any)
         .from('public_monitors')
-        .select('id, domain, display_name, category')
+        .select('id, domain, display_name, category, status_page_url')
         .in('id', monitorIds)
 
-      const monitorMap = new Map((monitors ?? []).map(m => [m.id, m]))
+      const monitorMap = new Map((monitors ?? []).map((m: PublicMonitor) => [m.id, m]))
 
       // Process one at a time to avoid hammering Claude API + Resend simultaneously
       for (const incident of eligibleIncidents) {
@@ -225,7 +226,7 @@ export async function GET(request: Request): Promise<NextResponse> {
         }
 
         try {
-          const research = await researchOutage(monitor.display_name, monitor.domain)
+          const research = await researchOutage(monitor.display_name, monitor.domain, monitor.status_page_url ?? undefined)
           const draft = await generateOutageBlogPost({
             siteDisplayName: monitor.display_name,
             siteDomain: monitor.domain,

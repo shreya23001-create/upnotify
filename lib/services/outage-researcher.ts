@@ -34,8 +34,11 @@ function guessStatusUrls(domain: string): string[] {
   ]
 }
 
-async function fetchOfficialStatus(domain: string): Promise<{ text: string; url: string } | null> {
-  const urls = guessStatusUrls(domain)
+async function fetchOfficialStatus(domain: string, statusPageUrl?: string): Promise<{ text: string; url: string } | null> {
+  // Use stored URL first (authoritative source), then fall back to pattern guessing
+  const urls = statusPageUrl
+    ? [statusPageUrl, ...guessStatusUrls(domain)]
+    : guessStatusUrls(domain)
 
   for (const url of urls) {
     try {
@@ -270,11 +273,11 @@ async function fetchXMentions(siteName: string): Promise<SourceArticle[]> {
  * Designed to complete within 10 seconds — all fetches have 8s timeouts.
  * Never throws — always returns a result even if all sources fail.
  */
-export async function researchOutage(siteName: string, domain: string): Promise<OutageResearch> {
-  logger.info('Starting outage research', { siteName, domain })
+export async function researchOutage(siteName: string, domain: string, statusPageUrl?: string): Promise<OutageResearch> {
+  logger.info('Starting outage research', { siteName, domain, hasStoredStatusPage: !!statusPageUrl })
 
   const [officialResult, newsArticles, redditPosts, xMentions] = await Promise.allSettled([
-    fetchOfficialStatus(domain),
+    fetchOfficialStatus(domain, statusPageUrl),
     fetchGoogleNews(siteName),
     fetchReddit(siteName, domain),
     fetchXMentions(siteName),
