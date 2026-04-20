@@ -367,7 +367,7 @@ export function AiSeoCheckerTool() {
                 </div>
               </div>
             </div>
-            <a href="/register" className="ai-monitor-cta-btn">Start free →</a>
+            <a href="/signup" className="ai-monitor-cta-btn">Start free →</a>
           </div>
 
         </div>
