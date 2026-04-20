@@ -15,6 +15,7 @@ export interface PublicMonitor {
   last_checked_at: string | null
   last_status: string
   last_response_time_ms: number | null
+  status_page_url: string | null
   created_at: string
   updated_at: string
 }
@@ -294,7 +295,7 @@ export async function createPublicMonitor(data: {
 
 export async function updatePublicMonitor(
   id: string,
-  updates: { domain?: string; display_name?: string; category?: string; check_interval_seconds?: number }
+  updates: { domain?: string; display_name?: string; category?: string; check_interval_seconds?: number; status_page_url?: string | null }
 ): Promise<PublicMonitor | null> {
   const supabase = createAdminClient()
   const updateData: Record<string, unknown> = {}
@@ -302,6 +303,7 @@ export async function updatePublicMonitor(
   if (updates.display_name !== undefined) updateData.display_name = updates.display_name
   if (updates.category !== undefined) updateData.category = updates.category
   if (updates.check_interval_seconds !== undefined) updateData.check_interval_seconds = updates.check_interval_seconds
+  if (updates.status_page_url !== undefined) updateData.status_page_url = updates.status_page_url
 
   const { data, error } = await supabase
     .from('public_monitors')
