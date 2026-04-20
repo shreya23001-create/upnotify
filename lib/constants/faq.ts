@@ -10,7 +10,7 @@ export const FAQ_ITEMS: FaqItem[] = [
   },
   {
     question: 'What monitor types are available?',
-    answer: 'Uptrue supports 10 monitor types: HTTP/HTTPS uptime, SSL certificate expiry, DNS record changes, keyword presence, domain expiry, port availability, ping/ICMP, API endpoint validation, heartbeat (cron job monitoring), and page content detection.',
+    answer: 'Uptrue supports 23 monitor types: HTTP/HTTPS uptime, SSL certificate expiry, DNS record changes, keyword presence, domain expiry, port availability, ping/ICMP, API endpoint validation, heartbeat (cron job monitoring), page change detection, security headers, response time, robots.txt, IP change, MX health, WHOIS/registrar, sitemap, redirect chain, SPF/DMARC, blacklist, page size, cookie consent, and nameserver monitoring.',
   },
   {
     question: 'How do public status pages work?',
@@ -26,7 +26,7 @@ export const FAQ_ITEMS: FaqItem[] = [
   },
   {
     question: 'What alert channels are supported?',
-    answer: 'Uptrue sends alerts via email, Slack, Microsoft Teams, and webhooks. Webhook payloads are signed with HMAC-SHA256 for security. You can configure different channels per monitor and set escalation rules.',
+    answer: 'Uptrue sends alerts via email, Slack, Microsoft Teams, Telegram, and webhooks. Webhook payloads are signed with HMAC-SHA256 for security. You can configure multiple channels per monitor and filter by severity.',
   },
   {
     question: 'Is there a free plan?',
