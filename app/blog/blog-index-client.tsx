@@ -1,15 +1,13 @@
 'use client'
 
 import Link from 'next/link'
-import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useState } from 'react'
 import type { UnifiedPost } from './page'
 import { BlogCardImage } from '@/components/ui/blog-card-image'
 
-const POSTS_PER_PAGE = 9
+const POSTS_PER_PAGE = 12
 
-const FILTER_TABS = ['All posts', 'Guide', 'Security', 'Performance', 'Ecommerce', 'Incident Report', 'Agency']
-
+const FILTER_TABS = ['All posts', 'Guide', 'Security', 'Performance', 'Ecommerce', 'Incident Report', 'Agency', 'AI Tools']
 
 const BADGE_STYLES: Record<string, { bg: string; color: string; border: string }> = {
   Guide: { bg: 'rgba(139,92,246,0.1)', color: '#8b5cf6', border: 'rgba(139,92,246,0.2)' },
@@ -18,24 +16,28 @@ const BADGE_STYLES: Record<string, { bg: string; color: string; border: string }
   Ecommerce: { bg: 'rgba(245,158,11,0.1)', color: '#f59e0b', border: 'rgba(245,158,11,0.2)' },
   'Incident Report': { bg: 'rgba(239,68,68,0.1)', color: '#ef4444', border: 'rgba(239,68,68,0.2)' },
   Agency: { bg: 'rgba(59,130,246,0.1)', color: '#06b6d4', border: 'rgba(6,182,212,0.2)' },
+  'AI Tools': { bg: 'rgba(16,185,129,0.1)', color: '#10b981', border: 'rgba(16,185,129,0.2)' },
 }
 
 function badgeStyle(cat: string) {
-  return BADGE_STYLES[cat] ?? { bg: 'rgba(59,130,246,0.1)', color: '#3b82f6', border: 'rgba(59,130,246,0.2)' }
+  return BADGE_STYLES[cat] ?? BADGE_STYLES['AI Tools'] ?? { bg: 'rgba(59,130,246,0.1)', color: '#3b82f6', border: 'rgba(59,130,246,0.2)' }
+}
+
+// Normalise category for matching — handles "ai-tools", "AI Tools", "ai tools" all the same
+function normCat(cat: string): string {
+  return cat.toLowerCase().replace(/[\s-_]/g, '')
 }
 
 
 function BlogIndexContent({ posts }: { posts: UnifiedPost[] }) {
-  const searchParams = useSearchParams()
-  const router = useRouter()
-  const page = Math.max(1, parseInt(searchParams.get('page') ?? '1', 10))
   const [activeTab, setActiveTab] = useState('All posts')
   const [searchQuery, setSearchQuery] = useState('')
+  const [visibleCount, setVisibleCount] = useState(POSTS_PER_PAGE)
 
   const catFilter = activeTab === 'All posts' ? null : activeTab
 
   const filtered = posts.filter(p => {
-    const matchesCat = !catFilter || p.category === catFilter
+    const matchesCat = !catFilter || normCat(p.category) === normCat(catFilter)
     const q = searchQuery.toLowerCase()
     const matchesSearch = !q || p.title.toLowerCase().includes(q) || p.excerpt.toLowerCase().includes(q)
     return matchesCat && matchesSearch
@@ -43,20 +45,16 @@ function BlogIndexContent({ posts }: { posts: UnifiedPost[] }) {
 
   const featuredPost = filtered[0]
   const remainingPosts = filtered.slice(1)
-  const totalPages = Math.ceil(remainingPosts.length / POSTS_PER_PAGE)
-  const start = (page - 1) * POSTS_PER_PAGE
-  const pagePosts = remainingPosts.slice(start, start + POSTS_PER_PAGE)
+  const pagePosts = remainingPosts.slice(0, visibleCount)
+  const hasMore = visibleCount < remainingPosts.length
 
-  function goToPage(p: number) {
-    const params = new URLSearchParams(searchParams.toString())
-    if (p === 1) params.delete('page')
-    else params.set('page', String(p))
-    router.push(`/blog${params.size > 0 ? `?${params.toString()}` : ''}`)
+  function loadMore() {
+    setVisibleCount(c => c + POSTS_PER_PAGE)
   }
 
   function switchTab(tab: string) {
     setActiveTab(tab)
-    router.push('/blog')
+    setVisibleCount(POSTS_PER_PAGE)
   }
 
   return (
@@ -92,7 +90,7 @@ function BlogIndexContent({ posts }: { posts: UnifiedPost[] }) {
       <div style={{ maxWidth: 1080, padding: '0 24px', margin: '0 auto' }}>
 
         {/* Featured post */}
-        {featuredPost && page === 1 && (
+        {featuredPost && (
           <div className="blog-featured-wrap">
             <div className="blog-featured-label">Featured</div>
             <Link href={`/blog/${featuredPost.slug}`} className="blog-featured-card">
@@ -203,19 +201,15 @@ function BlogIndexContent({ posts }: { posts: UnifiedPost[] }) {
               </div>
             )}
 
-            {/* Pagination */}
-            {totalPages > 1 && (
+            {/* Load more */}
+            {hasMore && (
               <div className="blog-load-more">
-                {page < totalPages ? (
-                  <button className="btn btn-ghost" onClick={() => goToPage(page + 1)}>
-                    Load more articles
-                    <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                      <polyline points="6 9 12 15 18 9"/>
-                    </svg>
-                  </button>
-                ) : (
-                  <button className="btn btn-ghost" onClick={() => goToPage(page - 1)}>← Newer articles</button>
-                )}
+                <button className="btn btn-ghost" onClick={loadMore}>
+                  Load more articles
+                  <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                    <polyline points="6 9 12 15 18 9"/>
+                  </svg>
+                </button>
               </div>
             )}
           </>
