@@ -11,14 +11,6 @@ import { isPublicRoute, isAuthRoute, isAdminRoute } from '@/lib/auth/helpers'
  *  - Block non-admin users from /admin routes
  */
 export async function proxy(request: NextRequest): Promise<NextResponse> {
-  // www → apex 301 redirect (prevents Google "alternate page with proper canonical tag")
-  const host = request.headers.get('host') || ''
-  if (host.startsWith('www.')) {
-    const url = request.nextUrl.clone()
-    url.host = host.replace(/^www\./, '')
-    return NextResponse.redirect(url, 301)
-  }
-
   const { supabase, response } = createProxyClient(request)
   const pathname = request.nextUrl.pathname
 
