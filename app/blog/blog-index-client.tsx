@@ -7,15 +7,17 @@ import { BlogCardImage } from '@/components/ui/blog-card-image'
 
 const POSTS_PER_PAGE = 12
 
-const FILTER_TABS = ['All posts', 'Guide', 'Security', 'Performance', 'Ecommerce', 'Incident Report', 'Agency', 'AI Tools']
+const FILTER_TABS = ['All posts', 'Guide', 'WordPress', 'Security', 'Performance', 'Ecommerce', 'Hosting', 'Incident Report', 'Agency', 'AI Tools']
 
 const BADGE_STYLES: Record<string, { bg: string; color: string; border: string }> = {
   Guide: { bg: 'rgba(139,92,246,0.1)', color: '#8b5cf6', border: 'rgba(139,92,246,0.2)' },
+  WordPress: { bg: 'rgba(59,130,246,0.1)', color: '#3b82f6', border: 'rgba(59,130,246,0.2)' },
   Security: { bg: 'rgba(239,68,68,0.1)', color: '#ef4444', border: 'rgba(239,68,68,0.2)' },
   Performance: { bg: 'rgba(16,185,129,0.1)', color: '#10b981', border: 'rgba(16,185,129,0.2)' },
   Ecommerce: { bg: 'rgba(245,158,11,0.1)', color: '#f59e0b', border: 'rgba(245,158,11,0.2)' },
+  Hosting: { bg: 'rgba(249,115,22,0.1)', color: '#f97316', border: 'rgba(249,115,22,0.2)' },
   'Incident Report': { bg: 'rgba(239,68,68,0.1)', color: '#ef4444', border: 'rgba(239,68,68,0.2)' },
-  Agency: { bg: 'rgba(59,130,246,0.1)', color: '#06b6d4', border: 'rgba(6,182,212,0.2)' },
+  Agency: { bg: 'rgba(6,182,212,0.1)', color: '#06b6d4', border: 'rgba(6,182,212,0.2)' },
   'AI Tools': { bg: 'rgba(16,185,129,0.1)', color: '#10b981', border: 'rgba(16,185,129,0.2)' },
 }
 
