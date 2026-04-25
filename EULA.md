@@ -5,12 +5,12 @@
 # Company Registration: 15928217 (England & Wales)
 # ================================================================
 #
-# Licensed to: {{CUSTOMER_NAME}}
-# License Key: {{LICENSE_KEY}}
-# Installed: {{INSTALL_DATE}}
-# License Type: {{LICENSE_TYPE}}
-# Seats: {{LICENSE_SEATS}}
-# Valid Until: {{LICENSE_EXPIRY}}
+# Licensed to: VISION SOFTWARE SOLUTIONS LIMITED
+# License Key: SRTHY-UPT-2I6J-4T8U
+# Installed: 2026-04-25
+# License Type: Professional
+# Seats: 10
+# Valid Until: 2027-04-25
 # ================================================================
 
 ---
@@ -167,4 +167,4 @@ Website: sarthy.io
 *By proceeding with installation, you confirm that you have read,
 understood, and agreed to all terms of this Agreement.*
 
-*EULA Version: 1.0 | Effective: {{INSTALL_DATE}}*
+*EULA Version: 1.0 | Effective: 2026-04-25*

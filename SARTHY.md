@@ -1,20 +1,20 @@
-# SARTHY.md — {{PROJECT_NAME}} Engineering App
+# SARTHY.md — Uptrue.io Engineering App
 # ================================================================
-# Project: {{PROJECT_NAME}}
-# Owner(s): {{OWNER_NAMES}}
-# Created: {{CREATED_DATE}}
-# Last Updated: {{LAST_UPDATED_DATE}}
-# Repo: {{GITLAB_URL}}/{{PROJECT_SLUG}}/engineering-app
-# Knowledge Repo: {{GITLAB_URL}}/{{PROJECT_SLUG}}/knowledge
-# Project Board: {{GITLAB_URL}}/{{PROJECT_SLUG}}/engineering-board
+# Project: Uptrue.io
+# Owner(s): Sachin Diwakar
+# Created: 2026-04-25
+# Last Updated: 2026-04-25
+# Repo: https://goodtekies.com/inernalprojects/uptrue-io/engineering-app
+# Knowledge Repo: https://goodtekies.com/inernalprojects/uptrue-io/knowledge
+# Project Board: https://goodtekies.com/inernalprojects/uptrue-io/engineering-board
 # ================================================================
 #
 # ---------------------------------------------------------------
 # LICENSE NOTICE
 # Copyright © Bizcircle Technologies Ltd. All rights reserved.
-# Licensed to: {{CUSTOMER_NAME}}
-# License Key: {{LICENSE_KEY}}
-# Installed: {{INSTALL_DATE}}
+# Licensed to: VISION SOFTWARE SOLUTIONS LIMITED
+# License Key: SRTHY-UPT-2I6J-4T8U
+# Installed: 2026-04-25
 #
 # You may use and modify this file within your organisation.
 # You may NOT distribute, sublicense, resell, or share this file
@@ -35,7 +35,7 @@
 
 ## 1. SESSION START PROTOCOL
 
-1. Confirm project name: `{{PROJECT_NAME}}`
+1. Confirm project name: `Uptrue.io`
 2. Confirm repo: `engineering-app`
 3. Load context from knowledge repo LOAD.md
 4. Check engineering board for assigned tasks
@@ -49,7 +49,7 @@
 - Work only within `engineering-app` during this session — no exceptions
 - No references to, reads from, or writes to any other repo
 - If security or infra changes are needed, raise a task on the board — do not touch other repos directly
-- All knowledge stays within `{{PROJECT_NAME}}` — no cross-project work ever
+- All knowledge stays within `Uptrue.io` — no cross-project work ever
 
 ---
 
@@ -237,4 +237,4 @@ Owner approves → knowledge repo updated → `engineering-app` marked as delive
 
 ---
 
-*This file is auto-managed. Last updated: {{LAST_UPDATED_DATE}}*
+*This file is auto-managed. Last updated: 2026-04-25*
