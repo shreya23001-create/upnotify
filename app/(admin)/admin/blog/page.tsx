@@ -15,6 +15,7 @@ export default async function AdminBlogPage(): Promise<React.ReactElement> {
 
   const publishedCount = posts.filter(p => p.status === 'published').length
   const draftCount = posts.filter(p => p.status === 'draft').length
+  const archivedCount = posts.filter(p => p.status === 'archived').length
 
   return (
     <div>
@@ -47,7 +48,7 @@ export default async function AdminBlogPage(): Promise<React.ReactElement> {
         <div className="card">
           <div className="card-content-compact">
             <div className="stat-label">Archived</div>
-            <div className="stat-value">{posts.length - publishedCount - draftCount}</div>
+            <div className="stat-value">{archivedCount}</div>
           </div>
         </div>
       </div>

@@ -146,18 +146,30 @@ export function AdminBlogContent({ posts }: AdminBlogContentProps): React.ReactE
     setSuccess(null)
     setBulkWorking(true)
     const ids = Array.from(selected)
+    const BATCH = 100
+    const chunks: string[][] = []
+    for (let i = 0; i < ids.length; i += BATCH) chunks.push(ids.slice(i, i + BATCH))
 
-    let result: { success: boolean; error?: string }
-    if (action === 'delete') {
-      result = await bulkDeleteBlogPostsAction(ids)
-      if (result.success) setSuccess(`${ids.length} post${ids.length !== 1 ? 's' : ''} deleted`)
-    } else {
-      const status = action === 'draft' ? 'draft' : action === 'archive' ? 'archived' : 'published'
-      result = await bulkUpdateBlogPostStatusAction(ids, status)
-      if (result.success) setSuccess(`${ids.length} post${ids.length !== 1 ? 's' : ''} moved to ${status}`)
+    let totalDone = 0
+    let failed = false
+
+    for (const chunk of chunks) {
+      let result: { success: boolean; error?: string }
+      if (action === 'delete') {
+        result = await bulkDeleteBlogPostsAction(chunk)
+      } else {
+        const status = action === 'draft' ? 'draft' : action === 'archive' ? 'archived' : 'published'
+        result = await bulkUpdateBlogPostStatusAction(chunk, status)
+      }
+      if (!result.success) { failed = true; setError(result.error ?? 'Bulk action failed'); break }
+      totalDone += chunk.length
+      if (chunks.length > 1) setSuccess(`Processing… ${totalDone} / ${ids.length}`)
     }
 
-    if (!result.success) setError(result.error ?? 'Bulk action failed')
+    if (!failed) {
+      const label = action === 'delete' ? 'deleted' : action === 'draft' ? 'moved to draft' : action === 'archive' ? 'archived' : 'published'
+      setSuccess(`${totalDone} post${totalDone !== 1 ? 's' : ''} ${label}`)
+    }
     setSelected(new Set())
     setBulkConfirm(null)
     setBulkWorking(false)
