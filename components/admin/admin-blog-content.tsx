@@ -47,6 +47,8 @@ export function AdminBlogContent({ posts }: AdminBlogContentProps): React.ReactE
   const [search, setSearch] = useState('')
   const [sortKey, setSortKey] = useState<SortKey>('created_at')
   const [sortDir, setSortDir] = useState<SortDir>('desc')
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(100)
 
   // Selection
   const [selected, setSelected] = useState<Set<string>>(new Set())
@@ -70,6 +72,7 @@ export function AdminBlogContent({ posts }: AdminBlogContentProps): React.ReactE
       setSortKey(key)
       setSortDir('asc')
     }
+    setPage(1)
     setSelected(new Set())
   }
 
@@ -104,7 +107,10 @@ export function AdminBlogContent({ posts }: AdminBlogContentProps): React.ReactE
     return list
   }, [posts, statusFilter, search, sortKey, sortDir])
 
-  // ── Selection helpers ─────────────────────────────────────
+  const totalPages = Math.max(1, Math.ceil(filteredPosts.length / pageSize))
+  const pagedPosts = filteredPosts.slice((page - 1) * pageSize, page * pageSize)
+
+  // ── Selection helpers — select/deselect across ALL filtered pages ──
   const allSelected = filteredPosts.length > 0 && filteredPosts.every(p => selected.has(p.id))
   const someSelected = selected.size > 0
 
@@ -216,26 +222,37 @@ export function AdminBlogContent({ posts }: AdminBlogContentProps): React.ReactE
           {(['all', 'draft', 'published', 'archived', 'pending_approval'] as const).map(s => (
             <button
               key={s}
-              onClick={() => { setStatusFilter(s); setSelected(new Set()) }}
+              onClick={() => { setStatusFilter(s); setSelected(new Set()); setPage(1) }}
               className={`btn btn-sm ${statusFilter === s ? 'btn-primary' : 'btn-outline'}`}
               style={{ textTransform: 'capitalize' }}
             >
               {s === 'pending_approval' ? 'Pending' : s}
-              {statusCounts[s] > 0 && (
-                <span style={{ marginLeft: 4, opacity: 0.7 }}>({statusCounts[s]})</span>
-              )}
+              <span style={{ marginLeft: 4, opacity: 0.7 }}>({statusCounts[s]})</span>
             </button>
           ))}
         </div>
 
-        <input
-          type="text"
-          placeholder="Search posts..."
-          value={search}
-          onChange={e => { setSearch(e.target.value); setSelected(new Set()) }}
-          className="input"
-          style={{ maxWidth: 260, marginLeft: 'auto' }}
-        />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 'auto' }}>
+          <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>Per page:</label>
+          <select
+            value={pageSize}
+            onChange={e => { setPageSize(Number(e.target.value)); setPage(1) }}
+            className="input"
+            style={{ width: 90, padding: '4px 8px' }}
+          >
+            {[100, 250, 1000, 2500, 5000].map(n => (
+              <option key={n} value={n}>{n}</option>
+            ))}
+          </select>
+          <input
+            type="text"
+            placeholder="Search posts..."
+            value={search}
+            onChange={e => { setSearch(e.target.value); setSelected(new Set()); setPage(1) }}
+            className="input"
+            style={{ maxWidth: 220 }}
+          />
+        </div>
       </div>
 
       {/* Bulk action bar */}
@@ -333,7 +350,7 @@ export function AdminBlogContent({ posts }: AdminBlogContentProps): React.ReactE
               </tr>
             </thead>
             <tbody>
-              {filteredPosts.map(post => (
+              {pagedPosts.map(post => (
                 <tr key={post.id} style={selected.has(post.id) ? { background: 'var(--color-primary-subtle, #eff6ff)' } : undefined}>
                   <td>
                     <input
@@ -410,9 +427,47 @@ export function AdminBlogContent({ posts }: AdminBlogContentProps): React.ReactE
         </div>
       )}
 
-      <div style={{ marginTop: 12, fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-        Showing {filteredPosts.length} of {posts.length} posts
-        {someSelected && ` · ${selected.size} selected`}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, marginTop: 12 }}>
+        <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+          {filteredPosts.length === 0 ? 'No posts' : (
+            <>
+              Showing {(page - 1) * pageSize + 1}–{Math.min(page * pageSize, filteredPosts.length)} of {filteredPosts.length}
+              {filteredPosts.length !== posts.length && ` (filtered from ${posts.length} total)`}
+              {someSelected && ` · ${selected.size} selected`}
+            </>
+          )}
+        </span>
+        {totalPages > 1 && (
+          <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+            <button
+              onClick={() => setPage(1)}
+              disabled={page === 1}
+              className="btn btn-sm btn-outline"
+              aria-label="First page"
+            >«</button>
+            <button
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              disabled={page === 1}
+              className="btn btn-sm btn-outline"
+              aria-label="Previous page"
+            >‹</button>
+            <span style={{ fontSize: '0.8rem', padding: '0 8px', whiteSpace: 'nowrap' }}>
+              Page {page} of {totalPages}
+            </span>
+            <button
+              onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+              className="btn btn-sm btn-outline"
+              aria-label="Next page"
+            >›</button>
+            <button
+              onClick={() => setPage(totalPages)}
+              disabled={page === totalPages}
+              className="btn btn-sm btn-outline"
+              aria-label="Last page"
+            >»</button>
+          </div>
+        )}
       </div>
     </div>
   )
