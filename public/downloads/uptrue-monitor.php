@@ -16,9 +16,13 @@ define( 'UPTRUE_VERSION',      '1.1.0' );
 define( 'UPTRUE_PLUGIN_FILE',  __FILE__ );
 
 function uptrue_api_base() {
-    // Override via wp-config.php: define( 'UPTRUE_API_BASE_URL', 'https://dev.uptrue.io/api/v1/wp-agent' );
+    // Priority: wp-config constant → saved option → hardcoded default
     if ( defined( 'UPTRUE_API_BASE_URL' ) ) {
         return rtrim( UPTRUE_API_BASE_URL, '/' );
+    }
+    $saved = get_option( 'uptrue_api_base_url', '' );
+    if ( $saved ) {
+        return rtrim( $saved, '/' );
     }
     return 'https://dev.uptrue.io/api/v1/wp-agent';
 }
@@ -781,6 +785,13 @@ function uptrue_page_settings() {
         $interval = (int) ( $_POST['uptrue_interval'] ?? 120 );
         if ( ! in_array( $interval, array( 60, 120, 180, 240, 1440, 10080, 43200 ), true ) ) $interval = 120;
 
+        $base_url = sanitize_text_field( wp_unslash( $_POST['uptrue_base_url'] ?? '' ) );
+        if ( $base_url && filter_var( $base_url, FILTER_VALIDATE_URL ) ) {
+            update_option( 'uptrue_api_base_url', rtrim( $base_url, '/' ) );
+        } elseif ( '' === $base_url ) {
+            delete_option( 'uptrue_api_base_url' ); // revert to default
+        }
+
         $raw_settings = $_POST['settings'] ?? array();
         $settings     = array();
         $check_keys   = array( 'scan_php_uploads', 'scan_js_uploads', 'scan_core_files', 'scan_htaccess',
@@ -811,6 +822,7 @@ function uptrue_page_settings() {
     $settings = get_option( UPTRUE_OPT_SETTINGS, array() );
     $self_test= get_option( 'uptrue_self_test_ok', null );
     $last_err = get_option( UPTRUE_OPT_LAST_ERR, null );
+    $base_url_saved = get_option( 'uptrue_api_base_url', '' );
     ?>
     <div class="wrap">
         <h1>Uptrue — Settings</h1>
@@ -820,7 +832,7 @@ function uptrue_page_settings() {
             <p><strong>Last push error:</strong> <?php echo esc_html( $last_err ); ?></p>
             <p style="font-size:13px">
                 <strong>401</strong> — Invalid API token. Copy the token from the Uptrue monitor setup page and paste it above.<br>
-                <strong>405</strong> — Wrong URL. Add <code>define('UPTRUE_API_BASE_URL','https://dev.uptrue.io/api/v1/wp-agent');</code> to wp-config.php if testing against the dev environment.<br>
+                <strong>405</strong> — Wrong URL. Set the <strong>Uptrue App URL</strong> field below to <code>https://dev.uptrue.io/api/v1/wp-agent</code> if you're using the Uptrue dev environment.<br>
                 <strong>Network error</strong> — Your server may be blocking outbound HTTPS requests to uptrue.io.
             </p>
         </div>
@@ -849,6 +861,17 @@ function uptrue_page_settings() {
                             <?php echo $self_test ? '✅ Connection test passed' : '❌ Connection test failed — verify your token and that your server can reach uptrue.io'; ?>
                         </p>
                         <?php endif; ?>
+                    </td>
+                </tr>
+                <tr>
+                    <th><label for="uptrue_base_url">Uptrue App URL</label></th>
+                    <td>
+                        <input type="url" id="uptrue_base_url" name="uptrue_base_url"
+                               value="<?php echo esc_attr( $base_url_saved ); ?>"
+                               class="regular-text" placeholder="https://uptrue.io/api/v1/wp-agent" />
+                        <p class="description">
+                            Leave blank to use the default. Change to <code>https://dev.uptrue.io/api/v1/wp-agent</code> if you're testing on the Uptrue dev environment.
+                        </p>
                     </td>
                 </tr>
                 <tr>
