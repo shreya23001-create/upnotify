@@ -138,15 +138,15 @@ export default function NewWordPressMonitorPage(): React.ReactElement {
               <div>
                 <div style={{ fontWeight: 600, marginBottom: 6 }}>Download the plugin</div>
                 <a
-                  href="/downloads/uptrue-monitor.php"
-                  download="uptrue-monitor.php"
+                  href="/downloads/uptrue-monitor.zip"
+                  download="uptrue-monitor.zip"
                   className="btn btn-outline"
                   style={{ fontSize: 13 }}
                 >
-                  ⬇️ Download uptrue-monitor.php
+                  ⬇ Download uptrue-monitor.zip
                 </a>
                 <p style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 8 }}>
-                  Create a folder named <code>uptrue-monitor</code>, place the file inside, zip it, then upload via{' '}
+                  Upload the zip directly via{' '}
                   <strong>WordPress Admin → Plugins → Add New → Upload Plugin</strong>.
                 </p>
               </div>

@@ -54,7 +54,7 @@ export function WpSetupRequired({ monitor, token }: WpSetupRequiredProps): React
   return (
     <div>
       <div className="page-header">
-        <h1 className="page-title">Add WordPress Monitor</h1>
+        <h1 className="page-title">Finish WordPress Monitor Setup</h1>
         <a href="/dashboard/monitors" className="btn btn-ghost">← All Monitors</a>
       </div>
 
@@ -92,11 +92,11 @@ export function WpSetupRequired({ monitor, token }: WpSetupRequiredProps): React
               <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#667eea', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700, flexShrink: 0, marginTop: 2 }}>1</div>
               <div>
                 <div style={{ fontWeight: 600, marginBottom: 6 }}>Download the plugin</div>
-                <a href="/downloads/uptrue-monitor.php" download="uptrue-monitor.php" className="btn btn-outline" style={{ fontSize: 13 }}>
-                  ⬇ Download uptrue-monitor.php
+                <a href="/downloads/uptrue-monitor.zip" download="uptrue-monitor.zip" className="btn btn-outline" style={{ fontSize: 13 }}>
+                  ⬇ Download uptrue-monitor.zip
                 </a>
                 <p style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 8 }}>
-                  Create a folder named <code>uptrue-monitor</code>, place the file inside, zip it, then upload via{' '}
+                  Upload the zip directly via{' '}
                   <strong>WordPress Admin → Plugins → Add New → Upload Plugin</strong>.
                 </p>
               </div>

@@ -166,6 +166,9 @@ export async function createMonitorAction(formData: FormData): Promise<{ error?:
 
   logger.info('Monitor created', { monitorId: monitor.id, name, type })
   await devAuditLog({ orgId: user.org_id, userId: user.id, action: 'monitor.created', resourceType: 'monitor', resourceId: monitor.id, metadata: { name, type } })
+  if (type === 'wordpress') {
+    redirect(`/dashboard/monitors/${monitor.id}/wordpress`)
+  }
   redirect('/dashboard/monitors')
 }
 
