@@ -818,8 +818,11 @@ function uptrue_page_settings() {
         <?php if ( $last_err ) : ?>
         <div class="notice notice-error inline" style="margin-bottom:16px">
             <p><strong>Last push error:</strong> <?php echo esc_html( $last_err ); ?></p>
-            <p style="font-size:13px">If you see <strong>401</strong>: your API token was not found — make sure the token matches what Uptrue shows.<br>
-            If you see a <strong>network error</strong>: your server may be blocking outbound HTTPS requests.</p>
+            <p style="font-size:13px">
+                <strong>401</strong> — Invalid API token. Copy the token from the Uptrue monitor setup page and paste it above.<br>
+                <strong>405</strong> — Wrong URL. Add <code>define('UPTRUE_API_BASE_URL','https://dev.uptrue.io/api/v1/wp-agent');</code> to wp-config.php if testing against the dev environment.<br>
+                <strong>Network error</strong> — Your server may be blocking outbound HTTPS requests to uptrue.io.
+            </p>
         </div>
         <?php endif; ?>
 
