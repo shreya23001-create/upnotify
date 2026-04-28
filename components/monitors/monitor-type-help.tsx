@@ -276,6 +276,20 @@ const helpData: Record<string, MonitorHelp> = {
       { q: 'Is the first check always "up"?', a: 'Yes — the first run sets the baseline nameservers. Only subsequent changes trigger alerts.' },
     ],
   },
+  wordpress: {
+    emoji: '🔌',
+    name: 'Uptrue WordPress Monitor',
+    what: 'A lightweight plugin installed on your WordPress site pushes security and health data to Uptrue on a schedule. Unlike external monitors, this runs from inside your site — detecting threats that HTTP checks can never see.',
+    targetLabel: 'Enter your WordPress site URL',
+    targetHint: 'e.g. https://yoursite.com — the same URL you use to access the site',
+    faqs: [
+      { q: 'How is this different from uptime monitoring?', a: 'Uptime monitoring only checks if your site responds. This plugin checks inside — file injections in uploads, rogue admin users, modified core files, outdated plugins, and more.' },
+      { q: 'Do I need to install a plugin?', a: 'Yes — after creating this monitor you\'ll get a secure token. Install the Uptrue plugin on your WordPress site and paste the token in Uptrue → Settings. The plugin then pushes data to Uptrue automatically.' },
+      { q: 'Will the plugin slow down my site?', a: 'No. All scans run via WordPress Cron in the background, staggered across the day so no single run is heavy.' },
+      { q: 'What does it check?', a: 'PHP/JS files in uploads, .htaccess & wp-config.php changes, core file modifications, new admin/editor users, recently created pages, foreign-language SEO spam, outdated plugins and themes, PHP version, and debug mode status.' },
+      { q: 'What if my site goes down?', a: 'Your standard HTTP uptime monitor (set up separately) covers that. This monitor focuses on security and health from inside the site.' },
+    ],
+  },
 }
 
 function Accordion({ q, a }: { q: string; a: string }) {
