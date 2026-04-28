@@ -4,7 +4,7 @@ import {
   getWpMonitorByMonitorId,
   getWpFindings,
   getLatestWpSnapshot,
-  saveWpAiReportTimestamp,
+  saveWpAiReport,
 } from '@/lib/db/wp-monitors'
 import { generateWpAiReport } from '@/lib/services/wp-ai-report'
 
@@ -47,7 +47,7 @@ export async function POST(request: Request): Promise<Response> {
   ])
 
   const report = await generateWpAiReport({ monitor, snapshot, findings })
-  await saveWpAiReportTimestamp(wpMonitor.id)
+  await saveWpAiReport(wpMonitor.id, report)
 
   return Response.json({ report, generated_at: new Date().toISOString() })
 }

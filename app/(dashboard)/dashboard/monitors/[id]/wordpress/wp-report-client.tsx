@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import Link from 'next/link'
 import type { Monitor } from '@/lib/types'
-import type { WpMonitor, WpFinding, WpSnapshot, WpPlugin } from '@/lib/db/wp-monitors'
+import type { WpMonitor, WpFinding, WpSnapshot, WpPlugin, WpSiteStats } from '@/lib/db/wp-monitors'
 import { MonitorActions } from '@/components/monitors/monitor-actions'
 import { CopyUrlButton } from '@/components/monitors/copy-url-button'
 
@@ -54,6 +54,42 @@ function WpAgentStatusBadge({ lastPushAt, intervalMinutes }: { lastPushAt: strin
   return <span className="badge badge-warning" style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}><span className="status-dot status-dot-degraded" />Stale</span>
 }
 
+function ScoreInfoPanel(): React.ReactElement {
+  return (
+    <div style={{
+      position: 'absolute', top: '100%', left: 0, zIndex: 50, marginTop: 6,
+      background: 'var(--bg-card)', border: '1px solid var(--border-primary)',
+      borderRadius: 10, padding: '14px 16px', width: 280, boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+      fontSize: 12, lineHeight: 1.6,
+    }}>
+      <div style={{ fontWeight: 700, marginBottom: 8, fontSize: 13 }}>How is the score calculated?</div>
+      <div style={{ color: 'var(--text-secondary)', marginBottom: 8 }}>Starts at 100. Points are deducted for security issues:</div>
+      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <tbody>
+          {[
+            ['PHP file in /uploads/', '−30', 'critical'],
+            ['Suspicious/executable file in /uploads/', '−25', 'critical'],
+            ['.htaccess file modified', '−15', 'high'],
+            ['wp-config.php modified', '−15', 'high'],
+            ['WordPress core files modified', '−20', 'high'],
+            ['Theme files modified', '−10', 'medium'],
+            ['End-of-life PHP version', '−15', 'high'],
+            ['WP_DEBUG mode enabled', '−10', 'medium'],
+            ['Each outdated plugin', '−3', 'medium'],
+            ['Outdated theme', '−5', 'medium'],
+            ['Foreign language page detected', '−10', 'high'],
+          ].map(([label, pts, sev]) => (
+            <tr key={label} style={{ borderTop: '1px solid var(--border-primary)' }}>
+              <td style={{ padding: '5px 0', color: 'var(--text-primary)', fontSize: 11 }}>{label}</td>
+              <td style={{ padding: '5px 0 5px 8px', textAlign: 'right', fontWeight: 700, color: sev === 'critical' ? 'var(--color-down)' : sev === 'high' ? '#f97316' : '#eab308', whiteSpace: 'nowrap' }}>{pts}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
 function HealthTrendChart({ history }: { history: WpSnapshot[] }): React.ReactElement | null {
   const data = [...history].reverse()
   if (data.length < 2) return null
@@ -67,7 +103,6 @@ function HealthTrendChart({ history }: { history: WpSnapshot[] }): React.ReactEl
 
   return (
     <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: 90, display: 'block' }} aria-label="Health score trend chart">
-      {/* Reference lines */}
       {[100, 70, 50].map(val => {
         const y = chartH - (val / 100) * (chartH - 6)
         return (
@@ -77,7 +112,6 @@ function HealthTrendChart({ history }: { history: WpSnapshot[] }): React.ReactEl
           </g>
         )
       })}
-
       {slice.map((snap, i) => {
         const score = snap.health_score ?? 100
         const barH = Math.max(3, (score / 100) * (chartH - 6))
@@ -90,13 +124,72 @@ function HealthTrendChart({ history }: { history: WpSnapshot[] }): React.ReactEl
             <text x={x + barW / 2} y={H - 2} textAnchor="middle" fontSize="7.5" fill="var(--text-muted)">
               {new Date(snap.received_at).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })}
             </text>
-            <text x={x + barW / 2} y={y - 2} textAnchor="middle" fontSize="8" fill={color} fontWeight="600">
-              {score}
-            </text>
+            <text x={x + barW / 2} y={y - 2} textAnchor="middle" fontSize="8" fill={color} fontWeight="600">{score}</text>
           </g>
         )
       })}
     </svg>
+  )
+}
+
+function Delta({ now, prev, warningOnIncrease = false }: { now?: number; prev?: number; warningOnIncrease?: boolean }): React.ReactElement {
+  if (now === undefined || prev === undefined) return <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>—</span>
+  const diff = now - prev
+  if (diff === 0) return <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>same</span>
+  const up = diff > 0
+  const color = warningOnIncrease ? (up ? '#f97316' : 'var(--color-up)') : (up ? 'var(--color-up)' : '#f97316')
+  return (
+    <span style={{ fontSize: 11, color, fontWeight: 600 }}>
+      {up ? '↑' : '↓'}{Math.abs(diff)} since last
+    </span>
+  )
+}
+
+function SiteStatsSection({ snapshot, prev }: { snapshot: WpSnapshot | null; prev: WpSnapshot | null }): React.ReactElement | null {
+  if (!snapshot) return null
+
+  const stats = (snapshot.raw_data as Record<string, unknown> | null)?.site_stats as WpSiteStats | undefined
+  const prevStats = (prev?.raw_data as Record<string, unknown> | null)?.site_stats as WpSiteStats | undefined
+
+  const roles = stats?.users_by_role ?? {}
+  const prevRoles = prevStats?.users_by_role ?? {}
+  const admins = (roles['administrator'] as number | undefined) ?? 0
+  const editors = (roles['editor'] as number | undefined) ?? 0
+  const prevAdmins = (prevRoles['administrator'] as number | undefined) ?? undefined
+  const prevEditors = (prevRoles['editor'] as number | undefined) ?? undefined
+
+  // Show nothing if no site_stats in payload yet (old plugin version)
+  if (!stats && (snapshot.admin_users as unknown[]).length === 0) return null
+
+  // Fallback to admin_users array count if site_stats not available
+  const adminCount = stats ? admins : (snapshot.admin_users as unknown as Array<{ roles: string[] }>).filter(u => u.roles.includes('administrator')).length
+  const editorCount = stats ? editors : (snapshot.admin_users as unknown as Array<{ roles: string[] }>).filter(u => u.roles.includes('editor')).length
+
+  return (
+    <div style={{ borderTop: '1px solid var(--border-primary)', marginTop: 16, paddingTop: 14 }}>
+      <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 12 }}>
+        Site Overview
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12 }}>
+        {[
+          { label: 'Pages', value: stats?.total_pages, prevValue: prevStats?.total_pages, warn: false },
+          { label: 'Posts', value: stats?.total_posts, prevValue: prevStats?.total_posts, warn: false },
+          { label: 'Total Users', value: stats?.total_users, prevValue: prevStats?.total_users, warn: false },
+          { label: 'Admins', value: adminCount, prevValue: prevAdmins, warn: true },
+          { label: 'Editors', value: editorCount, prevValue: prevEditors, warn: false },
+        ].map(({ label, value, prevValue, warn }) => (
+          <div key={label} style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</div>
+            <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.1 }}>
+              {value ?? '—'}
+            </div>
+            <div style={{ marginTop: 3 }}>
+              <Delta now={value} prev={prevValue} warningOnIncrease={warn} />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
   )
 }
 
@@ -107,11 +200,13 @@ function generatePrintHtml(opts: {
   openFindings: WpFinding[]
   latestSnapshot: WpSnapshot | null
   generatedAt: string
+  aiReport?: string | null
 }): string {
-  const { siteName, siteUrl, score, openFindings, latestSnapshot, generatedAt } = opts
+  const { siteName, siteUrl, score, openFindings, latestSnapshot, generatedAt, aiReport } = opts
   const scoreCardClass = score >= 70 ? 'green' : score >= 50 ? 'yellow' : 'red'
   const scoreTextColor = score >= 70 ? '#16a34a' : score >= 50 ? '#d97706' : '#dc2626'
   const outdated = (latestSnapshot?.active_plugins as WpPlugin[] ?? []).filter(p => p.update_available)
+  const stats = (latestSnapshot?.raw_data as Record<string, unknown> | null)?.site_stats as WpSiteStats | undefined
 
   const badgeStyle: Record<string, string> = {
     critical: 'background:#fef2f2;color:#dc2626',
@@ -134,7 +229,7 @@ function generatePrintHtml(opts: {
   .logo-sub{font-size:11px;color:#9ca3af;margin-top:3px}
   .meta{text-align:right;font-size:12px;color:#6b7280}
   .meta strong{font-size:15px;color:#1a1a2e;display:block;margin-bottom:2px}
-  .cards{display:flex;gap:16px;margin-bottom:28px}
+  .cards{display:flex;gap:16px;margin-bottom:24px}
   .card{flex:1;padding:18px 20px;border-radius:10px;border:1px solid #e5e7eb}
   .card.green{background:#f0fdf4;border-color:#86efac}
   .card.yellow{background:#fffbeb;border-color:#fcd34d}
@@ -143,16 +238,19 @@ function generatePrintHtml(opts: {
   .val{font-size:40px;font-weight:800;line-height:1}
   .val-sm{font-size:28px;font-weight:800;line-height:1}
   .lbl{font-size:12px;color:#6b7280;margin-top:4px}
-  h2{font-size:15px;font-weight:700;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid #e5e7eb}
+  .stats-row{display:flex;gap:16px;margin-bottom:24px}
+  .stat-box{flex:1;padding:12px 14px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;text-align:center}
+  .stat-val{font-size:20px;font-weight:700;color:#1a1a2e}
+  .stat-lbl{font-size:11px;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em}
+  h2{font-size:15px;font-weight:700;margin:24px 0 14px;padding-bottom:8px;border-bottom:1px solid #e5e7eb}
   .row{display:flex;justify-content:space-between;align-items:flex-start;padding:11px 0;border-bottom:1px solid #f3f4f6}
   .row:last-child{border-bottom:none}
   .ftitle{font-weight:500;font-size:13px}
   .fdate{font-size:11px;color:#9ca3af;margin-top:2px}
   .badge{padding:2px 9px;border-radius:4px;font-size:11px;font-weight:600}
-  .sysrow{display:flex;gap:24px;margin-bottom:28px}
-  .syscard{flex:1;padding:14px 16px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px}
-  .sys-val{font-size:18px;font-weight:700;margin-bottom:2px}
-  .sys-lbl{font-size:11px;color:#9ca3af}
+  .ai-section{margin-top:28px;padding:20px;background:#f8f9ff;border:1px solid #e0e4ff;border-radius:10px}
+  .ai-header{font-size:14px;font-weight:700;color:#4f46e5;margin-bottom:12px}
+  .ai-content{font-size:13px;line-height:1.7;white-space:pre-wrap;color:#374151}
   .footer{margin-top:36px;padding-top:14px;border-top:1px solid #e5e7eb;display:flex;justify-content:space-between;font-size:11px;color:#9ca3af}
   @media print{body{padding:20px}}
 </style>
@@ -189,17 +287,24 @@ function generatePrintHtml(opts: {
   </div>` : ''}
 </div>
 
-${latestSnapshot ? `<div class="sysrow">
-  <div class="syscard"><div class="sys-val">${(latestSnapshot.active_plugins as WpPlugin[]).length}</div><div class="sys-lbl">Active Plugins</div></div>
-  ${latestSnapshot.memory_limit ? `<div class="syscard"><div class="sys-val">${latestSnapshot.memory_limit}</div><div class="sys-lbl">PHP Memory Limit</div></div>` : ''}
-  ${latestSnapshot.db_size_mb ? `<div class="syscard"><div class="sys-val">${latestSnapshot.db_size_mb} MB</div><div class="sys-lbl">Database Size</div></div>` : ''}
+${stats ? `<div class="stats-row">
+  ${stats.total_pages !== undefined ? `<div class="stat-box"><div class="stat-val">${stats.total_pages}</div><div class="stat-lbl">Pages</div></div>` : ''}
+  ${stats.total_posts !== undefined ? `<div class="stat-box"><div class="stat-val">${stats.total_posts}</div><div class="stat-lbl">Posts</div></div>` : ''}
+  ${stats.total_users !== undefined ? `<div class="stat-box"><div class="stat-val">${stats.total_users}</div><div class="stat-lbl">Total Users</div></div>` : ''}
+  ${stats.users_by_role?.['administrator'] !== undefined ? `<div class="stat-box"><div class="stat-val">${stats.users_by_role['administrator']}</div><div class="stat-lbl">Admins</div></div>` : ''}
+  ${stats.users_by_role?.['editor'] !== undefined ? `<div class="stat-box"><div class="stat-val">${stats.users_by_role['editor']}</div><div class="stat-lbl">Editors</div></div>` : ''}
 </div>` : ''}
 
 ${openFindings.length > 0 ? `<h2>Open Issues (${openFindings.length})</h2>
 ${openFindings.map(f => `<div class="row">
   <div><div class="ftitle">${escapeHtml(f.title)}</div><div class="fdate">Detected: ${new Date(f.first_detected_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</div></div>
   <span class="badge" style="${badgeStyle[f.severity] ?? badgeStyle.info}">${f.severity.charAt(0).toUpperCase() + f.severity.slice(1)}</span>
-</div>`).join('')}` : `<p style="color:#16a34a;font-weight:600;padding:16px 0">✓ No open issues found — your WordPress site looks healthy.</p>`}
+</div>`).join('')}` : `<p style="color:#16a34a;font-weight:600;padding:16px 0">✓ No open issues — your WordPress site looks healthy.</p>`}
+
+${aiReport ? `<div class="ai-section">
+  <div class="ai-header">🤖 AI Security Analysis</div>
+  <div class="ai-content">${escapeHtml(aiReport)}</div>
+</div>` : ''}
 
 <div class="footer">
   <div>Powered by <strong>Uptrue</strong> — uptrue.io</div>
@@ -218,15 +323,19 @@ interface Props {
   wpMonitor: WpMonitor
   findings: WpFinding[]
   latestSnapshot: WpSnapshot | null
+  previousSnapshot: WpSnapshot | null
   history: WpSnapshot[]
+  lastAiReport: string | null
+  lastAiReportAt: string | null
 }
 
-export function WpReportClient({ monitor, wpMonitor, findings, latestSnapshot, history }: Props): React.ReactElement {
+export function WpReportClient({ monitor, wpMonitor, findings, latestSnapshot, previousSnapshot, history, lastAiReport, lastAiReportAt }: Props): React.ReactElement {
   const [expandedFinding, setExpandedFinding] = useState<string | null>(null)
   const [aiReportOpen, setAiReportOpen] = useState(false)
-  const [aiReport, setAiReport] = useState<string | null>(null)
+  const [aiReport, setAiReport] = useState<string | null>(lastAiReport)
   const [aiRateMsg, setAiRateMsg] = useState<string | null>(null)
   const [aiLoading, startAiTransition] = useTransition()
+  const [scoreInfoOpen, setScoreInfoOpen] = useState(false)
 
   const openFindings = findings
     .filter(f => f.status === 'open' || f.status === 'acknowledged')
@@ -237,17 +346,17 @@ export function WpReportClient({ monitor, wpMonitor, findings, latestSnapshot, h
   const highCount = openFindings.filter(f => f.severity === 'high').length
   const outdatedPlugins = (latestSnapshot?.active_plugins as WpPlugin[] | undefined ?? []).filter(p => p.update_available)
 
-  // Derive AI report availability from wpMonitor.settings
   const settings = (wpMonitor.settings ?? {}) as Record<string, unknown>
-  const lastAiReportAt = settings.last_ai_report_at as string | undefined
-  const aiAvailableAt = lastAiReportAt ? new Date(new Date(lastAiReportAt).getTime() + 7 * 24 * 60 * 60 * 1000) : null
+  const lastAiReportAtFromSettings = lastAiReportAt ?? (settings.last_ai_report_at as string | undefined)
+  const aiAvailableAt = lastAiReportAtFromSettings
+    ? new Date(new Date(lastAiReportAtFromSettings).getTime() + 7 * 24 * 60 * 60 * 1000)
+    : null
   const aiRateLimited = aiAvailableAt ? Date.now() < aiAvailableAt.getTime() : false
 
   function handleGenerateAiReport(): void {
-    if (aiRateLimited) return
     setAiRateMsg(null)
     setAiReportOpen(true)
-    if (aiReport) return
+    if (aiRateLimited) return  // Still open the modal to show existing report
     startAiTransition(async () => {
       try {
         const res = await fetch(`/api/v1/wp-agent/ai-report?monitor_id=${monitor.id}`, { method: 'POST' })
@@ -273,6 +382,7 @@ export function WpReportClient({ monitor, wpMonitor, findings, latestSnapshot, h
       openFindings,
       latestSnapshot,
       generatedAt,
+      aiReport,
     })
     const w = window.open('', '_blank', 'width=900,height=700')
     if (!w) return
@@ -301,12 +411,9 @@ export function WpReportClient({ monitor, wpMonitor, findings, latestSnapshot, h
             type="button"
             onClick={handleGenerateAiReport}
             className="btn btn-sm btn-outline"
-            disabled={aiRateLimited}
-            title={aiRateLimited && aiAvailableAt ? `Next AI report: ${aiAvailableAt.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}` : undefined}
+            title={aiRateLimited && aiAvailableAt ? `Next generation: ${aiAvailableAt.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}. Click to view last report.` : undefined}
           >
-            {aiRateLimited && aiAvailableAt
-              ? `AI Report (from ${aiAvailableAt.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })})`
-              : 'AI Report'}
+            {aiRateLimited ? (aiReport ? 'View AI Report' : `AI Report (from ${aiAvailableAt!.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })})`) : 'Generate AI Report'}
           </button>
           <button type="button" onClick={handleDownload} className="btn btn-sm btn-outline">
             ↓ Download
@@ -318,11 +425,27 @@ export function WpReportClient({ monitor, wpMonitor, findings, latestSnapshot, h
 
       {/* Stat cards */}
       <div className="monitor-stat-grid">
-        <div className={`monitor-stat-card ${score >= 70 ? 'card-up' : 'card-warn'}`}>
+        {/* Health Score with info icon */}
+        <div className={`monitor-stat-card ${score >= 70 ? 'card-up' : 'card-warn'}`} style={{ position: 'relative' }}>
           <div className={`monitor-stat-icon ${score >= 70 ? 'icon-up' : 'icon-warn'}`}>
             <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
           </div>
-          <div className="monitor-stat-label">Health Score</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <div className="monitor-stat-label">Health Score</div>
+            <div style={{ position: 'relative' }}>
+              <button
+                type="button"
+                onClick={() => setScoreInfoOpen(v => !v)}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: 'var(--text-muted)', lineHeight: 1, display: 'flex', alignItems: 'center' }}
+                title="How is this score calculated?"
+              >
+                <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+                </svg>
+              </button>
+              {scoreInfoOpen && <ScoreInfoPanel />}
+            </div>
+          </div>
           <div className="monitor-stat-value">
             {score}<span className="monitor-stat-unit">/ 100</span>
           </div>
@@ -404,6 +527,9 @@ export function WpReportClient({ monitor, wpMonitor, findings, latestSnapshot, h
               </div>
             </div>
           )}
+          <div style={{ padding: '0 20px 16px' }}>
+            <SiteStatsSection snapshot={latestSnapshot} prev={previousSnapshot} />
+          </div>
         </div>
 
         <div className="card">
@@ -434,7 +560,7 @@ export function WpReportClient({ monitor, wpMonitor, findings, latestSnapshot, h
         </div>
       </div>
 
-      {/* Full findings list */}
+      {/* Full findings */}
       {openFindings.length > 0 && (
         <div style={{ marginBottom: 24 }}>
           <div className="card">
@@ -448,9 +574,7 @@ export function WpReportClient({ monitor, wpMonitor, findings, latestSnapshot, h
                     style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 20px', cursor: 'pointer' }}
                     onClick={() => setExpandedFinding(expandedFinding === finding.id ? null : finding.id)}
                   >
-                    <span className={`badge ${severityBadgeClass[finding.severity] ?? 'badge-outline'}`}>
-                      {finding.severity}
-                    </span>
+                    <span className={`badge ${severityBadgeClass[finding.severity] ?? 'badge-outline'}`}>{finding.severity}</span>
                     <span style={{ fontWeight: 500, flex: 1, fontSize: 14 }}>{finding.title}</span>
                     <span className="table-muted">{fmtDate(finding.first_detected_at)}</span>
                     <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"
@@ -461,12 +585,10 @@ export function WpReportClient({ monitor, wpMonitor, findings, latestSnapshot, h
                   {expandedFinding === finding.id && (
                     <div style={{ padding: '0 20px 16px', borderTop: '1px solid var(--border-primary)' }}>
                       {finding.ai_explanation ? (
-                        <p style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--text-primary)', whiteSpace: 'pre-wrap', margin: '12px 0 0' }}>
-                          {finding.ai_explanation}
-                        </p>
+                        <p style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--text-primary)', whiteSpace: 'pre-wrap', margin: '12px 0 0' }}>{finding.ai_explanation}</p>
                       ) : (
                         <p style={{ fontSize: 13, color: 'var(--text-secondary)', margin: '12px 0 0' }}>
-                          Click <strong>AI Report</strong> at the top for a full explanation and fix instructions.
+                          Click <strong>Generate AI Report</strong> at the top for a full explanation and fix instructions.
                         </p>
                       )}
                       {Object.keys(finding.detail).length > 0 && (
@@ -496,22 +618,16 @@ export function WpReportClient({ monitor, wpMonitor, findings, latestSnapshot, h
             <div style={{ padding: '16px 20px 8px' }}>
               <HealthTrendChart history={history} />
               <div style={{ display: 'flex', gap: 16, marginTop: 10, fontSize: 11, color: 'var(--text-muted)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                  <span style={{ width: 10, height: 10, background: 'var(--color-up)', borderRadius: 2, display: 'inline-block' }} />
-                  Good (70+)
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                  <span style={{ width: 10, height: 10, background: '#eab308', borderRadius: 2, display: 'inline-block' }} />
-                  Fair (50–69)
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                  <span style={{ width: 10, height: 10, background: 'var(--color-down)', borderRadius: 2, display: 'inline-block' }} />
-                  Poor (&lt;50)
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                  <span style={{ width: 16, height: 1, background: 'var(--border-primary)', borderTop: '1px dashed', display: 'inline-block' }} />
-                  70 threshold
-                </div>
+                {[
+                  { color: 'var(--color-up)', label: 'Good (70+)' },
+                  { color: '#eab308', label: 'Fair (50–69)' },
+                  { color: 'var(--color-down)', label: 'Poor (<50)' },
+                ].map(({ color, label }) => (
+                  <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <span style={{ width: 10, height: 10, background: color, borderRadius: 2, display: 'inline-block' }} />
+                    {label}
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -527,21 +643,14 @@ export function WpReportClient({ monitor, wpMonitor, findings, latestSnapshot, h
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
               {history.map((snap, i) => (
-                <div
-                  key={snap.id}
-                  className="incident-row"
-                  style={{ borderTop: i === 0 ? 'none' : '1px solid var(--border-primary)', padding: '12px 20px' }}
-                >
+                <div key={snap.id} className="incident-row"
+                  style={{ borderTop: i === 0 ? 'none' : '1px solid var(--border-primary)', padding: '12px 20px' }}>
                   <div className="incident-row-info">
-                    <span className="incident-row-title">
-                      WP {snap.wp_version ?? '—'} · PHP {snap.php_version ?? '—'}
-                    </span>
+                    <span className="incident-row-title">WP {snap.wp_version ?? '—'} · PHP {snap.php_version ?? '—'}</span>
                     <span className="incident-row-time">{fmtDate(snap.received_at)}</span>
                   </div>
-                  <span
-                    className={`badge ${(snap.health_score ?? 100) >= 70 ? 'badge-outline' : 'badge-warning'}`}
-                    style={{ color: scoreColor(snap.health_score ?? 100) }}
-                  >
+                  <span className={`badge ${(snap.health_score ?? 100) >= 70 ? 'badge-outline' : 'badge-warning'}`}
+                    style={{ color: scoreColor(snap.health_score ?? 100) }}>
                     {snap.health_score ?? 100} — {scoreLabel(snap.health_score ?? 100)}
                   </span>
                 </div>
@@ -553,30 +662,28 @@ export function WpReportClient({ monitor, wpMonitor, findings, latestSnapshot, h
 
       {/* AI Report modal */}
       {aiReportOpen && (
-        <div style={{
-          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000,
-          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
-        }}>
-          <div className="card" style={{ maxWidth: 700, width: '100%', maxHeight: '80vh', overflow: 'auto', padding: 'var(--space-6)' }}>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+          <div className="card" style={{ maxWidth: 720, width: '100%', maxHeight: '85vh', overflow: 'auto', padding: 'var(--space-6)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <h2 style={{ fontSize: 18, fontWeight: 700 }}>AI Security Report</h2>
+              <div>
+                <h2 style={{ fontSize: 18, fontWeight: 700 }}>AI Security Report</h2>
+                {lastAiReportAtFromSettings && (
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
+                    Generated: {fmtDate(lastAiReportAtFromSettings)}
+                    {aiAvailableAt && ` · Next generation: ${aiAvailableAt.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}`}
+                  </div>
+                )}
+              </div>
               <button type="button" onClick={() => setAiReportOpen(false)} className="btn btn-ghost" style={{ fontSize: 18, padding: '4px 10px' }}>×</button>
             </div>
             {aiRateMsg ? (
               <div className="form-error">{aiRateMsg}</div>
             ) : aiLoading ? (
-              <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--text-secondary)' }}>
-                Analysing your WordPress site…
-              </div>
+              <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--text-secondary)' }}>Analysing your WordPress site…</div>
+            ) : aiReport ? (
+              <div style={{ fontSize: 14, lineHeight: 1.7, whiteSpace: 'pre-wrap', color: 'var(--text-primary)' }}>{aiReport}</div>
             ) : (
-              <div style={{ fontSize: 14, lineHeight: 1.7, whiteSpace: 'pre-wrap', color: 'var(--text-primary)' }}>
-                {aiReport}
-              </div>
-            )}
-            {lastAiReportAt && (
-              <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 16 }}>
-                Reports are generated once per week. Next available: {new Date(new Date(lastAiReportAt).getTime() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
-              </p>
+              <p style={{ fontSize: 14, color: 'var(--text-secondary)' }}>No report generated yet. Close this dialog and click <strong>Generate AI Report</strong>.</p>
             )}
           </div>
         </div>

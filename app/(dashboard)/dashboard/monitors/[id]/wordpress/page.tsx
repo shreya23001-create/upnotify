@@ -1,7 +1,7 @@
 import { notFound, redirect } from 'next/navigation'
 import { getCurrentUser } from '@/lib/db/users'
 import { getMonitorById } from '@/lib/db/monitors'
-import { getWpMonitorByMonitorId, getWpFindings, getLatestWpSnapshot, getWpSnapshotHistory, createWpMonitor, generateWpToken } from '@/lib/db/wp-monitors'
+import { getWpMonitorByMonitorId, getWpFindings, getLatestWpSnapshot, getWpSnapshotHistory, getPreviousWpSnapshot, createWpMonitor, generateWpToken } from '@/lib/db/wp-monitors'
 import { WpReportClient } from './wp-report-client'
 import { WpSetupRequired } from './wp-setup-required'
 
@@ -44,13 +44,24 @@ export default async function WordPressMonitorPage({
     getWpSnapshotHistory(wpMonitor.id, 30),
   ])
 
+  const previousSnapshot = latestSnapshot
+    ? await getPreviousWpSnapshot(wpMonitor.id, latestSnapshot.id)
+    : null
+
+  const settings = (wpMonitor.settings ?? {}) as Record<string, unknown>
+  const lastAiReport = (settings.last_ai_report_text as string | undefined) ?? null
+  const lastAiReportAt = (settings.last_ai_report_at as string | undefined) ?? null
+
   return (
     <WpReportClient
       monitor={monitor}
       wpMonitor={wpMonitor}
       findings={findings}
       latestSnapshot={latestSnapshot}
+      previousSnapshot={previousSnapshot}
       history={history}
+      lastAiReport={lastAiReport}
+      lastAiReportAt={lastAiReportAt}
     />
   )
 }

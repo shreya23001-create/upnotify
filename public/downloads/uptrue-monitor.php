@@ -255,6 +255,8 @@ function uptrue_collect_data() {
         $wpdb->prepare( "SELECT SUM(data_length + index_length) / 1024 / 1024 FROM information_schema.tables WHERE table_schema = %s", DB_NAME )
     );
 
+    $user_counts = count_users();
+
     return array(
         'site_url'         => get_bloginfo( 'url' ),
         'wp_version'       => get_bloginfo( 'version' ),
@@ -269,6 +271,12 @@ function uptrue_collect_data() {
         'memory_limit'     => defined( 'WP_MEMORY_LIMIT' ) ? WP_MEMORY_LIMIT : ini_get( 'memory_limit' ),
         'db_size_mb'       => round( $db_size, 2 ),
         'cron_last_run'    => get_option( UPTRUE_OPT_LAST_PUSH, null ),
+        'site_stats'       => array(
+            'total_pages'   => (int) wp_count_posts( 'page' )->publish,
+            'total_posts'   => (int) wp_count_posts( 'post' )->publish,
+            'total_users'   => (int) $user_counts['total_users'],
+            'users_by_role' => (array) $user_counts['avail_roles'],
+        ),
     );
 }
 

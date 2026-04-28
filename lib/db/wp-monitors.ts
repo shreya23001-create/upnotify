@@ -22,6 +22,13 @@ export interface WpMonitor {
   updated_at: string
 }
 
+export interface WpSiteStats {
+  total_pages?: number
+  total_posts?: number
+  total_users?: number
+  users_by_role?: Record<string, number>
+}
+
 export interface WpSnapshot {
   id: string
   wp_monitor_id: string
@@ -40,6 +47,7 @@ export interface WpSnapshot {
   db_size_mb: number | null
   cron_last_run: string | null
   health_score: number | null
+  raw_data: Record<string, unknown> | null
   created_at: string
 }
 
@@ -314,18 +322,36 @@ export async function saveAiExplanation(findingId: string, explanation: string):
     .eq('id', findingId)
 }
 
-export async function saveWpAiReportTimestamp(wpMonitorId: string): Promise<void> {
+export async function saveWpAiReport(wpMonitorId: string, reportText: string): Promise<void> {
   const { data: current } = await db()
     .from('wp_monitors')
     .select('settings')
     .eq('id', wpMonitorId)
     .maybeSingle()
 
-  const settings = { ...(current?.settings ?? {}), last_ai_report_at: new Date().toISOString() }
+  const settings = {
+    ...(current?.settings ?? {}),
+    last_ai_report_at: new Date().toISOString(),
+    last_ai_report_text: reportText,
+  }
   await db()
     .from('wp_monitors')
     .update({ settings, updated_at: new Date().toISOString() })
     .eq('id', wpMonitorId)
+}
+
+export async function getPreviousWpSnapshot(wpMonitorId: string, excludeId: string): Promise<WpSnapshot | null> {
+  const { data, error } = await db()
+    .from('wp_snapshots')
+    .select('*')
+    .eq('wp_monitor_id', wpMonitorId)
+    .neq('id', excludeId)
+    .order('received_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  if (error) return null
+  return data as WpSnapshot | null
 }
 
 export async function getWpMonitorCountByOrg(orgId: string): Promise<number> {
