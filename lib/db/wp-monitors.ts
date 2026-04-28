@@ -314,6 +314,20 @@ export async function saveAiExplanation(findingId: string, explanation: string):
     .eq('id', findingId)
 }
 
+export async function saveWpAiReportTimestamp(wpMonitorId: string): Promise<void> {
+  const { data: current } = await db()
+    .from('wp_monitors')
+    .select('settings')
+    .eq('id', wpMonitorId)
+    .maybeSingle()
+
+  const settings = { ...(current?.settings ?? {}), last_ai_report_at: new Date().toISOString() }
+  await db()
+    .from('wp_monitors')
+    .update({ settings, updated_at: new Date().toISOString() })
+    .eq('id', wpMonitorId)
+}
+
 export async function getWpMonitorCountByOrg(orgId: string): Promise<number> {
   const { count } = await db()
     .from('wp_monitors')

@@ -4,10 +4,8 @@ import { useState, useTransition } from 'react'
 import Link from 'next/link'
 import type { Monitor } from '@/lib/types'
 import type { WpMonitor, WpFinding, WpSnapshot, WpPlugin } from '@/lib/db/wp-monitors'
-import { MonitorStatusBadge } from '@/components/monitors/monitor-status-badge'
 import { MonitorActions } from '@/components/monitors/monitor-actions'
 import { CopyUrlButton } from '@/components/monitors/copy-url-button'
-import { BadgeEmbed } from '@/components/monitors/badge-embed'
 
 const SEVERITY_ORDER = { critical: 0, high: 1, medium: 2, low: 3, info: 4 }
 
@@ -45,6 +43,176 @@ const severityBadgeClass: Record<string, string> = {
   info: 'badge-outline',
 }
 
+function WpAgentStatusBadge({ lastPushAt, intervalMinutes }: { lastPushAt: string | null; intervalMinutes: number }): React.ReactElement {
+  if (!lastPushAt) {
+    return <span className="badge badge-outline" style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}><span className="status-dot" style={{ background: 'var(--text-muted)' }} />Not connected</span>
+  }
+  const minutesSince = (Date.now() - new Date(lastPushAt).getTime()) / 60000
+  if (minutesSince <= intervalMinutes * 3) {
+    return <span className="badge badge-success" style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}><span className="status-dot status-dot-up" />Connected</span>
+  }
+  return <span className="badge badge-warning" style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}><span className="status-dot status-dot-degraded" />Stale</span>
+}
+
+function HealthTrendChart({ history }: { history: WpSnapshot[] }): React.ReactElement | null {
+  const data = [...history].reverse()
+  if (data.length < 2) return null
+
+  const W = 520, H = 90, PAD_X = 24, PAD_B = 18
+  const chartH = H - PAD_B
+  const count = Math.min(data.length, 12)
+  const slice = data.slice(-count)
+  const barW = Math.max(14, Math.min(36, Math.floor((W - PAD_X * 2) / count) - 4))
+  const step = (W - PAD_X * 2) / count
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: 90, display: 'block' }} aria-label="Health score trend chart">
+      {/* Reference lines */}
+      {[100, 70, 50].map(val => {
+        const y = chartH - (val / 100) * (chartH - 6)
+        return (
+          <g key={val}>
+            <line x1={PAD_X} y1={y} x2={W - 4} y2={y} stroke="var(--border-primary)" strokeWidth="0.5" strokeDasharray={val === 70 ? '3,3' : undefined} />
+            <text x={PAD_X - 4} y={y + 3} fontSize="8" fill="var(--text-muted)" textAnchor="end">{val}</text>
+          </g>
+        )
+      })}
+
+      {slice.map((snap, i) => {
+        const score = snap.health_score ?? 100
+        const barH = Math.max(3, (score / 100) * (chartH - 6))
+        const x = PAD_X + i * step + (step - barW) / 2
+        const y = chartH - barH
+        const color = score >= 70 ? 'var(--color-up)' : score >= 50 ? '#eab308' : 'var(--color-down)'
+        return (
+          <g key={snap.id}>
+            <rect x={x} y={y} width={barW} height={barH} fill={color} rx="2" opacity="0.82" />
+            <text x={x + barW / 2} y={H - 2} textAnchor="middle" fontSize="7.5" fill="var(--text-muted)">
+              {new Date(snap.received_at).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })}
+            </text>
+            <text x={x + barW / 2} y={y - 2} textAnchor="middle" fontSize="8" fill={color} fontWeight="600">
+              {score}
+            </text>
+          </g>
+        )
+      })}
+    </svg>
+  )
+}
+
+function generatePrintHtml(opts: {
+  siteName: string
+  siteUrl: string
+  score: number
+  openFindings: WpFinding[]
+  latestSnapshot: WpSnapshot | null
+  generatedAt: string
+}): string {
+  const { siteName, siteUrl, score, openFindings, latestSnapshot, generatedAt } = opts
+  const scoreCardClass = score >= 70 ? 'green' : score >= 50 ? 'yellow' : 'red'
+  const scoreTextColor = score >= 70 ? '#16a34a' : score >= 50 ? '#d97706' : '#dc2626'
+  const outdated = (latestSnapshot?.active_plugins as WpPlugin[] ?? []).filter(p => p.update_available)
+
+  const badgeStyle: Record<string, string> = {
+    critical: 'background:#fef2f2;color:#dc2626',
+    high: 'background:#fffbeb;color:#d97706',
+    medium: 'background:#fffbeb;color:#d97706',
+    low: 'background:#f9fafb;color:#6b7280',
+    info: 'background:#f9fafb;color:#6b7280',
+  }
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>WordPress Report — ${siteName}</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#1a1a2e;padding:40px;font-size:14px}
+  .hd{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:20px;border-bottom:3px solid #667eea;margin-bottom:28px}
+  .logo{font-size:26px;font-weight:800;color:#667eea;letter-spacing:-0.5px}.logo span{color:#06b6d4}
+  .logo-sub{font-size:11px;color:#9ca3af;margin-top:3px}
+  .meta{text-align:right;font-size:12px;color:#6b7280}
+  .meta strong{font-size:15px;color:#1a1a2e;display:block;margin-bottom:2px}
+  .cards{display:flex;gap:16px;margin-bottom:28px}
+  .card{flex:1;padding:18px 20px;border-radius:10px;border:1px solid #e5e7eb}
+  .card.green{background:#f0fdf4;border-color:#86efac}
+  .card.yellow{background:#fffbeb;border-color:#fcd34d}
+  .card.red{background:#fef2f2;border-color:#fca5a5}
+  .card.grey{background:#f9fafb}
+  .val{font-size:40px;font-weight:800;line-height:1}
+  .val-sm{font-size:28px;font-weight:800;line-height:1}
+  .lbl{font-size:12px;color:#6b7280;margin-top:4px}
+  h2{font-size:15px;font-weight:700;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid #e5e7eb}
+  .row{display:flex;justify-content:space-between;align-items:flex-start;padding:11px 0;border-bottom:1px solid #f3f4f6}
+  .row:last-child{border-bottom:none}
+  .ftitle{font-weight:500;font-size:13px}
+  .fdate{font-size:11px;color:#9ca3af;margin-top:2px}
+  .badge{padding:2px 9px;border-radius:4px;font-size:11px;font-weight:600}
+  .sysrow{display:flex;gap:24px;margin-bottom:28px}
+  .syscard{flex:1;padding:14px 16px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px}
+  .sys-val{font-size:18px;font-weight:700;margin-bottom:2px}
+  .sys-lbl{font-size:11px;color:#9ca3af}
+  .footer{margin-top:36px;padding-top:14px;border-top:1px solid #e5e7eb;display:flex;justify-content:space-between;font-size:11px;color:#9ca3af}
+  @media print{body{padding:20px}}
+</style>
+</head>
+<body>
+<div class="hd">
+  <div>
+    <div class="logo">Up<span>true</span></div>
+    <div class="logo-sub">WordPress Security &amp; Health Report</div>
+  </div>
+  <div class="meta">
+    <strong>${siteName}</strong>
+    <div>${siteUrl}</div>
+    <div style="margin-top:4px">Generated: ${generatedAt}</div>
+  </div>
+</div>
+
+<div class="cards">
+  <div class="card ${scoreCardClass}">
+    <div class="val" style="color:${scoreTextColor}">${score}</div>
+    <div class="lbl">Health Score / 100 — ${scoreLabel(score)}</div>
+  </div>
+  <div class="card grey">
+    <div class="val-sm">${openFindings.length}</div>
+    <div class="lbl">Open Issues${openFindings.filter(f => f.severity === 'critical').length > 0 ? ` (${openFindings.filter(f => f.severity === 'critical').length} critical)` : ''}</div>
+  </div>
+  ${latestSnapshot ? `<div class="card grey">
+    <div class="val-sm">${latestSnapshot.wp_version ?? '—'}</div>
+    <div class="lbl">WordPress · PHP ${latestSnapshot.php_version ?? '—'}</div>
+  </div>` : ''}
+  ${outdated.length > 0 ? `<div class="card yellow">
+    <div class="val-sm" style="color:#d97706">${outdated.length}</div>
+    <div class="lbl">Plugin Updates Needed</div>
+  </div>` : ''}
+</div>
+
+${latestSnapshot ? `<div class="sysrow">
+  <div class="syscard"><div class="sys-val">${(latestSnapshot.active_plugins as WpPlugin[]).length}</div><div class="sys-lbl">Active Plugins</div></div>
+  ${latestSnapshot.memory_limit ? `<div class="syscard"><div class="sys-val">${latestSnapshot.memory_limit}</div><div class="sys-lbl">PHP Memory Limit</div></div>` : ''}
+  ${latestSnapshot.db_size_mb ? `<div class="syscard"><div class="sys-val">${latestSnapshot.db_size_mb} MB</div><div class="sys-lbl">Database Size</div></div>` : ''}
+</div>` : ''}
+
+${openFindings.length > 0 ? `<h2>Open Issues (${openFindings.length})</h2>
+${openFindings.map(f => `<div class="row">
+  <div><div class="ftitle">${escapeHtml(f.title)}</div><div class="fdate">Detected: ${new Date(f.first_detected_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</div></div>
+  <span class="badge" style="${badgeStyle[f.severity] ?? badgeStyle.info}">${f.severity.charAt(0).toUpperCase() + f.severity.slice(1)}</span>
+</div>`).join('')}` : `<p style="color:#16a34a;font-weight:600;padding:16px 0">✓ No open issues found — your WordPress site looks healthy.</p>`}
+
+<div class="footer">
+  <div>Powered by <strong>Uptrue</strong> — uptrue.io</div>
+  <div>Automated WordPress monitoring &amp; security scanning</div>
+</div>
+</body>
+</html>`
+}
+
+function escapeHtml(s: string): string {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+}
+
 interface Props {
   monitor: Monitor
   wpMonitor: WpMonitor
@@ -57,6 +225,7 @@ export function WpReportClient({ monitor, wpMonitor, findings, latestSnapshot, h
   const [expandedFinding, setExpandedFinding] = useState<string | null>(null)
   const [aiReportOpen, setAiReportOpen] = useState(false)
   const [aiReport, setAiReport] = useState<string | null>(null)
+  const [aiRateMsg, setAiRateMsg] = useState<string | null>(null)
   const [aiLoading, startAiTransition] = useTransition()
 
   const openFindings = findings
@@ -68,12 +237,25 @@ export function WpReportClient({ monitor, wpMonitor, findings, latestSnapshot, h
   const highCount = openFindings.filter(f => f.severity === 'high').length
   const outdatedPlugins = (latestSnapshot?.active_plugins as WpPlugin[] | undefined ?? []).filter(p => p.update_available)
 
+  // Derive AI report availability from wpMonitor.settings
+  const settings = (wpMonitor.settings ?? {}) as Record<string, unknown>
+  const lastAiReportAt = settings.last_ai_report_at as string | undefined
+  const aiAvailableAt = lastAiReportAt ? new Date(new Date(lastAiReportAt).getTime() + 7 * 24 * 60 * 60 * 1000) : null
+  const aiRateLimited = aiAvailableAt ? Date.now() < aiAvailableAt.getTime() : false
+
   function handleGenerateAiReport(): void {
+    if (aiRateLimited) return
+    setAiRateMsg(null)
     setAiReportOpen(true)
     if (aiReport) return
     startAiTransition(async () => {
       try {
         const res = await fetch(`/api/v1/wp-agent/ai-report?monitor_id=${monitor.id}`, { method: 'POST' })
+        if (res.status === 429) {
+          const data = await res.json() as { message?: string }
+          setAiRateMsg(data.message ?? 'Rate limit reached. Try again next week.')
+          return
+        }
         const data = await res.json() as { report?: string; error?: string }
         setAiReport(data.report ?? data.error ?? 'Could not generate report.')
       } catch {
@@ -82,14 +264,31 @@ export function WpReportClient({ monitor, wpMonitor, findings, latestSnapshot, h
     })
   }
 
+  function handleDownload(): void {
+    const generatedAt = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+    const html = generatePrintHtml({
+      siteName: monitor.name,
+      siteUrl: wpMonitor.site_url,
+      score,
+      openFindings,
+      latestSnapshot,
+      generatedAt,
+    })
+    const w = window.open('', '_blank', 'width=900,height=700')
+    if (!w) return
+    w.document.write(html)
+    w.document.close()
+    setTimeout(() => w.print(), 400)
+  }
+
   return (
     <div>
-      {/* Header — same structure as standard monitor detail page */}
+      {/* Header */}
       <div className="monitor-header-v2">
         <div className="monitor-header-v2-left">
           <div className="monitor-header-v2-title-row">
             <h1 className="monitor-header-v2-name">{monitor.name}</h1>
-            <MonitorStatusBadge status={monitor.status} monitorType={monitor.type} />
+            <WpAgentStatusBadge lastPushAt={wpMonitor.last_push_at} intervalMinutes={wpMonitor.check_interval_minutes} />
             <span className="monitor-type-badge">wordpress</span>
           </div>
           <div className="monitor-target-row">
@@ -98,15 +297,26 @@ export function WpReportClient({ monitor, wpMonitor, findings, latestSnapshot, h
           </div>
         </div>
         <div className="monitor-header-v2-right">
-          <button type="button" onClick={handleGenerateAiReport} className="btn btn-sm btn-outline">
-            AI Report
+          <button
+            type="button"
+            onClick={handleGenerateAiReport}
+            className="btn btn-sm btn-outline"
+            disabled={aiRateLimited}
+            title={aiRateLimited && aiAvailableAt ? `Next AI report: ${aiAvailableAt.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}` : undefined}
+          >
+            {aiRateLimited && aiAvailableAt
+              ? `AI Report (from ${aiAvailableAt.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })})`
+              : 'AI Report'}
+          </button>
+          <button type="button" onClick={handleDownload} className="btn btn-sm btn-outline">
+            ↓ Download
           </button>
           <Link href={`/dashboard/monitors/${monitor.id}/edit`} className="btn btn-sm btn-secondary">Edit</Link>
           <MonitorActions monitorId={monitor.id} isPaused={monitor.is_paused} />
         </div>
       </div>
 
-      {/* Stat cards — same grid as standard monitor page */}
+      {/* Stat cards */}
       <div className="monitor-stat-grid">
         <div className={`monitor-stat-card ${score >= 70 ? 'card-up' : 'card-warn'}`}>
           <div className={`monitor-stat-icon ${score >= 70 ? 'icon-up' : 'icon-warn'}`}>
@@ -155,7 +365,7 @@ export function WpReportClient({ monitor, wpMonitor, findings, latestSnapshot, h
         </div>
       </div>
 
-      {/* Config + top findings — same 2-column grid as standard monitor page */}
+      {/* Config + top findings */}
       <div className="grid-2" style={{ marginBottom: 24 }}>
         <div className="card">
           <div className="card-header">
@@ -233,13 +443,7 @@ export function WpReportClient({ monitor, wpMonitor, findings, latestSnapshot, h
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
               {openFindings.map((finding, i) => (
-                <div
-                  key={finding.id}
-                  style={{
-                    borderTop: i === 0 ? 'none' : '1px solid var(--border-primary)',
-                    padding: '0',
-                  }}
-                >
+                <div key={finding.id} style={{ borderTop: i === 0 ? 'none' : '1px solid var(--border-primary)', padding: '0' }}>
                   <div
                     style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 20px', cursor: 'pointer' }}
                     onClick={() => setExpandedFinding(expandedFinding === finding.id ? null : finding.id)}
@@ -281,7 +485,40 @@ export function WpReportClient({ monitor, wpMonitor, findings, latestSnapshot, h
         </div>
       )}
 
-      {/* Snapshot history */}
+      {/* Health trend chart */}
+      {history.length >= 2 && (
+        <div style={{ marginBottom: 24 }}>
+          <div className="card">
+            <div className="card-header">
+              <div className="card-title">Health Score Trend</div>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>Last {Math.min(history.length, 12)} pushes</div>
+            </div>
+            <div style={{ padding: '16px 20px 8px' }}>
+              <HealthTrendChart history={history} />
+              <div style={{ display: 'flex', gap: 16, marginTop: 10, fontSize: 11, color: 'var(--text-muted)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <span style={{ width: 10, height: 10, background: 'var(--color-up)', borderRadius: 2, display: 'inline-block' }} />
+                  Good (70+)
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <span style={{ width: 10, height: 10, background: '#eab308', borderRadius: 2, display: 'inline-block' }} />
+                  Fair (50–69)
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <span style={{ width: 10, height: 10, background: 'var(--color-down)', borderRadius: 2, display: 'inline-block' }} />
+                  Poor (&lt;50)
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <span style={{ width: 16, height: 1, background: 'var(--border-primary)', borderTop: '1px dashed', display: 'inline-block' }} />
+                  70 threshold
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Push history */}
       {history.length > 0 && (
         <div style={{ marginBottom: 24 }}>
           <div className="card">
@@ -314,11 +551,6 @@ export function WpReportClient({ monitor, wpMonitor, findings, latestSnapshot, h
         </div>
       )}
 
-      {/* Badge embed */}
-      <div style={{ marginBottom: 24 }}>
-        <BadgeEmbed monitorId={monitor.id} />
-      </div>
-
       {/* AI Report modal */}
       {aiReportOpen && (
         <div style={{
@@ -330,7 +562,9 @@ export function WpReportClient({ monitor, wpMonitor, findings, latestSnapshot, h
               <h2 style={{ fontSize: 18, fontWeight: 700 }}>AI Security Report</h2>
               <button type="button" onClick={() => setAiReportOpen(false)} className="btn btn-ghost" style={{ fontSize: 18, padding: '4px 10px' }}>×</button>
             </div>
-            {aiLoading ? (
+            {aiRateMsg ? (
+              <div className="form-error">{aiRateMsg}</div>
+            ) : aiLoading ? (
               <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--text-secondary)' }}>
                 Analysing your WordPress site…
               </div>
@@ -338,6 +572,11 @@ export function WpReportClient({ monitor, wpMonitor, findings, latestSnapshot, h
               <div style={{ fontSize: 14, lineHeight: 1.7, whiteSpace: 'pre-wrap', color: 'var(--text-primary)' }}>
                 {aiReport}
               </div>
+            )}
+            {lastAiReportAt && (
+              <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 16 }}>
+                Reports are generated once per week. Next available: {new Date(new Date(lastAiReportAt).getTime() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+              </p>
             )}
           </div>
         </div>

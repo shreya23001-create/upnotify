@@ -25,6 +25,7 @@ import { check as checkBlacklist } from '@/lib/checkers/blacklist'
 import { check as checkPageSize } from '@/lib/checkers/page-size'
 import { check as checkCookieConsent } from '@/lib/checkers/cookie-consent'
 import { check as checkNameserverChange } from '@/lib/checkers/nameserver-change'
+import { check as checkWordpress } from '@/lib/checkers/wordpress'
 
 const checkerMap: Record<string, (monitor: Monitor) => Promise<CheckerResult>> = {
   http: checkHttp,
@@ -50,6 +51,7 @@ const checkerMap: Record<string, (monitor: Monitor) => Promise<CheckerResult>> =
   'page-size': checkPageSize,
   'cookie-consent': checkCookieConsent,
   'nameserver-change': checkNameserverChange,
+  wordpress: checkWordpress,
 }
 
 export async function dispatchChecker(monitor: Monitor): Promise<CheckerResult> {

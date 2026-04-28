@@ -16,8 +16,11 @@ define( 'UPTRUE_VERSION',      '1.0.0' );
 define( 'UPTRUE_PLUGIN_FILE',  __FILE__ );
 
 function uptrue_api_base() {
-    $custom = get_option( 'uptrue_api_base', '' );
-    return rtrim( $custom ?: 'https://uptrue.io/api/v1/wp-agent', '/' );
+    // Override via wp-config.php: define( 'UPTRUE_API_BASE_URL', 'https://dev.uptrue.io/api/v1/wp-agent' );
+    if ( defined( 'UPTRUE_API_BASE_URL' ) ) {
+        return rtrim( UPTRUE_API_BASE_URL, '/' );
+    }
+    return 'https://uptrue.io/api/v1/wp-agent';
 }
 define( 'UPTRUE_OPT_TOKEN',    'uptrue_api_token' );
 define( 'UPTRUE_OPT_INTERVAL', 'uptrue_check_interval' );
@@ -602,7 +605,6 @@ function uptrue_page_settings() {
 
     if ( isset( $_POST['uptrue_save'] ) && check_admin_referer( 'uptrue_save_settings' ) ) {
         $token    = sanitize_text_field( wp_unslash( $_POST['uptrue_token'] ?? '' ) );
-        $api_base = esc_url_raw( wp_unslash( $_POST['uptrue_api_base'] ?? '' ) );
         $interval = (int) ( $_POST['uptrue_interval'] ?? 120 );
         if ( ! in_array( $interval, array( 60, 120, 180, 240, 1440, 10080, 43200 ), true ) ) $interval = 120;
 
@@ -618,11 +620,6 @@ function uptrue_page_settings() {
         update_option( UPTRUE_OPT_TOKEN,    $token );
         update_option( UPTRUE_OPT_INTERVAL, $interval );
         update_option( UPTRUE_OPT_SETTINGS, $settings );
-        if ( $api_base ) {
-            update_option( 'uptrue_api_base', $api_base );
-        } else {
-            delete_option( 'uptrue_api_base' );
-        }
 
         uptrue_unschedule_crons();
         uptrue_schedule_crons();
@@ -641,7 +638,6 @@ function uptrue_page_settings() {
     $settings = get_option( UPTRUE_OPT_SETTINGS, array() );
     $self_test= get_option( 'uptrue_self_test_ok', null );
     $last_err = get_option( UPTRUE_OPT_LAST_ERR, null );
-    $api_base_saved = get_option( 'uptrue_api_base', '' );
     ?>
     <div class="wrap">
         <h1>Uptrue — Settings</h1>
@@ -675,21 +671,9 @@ function uptrue_page_settings() {
                         </p>
                         <?php if ( $token && null !== $self_test ) : ?>
                         <p style="color:<?php echo $self_test ? '#10b981' : '#ef4444'; ?>;font-weight:600;margin-top:6px">
-                            <?php echo $self_test ? '✅ Connection test passed' : '❌ Connection test failed — verify the Uptrue App URL below and that your server can reach it'; ?>
+                            <?php echo $self_test ? '✅ Connection test passed' : '❌ Connection test failed — verify your token and that your server can reach uptrue.io'; ?>
                         </p>
                         <?php endif; ?>
-                    </td>
-                </tr>
-                <tr>
-                    <th><label for="uptrue_api_base">Uptrue App URL</label></th>
-                    <td>
-                        <input type="url" id="uptrue_api_base" name="uptrue_api_base"
-                               value="<?php echo esc_attr( $api_base_saved ); ?>"
-                               class="regular-text" placeholder="https://uptrue.io/api/v1/wp-agent" />
-                        <p class="description">
-                            Leave blank to use the default <code>https://uptrue.io/api/v1/wp-agent</code>.<br>
-                            Override this if your Uptrue instance is on a different URL (e.g. a Vercel preview during development).
-                        </p>
                     </td>
                 </tr>
                 <tr>
