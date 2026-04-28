@@ -66,9 +66,70 @@ Code only. The `uptrue-io/uptrue-app` repository. Dev team only.
 - Feature branches only — never commit to `master` or `dev` directly
 - Always merge to `dev` first, test, then `master` for production
 
+## PRODUCT USP — MONITORING SUITE
+
+Uptrue is a **Monitoring Suite** — not a single-purpose uptime tool. No competitor offers this combination:
+
+| Feature | What it does |
+|---|---|
+| **23-type Monitor Engine** | HTTP, SSL, DNS, port, keyword, API, blacklist, DMARC, headers, sitemaps, redirects, cookie consent + more |
+| **AI Checker** | Claude-powered analysis of monitor results — plain-English health summaries, root cause hints |
+| **LLM.xml / llms.txt Writer** | Auto-generates LLM-readable sitemaps so search AI engines can index client sites correctly |
+| **AI Engine Citation Checker** | Queries ChatGPT, Gemini, Perplexity, Claude, Mistral, Cohere — checks whether each LLM cites the user's site for their target keywords |
+
+**Always frame Uptrue as a suite.** Never describe it as just "uptime monitoring."
+
+**V1 scope reminder — do NOT reference these in any V1 marketing, copy, or features:**
+- Agency multi-client dashboard — Phase 2
+- Stripe Connect / agency revenue split — Phase 2
+- White-label — Phase 2
+- Multi-workspace — Phase 2
+
+---
+
+## PRODUCTION READINESS CHECKLIST
+
+Before go-live, every item below must be confirmed set in Vercel production env vars:
+
+### Core
+- [ ] `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY` + `SUPABASE_SERVICE_ROLE_KEY`
+- [ ] `NEXT_PUBLIC_APP_URL=https://uptrue.io`
+- [ ] `ADMIN_EMAILS` + `ADMIN_REPORT_EMAIL`
+- [ ] `CRON_SECRET`
+
+### AI & LLM Engine Citation Checker
+- [ ] `ANTHROPIC_API_KEY` — Claude API (AI reports, AI checker, LLM.xml writer)
+- [ ] `OPENAI_API_KEY` — ChatGPT citation checks
+- [ ] `GEMINI_API_KEY` — Google Gemini citation checks
+- [ ] `PERPLEXITY_API_KEY` — Perplexity citation checks
+- [ ] `MISTRAL_API_KEY` — Mistral citation checks
+- [ ] `COHERE_API_KEY` — Cohere citation checks
+- [ ] `AI_ENGINE_ENCRYPTION_SECRET` — AES-256 key for encrypting user engine keys in DB
+
+### Billing
+- [ ] `STRIPE_SECRET_KEY` (live key, not test)
+- [ ] `STRIPE_WEBHOOK_SECRET`
+- [ ] `RAZORPAY_KEY_ID` + `RAZORPAY_KEY_SECRET` + `RAZORPAY_WEBHOOK_SECRET`
+
+### Email & Alerts
+- [ ] `RESEND_API_KEY` + `RESEND_FROM_EMAIL` + `RESEND_FROM_NAME`
+- [ ] `RESEND_WEBHOOK_SECRET`
+- [ ] `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHAT_ID`
+
+### Social & Blog
+- [ ] `X_CONSUMER_KEY/SECRET` + `X_ACCESS_TOKEN/SECRET` + `X_BEARER_TOKEN`
+- [ ] `LINKEDIN_ACCESS_TOKEN` + `LINKEDIN_MEMBER_ID` + `LINKEDIN_ORGANIZATION_ID`
+- [ ] `BLOG_APPROVAL_SECRET`
+
+### Analytics (production only)
+- [ ] `NEXT_PUBLIC_GA_MEASUREMENT_ID`
+- [ ] `NEXT_PUBLIC_GTM_ID`
+
+---
+
 ## TECH STACK
 
-Next.js 16.2.1 · TypeScript · Supabase · Vercel Pro · Plain CSS · Stripe · Razorpay · Claude API · Resend
+Next.js 16.2.1 · TypeScript · Supabase · Vercel Pro · Plain CSS · Stripe · Razorpay · Claude API · OpenAI · Gemini · Perplexity · Mistral · Cohere · Resend
 
 ## NEXT.JS 16 WARNING
 
