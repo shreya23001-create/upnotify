@@ -209,6 +209,32 @@ export function ScanClient({
               </div>
             ))}
           </div>
+
+          {/* WordPress Monitor — special agent-based monitor */}
+          <div style={{ marginTop: 28, textAlign: 'left' }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 10 }}>Agent-Based Monitors</div>
+            <a
+              href="/dashboard/monitors/new/wordpress"
+              style={{ textDecoration: 'none' }}
+            >
+              <div className="card" style={{
+                padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 16,
+                border: '1.5px solid #667eea40', background: 'linear-gradient(135deg, #667eea08, #764ba208)',
+                cursor: 'pointer', transition: 'border-color 0.15s',
+              }}>
+                <div style={{ fontSize: 28, flexShrink: 0 }}>🔌</div>
+                <div style={{ flex: 1, textAlign: 'left' }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 3 }}>Uptrue WordPress Monitor</div>
+                  <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                    Install a lightweight plugin on your WordPress site. Monitors file injections, outdated plugins, unknown admin users, suspicious pages, and more — from inside your site.
+                  </div>
+                </div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: '#667eea', background: '#667eea15', padding: '4px 10px', borderRadius: 20, flexShrink: 0 }}>
+                  Set up →
+                </div>
+              </div>
+            </a>
+          </div>
         </div>
       )}
 
@@ -375,6 +401,8 @@ export function ScanClient({
           <div style={{ marginTop: 20, padding: '12px 16px', borderRadius: 10, border: '1px solid var(--border-primary)', fontSize: 13, color: 'var(--text-secondary)' }}>
             ⚙️ <strong style={{ color: 'var(--text-primary)' }}>Need more?</strong> Keyword, API Endpoint, Heartbeat, Port Check require manual setup.{' '}
             <a href="/dashboard/monitors/new/manual" style={{ color: 'var(--accent)', textDecoration: 'underline' }}>Add individually →</a>
+            {' · '}
+            <a href="/dashboard/monitors/new/wordpress" style={{ color: '#667eea', textDecoration: 'underline' }}>🔌 WordPress Monitor →</a>
           </div>
         </div>
       )}

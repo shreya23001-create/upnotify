@@ -32,3 +32,29 @@ export async function setMonitorLimitOverrideAction(
   revalidatePath('/admin/user360')
   return {}
 }
+
+export async function setWpMonitorLimitOverrideAction(
+  orgId: string,
+  override: number | null
+): Promise<{ error?: string }> {
+  const user = await getCurrentUser()
+  if (!user) return { error: 'Not authenticated' }
+  if (!await canAccessAdminModule(user.email, !!user.is_super_admin, 'user360')) {
+    return { error: 'Forbidden' }
+  }
+
+  const supabase = createAdminClient()
+  const { error } = await supabase
+    .from('organisations')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .update({ wp_monitor_limit_override: override } as any)
+    .eq('id', orgId)
+
+  if (error) return { error: error.message }
+
+  logger.info('Admin set WP monitor limit override', { orgId, override, adminEmail: user.email })
+  await writeAuditLog({ orgId: 'system', userId: user.id, action: 'admin.wp_monitor_limit_override', resourceType: 'organisation', resourceId: orgId, metadata: { override, adminEmail: user.email } })
+
+  revalidatePath('/admin/user360')
+  return {}
+}

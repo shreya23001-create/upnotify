@@ -1,0 +1,766 @@
+<?php
+/**
+ * Plugin Name: Uptrue WordPress Monitor
+ * Plugin URI:  https://uptrue.io/wordpress-monitor
+ * Description: Connect your WordPress site to Uptrue for real-time security monitoring, health alerts, and AI-powered fix suggestions. Works standalone with a free monthly email report — no Uptrue account required.
+ * Version:     1.0.0
+ * Author:      Uptrue
+ * Author URI:  https://uptrue.io
+ * License:     GPL v2 or later
+ * Text Domain: uptrue-monitor
+ */
+
+if ( ! defined( 'ABSPATH' ) ) exit;
+
+define( 'UPTRUE_VERSION',      '1.0.0' );
+define( 'UPTRUE_API_BASE',     'https://uptrue.io/api/v1/wp-agent' );
+define( 'UPTRUE_PLUGIN_FILE',  __FILE__ );
+define( 'UPTRUE_OPT_TOKEN',    'uptrue_api_token' );
+define( 'UPTRUE_OPT_INTERVAL', 'uptrue_check_interval' );
+define( 'UPTRUE_OPT_LAST_PUSH','uptrue_last_push' );
+define( 'UPTRUE_OPT_LAST_ERR', 'uptrue_last_error' );
+define( 'UPTRUE_OPT_SETTINGS', 'uptrue_settings' );
+define( 'UPTRUE_CRON_MAIN',    'uptrue_main_push' );
+define( 'UPTRUE_CRON_PHP',     'uptrue_scan_php' );
+define( 'UPTRUE_CRON_JS',      'uptrue_scan_js' );
+define( 'UPTRUE_CRON_CORE',    'uptrue_scan_core' );
+define( 'UPTRUE_CRON_HTACCESS','uptrue_scan_htaccess' );
+define( 'UPTRUE_CRON_EXEC',    'uptrue_scan_exec' );
+define( 'UPTRUE_CRON_THEME',   'uptrue_scan_theme' );
+define( 'UPTRUE_CRON_REPORT',  'uptrue_monthly_report' );
+
+// ============================================================
+// ACTIVATION / DEACTIVATION
+// ============================================================
+
+register_activation_hook( UPTRUE_PLUGIN_FILE, 'uptrue_activate' );
+register_deactivation_hook( UPTRUE_PLUGIN_FILE, 'uptrue_deactivate' );
+
+function uptrue_activate() {
+    add_filter( 'cron_schedules', 'uptrue_add_cron_intervals' );
+    uptrue_schedule_crons();
+    uptrue_self_test();
+}
+
+function uptrue_deactivate() {
+    uptrue_unschedule_crons();
+    $token = get_option( UPTRUE_OPT_TOKEN, '' );
+    if ( $token ) {
+        uptrue_api_post( '/event', array( 'event' => 'plugin_deactivated' ), $token );
+    }
+}
+
+// ============================================================
+// CRON INTERVALS & SCHEDULING
+// ============================================================
+
+add_filter( 'cron_schedules', 'uptrue_add_cron_intervals' );
+
+function uptrue_add_cron_intervals( $schedules ) {
+    foreach ( array( 60, 120, 180, 240 ) as $mins ) {
+        $schedules[ 'uptrue_' . $mins . 'min' ] = array(
+            'interval' => $mins * 60,
+            'display'  => sprintf( 'Every %d minutes (Uptrue)', $mins ),
+        );
+    }
+    $schedules['uptrue_daily']   = array( 'interval' => DAY_IN_SECONDS,   'display' => 'Daily (Uptrue)' );
+    $schedules['uptrue_weekly']  = array( 'interval' => WEEK_IN_SECONDS,   'display' => 'Weekly (Uptrue)' );
+    $schedules['uptrue_monthly'] = array( 'interval' => 30 * DAY_IN_SECONDS, 'display' => 'Monthly (Uptrue)' );
+    return $schedules;
+}
+
+function uptrue_get_interval_schedule() {
+    $mins = (int) get_option( UPTRUE_OPT_INTERVAL, 120 );
+    $allowed = array( 60, 120, 180, 240 );
+    if ( ! in_array( $mins, $allowed, true ) ) {
+        return 'uptrue_daily';
+    }
+    return 'uptrue_' . $mins . 'min';
+}
+
+function uptrue_schedule_crons() {
+    // Main push — uses configured interval
+    if ( ! wp_next_scheduled( UPTRUE_CRON_MAIN ) ) {
+        wp_schedule_event( time(), uptrue_get_interval_schedule(), UPTRUE_CRON_MAIN );
+    }
+
+    // Staggered security scans — daily, offset by activation hour to distribute server load
+    $base = time();
+    $scan_jobs = array(
+        UPTRUE_CRON_PHP      => 0,
+        UPTRUE_CRON_JS       => HOUR_IN_SECONDS,
+        UPTRUE_CRON_CORE     => 2 * HOUR_IN_SECONDS,
+        UPTRUE_CRON_HTACCESS => 3 * HOUR_IN_SECONDS,
+        UPTRUE_CRON_EXEC     => 4 * HOUR_IN_SECONDS,
+        UPTRUE_CRON_THEME    => 5 * HOUR_IN_SECONDS,
+    );
+    foreach ( $scan_jobs as $hook => $offset ) {
+        if ( ! wp_next_scheduled( $hook ) ) {
+            wp_schedule_event( $base + $offset, 'uptrue_daily', $hook );
+        }
+    }
+
+    // Monthly free report (also fires when connected — Uptrue account not required)
+    if ( ! wp_next_scheduled( UPTRUE_CRON_REPORT ) ) {
+        wp_schedule_event( time(), 'uptrue_monthly', UPTRUE_CRON_REPORT );
+    }
+}
+
+function uptrue_unschedule_crons() {
+    $hooks = array(
+        UPTRUE_CRON_MAIN, UPTRUE_CRON_PHP, UPTRUE_CRON_JS, UPTRUE_CRON_CORE,
+        UPTRUE_CRON_HTACCESS, UPTRUE_CRON_EXEC, UPTRUE_CRON_THEME, UPTRUE_CRON_REPORT,
+    );
+    foreach ( $hooks as $hook ) {
+        $ts = wp_next_scheduled( $hook );
+        if ( $ts ) wp_unschedule_event( $ts, $hook );
+    }
+}
+
+// ============================================================
+// CRON HANDLERS
+// ============================================================
+
+add_action( UPTRUE_CRON_MAIN,    'uptrue_do_main_push' );
+add_action( UPTRUE_CRON_PHP,     'uptrue_scan_php_files' );
+add_action( UPTRUE_CRON_JS,      'uptrue_scan_js_files' );
+add_action( UPTRUE_CRON_CORE,    'uptrue_scan_core_files' );
+add_action( UPTRUE_CRON_HTACCESS,'uptrue_scan_htaccess_files' );
+add_action( UPTRUE_CRON_EXEC,    'uptrue_scan_exec_files' );
+add_action( UPTRUE_CRON_THEME,   'uptrue_scan_theme_files' );
+add_action( UPTRUE_CRON_REPORT,  'uptrue_send_monthly_report' );
+
+function uptrue_do_main_push() {
+    $token = get_option( UPTRUE_OPT_TOKEN, '' );
+    if ( ! $token ) return;
+
+    $payload = uptrue_collect_data();
+    $ok = uptrue_push_data( $token, $payload );
+    if ( $ok ) {
+        update_option( UPTRUE_OPT_LAST_PUSH, current_time( 'mysql' ) );
+        delete_option( UPTRUE_OPT_LAST_ERR );
+    }
+}
+
+// ============================================================
+// DATA COLLECTION
+// ============================================================
+
+function uptrue_collect_data() {
+    global $wpdb;
+
+    // Active plugins
+    $all_plugins          = get_plugins();
+    $active_slugs         = get_option( 'active_plugins', array() );
+    $plugin_updates       = get_site_transient( 'update_plugins' );
+    $active_plugins       = array();
+    $inactive_plugins     = array();
+
+    foreach ( $all_plugins as $file => $data ) {
+        $is_active   = in_array( $file, $active_slugs, true );
+        $has_update  = isset( $plugin_updates->response[ $file ] );
+        $entry = array(
+            'name'             => $data['Name'],
+            'slug'             => dirname( $file ),
+            'version'          => $data['Version'],
+            'update_available' => $has_update,
+            'new_version'      => $has_update ? $plugin_updates->response[ $file ]->new_version : null,
+        );
+        if ( $is_active ) {
+            $active_plugins[] = $entry;
+        } else {
+            $inactive_plugins[] = array( 'name' => $data['Name'], 'slug' => dirname( $file ), 'version' => $data['Version'] );
+        }
+    }
+
+    // Active theme
+    $theme        = wp_get_theme();
+    $theme_upd    = get_site_transient( 'update_themes' );
+    $theme_slug   = $theme->get_stylesheet();
+    $active_theme = array(
+        'name'             => $theme->get( 'Name' ),
+        'version'          => $theme->get( 'Version' ),
+        'update_available' => isset( $theme_upd->response[ $theme_slug ] ),
+    );
+
+    // Admin + editor users
+    $admin_users = array();
+    foreach ( get_users( array( 'role__in' => array( 'administrator', 'editor' ), 'number' => 100 ) ) as $u ) {
+        $admin_users[] = array(
+            'id'         => $u->ID,
+            'login'      => $u->user_login,
+            'email'      => $u->user_email,
+            'roles'      => array_values( $u->roles ),
+            'registered' => $u->user_registered,
+        );
+    }
+
+    // Pages/posts created in last 7 days
+    $recent_pages = array();
+    foreach ( get_posts( array( 'post_status' => 'publish', 'post_type' => array( 'post', 'page' ), 'date_query' => array( array( 'after' => '1 week ago' ) ), 'numberposts' => 100 ) ) as $post ) {
+        $recent_pages[] = array(
+            'id'         => $post->ID,
+            'title'      => $post->post_title,
+            'slug'       => $post->post_name,
+            'status'     => $post->post_status,
+            'author_id'  => (int) $post->post_author,
+            'created_at' => $post->post_date_gmt,
+            'language'   => uptrue_detect_language( $post->post_title ),
+        );
+    }
+
+    // File scan results cached from staggered crons
+    $file_scan = get_option( 'uptrue_file_scan_cache', array(
+        'php_in_uploads'       => array(),
+        'js_in_uploads'        => array(),
+        'htaccess_modified'    => false,
+        'wpconfig_modified'    => false,
+        'suspicious_files'     => array(),
+        'core_files_modified'  => array(),
+        'theme_files_modified' => array(),
+    ) );
+
+    // DB size
+    $db_size = (float) $wpdb->get_var(
+        $wpdb->prepare( "SELECT SUM(data_length + index_length) / 1024 / 1024 FROM information_schema.tables WHERE table_schema = %s", DB_NAME )
+    );
+
+    return array(
+        'site_url'         => get_bloginfo( 'url' ),
+        'wp_version'       => get_bloginfo( 'version' ),
+        'php_version'      => PHP_VERSION,
+        'active_plugins'   => $active_plugins,
+        'inactive_plugins' => $inactive_plugins,
+        'active_theme'     => $active_theme,
+        'admin_users'      => $admin_users,
+        'recent_pages'     => $recent_pages,
+        'file_scan'        => $file_scan,
+        'debug_mode'       => defined( 'WP_DEBUG' ) && WP_DEBUG,
+        'memory_limit'     => defined( 'WP_MEMORY_LIMIT' ) ? WP_MEMORY_LIMIT : ini_get( 'memory_limit' ),
+        'db_size_mb'       => round( $db_size, 2 ),
+        'cron_last_run'    => get_option( UPTRUE_OPT_LAST_PUSH, null ),
+    );
+}
+
+// ============================================================
+// LANGUAGE DETECTION (Unicode block check — no library needed)
+// ============================================================
+
+function uptrue_detect_language( $text ) {
+    if ( preg_match( '/[\x{0400}-\x{04FF}]/u', $text ) )                            return 'ru';
+    if ( preg_match( '/[\x{4E00}-\x{9FFF}]/u', $text ) )                            return 'zh';
+    if ( preg_match( '/[\x{0600}-\x{06FF}]/u', $text ) )                            return 'ar';
+    if ( preg_match( '/[\x{0900}-\x{097F}]/u', $text ) )                            return 'hi';
+    if ( preg_match( '/[\x{0E00}-\x{0E7F}]/u', $text ) )                            return 'th';
+    if ( preg_match( '/[\x{3040}-\x{309F}\x{30A0}-\x{30FF}]/u', $text ) )           return 'ja';
+    return 'en';
+}
+
+// ============================================================
+// STAGGERED FILE SCANS
+// ============================================================
+
+function uptrue_scan_php_files() {
+    $dir   = wp_upload_dir();
+    $found = uptrue_scan_dir_for_extensions( $dir['basedir'], array( 'php', 'php5', 'php7', 'phtml' ) );
+    uptrue_update_scan_cache( 'php_in_uploads', $found );
+}
+
+function uptrue_scan_js_files() {
+    $dir   = wp_upload_dir();
+    $found = uptrue_scan_dir_for_extensions( $dir['basedir'], array( 'js' ) );
+    uptrue_update_scan_cache( 'js_in_uploads', $found );
+}
+
+function uptrue_scan_exec_files() {
+    $dir   = wp_upload_dir();
+    $found = uptrue_scan_dir_for_extensions( $dir['basedir'], array( 'sh', 'exe', 'bat', 'py', 'pl', 'cgi', 'cmd' ) );
+    uptrue_update_scan_cache( 'suspicious_files', $found );
+}
+
+function uptrue_scan_htaccess_files() {
+    $baseline = get_option( 'uptrue_file_baseline', array() );
+    $cache    = get_option( 'uptrue_file_scan_cache', array() );
+
+    foreach ( array( '.htaccess' => 'htaccess_modified', 'wp-config.php' => 'wpconfig_modified' ) as $file => $key ) {
+        $path = ABSPATH . $file;
+        if ( ! file_exists( $path ) ) continue;
+        $mtime = filemtime( $path );
+        if ( ! isset( $baseline[ $file ] ) ) {
+            $baseline[ $file ] = $mtime;
+        }
+        $cache[ $key ] = $mtime > $baseline[ $file ];
+    }
+
+    update_option( 'uptrue_file_baseline', $baseline );
+    update_option( 'uptrue_file_scan_cache', $cache );
+}
+
+function uptrue_scan_core_files() {
+    $core_files = array( 'wp-login.php', 'wp-settings.php', 'wp-admin/admin.php', 'wp-includes/functions.php' );
+    $baseline   = get_option( 'uptrue_core_baseline', array() );
+    $modified   = array();
+
+    foreach ( $core_files as $rel ) {
+        $path = ABSPATH . $rel;
+        if ( ! file_exists( $path ) ) continue;
+        $mtime = filemtime( $path );
+        if ( ! isset( $baseline[ $rel ] ) ) {
+            $baseline[ $rel ] = $mtime;
+        } elseif ( $mtime > $baseline[ $rel ] ) {
+            $modified[] = $rel;
+        }
+    }
+
+    update_option( 'uptrue_core_baseline', $baseline );
+    uptrue_update_scan_cache( 'core_files_modified', $modified );
+}
+
+function uptrue_scan_theme_files() {
+    $theme    = wp_get_theme();
+    $dir      = $theme->get_stylesheet_directory();
+    $baseline = get_option( 'uptrue_theme_baseline', array() );
+    $modified = array();
+
+    $functions = $dir . '/functions.php';
+    if ( file_exists( $functions ) ) {
+        $mtime = filemtime( $functions );
+        if ( ! isset( $baseline['functions.php'] ) ) {
+            $baseline['functions.php'] = $mtime;
+        } elseif ( $mtime > $baseline['functions.php'] ) {
+            $modified[] = 'functions.php';
+        }
+    }
+
+    update_option( 'uptrue_theme_baseline', $baseline );
+    uptrue_update_scan_cache( 'theme_files_modified', $modified );
+}
+
+function uptrue_scan_dir_for_extensions( $dir, $extensions ) {
+    $found = array();
+    if ( ! is_dir( $dir ) ) return $found;
+    try {
+        $it = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $dir, RecursiveDirectoryIterator::SKIP_DOTS ) );
+        foreach ( $it as $file ) {
+            if ( in_array( strtolower( $file->getExtension() ), $extensions, true ) ) {
+                $found[] = str_replace( ABSPATH, '', $file->getPathname() );
+            }
+        }
+    } catch ( Exception $e ) { /* skip unreadable dirs */ }
+    return $found;
+}
+
+function uptrue_update_scan_cache( $key, $value ) {
+    $cache         = get_option( 'uptrue_file_scan_cache', array() );
+    $cache[ $key ] = $value;
+    update_option( 'uptrue_file_scan_cache', $cache );
+}
+
+// ============================================================
+// PUSH TO UPTRUE API
+// ============================================================
+
+function uptrue_push_data( $token, $payload ) {
+    $response = uptrue_api_post( '/push', $payload, $token );
+    if ( is_wp_error( $response ) ) {
+        update_option( UPTRUE_OPT_LAST_ERR, $response->get_error_message() );
+        return false;
+    }
+    $code = wp_remote_retrieve_response_code( $response );
+    if ( 200 !== $code ) {
+        update_option( UPTRUE_OPT_LAST_ERR, 'API returned HTTP ' . $code );
+        return false;
+    }
+    return true;
+}
+
+function uptrue_api_post( $endpoint, $body, $token ) {
+    return wp_remote_post( UPTRUE_API_BASE . $endpoint, array(
+        'headers' => array(
+            'Content-Type'     => 'application/json',
+            'Authorization'    => 'Bearer ' . $token,
+            'X-Uptrue-Version' => UPTRUE_VERSION,
+            'User-Agent'       => 'Uptrue-WP-Monitor/' . UPTRUE_VERSION,
+        ),
+        'body'    => wp_json_encode( $body ),
+        'timeout' => 20,
+    ) );
+}
+
+// ============================================================
+// SELF TEST ON ACTIVATION
+// ============================================================
+
+function uptrue_self_test() {
+    $response = wp_remote_get( UPTRUE_API_BASE . '/ping', array(
+        'timeout'    => 10,
+        'user-agent' => 'Uptrue-WP-Monitor/' . UPTRUE_VERSION,
+    ) );
+    $ok = ! is_wp_error( $response ) && 200 === wp_remote_retrieve_response_code( $response );
+    update_option( 'uptrue_self_test_ok', $ok );
+    update_option( 'uptrue_self_test_at', current_time( 'mysql' ) );
+}
+
+// ============================================================
+// FREE MONTHLY EMAIL REPORT (no Uptrue account required)
+// ============================================================
+
+function uptrue_send_monthly_report() {
+    $settings = get_option( UPTRUE_OPT_SETTINGS, array() );
+    if ( isset( $settings['monthly_report'] ) && ! $settings['monthly_report'] ) return;
+
+    $data    = uptrue_collect_data();
+    $issues  = array();
+    $score   = 100;
+
+    $outdated = array_filter( $data['active_plugins'], function( $p ) { return $p['update_available']; } );
+    if ( count( $outdated ) > 0 ) {
+        $issues[] = '⚠️  ' . count( $outdated ) . ' plugin(s) need updating: ' . implode( ', ', array_column( $outdated, 'name' ) );
+        $score   -= count( $outdated ) * 3;
+    }
+
+    if ( ! empty( $data['active_theme']['update_available'] ) ) {
+        $issues[] = '⚠️  Active theme has an update available: ' . $data['active_theme']['name'];
+        $score   -= 5;
+    }
+
+    if ( ! empty( $data['file_scan']['php_in_uploads'] ) ) {
+        $issues[] = '🚨 PHP files found in /uploads/ — possible security threat: ' . implode( ', ', $data['file_scan']['php_in_uploads'] );
+        $score   -= 30;
+    }
+
+    if ( ! empty( $data['debug_mode'] ) ) {
+        $issues[] = '⚠️  WP_DEBUG is ON — this should be disabled in production.';
+        $score   -= 10;
+    }
+
+    $score       = max( 0, $score );
+    $score_label = $score >= 90 ? 'Excellent' : ( $score >= 70 ? 'Good' : ( $score >= 50 ? 'Fair' : 'Poor' ) );
+    $site_name   = get_bloginfo( 'name' );
+    $site_url    = get_bloginfo( 'url' );
+    $to          = get_option( 'admin_email' );
+    $subject     = "[Uptrue] Monthly WordPress health report for {$site_name}";
+
+    $body  = "Monthly WordPress Health Report\n";
+    $body .= str_repeat( '=', 44 ) . "\n\n";
+    $body .= "Site:         {$site_url}\n";
+    $body .= "Health Score: {$score}/100 ({$score_label})\n";
+    $body .= "Report Date:  " . date( 'd M Y' ) . "\n\n";
+
+    if ( empty( $issues ) ) {
+        $body .= "✅  No issues found. Your site looks healthy!\n\n";
+    } else {
+        $body .= "Issues Found\n" . str_repeat( '-', 44 ) . "\n";
+        foreach ( $issues as $issue ) {
+            $body .= "  {$issue}\n";
+        }
+        $body .= "\n";
+    }
+
+    $body .= str_repeat( '-', 44 ) . "\n";
+    $body .= "Connect to Uptrue for real-time alerts, AI-powered fix suggestions, and full historical reports.\n";
+    $body .= "Free to start: https://uptrue.io/wordpress-monitor\n";
+
+    wp_mail( $to, $subject, $body );
+}
+
+// ============================================================
+// REST API — handshake endpoint for setup wizard
+// ============================================================
+
+add_action( 'rest_api_init', function () {
+    register_rest_route( 'uptrue/v1', '/status', array(
+        'methods'             => 'GET',
+        'callback'            => 'uptrue_rest_status',
+        'permission_callback' => '__return_true',
+    ) );
+} );
+
+function uptrue_rest_status( WP_REST_Request $request ) {
+    $token = get_option( UPTRUE_OPT_TOKEN, '' );
+    $auth  = $request->get_header( 'X-Uptrue-Token' );
+
+    if ( ! $token || $auth !== $token ) {
+        return new WP_Error( 'unauthorized', 'Invalid token', array( 'status' => 401 ) );
+    }
+
+    return array(
+        'status'    => 'connected',
+        'version'   => UPTRUE_VERSION,
+        'site_url'  => get_bloginfo( 'url' ),
+        'wp_version'=> get_bloginfo( 'version' ),
+        'last_push' => get_option( UPTRUE_OPT_LAST_PUSH, null ),
+        'self_test' => (bool) get_option( 'uptrue_self_test_ok', false ),
+    );
+}
+
+// ============================================================
+// ADMIN MENU
+// ============================================================
+
+add_action( 'admin_menu', 'uptrue_admin_menu' );
+
+function uptrue_admin_menu() {
+    $icon = 'dashicons-shield-alt';
+    add_menu_page( 'Uptrue', 'Uptrue', 'manage_options', 'uptrue', 'uptrue_page_dashboard', $icon, 25 );
+    add_submenu_page( 'uptrue', 'Dashboard', 'Dashboard',   'manage_options', 'uptrue',          'uptrue_page_dashboard' );
+    add_submenu_page( 'uptrue', 'Settings',  'Settings',    'manage_options', 'uptrue-settings', 'uptrue_page_settings' );
+    add_submenu_page( 'uptrue', 'Cron Status','Cron Status','manage_options', 'uptrue-cron',     'uptrue_page_cron' );
+}
+
+// ============================================================
+// ADMIN PAGE — DASHBOARD
+// ============================================================
+
+function uptrue_page_dashboard() {
+    $token     = get_option( UPTRUE_OPT_TOKEN, '' );
+    $last_push = get_option( UPTRUE_OPT_LAST_PUSH, null );
+    $last_err  = get_option( UPTRUE_OPT_LAST_ERR, null );
+    $self_test = get_option( 'uptrue_self_test_ok', false );
+    ?>
+    <div class="wrap">
+        <h1>🛡️ Uptrue WordPress Monitor</h1>
+
+        <?php if ( ! $token ) : ?>
+        <div class="notice notice-warning inline">
+            <p><strong>Not connected to Uptrue.</strong>
+            Go to <a href="<?php echo esc_url( admin_url( 'admin.php?page=uptrue-settings' ) ); ?>">Settings</a> to paste your API token.</p>
+        </div>
+        <?php else : ?>
+
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:20px 0;max-width:700px">
+            <?php foreach ( array(
+                array( 'Status',          $token ? '✅ Connected'             : '❌ Not connected',    $token ? '#10b981' : '#ef4444' ),
+                array( 'Last Push',       $last_push ? esc_html( $last_push ) : 'Never',               '#1e293b' ),
+                array( 'Uptrue API',      $self_test  ? '✅ Reachable'        : '⚠️ Check connection', $self_test ? '#10b981' : '#f97316' ),
+            ) as $stat ) : ?>
+            <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:16px">
+                <div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.06em;font-weight:600"><?php echo esc_html( $stat[0] ); ?></div>
+                <div style="font-size:15px;font-weight:700;color:<?php echo esc_attr( $stat[2] ); ?>;margin-top:6px"><?php echo $stat[1]; ?></div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+
+        <?php if ( $last_err ) : ?>
+        <div class="notice notice-error inline">
+            <p><strong>Last error:</strong> <?php echo esc_html( $last_err ); ?></p>
+        </div>
+        <?php endif; ?>
+
+        <p>
+            <a href="https://uptrue.io/dashboard/monitors" target="_blank" class="button button-primary">View full report on Uptrue →</a>
+            &nbsp;
+            <a href="<?php echo esc_url( admin_url( 'admin.php?page=uptrue-settings' ) ); ?>" class="button">Settings</a>
+        </p>
+
+        <?php endif; ?>
+    </div>
+    <?php
+}
+
+// ============================================================
+// ADMIN PAGE — SETTINGS
+// ============================================================
+
+function uptrue_page_settings() {
+    if ( isset( $_POST['uptrue_save'] ) && check_admin_referer( 'uptrue_save_settings' ) ) {
+        $token    = sanitize_text_field( wp_unslash( $_POST['uptrue_token'] ?? '' ) );
+        $interval = (int) ( $_POST['uptrue_interval'] ?? 120 );
+        if ( ! in_array( $interval, array( 60, 120, 180, 240, 1440, 10080, 43200 ), true ) ) $interval = 120;
+
+        $raw_settings = $_POST['settings'] ?? array();
+        $settings     = array();
+        $check_keys   = array( 'scan_php_uploads', 'scan_js_uploads', 'scan_core_files', 'scan_htaccess',
+                               'scan_exec_files', 'scan_theme_files', 'detect_new_users',
+                               'detect_new_pages', 'detect_languages', 'monthly_report' );
+        foreach ( $check_keys as $k ) {
+            $settings[ $k ] = isset( $raw_settings[ $k ] );
+        }
+
+        update_option( UPTRUE_OPT_TOKEN,    $token );
+        update_option( UPTRUE_OPT_INTERVAL, $interval );
+        update_option( UPTRUE_OPT_SETTINGS, $settings );
+
+        uptrue_unschedule_crons();
+        uptrue_schedule_crons();
+
+        if ( $token ) {
+            uptrue_self_test();
+            uptrue_do_main_push();
+        }
+
+        echo '<div class="notice notice-success inline"><p>Settings saved. First push sent.</p></div>';
+    }
+
+    $token    = get_option( UPTRUE_OPT_TOKEN, '' );
+    $interval = get_option( UPTRUE_OPT_INTERVAL, 120 );
+    $settings = get_option( UPTRUE_OPT_SETTINGS, array() );
+    $self_test= get_option( 'uptrue_self_test_ok', null );
+    ?>
+    <div class="wrap">
+        <h1>Uptrue — Settings</h1>
+        <form method="post">
+            <?php wp_nonce_field( 'uptrue_save_settings' ); ?>
+            <table class="form-table">
+                <tr>
+                    <th><label for="uptrue_token">Uptrue API Token</label></th>
+                    <td>
+                        <input type="text" id="uptrue_token" name="uptrue_token"
+                               value="<?php echo esc_attr( $token ); ?>"
+                               class="regular-text" placeholder="wpt_..." />
+                        <p class="description">
+                            Get your token from the
+                            <a href="https://uptrue.io/dashboard/monitors/new/wordpress" target="_blank">Uptrue setup page</a>.
+                        </p>
+                        <?php if ( $token && null !== $self_test ) : ?>
+                        <p style="color:<?php echo $self_test ? '#10b981' : '#ef4444'; ?>;font-weight:600;margin-top:6px">
+                            <?php echo $self_test ? '✅ Connection test passed' : '❌ Connection test failed — verify your token and that your server can reach uptrue.io'; ?>
+                        </p>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+                <tr>
+                    <th><label for="uptrue_interval">Check Frequency</label></th>
+                    <td>
+                        <select id="uptrue_interval" name="uptrue_interval">
+                            <?php foreach ( array(
+                                60    => 'Every 60 minutes',
+                                120   => 'Every 120 minutes (default)',
+                                180   => 'Every 180 minutes',
+                                240   => 'Every 240 minutes',
+                                1440  => 'Once a day',
+                                10080 => 'Once a week',
+                                43200 => 'Once a month',
+                            ) as $val => $label ) : ?>
+                            <option value="<?php echo esc_attr( $val ); ?>" <?php selected( $interval, $val ); ?>>
+                                <?php echo esc_html( $label ); ?>
+                            </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+
+            <h2 style="margin-top:24px">Advanced — Enable / Disable Checks</h2>
+            <table class="form-table">
+                <?php foreach ( array(
+                    'scan_php_uploads'  => 'Scan /uploads/ for PHP files (critical security check)',
+                    'scan_js_uploads'   => 'Scan /uploads/ for JavaScript files',
+                    'scan_core_files'   => 'Monitor WordPress core file modifications',
+                    'scan_htaccess'     => 'Monitor .htaccess and wp-config.php changes',
+                    'scan_exec_files'   => 'Scan /uploads/ for executable files (.sh, .exe, .py…)',
+                    'scan_theme_files'  => 'Monitor active theme file changes (functions.php)',
+                    'detect_new_users'  => 'Alert on new admin/editor users',
+                    'detect_new_pages'  => 'Alert on newly published pages/posts',
+                    'detect_languages'  => 'Alert on foreign-language page titles (SEO spam detection)',
+                    'monthly_report'    => 'Send monthly health report to admin email',
+                ) as $key => $label ) :
+                    $checked = ! isset( $settings[ $key ] ) || $settings[ $key ];
+                ?>
+                <tr>
+                    <th><?php echo esc_html( $label ); ?></th>
+                    <td>
+                        <input type="checkbox" name="settings[<?php echo esc_attr( $key ); ?>]" value="1" <?php checked( $checked ); ?> />
+                        <label>Enabled</label>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </table>
+
+            <p class="submit">
+                <button type="submit" name="uptrue_save" class="button button-primary">Save Settings</button>
+            </p>
+        </form>
+    </div>
+    <?php
+}
+
+// ============================================================
+// ADMIN PAGE — CRON STATUS
+// ============================================================
+
+function uptrue_page_cron() {
+    $interval     = get_option( UPTRUE_OPT_INTERVAL, 120 );
+    $last_err     = get_option( UPTRUE_OPT_LAST_ERR, null );
+    $cron_disabled= defined( 'DISABLE_WP_CRON' ) && DISABLE_WP_CRON;
+
+    $jobs = array(
+        UPTRUE_CRON_MAIN     => 'Main data push',
+        UPTRUE_CRON_PHP      => 'PHP file scan (/uploads/)',
+        UPTRUE_CRON_JS       => 'JavaScript file scan (/uploads/)',
+        UPTRUE_CRON_CORE     => 'Core file integrity check',
+        UPTRUE_CRON_HTACCESS => '.htaccess / wp-config.php monitor',
+        UPTRUE_CRON_EXEC     => 'Executable file scan (/uploads/)',
+        UPTRUE_CRON_THEME    => 'Active theme file monitor',
+        UPTRUE_CRON_REPORT   => 'Monthly health email report',
+    );
+    ?>
+    <div class="wrap">
+        <h1>Uptrue — Cron Status</h1>
+
+        <?php if ( $cron_disabled ) : ?>
+        <div class="notice notice-warning">
+            <p><strong>WP Cron is disabled</strong> (DISABLE_WP_CRON = true in wp-config.php).</p>
+            <p>Add a real cron job to your server so Uptrue checks run on schedule:</p>
+            <code>*/ <?php echo esc_html( $interval ); ?> * * * * curl -s "<?php echo esc_url( get_bloginfo( 'url' ) ); ?>/wp-cron.php?doing_wp_cron" > /dev/null 2>&1</code>
+        </div>
+        <?php endif; ?>
+
+        <?php if ( $last_err ) : ?>
+        <div class="notice notice-error">
+            <p><strong>Last error:</strong> <?php echo esc_html( $last_err ); ?></p>
+            <p><strong>Likely fix:</strong> Verify your API token in Settings. Confirm your server allows outbound HTTPS requests to uptrue.io.</p>
+        </div>
+        <?php endif; ?>
+
+        <table class="wp-list-table widefat fixed striped" style="max-width:800px;margin-top:16px">
+            <thead>
+                <tr>
+                    <th>Job</th>
+                    <th>Next Scheduled Run</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ( $jobs as $hook => $label ) :
+                    $next = wp_next_scheduled( $hook );
+                ?>
+                <tr>
+                    <td><?php echo esc_html( $label ); ?></td>
+                    <td><?php echo $next ? esc_html( date( 'd M Y H:i', $next ) . ' UTC' ) : '—'; ?></td>
+                    <td>
+                        <?php if ( $next ) : ?>
+                            <span style="color:#10b981;font-weight:600">✅ Scheduled</span>
+                        <?php else : ?>
+                            <span style="color:#ef4444;font-weight:600">❌ Not scheduled</span>
+                            &nbsp;
+                            <a href="<?php echo esc_url( add_query_arg( array( 'uptrue_reschedule' => $hook, '_wpnonce' => wp_create_nonce( 'uptrue_reschedule' ) ), admin_url( 'admin.php?page=uptrue-cron' ) ) ); ?>" class="button button-small">Reschedule</a>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+
+        <?php
+        // Handle reschedule action
+        if ( isset( $_GET['uptrue_reschedule'] ) && wp_verify_nonce( $_GET['_wpnonce'] ?? '', 'uptrue_reschedule' ) ) {
+            $hook = sanitize_key( $_GET['uptrue_reschedule'] );
+            if ( array_key_exists( $hook, $jobs ) ) {
+                wp_schedule_single_event( time() + 60, $hook );
+                echo '<div class="notice notice-success inline" style="margin-top:12px"><p>Job rescheduled to run in 60 seconds.</p></div>';
+            }
+        }
+        ?>
+
+        <h2 style="margin-top:24px">Remediation Steps</h2>
+        <ol>
+            <li><strong>Check if WP Cron is disabled</strong> — look for <code>define( 'DISABLE_WP_CRON', true )</code> in wp-config.php and remove it (or set up a server cron).</li>
+            <li><strong>Set up a real server cron</strong> — in cPanel or SSH terminal, run:<br>
+                <code>*/ <?php echo esc_html( $interval ); ?> * * * * php <?php echo esc_html( ABSPATH ); ?>wp-cron.php</code></li>
+            <li><strong>Trigger manually now</strong> — visit <a href="<?php echo esc_url( get_bloginfo( 'url' ) . '/wp-cron.php?doing_wp_cron' ); ?>" target="_blank">wp-cron.php?doing_wp_cron</a></li>
+            <li><strong>Re-save Settings</strong> — go to Uptrue → Settings and click Save to reschedule all jobs.</li>
+        </ol>
+    </div>
+    <?php
+}

@@ -17,6 +17,7 @@ interface PlanLimits {
   hasWhiteLabel: boolean
   hasVoiceCalls: boolean
   checkIntervalSeconds: number
+  wpMonitors: number
 }
 
 const UPGRADE_NUDGE_THRESHOLD = 15
@@ -39,6 +40,7 @@ const FREE_DEFAULTS: PlanLimits = {
   hasWhiteLabel: false,
   hasVoiceCalls: false,
   checkIntervalSeconds: 600,
+  wpMonitors: 0,
 }
 
 /** Extract plan limits from a raw plan record */
@@ -60,6 +62,7 @@ function extractLimits(plan: Record<string, unknown>): PlanLimits {
     hasWhiteLabel: (plan.has_white_label as boolean) ?? false,
     hasVoiceCalls: (plan.has_voice_calls as boolean) ?? false,
     checkIntervalSeconds: (plan.check_interval_seconds as number) ?? 600,
+    wpMonitors: (plan.wp_monitor_limit as number) ?? 0,
   }
 }
 
@@ -310,6 +313,29 @@ export async function checkCompetitorLimit(orgId: string): Promise<{
   const allowed = currentCount < limit
 
   return { allowed, currentCount, limit }
+}
+
+/** Check if the org can add another WordPress monitor */
+export async function checkWpMonitorLimit(orgId: string): Promise<{
+  allowed: boolean
+  currentCount: number
+  limit: number
+}> {
+  const supabase = createAdminClient()
+  const [limits, orgResult, countResult] = await Promise.all([
+    getPlanLimits(orgId),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (supabase as any).from('organisations').select('wp_monitor_limit_override').eq('id', orgId).single() as Promise<{ data: { wp_monitor_limit_override: number | null } | null }>,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (supabase as any).from('wp_monitors').select('id', { count: 'exact', head: true }).eq('org_id', orgId),
+  ])
+
+  const override = (orgResult.data?.wp_monitor_limit_override as number | null) ?? null
+  const effectiveLimit = override !== null ? override : limits.wpMonitors
+  const currentCount = countResult.count ?? 0
+  const allowed = currentCount < effectiveLimit
+
+  return { allowed, currentCount, limit: effectiveLimit }
 }
 
 /** Check if the org can add another team member */
