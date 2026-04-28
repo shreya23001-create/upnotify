@@ -189,10 +189,11 @@ export async function POST(request: Request): Promise<Response> {
     await updateWpMonitorLastPush(wpMonitor.id)
   }
 
-  // Update parent monitor status
-  const monitorStatus = healthScore >= 70 ? 'up' : healthScore >= 40 ? 'degraded' : 'down'
+  // A successful push proves the site is reachable — always 'up'.
+  // Health score drives the security panel, not the uptime status.
+  // Staleness (no push received) is handled separately by the check-runner cron.
   await updateMonitorStatus(wpMonitor.monitor_id, {
-    status: monitorStatus,
+    status: 'up',
     last_checked_at: new Date().toISOString(),
     next_check_at: new Date(Date.now() + wpMonitor.check_interval_minutes * 60 * 1000).toISOString(),
   })
