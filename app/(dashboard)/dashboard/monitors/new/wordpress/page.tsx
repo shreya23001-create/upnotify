@@ -107,7 +107,7 @@ export default function NewWordPressMonitorPage(): React.ReactElement {
             We'll generate a secure token to connect your site to Uptrue.
           </p>
           {error && <div className="form-error" style={{ marginBottom: 16 }}>{error}</div>}
-          <form action={handleStep1}>
+          <form onSubmit={e => { e.preventDefault(); handleStep1(new FormData(e.currentTarget)) }}>
             <div className="form-group">
               <label className="form-label">Monitor Name</label>
               <input className="form-input" name="name" required placeholder="My WordPress Site" disabled={isPending} />

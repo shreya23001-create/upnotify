@@ -6,20 +6,21 @@ import { PublicFooter } from '@/components/ui/public-footer'
 import { MONITOR_TYPES } from '@/lib/constants/monitor-types'
 
 export const metadata: Metadata = {
-  title: 'Website Monitoring Suite — 23 Monitor Types | Uptrue',
-  description: 'Uptrue monitors 23 types of infrastructure — HTTP uptime, SSL certificates, DNS records, security headers, MX health, SPF/DMARC, blacklists, and more. See every monitoring type explained.',
+  title: 'Website Monitoring Suite — 24 Monitor Types | Uptrue',
+  description: 'Uptrue monitors 24 types of infrastructure — HTTP uptime, SSL certificates, DNS records, security headers, WordPress site health, MX, SPF/DMARC, blacklists, and more. See every monitoring type explained.',
   alternates: { canonical: 'https://uptrue.io/monitoring' },
 }
 
 const coreTypes = ['http', 'ssl', 'dns', 'keyword', 'domain', 'port', 'ping', 'api', 'heartbeat', 'competitor']
 const coreMonitorTypes = MONITOR_TYPES.filter(t => coreTypes.includes(t.type))
-const advancedTypes = MONITOR_TYPES.filter(t => !coreTypes.includes(t.type))
+const agentTypes = MONITOR_TYPES.filter(t => t.type === 'wordpress')
+const advancedTypes = MONITOR_TYPES.filter(t => !coreTypes.includes(t.type) && t.type !== 'wordpress')
 
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'CollectionPage',
-  name: 'Website Monitoring Suite — 23 Monitor Types',
-  description: 'Uptrue monitors 23 types of infrastructure — HTTP uptime, SSL certificates, DNS records, security headers, MX health, SPF/DMARC, blacklists, and more.',
+  name: 'Website Monitoring Suite — 24 Monitor Types',
+  description: 'Uptrue monitors 24 types of infrastructure — HTTP uptime, SSL certificates, DNS records, security headers, WordPress site health, MX health, SPF/DMARC, blacklists, and more.',
   url: 'https://uptrue.io/monitoring',
   publisher: {
     '@type': 'Organization',
@@ -52,11 +53,11 @@ export default function MonitoringIndexPage() {
             </div>
           </div>
           <h1 style={{ fontSize: 'clamp(32px, 5vw, 52px)', fontWeight: 900, letterSpacing: '-0.03em', color: 'var(--text-primary)', lineHeight: 1.15, marginBottom: 16 }}>
-            23 ways to monitor<br />
+            24 ways to monitor<br />
             <span className="gradient-text">your website</span>
           </h1>
           <p style={{ fontSize: 18, color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: 36, maxWidth: 560, margin: '0 auto 36px' }}>
-            From basic HTTP uptime to security headers, SPF/DMARC, blacklists, and cookie consent —
+            From HTTP uptime to WordPress internals, security headers, SPF/DMARC, blacklists, and cookie consent —
             Uptrue is the only monitoring suite that covers every layer of your stack in one place.
           </p>
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -69,7 +70,7 @@ export default function MonitoringIndexPage() {
             <Link href="/score" className="btn btn-ghost btn-lg">Score Your Site Free</Link>
           </div>
           <div style={{ display: 'flex', gap: 24, justifyContent: 'center', flexWrap: 'wrap', marginTop: 20 }}>
-            {['No credit card required', '3 monitors free forever', '1-minute checks'].map(t => (
+            {['No credit card required', '3 monitors free forever', 'WordPress plugin included'].map(t => (
               <span key={t} style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 500 }}>✓ {t}</span>
             ))}
           </div>
@@ -111,6 +112,24 @@ export default function MonitoringIndexPage() {
           </div>
         </section>
 
+        {/* Agent-based monitors */}
+        {agentTypes.length > 0 && (
+          <section style={{ marginBottom: 64 }}>
+            <div style={{ marginBottom: 32 }}>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'linear-gradient(135deg, #667eea18, #764ba212)', border: '1px solid #667eea35', borderRadius: 'var(--radius-full)', padding: '4px 12px', marginBottom: 12 }}>
+                <span style={{ fontSize: 11, fontWeight: 700, color: '#667eea', textTransform: 'uppercase', letterSpacing: '0.05em' }}>🔌 New — Agent-Based Monitors</span>
+              </div>
+              <h2 style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--text-primary)', marginBottom: 6 }}>Monitor from inside your site</h2>
+              <p style={{ color: 'var(--text-secondary)', fontSize: 15 }}>Plugin-based monitors that check what external tools can&apos;t see — file injections, rogue users, and internal compromises.</p>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
+              {agentTypes.map(t => (
+                <MonitorCard key={t.slug} t={t} />
+              ))}
+            </div>
+          </section>
+        )}
+
         {/* Bottom CTA */}
         <div style={{
           background: 'var(--brand-gradient)',
@@ -123,8 +142,8 @@ export default function MonitoringIndexPage() {
           gap: 24,
         }}>
           <div>
-            <div style={{ fontSize: 22, fontWeight: 800, color: '#fff', marginBottom: 6 }}>Set up all 23 monitor types in minutes</div>
-            <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.75)' }}>Free plan included. No credit card. No agents to install.</div>
+            <div style={{ fontSize: 22, fontWeight: 800, color: '#fff', marginBottom: 6 }}>Set up all 24 monitor types in minutes</div>
+            <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.75)' }}>Free plan included. No credit card. WordPress plugin included.</div>
           </div>
           <Link href="/signup" style={{
             background: '#fff',
@@ -147,6 +166,15 @@ export default function MonitoringIndexPage() {
   )
 }
 
+function WpIcon({ size = 20 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="12" cy="12" r="11" fill="#21759b" />
+      <text x="12" y="16.5" textAnchor="middle" fill="white" fontSize="11" fontWeight="bold" fontFamily="Georgia, serif">W</text>
+    </svg>
+  )
+}
+
 function MonitorCard({ t }: { t: typeof MONITOR_TYPES[number] }) {
   return (
     <Link
@@ -156,20 +184,20 @@ function MonitorCard({ t }: { t: typeof MONITOR_TYPES[number] }) {
         display: 'block',
         padding: '20px 22px',
         borderRadius: 12,
-        border: '1px solid var(--border)',
-        background: 'var(--bg-card)',
+        border: t.type === 'wordpress' ? '1px solid #21759b30' : '1px solid var(--border)',
+        background: t.type === 'wordpress' ? 'linear-gradient(135deg, #21759b08, #0073aa06)' : 'var(--bg-card)',
         textDecoration: 'none',
         color: 'inherit',
       }}
     >
       <div style={{
         width: 40, height: 40,
-        background: 'var(--brand-gradient-soft)',
+        background: t.type === 'wordpress' ? '#21759b' : 'var(--brand-gradient-soft)',
         borderRadius: 10,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         fontSize: 20, marginBottom: 12,
       }}>
-        {t.emoji}
+        {t.type === 'wordpress' ? <WpIcon size={22} /> : t.emoji}
       </div>
       <div style={{ fontWeight: 700, fontSize: 15, color: 'var(--text-primary)', marginBottom: 6 }}>{t.name}</div>
       <div style={{ color: 'var(--text-secondary)', fontSize: 13, lineHeight: 1.55 }}>{t.tagline}</div>

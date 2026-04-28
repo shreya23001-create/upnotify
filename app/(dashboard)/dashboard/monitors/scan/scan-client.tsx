@@ -219,17 +219,17 @@ export function ScanClient({
             >
               <div className="card" style={{
                 padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 16,
-                border: '1.5px solid #667eea40', background: 'linear-gradient(135deg, #667eea08, #764ba208)',
+                border: '1.5px solid #21759b40', background: 'linear-gradient(135deg, #21759b08, #0073aa08)',
                 cursor: 'pointer', transition: 'border-color 0.15s',
               }}>
-                <div style={{ fontSize: 28, flexShrink: 0 }}>🔌</div>
+                <WpIcon size={32} />
                 <div style={{ flex: 1, textAlign: 'left' }}>
                   <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 3 }}>Uptrue WordPress Monitor</div>
                   <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
                     Install a lightweight plugin on your WordPress site. Monitors file injections, outdated plugins, unknown admin users, suspicious pages, and more — from inside your site.
                   </div>
                 </div>
-                <div style={{ fontSize: 11, fontWeight: 700, color: '#667eea', background: '#667eea15', padding: '4px 10px', borderRadius: 20, flexShrink: 0 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: '#21759b', background: '#21759b15', padding: '4px 10px', borderRadius: 20, flexShrink: 0 }}>
                   Set up →
                 </div>
               </div>
@@ -451,6 +451,15 @@ export function ScanClient({
         </div>
       )}
     </div>
+  )
+}
+
+function WpIcon({ size = 28 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}>
+      <circle cx="12" cy="12" r="11" fill="#21759b" />
+      <text x="12" y="16.5" textAnchor="middle" fill="white" fontSize="11" fontWeight="bold" fontFamily="Georgia, serif">W</text>
+    </svg>
   )
 }
 
