@@ -13,8 +13,12 @@
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 define( 'UPTRUE_VERSION',      '1.0.0' );
-define( 'UPTRUE_API_BASE',     'https://uptrue.io/api/v1/wp-agent' );
 define( 'UPTRUE_PLUGIN_FILE',  __FILE__ );
+
+function uptrue_api_base() {
+    $custom = get_option( 'uptrue_api_base', '' );
+    return rtrim( $custom ?: 'https://uptrue.io/api/v1/wp-agent', '/' );
+}
 define( 'UPTRUE_OPT_TOKEN',    'uptrue_api_token' );
 define( 'UPTRUE_OPT_INTERVAL', 'uptrue_check_interval' );
 define( 'UPTRUE_OPT_LAST_PUSH','uptrue_last_push' );
@@ -375,7 +379,7 @@ function uptrue_push_data( $token, $payload ) {
 }
 
 function uptrue_api_post( $endpoint, $body, $token ) {
-    return wp_remote_post( UPTRUE_API_BASE . $endpoint, array(
+    return wp_remote_post( uptrue_api_base() . $endpoint, array(
         'headers' => array(
             'Content-Type'     => 'application/json',
             'Authorization'    => 'Bearer ' . $token,
@@ -392,7 +396,7 @@ function uptrue_api_post( $endpoint, $body, $token ) {
 // ============================================================
 
 function uptrue_self_test() {
-    $response = wp_remote_get( UPTRUE_API_BASE . '/ping', array(
+    $response = wp_remote_get( uptrue_api_base() . '/ping', array(
         'timeout'    => 10,
         'user-agent' => 'Uptrue-WP-Monitor/' . UPTRUE_VERSION,
     ) );
@@ -563,8 +567,19 @@ function uptrue_page_dashboard() {
 // ============================================================
 
 function uptrue_page_settings() {
+    // Handle force-push action
+    if ( isset( $_GET['uptrue_push_now'] ) && wp_verify_nonce( $_GET['_wpnonce'] ?? '', 'uptrue_push_now' ) ) {
+        $token = get_option( UPTRUE_OPT_TOKEN, '' );
+        if ( $token ) {
+            uptrue_self_test();
+            uptrue_do_main_push();
+            echo '<div class="notice notice-success inline"><p>Push sent. Check Last Error below — if empty, it worked.</p></div>';
+        }
+    }
+
     if ( isset( $_POST['uptrue_save'] ) && check_admin_referer( 'uptrue_save_settings' ) ) {
         $token    = sanitize_text_field( wp_unslash( $_POST['uptrue_token'] ?? '' ) );
+        $api_base = esc_url_raw( wp_unslash( $_POST['uptrue_api_base'] ?? '' ) );
         $interval = (int) ( $_POST['uptrue_interval'] ?? 120 );
         if ( ! in_array( $interval, array( 60, 120, 180, 240, 1440, 10080, 43200 ), true ) ) $interval = 120;
 
@@ -580,6 +595,11 @@ function uptrue_page_settings() {
         update_option( UPTRUE_OPT_TOKEN,    $token );
         update_option( UPTRUE_OPT_INTERVAL, $interval );
         update_option( UPTRUE_OPT_SETTINGS, $settings );
+        if ( $api_base ) {
+            update_option( 'uptrue_api_base', $api_base );
+        } else {
+            delete_option( 'uptrue_api_base' );
+        }
 
         uptrue_unschedule_crons();
         uptrue_schedule_crons();
@@ -589,16 +609,33 @@ function uptrue_page_settings() {
             uptrue_do_main_push();
         }
 
-        echo '<div class="notice notice-success inline"><p>Settings saved. First push sent.</p></div>';
+        echo '<div class="notice notice-success inline"><p>Settings saved. Push sent — check Last Error below.</p></div>';
     }
 
     $token    = get_option( UPTRUE_OPT_TOKEN, '' );
     $interval = get_option( UPTRUE_OPT_INTERVAL, 120 );
     $settings = get_option( UPTRUE_OPT_SETTINGS, array() );
     $self_test= get_option( 'uptrue_self_test_ok', null );
+    $last_err = get_option( UPTRUE_OPT_LAST_ERR, null );
+    $api_base_saved = get_option( 'uptrue_api_base', '' );
     ?>
     <div class="wrap">
         <h1>Uptrue — Settings</h1>
+
+        <?php if ( $last_err ) : ?>
+        <div class="notice notice-error inline" style="margin-bottom:16px">
+            <p><strong>Last push error:</strong> <?php echo esc_html( $last_err ); ?></p>
+            <p style="font-size:13px">If you see <strong>401</strong>: your API token was not found — make sure the Uptrue app URL below matches where you created this monitor.<br>
+            If you see a <strong>network error</strong>: your server may be blocking outbound HTTPS requests.</p>
+        </div>
+        <?php endif; ?>
+
+        <p>
+            <a href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'uptrue_push_now', '1', admin_url( 'admin.php?page=uptrue-settings' ) ), 'uptrue_push_now' ) ); ?>" class="button">
+                ↑ Force push now
+            </a>
+        </p>
+
         <form method="post">
             <?php wp_nonce_field( 'uptrue_save_settings' ); ?>
             <table class="form-table">
@@ -610,13 +647,25 @@ function uptrue_page_settings() {
                                class="regular-text" placeholder="wpt_..." />
                         <p class="description">
                             Get your token from the
-                            <a href="https://uptrue.io/dashboard/monitors/new/wordpress" target="_blank">Uptrue setup page</a>.
+                            <a href="<?php echo esc_url( uptrue_api_base() ); ?>/../../monitors/new/wordpress" target="_blank">Uptrue setup page</a>.
                         </p>
                         <?php if ( $token && null !== $self_test ) : ?>
                         <p style="color:<?php echo $self_test ? '#10b981' : '#ef4444'; ?>;font-weight:600;margin-top:6px">
-                            <?php echo $self_test ? '✅ Connection test passed' : '❌ Connection test failed — verify your token and that your server can reach uptrue.io'; ?>
+                            <?php echo $self_test ? '✅ Connection test passed' : '❌ Connection test failed — verify the Uptrue App URL below and that your server can reach it'; ?>
                         </p>
                         <?php endif; ?>
+                    </td>
+                </tr>
+                <tr>
+                    <th><label for="uptrue_api_base">Uptrue App URL</label></th>
+                    <td>
+                        <input type="url" id="uptrue_api_base" name="uptrue_api_base"
+                               value="<?php echo esc_attr( $api_base_saved ); ?>"
+                               class="regular-text" placeholder="https://uptrue.io/api/v1/wp-agent" />
+                        <p class="description">
+                            Leave blank to use the default <code>https://uptrue.io/api/v1/wp-agent</code>.<br>
+                            Override this if your Uptrue instance is on a different URL (e.g. a Vercel preview during development).
+                        </p>
                     </td>
                 </tr>
                 <tr>
