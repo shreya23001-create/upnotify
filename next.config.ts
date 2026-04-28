@@ -1,16 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  async redirects() {
-    return [
-      {
-        source: '/:path*',
-        has: [{ type: 'host', value: 'www.uptrue.io' }],
-        destination: 'https://uptrue.io/:path*',
-        permanent: true,
-      },
-    ]
-  },
   headers: async (): Promise<
     { source: string; headers: { key: string; value: string }[] }[]
   > => [
