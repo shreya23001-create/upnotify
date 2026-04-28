@@ -34,6 +34,7 @@ export interface PlanDisplayData {
   competitor_limit: number
   llms_txt_limit: number
   citation_check_monthly_limit: number
+  wp_monitor_limit: number
 }
 
 export interface PlanFeature {
@@ -138,6 +139,16 @@ export function getPlanFeatures(p: PlanDisplayData): PlanFeature[] {
     features.push({ text: `AI Citation Monitor (${p.citation_check_monthly_limit}/month)`, included: true })
   } else {
     features.push({ text: 'AI Citation Monitor', included: false })
+  }
+
+  // WordPress Monitor
+  const wpLimit = p.wp_monitor_limit ?? 0
+  if (wpLimit === 0) {
+    features.push({ text: 'WordPress Monitor', included: false })
+  } else if (wpLimit === -1) {
+    features.push({ text: 'WordPress Monitor (unlimited)', included: true })
+  } else {
+    features.push({ text: `WordPress Monitor (${wpLimit} site${wpLimit === 1 ? '' : 's'})`, included: true })
   }
 
   return features

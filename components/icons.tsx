@@ -159,6 +159,10 @@ export function IconNameserverChange({ size = 18, className }: IconProps) {
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><circle cx="6" cy="6" r="1"/><circle cx="6" cy="18" r="1"/><path d="M19 5l2 1-2 1"/><path d="M19 17l2 1-2 1"/></svg>
 }
 
+export function IconWordpress({ size = 18, className }: IconProps) {
+  return <svg width={size} height={size} viewBox="0 0 24 24" className={className}><circle cx="12" cy="12" r="11" fill="#21759b"/><text x="12" y="16.5" textAnchor="middle" fill="white" fontSize="11" fontWeight="bold" fontFamily="Georgia,serif">W</text></svg>
+}
+
 /* Admin icons */
 
 export function IconUsers({ size = 18, className }: IconProps) {
