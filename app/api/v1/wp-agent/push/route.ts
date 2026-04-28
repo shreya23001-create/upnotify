@@ -15,6 +15,21 @@ import {
 } from '@/lib/db/wp-monitors'
 import { updateMonitorStatus } from '@/lib/db/monitors'
 
+interface SecurityConfig {
+  login_failures_24h?: number
+  world_writable_dirs?: string[]
+  xmlrpc_enabled?: boolean
+  rest_user_enum?: boolean
+  app_passwords_in_use?: boolean
+  auto_updates?: string
+  spam_comments?: number
+  twofa_active?: boolean
+  modified_plugin_files?: string[]
+  backup_plugin_present?: boolean
+  disk_used_pct?: number | null
+  disk_free_gb?: number | null
+}
+
 interface PushPayload {
   site_url?: string
   wp_version?: string
@@ -29,6 +44,7 @@ interface PushPayload {
   memory_limit?: string
   db_size_mb?: number
   cron_last_run?: string
+  security_config?: SecurityConfig
   event?: string
 }
 
@@ -79,6 +95,31 @@ function computeHealthScore(payload: PushPayload, fileScan: WpFileScan): number 
   // High: foreign language pages (potential SEO spam)
   const foreignPages = (payload.recent_pages ?? []).filter(p => p.language && p.language !== 'en')
   score -= foreignPages.length * 10
+
+  // Security config deductions
+  const sec = payload.security_config
+  if (sec) {
+    if ((sec.login_failures_24h ?? 0) > 20) score -= 10
+    else if ((sec.login_failures_24h ?? 0) > 5) score -= 5
+
+    score -= (sec.world_writable_dirs?.length ?? 0) * 10
+
+    if (sec.xmlrpc_enabled) score -= 5
+    if (sec.rest_user_enum) score -= 5
+    if (sec.auto_updates === 'disabled') score -= 5
+
+    if ((sec.spam_comments ?? 0) > 100) score -= 5
+    else if ((sec.spam_comments ?? 0) > 20) score -= 2
+
+    if (!sec.twofa_active) score -= 8
+    if (!sec.backup_plugin_present) score -= 5
+
+    const modFiles = sec.modified_plugin_files?.length ?? 0
+    if (modFiles > 0) score -= Math.min(modFiles * 5, 15)
+
+    if ((sec.disk_used_pct ?? 0) > 90) score -= 10
+    else if ((sec.disk_used_pct ?? 0) > 80) score -= 5
+  }
 
   return Math.max(0, Math.min(100, score))
 }
@@ -333,6 +374,194 @@ export async function POST(request: Request): Promise<Response> {
       }
     } else {
       const existing = await getOpenWpFindingByType(wpMonitor.id, findingType)
+      if (existing) await resolveWpFinding(existing.id)
+    }
+  }
+
+  // Security config findings
+  const sec = payload.security_config
+  if (sec) {
+    // Brute force / login failures
+    if ((sec.login_failures_24h ?? 0) > 5) {
+      const existing = await getOpenWpFindingByType(wpMonitor.id, 'brute_force')
+      if (!existing) {
+        await createWpFinding({
+          wp_monitor_id: wpMonitor.id,
+          org_id: wpMonitor.org_id,
+          snapshot_id: snapshotId,
+          finding_type: 'brute_force',
+          severity: (sec.login_failures_24h ?? 0) > 20 ? 'critical' : 'high',
+          title: `Brute force detected: ${sec.login_failures_24h} failed login attempts in 24h`,
+          detail: { count: sec.login_failures_24h },
+        })
+      }
+    } else {
+      const existing = await getOpenWpFindingByType(wpMonitor.id, 'brute_force')
+      if (existing) await resolveWpFinding(existing.id)
+    }
+
+    // World-writable directories
+    for (const dir of (sec.world_writable_dirs ?? [])) {
+      const existing = await getOpenWpFindingByType(wpMonitor.id, `world_writable:${dir}`)
+      if (!existing) {
+        await createWpFinding({
+          wp_monitor_id: wpMonitor.id,
+          org_id: wpMonitor.org_id,
+          snapshot_id: snapshotId,
+          finding_type: `world_writable:${dir}`,
+          severity: 'high',
+          title: `World-writable directory detected: ${dir}`,
+          detail: { directory: dir },
+        })
+      }
+    }
+
+    // XML-RPC
+    if (sec.xmlrpc_enabled) {
+      const existing = await getOpenWpFindingByType(wpMonitor.id, 'xmlrpc_enabled')
+      if (!existing) {
+        await createWpFinding({
+          wp_monitor_id: wpMonitor.id,
+          org_id: wpMonitor.org_id,
+          snapshot_id: snapshotId,
+          finding_type: 'xmlrpc_enabled',
+          severity: 'medium',
+          title: 'XML-RPC is enabled — can be exploited for brute-force and DDoS amplification attacks',
+          detail: {},
+        })
+      }
+    } else {
+      const existing = await getOpenWpFindingByType(wpMonitor.id, 'xmlrpc_enabled')
+      if (existing) await resolveWpFinding(existing.id)
+    }
+
+    // REST API user enumeration
+    if (sec.rest_user_enum) {
+      const existing = await getOpenWpFindingByType(wpMonitor.id, 'rest_user_enum')
+      if (!existing) {
+        await createWpFinding({
+          wp_monitor_id: wpMonitor.id,
+          org_id: wpMonitor.org_id,
+          snapshot_id: snapshotId,
+          finding_type: 'rest_user_enum',
+          severity: 'medium',
+          title: 'REST API exposes username list at /wp-json/wp/v2/users — install a security plugin to restrict this',
+          detail: {},
+        })
+      }
+    } else {
+      const existing = await getOpenWpFindingByType(wpMonitor.id, 'rest_user_enum')
+      if (existing) await resolveWpFinding(existing.id)
+    }
+
+    // Auto-updates disabled
+    if (sec.auto_updates === 'disabled') {
+      const existing = await getOpenWpFindingByType(wpMonitor.id, 'auto_updates_disabled')
+      if (!existing) {
+        await createWpFinding({
+          wp_monitor_id: wpMonitor.id,
+          org_id: wpMonitor.org_id,
+          snapshot_id: snapshotId,
+          finding_type: 'auto_updates_disabled',
+          severity: 'high',
+          title: 'WordPress automatic updates are disabled — site will not receive security patches automatically',
+          detail: { setting: sec.auto_updates },
+        })
+      }
+    } else {
+      const existing = await getOpenWpFindingByType(wpMonitor.id, 'auto_updates_disabled')
+      if (existing) await resolveWpFinding(existing.id)
+    }
+
+    // High spam volume
+    if ((sec.spam_comments ?? 0) > 50) {
+      const existing = await getOpenWpFindingByType(wpMonitor.id, 'high_spam')
+      if (!existing) {
+        await createWpFinding({
+          wp_monitor_id: wpMonitor.id,
+          org_id: wpMonitor.org_id,
+          snapshot_id: snapshotId,
+          finding_type: 'high_spam',
+          severity: 'medium',
+          title: `High spam comment volume: ${sec.spam_comments} spam comments queued`,
+          detail: { count: sec.spam_comments },
+        })
+      }
+    } else {
+      const existing = await getOpenWpFindingByType(wpMonitor.id, 'high_spam')
+      if (existing) await resolveWpFinding(existing.id)
+    }
+
+    // No 2FA
+    if (!sec.twofa_active) {
+      const existing = await getOpenWpFindingByType(wpMonitor.id, 'no_twofa')
+      if (!existing) {
+        await createWpFinding({
+          wp_monitor_id: wpMonitor.id,
+          org_id: wpMonitor.org_id,
+          snapshot_id: snapshotId,
+          finding_type: 'no_twofa',
+          severity: 'high',
+          title: 'No two-factor authentication plugin detected — admin accounts are vulnerable to credential theft',
+          detail: {},
+        })
+      }
+    } else {
+      const existing = await getOpenWpFindingByType(wpMonitor.id, 'no_twofa')
+      if (existing) await resolveWpFinding(existing.id)
+    }
+
+    // Recently modified plugin files
+    for (const file of (sec.modified_plugin_files ?? [])) {
+      const existing = await getOpenWpFindingByType(wpMonitor.id, `modified_plugin:${file}`)
+      if (!existing) {
+        await createWpFinding({
+          wp_monitor_id: wpMonitor.id,
+          org_id: wpMonitor.org_id,
+          snapshot_id: snapshotId,
+          finding_type: `modified_plugin:${file}`,
+          severity: 'high',
+          title: `Plugin file modified in last 24h: ${file}`,
+          detail: { file },
+        })
+      }
+    }
+
+    // No backup plugin
+    if (!sec.backup_plugin_present) {
+      const existing = await getOpenWpFindingByType(wpMonitor.id, 'no_backup_plugin')
+      if (!existing) {
+        await createWpFinding({
+          wp_monitor_id: wpMonitor.id,
+          org_id: wpMonitor.org_id,
+          snapshot_id: snapshotId,
+          finding_type: 'no_backup_plugin',
+          severity: 'medium',
+          title: 'No backup plugin detected — site has no automated backup protection',
+          detail: {},
+        })
+      }
+    } else {
+      const existing = await getOpenWpFindingByType(wpMonitor.id, 'no_backup_plugin')
+      if (existing) await resolveWpFinding(existing.id)
+    }
+
+    // High disk usage
+    if ((sec.disk_used_pct ?? 0) > 80) {
+      const existing = await getOpenWpFindingByType(wpMonitor.id, 'high_disk_usage')
+      if (!existing) {
+        await createWpFinding({
+          wp_monitor_id: wpMonitor.id,
+          org_id: wpMonitor.org_id,
+          snapshot_id: snapshotId,
+          finding_type: 'high_disk_usage',
+          severity: (sec.disk_used_pct ?? 0) > 90 ? 'high' : 'medium',
+          title: `Disk usage is at ${sec.disk_used_pct}%${sec.disk_free_gb != null ? ` — ${sec.disk_free_gb} GB free` : ''}`,
+          detail: { used_pct: sec.disk_used_pct, free_gb: sec.disk_free_gb },
+        })
+      }
+    } else {
+      const existing = await getOpenWpFindingByType(wpMonitor.id, 'high_disk_usage')
       if (existing) await resolveWpFinding(existing.id)
     }
   }

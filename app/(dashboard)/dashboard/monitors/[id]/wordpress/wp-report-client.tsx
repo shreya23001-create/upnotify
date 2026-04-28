@@ -9,6 +9,21 @@ import { CopyUrlButton } from '@/components/monitors/copy-url-button'
 
 const SEVERITY_ORDER = { critical: 0, high: 1, medium: 2, low: 3, info: 4 }
 
+interface SecurityConfig {
+  login_failures_24h?: number
+  world_writable_dirs?: string[]
+  xmlrpc_enabled?: boolean
+  rest_user_enum?: boolean
+  app_passwords_in_use?: boolean
+  auto_updates?: string
+  spam_comments?: number
+  twofa_active?: boolean
+  modified_plugin_files?: string[]
+  backup_plugin_present?: boolean
+  disk_used_pct?: number | null
+  disk_free_gb?: number | null
+}
+
 function scoreColor(score: number): string {
   if (score >= 90) return 'var(--color-up)'
   if (score >= 70) return '#f97316'
@@ -78,6 +93,17 @@ function ScoreInfoPanel(): React.ReactElement {
             ['Each outdated plugin', '−3', 'medium'],
             ['Outdated theme', '−5', 'medium'],
             ['Foreign language page detected', '−10', 'high'],
+            ['No 2FA plugin', '−8', 'high'],
+            ['No backup plugin', '−5', 'medium'],
+            ['Auto-updates disabled', '−5', 'high'],
+            ['XML-RPC enabled', '−5', 'medium'],
+            ['REST user enumeration exposed', '−5', 'medium'],
+            ['World-writable directory', '−10', 'high'],
+            ['Modified plugin file (last 24h)', '−5 each', 'high'],
+            ['Disk usage >90%', '−10', 'high'],
+            ['Disk usage 80–90%', '−5', 'medium'],
+            ['>20 failed logins (brute force)', '−10', 'critical'],
+            ['>5 failed logins (brute force)', '−5', 'high'],
           ].map(([label, pts, sev]) => (
             <tr key={label} style={{ borderTop: '1px solid var(--border-primary)' }}>
               <td style={{ padding: '5px 0', color: 'var(--text-primary)', fontSize: 11 }}>{label}</td>
@@ -193,6 +219,150 @@ function SiteStatsSection({ snapshot, prev }: { snapshot: WpSnapshot | null; pre
   )
 }
 
+function SecurityChecksSection({ snapshot }: { snapshot: WpSnapshot | null }): React.ReactElement | null {
+  if (!snapshot) return null
+  const sec = (snapshot.raw_data as Record<string, unknown> | null)?.security_config as SecurityConfig | undefined
+  if (!sec) return null
+
+  const checks = [
+    {
+      key: 'twofa',
+      label: '2FA Plugin Active',
+      pass: !!sec.twofa_active,
+      detail: sec.twofa_active ? 'Two-factor authentication is active' : 'No 2FA plugin found — admin accounts at risk',
+      severity: 'high',
+    },
+    {
+      key: 'backup',
+      label: 'Backup Plugin Present',
+      pass: !!sec.backup_plugin_present,
+      detail: sec.backup_plugin_present ? 'Automated backup plugin is active' : 'No backup plugin — install one to protect against data loss',
+      severity: 'medium',
+    },
+    {
+      key: 'autoupdates',
+      label: 'Auto-Updates Enabled',
+      pass: sec.auto_updates !== 'disabled',
+      detail: sec.auto_updates === 'enabled' ? 'Full auto-updates enabled' : sec.auto_updates === 'minor_only' ? 'Security/minor updates only (WordPress default)' : 'Auto-updates DISABLED — site won\'t receive security patches automatically',
+      severity: 'high',
+    },
+    {
+      key: 'xmlrpc',
+      label: 'XML-RPC Disabled',
+      pass: !sec.xmlrpc_enabled,
+      detail: sec.xmlrpc_enabled ? 'XML-RPC is enabled — can be used for brute-force amplification attacks' : 'XML-RPC is disabled',
+      severity: 'medium',
+    },
+    {
+      key: 'rest_enum',
+      label: 'REST User Enum Blocked',
+      pass: !sec.rest_user_enum,
+      detail: sec.rest_user_enum ? 'Username list exposed at /wp-json/wp/v2/users — restrict with a security plugin' : 'User list is not publicly exposed',
+      severity: 'medium',
+    },
+    {
+      key: 'brute_force',
+      label: 'Brute Force',
+      pass: (sec.login_failures_24h ?? 0) <= 5,
+      detail: (sec.login_failures_24h ?? 0) > 0
+        ? `${sec.login_failures_24h} failed login attempts in the last 24h`
+        : 'No failed login attempts detected',
+      severity: (sec.login_failures_24h ?? 0) > 20 ? 'critical' : 'high',
+    },
+    {
+      key: 'world_writable',
+      label: 'File Permissions',
+      pass: (sec.world_writable_dirs?.length ?? 0) === 0,
+      detail: (sec.world_writable_dirs?.length ?? 0) > 0
+        ? `World-writable directories: ${sec.world_writable_dirs?.join(', ')}`
+        : 'No world-writable directories detected',
+      severity: 'high',
+    },
+    {
+      key: 'plugin_mods',
+      label: 'Plugin File Changes',
+      pass: (sec.modified_plugin_files?.length ?? 0) === 0,
+      detail: (sec.modified_plugin_files?.length ?? 0) > 0
+        ? `${sec.modified_plugin_files?.length} plugin file(s) modified in last 24h`
+        : 'No recent plugin file modifications',
+      severity: 'high',
+    },
+    {
+      key: 'app_passwords',
+      label: 'Application Passwords',
+      pass: !sec.app_passwords_in_use,
+      detail: sec.app_passwords_in_use
+        ? 'Application passwords are in use — review which applications have access'
+        : 'No application passwords in use',
+      severity: 'low',
+    },
+    {
+      key: 'spam',
+      label: 'Spam Volume',
+      pass: (sec.spam_comments ?? 0) <= 20,
+      detail: (sec.spam_comments ?? 0) > 0
+        ? `${sec.spam_comments} spam comments queued`
+        : 'No spam comments queued',
+      severity: 'medium',
+    },
+    {
+      key: 'disk',
+      label: 'Disk Usage',
+      pass: (sec.disk_used_pct ?? 0) <= 80,
+      detail: sec.disk_used_pct != null
+        ? `${sec.disk_used_pct}% used${sec.disk_free_gb != null ? ` · ${sec.disk_free_gb} GB free` : ''}`
+        : 'Disk usage unavailable',
+      severity: (sec.disk_used_pct ?? 0) > 90 ? 'high' : 'medium',
+    },
+  ]
+
+  const failCount = checks.filter(c => !c.pass).length
+
+  return (
+    <div className="card" style={{ marginBottom: 24 }}>
+      <div className="card-header">
+        <div className="card-title">Security Checks</div>
+        <div style={{ fontSize: 12, color: failCount > 0 ? '#f97316' : 'var(--color-up)', fontWeight: 600 }}>
+          {failCount === 0 ? '✓ All checks passed' : `${failCount} issue${failCount > 1 ? 's' : ''} found`}
+        </div>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))' }}>
+        {checks.map((check, i) => (
+          <div key={check.key} style={{
+            display: 'flex', alignItems: 'flex-start', gap: 10, padding: '11px 20px',
+            borderTop: i === 0 ? 'none' : '1px solid var(--border-primary)',
+            background: !check.pass ? 'rgba(249,115,22,0.03)' : undefined,
+            borderLeft: i % 2 === 1 ? '1px solid var(--border-primary)' : undefined,
+          }}>
+            <div style={{ flexShrink: 0, marginTop: 2 }}>
+              {check.pass ? (
+                <svg width="15" height="15" fill="none" stroke="var(--color-up)" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+              ) : (
+                <svg width="15" height="15" fill="none"
+                  stroke={check.severity === 'critical' || check.severity === 'high' ? 'var(--color-down)' : '#f97316'}
+                  strokeWidth="2.5" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+              )}
+            </div>
+            <div style={{ minWidth: 0 }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>{check.label}</div>
+              <div style={{
+                fontSize: 12, marginTop: 2,
+                color: check.pass
+                  ? 'var(--text-muted)'
+                  : (check.severity === 'critical' || check.severity === 'high') ? 'var(--color-down)' : '#f97316',
+              }}>{check.detail}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 function generatePrintHtml(opts: {
   siteName: string
   siteUrl: string
@@ -207,6 +377,7 @@ function generatePrintHtml(opts: {
   const scoreTextColor = score >= 70 ? '#16a34a' : score >= 50 ? '#d97706' : '#dc2626'
   const outdated = (latestSnapshot?.active_plugins as WpPlugin[] ?? []).filter(p => p.update_available)
   const stats = (latestSnapshot?.raw_data as Record<string, unknown> | null)?.site_stats as WpSiteStats | undefined
+  const sec = (latestSnapshot?.raw_data as Record<string, unknown> | null)?.security_config as SecurityConfig | undefined
 
   const badgeStyle: Record<string, string> = {
     critical: 'background:#fef2f2;color:#dc2626',
@@ -300,6 +471,26 @@ ${openFindings.map(f => `<div class="row">
   <div><div class="ftitle">${escapeHtml(f.title)}</div><div class="fdate">Detected: ${new Date(f.first_detected_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</div></div>
   <span class="badge" style="${badgeStyle[f.severity] ?? badgeStyle.info}">${f.severity.charAt(0).toUpperCase() + f.severity.slice(1)}</span>
 </div>`).join('')}` : `<p style="color:#16a34a;font-weight:600;padding:16px 0">✓ No open issues — your WordPress site looks healthy.</p>`}
+
+${sec ? `<h2>Security Checks</h2>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;margin-bottom:20px">
+  ${[
+    { label: '2FA Plugin', pass: !!sec.twofa_active, detail: sec.twofa_active ? 'Active' : 'Not detected' },
+    { label: 'Backup Plugin', pass: !!sec.backup_plugin_present, detail: sec.backup_plugin_present ? 'Active' : 'Not detected' },
+    { label: 'Auto-Updates', pass: sec.auto_updates !== 'disabled', detail: sec.auto_updates === 'enabled' ? 'Full' : sec.auto_updates === 'disabled' ? 'DISABLED' : 'Minor only' },
+    { label: 'XML-RPC', pass: !sec.xmlrpc_enabled, detail: sec.xmlrpc_enabled ? 'Enabled (risk)' : 'Disabled' },
+    { label: 'REST User Enum', pass: !sec.rest_user_enum, detail: sec.rest_user_enum ? 'Exposed' : 'Protected' },
+    { label: 'Brute Force', pass: (sec.login_failures_24h ?? 0) <= 5, detail: `${sec.login_failures_24h ?? 0} failed logins today` },
+    { label: 'File Permissions', pass: (sec.world_writable_dirs?.length ?? 0) === 0, detail: (sec.world_writable_dirs?.length ?? 0) === 0 ? 'OK' : `${sec.world_writable_dirs?.length} writable dirs` },
+    { label: 'Plugin Files', pass: (sec.modified_plugin_files?.length ?? 0) === 0, detail: (sec.modified_plugin_files?.length ?? 0) === 0 ? 'No recent changes' : `${sec.modified_plugin_files?.length} files changed` },
+    { label: 'Spam Comments', pass: (sec.spam_comments ?? 0) <= 20, detail: `${sec.spam_comments ?? 0} spam queued` },
+    { label: 'Disk Usage', pass: (sec.disk_used_pct ?? 0) <= 80, detail: sec.disk_used_pct != null ? `${sec.disk_used_pct}% used` : 'Unknown' },
+  ].map(c => `<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:${c.pass ? '#fff' : '#fffbeb'};border-bottom:1px solid #e5e7eb">
+    <span style="font-size:13px">${c.pass ? '✅' : '⚠️'}</span>
+    <span style="font-size:12px;font-weight:600;color:#1a1a2e;min-width:110px">${c.label}</span>
+    <span style="font-size:12px;color:${c.pass ? '#6b7280' : '#d97706'}">${c.detail}</span>
+  </div>`).join('')}
+</div>` : ''}
 
 ${aiReport ? `<div class="ai-section">
   <div class="ai-header">🤖 AI Security Analysis</div>
@@ -606,6 +797,9 @@ export function WpReportClient({ monitor, wpMonitor, findings, latestSnapshot, p
           </div>
         </div>
       )}
+
+      {/* Security checks */}
+      <SecurityChecksSection snapshot={latestSnapshot} />
 
       {/* Health trend chart */}
       {history.length >= 2 && (
