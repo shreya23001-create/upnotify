@@ -1,0 +1,347 @@
+import { logger } from '@/lib/utils/logger'
+import {
+  getWpMonitorByToken,
+  markWpMonitorVerified,
+  updateWpMonitorLastPush,
+  saveWpSnapshot,
+  getLatestWpSnapshot,
+  createWpFinding,
+  getOpenWpFindingByType,
+  resolveWpFinding,
+  type WpPlugin,
+  type WpUser,
+  type WpPage,
+  type WpFileScan,
+} from '@/lib/db/wp-monitors'
+import { updateMonitorStatus } from '@/lib/db/monitors'
+
+interface PushPayload {
+  site_url?: string
+  wp_version?: string
+  php_version?: string
+  active_plugins?: WpPlugin[]
+  inactive_plugins?: WpPlugin[]
+  active_theme?: { name: string; version: string; update_available: boolean }
+  admin_users?: WpUser[]
+  recent_pages?: WpPage[]
+  file_scan?: WpFileScan
+  debug_mode?: boolean
+  memory_limit?: string
+  db_size_mb?: number
+  cron_last_run?: string
+  event?: string
+}
+
+const EOL_PHP_VERSIONS = ['5.6', '7.0', '7.1', '7.2', '7.3', '7.4', '8.0']
+
+function isEolPhp(version: string | null | undefined): boolean {
+  if (!version) return false
+  return EOL_PHP_VERSIONS.some(v => version.startsWith(v))
+}
+
+function detectForeignLanguage(title: string): boolean {
+  return (
+    /[Ѐ-ӿ]/.test(title) || // Cyrillic
+    /[一-鿿]/.test(title) || // CJK
+    /[؀-ۿ]/.test(title) || // Arabic
+    /[ऀ-ॿ]/.test(title) || // Devanagari
+    /[฀-๿]/.test(title) || // Thai
+    /[぀-ゟ゠-ヿ]/.test(title)  // Japanese
+  )
+}
+
+function computeHealthScore(payload: PushPayload, fileScan: WpFileScan): number {
+  let score = 100
+
+  // Critical: executable/php files in uploads
+  score -= (fileScan.php_in_uploads?.length ?? 0) * 30
+  score -= (fileScan.suspicious_files?.length ?? 0) * 25
+
+  // High: modified sensitive files
+  if (fileScan.htaccess_modified) score -= 15
+  if (fileScan.wpconfig_modified) score -= 15
+  if ((fileScan.core_files_modified?.length ?? 0) > 0) score -= 20
+  if ((fileScan.theme_files_modified?.length ?? 0) > 0) score -= 10
+
+  // High: EOL PHP
+  if (isEolPhp(payload.php_version)) score -= 15
+
+  // High: debug mode on
+  if (payload.debug_mode) score -= 10
+
+  // Medium: outdated plugins
+  const outdatedCount = (payload.active_plugins ?? []).filter(p => p.update_available).length
+  score -= outdatedCount * 3
+
+  // Medium: outdated theme
+  if (payload.active_theme?.update_available) score -= 5
+
+  // High: foreign language pages (potential SEO spam)
+  const foreignPages = (payload.recent_pages ?? []).filter(p => p.language && p.language !== 'en')
+  score -= foreignPages.length * 10
+
+  return Math.max(0, Math.min(100, score))
+}
+
+export async function POST(request: Request): Promise<Response> {
+  const authHeader = request.headers.get('Authorization') ?? ''
+  const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7).trim() : ''
+
+  if (!token) {
+    return Response.json({ error: 'Missing token' }, { status: 401 })
+  }
+
+  const wpMonitor = await getWpMonitorByToken(token)
+  if (!wpMonitor) {
+    return Response.json({ error: 'Invalid token' }, { status: 401 })
+  }
+
+  let payload: PushPayload
+  try {
+    payload = await request.json() as PushPayload
+  } catch {
+    return Response.json({ error: 'Invalid JSON' }, { status: 400 })
+  }
+
+  // Handle plugin deactivation event
+  if (payload.event === 'plugin_deactivated') {
+    logger.info('WP plugin deactivated', { wpMonitorId: wpMonitor.id, siteUrl: wpMonitor.site_url })
+    return Response.json({ ok: true })
+  }
+
+  const fileScan: WpFileScan = {
+    php_in_uploads: payload.file_scan?.php_in_uploads ?? [],
+    js_in_uploads: payload.file_scan?.js_in_uploads ?? [],
+    htaccess_modified: payload.file_scan?.htaccess_modified ?? false,
+    wpconfig_modified: payload.file_scan?.wpconfig_modified ?? false,
+    suspicious_files: payload.file_scan?.suspicious_files ?? [],
+    core_files_modified: payload.file_scan?.core_files_modified ?? [],
+    theme_files_modified: payload.file_scan?.theme_files_modified ?? [],
+  }
+
+  const healthScore = computeHealthScore(payload, fileScan)
+
+  // Save snapshot
+  const snapshot = await saveWpSnapshot({
+    wp_monitor_id: wpMonitor.id,
+    org_id: wpMonitor.org_id,
+    wp_version: payload.wp_version,
+    php_version: payload.php_version,
+    active_plugins: payload.active_plugins as unknown[],
+    inactive_plugins: payload.inactive_plugins as unknown[],
+    active_theme: payload.active_theme as unknown,
+    admin_users: payload.admin_users as unknown[],
+    recent_pages: payload.recent_pages as unknown[],
+    file_scan: fileScan as unknown,
+    debug_mode: payload.debug_mode,
+    memory_limit: payload.memory_limit,
+    db_size_mb: payload.db_size_mb,
+    cron_last_run: payload.cron_last_run,
+    health_score: healthScore,
+    raw_data: payload as unknown,
+  })
+
+  // Mark verified on first push
+  if (!wpMonitor.token_verified) {
+    await markWpMonitorVerified(wpMonitor.id)
+  } else {
+    await updateWpMonitorLastPush(wpMonitor.id)
+  }
+
+  // Update parent monitor status
+  const monitorStatus = healthScore >= 70 ? 'up' : healthScore >= 40 ? 'degraded' : 'down'
+  await updateMonitorStatus(wpMonitor.monitor_id, {
+    status: monitorStatus,
+    last_checked_at: new Date().toISOString(),
+    next_check_at: new Date(Date.now() + wpMonitor.check_interval_minutes * 60 * 1000).toISOString(),
+  })
+
+  // Diff against previous snapshot to create/resolve findings
+  const prevSnapshot = await getLatestWpSnapshot(wpMonitor.id)
+  const snapshotId = snapshot?.id
+
+  // PHP files in uploads
+  for (const file of fileScan.php_in_uploads) {
+    const existing = await getOpenWpFindingByType(wpMonitor.id, `php_in_uploads:${file}`)
+    if (!existing) {
+      await createWpFinding({
+        wp_monitor_id: wpMonitor.id,
+        org_id: wpMonitor.org_id,
+        snapshot_id: snapshotId,
+        finding_type: `php_in_uploads:${file}`,
+        severity: 'critical',
+        title: `PHP file found in /uploads/: ${file}`,
+        detail: { file, location: 'uploads' },
+      })
+    }
+  }
+
+  // Resolve cleared PHP file findings
+  if (prevSnapshot) {
+    const prevPhpFiles = (prevSnapshot.file_scan as WpFileScan)?.php_in_uploads ?? []
+    for (const file of prevPhpFiles) {
+      if (!fileScan.php_in_uploads.includes(file)) {
+        const existing = await getOpenWpFindingByType(wpMonitor.id, `php_in_uploads:${file}`)
+        if (existing) await resolveWpFinding(existing.id)
+      }
+    }
+  }
+
+  // Suspicious/executable files in uploads
+  for (const file of fileScan.suspicious_files) {
+    const existing = await getOpenWpFindingByType(wpMonitor.id, `exec_in_uploads:${file}`)
+    if (!existing) {
+      await createWpFinding({
+        wp_monitor_id: wpMonitor.id,
+        org_id: wpMonitor.org_id,
+        snapshot_id: snapshotId,
+        finding_type: `exec_in_uploads:${file}`,
+        severity: 'critical',
+        title: `Executable file found in /uploads/: ${file}`,
+        detail: { file, location: 'uploads' },
+      })
+    }
+  }
+
+  // htaccess modified
+  if (fileScan.htaccess_modified) {
+    const existing = await getOpenWpFindingByType(wpMonitor.id, 'htaccess_modified')
+    if (!existing) {
+      await createWpFinding({
+        wp_monitor_id: wpMonitor.id,
+        org_id: wpMonitor.org_id,
+        snapshot_id: snapshotId,
+        finding_type: 'htaccess_modified',
+        severity: 'high',
+        title: '.htaccess file has been modified',
+        detail: {},
+      })
+    }
+  } else {
+    const existing = await getOpenWpFindingByType(wpMonitor.id, 'htaccess_modified')
+    if (existing) await resolveWpFinding(existing.id)
+  }
+
+  // wp-config.php modified
+  if (fileScan.wpconfig_modified) {
+    const existing = await getOpenWpFindingByType(wpMonitor.id, 'wpconfig_modified')
+    if (!existing) {
+      await createWpFinding({
+        wp_monitor_id: wpMonitor.id,
+        org_id: wpMonitor.org_id,
+        snapshot_id: snapshotId,
+        finding_type: 'wpconfig_modified',
+        severity: 'high',
+        title: 'wp-config.php has been modified',
+        detail: {},
+      })
+    }
+  } else {
+    const existing = await getOpenWpFindingByType(wpMonitor.id, 'wpconfig_modified')
+    if (existing) await resolveWpFinding(existing.id)
+  }
+
+  // New admin users (compare by user ID against previous snapshot)
+  if (prevSnapshot) {
+    const prevAdminIds = new Set((prevSnapshot.admin_users as WpUser[]).map(u => u.id))
+    const newAdmins = (payload.admin_users ?? []).filter(u => !prevAdminIds.has(u.id))
+    for (const user of newAdmins) {
+      await createWpFinding({
+        wp_monitor_id: wpMonitor.id,
+        org_id: wpMonitor.org_id,
+        snapshot_id: snapshotId,
+        finding_type: `new_admin_user:${user.id}`,
+        severity: 'high',
+        title: `New admin/editor user created: ${user.login}`,
+        detail: { user_id: user.id, login: user.login, roles: user.roles },
+      })
+    }
+  }
+
+  // EOL PHP version
+  if (isEolPhp(payload.php_version)) {
+    const existing = await getOpenWpFindingByType(wpMonitor.id, 'eol_php')
+    if (!existing) {
+      await createWpFinding({
+        wp_monitor_id: wpMonitor.id,
+        org_id: wpMonitor.org_id,
+        snapshot_id: snapshotId,
+        finding_type: 'eol_php',
+        severity: 'high',
+        title: `PHP version ${payload.php_version} is end-of-life`,
+        detail: { version: payload.php_version },
+      })
+    }
+  } else {
+    const existing = await getOpenWpFindingByType(wpMonitor.id, 'eol_php')
+    if (existing) await resolveWpFinding(existing.id)
+  }
+
+  // Debug mode on
+  if (payload.debug_mode) {
+    const existing = await getOpenWpFindingByType(wpMonitor.id, 'debug_mode_on')
+    if (!existing) {
+      await createWpFinding({
+        wp_monitor_id: wpMonitor.id,
+        org_id: wpMonitor.org_id,
+        snapshot_id: snapshotId,
+        finding_type: 'debug_mode_on',
+        severity: 'medium',
+        title: 'WP_DEBUG is enabled in production',
+        detail: {},
+      })
+    }
+  } else {
+    const existing = await getOpenWpFindingByType(wpMonitor.id, 'debug_mode_on')
+    if (existing) await resolveWpFinding(existing.id)
+  }
+
+  // Foreign language pages (new pages only — compare against previous)
+  if (prevSnapshot) {
+    const prevPageIds = new Set((prevSnapshot.recent_pages as WpPage[]).map(p => p.id))
+    const newPages = (payload.recent_pages ?? []).filter(p => !prevPageIds.has(p.id))
+    for (const page of newPages) {
+      if (detectForeignLanguage(page.title)) {
+        await createWpFinding({
+          wp_monitor_id: wpMonitor.id,
+          org_id: wpMonitor.org_id,
+          snapshot_id: snapshotId,
+          finding_type: `foreign_page:${page.id}`,
+          severity: 'high',
+          title: `New page with foreign language title detected: "${page.title}"`,
+          detail: { page_id: page.id, title: page.title, slug: page.slug, language: page.language },
+        })
+      }
+    }
+  }
+
+  // Outdated plugins (create once, resolve when updated)
+  for (const plugin of payload.active_plugins ?? []) {
+    const findingType = `outdated_plugin:${plugin.slug}`
+    if (plugin.update_available) {
+      const existing = await getOpenWpFindingByType(wpMonitor.id, findingType)
+      if (!existing) {
+        await createWpFinding({
+          wp_monitor_id: wpMonitor.id,
+          org_id: wpMonitor.org_id,
+          snapshot_id: snapshotId,
+          finding_type: findingType,
+          severity: 'medium',
+          title: `Plugin update available: ${plugin.name} (${plugin.version} → ${plugin.new_version ?? 'latest'})`,
+          detail: { name: plugin.name, slug: plugin.slug, current: plugin.version, latest: plugin.new_version },
+        })
+      }
+    } else {
+      const existing = await getOpenWpFindingByType(wpMonitor.id, findingType)
+      if (existing) await resolveWpFinding(existing.id)
+    }
+  }
+
+  logger.info('WP push processed', {
+    wpMonitorId: wpMonitor.id,
+    healthScore,
+    snapshotId,
+  })
+
+  return Response.json({ ok: true, health_score: healthScore })
+}
