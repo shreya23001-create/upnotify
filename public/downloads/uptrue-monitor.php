@@ -54,6 +54,29 @@ function uptrue_deactivate() {
     }
 }
 
+// Re-register any missing cron jobs on every WP load.
+// Cron entries can silently disappear after WP updates, migrations, or
+// certain object-cache flushes. Activation hook alone is not enough.
+add_action( 'plugins_loaded', 'uptrue_ensure_crons' );
+
+function uptrue_ensure_crons() {
+    // Only reschedule if the plugin has a token — no point scheduling without one
+    if ( ! get_option( UPTRUE_OPT_TOKEN, '' ) ) return;
+
+    $needs_reschedule = false;
+    $critical_hooks   = array( UPTRUE_CRON_MAIN, UPTRUE_CRON_PHP, UPTRUE_CRON_REPORT );
+    foreach ( $critical_hooks as $hook ) {
+        if ( ! wp_next_scheduled( $hook ) ) {
+            $needs_reschedule = true;
+            break;
+        }
+    }
+
+    if ( $needs_reschedule ) {
+        uptrue_schedule_crons();
+    }
+}
+
 // ============================================================
 // CRON INTERVALS & SCHEDULING
 // ============================================================
@@ -606,10 +629,11 @@ function uptrue_page_settings() {
 
         if ( $token ) {
             uptrue_self_test();
-            uptrue_do_main_push();
+            // Schedule push 5 seconds from now — avoids blocking the admin HTTP response on slow servers.
+            wp_schedule_single_event( time() + 5, UPTRUE_CRON_MAIN );
         }
 
-        echo '<div class="notice notice-success inline"><p>Settings saved. Push sent — check Last Error below.</p></div>';
+        echo '<div class="notice notice-success inline"><p>Settings saved. First data push scheduled — check Last Error below in a few seconds.</p></div>';
     }
 
     $token    = get_option( UPTRUE_OPT_TOKEN, '' );
