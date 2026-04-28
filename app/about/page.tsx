@@ -69,7 +69,7 @@ export default function AboutPage(): React.ReactElement {
               <h2 className="about-section-title">Who We Are</h2>
               <p className="about-text">
                 Uptrue is built and operated by <strong>Vision Software Solutions Limited</strong>,
-                a UK company founded in 2026 and headquartered in Brentford, United Kingdom.
+                a UK company incorporated in 1992 (Company No. 02710980), headquartered in Brentford, United Kingdom.
               </p>
               <p className="about-text">
                 We set out to solve a problem we experienced first-hand: monitoring dozens of
