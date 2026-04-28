@@ -157,7 +157,9 @@ export async function getRecentCheckResultsByOrg(orgId: string, days: number = 3
 
 function formatSlotTime(base: Date, slotIndex: number, slotMinutes: number = 15): string {
   const time = new Date(base.getTime() + slotIndex * slotMinutes * 60 * 1000)
-  return time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  const h = String(time.getUTCHours()).padStart(2, '0')
+  const m = String(time.getUTCMinutes()).padStart(2, '0')
+  return `${h}:${m} UTC`
 }
 
 /**

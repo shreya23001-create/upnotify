@@ -14,7 +14,7 @@ export function StatusIncidentList({ incidents }: { incidents: Incident[] }): Re
             <div>
               <div className="sp-incident-title">{inc.title}</div>
               <div style={{ fontSize: 11, color: '#b45309', marginTop: 2 }}>
-                {new Date(inc.started_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+                {fmtDate(inc.started_at)}
                 {inc.status === 'resolved' ? ' · Resolved' : ''}
                 {inc.duration_seconds ? ` · Duration: ${formatDuration(inc.duration_seconds)}` : ''}
               </div>
@@ -36,7 +36,7 @@ export function StatusIncidentList({ incidents }: { incidents: Incident[] }): Re
                 </div>
                 <div>
                   <div className="sp-incident-update-time">
-                    {new Date(inc.resolved_at).toLocaleString('en-GB', { timeStyle: 'short', timeZoneName: 'short' })}
+                    {fmtDateTime(inc.resolved_at)}
                   </div>
                   <div className="sp-incident-update-msg">Services returned to normal operation.</div>
                   <div className="sp-incident-update-status" style={{ color: 'var(--color-up)' }}>Status: Resolved</div>
@@ -50,7 +50,7 @@ export function StatusIncidentList({ incidents }: { incidents: Incident[] }): Re
               </div>
               <div>
                 <div className="sp-incident-update-time">
-                  {new Date(inc.started_at).toLocaleString('en-GB', { timeStyle: 'short', timeZoneName: 'short' })}
+                  {fmtDateTime(inc.started_at)}
                 </div>
                 <div className="sp-incident-update-msg">Incident detected. Our team began investigating.</div>
                 <div className="sp-incident-update-status" style={{ color: 'var(--color-warn)' }}>Status: Investigating</div>
@@ -67,4 +67,18 @@ function formatDuration(seconds: number): string {
   if (seconds < 60) return `${seconds}s`
   if (seconds < 3600) return `${Math.floor(seconds / 60)}m`
   return `${Math.floor(seconds / 3600)}h ${Math.floor((seconds % 3600) / 60)}m`
+}
+
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+
+function fmtDate(iso: string): string {
+  const d = new Date(iso)
+  return `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`
+}
+
+function fmtDateTime(iso: string): string {
+  const d = new Date(iso)
+  const h = String(d.getUTCHours()).padStart(2, '0')
+  const m = String(d.getUTCMinutes()).padStart(2, '0')
+  return `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}, ${h}:${m} UTC`
 }
