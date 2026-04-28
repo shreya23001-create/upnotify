@@ -429,12 +429,16 @@ function uptrue_collect_data() {
 // ============================================================
 
 function uptrue_detect_language( $text ) {
-    if ( preg_match( '/[\x{0400}-\x{04FF}]/u', $text ) )                          return 'ru';
-    if ( preg_match( '/[\x{4E00}-\x{9FFF}]/u', $text ) )                          return 'zh';
-    if ( preg_match( '/[\x{0600}-\x{06FF}]/u', $text ) )                          return 'ar';
-    if ( preg_match( '/[\x{0900}-\x{097F}]/u', $text ) )                          return 'hi';
-    if ( preg_match( '/[\x{0E00}-\x{0E7F}]/u', $text ) )                          return 'th';
-    if ( preg_match( '/[\x{3040}-\x{309F}\x{30A0}-\x{30FF}]/u', $text ) )         return 'ja';
+    if ( preg_match( '/[\x{0400}-\x{04FF}]/u', $text ) )                          return 'ru'; // Cyrillic
+    if ( preg_match( '/[\x{4E00}-\x{9FFF}]/u', $text ) )                          return 'zh'; // CJK (Chinese)
+    if ( preg_match( '/[\x{0600}-\x{06FF}]/u', $text ) )                          return 'ar'; // Arabic / Persian / Urdu
+    if ( preg_match( '/[\x{0900}-\x{097F}]/u', $text ) )                          return 'hi'; // Devanagari (Hindi)
+    if ( preg_match( '/[\x{0E00}-\x{0E7F}]/u', $text ) )                          return 'th'; // Thai
+    if ( preg_match( '/[\x{3040}-\x{309F}\x{30A0}-\x{30FF}]/u', $text ) )         return 'ja'; // Japanese
+    if ( preg_match( '/[\x{AC00}-\x{D7A3}]/u', $text ) )                          return 'ko'; // Korean
+    if ( preg_match( '/[\x{0590}-\x{05FF}]/u', $text ) )                          return 'he'; // Hebrew
+    if ( preg_match( '/[\x{0980}-\x{09FF}]/u', $text ) )                          return 'bn'; // Bengali
+    if ( preg_match( '/[\x{10A0}-\x{10FF}]/u', $text ) )                          return 'ka'; // Georgian
     return 'en';
 }
 

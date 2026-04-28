@@ -68,12 +68,16 @@ function isEolPhp(version: string | null | undefined): boolean {
 
 function detectForeignLanguage(title: string): boolean {
   return (
-    /[Ѐ-ӿ]/.test(title) || // Cyrillic
-    /[一-鿿]/.test(title) || // CJK
-    /[؀-ۿ]/.test(title) || // Arabic
-    /[ऀ-ॿ]/.test(title) || // Devanagari
-    /[฀-๿]/.test(title) || // Thai
-    /[぀-ゟ゠-ヿ]/.test(title)  // Japanese
+    /[Ѐ-ӿ]/.test(title)         || // Cyrillic (Russian/Ukrainian/Bulgarian)
+    /[一-鿿]/.test(title)         || // CJK (Chinese)
+    /[؀-ۿ]/.test(title)         || // Arabic / Persian / Urdu
+    /[ऀ-ॿ]/.test(title)         || // Devanagari (Hindi)
+    /[฀-๿]/.test(title)         || // Thai
+    /[぀-ゟ゠-ヿ]/.test(title)    || // Japanese
+    /[가-힣]/.test(title) || // Korean
+    /[֐-׿]/.test(title) || // Hebrew
+    /[ঀ-৿]/.test(title) || // Bengali
+    /[Ⴀ-ჿ]/.test(title)    // Georgian
   )
 }
 
@@ -356,7 +360,7 @@ export async function POST(request: Request): Promise<Response> {
     const findingType = `foreign_page:${page.id}`
     const existing = await getOpenWpFindingByType(wpMonitor.id, findingType)
     if (!existing) {
-      const langLabels: Record<string, string> = { zh: 'Chinese', ru: 'Russian', ar: 'Arabic', hi: 'Hindi', ja: 'Japanese', th: 'Thai' }
+      const langLabels: Record<string, string> = { zh: 'Chinese', ru: 'Russian', ar: 'Arabic/Persian/Urdu', hi: 'Hindi', ja: 'Japanese', th: 'Thai', ko: 'Korean', he: 'Hebrew', bn: 'Bengali', ka: 'Georgian' }
       const langLabel = langLabels[page.lang] ?? page.lang.toUpperCase()
       await createWpFinding({
         wp_monitor_id: wpMonitor.id,
