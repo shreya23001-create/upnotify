@@ -20,7 +20,7 @@ function uptrue_api_base() {
     if ( defined( 'UPTRUE_API_BASE_URL' ) ) {
         return rtrim( UPTRUE_API_BASE_URL, '/' );
     }
-    return 'https://uptrue.io/api/v1/wp-agent';
+    return 'https://dev.uptrue.io/api/v1/wp-agent';
 }
 define( 'UPTRUE_OPT_TOKEN',    'uptrue_api_token' );
 define( 'UPTRUE_OPT_INTERVAL', 'uptrue_check_interval' );
