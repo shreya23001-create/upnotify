@@ -160,7 +160,7 @@ export function IconNameserverChange({ size = 18, className }: IconProps) {
 }
 
 export function IconWordpress({ size = 18, className }: IconProps) {
-  return <svg width={size} height={size} viewBox="0 0 24 24" className={className}><circle cx="12" cy="12" r="11" fill="#21759b"/><text x="12" y="16.5" textAnchor="middle" fill="white" fontSize="11" fontWeight="bold" fontFamily="Georgia,serif">W</text></svg>
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><polyline points="6,8 8.5,16 12,12 15.5,16 18,8"/></svg>
 }
 
 /* Admin icons */

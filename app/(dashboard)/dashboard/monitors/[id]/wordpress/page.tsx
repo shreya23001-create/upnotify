@@ -1,8 +1,9 @@
 import { notFound, redirect } from 'next/navigation'
 import { getCurrentUser } from '@/lib/db/users'
 import { getMonitorById } from '@/lib/db/monitors'
-import { getWpMonitorByMonitorId, getWpFindings, getLatestWpSnapshot, getWpSnapshotHistory } from '@/lib/db/wp-monitors'
+import { getWpMonitorByMonitorId, getWpFindings, getLatestWpSnapshot, getWpSnapshotHistory, createWpMonitor, generateWpToken } from '@/lib/db/wp-monitors'
 import { WpReportClient } from './wp-report-client'
+import { WpSetupRequired } from './wp-setup-required'
 
 export default async function WordPressMonitorPage({
   params,
@@ -19,7 +20,20 @@ export default async function WordPressMonitorPage({
   ])
 
   if (!monitor || monitor.org_id !== user.org_id) notFound()
-  if (!wpMonitor) notFound()
+
+  if (!wpMonitor) {
+    // Monitor was created via manual form — auto-provision the wp_monitors record
+    const token = generateWpToken()
+    const created = await createWpMonitor({
+      monitor_id: monitor.id,
+      org_id: monitor.org_id,
+      site_url: monitor.target,
+      api_token: token,
+      check_interval_minutes: 120,
+    })
+    if (!created) notFound()
+    return <WpSetupRequired monitor={monitor} token={token} />
+  }
 
   const [findings, latestSnapshot, history] = await Promise.all([
     getWpFindings(wpMonitor.id),
