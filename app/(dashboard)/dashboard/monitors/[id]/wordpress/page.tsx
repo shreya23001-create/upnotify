@@ -22,7 +22,6 @@ export default async function WordPressMonitorPage({
   if (!monitor || monitor.org_id !== user.org_id) notFound()
 
   if (!wpMonitor) {
-    // Monitor was created via manual form — auto-provision the wp_monitors record
     const token = generateWpToken()
     const created = await createWpMonitor({
       monitor_id: monitor.id,
@@ -33,6 +32,10 @@ export default async function WordPressMonitorPage({
     })
     if (!created) notFound()
     return <WpSetupRequired monitor={monitor} token={token} />
+  }
+
+  if (!wpMonitor.token_verified) {
+    return <WpSetupRequired monitor={monitor} token={wpMonitor.api_token} />
   }
 
   const [findings, latestSnapshot, history] = await Promise.all([

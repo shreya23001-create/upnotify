@@ -1,24 +1,15 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import Link from 'next/link'
 import type { Monitor } from '@/lib/types'
 import type { WpMonitor, WpFinding, WpSnapshot, WpPlugin } from '@/lib/db/wp-monitors'
+import { MonitorStatusBadge } from '@/components/monitors/monitor-status-badge'
+import { MonitorActions } from '@/components/monitors/monitor-actions'
+import { CopyUrlButton } from '@/components/monitors/copy-url-button'
+import { BadgeEmbed } from '@/components/monitors/badge-embed'
 
 const SEVERITY_ORDER = { critical: 0, high: 1, medium: 2, low: 3, info: 4 }
-const SEVERITY_COLOR: Record<string, string> = {
-  critical: 'var(--color-down)',
-  high: '#f97316',
-  medium: '#eab308',
-  low: 'var(--color-up)',
-  info: 'var(--text-secondary)',
-}
-const SEVERITY_BG: Record<string, string> = {
-  critical: 'var(--color-down-bg)',
-  high: '#fff7ed',
-  medium: '#fefce8',
-  low: 'var(--color-up-bg)',
-  info: 'var(--bg-muted)',
-}
 
 function scoreColor(score: number): string {
   if (score >= 90) return 'var(--color-up)'
@@ -35,11 +26,23 @@ function scoreLabel(score: number): string {
 }
 
 function fmtDate(iso: string): string {
-  const d = new Date(iso)
-  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
-  const h = String(d.getUTCHours()).padStart(2, '0')
-  const m = String(d.getUTCMinutes()).padStart(2, '0')
-  return `${d.getUTCDate()} ${months[d.getUTCMonth()]} ${d.getUTCFullYear()}, ${h}:${m} UTC`
+  return new Date(iso).toLocaleString('en-GB', { dateStyle: 'short', timeStyle: 'short' })
+}
+
+function timeAgo(iso: string): string {
+  const seconds = Math.floor((Date.now() - new Date(iso).getTime()) / 1000)
+  if (seconds < 60) return 'Just now'
+  if (seconds < 3600) return `${Math.floor(seconds / 60)} min ago`
+  if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`
+  return `${Math.floor(seconds / 86400)}d ago`
+}
+
+const severityBadgeClass: Record<string, string> = {
+  critical: 'badge-danger',
+  high: 'badge-warning',
+  medium: 'badge-warning',
+  low: 'badge-outline',
+  info: 'badge-outline',
 }
 
 interface Props {
@@ -55,7 +58,6 @@ export function WpReportClient({ monitor, wpMonitor, findings, latestSnapshot, h
   const [aiReportOpen, setAiReportOpen] = useState(false)
   const [aiReport, setAiReport] = useState<string | null>(null)
   const [aiLoading, startAiTransition] = useTransition()
-  const [activeTab, setActiveTab] = useState<'issues' | 'timeline'>('issues')
 
   const openFindings = findings
     .filter(f => f.status === 'open' || f.status === 'acknowledged')
@@ -64,6 +66,7 @@ export function WpReportClient({ monitor, wpMonitor, findings, latestSnapshot, h
   const score = latestSnapshot?.health_score ?? 100
   const criticalCount = openFindings.filter(f => f.severity === 'critical').length
   const highCount = openFindings.filter(f => f.severity === 'high').length
+  const outdatedPlugins = (latestSnapshot?.active_plugins as WpPlugin[] | undefined ?? []).filter(p => p.update_available)
 
   function handleGenerateAiReport(): void {
     setAiReportOpen(true)
@@ -81,130 +84,186 @@ export function WpReportClient({ monitor, wpMonitor, findings, latestSnapshot, h
 
   return (
     <div>
-      <div className="page-header">
-        <div>
-          <h1 className="page-title">🔌 {monitor.name}</h1>
-          <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 2 }}>
-            {wpMonitor.site_url} · Last push: {wpMonitor.last_push_at ? fmtDate(wpMonitor.last_push_at) : 'Never'}
+      {/* Header — same structure as standard monitor detail page */}
+      <div className="monitor-header-v2">
+        <div className="monitor-header-v2-left">
+          <div className="monitor-header-v2-title-row">
+            <h1 className="monitor-header-v2-name">{monitor.name}</h1>
+            <MonitorStatusBadge status={monitor.status} monitorType={monitor.type} />
+            <span className="monitor-type-badge">wordpress</span>
+          </div>
+          <div className="monitor-target-row">
+            <div className="monitor-header-v2-url">{wpMonitor.site_url}</div>
+            <CopyUrlButton url={wpMonitor.site_url} />
           </div>
         </div>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <button type="button" onClick={handleGenerateAiReport} className="btn btn-outline" style={{ fontSize: 13 }}>
-            🤖 Generate AI Report
+        <div className="monitor-header-v2-right">
+          <button type="button" onClick={handleGenerateAiReport} className="btn btn-sm btn-outline">
+            AI Report
           </button>
-          <a href="/dashboard/monitors" className="btn btn-ghost">← Monitors</a>
+          <Link href={`/dashboard/monitors/${monitor.id}/edit`} className="btn btn-sm btn-secondary">Edit</Link>
+          <MonitorActions monitorId={monitor.id} isPaused={monitor.is_paused} />
         </div>
       </div>
 
-      {!wpMonitor.token_verified && (
-        <div className="alert alert-warning" style={{ marginBottom: 20 }}>
-          Waiting for first push from your WordPress site. Make sure the plugin is installed and the token is saved in{' '}
-          <strong>Uptrue → Settings</strong> in your WP Admin.
+      {/* Stat cards — same grid as standard monitor page */}
+      <div className="monitor-stat-grid">
+        <div className={`monitor-stat-card ${score >= 70 ? 'card-up' : 'card-warn'}`}>
+          <div className={`monitor-stat-icon ${score >= 70 ? 'icon-up' : 'icon-warn'}`}>
+            <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+          </div>
+          <div className="monitor-stat-label">Health Score</div>
+          <div className="monitor-stat-value">
+            {score}<span className="monitor-stat-unit">/ 100</span>
+          </div>
+          <div className="monitor-stat-sub">{scoreLabel(score)}</div>
         </div>
-      )}
 
-      {/* Health score hero */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: 24, alignItems: 'center', marginBottom: 28 }}>
-        <div style={{
-          width: 120, height: 120, borderRadius: '50%',
-          background: `conic-gradient(${scoreColor(score)} ${score}%, var(--bg-muted) 0%)`,
-          display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-        }}>
-          <div style={{
-            width: 94, height: 94, borderRadius: '50%', background: 'var(--bg-card)',
-            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-          }}>
-            <span style={{ fontSize: 28, fontWeight: 800, color: scoreColor(score), lineHeight: 1 }}>{score}</span>
-            <span style={{ fontSize: 11, color: 'var(--text-secondary)', fontWeight: 600 }}>{scoreLabel(score)}</span>
+        <div className={`monitor-stat-card ${criticalCount > 0 ? 'card-warn' : 'card-blue'}`}>
+          <div className={`monitor-stat-icon ${criticalCount > 0 ? 'icon-warn' : 'icon-blue'}`}>
+            <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          </div>
+          <div className="monitor-stat-label">Open Issues</div>
+          <div className="monitor-stat-value">{openFindings.length}</div>
+          <div className="monitor-stat-sub">
+            {criticalCount > 0 ? `${criticalCount} critical` : highCount > 0 ? `${highCount} high` : 'No critical issues'}
           </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
-          {[
-            { label: 'Critical', value: criticalCount, color: 'var(--color-down)' },
-            { label: 'High', value: highCount, color: '#f97316' },
-            { label: 'Open Issues', value: openFindings.length, color: '#667eea' },
-            { label: 'WP Version', value: latestSnapshot?.wp_version ?? '—', color: 'var(--text-primary)' },
-          ].map(stat => (
-            <div key={stat.label} className="card" style={{ padding: '12px 16px', textAlign: 'center' }}>
-              <div style={{ fontSize: 22, fontWeight: 800, color: stat.color }}>{stat.value}</div>
-              <div style={{ fontSize: 11, color: 'var(--text-secondary)', fontWeight: 600, marginTop: 2 }}>{stat.label}</div>
-            </div>
-          ))}
+        <div className="monitor-stat-card card-up">
+          <div className="monitor-stat-icon icon-up">
+            <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <div className="monitor-stat-label">Last Push</div>
+          <div className="monitor-stat-value" style={{ fontSize: 18 }}>
+            {wpMonitor.last_push_at ? timeAgo(wpMonitor.last_push_at) : '—'}
+          </div>
+          <div className="monitor-stat-sub">
+            {wpMonitor.last_push_at ? fmtDate(wpMonitor.last_push_at) : 'No data yet'}
+          </div>
+        </div>
+
+        <div className={`monitor-stat-card ${outdatedPlugins.length > 0 ? 'card-warn' : 'card-up'}`}>
+          <div className={`monitor-stat-icon ${outdatedPlugins.length > 0 ? 'icon-warn' : 'icon-up'}`}>
+            <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="6,8 8.5,16 12,12 15.5,16 18,8"/></svg>
+          </div>
+          <div className="monitor-stat-label">Plugin Updates</div>
+          <div className="monitor-stat-value">{outdatedPlugins.length}</div>
+          <div className="monitor-stat-sub">
+            {latestSnapshot ? `WP ${latestSnapshot.wp_version ?? '—'} · PHP ${latestSnapshot.php_version ?? '—'}` : 'No data yet'}
+          </div>
         </div>
       </div>
 
-      {/* Tabs */}
-      <div style={{ display: 'flex', gap: 0, borderBottom: '2px solid var(--border-primary)', marginBottom: 20 }}>
-        {(['issues', 'timeline'] as const).map(tab => (
-          <button
-            key={tab}
-            type="button"
-            onClick={() => setActiveTab(tab)}
-            style={{
-              padding: '10px 20px', fontSize: 14, fontWeight: 600, border: 'none', background: 'none',
-              cursor: 'pointer', borderBottom: activeTab === tab ? '2px solid #667eea' : '2px solid transparent',
-              color: activeTab === tab ? '#667eea' : 'var(--text-secondary)',
-              marginBottom: -2, textTransform: 'capitalize',
-            }}
-          >
-            {tab === 'issues' ? `Issues (${openFindings.length})` : 'Timeline'}
-          </button>
-        ))}
-      </div>
-
-      {/* Issues tab */}
-      {activeTab === 'issues' && (
-        <div>
-          {openFindings.length === 0 ? (
-            <div className="card" style={{ padding: 'var(--space-6)', textAlign: 'center' }}>
-              <div style={{ fontSize: 32, marginBottom: 8 }}>✅</div>
-              <div style={{ fontWeight: 600 }}>No open issues</div>
-              <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 4 }}>
-                Your WordPress site looks healthy.
+      {/* Config + top findings — same 2-column grid as standard monitor page */}
+      <div className="grid-2" style={{ marginBottom: 24 }}>
+        <div className="card">
+          <div className="card-header">
+            <div className="card-title">Monitor Settings</div>
+          </div>
+          <div className="mon-config-grid">
+            <div className="mon-config-item">
+              <div className="mon-config-item-label">WordPress Version</div>
+              <div className="mon-config-item-value">{latestSnapshot?.wp_version ?? '—'}</div>
+              <div className="mon-config-item-sub">
+                {latestSnapshot?.php_version ? `PHP ${latestSnapshot.php_version}` : 'No data yet'}
               </div>
             </div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {openFindings.map(finding => (
+            <div className="mon-config-item">
+              <div className="mon-config-item-label">Active Plugins</div>
+              <div className="mon-config-item-value">
+                {latestSnapshot ? (latestSnapshot.active_plugins as WpPlugin[]).length : '—'}
+              </div>
+              <div className="mon-config-item-sub">
+                {outdatedPlugins.length > 0 ? `${outdatedPlugins.length} need updates` : 'All up to date'}
+              </div>
+            </div>
+            <div className="mon-config-item">
+              <div className="mon-config-item-label">Check Interval</div>
+              <div className="mon-config-item-value">Every {wpMonitor.check_interval_minutes}m</div>
+              <div className="mon-config-item-sub">Agent-based push</div>
+            </div>
+          </div>
+          {latestSnapshot?.memory_limit && (
+            <div className="alert-channels-row">
+              <div className="alert-channels-label">Server</div>
+              <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
+                Memory limit: {latestSnapshot.memory_limit}
+                {latestSnapshot.db_size_mb ? ` · DB size: ${latestSnapshot.db_size_mb} MB` : ''}
+                {latestSnapshot.debug_mode ? ' · Debug mode ON' : ''}
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="card">
+          <div className="card-header">
+            <div className="card-title">Top Issues</div>
+          </div>
+          <div className="card-content">
+            {openFindings.length === 0 ? (
+              <p style={{ fontSize: 14, color: 'var(--text-secondary)' }}>
+                {latestSnapshot ? 'No open issues — your WordPress site looks healthy.' : 'No data received yet.'}
+              </p>
+            ) : (
+              <div className="space-y-sm">
+                {openFindings.slice(0, 5).map(f => (
+                  <div key={f.id} className="incident-row">
+                    <div className="incident-row-info">
+                      <span className="incident-row-title">{f.title}</span>
+                      <span className="incident-row-time">{fmtDate(f.first_detected_at)}</span>
+                    </div>
+                    <span className={`badge ${severityBadgeClass[f.severity] ?? 'badge-outline'}`}>
+                      {f.severity}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Full findings list */}
+      {openFindings.length > 0 && (
+        <div style={{ marginBottom: 24 }}>
+          <div className="card">
+            <div className="card-header">
+              <div className="card-title">All Open Issues ({openFindings.length})</div>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+              {openFindings.map((finding, i) => (
                 <div
                   key={finding.id}
-                  className="card"
                   style={{
-                    border: `1px solid ${SEVERITY_COLOR[finding.severity]}33`,
-                    background: SEVERITY_BG[finding.severity],
-                    padding: 0, overflow: 'hidden',
+                    borderTop: i === 0 ? 'none' : '1px solid var(--border-primary)',
+                    padding: '0',
                   }}
                 >
                   <div
-                    style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', cursor: 'pointer' }}
+                    style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 20px', cursor: 'pointer' }}
                     onClick={() => setExpandedFinding(expandedFinding === finding.id ? null : finding.id)}
                   >
-                    <span style={{
-                      padding: '2px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700,
-                      background: SEVERITY_COLOR[finding.severity], color: '#fff', flexShrink: 0,
-                    }}>
-                      {finding.severity.toUpperCase()}
+                    <span className={`badge ${severityBadgeClass[finding.severity] ?? 'badge-outline'}`}>
+                      {finding.severity}
                     </span>
-                    <span style={{ fontWeight: 600, flex: 1 }}>{finding.title}</span>
-                    <span style={{ fontSize: 12, color: 'var(--text-secondary)', flexShrink: 0 }}>
-                      {fmtDate(finding.first_detected_at)}
-                    </span>
-                    <span style={{ color: 'var(--text-secondary)', fontSize: 16 }}>
-                      {expandedFinding === finding.id ? '▲' : '▼'}
-                    </span>
+                    <span style={{ fontWeight: 500, flex: 1, fontSize: 14 }}>{finding.title}</span>
+                    <span className="table-muted">{fmtDate(finding.first_detected_at)}</span>
+                    <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"
+                      style={{ transform: expandedFinding === finding.id ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s', flexShrink: 0 }}>
+                      <polyline points="6 9 12 15 18 9"/>
+                    </svg>
                   </div>
-
                   {expandedFinding === finding.id && (
-                    <div style={{ borderTop: `1px solid ${SEVERITY_COLOR[finding.severity]}33`, padding: '16px' }}>
+                    <div style={{ padding: '0 20px 16px', borderTop: '1px solid var(--border-primary)' }}>
                       {finding.ai_explanation ? (
-                        <div style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--text-primary)', whiteSpace: 'pre-wrap' }}>
+                        <p style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--text-primary)', whiteSpace: 'pre-wrap', margin: '12px 0 0' }}>
                           {finding.ai_explanation}
-                        </div>
+                        </p>
                       ) : (
-                        <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
-                          Click <strong>Generate AI Report</strong> at the top of the page for a full explanation and fix instructions for all open issues.
-                        </div>
+                        <p style={{ fontSize: 13, color: 'var(--text-secondary)', margin: '12px 0 0' }}>
+                          Click <strong>AI Report</strong> at the top for a full explanation and fix instructions.
+                        </p>
                       )}
                       {Object.keys(finding.detail).length > 0 && (
                         <div style={{ marginTop: 12, padding: '10px 12px', background: 'var(--bg-muted)', borderRadius: 8, fontSize: 12, fontFamily: 'monospace' }}>
@@ -218,78 +277,47 @@ export function WpReportClient({ monitor, wpMonitor, findings, latestSnapshot, h
                 </div>
               ))}
             </div>
-          )}
-        </div>
-      )}
-
-      {/* Timeline tab */}
-      {activeTab === 'timeline' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {history.length === 0 ? (
-            <div className="card" style={{ padding: 'var(--space-5)', textAlign: 'center', color: 'var(--text-secondary)', fontSize: 14 }}>
-              No snapshots yet. Waiting for first push.
-            </div>
-          ) : (
-            history.map(snap => (
-              <div key={snap.id} className="card" style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 16 }}>
-                <div style={{
-                  width: 44, height: 44, borderRadius: '50%', flexShrink: 0,
-                  background: `conic-gradient(${scoreColor(snap.health_score ?? 100)} ${snap.health_score ?? 100}%, var(--bg-muted) 0%)`,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}>
-                  <div style={{
-                    width: 34, height: 34, borderRadius: '50%', background: 'var(--bg-card)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 13, fontWeight: 700, color: scoreColor(snap.health_score ?? 100),
-                  }}>
-                    {snap.health_score ?? 100}
-                  </div>
-                </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 13, fontWeight: 600 }}>{fmtDate(snap.received_at)}</div>
-                  <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 2 }}>
-                    WP {(snap as unknown as Record<string, string>).wp_version ?? '—'} · PHP {(snap as unknown as Record<string, string>).php_version ?? '—'}
-                  </div>
-                </div>
-                <div style={{ fontSize: 12, color: scoreColor(snap.health_score ?? 100), fontWeight: 700 }}>
-                  {scoreLabel(snap.health_score ?? 100)}
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-      )}
-
-      {/* Software summary from latest snapshot */}
-      {latestSnapshot && (
-        <div style={{ marginTop: 28 }}>
-          <div className="sp-section-title" style={{ marginBottom: 12 }}>Software Status</div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 12 }}>
-            {/* Outdated plugins */}
-            {(latestSnapshot.active_plugins as WpPlugin[]).filter(p => p.update_available).map(p => (
-              <div key={p.slug} className="card" style={{ padding: '10px 14px', display: 'flex', gap: 10, alignItems: 'center', borderLeft: '3px solid #eab308' }}>
-                <span style={{ fontSize: 18 }}>🔌</span>
-                <div>
-                  <div style={{ fontSize: 13, fontWeight: 600 }}>{p.name}</div>
-                  <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>{p.version} → {p.new_version ?? 'update available'}</div>
-                </div>
-                <span style={{ marginLeft: 'auto', fontSize: 10, fontWeight: 700, color: '#eab308', background: '#fefce8', padding: '2px 8px', borderRadius: 10 }}>UPDATE</span>
-              </div>
-            ))}
-            {/* Outdated theme */}
-            {latestSnapshot.active_theme && (latestSnapshot.active_theme as { update_available: boolean }).update_available && (
-              <div className="card" style={{ padding: '10px 14px', display: 'flex', gap: 10, alignItems: 'center', borderLeft: '3px solid #eab308' }}>
-                <span style={{ fontSize: 18 }}>🎨</span>
-                <div>
-                  <div style={{ fontSize: 13, fontWeight: 600 }}>{(latestSnapshot.active_theme as { name: string }).name}</div>
-                  <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>Theme update available</div>
-                </div>
-                <span style={{ marginLeft: 'auto', fontSize: 10, fontWeight: 700, color: '#eab308', background: '#fefce8', padding: '2px 8px', borderRadius: 10 }}>UPDATE</span>
-              </div>
-            )}
           </div>
         </div>
       )}
+
+      {/* Snapshot history */}
+      {history.length > 0 && (
+        <div style={{ marginBottom: 24 }}>
+          <div className="card">
+            <div className="card-header">
+              <div className="card-title">Push History</div>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+              {history.map((snap, i) => (
+                <div
+                  key={snap.id}
+                  className="incident-row"
+                  style={{ borderTop: i === 0 ? 'none' : '1px solid var(--border-primary)', padding: '12px 20px' }}
+                >
+                  <div className="incident-row-info">
+                    <span className="incident-row-title">
+                      WP {snap.wp_version ?? '—'} · PHP {snap.php_version ?? '—'}
+                    </span>
+                    <span className="incident-row-time">{fmtDate(snap.received_at)}</span>
+                  </div>
+                  <span
+                    className={`badge ${(snap.health_score ?? 100) >= 70 ? 'badge-outline' : 'badge-warning'}`}
+                    style={{ color: scoreColor(snap.health_score ?? 100) }}
+                  >
+                    {snap.health_score ?? 100} — {scoreLabel(snap.health_score ?? 100)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Badge embed */}
+      <div style={{ marginBottom: 24 }}>
+        <BadgeEmbed monitorId={monitor.id} />
+      </div>
 
       {/* AI Report modal */}
       {aiReportOpen && (
@@ -299,12 +327,12 @@ export function WpReportClient({ monitor, wpMonitor, findings, latestSnapshot, h
         }}>
           <div className="card" style={{ maxWidth: 700, width: '100%', maxHeight: '80vh', overflow: 'auto', padding: 'var(--space-6)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <h2 style={{ fontSize: 18, fontWeight: 700 }}>🤖 AI Security Report</h2>
+              <h2 style={{ fontSize: 18, fontWeight: 700 }}>AI Security Report</h2>
               <button type="button" onClick={() => setAiReportOpen(false)} className="btn btn-ghost" style={{ fontSize: 18, padding: '4px 10px' }}>×</button>
             </div>
             {aiLoading ? (
               <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--text-secondary)' }}>
-                Analysing your WordPress site with AI…
+                Analysing your WordPress site…
               </div>
             ) : (
               <div style={{ fontSize: 14, lineHeight: 1.7, whiteSpace: 'pre-wrap', color: 'var(--text-primary)' }}>
