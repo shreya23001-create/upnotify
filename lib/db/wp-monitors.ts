@@ -300,6 +300,20 @@ export async function getOpenWpFindingByType(
   return data as WpFinding | null
 }
 
+export async function getOpenWpFindingsByTypePrefix(
+  wpMonitorId: string,
+  prefix: string,
+): Promise<WpFinding[]> {
+  const { data } = await db()
+    .from('wp_findings')
+    .select('*')
+    .eq('wp_monitor_id', wpMonitorId)
+    .like('finding_type', `${prefix}%`)
+    .in('status', ['open', 'acknowledged'])
+
+  return (data ?? []) as WpFinding[]
+}
+
 export async function resolveWpFinding(findingId: string): Promise<void> {
   await db()
     .from('wp_findings')

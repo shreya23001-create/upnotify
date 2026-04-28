@@ -7,6 +7,7 @@ import {
   getLatestWpSnapshot,
   createWpFinding,
   getOpenWpFindingByType,
+  getOpenWpFindingsByTypePrefix,
   resolveWpFinding,
   type WpPlugin,
   type WpUser,
@@ -30,6 +31,15 @@ interface SecurityConfig {
   disk_free_gb?: number | null
 }
 
+interface ForeignPage {
+  id: number
+  title: string
+  slug: string
+  lang: string
+  detected_in: string
+  url: string
+}
+
 interface PushPayload {
   site_url?: string
   wp_version?: string
@@ -39,6 +49,7 @@ interface PushPayload {
   active_theme?: { name: string; version: string; update_available: boolean }
   admin_users?: WpUser[]
   recent_pages?: WpPage[]
+  foreign_pages?: ForeignPage[]
   file_scan?: WpFileScan
   debug_mode?: boolean
   memory_limit?: string
@@ -338,22 +349,32 @@ export async function POST(request: Request): Promise<Response> {
     if (existing) await resolveWpFinding(existing.id)
   }
 
-  // Foreign language pages (new pages only — compare against previous)
-  if (prevSnapshot) {
-    const prevPageIds = new Set((prevSnapshot.recent_pages as WpPage[]).map(p => p.id))
-    const newPages = (payload.recent_pages ?? []).filter(p => !prevPageIds.has(p.id))
-    for (const page of newPages) {
-      if (detectForeignLanguage(page.title)) {
-        await createWpFinding({
-          wp_monitor_id: wpMonitor.id,
-          org_id: wpMonitor.org_id,
-          snapshot_id: snapshotId,
-          finding_type: `foreign_page:${page.id}`,
-          severity: 'high',
-          title: `New page with foreign language title detected: "${page.title}"`,
-          detail: { page_id: page.id, title: page.title, slug: page.slug, language: page.language },
-        })
-      }
+  // Foreign language injection — scans ALL published pages (title + slug + content snippet)
+  const foreignPages = payload.foreign_pages ?? []
+  const currentForeignIds = new Set(foreignPages.map(p => p.id))
+  for (const page of foreignPages) {
+    const findingType = `foreign_page:${page.id}`
+    const existing = await getOpenWpFindingByType(wpMonitor.id, findingType)
+    if (!existing) {
+      const langLabels: Record<string, string> = { zh: 'Chinese', ru: 'Russian', ar: 'Arabic', hi: 'Hindi', ja: 'Japanese', th: 'Thai' }
+      const langLabel = langLabels[page.lang] ?? page.lang.toUpperCase()
+      await createWpFinding({
+        wp_monitor_id: wpMonitor.id,
+        org_id: wpMonitor.org_id,
+        snapshot_id: snapshotId,
+        finding_type: findingType,
+        severity: 'high',
+        title: `${langLabel} content injected in ${page.detected_in}: "${page.title}"`,
+        detail: { page_id: page.id, title: page.title, slug: page.slug, lang: page.lang, detected_in: page.detected_in, url: page.url },
+      })
+    }
+  }
+  // Resolve findings for pages that no longer contain foreign content
+  const openForeignFindings = await getOpenWpFindingsByTypePrefix(wpMonitor.id, 'foreign_page:')
+  for (const finding of openForeignFindings) {
+    const pageId = parseInt(finding.finding_type.replace('foreign_page:', ''), 10)
+    if (!currentForeignIds.has(pageId)) {
+      await resolveWpFinding(finding.id)
     }
   }
 

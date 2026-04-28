@@ -233,7 +233,7 @@ function uptrue_collect_data() {
         );
     }
 
-    // ---- Recent pages/posts ----
+    // ---- Recent pages/posts (last 7 days — for new content detection) ----
     $recent_pages = array();
     foreach ( get_posts( array(
         'post_status'  => 'publish',
@@ -250,6 +250,31 @@ function uptrue_collect_data() {
             'created_at' => $post->post_date_gmt,
             'language'   => uptrue_detect_language( $post->post_title ),
         );
+    }
+
+    // ---- Foreign language injection scan (ALL published content) ----
+    // Checks title, slug, and first 300 chars of content for CJK/Cyrillic/Arabic/etc.
+    $foreign_pages = array();
+    foreach ( get_posts( array(
+        'post_status' => 'publish',
+        'post_type'   => array( 'post', 'page' ),
+        'numberposts' => 300,
+    ) ) as $post ) {
+        $title_lang   = uptrue_detect_language( $post->post_title );
+        $slug_lang    = uptrue_detect_language( $post->post_name );
+        $content_lang = uptrue_detect_language( wp_strip_all_tags( substr( $post->post_content, 0, 300 ) ) );
+        $lang         = 'en' !== $title_lang ? $title_lang : ( 'en' !== $slug_lang ? $slug_lang : ( 'en' !== $content_lang ? $content_lang : 'en' ) );
+        $detected_in  = 'en' !== $title_lang ? 'title' : ( 'en' !== $slug_lang ? 'slug' : ( 'en' !== $content_lang ? 'content' : '' ) );
+        if ( 'en' !== $lang ) {
+            $foreign_pages[] = array(
+                'id'          => $post->ID,
+                'title'       => $post->post_title,
+                'slug'        => $post->post_name,
+                'lang'        => $lang,
+                'detected_in' => $detected_in,
+                'url'         => get_permalink( $post->ID ),
+            );
+        }
     }
 
     // ---- File scan cache (written by staggered daily crons) ----
@@ -370,6 +395,7 @@ function uptrue_collect_data() {
         'active_theme'     => $active_theme,
         'admin_users'      => $admin_users,
         'recent_pages'     => $recent_pages,
+        'foreign_pages'    => $foreign_pages,
         'file_scan'        => $file_scan,
         'debug_mode'       => defined( 'WP_DEBUG' ) && WP_DEBUG,
         'memory_limit'     => defined( 'WP_MEMORY_LIMIT' ) ? WP_MEMORY_LIMIT : ini_get( 'memory_limit' ),
