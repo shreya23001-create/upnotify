@@ -31,12 +31,12 @@ export const dynamic = 'force-dynamic'
 export const metadata: Metadata = {
   title: 'Uptrue — Website Monitoring Suite for Agencies & Teams',
   description:
-    'Monitor uptime, performance and infrastructure across all your sites. 23 monitor types, AI-powered reports, public status pages, multi-channel alerts, and agency white-label — all in one platform. Free plan available.',
+    'Monitor uptime, performance and infrastructure across all your sites. 24 monitor types, AI-powered reports, public status pages, multi-channel alerts, and agency white-label — all in one platform. Free plan available.',
   alternates: { canonical: 'https://uptrue.io' },
   openGraph: {
     title: 'Uptrue — Website Monitoring Suite for Agencies & Teams',
     description:
-      'Monitor uptime, performance and infrastructure across all your sites. 23 monitor types, AI-powered reports, public status pages, and multi-channel alerts.',
+      'Monitor uptime, performance and infrastructure across all your sites. 24 monitor types, AI-powered reports, public status pages, and multi-channel alerts.',
     url: 'https://uptrue.io',
   },
 }
@@ -120,7 +120,7 @@ export default async function LandingPage(): Promise<React.ReactElement> {
             <div className="hero-eyebrow fade-up">
               <div className="hero-eyebrow-text">
                 <span className="hero-eyebrow-dot" />
-                23 monitor types · 1-minute checks · AI-powered reports
+                24 monitor types · 1-minute checks · AI-powered reports
               </div>
             </div>
             <h1 className="hero-headline fade-up delay-1">
@@ -265,7 +265,7 @@ export default async function LandingPage(): Promise<React.ReactElement> {
                 textDecoration: 'none',
               }}
             >
-              See all 23 monitor types →
+              See all 24 monitor types →
             </a>
           </div>
         </div>
@@ -544,7 +544,7 @@ export default async function LandingPage(): Promise<React.ReactElement> {
                 </tr>
                 <tr>
                   <td>Monitor types (HTTP, SSL, DNS, Security Headers…)</td>
-                  <td className="col-uptrue"><span className="comp-val highlight">23 types</span></td>
+                  <td className="col-uptrue"><span className="comp-val highlight">24 types</span></td>
                   <td><span className="comp-val">7 types</span></td>
                   <td><span className="comp-val">6 types</span></td>
                 </tr>

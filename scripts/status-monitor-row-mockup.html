@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Status Monitor Row — Mockup</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f1f5f9; padding: 40px; }
+  h3 { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #94a3b8; margin-bottom: 12px; }
+
+  .card { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; overflow: hidden; margin-bottom: 32px; }
+
+  /* ===================== OPTION A ===================== */
+  .row-a {
+    padding: 14px 20px;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .row-a:last-child { border-bottom: none; }
+
+  .row-a-top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .row-a-icon {
+    width: 22px; height: 22px; border-radius: 6px;
+    background: #f1f5f9; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; font-size: 11px; color: #64748b;
+  }
+  .row-a-name { font-size: 14px; font-weight: 600; color: #0f172a; flex: 1; }
+  .row-a-url  { font-size: 11px; color: #94a3b8; font-family: monospace; }
+
+  .row-a-bottom {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-left: 30px; /* indent to align under name */
+  }
+  .bars {
+    flex: 1; display: flex; gap: 2px; height: 20px;
+  }
+  .bar { flex: 1; border-radius: 2px; }
+  .bar.ok   { background: #10b981; }
+  .bar.none { background: #e2e8f0; }
+  .bar.down { background: #ef4444; }
+  .bar.warn { background: #f59e0b; }
+
+  .pct { font-size: 12px; font-weight: 700; font-family: monospace; color: #10b981; min-width: 52px; text-align: right; }
+  .pct.bad { color: #ef4444; }
+
+  .pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 10px; border-radius: 9999px;
+    font-size: 11px; font-weight: 700; white-space: nowrap;
+  }
+  .pill.up       { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
+  .pill.degraded { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
+  .pill.down     { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+
+  .range-label { font-size: 10px; color: #94a3b8; white-space: nowrap; }
+
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<h3>Proposed layout — Option A (icon + name on row 1 · bars + % on row 2)</h3>
+<div class="card">
+
+  <!-- Row 1: Operational -->
+  <div class="row-a">
+    <div class="row-a-top">
+      <div class="row-a-icon">🌐</div>
+      <div style="flex:1; min-width:0;">
+        <div class="row-a-name">pocketorder.co.uk — HTTP</div>
+        <div class="row-a-url">https://pocketorder.co.uk</div>
+      </div>
+      <div class="pill up"><span class="dot"></span> Up</div>
+    </div>
+    <div class="row-a-bottom">
+      <div class="bars" id="bars1"></div>
+      <div class="pct">100.00%</div>
+      <div class="range-label">24 hours</div>
+    </div>
+  </div>
+
+  <!-- Row 2: Degraded -->
+  <div class="row-a">
+    <div class="row-a-top">
+      <div class="row-a-icon">🍪</div>
+      <div style="flex:1; min-width:0;">
+        <div class="row-a-name">pocketorder.co.uk — Cookie Consent</div>
+        <div class="row-a-url">https://pocketorder.co.uk</div>
+      </div>
+      <div class="pill degraded"><span class="dot"></span> Degraded</div>
+    </div>
+    <div class="row-a-bottom">
+      <div class="bars" id="bars2"></div>
+      <div class="pct bad">0.00%</div>
+      <div class="range-label">24 hours</div>
+    </div>
+  </div>
+
+  <!-- Row 3: Nameservers -->
+  <div class="row-a">
+    <div class="row-a-top">
+      <div class="row-a-icon">🔗</div>
+      <div style="flex:1; min-width:0;">
+        <div class="row-a-name">pocketorder.co.uk — Nameservers</div>
+        <div class="row-a-url">pocketorder.co.uk</div>
+      </div>
+      <div class="pill up"><span class="dot"></span> Up</div>
+    </div>
+    <div class="row-a-bottom">
+      <div class="bars" id="bars3"></div>
+      <div class="pct">100.00%</div>
+      <div class="range-label">24 hours</div>
+    </div>
+  </div>
+
+  <!-- Row 4: robots.txt -->
+  <div class="row-a">
+    <div class="row-a-top">
+      <div class="row-a-icon">🤖</div>
+      <div style="flex:1; min-width:0;">
+        <div class="row-a-name">pocketorder.co.uk — robots.txt</div>
+        <div class="row-a-url">https://pocketorder.co.uk</div>
+      </div>
+      <div class="pill up"><span class="dot"></span> Up</div>
+    </div>
+    <div class="row-a-bottom">
+      <div class="bars" id="bars4"></div>
+      <div class="pct">100.00%</div>
+      <div class="range-label">24 hours</div>
+    </div>
+  </div>
+
+  <!-- Row 5: Down -->
+  <div class="row-a">
+    <div class="row-a-top">
+      <div class="row-a-icon">⚡</div>
+      <div style="flex:1; min-width:0;">
+        <div class="row-a-name">pocketorder.co.uk — Response Time</div>
+        <div class="row-a-url">https://pocketorder.co.uk</div>
+      </div>
+      <div class="pill down"><span class="dot"></span> Down</div>
+    </div>
+    <div class="row-a-bottom">
+      <div class="bars" id="bars5"></div>
+      <div class="pct bad">87.50%</div>
+      <div class="range-label">24 hours</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function generateBars(id, pattern) {
+    const el = document.getElementById(id)
+    for (let i = 0; i < 48; i++) {
+      const d = document.createElement('div')
+      d.className = 'bar ' + pattern(i)
+      el.appendChild(d)
+    }
+  }
+  generateBars('bars1', i => i < 10 ? 'none' : 'ok')
+  generateBars('bars2', i => i < 10 ? 'none' : 'warn')
+  generateBars('bars3', i => i < 10 ? 'none' : 'ok')
+  generateBars('bars4', i => i < 10 ? 'none' : 'ok')
+  generateBars('bars5', i => i < 10 ? 'none' : (i > 40 ? 'down' : 'ok'))
+</script>
+</body>
+</html>

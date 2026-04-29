@@ -13,7 +13,7 @@ const FAQ_SCHEMA = {
       name: 'What types of monitors does Uptrue support?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Uptrue supports 23 monitor types across two tiers. Core monitors: HTTP/HTTPS Uptime, SSL Certificate, DNS Records, Keyword Detection, Domain Expiry, Port Check, Ping/Reachability, API Endpoint, Heartbeat, and Page Change Detection. Advanced monitors: Security Headers, Response Time Threshold, robots.txt Change, IP Address Change, MX Health, WHOIS Registrar Change, Sitemap Validity, Redirect Chain, SPF/DMARC Validity, Blacklist Check, Page Size, Cookie Consent Presence, and Nameserver Change.',
+        text: 'Uptrue supports 24 monitor types across two tiers. Core monitors: HTTP/HTTPS Uptime, SSL Certificate, DNS Records, Keyword Detection, Domain Expiry, Port Check, Ping/Reachability, API Endpoint, Heartbeat, and Page Change Detection. Advanced monitors: Security Headers, Response Time Threshold, robots.txt Change, IP Address Change, MX Health, WHOIS Registrar Change, Sitemap Validity, Redirect Chain, SPF/DMARC Validity, Blacklist Check, Page Size, Cookie Consent Presence, and Nameserver Change.',
       },
     },
     {
@@ -61,7 +61,7 @@ export default function MonitorsPage(): React.ReactElement {
           </p>
 
           <section className="help-section">
-            <h2 className="help-section-title">The 23 monitor types</h2>
+            <h2 className="help-section-title">The 24 monitor types</h2>
             <p>
               Different things can go wrong with a website, so Uptrue gives you different tools
               to catch them. Monitors are grouped into two tiers: core monitors that every site

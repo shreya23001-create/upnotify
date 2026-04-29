@@ -85,7 +85,7 @@ export default function AboutPage(): React.ReactElement {
                 and direct businesses. Our platform covers:
               </p>
               <ul className="about-list">
-                <li><strong>23 monitor types</strong> covering uptime, SSL, DNS, performance, security headers, SPF/DMARC, redirect chains, sitemaps, blacklists, cookie consent, and more</li>
+                <li><strong>24 monitor types</strong> covering uptime, SSL, DNS, performance, security headers, SPF/DMARC, redirect chains, sitemaps, blacklists, cookie consent, WordPress agent monitoring, and more</li>
                 <li><strong>Public status pages</strong> with branded pages, real-time incident feed, and subscriber notifications</li>
                 <li><strong>AI-powered reports</strong> that turn raw monitoring data into executive-ready insights</li>
                 <li><strong>Multi-channel alerting</strong> via email, Slack, Microsoft Teams, Telegram, and signed webhooks</li>

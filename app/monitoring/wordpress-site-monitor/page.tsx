@@ -47,8 +47,8 @@ const threats = [
   },
   {
     icon: '📄',
-    title: 'Suspicious & Foreign Pages',
-    desc: 'SEO spam attacks create hundreds of hidden pages with foreign-language content (Russian, Chinese, Arabic) to hijack your search rankings. Uptrue detects these the moment they appear.',
+    title: 'Foreign-Language Content Injection',
+    desc: 'SEO spam attacks inject hidden pages with Chinese, Russian, Korean, Arabic, and 6 other scripts to hijack your search rankings. Uptrue scans every published page — title, slug, and body — on each push.',
     severity: 'high',
   },
   {
@@ -58,8 +58,20 @@ const threats = [
     severity: 'critical',
   },
   {
+    icon: '🔐',
+    title: 'Security Configuration Weaknesses',
+    desc: 'XML-RPC enabled, REST API user enumeration exposed, no 2FA, no backup plugin, world-writable directories, disabled auto-updates — Uptrue checks all of these on every push and scores your configuration.',
+    severity: 'high',
+  },
+  {
+    icon: '🚨',
+    title: 'Brute Force Login Attacks',
+    desc: 'Uptrue counts failed login attempts every 24 hours. A spike in failures means your wp-login.php is under attack — alerting you before an account is compromised.',
+    severity: 'high',
+  },
+  {
     icon: '🐛',
-    title: 'Debug Mode Left On',
+    title: 'Debug Mode & Misconfigurations',
     desc: 'WordPress debug mode exposes sensitive error messages, file paths, and database structure to any visitor. It\'s frequently forgotten after a developer fixes an issue.',
     severity: 'medium',
   },
@@ -139,11 +151,11 @@ const faq = [
   },
   {
     q: 'How many WordPress sites can I monitor?',
-    a: 'Free plan: 1 site. Lite plan: 1 site. Builder plan: up to 5 sites. Scale plan: up to 20 sites. You can add more from your Uptrue dashboard.',
+    a: 'Free plan: 0 sites. Lite plan: 1 site. Builder plan: up to 5 sites. Scale plan: up to 10 sites.',
   },
   {
     q: 'What checks does the plugin run?',
-    a: 'PHP files in uploads, JavaScript files in uploads, executable code patterns, .htaccess modifications, wp-config.php changes, WordPress core file changes, theme file changes, new admin/editor users, recently created pages, outdated plugins and themes, debug mode status, PHP version, and database size.',
+    a: 'File injection (PHP/JS/executables in uploads), .htaccess and wp-config.php changes, core and theme file modifications, new admin/editor users, foreign-language content injection (10 scripts: Chinese, Russian, Korean, Arabic, Hindi, Japanese, Thai, Hebrew, Bengali, Georgian), outdated plugins and themes, debug mode, PHP version, brute force login attempts, world-writable directories, XML-RPC status, REST API user enumeration, application passwords, auto-update settings, spam comment volume, 2FA status, recently modified plugin files, backup plugin presence, and disk usage.',
   },
 ]
 
@@ -226,7 +238,7 @@ export default function WordPressMonitorPage() {
               <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
               Add WordPress Monitor Free
             </Link>
-            <a href="/downloads/uptrue-monitor.php" style={{
+            <a href="/downloads/uptrue-monitor.zip" style={{
               background: 'rgba(255,255,255,0.08)',
               color: 'rgba(255,255,255,0.85)',
               border: '1px solid rgba(255,255,255,0.15)',
@@ -251,8 +263,8 @@ export default function WordPressMonitorPage() {
         <div style={{ maxWidth: 820, margin: '0 auto', display: 'flex', gap: 32, flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center' }}>
           {[
             { value: '100', label: 'Health Score', color: '#10b981' },
-            { value: '6+', label: 'Threat Categories', color: '#667eea' },
-            { value: '14', label: 'Checks Per Scan', color: '#f59e0b' },
+            { value: '8', label: 'Threat Categories', color: '#667eea' },
+            { value: '25+', label: 'Checks Per Scan', color: '#f59e0b' },
             { value: '2 min', label: 'Setup Time', color: '#06b6d4' },
           ].map(stat => (
             <div key={stat.label} style={{ textAlign: 'center', padding: '8px 20px' }}>
@@ -343,7 +355,7 @@ export default function WordPressMonitorPage() {
                 'New administrator accounts',
                 'New editor accounts',
                 'Recently created pages (last 7 days)',
-                'Foreign-language page content (SEO spam)',
+                'Foreign-language content — 10 scripts (Chinese, Russian, Korean, Arabic, Hindi, Japanese, Thai, Hebrew, Bengali, Georgian)',
                 'Outdated plugins (with update available)',
                 'Outdated active theme',
                 'WordPress core version',
@@ -351,6 +363,17 @@ export default function WordPressMonitorPage() {
                 'Debug mode status (WP_DEBUG)',
                 'Memory limit',
                 'Database size',
+                'Failed login attempts (24h brute force detection)',
+                'World-writable directories',
+                'XML-RPC enabled / disabled',
+                'REST API user enumeration exposed',
+                'Application passwords in use',
+                'WordPress auto-update settings',
+                'Spam comment volume',
+                '2FA plugin active',
+                'Recently modified plugin files (last 24h)',
+                'Backup plugin present',
+                'Disk usage percentage',
               ].map((check, i) => (
                 <div key={i} style={{
                   display: 'flex', gap: 10, alignItems: 'flex-start',
@@ -458,12 +481,21 @@ export default function WordPressMonitorPage() {
                 { severity: 'critical', text: 'wp-config.php file modified since last scan' },
                 { severity: 'critical', text: 'WordPress core file modified (may indicate compromise)' },
                 { severity: 'high', text: 'New administrator account created' },
-                { severity: 'high', text: 'Foreign-language page detected (SEO spam indicator)' },
+                { severity: 'high', text: 'Foreign-language content injected (Chinese, Russian, Korean, Arabic + 6 more scripts)' },
                 { severity: 'high', text: 'JavaScript file found in uploads folder' },
                 { severity: 'high', text: 'Active theme files modified' },
+                { severity: 'high', text: 'World-writable directory detected' },
+                { severity: 'high', text: 'More than 20 failed logins in 24 hours (brute force)' },
+                { severity: 'high', text: 'No 2FA plugin active on the site' },
+                { severity: 'high', text: 'No backup plugin installed' },
+                { severity: 'high', text: 'Plugin files modified in the last 24 hours' },
                 { severity: 'medium', text: 'Plugin update available (vulnerabilities exploited in the wild)' },
                 { severity: 'medium', text: 'Active theme update available' },
                 { severity: 'medium', text: 'PHP version end-of-life — no longer receiving security patches' },
+                { severity: 'medium', text: 'XML-RPC enabled (brute force attack surface)' },
+                { severity: 'medium', text: 'REST API exposes user list publicly' },
+                { severity: 'medium', text: 'WordPress auto-updates disabled' },
+                { severity: 'medium', text: 'Disk usage above 80%' },
                 { severity: 'low', text: 'WordPress debug mode (WP_DEBUG) left enabled' },
               ].map((item, i) => (
                 <div key={i} style={{
@@ -560,7 +592,7 @@ export default function WordPressMonitorPage() {
             }}>
               Create Free Account →
             </Link>
-            <a href="/downloads/uptrue-monitor.php" style={{
+            <a href="/downloads/uptrue-monitor.zip" style={{
               background: 'rgba(255,255,255,0.12)',
               color: '#fff',
               border: '1px solid rgba(255,255,255,0.25)',

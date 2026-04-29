@@ -104,7 +104,7 @@ ALTER TABLE plans ADD COLUMN IF NOT EXISTS wp_monitor_limit integer NOT NULL DEF
 UPDATE plans SET wp_monitor_limit = 0  WHERE slug = 'free';
 UPDATE plans SET wp_monitor_limit = 1  WHERE slug = 'lite';
 UPDATE plans SET wp_monitor_limit = 5  WHERE slug = 'builder';
-UPDATE plans SET wp_monitor_limit = 20 WHERE slug = 'scale';
+UPDATE plans SET wp_monitor_limit = 10 WHERE slug = 'scale';
 
 -- ============================================================
 -- 6. Organisation-level admin override

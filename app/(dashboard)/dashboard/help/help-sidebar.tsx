@@ -22,9 +22,16 @@ export const helpTopics: HelpTopic[] = [
   {
     href: '/dashboard/help/monitors',
     title: 'Understanding Monitors',
-    description: 'Learn about the 10 monitor types, check intervals, two-confirmation checks, and more.',
+    description: 'Learn about all 24 monitor types, check intervals, two-confirmation checks, and more.',
     icon: '📡',
     keywords: ['monitor', 'http', 'ssl', 'dns', 'ping', 'keyword', 'port', 'api', 'heartbeat', 'check', 'uptime'],
+  },
+  {
+    href: '/dashboard/help/wordpress',
+    title: 'WordPress Plugin',
+    description: 'Install the free Uptrue plugin to monitor your WordPress site from the inside — file injections, rogue users, security config, and more.',
+    icon: '🔌',
+    keywords: ['wordpress', 'plugin', 'wp', 'file injection', 'security', 'health', 'agent', 'brute force', 'foreign language'],
   },
   {
     href: '/dashboard/help/alerts',
