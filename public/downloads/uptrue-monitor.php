@@ -1,12 +1,17 @@
 <?php
 /**
  * Plugin Name: Uptrue WordPress Monitor
- * Plugin URI:  https://uptrue.io/wordpress-monitor
- * Description: Connect your WordPress site to Uptrue for real-time security monitoring, health alerts, and AI-powered fix suggestions. Works standalone with a free monthly email report — no Uptrue account required.
+ * Plugin URI:  https://uptrue.io/monitoring/wordpress-site-monitor
+ * Description: Monitor your WordPress site from the inside — file injections, rogue admin users, foreign-language content, brute force attacks, security misconfigurations, and more. Works standalone with a free monthly email report. No inbound ports. Works behind Cloudflare.
  * Version:     1.2.0
+ * Requires at least: 5.0
+ * Requires PHP:      7.0
+ * Tested up to:      6.7
+ * Stable tag:        1.2.0
  * Author:      Uptrue
  * Author URI:  https://uptrue.io
  * License:     GPL v2 or later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: uptrue-monitor
  */
 
@@ -376,8 +381,8 @@ function uptrue_collect_data() {
     $spam_count     = isset( $comment_counts->spam ) ? (int) $comment_counts->spam : 0;
 
     // Disk usage
-    $disk_free     = @disk_free_space( ABSPATH );
-    $disk_total    = @disk_total_space( ABSPATH );
+    $disk_free     = disk_free_space( ABSPATH );
+    $disk_total    = disk_total_space( ABSPATH );
     $disk_used_pct = ( $disk_total && false !== $disk_free )
         ? round( ( 1 - $disk_free / $disk_total ) * 100, 1 )
         : null;
@@ -531,7 +536,7 @@ function uptrue_scan_permissions() {
     $writable = array();
     foreach ( $paths as $label => $path ) {
         if ( is_dir( $path ) ) {
-            $perms = @fileperms( $path );
+            $perms = fileperms( $path );
             if ( false !== $perms && ( $perms & 0x0002 ) ) {
                 $writable[] = $label;
             }
@@ -773,7 +778,7 @@ function uptrue_page_dashboard() {
             ) as $stat ) : ?>
             <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:16px">
                 <div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.06em;font-weight:600"><?php echo esc_html( $stat[0] ); ?></div>
-                <div style="font-size:15px;font-weight:700;color:<?php echo esc_attr( $stat[2] ); ?>;margin-top:6px"><?php echo $stat[1]; ?></div>
+                <div style="font-size:15px;font-weight:700;color:<?php echo esc_attr( $stat[2] ); ?>;margin-top:6px"><?php echo wp_kses_post( $stat[1] ); ?></div>
             </div>
             <?php endforeach; ?>
         </div>
@@ -879,8 +884,8 @@ function uptrue_page_settings() {
                             Get your token from the Uptrue dashboard — WordPress monitor setup page.
                         </p>
                         <?php if ( $token && null !== $self_test ) : ?>
-                        <p style="color:<?php echo $self_test ? '#10b981' : '#ef4444'; ?>;font-weight:600;margin-top:6px">
-                            <?php echo $self_test ? '✅ Connection test passed' : '❌ Connection test failed — verify your token and that your server can reach uptrue.io'; ?>
+                        <p style="color:<?php echo esc_attr( $self_test ? '#10b981' : '#ef4444' ); ?>;font-weight:600;margin-top:6px">
+                            <?php echo wp_kses_post( $self_test ? '✅ Connection test passed' : '❌ Connection test failed — verify your token and that your server can reach uptrue.io' ); ?>
                         </p>
                         <?php endif; ?>
                     </td>
