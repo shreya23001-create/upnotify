@@ -314,6 +314,20 @@ export async function getOpenWpFindingsByTypePrefix(
   return (data ?? []) as WpFinding[]
 }
 
+/**
+ * Load ALL open/acknowledged findings for a monitor in one query.
+ * Use this in the push handler instead of calling getOpenWpFindingByType per finding.
+ */
+export async function getAllOpenWpFindings(wpMonitorId: string): Promise<WpFinding[]> {
+  const { data } = await db()
+    .from('wp_findings')
+    .select('*')
+    .eq('wp_monitor_id', wpMonitorId)
+    .in('status', ['open', 'acknowledged'])
+
+  return (data ?? []) as WpFinding[]
+}
+
 export async function resolveWpFinding(findingId: string): Promise<void> {
   await db()
     .from('wp_findings')

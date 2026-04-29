@@ -6,13 +6,13 @@ import {
   saveWpSnapshot,
   getLatestWpSnapshot,
   createWpFinding,
-  getOpenWpFindingByType,
-  getOpenWpFindingsByTypePrefix,
+  getAllOpenWpFindings,
   resolveWpFinding,
   type WpPlugin,
   type WpUser,
   type WpPage,
   type WpFileScan,
+  type WpFinding,
 } from '@/lib/db/wp-monitors'
 import { updateMonitorStatus } from '@/lib/db/monitors'
 
@@ -213,384 +213,168 @@ export async function POST(request: Request): Promise<Response> {
     next_check_at: new Date(Date.now() + wpMonitor.check_interval_minutes * 60 * 1000).toISOString(),
   })
 
+  // Load ALL open findings in one query, then work from a Map in memory.
+  // Previously this did 50-100+ sequential getOpenWpFindingByType calls — one per check.
+  const allOpenFindings = await getAllOpenWpFindings(wpMonitor.id)
+  const openMap = new Map<string, WpFinding>(allOpenFindings.map(f => [f.finding_type, f]))
+
+  const toCreate: Parameters<typeof createWpFinding>[0][] = []
+  const toResolve: string[] = []
+
+  const snapshotId = snapshot?.id
+  const base = { wp_monitor_id: wpMonitor.id, org_id: wpMonitor.org_id, snapshot_id: snapshotId }
+
+  function maybeCreate(findingType: string, data: Omit<Parameters<typeof createWpFinding>[0], 'wp_monitor_id' | 'org_id' | 'snapshot_id' | 'finding_type'>): void {
+    if (!openMap.has(findingType)) toCreate.push({ ...base, finding_type: findingType, ...data })
+  }
+  function maybeResolve(findingType: string): void {
+    const f = openMap.get(findingType)
+    if (f) toResolve.push(f.id)
+  }
+
   // Diff against previous snapshot to create/resolve findings
   const prevSnapshot = await getLatestWpSnapshot(wpMonitor.id)
-  const snapshotId = snapshot?.id
 
   // PHP files in uploads
   for (const file of fileScan.php_in_uploads) {
-    const existing = await getOpenWpFindingByType(wpMonitor.id, `php_in_uploads:${file}`)
-    if (!existing) {
-      await createWpFinding({
-        wp_monitor_id: wpMonitor.id,
-        org_id: wpMonitor.org_id,
-        snapshot_id: snapshotId,
-        finding_type: `php_in_uploads:${file}`,
-        severity: 'critical',
-        title: `PHP file found in /uploads/: ${file}`,
-        detail: { file, location: 'uploads' },
-      })
-    }
+    maybeCreate(`php_in_uploads:${file}`, { severity: 'critical', title: `PHP file found in /uploads/: ${file}`, detail: { file, location: 'uploads' } })
   }
-
-  // Resolve cleared PHP file findings
   if (prevSnapshot) {
     const prevPhpFiles = (prevSnapshot.file_scan as WpFileScan)?.php_in_uploads ?? []
     for (const file of prevPhpFiles) {
-      if (!fileScan.php_in_uploads.includes(file)) {
-        const existing = await getOpenWpFindingByType(wpMonitor.id, `php_in_uploads:${file}`)
-        if (existing) await resolveWpFinding(existing.id)
-      }
+      if (!fileScan.php_in_uploads.includes(file)) maybeResolve(`php_in_uploads:${file}`)
     }
   }
 
   // Suspicious/executable files in uploads
   for (const file of fileScan.suspicious_files) {
-    const existing = await getOpenWpFindingByType(wpMonitor.id, `exec_in_uploads:${file}`)
-    if (!existing) {
-      await createWpFinding({
-        wp_monitor_id: wpMonitor.id,
-        org_id: wpMonitor.org_id,
-        snapshot_id: snapshotId,
-        finding_type: `exec_in_uploads:${file}`,
-        severity: 'critical',
-        title: `Executable file found in /uploads/: ${file}`,
-        detail: { file, location: 'uploads' },
-      })
-    }
+    maybeCreate(`exec_in_uploads:${file}`, { severity: 'critical', title: `Executable file found in /uploads/: ${file}`, detail: { file, location: 'uploads' } })
   }
 
   // htaccess modified
   if (fileScan.htaccess_modified) {
-    const existing = await getOpenWpFindingByType(wpMonitor.id, 'htaccess_modified')
-    if (!existing) {
-      await createWpFinding({
-        wp_monitor_id: wpMonitor.id,
-        org_id: wpMonitor.org_id,
-        snapshot_id: snapshotId,
-        finding_type: 'htaccess_modified',
-        severity: 'high',
-        title: '.htaccess file has been modified',
-        detail: {},
-      })
-    }
+    maybeCreate('htaccess_modified', { severity: 'high', title: '.htaccess file has been modified', detail: {} })
   } else {
-    const existing = await getOpenWpFindingByType(wpMonitor.id, 'htaccess_modified')
-    if (existing) await resolveWpFinding(existing.id)
+    maybeResolve('htaccess_modified')
   }
 
   // wp-config.php modified
   if (fileScan.wpconfig_modified) {
-    const existing = await getOpenWpFindingByType(wpMonitor.id, 'wpconfig_modified')
-    if (!existing) {
-      await createWpFinding({
-        wp_monitor_id: wpMonitor.id,
-        org_id: wpMonitor.org_id,
-        snapshot_id: snapshotId,
-        finding_type: 'wpconfig_modified',
-        severity: 'high',
-        title: 'wp-config.php has been modified',
-        detail: {},
-      })
-    }
+    maybeCreate('wpconfig_modified', { severity: 'high', title: 'wp-config.php has been modified', detail: {} })
   } else {
-    const existing = await getOpenWpFindingByType(wpMonitor.id, 'wpconfig_modified')
-    if (existing) await resolveWpFinding(existing.id)
+    maybeResolve('wpconfig_modified')
   }
 
   // New admin users (compare by user ID against previous snapshot)
   if (prevSnapshot) {
     const prevAdminIds = new Set((prevSnapshot.admin_users as WpUser[]).map(u => u.id))
-    const newAdmins = (payload.admin_users ?? []).filter(u => !prevAdminIds.has(u.id))
-    for (const user of newAdmins) {
-      await createWpFinding({
-        wp_monitor_id: wpMonitor.id,
-        org_id: wpMonitor.org_id,
-        snapshot_id: snapshotId,
-        finding_type: `new_admin_user:${user.id}`,
-        severity: 'high',
-        title: `New admin/editor user created: ${user.login}`,
-        detail: { user_id: user.id, login: user.login, roles: user.roles },
-      })
+    for (const user of (payload.admin_users ?? []).filter(u => !prevAdminIds.has(u.id))) {
+      maybeCreate(`new_admin_user:${user.id}`, { severity: 'high', title: `New admin/editor user created: ${user.login}`, detail: { user_id: user.id, login: user.login, roles: user.roles } })
     }
   }
 
   // EOL PHP version
   if (isEolPhp(payload.php_version)) {
-    const existing = await getOpenWpFindingByType(wpMonitor.id, 'eol_php')
-    if (!existing) {
-      await createWpFinding({
-        wp_monitor_id: wpMonitor.id,
-        org_id: wpMonitor.org_id,
-        snapshot_id: snapshotId,
-        finding_type: 'eol_php',
-        severity: 'high',
-        title: `PHP version ${payload.php_version} is end-of-life`,
-        detail: { version: payload.php_version },
-      })
-    }
+    maybeCreate('eol_php', { severity: 'high', title: `PHP version ${payload.php_version} is end-of-life`, detail: { version: payload.php_version } })
   } else {
-    const existing = await getOpenWpFindingByType(wpMonitor.id, 'eol_php')
-    if (existing) await resolveWpFinding(existing.id)
+    maybeResolve('eol_php')
   }
 
   // Debug mode on
   if (payload.debug_mode) {
-    const existing = await getOpenWpFindingByType(wpMonitor.id, 'debug_mode_on')
-    if (!existing) {
-      await createWpFinding({
-        wp_monitor_id: wpMonitor.id,
-        org_id: wpMonitor.org_id,
-        snapshot_id: snapshotId,
-        finding_type: 'debug_mode_on',
-        severity: 'medium',
-        title: 'WP_DEBUG is enabled in production',
-        detail: {},
-      })
-    }
+    maybeCreate('debug_mode_on', { severity: 'medium', title: 'WP_DEBUG is enabled in production', detail: {} })
   } else {
-    const existing = await getOpenWpFindingByType(wpMonitor.id, 'debug_mode_on')
-    if (existing) await resolveWpFinding(existing.id)
+    maybeResolve('debug_mode_on')
   }
 
-  // Foreign language injection — scans ALL published pages (title + slug + content snippet)
+  // Foreign language injection
   const foreignPages = payload.foreign_pages ?? []
   const currentForeignIds = new Set(foreignPages.map(p => p.id))
+  const langLabels: Record<string, string> = { zh: 'Chinese', ru: 'Russian', ar: 'Arabic/Persian/Urdu', hi: 'Hindi', ja: 'Japanese', th: 'Thai', ko: 'Korean', he: 'Hebrew', bn: 'Bengali', ka: 'Georgian' }
   for (const page of foreignPages) {
-    const findingType = `foreign_page:${page.id}`
-    const existing = await getOpenWpFindingByType(wpMonitor.id, findingType)
-    if (!existing) {
-      const langLabels: Record<string, string> = { zh: 'Chinese', ru: 'Russian', ar: 'Arabic/Persian/Urdu', hi: 'Hindi', ja: 'Japanese', th: 'Thai', ko: 'Korean', he: 'Hebrew', bn: 'Bengali', ka: 'Georgian' }
-      const langLabel = langLabels[page.lang] ?? page.lang.toUpperCase()
-      await createWpFinding({
-        wp_monitor_id: wpMonitor.id,
-        org_id: wpMonitor.org_id,
-        snapshot_id: snapshotId,
-        finding_type: findingType,
-        severity: 'high',
-        title: `${langLabel} content injected in ${page.detected_in}: "${page.title}"`,
-        detail: { page_id: page.id, title: page.title, slug: page.slug, lang: page.lang, detected_in: page.detected_in, url: page.url },
-      })
-    }
+    const langLabel = langLabels[page.lang] ?? page.lang.toUpperCase()
+    maybeCreate(`foreign_page:${page.id}`, { severity: 'high', title: `${langLabel} content injected in ${page.detected_in}: "${page.title}"`, detail: { page_id: page.id, title: page.title, slug: page.slug, lang: page.lang, detected_in: page.detected_in, url: page.url } })
   }
-  // Resolve findings for pages that no longer contain foreign content
-  const openForeignFindings = await getOpenWpFindingsByTypePrefix(wpMonitor.id, 'foreign_page:')
-  for (const finding of openForeignFindings) {
-    const pageId = parseInt(finding.finding_type.replace('foreign_page:', ''), 10)
-    if (!currentForeignIds.has(pageId)) {
-      await resolveWpFinding(finding.id)
-    }
+  for (const f of allOpenFindings.filter(f => f.finding_type.startsWith('foreign_page:'))) {
+    const pageId = parseInt(f.finding_type.replace('foreign_page:', ''), 10)
+    if (!currentForeignIds.has(pageId)) toResolve.push(f.id)
   }
 
-  // Outdated plugins (create once, resolve when updated)
+  // Outdated plugins
   for (const plugin of payload.active_plugins ?? []) {
-    const findingType = `outdated_plugin:${plugin.slug}`
+    const ft = `outdated_plugin:${plugin.slug}`
     if (plugin.update_available) {
-      const existing = await getOpenWpFindingByType(wpMonitor.id, findingType)
-      if (!existing) {
-        await createWpFinding({
-          wp_monitor_id: wpMonitor.id,
-          org_id: wpMonitor.org_id,
-          snapshot_id: snapshotId,
-          finding_type: findingType,
-          severity: 'medium',
-          title: `Plugin update available: ${plugin.name} (${plugin.version} → ${plugin.new_version ?? 'latest'})`,
-          detail: { name: plugin.name, slug: plugin.slug, current: plugin.version, latest: plugin.new_version },
-        })
-      }
+      maybeCreate(ft, { severity: 'medium', title: `Plugin update available: ${plugin.name} (${plugin.version} → ${plugin.new_version ?? 'latest'})`, detail: { name: plugin.name, slug: plugin.slug, current: plugin.version, latest: plugin.new_version } })
     } else {
-      const existing = await getOpenWpFindingByType(wpMonitor.id, findingType)
-      if (existing) await resolveWpFinding(existing.id)
+      maybeResolve(ft)
     }
   }
 
   // Security config findings
   const sec = payload.security_config
   if (sec) {
-    // Brute force / login failures
     if ((sec.login_failures_24h ?? 0) > 5) {
-      const existing = await getOpenWpFindingByType(wpMonitor.id, 'brute_force')
-      if (!existing) {
-        await createWpFinding({
-          wp_monitor_id: wpMonitor.id,
-          org_id: wpMonitor.org_id,
-          snapshot_id: snapshotId,
-          finding_type: 'brute_force',
-          severity: (sec.login_failures_24h ?? 0) > 20 ? 'critical' : 'high',
-          title: `Brute force detected: ${sec.login_failures_24h} failed login attempts in 24h`,
-          detail: { count: sec.login_failures_24h },
-        })
-      }
+      maybeCreate('brute_force', { severity: (sec.login_failures_24h ?? 0) > 20 ? 'critical' : 'high', title: `Brute force detected: ${sec.login_failures_24h} failed login attempts in 24h`, detail: { count: sec.login_failures_24h } })
     } else {
-      const existing = await getOpenWpFindingByType(wpMonitor.id, 'brute_force')
-      if (existing) await resolveWpFinding(existing.id)
+      maybeResolve('brute_force')
     }
 
-    // World-writable directories
     for (const dir of (sec.world_writable_dirs ?? [])) {
-      const existing = await getOpenWpFindingByType(wpMonitor.id, `world_writable:${dir}`)
-      if (!existing) {
-        await createWpFinding({
-          wp_monitor_id: wpMonitor.id,
-          org_id: wpMonitor.org_id,
-          snapshot_id: snapshotId,
-          finding_type: `world_writable:${dir}`,
-          severity: 'high',
-          title: `World-writable directory detected: ${dir}`,
-          detail: { directory: dir },
-        })
-      }
+      maybeCreate(`world_writable:${dir}`, { severity: 'high', title: `World-writable directory detected: ${dir}`, detail: { directory: dir } })
     }
 
-    // XML-RPC
     if (sec.xmlrpc_enabled) {
-      const existing = await getOpenWpFindingByType(wpMonitor.id, 'xmlrpc_enabled')
-      if (!existing) {
-        await createWpFinding({
-          wp_monitor_id: wpMonitor.id,
-          org_id: wpMonitor.org_id,
-          snapshot_id: snapshotId,
-          finding_type: 'xmlrpc_enabled',
-          severity: 'medium',
-          title: 'XML-RPC is enabled — can be exploited for brute-force and DDoS amplification attacks',
-          detail: {},
-        })
-      }
+      maybeCreate('xmlrpc_enabled', { severity: 'medium', title: 'XML-RPC is enabled — can be exploited for brute-force and DDoS amplification attacks', detail: {} })
     } else {
-      const existing = await getOpenWpFindingByType(wpMonitor.id, 'xmlrpc_enabled')
-      if (existing) await resolveWpFinding(existing.id)
+      maybeResolve('xmlrpc_enabled')
     }
 
-    // REST API user enumeration
     if (sec.rest_user_enum) {
-      const existing = await getOpenWpFindingByType(wpMonitor.id, 'rest_user_enum')
-      if (!existing) {
-        await createWpFinding({
-          wp_monitor_id: wpMonitor.id,
-          org_id: wpMonitor.org_id,
-          snapshot_id: snapshotId,
-          finding_type: 'rest_user_enum',
-          severity: 'medium',
-          title: 'REST API exposes username list at /wp-json/wp/v2/users — install a security plugin to restrict this',
-          detail: {},
-        })
-      }
+      maybeCreate('rest_user_enum', { severity: 'medium', title: 'REST API exposes username list at /wp-json/wp/v2/users — install a security plugin to restrict this', detail: {} })
     } else {
-      const existing = await getOpenWpFindingByType(wpMonitor.id, 'rest_user_enum')
-      if (existing) await resolveWpFinding(existing.id)
+      maybeResolve('rest_user_enum')
     }
 
-    // Auto-updates disabled
     if (sec.auto_updates === 'disabled') {
-      const existing = await getOpenWpFindingByType(wpMonitor.id, 'auto_updates_disabled')
-      if (!existing) {
-        await createWpFinding({
-          wp_monitor_id: wpMonitor.id,
-          org_id: wpMonitor.org_id,
-          snapshot_id: snapshotId,
-          finding_type: 'auto_updates_disabled',
-          severity: 'high',
-          title: 'WordPress automatic updates are disabled — site will not receive security patches automatically',
-          detail: { setting: sec.auto_updates },
-        })
-      }
+      maybeCreate('auto_updates_disabled', { severity: 'high', title: 'WordPress automatic updates are disabled — site will not receive security patches automatically', detail: { setting: sec.auto_updates } })
     } else {
-      const existing = await getOpenWpFindingByType(wpMonitor.id, 'auto_updates_disabled')
-      if (existing) await resolveWpFinding(existing.id)
+      maybeResolve('auto_updates_disabled')
     }
 
-    // High spam volume
     if ((sec.spam_comments ?? 0) > 50) {
-      const existing = await getOpenWpFindingByType(wpMonitor.id, 'high_spam')
-      if (!existing) {
-        await createWpFinding({
-          wp_monitor_id: wpMonitor.id,
-          org_id: wpMonitor.org_id,
-          snapshot_id: snapshotId,
-          finding_type: 'high_spam',
-          severity: 'medium',
-          title: `High spam comment volume: ${sec.spam_comments} spam comments queued`,
-          detail: { count: sec.spam_comments },
-        })
-      }
+      maybeCreate('high_spam', { severity: 'medium', title: `High spam comment volume: ${sec.spam_comments} spam comments queued`, detail: { count: sec.spam_comments } })
     } else {
-      const existing = await getOpenWpFindingByType(wpMonitor.id, 'high_spam')
-      if (existing) await resolveWpFinding(existing.id)
+      maybeResolve('high_spam')
     }
 
-    // No 2FA
     if (!sec.twofa_active) {
-      const existing = await getOpenWpFindingByType(wpMonitor.id, 'no_twofa')
-      if (!existing) {
-        await createWpFinding({
-          wp_monitor_id: wpMonitor.id,
-          org_id: wpMonitor.org_id,
-          snapshot_id: snapshotId,
-          finding_type: 'no_twofa',
-          severity: 'high',
-          title: 'No two-factor authentication plugin detected — admin accounts are vulnerable to credential theft',
-          detail: {},
-        })
-      }
+      maybeCreate('no_twofa', { severity: 'high', title: 'No two-factor authentication plugin detected — admin accounts are vulnerable to credential theft', detail: {} })
     } else {
-      const existing = await getOpenWpFindingByType(wpMonitor.id, 'no_twofa')
-      if (existing) await resolveWpFinding(existing.id)
+      maybeResolve('no_twofa')
     }
 
-    // Recently modified plugin files
     for (const file of (sec.modified_plugin_files ?? [])) {
-      const existing = await getOpenWpFindingByType(wpMonitor.id, `modified_plugin:${file}`)
-      if (!existing) {
-        await createWpFinding({
-          wp_monitor_id: wpMonitor.id,
-          org_id: wpMonitor.org_id,
-          snapshot_id: snapshotId,
-          finding_type: `modified_plugin:${file}`,
-          severity: 'high',
-          title: `Plugin file modified in last 24h: ${file}`,
-          detail: { file },
-        })
-      }
+      maybeCreate(`modified_plugin:${file}`, { severity: 'high', title: `Plugin file modified in last 24h: ${file}`, detail: { file } })
     }
 
-    // No backup plugin
     if (!sec.backup_plugin_present) {
-      const existing = await getOpenWpFindingByType(wpMonitor.id, 'no_backup_plugin')
-      if (!existing) {
-        await createWpFinding({
-          wp_monitor_id: wpMonitor.id,
-          org_id: wpMonitor.org_id,
-          snapshot_id: snapshotId,
-          finding_type: 'no_backup_plugin',
-          severity: 'medium',
-          title: 'No backup plugin detected — site has no automated backup protection',
-          detail: {},
-        })
-      }
+      maybeCreate('no_backup_plugin', { severity: 'medium', title: 'No backup plugin detected — site has no automated backup protection', detail: {} })
     } else {
-      const existing = await getOpenWpFindingByType(wpMonitor.id, 'no_backup_plugin')
-      if (existing) await resolveWpFinding(existing.id)
+      maybeResolve('no_backup_plugin')
     }
 
-    // High disk usage
     if ((sec.disk_used_pct ?? 0) > 80) {
-      const existing = await getOpenWpFindingByType(wpMonitor.id, 'high_disk_usage')
-      if (!existing) {
-        await createWpFinding({
-          wp_monitor_id: wpMonitor.id,
-          org_id: wpMonitor.org_id,
-          snapshot_id: snapshotId,
-          finding_type: 'high_disk_usage',
-          severity: (sec.disk_used_pct ?? 0) > 90 ? 'high' : 'medium',
-          title: `Disk usage is at ${sec.disk_used_pct}%${sec.disk_free_gb != null ? ` — ${sec.disk_free_gb} GB free` : ''}`,
-          detail: { used_pct: sec.disk_used_pct, free_gb: sec.disk_free_gb },
-        })
-      }
+      maybeCreate('high_disk_usage', { severity: (sec.disk_used_pct ?? 0) > 90 ? 'high' : 'medium', title: `Disk usage is at ${sec.disk_used_pct}%${sec.disk_free_gb != null ? ` — ${sec.disk_free_gb} GB free` : ''}`, detail: { used_pct: sec.disk_used_pct, free_gb: sec.disk_free_gb } })
     } else {
-      const existing = await getOpenWpFindingByType(wpMonitor.id, 'high_disk_usage')
-      if (existing) await resolveWpFinding(existing.id)
+      maybeResolve('high_disk_usage')
     }
   }
+
+  // Execute all creates and resolves in parallel
+  await Promise.allSettled([
+    ...toCreate.map(data => createWpFinding(data)),
+    ...toResolve.map(id => resolveWpFinding(id)),
+  ])
 
   logger.info('WP push processed', {
     wpMonitorId: wpMonitor.id,
