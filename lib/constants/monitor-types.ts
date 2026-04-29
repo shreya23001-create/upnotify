@@ -902,6 +902,46 @@ export const MONITOR_TYPES: MonitorTypeDefinition[] = [
         'This is an Uptrue recovery alert. Nameservers for {{target}} are back to their expected values.',
     },
   },
+  {
+    type: 'wordpress',
+    slug: 'wordpress-site-monitor',
+    name: 'Uptrue WordPress Monitor',
+    emoji: '🔌',
+    tagline: 'Deep WordPress security and health monitoring via a lightweight plugin',
+    defaultInterval: 7200,
+    minInterval: 3600,
+    description:
+      'Installs a lightweight plugin on your WordPress site that monitors security threats, software health, content changes, and performance — then sends findings to Uptrue for real-time alerts and AI-powered fix suggestions.',
+    whatItCatches: [
+      'PHP and executable files injected into /uploads/',
+      'New admin users created without your knowledge',
+      'User role escalation attacks',
+      'Outdated plugins and themes with known vulnerabilities',
+      'Modified core files (wp-config.php, .htaccess, functions.php)',
+      'Spam pages created in foreign languages',
+      'WP debug mode left on in production',
+    ],
+    whyItMatters:
+      'WordPress powers 43% of the web and is the most targeted CMS — without deep monitoring, attacks go undetected for days while your site serves malware to visitors.',
+    alertCopy: {
+      subject: '[{{severity}}] Security issue detected on {{monitorName}}',
+      headline: 'WordPress security issue detected',
+      detail:
+        'Uptrue detected a security issue on {{target}} at {{checkedAt}}. Check your WordPress Monitor dashboard for details and AI-powered fix instructions.',
+      shortText: '[Uptrue] Security issue on {{monitorName}}. Check your dashboard.',
+      voiceScript:
+        'This is an Uptrue alert. A security issue has been detected on your WordPress site {{monitorName}}. Please check your Uptrue dashboard immediately.',
+    },
+    recoveryCopy: {
+      subject: '[Resolved] {{monitorName}} WordPress issue resolved',
+      headline: 'WordPress issue resolved',
+      detail:
+        'The previously detected issue on {{target}} has been resolved as of {{resolvedAt}}.',
+      shortText: '[Uptrue] {{monitorName}} WordPress issue resolved.',
+      voiceScript:
+        'This is an Uptrue alert. The WordPress issue on {{monitorName}} has been resolved.',
+    },
+  },
 ]
 
 // Lookup helpers

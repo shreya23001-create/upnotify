@@ -6,6 +6,7 @@ import {
   IconSecurityHeaders, IconResponseTime, IconRobotsTxt, IconIpChange,
   IconMxHealth, IconWhoisChange, IconSitemap, IconRedirectChain,
   IconSpfDmarc, IconBlacklist, IconPageSize, IconCookieConsent, IconNameserverChange,
+  IconWordpress,
 } from '@/components/icons'
 
 const iconMap: Record<string, React.ComponentType<{ size?: number }>> = {
@@ -33,6 +34,7 @@ const iconMap: Record<string, React.ComponentType<{ size?: number }>> = {
   'page-size': IconPageSize,
   'cookie-consent': IconCookieConsent,
   'nameserver-change': IconNameserverChange,
+  wordpress: IconWordpress,
 }
 
 const displayNames: Record<string, string> = {
@@ -60,6 +62,7 @@ const displayNames: Record<string, string> = {
   'page-size': 'Page Size',
   'cookie-consent': 'Cookie Consent',
   'nameserver-change': 'Nameservers',
+  wordpress: 'WordPress',
 }
 
 export function MonitorTypeIcon({ type, iconOnly = false }: { type: string; iconOnly?: boolean }) {

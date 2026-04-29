@@ -15,7 +15,15 @@ export const metadata: Metadata = {
   },
 }
 
-const TOOLS = [
+const TOOLS: { slug: string; title: string; description: string; tag: string; href?: string }[] = [
+  {
+    slug: 'wordpress-monitor',
+    href: '/monitoring/wordpress-site-monitor',
+    title: 'WordPress Site Monitor Plugin',
+    description:
+      'Free plugin that monitors your WordPress site from the inside — detecting file injections, rogue admin users, foreign-language content, brute force attacks, security misconfigurations, and more. No inbound ports. Works behind Cloudflare.',
+    tag: 'Free Plugin',
+  },
   {
     slug: 'ai-seo-checker',
     title: 'AI SEO Checker',
@@ -115,14 +123,14 @@ export default function ToolsIndexPage(): React.ReactElement {
       <div className="tools-hero">
         <h1 className="tools-hero-title">Free Website Tools</h1>
         <p className="tools-hero-subtitle">
-          13 free tools for developers, sysadmins, and website owners — DNS, SSL, security headers, WHOIS, speed test, and more. No signup required.
+          14 free tools and plugins for developers, sysadmins, and website owners — DNS, SSL, security headers, WHOIS, speed test, WordPress monitoring, and more. No signup required.
         </p>
       </div>
 
       <div className="tools-container">
         <div className="tools-grid">
           {TOOLS.map((tool) => (
-            <Link key={tool.slug} href={`/tools/${tool.slug}`} className="tools-card">
+            <Link key={tool.slug} href={tool.href ?? `/tools/${tool.slug}`} className="tools-card">
               <div className="tools-card-header">
                 <h2 className="tools-card-title">{tool.title}</h2>
                 {tool.tag && <span className="tools-card-tag">{tool.tag}</span>}

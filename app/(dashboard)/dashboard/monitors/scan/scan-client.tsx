@@ -209,6 +209,32 @@ export function ScanClient({
               </div>
             ))}
           </div>
+
+          {/* WordPress Monitor — special agent-based monitor */}
+          <div style={{ marginTop: 28, textAlign: 'left' }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 10 }}>Agent-Based Monitors</div>
+            <a
+              href="/dashboard/monitors/new/wordpress"
+              style={{ textDecoration: 'none' }}
+            >
+              <div className="card" style={{
+                padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 16,
+                border: '1.5px solid #21759b40', background: 'linear-gradient(135deg, #21759b08, #0073aa08)',
+                cursor: 'pointer', transition: 'border-color 0.15s',
+              }}>
+                <WpIcon size={32} />
+                <div style={{ flex: 1, textAlign: 'left' }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 3 }}>Uptrue WordPress Monitor</div>
+                  <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                    Install a lightweight plugin on your WordPress site. Monitors file injections, outdated plugins, unknown admin users, suspicious pages, and more — from inside your site.
+                  </div>
+                </div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: '#21759b', background: '#21759b15', padding: '4px 10px', borderRadius: 20, flexShrink: 0 }}>
+                  Set up →
+                </div>
+              </div>
+            </a>
+          </div>
         </div>
       )}
 
@@ -375,6 +401,8 @@ export function ScanClient({
           <div style={{ marginTop: 20, padding: '12px 16px', borderRadius: 10, border: '1px solid var(--border-primary)', fontSize: 13, color: 'var(--text-secondary)' }}>
             ⚙️ <strong style={{ color: 'var(--text-primary)' }}>Need more?</strong> Keyword, API Endpoint, Heartbeat, Port Check require manual setup.{' '}
             <a href="/dashboard/monitors/new/manual" style={{ color: 'var(--accent)', textDecoration: 'underline' }}>Add individually →</a>
+            {' · '}
+            <a href="/dashboard/monitors/new/wordpress" style={{ color: '#667eea', textDecoration: 'underline' }}>🔌 WordPress Monitor →</a>
           </div>
         </div>
       )}
@@ -423,6 +451,15 @@ export function ScanClient({
         </div>
       )}
     </div>
+  )
+}
+
+function WpIcon({ size = 28 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}>
+      <circle cx="12" cy="12" r="11" fill="#21759b" />
+      <text x="12" y="16.5" textAnchor="middle" fill="white" fontSize="11" fontWeight="bold" fontFamily="Georgia, serif">W</text>
+    </svg>
   )
 }
 

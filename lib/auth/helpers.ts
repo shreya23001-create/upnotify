@@ -37,12 +37,14 @@ export function isPublicRoute(pathname: string): boolean {
   if (pathname.startsWith('/score/')) return true
   if (pathname.startsWith('/tracker/')) return true
   if (pathname.startsWith('/blog/')) return true
+  if (pathname.startsWith('/monitoring/')) return true
   if (pathname.startsWith('/tools/')) return true
   if (pathname.startsWith('/api/cron/')) return true
   if (pathname.startsWith('/api/badge/')) return true
   if (pathname.startsWith('/api/v1/tracker/')) return true
   if (pathname.startsWith('/api/tools/')) return true
   if (pathname.startsWith('/api/webhooks/')) return true
+  if (pathname.startsWith('/api/v1/wp-agent/')) return true
   if (pathname.startsWith('/api/v1/agency-waitlist')) return true
   if (pathname === '/api/v1/plans') return true
   if (pathname === '/api/v1/compete/plans') return true

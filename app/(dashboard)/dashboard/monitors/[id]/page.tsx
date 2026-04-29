@@ -39,6 +39,9 @@ export default async function MonitorDetailPage({
   const monitor = await getMonitorById(id)
   if (!monitor) notFound()
 
+  // WordPress monitors have their own dedicated report page
+  if (monitor.type === 'wordpress') redirect(`/dashboard/monitors/${id}/wordpress`)
+
   const [incidents, checkResults, uptimeSlots, uptimePercent] = await Promise.all([
     getIncidentsByWorkspace(monitor.workspace_id, { limit: 5 }),
     getCheckResultsByMonitor(monitor.id, 50),

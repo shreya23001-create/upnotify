@@ -8,7 +8,7 @@ export async function GET(): Promise<NextResponse> {
 
   const { data, error } = await supabase
     .from('plans')
-    .select('name, slug, price_monthly_gbp, price_annual_gbp, price_monthly_inr, price_annual_inr, monitor_limit, check_interval_seconds, max_team_members, has_email_alerts, has_slack_teams, has_webhooks, has_status_pages, status_page_limit, has_status_page_custom_domain, has_ai_predictive, ai_report_limit, has_api_access, data_retention_days, competitor_limit, is_visible, llms_txt_limit, citation_check_monthly_limit')
+    .select('name, slug, price_monthly_gbp, price_annual_gbp, price_monthly_inr, price_annual_inr, monitor_limit, check_interval_seconds, max_team_members, has_email_alerts, has_slack_teams, has_webhooks, has_status_pages, status_page_limit, has_status_page_custom_domain, has_ai_predictive, ai_report_limit, has_api_access, data_retention_days, competitor_limit, is_visible, llms_txt_limit, citation_check_monthly_limit, wp_monitor_limit')
     .eq('is_visible', true)
     .order('price_monthly_gbp', { ascending: true })
 
