@@ -3,7 +3,7 @@
  * Plugin Name: Uptrue WordPress Monitor
  * Plugin URI:  https://uptrue.io/wordpress-monitor
  * Description: Connect your WordPress site to Uptrue for real-time security monitoring, health alerts, and AI-powered fix suggestions. Works standalone with a free monthly email report — no Uptrue account required.
- * Version:     1.1.0
+ * Version:     1.2.0
  * Author:      Uptrue
  * Author URI:  https://uptrue.io
  * License:     GPL v2 or later
@@ -12,7 +12,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define( 'UPTRUE_VERSION',      '1.1.0' );
+define( 'UPTRUE_VERSION',      '1.2.0' );
 define( 'UPTRUE_PLUGIN_FILE',  __FILE__ );
 
 function uptrue_api_base() {
@@ -24,7 +24,7 @@ function uptrue_api_base() {
     if ( $saved ) {
         return rtrim( $saved, '/' );
     }
-    return 'https://dev.uptrue.io/api/v1/wp-agent';
+    return 'https://uptrue.io/api/v1/wp-agent';
 }
 define( 'UPTRUE_OPT_TOKEN',    'uptrue_api_token' );
 define( 'UPTRUE_OPT_INTERVAL', 'uptrue_check_interval' );
