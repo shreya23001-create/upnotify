@@ -64,6 +64,32 @@ export async function endCronRun(
 }
 
 /**
+ * Returns true if a cron with this path has a 'running' log entry created
+ * within the last `withinMs` milliseconds. Use this as a concurrency guard
+ * at the top of any cron that must not run concurrently with itself.
+ *
+ * If the Supabase call fails, returns false so the cron proceeds rather than
+ * silently skipping.
+ */
+export async function isCronRunning(cronPath: string, withinMs: number): Promise<boolean> {
+  try {
+    const supabase = createAdminClient()
+    const cutoff = new Date(Date.now() - withinMs).toISOString()
+    const { data } = await untyped(supabase)
+      .from('cron_run_log')
+      .select('id')
+      .eq('cron_path', cronPath)
+      .eq('status', 'running')
+      .gt('ran_at', cutoff)
+      .limit(1)
+      .maybeSingle()
+    return !!data
+  } catch {
+    return false
+  }
+}
+
+/**
  * Detect if the request is a manual admin trigger (vs Vercel/cron-job.org schedule).
  * The trigger-cron endpoint passes x-cron-trigger: manual.
  */

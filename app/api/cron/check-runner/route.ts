@@ -2,13 +2,13 @@ import { NextResponse } from 'next/server'
 import { getDueMonitors, getAllActiveMonitors, updateMonitorStatus, incrementFlapCount, patchMonitorConfig } from '@/lib/db/monitors'
 import { writeCheckResult } from '@/lib/db/check-results'
 import { createIncident, resolveIncident, getOpenIncidentForMonitor } from '@/lib/db/incidents'
-import { isMonitorInMaintenance } from '@/lib/db/maintenance-windows'
+import { getMaintenanceSetForMonitors } from '@/lib/db/maintenance-windows'
 import { dispatchChecker } from '@/lib/services/checker'
 import { dispatchAlerts, dispatchRecoveryAlerts } from '@/lib/services/alert-dispatcher'
 import { getAlertCopy } from '@/lib/utils/alert-copy'
 import { getServerConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
-import { startCronRun, endCronRun, getTriggeredBy } from '@/lib/utils/cron-logger'
+import { startCronRun, endCronRun, getTriggeredBy, isCronRunning } from '@/lib/utils/cron-logger'
 import type { Monitor } from '@/lib/types'
 import type { CheckerResult } from '@/lib/checkers/types'
 
@@ -37,6 +37,16 @@ export async function GET(request: Request): Promise<NextResponse> {
   }
 
   const cronStart = Date.now()
+
+  // Concurrency guard — skip if a previous run is still active (within 290s).
+  // Without this, the 1-minute schedule stacks up concurrent instances when the
+  // runner takes longer than 60s, eventually exhausting Supabase connections.
+  const alreadyRunning = await isCronRunning('/api/cron/check-runner', 290_000)
+  if (alreadyRunning) {
+    logger.warn('Check runner already running, skipping this invocation')
+    return NextResponse.json({ ok: true, skipped: true, reason: 'already_running' })
+  }
+
   // Round down to the cron fire minute so next_check_at lands exactly on the next cron boundary.
   // Without this, a 3s function startup delay shifts next_check_at past the next :00 mark and
   // causes monitors to be skipped for an entire minute (effectively 2× their configured interval).
@@ -51,21 +61,14 @@ export async function GET(request: Request): Promise<NextResponse> {
     const allMonitors = force ? await getAllActiveMonitors() : await getDueMonitors()
     logger.info('Check runner started', { dueMonitors: allMonitors.length, force })
 
-    // Filter out monitors in maintenance (parallel DB calls)
-    const maintenanceChecks = await Promise.allSettled(
-      allMonitors.map(async (m) => ({
-        monitor: m,
-        inMaintenance: await isMonitorInMaintenance(m.id, m.org_id),
-      }))
-    )
+    // Filter out monitors in maintenance — single batch query instead of N individual calls
+    const maintenanceSet = await getMaintenanceSetForMonitors(allMonitors)
 
     const monitors: Monitor[] = []
     const maintenanceUpdates: Promise<void>[] = []
 
-    for (const r of maintenanceChecks) {
-      if (r.status !== 'fulfilled') continue
-      const { monitor: m, inMaintenance } = r.value
-      if (inMaintenance) {
+    for (const m of allMonitors) {
+      if (maintenanceSet.has(m.id)) {
         const now = new Date()
         maintenanceUpdates.push(updateMonitorStatus(m.id, {
           status: m.status,
