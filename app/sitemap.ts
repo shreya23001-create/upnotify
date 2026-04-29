@@ -1,5 +1,7 @@
 import type { MetadataRoute } from 'next'
 import { createAdminClient } from '@/lib/supabase/admin'
+
+export const dynamic = 'force-dynamic'
 import { logger } from '@/lib/utils/logger'
 import { getAllSlugs } from '@/lib/constants/monitor-types'
 
