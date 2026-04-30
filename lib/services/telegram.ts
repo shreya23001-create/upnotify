@@ -50,7 +50,8 @@ async function sendTelegramMessage(
     const data = await res.json() as { ok: boolean; description?: string }
 
     if (!data.ok) {
-      logger.error('Telegram message failed', { error: data.description })
+      const sanitizedChatId = String(chatId).slice(-4).padStart(String(chatId).length, '*')
+      logger.error('Telegram message failed', { error: data.description, chatId: sanitizedChatId, statusCode: res.status })
       return { success: false, error: data.description ?? 'Unknown Telegram error' }
     }
 
@@ -90,6 +91,12 @@ export async function sendTelegramAlert(params: MonitorAlertTelegramParams): Pro
     return { success: false, error: 'Telegram bot token not configured' }
   }
 
+  const chatId = params.chatId?.trim() ?? ''
+  if (!chatId) {
+    logger.warn('Telegram chat ID missing or empty — skipping alert', { monitorName: params.monitorName })
+    return { success: false, error: 'Telegram chat ID not configured' }
+  }
+
   const icon = params.isResolved ? '✅' : '🔴'
   const status = params.isResolved ? 'Recovered' : 'Down'
 
@@ -107,7 +114,7 @@ export async function sendTelegramAlert(params: MonitorAlertTelegramParams): Pro
     lines.push(`<b>Downtime:</b> ${escapeHtml(params.downtimeDuration)}`)
   }
 
-  return sendTelegramMessage(params.chatId, {
+  return sendTelegramMessage(chatId, {
     text: lines.join('\n'),
     inlineKeyboard: [[{ text: '👁 View Monitor', url: params.monitorUrl }]],
   }, botToken)
@@ -134,11 +141,17 @@ interface BlogApprovalTelegramParams {
  */
 export async function sendBlogApprovalTelegram(params: BlogApprovalTelegramParams): Promise<TelegramResult> {
   const config = getServerConfig()
-  const { botToken, chatId } = config.telegram
+  const { botToken, chatId: configChatId } = config.telegram
 
-  if (!botToken || !chatId) {
+  if (!botToken || !configChatId) {
     logger.warn('Telegram not configured — skipping blog approval notification')
     return { success: false, error: 'Telegram credentials not configured' }
+  }
+
+  const chatId = configChatId.trim()
+  if (!chatId) {
+    logger.warn('Telegram chat ID is empty after trimming — skipping blog approval notification')
+    return { success: false, error: 'Telegram chat ID not configured' }
   }
 
   const sourcesLine = params.sourcesCount > 0

@@ -240,13 +240,13 @@ export async function getPublicMonitorByDomain(domain: string): Promise<PublicMo
     .select('*')
     .eq('domain', domain)
     .eq('is_active', true)
-    .single()
+    .maybeSingle()
 
   if (error) {
     logger.error('Failed to get public monitor by domain', { error: error.message, domain })
     return null
   }
-  return data as unknown as PublicMonitor
+  return data ? (data as unknown as PublicMonitor) : null
 }
 
 export async function getPublicMonitorById(id: string): Promise<PublicMonitor | null> {
