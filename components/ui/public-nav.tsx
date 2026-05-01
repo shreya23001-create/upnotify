@@ -25,7 +25,6 @@ export async function PublicNav(): Promise<React.ReactElement> {
   const cms = section?.content as NavContent | undefined
 
   return (
-      )}
     <PublicNavClient
       links={cms?.links ?? DEFAULT_LINKS}
       ctaPrimary={cms?.cta_primary}
