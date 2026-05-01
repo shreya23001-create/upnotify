@@ -6,12 +6,13 @@ deploy_dev:
   script:
     - npx --yes vercel pull --yes --environment=preview --token=$VERCEL_TOKEN
     - npx --yes vercel build --token=$VERCEL_TOKEN
-    - npx --yes vercel deploy --prebuilt --token=$VERCEL_TOKEN --meta gitBranch=$CI_COMMIT_REF_NAME --meta gitCommitSha=$CI_COMMIT_SHA
+    - DEPLOYMENT_URL=$(npx --yes vercel deploy --prebuilt --token=$VERCEL_TOKEN --meta gitBranch=$CI_COMMIT_REF_NAME --meta gitCommitSha=$CI_COMMIT_SHA)
+    - npx --yes vercel alias $DEPLOYMENT_URL dev.uptrue.io --token=$VERCEL_TOKEN
   only:
     - dev
   environment:
     name: development
-    url: https://uptrue-dev.vercel.app
+    url: https://dev.uptrue.io
 
 deploy_prod:
   stage: deploy
@@ -23,4 +24,4 @@ deploy_prod:
     - master
   environment:
     name: production
-    url: https://uptrue.vercel.app
+    url: https://uptrue.io
