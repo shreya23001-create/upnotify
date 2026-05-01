@@ -6,7 +6,7 @@ deploy_dev:
   script:
     - npx --yes vercel pull --yes --environment=preview --token=$VERCEL_TOKEN
     - npx --yes vercel build --token=$VERCEL_TOKEN
-    - npx --yes vercel deploy --prebuilt --token=$VERCEL_TOKEN
+    - npx --yes vercel deploy --prebuilt --token=$VERCEL_TOKEN --meta gitBranch=$CI_COMMIT_REF_NAME --meta gitCommitSha=$CI_COMMIT_SHA
   only:
     - dev
   environment:
@@ -18,7 +18,7 @@ deploy_prod:
   script:
     - npx --yes vercel pull --yes --environment=production --token=$VERCEL_TOKEN
     - npx --yes vercel build --prod --token=$VERCEL_TOKEN
-    - npx --yes vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN
+    - npx --yes vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN --meta gitBranch=$CI_COMMIT_REF_NAME --meta gitCommitSha=$CI_COMMIT_SHA
   only:
     - master
   environment:
