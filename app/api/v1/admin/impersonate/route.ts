@@ -35,7 +35,12 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       .eq('id', authUser.id)
       .single()
 
-    if (adminError || !adminUser?.is_super_admin) {
+    const adminEmailsRaw = process.env.ADMIN_EMAILS || ''
+    const adminEmails = adminEmailsRaw.split(',').map(e => e.trim().toLowerCase()).filter(Boolean)
+    const callerEmail = (adminUser?.email ?? '').toLowerCase()
+    const isSuperAdmin = adminUser?.is_super_admin || adminEmails.includes(callerEmail)
+
+    if (adminError || !isSuperAdmin) {
       logger.warn('Non-admin attempted impersonation', { userId: authUser.id })
       return NextResponse.json(
         { success: false, error: 'Forbidden' },

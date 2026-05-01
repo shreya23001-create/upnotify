@@ -226,7 +226,7 @@ export default function AdminMessagesPage(): React.ReactElement {
                       <td>{b.audience}</td>
                       <td>{b.recipient_count}</td>
                       <td style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-                        {new Date(b.sent_at).toLocaleDateString()} {new Date(b.sent_at).toLocaleTimeString()}
+                        {new Date(b.sent_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })} {new Date(b.sent_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
                       </td>
                     </tr>
                   ))}

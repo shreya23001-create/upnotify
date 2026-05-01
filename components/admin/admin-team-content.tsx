@@ -241,7 +241,7 @@ export function AdminTeamContent({ adminRoles, currentUserEmail }: AdminTeamCont
       label: 'Added',
       render: (r: AdminRole) => (
         <span className="table-muted">
-          {new Date(r.created_at).toLocaleDateString()}
+          {new Date(r.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
         </span>
       ),
     },

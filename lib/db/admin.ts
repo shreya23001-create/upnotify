@@ -10,7 +10,7 @@ export async function getAllOrganisations(search?: string): Promise<OrgWithUsers
   const supabase = createAdminClient()
   let query = supabase
     .from('organisations')
-    .select('*, users(id, email, full_name, is_active)')
+    .select('*, users!users_org_id_fkey(id, email, full_name, is_active)')
     .order('created_at', { ascending: false })
   if (search) query = query.ilike('name', `%${search}%`)
 

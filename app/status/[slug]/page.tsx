@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
-import { getStatusPageBySlug } from '@/lib/db/status-pages'
-import { getBulkUptimeDataForRange } from '@/lib/db/check-results'
+import { getStatusPageBySlug, getUptimePercentage } from '@/lib/db/status-pages'
+import { getUptimeBarDataForRange } from '@/lib/db/check-results'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { StatusOverallBanner } from '@/components/status-page/status-overall-banner'
 import { StatusMonitorRow } from '@/components/status-page/status-monitor-row'
@@ -72,7 +72,14 @@ export default async function PublicStatusPage({
     monitors = data ?? []
   }
 
-  const { uptimeData, uptimePercent } = await getBulkUptimeDataForRange(monitorIds, range)
+  const uptimeDays = range === '24h' ? 1 : range === '7d' ? 7 : range === '90d' ? 90 : 30
+
+  const [uptimeEntries, uptimePercentages] = await Promise.all([
+    Promise.all(monitors.map(async (m) => [m.id, await getUptimeBarDataForRange(m.id, range)] as const)),
+    Promise.all(monitors.map(async (m) => [m.id, await getUptimePercentage(m.id, uptimeDays)] as const)),
+  ])
+  const uptimeData = Object.fromEntries(uptimeEntries)
+  const uptimePercent = Object.fromEntries(uptimePercentages)
 
   let incidents: Incident[] = []
   if (monitorIds.length > 0) {

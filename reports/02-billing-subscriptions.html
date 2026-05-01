@@ -1,0 +1,354 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><title>Billing & Subscriptions — Audit Report</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;font-size:13px;color:#1a1a2e;background:#fff;padding:48px;max-width:960px;margin:0 auto;line-height:1.7}
+.cover{border-bottom:3px solid #0ea5e9;padding-bottom:32px;margin-bottom:32px}
+.cover-tag{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#0ea5e9;margin-bottom:10px}
+.cover h1{font-size:28px;font-weight:700;color:#0f0f1a;margin-bottom:8px}
+.cover-sub{font-size:13px;color:#555;margin-bottom:18px}
+.cover-meta{display:flex;gap:28px;font-size:12px;color:#777;flex-wrap:wrap}
+.cover-meta strong{color:#333;display:block}
+h2{font-size:16px;font-weight:700;color:#0f0f1a;margin:36px 0 12px;padding-bottom:6px;border-bottom:2px solid #e0f2fe}
+h3{font-size:13px;font-weight:700;color:#0369a1;margin:20px 0 7px}
+p{margin-bottom:10px;color:#333}
+.callout{border-left:4px solid #0ea5e9;background:#f0f9ff;padding:12px 16px;border-radius:0 6px 6px 0;margin:14px 0;font-size:12.5px}
+.callout.warn{border-color:#d97706;background:#fffbeb}
+.callout.danger{border-color:#dc2626;background:#fef2f2}
+.callout.ok{border-color:#059669;background:#f0fdf4}
+.callout-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#0369a1;margin-bottom:4px}
+.callout.warn .callout-label{color:#b45309}
+.callout.danger .callout-label{color:#b91c1c}
+.callout.ok .callout-label{color:#047857}
+pre{font-family:'JetBrains Mono',monospace;font-size:11px;background:#0f0f1a;color:#e2e8f0;padding:16px 20px;border-radius:8px;overflow-x:auto;margin:12px 0;line-height:1.75}
+code{font-family:'JetBrains Mono',monospace;font-size:11px;background:#e0f2fe;color:#0369a1;padding:1px 5px;border-radius:3px}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:12px}
+thead tr{background:#0ea5e9;color:#fff}
+thead th{text-align:left;padding:9px 12px;font-weight:600;font-size:11px;letter-spacing:.04em}
+tbody tr:nth-child(even){background:#f0f9ff}
+tbody td{padding:8px 12px;border-bottom:1px solid #e0f2fe;vertical-align:top}
+.tag{display:inline-block;padding:2px 9px;border-radius:20px;font-size:10px;font-weight:700}
+.tag-crit{background:#fee2e2;color:#991b1b}
+.tag-high{background:#fef3c7;color:#92400e}
+.tag-med{background:#dbeafe;color:#1e40af}
+.tag-low{background:#d1fae5;color:#065f46}
+.tag-ok{background:#d1fae5;color:#065f46}
+.flow-box{border:1px solid #e0f2fe;border-radius:10px;overflow:hidden;margin:14px 0}
+.flow-header{background:#0ea5e9;color:#fff;padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.flow-body{padding:16px;background:#fafeff}
+.flow-step{display:flex;gap:14px;margin-bottom:10px;align-items:flex-start}
+.flow-num{background:#0ea5e9;color:#fff;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.flow-text{font-size:12px;color:#333;padding-top:3px}
+.flow-text strong{color:#0f0f1a}
+.flow-arrow{text-align:center;color:#38bdf8;font-size:16px;margin:2px 0 4px 19px}
+.issue-block{border-radius:10px;overflow:hidden;margin:14px 0;border:1px solid #e0f2fe}
+.issue-header{padding:10px 16px;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.issue-header.crit{background:#fee2e2;color:#991b1b}
+.issue-header.high{background:#fef3c7;color:#92400e}
+.issue-header.med{background:#dbeafe;color:#1e40af}
+.issue-header.low{background:#d1fae5;color:#065f46}
+.issue-body{padding:12px 16px;background:#fff}
+.issue-item{display:flex;gap:12px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid #f0f9ff}
+.issue-item:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.issue-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.dot-crit{background:#ef4444}
+.dot-high{background:#f59e0b}
+.dot-med{background:#3b82f6}
+.dot-low{background:#10b981}
+.issue-title{font-weight:600;font-size:12.5px;color:#0f0f1a;margin-bottom:3px}
+.issue-desc{font-size:12px;color:#555;margin-bottom:4px}
+.issue-fix{font-size:11.5px;background:#f0fdf4;border-left:3px solid #10b981;padding:5px 10px;border-radius:0 4px 4px 0;color:#065f46}
+.issue-file{font-size:10.5px;color:#0369a1;font-family:'JetBrains Mono',monospace;margin-top:3px}
+.suggest-box{background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:14px 18px;margin:14px 0}
+.suggest-box h4{color:#0369a1;font-size:12.5px;font-weight:700;margin-bottom:8px}
+.suggest-item{font-size:12px;color:#333;margin-bottom:5px;display:flex;gap:8px}
+.suggest-item::before{content:'→';color:#0ea5e9;font-weight:700;flex-shrink:0}
+.footer{margin-top:48px;padding-top:14px;border-top:1px solid #e0f2fe;font-size:11px;color:#aaa;display:flex;justify-content:space-between}
+@media print{body{padding:24px}pre{white-space:pre-wrap}}
+</style></head><body>
+
+<div class="cover">
+  <div class="cover-tag">Uptrue · Engineering Audit — Report 2 of 6</div>
+  <h1>Billing &amp; Subscriptions</h1>
+  <p class="cover-sub">Full audit of the dual-provider billing system — Stripe (GBP) and Razorpay (INR) — including checkout flows, webhook handlers, proration logic, credit system, plan enforcement, and revenue analytics.</p>
+  <div class="cover-meta">
+    <div><strong>Date</strong>27 April 2026</div>
+    <div><strong>Providers</strong>Stripe + Razorpay</div>
+    <div><strong>Currencies</strong>GBP (pence) + INR (paise)</div>
+    <div><strong>Revenue-Loss Bugs</strong>2 critical</div>
+    <div><strong>Total Issues</strong>14</div>
+  </div>
+</div>
+
+<h2>Working Flow — Stripe (GBP)</h2>
+
+<div class="flow-box">
+  <div class="flow-header">Stripe Checkout &amp; Upgrade Flow</div>
+  <div class="flow-body">
+    <div class="flow-step"><div class="flow-num">1</div><div class="flow-text"><strong>User selects plan</strong> → <code>POST /api/v1/billing/checkout</code> with <code>{planSlug, billingCycle}</code></div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step"><div class="flow-num">2</div><div class="flow-text">Server validates auth + org + impersonation guard. Loads plan from DB by slug. Checks plan is not free. Reads pre-configured <code>stripe_price_id_monthly</code> or <code>stripe_price_id_annual</code> from plans table.</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step"><div class="flow-num">3</div><div class="flow-text"><strong>ensureStripeCustomer()</strong> — creates or reuses Stripe customer by email. Returns <code>checkoutUrl</code> to frontend. Old subscription NOT cancelled yet (protects against abandoned checkouts).</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step"><div class="flow-num">4</div><div class="flow-text"><strong>User completes Stripe checkout</strong> → Stripe fires <code>checkout.session.completed</code> webhook.</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step"><div class="flow-num">5</div><div class="flow-text"><strong>handleCheckoutCompleted()</strong> — idempotency check (skip if subscription already recorded). Cancels ALL active/cancelling Stripe subscriptions for the org. Retrieves new subscription from Stripe API for accurate billing period dates.</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step"><div class="flow-num">6</div><div class="flow-text">Inserts new subscription record (<code>status=active</code>). Calls <code>enforceDowngradeLimits()</code> (pauses monitors/status pages beyond new plan limit). Calls <code>notifyPlanChange()</code> (in-app message to org admin).</div></div>
+  </div>
+</div>
+
+<div class="flow-box">
+  <div class="flow-header">Stripe Webhook Events Handled</div>
+  <div class="flow-body">
+    <div class="flow-step"><div class="flow-num">✓</div><div class="flow-text"><strong>checkout.session.completed</strong> — activates new subscription, cancels old ones, enforces limits</div></div>
+    <div class="flow-step"><div class="flow-num">✓</div><div class="flow-text"><strong>invoice.paid</strong> — records invoice with amount, PDF URL, billing period dates</div></div>
+    <div class="flow-step"><div class="flow-num">✓</div><div class="flow-text"><strong>invoice.payment_failed</strong> — marks subscription as <code>past_due</code></div></div>
+    <div class="flow-step"><div class="flow-num">✓</div><div class="flow-text"><strong>customer.subscription.updated</strong> — syncs period dates, handles <code>cancel_at_period_end</code> flag</div></div>
+    <div class="flow-step"><div class="flow-num">✓</div><div class="flow-text"><strong>customer.subscription.deleted</strong> — marks subscription <code>canceled</code></div></div>
+  </div>
+</div>
+
+<h2>Working Flow — Razorpay (INR)</h2>
+
+<div class="flow-box">
+  <div class="flow-header">Razorpay Checkout &amp; Upgrade Flow</div>
+  <div class="flow-body">
+    <div class="flow-step"><div class="flow-num">1</div><div class="flow-text"><strong>User selects plan</strong> → <code>POST /api/v1/billing/razorpay/checkout</code> with <code>{planSlug, billingCycle}</code></div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step"><div class="flow-num">2</div><div class="flow-text">Server validates auth + org. Loads plan with <code>razorpay_monthly_plan_id</code> or <code>razorpay_annual_plan_id</code>. <strong>Mock mode check</strong>: if key is placeholder, returns <code>mock_sub_*</code> ID for dev testing.</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step"><div class="flow-num">3</div><div class="flow-text"><strong>ensureRazorpayCustomer()</strong> — creates or reuses customer (<code>fail_existing:0</code>). Saves <code>razorpay_customer_id</code> to org.</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step"><div class="flow-num">4</div><div class="flow-text"><strong>createRazorpaySubscription()</strong> — creates subscription (status=<code>created</code>). Returns <code>{subscriptionId, keyId, amount}</code> to frontend for the Razorpay checkout modal.</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step"><div class="flow-num">5</div><div class="flow-text"><strong>User pays in modal</strong> → Razorpay fires <code>subscription.activated</code> webhook.</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step"><div class="flow-num">6</div><div class="flow-text"><strong>handleSubscriptionActivated()</strong> — rejects mock IDs. Idempotency check. <strong>Annual upgrade proration</strong>: if switching from annual Razorpay → annual Razorpay, calculates <code>(days_remaining/365) × old_price_inr</code> and logs to <code>razorpay_annual_upgrade_log</code> with <code>refund_status='pending'</code> for manual admin review.</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step"><div class="flow-num">7</div><div class="flow-text">Cancels ALL existing Stripe + Razorpay subscriptions for org. Inserts new subscription record. Calls <code>enforceDowngradeLimits()</code> and <code>notifyPlanChange()</code>.</div></div>
+  </div>
+</div>
+
+<h2>Working Flow — Credit System</h2>
+
+<div class="flow-box">
+  <div class="flow-header">Credit Award &amp; Application Flow</div>
+  <div class="flow-body">
+    <div class="flow-step"><div class="flow-num">1</div><div class="flow-text"><strong>User submits credit claim</strong> → <code>createSubmission()</code> saves with <code>status='pending'</code></div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step"><div class="flow-num">2</div><div class="flow-text"><strong>Admin approves</strong> → <code>approveSubmission()</code> validates rule (is_active, max_per_user, max_credit_per_month_pence). Blocks trial subscription users. Creates <code>user_credit</code> record with <code>expires_at = now + 365 days</code>.</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step"><div class="flow-num">3</div><div class="flow-text"><strong>applyCreditsToStripeInvoice()</strong> — marks credits as <code>applied=true</code> in DB. <span style="color:#dc2626;font-weight:600">⚠ Phase 2 (Stripe negative invoice item) is commented out — credits are NOT actually deducted from Stripe charges.</span></div></div>
+  </div>
+</div>
+
+<div class="callout danger">
+  <div class="callout-label">Revenue-Loss Bug — Critical</div>
+  <code>applyCreditsToStripeInvoice()</code> marks credits as applied in the database but the Stripe invoice item creation (Phase 2) is commented out. Customers see "Credit applied to your bill" but are charged full price. The credit is silently lost.
+</div>
+
+<h2>Working Flow — Plan Enforcement on Downgrade</h2>
+
+<div class="flow-box">
+  <div class="flow-header">enforceDowngradeLimits() — called after every plan change</div>
+  <div class="flow-body">
+    <div class="flow-step"><div class="flow-num">1</div><div class="flow-text">Fetch plan limits for org (<code>getPlanLimits()</code>). Compare against current resource counts.</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step"><div class="flow-num">2</div><div class="flow-text"><strong>Monitors</strong>: sort ascending by <code>created_at</code>. Slice beyond limit (newest get paused first). Set <code>is_paused=true</code> for excess monitors.</div></div>
+    <div class="flow-step"><div class="flow-num">3</div><div class="flow-text"><strong>Status Pages</strong>: same sort + slice logic. Set <code>is_published=false</code> for excess pages.</div></div>
+    <div class="flow-step"><div class="flow-num">4</div><div class="flow-text"><strong>Alert Channels</strong>: disable Slack/Teams if <code>!hasSlackTeams</code>. Disable webhooks if <code>!hasWebhooks</code>. Email always preserved.</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step"><div class="flow-num">5</div><div class="flow-text">Sends in-app notification to user listing affected resources.</div></div>
+  </div>
+</div>
+
+<h2>Proration Summary</h2>
+<table>
+  <thead><tr><th>Provider</th><th>Upgrade Path</th><th>Refund?</th><th>Method</th><th>Automatic?</th></tr></thead>
+  <tbody>
+    <tr><td>Stripe</td><td>Any → Any</td><td>Yes (Stripe auto)</td><td>Stripe proration engine</td><td>Yes</td></tr>
+    <tr><td>Razorpay</td><td>Monthly → Any</td><td>No</td><td>Not implemented</td><td>N/A</td></tr>
+    <tr><td>Razorpay</td><td>Annual → Annual</td><td>Manual only</td><td><code>(days_remaining/365) × old_price_inr</code> → pending log</td><td>No — admin reviews</td></tr>
+    <tr><td>Razorpay</td><td>Annual → Monthly</td><td>No</td><td>No code path exists</td><td>N/A</td></tr>
+  </tbody>
+</table>
+
+<h2>Issues Found</h2>
+
+<div class="issue-block">
+  <div class="issue-header crit">TIER 1 — REVENUE LOSS</div>
+  <div class="issue-body">
+    <div class="issue-item">
+      <div class="issue-dot dot-crit"></div>
+      <div class="issue-content">
+        <div class="issue-title">Credit application does not create Stripe invoice item — customers charged full price</div>
+        <div class="issue-desc">Phase 2 of <code>applyCreditsToStripeInvoice()</code> (creating a negative Stripe invoice item) is commented out with a TODO. Credits are marked "applied" in DB but Stripe never receives the deduction. Every credit redemption results in a full-price charge.</div>
+        <div class="issue-fix">✦ Fix: Implement the commented Phase 2 code. Call <code>stripe.invoiceItems.create({ amount: -totalAppliedPence, currency: 'gbp', customer: stripeCustomerId })</code> before the invoice is finalized. Test with Stripe test mode.</div>
+        <div class="issue-file">lib/db/user-credits.ts · applyCreditsToStripeInvoice() · line 241</div>
+      </div>
+    </div>
+    <div class="issue-item">
+      <div class="issue-dot dot-crit"></div>
+      <div class="issue-content">
+        <div class="issue-title">Razorpay annual upgrade credit never automatically processed</div>
+        <div class="issue-desc">Annual upgrade credits are correctly calculated and stored in <code>razorpay_annual_upgrade_log</code> as 'pending', but require a manual admin to mark each as 'refunded'. No automatic refund, no customer notification, no SLA on processing.</div>
+        <div class="issue-fix">✦ Fix: Integrate Razorpay's Refund API. After logging the credit, call <code>razorpay.refunds.create({ payment_id, amount: creditAmountPaise })</code> and update the log with the refund ID and status. Notify the user by email.</div>
+        <div class="issue-file">app/api/webhooks/razorpay/route.ts · handleSubscriptionActivated()</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="issue-block">
+  <div class="issue-header high">TIER 2 — DATA INTEGRITY</div>
+  <div class="issue-body">
+    <div class="issue-item">
+      <div class="issue-dot dot-high"></div>
+      <div class="issue-content">
+        <div class="issue-title">Invoice amount_gbp column stores INR paise for Razorpay invoices</div>
+        <div class="issue-desc">The invoices table has an <code>amount_gbp</code> column used for both GBP pence (Stripe) and INR paise (Razorpay). Revenue dashboard mixes currencies, making totals wrong.</div>
+        <div class="issue-fix">✦ Fix: Add a separate <code>amount_inr</code> column. Migrate Razorpay invoice records. Update revenue aggregation queries to sum each currency column separately.</div>
+        <div class="issue-file">app/api/webhooks/razorpay/route.ts · handleSubscriptionCharged() · line 297</div>
+      </div>
+    </div>
+    <div class="issue-item">
+      <div class="issue-dot dot-high"></div>
+      <div class="issue-content">
+        <div class="issue-title">Razorpay refund summary uses credit_amount as fallback — partial refunds counted incorrectly</div>
+        <div class="issue-desc"><code>refunded_amount_inr ?? credit_amount_inr</code> means records with partial refunds (refunded less than credited) show the full credit amount in the total, inflating the "total refunded" figure.</div>
+        <div class="issue-fix">✦ Fix: Only include records in the refunded total where <code>refunded_amount_inr IS NOT NULL</code>. Show credit_amount vs refunded_amount separately in the admin UI.</div>
+        <div class="issue-file">app/api/admin/revenue/razorpay-upgrades/route.ts · line 110</div>
+      </div>
+    </div>
+    <div class="issue-item">
+      <div class="issue-dot dot-high"></div>
+      <div class="issue-content">
+        <div class="issue-title">Duplicate getPlanBySlug() in two files</div>
+        <div class="issue-desc">Same function exists in both <code>lib/db/subscriptions.ts</code> and <code>lib/db/plans.ts</code>. Future schema changes must be applied in two places.</div>
+        <div class="issue-fix">✦ Fix: Keep canonical version in <code>lib/db/plans.ts</code>. Import and re-export from <code>subscriptions.ts</code> if needed for backwards compatibility.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="issue-block">
+  <div class="issue-header high">TIER 3 — SECURITY / OPERATIONAL</div>
+  <div class="issue-body">
+    <div class="issue-item">
+      <div class="issue-dot dot-high"></div>
+      <div class="issue-content">
+        <div class="issue-title">Mock mode not blocked in production — payment bypass risk</div>
+        <div class="issue-desc">If deployed with <code>RAZORPAY_KEY_ID=rzp_test_placeholder</code>, all Razorpay checkout calls silently succeed with a mock subscription ID. Webhooks reject these IDs, but the user receives a "checkout success" response without paying.</div>
+        <div class="issue-fix">✦ Fix: Detect production environment (<code>process.env.NODE_ENV === 'production'</code>). In production, if key is placeholder, return 500 error instead of mock response. Never silently succeed a payment in production.</div>
+        <div class="issue-file">app/api/v1/billing/razorpay/checkout/route.ts · line 70</div>
+      </div>
+    </div>
+    <div class="issue-item">
+      <div class="issue-dot dot-high"></div>
+      <div class="issue-content">
+        <div class="issue-title">Razorpay webhook signature not enforced — accepts unverified payloads in dev/staging</div>
+        <div class="issue-desc">In non-production environments, signature mismatch logs a warning but processing continues. Allows crafted webhook payloads to manipulate subscription state in staging environments.</div>
+        <div class="issue-fix">✦ Fix: Always enforce signature validation. For local dev, use Razorpay's test webhook tool or forward real webhooks via ngrok with the real secret. Never process unverified webhooks.</div>
+        <div class="issue-file">app/api/webhooks/razorpay/route.ts · line 394</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="issue-block">
+  <div class="issue-header med">TIER 4 — FUNCTIONAL GAPS</div>
+  <div class="issue-body">
+    <div class="issue-item">
+      <div class="issue-dot dot-med"></div>
+      <div class="issue-content">
+        <div class="issue-title">AI report limit never enforced — unlimited generation regardless of plan</div>
+        <div class="issue-desc"><code>checkAiReportLimit()</code> always returns <code>{ allowed: true }</code> with a TODO comment. All users on all plans can generate unlimited AI reports.</div>
+        <div class="issue-fix">✦ Fix: Add a <code>COUNT(*)</code> query to <code>reports</code> table for the current calendar month (<code>generated_at >= start_of_month</code>). Compare against <code>plan.aiReportLimit</code>. Reject if exceeded.</div>
+        <div class="issue-file">lib/utils/plan-limits.ts · line 215</div>
+      </div>
+    </div>
+    <div class="issue-item">
+      <div class="issue-dot dot-med"></div>
+      <div class="issue-content">
+        <div class="issue-title">Invisible plans can be purchased via checkout API</div>
+        <div class="issue-desc">Checkout only validates plan existence, not <code>is_visible=true</code>. Hidden/retired plans can be purchased by guessing the plan slug.</div>
+        <div class="issue-fix">✦ Fix: Add <code>.eq('is_visible', true)</code> filter to the plan lookup in both Stripe and Razorpay checkout routes.</div>
+      </div>
+    </div>
+    <div class="issue-item">
+      <div class="issue-dot dot-med"></div>
+      <div class="issue-content">
+        <div class="issue-title">Trial subscription silently skips if any prior subscription exists (including cancelled)</div>
+        <div class="issue-desc"><code>createTrialSubscription()</code> skips if <code>count > 0</code> without filtering by status. A user who was on free and cancelled cannot start a trial.</div>
+        <div class="issue-fix">✦ Fix: Add <code>.in('status', ['active', 'trialing', 'paused'])</code> filter. Only skip trial if there is a currently active/paused subscription, not a historical cancelled one.</div>
+        <div class="issue-file">lib/db/subscriptions.ts · createTrialSubscription()</div>
+      </div>
+    </div>
+    <div class="issue-item">
+      <div class="issue-dot dot-med"></div>
+      <div class="issue-content">
+        <div class="issue-title">Deactivated team members counted against seat limit</div>
+        <div class="issue-desc"><code>checkTeamMemberLimit()</code> does not filter by <code>is_active</code>. If a user is deactivated, they still occupy a seat, preventing adding new members.</div>
+        <div class="issue-fix">✦ Fix: Add <code>.eq('is_active', true)</code> to the user count query in <code>checkTeamMemberLimit()</code>.</div>
+        <div class="issue-file">lib/utils/plan-limits.ts · checkTeamMemberLimit()</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="issue-block">
+  <div class="issue-header low">TIER 5 — PERFORMANCE / MINOR</div>
+  <div class="issue-body">
+    <div class="issue-item">
+      <div class="issue-dot dot-low"></div>
+      <div class="issue-content">
+        <div class="issue-title">No subscription state change audit trail</div>
+        <div class="issue-desc">Subscriptions have <code>created_at</code> only. Cannot determine when a subscription went from active → past_due → cancelled or who initiated a cancellation.</div>
+        <div class="issue-fix">✦ Fix: Add <code>updated_at</code> (auto-updated trigger) and a <code>subscription_events</code> log table recording each status transition with timestamp and triggering webhook/action.</div>
+      </div>
+    </div>
+    <div class="issue-item">
+      <div class="issue-dot dot-low"></div>
+      <div class="issue-content">
+        <div class="issue-title">Revenue dashboard stores only first user per org in email map</div>
+        <div class="issue-desc"><code>usersByOrgId</code> map is built with <code>map[user.org_id] = user</code> — overwrites on multiple users. Multi-seat orgs show the wrong contact email in the revenue table.</div>
+        <div class="issue-fix">✦ Fix: Map <code>orgId → user[]</code> (array). Display primary owner (user.role === 'owner') email in the UI, with a "View all" link.</div>
+        <div class="issue-file">app/api/admin/revenue/route.ts · line 173</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2>Suggestions &amp; Improvements</h2>
+
+<div class="suggest-box">
+  <h4>Immediate — Revenue Protection</h4>
+  <div class="suggest-item">Complete Phase 2 of credit application — this is a silent revenue leak affecting every credit user</div>
+  <div class="suggest-item">Implement automatic Razorpay refund API call after annual upgrade credit calculation</div>
+  <div class="suggest-item">Add <code>is_visible=true</code> filter to both checkout routes to prevent retired plan purchases</div>
+  <div class="suggest-item">Block mock mode in production via NODE_ENV check — prevents accidental payment bypass on deploy</div>
+</div>
+
+<div class="suggest-box">
+  <h4>Short-Term — Data Quality</h4>
+  <div class="suggest-item">Add separate <code>amount_inr</code> column to invoices table — stop mixing currencies in a GBP-named column</div>
+  <div class="suggest-item">Implement AI report monthly count limit — the TODO has been open; implement the COUNT(*) query</div>
+  <div class="suggest-item">Add <code>subscription_events</code> audit table — every status transition logged with timestamp</div>
+  <div class="suggest-item">Fix trial subscription logic to filter by active status, not just existence</div>
+</div>
+
+<div class="suggest-box">
+  <h4>Architecture</h4>
+  <div class="suggest-item">Consolidate getPlanBySlug() to one file (lib/db/plans.ts) — prevents future divergence</div>
+  <div class="suggest-item">Add Razorpay webhook enforcement in all environments — use ngrok or Razorpay test tool for local dev</div>
+  <div class="suggest-item">Add revenue CSV export endpoint for accounting — query invoices, format as CSV, stream response</div>
+  <div class="suggest-item">Consider Razorpay credit note flow for monthly-to-annual downgrades — currently no code path handles this</div>
+</div>
+
+<div class="footer">
+  <span>Uptrue Engineering · Billing &amp; Subscriptions · Report 2 of 6 · 27 April 2026</span>
+  <span>2 providers · 14 issues · 2 revenue-loss critical</span>
+</div>
+</body></html>

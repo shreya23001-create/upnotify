@@ -17,7 +17,8 @@ interface AuditEntry {
 
 const PAGE_SIZE = 30
 
-export function AdminAuditLogClientPage(): React.ReactElement {
+// canWrite unused — audit log is read-only by nature, prop accepted for API consistency
+export function AdminAuditLogClientPage({ canWrite: _canWrite = true }: { canWrite?: boolean }): React.ReactElement {
   const [logs, setLogs] = useState<AuditEntry[]>([])
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(1)

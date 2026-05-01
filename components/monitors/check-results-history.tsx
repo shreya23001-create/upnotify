@@ -1,6 +1,7 @@
 'use client'
 
 import { DataTable, type Column } from '@/components/ui/data-table'
+import { getRegionLabel } from '@/lib/config/regions'
 import type { CheckResult } from '@/lib/types'
 
 export function CheckResultsHistory({ results }: { results: CheckResult[] }) {
@@ -11,6 +12,7 @@ export function CheckResultsHistory({ results }: { results: CheckResult[] }) {
         {r.status}
       </span>
     )},
+    { key: 'region', label: 'Location', render: (r) => <span className="table-muted">{getRegionLabel(r.region)}</span> },
     { key: 'response_time_ms', label: 'Response Time', render: (r) => r.response_time_ms ? `${r.response_time_ms}ms` : '—' },
     { key: 'status_code', label: 'Status Code', render: (r) => r.status_code != null ? String(r.status_code) : '—' },
     { key: 'error_message', label: 'Error', render: (r) => <span className="table-muted table-truncate">{r.error_message ?? '—'}</span> },

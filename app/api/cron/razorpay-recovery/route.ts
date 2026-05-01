@@ -18,6 +18,7 @@ import { sendAlertEmail } from '@/lib/services/email'
 import { getServerConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
 import { startCronRun, endCronRun, getTriggeredBy } from '@/lib/utils/cron-logger'
+import { enforceDowngradeLimits } from '@/lib/services/plan-enforcement'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 30
@@ -159,10 +160,39 @@ export async function GET(request: Request): Promise<NextResponse> {
       }
     }
 
-    const summary = `Notified: ${notified}, Skipped: ${skipped}, Errors: ${errors}`
+    // ── Expire cancelling Razorpay subscriptions whose period has ended ────────
+    // The webhook sets status='cancelling' when cancel_at_cycle_end=1 fires. This
+    // sweep finalises them once current_period_end has passed.
+    let expired = 0
+    const { data: cancellingSubs } = await supabase
+      .from('subscriptions')
+      .select('id, org_id')
+      .eq('status', 'cancelling')
+      .not('razorpay_subscription_id', 'is', null)
+      .lt('current_period_end', new Date().toISOString())
+
+    for (const sub of cancellingSubs ?? []) {
+      try {
+        await supabase
+          .from('subscriptions')
+          .update({ status: 'canceled', canceled_at: new Date().toISOString() })
+          .eq('id', sub.id)
+        await enforceDowngradeLimits(sub.org_id)
+        logger.info('razorpay-recovery: expired cancelling subscription', { subscriptionId: sub.id, orgId: sub.org_id })
+        expired++
+      } catch (err) {
+        logger.error('razorpay-recovery: failed to expire cancelling sub', {
+          subscriptionId: sub.id,
+          error: err instanceof Error ? err.message : String(err),
+        })
+        errors++
+      }
+    }
+
+    const summary = `Notified: ${notified}, Skipped: ${skipped}, Expired: ${expired}, Errors: ${errors}`
     await endCronRun(runId, cronStart, errors > 0 && notified === 0 ? 'error' : 'ok', { summary })
 
-    return NextResponse.json({ success: true, notified, skipped, errors })
+    return NextResponse.json({ success: true, notified, skipped, expired, errors })
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
     logger.error('razorpay-recovery: cron failed', { error: message })

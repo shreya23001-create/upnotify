@@ -124,7 +124,7 @@ export function MonitorTypeHealthDashboard(): React.ReactElement {
           <h1 className="page-title">Monitor Type Health</h1>
           <p style={{ fontSize: 14, color: 'var(--text-muted)', marginTop: 4 }}>
             Platform-wide health across all monitor types and all organisations
-            {lastUpdated && <span> · Updated {new Date(lastUpdated).toLocaleTimeString()}</span>}
+            {lastUpdated && <span> · Updated {new Date(lastUpdated).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}</span>}
           </p>
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>

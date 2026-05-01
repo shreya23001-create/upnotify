@@ -1,0 +1,342 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><title>Status Pages & Reports — Audit Report</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;font-size:13px;color:#1a1a2e;background:#fff;padding:48px;max-width:960px;margin:0 auto;line-height:1.7}
+.cover{border-bottom:3px solid #059669;padding-bottom:32px;margin-bottom:32px}
+.cover-tag{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#059669;margin-bottom:10px}
+.cover h1{font-size:28px;font-weight:700;color:#0f0f1a;margin-bottom:8px}
+.cover-sub{font-size:13px;color:#555;margin-bottom:18px}
+.cover-meta{display:flex;gap:28px;font-size:12px;color:#777;flex-wrap:wrap}
+.cover-meta strong{color:#333;display:block}
+h2{font-size:16px;font-weight:700;color:#0f0f1a;margin:36px 0 12px;padding-bottom:6px;border-bottom:2px solid #d1fae5}
+h3{font-size:13px;font-weight:700;color:#065f46;margin:20px 0 7px}
+p{margin-bottom:10px;color:#333}
+.callout{border-left:4px solid #059669;background:#f0fdf4;padding:12px 16px;border-radius:0 6px 6px 0;margin:14px 0;font-size:12.5px}
+.callout.warn{border-color:#d97706;background:#fffbeb}
+.callout.danger{border-color:#dc2626;background:#fef2f2}
+.callout.info{border-color:#0ea5e9;background:#f0f9ff}
+.callout-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#065f46;margin-bottom:4px}
+.callout.warn .callout-label{color:#b45309}
+.callout.danger .callout-label{color:#b91c1c}
+.callout.info .callout-label{color:#0369a1}
+pre{font-family:'JetBrains Mono',monospace;font-size:11px;background:#0f0f1a;color:#e2e8f0;padding:16px 20px;border-radius:8px;overflow-x:auto;margin:12px 0;line-height:1.75}
+code{font-family:'JetBrains Mono',monospace;font-size:11px;background:#d1fae5;color:#065f46;padding:1px 5px;border-radius:3px}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:12px}
+thead tr{background:#059669;color:#fff}
+thead th{text-align:left;padding:9px 12px;font-weight:600;font-size:11px;letter-spacing:.04em}
+tbody tr:nth-child(even){background:#f0fdf4}
+tbody td{padding:8px 12px;border-bottom:1px solid #d1fae5;vertical-align:top}
+.tag{display:inline-block;padding:2px 9px;border-radius:20px;font-size:10px;font-weight:700}
+.tag-crit{background:#fee2e2;color:#991b1b}
+.tag-high{background:#fef3c7;color:#92400e}
+.tag-med{background:#dbeafe;color:#1e40af}
+.tag-low{background:#d1fae5;color:#065f46}
+.tag-ok{background:#d1fae5;color:#065f46}
+.flow-box{border:1px solid #d1fae5;border-radius:10px;overflow:hidden;margin:14px 0}
+.flow-header{background:#059669;color:#fff;padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.flow-body{padding:16px;background:#fafffe}
+.flow-step{display:flex;gap:14px;margin-bottom:10px;align-items:flex-start}
+.flow-num{background:#059669;color:#fff;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.flow-text{font-size:12px;color:#333;padding-top:3px}
+.flow-text strong{color:#0f0f1a}
+.flow-arrow{text-align:center;color:#34d399;font-size:16px;margin:2px 0 4px 19px}
+.issue-block{border-radius:10px;overflow:hidden;margin:14px 0;border:1px solid #d1fae5}
+.issue-header{padding:10px 16px;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.issue-header.crit{background:#fee2e2;color:#991b1b}
+.issue-header.high{background:#fef3c7;color:#92400e}
+.issue-header.med{background:#dbeafe;color:#1e40af}
+.issue-header.low{background:#d1fae5;color:#065f46}
+.issue-body{padding:12px 16px;background:#fff}
+.issue-item{display:flex;gap:12px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid #f0fdf4}
+.issue-item:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.issue-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.dot-crit{background:#ef4444}
+.dot-high{background:#f59e0b}
+.dot-med{background:#3b82f6}
+.dot-low{background:#10b981}
+.issue-title{font-weight:600;font-size:12.5px;color:#0f0f1a;margin-bottom:3px}
+.issue-desc{font-size:12px;color:#555;margin-bottom:4px}
+.issue-fix{font-size:11.5px;background:#f0fdf4;border-left:3px solid #10b981;padding:5px 10px;border-radius:0 4px 4px 0;color:#065f46}
+.issue-file{font-size:10.5px;color:#059669;font-family:'JetBrains Mono',monospace;margin-top:3px}
+.suggest-box{background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:14px 18px;margin:14px 0}
+.suggest-box h4{color:#065f46;font-size:12.5px;font-weight:700;margin-bottom:8px}
+.suggest-item{font-size:12px;color:#333;margin-bottom:5px;display:flex;gap:8px}
+.suggest-item::before{content:'→';color:#059669;font-weight:700;flex-shrink:0}
+.footer{margin-top:48px;padding-top:14px;border-top:1px solid #d1fae5;font-size:11px;color:#aaa;display:flex;justify-content:space-between}
+@media print{body{padding:24px}pre{white-space:pre-wrap}}
+</style></head><body>
+
+<div class="cover">
+  <div class="cover-tag">Uptrue · Engineering Audit — Report 3 of 6</div>
+  <h1>Status Pages &amp; Reports</h1>
+  <p class="cover-sub">Audit of public status page creation, subscription delivery, public rendering, and the report generation system (9 types with AI summary, 3 delivery modes).</p>
+  <div class="cover-meta">
+    <div><strong>Date</strong>27 April 2026</div>
+    <div><strong>Report Types</strong>9</div>
+    <div><strong>Delivery Modes</strong>Dashboard, Email, Webhook</div>
+    <div><strong>Critical Bugs</strong>2 security</div>
+    <div><strong>Total Issues</strong>18</div>
+  </div>
+</div>
+
+<h2>Working Flow — Status Page Creation</h2>
+
+<div class="flow-box">
+  <div class="flow-header">Create Status Page Flow</div>
+  <div class="flow-body">
+    <div class="flow-step"><div class="flow-num">1</div><div class="flow-text"><strong>User fills form</strong> (name, slug, select monitors) → <code>createStatusPageAction()</code> server action</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step"><div class="flow-num">2</div><div class="flow-text"><strong>Guards</strong>: impersonationGuard() + getCurrentUser() + redirect if not authenticated</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step"><div class="flow-num">3</div><div class="flow-text"><strong>Slug validation</strong>: check against 16 reserved slugs (api, admin, login, etc.) + format check (alphanumeric + hyphens) + <code>isSlugTaken()</code> DB call</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step"><div class="flow-num">4</div><div class="flow-text"><strong>Plan limit check</strong>: <code>checkStatusPageLimit()</code> → returns <code>{ allowed, currentCount, limit }</code>. Rejects with helpful plan tier suggestion if at limit.</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step"><div class="flow-num">5</div><div class="flow-text"><code>createStatusPage()</code> → INSERT with <code>org_id, workspace_id, name, slug, monitor_ids[]</code>. Handles duplicate slug (code 23505) gracefully.</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step"><div class="flow-num">6</div><div class="flow-text">Redirect to <code>/dashboard/status-pages</code></div></div>
+  </div>
+</div>
+
+<h2>Working Flow — Public Status Page Rendering</h2>
+
+<div class="flow-box">
+  <div class="flow-header">GET /status/{slug} — Public Page (force-dynamic)</div>
+  <div class="flow-body">
+    <div class="flow-step"><div class="flow-num">1</div><div class="flow-text"><code>getStatusPageBySlug(slug)</code> — only returns <code>is_published=true</code> pages. 404 if not found or unpublished.</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step"><div class="flow-num">2</div><div class="flow-text">Parallel data fetch: org logo, monitors by ID array, uptime bars (24h/7d/30d/90d), uptime percentage (30d), incidents (last 20 ordered by started_at DESC).</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step"><div class="flow-num">3</div><div class="flow-text"><strong>Overall status determination</strong>:<br><code>anyDown → "Major Outage"</code><br><code>openIncidents.length > 0 → "Partial Outage"</code><br><code>else → "All Systems Operational"</code></div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step"><div class="flow-num">4</div><div class="flow-text">Render: logo + status dot → hero banner (status, uptime %, avg response) → monitor rows (time-range selector) → incident history → subscribe form → "Powered by Uptrue" footer</div></div>
+  </div>
+</div>
+
+<h2>Working Flow — Status Page Subscription</h2>
+
+<div class="flow-box">
+  <div class="flow-header">POST /api/v1/status-pages/subscribe</div>
+  <div class="flow-body">
+    <div class="flow-step"><div class="flow-num">1</div><div class="flow-text">Validate: must have either <code>email</code> OR <code>webhookUrl + type</code>. Slack webhook: must start with <code>https://hooks.slack.com/</code>. Teams: must contain <code>webhook.office.com</code>.</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step"><div class="flow-num">2a</div><div class="flow-text"><strong>Email path</strong>: <code>subscribeToStatusPage(statusPageId, email)</code> → INSERT row with <code>confirmation_token</code> and <code>unsubscribe_token</code> (UUIDs). <span style="color:#dc2626">⚠ Confirmation email is never sent.</span></div></div>
+    <div class="flow-step"><div class="flow-num">2b</div><div class="flow-text"><strong>Webhook path</strong>: <code>subscribeWebhookToStatusPage(statusPageId, webhookUrl, type)</code> → INSERT row with email = <code>"webhook:slack:https://..."</code>. <span style="color:#dc2626">⚠ Webhooks stored as encoded email string. No delivery job exists.</span></div></div>
+  </div>
+</div>
+
+<h2>Working Flow — Report Generation</h2>
+
+<div class="flow-box">
+  <div class="flow-header">Report Generation (9 Types)</div>
+  <div class="flow-body">
+    <div class="flow-step"><div class="flow-num">1</div><div class="flow-text"><strong>User submits form</strong> → <code>generateReportAction()</code> with type, reportType, periodStart, periodEnd, delivery options</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step"><div class="flow-num">2</div><div class="flow-text">Fetch all monitors in workspace. For each monitor: query <code>check_results</code> for the period. Calculate: total checks, uptime %, min/max/avg response time, incident count.</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step"><div class="flow-num">3</div><div class="flow-text"><strong>Type-specific processing</strong>:<br>
+    • site-health / security-audit / availability-summary → group by apex domain, health score<br>
+    • change-digest → filter degraded checks from change-detection types (limit 200)<br>
+    • response-trend → daily min/max/avg per monitor</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step"><div class="flow-num">4</div><div class="flow-text"><code>generateReportSummary()</code> → Claude Sonnet 4.6, 25s timeout. Falls back to static summary on failure.</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step"><div class="flow-num">5</div><div class="flow-text">INSERT report to DB with full <code>data</code> JSON + <code>ai_summary</code>.</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step"><div class="flow-num">6</div><div class="flow-text"><strong>Delivery</strong>: Dashboard (redirect to /dashboard/reports/{id}) OR Email (sendEmail() per recipient) OR Webhook (fetch POST, fire-and-forget).</div></div>
+  </div>
+</div>
+
+<h2>Report Types</h2>
+<table>
+  <thead><tr><th>Report Type</th><th>What It Measures</th><th>Special Logic</th></tr></thead>
+  <tbody>
+    <tr><td>uptime</td><td>Uptime % per monitor for the period</td><td>Standard metrics aggregation</td></tr>
+    <tr><td>performance</td><td>Avg/min/max response time</td><td>Standard metrics aggregation</td></tr>
+    <tr><td>incident</td><td>Incident count + mean resolution time (minutes)</td><td>Includes previous month comparison</td></tr>
+    <tr><td>sla</td><td>SLA compliance tracking</td><td>Standard metrics; SLA rules config not yet built</td></tr>
+    <tr><td>site-health</td><td>Health score per apex domain</td><td>Groups monitors by domain, calculates domain-level score</td></tr>
+    <tr><td>security-audit</td><td>SSL expiry days, security grade, blacklist status</td><td>Filters security monitor types, extracts metadata</td></tr>
+    <tr><td>availability-summary</td><td>Domain availability rollup</td><td>Same domain grouping as site-health</td></tr>
+    <tr><td>change-digest</td><td>Detected changes (DNS, IP, robots.txt, etc.)</td><td>Filters degraded check results from change-detection types. Hard limit: 200 events.</td></tr>
+    <tr><td>response-trend</td><td>Daily min/max/avg response time trend</td><td>Builds per-day data points for response-time monitors</td></tr>
+  </tbody>
+</table>
+
+<h2>Issues Found</h2>
+
+<div class="issue-block">
+  <div class="issue-header crit">CRITICAL — Security</div>
+  <div class="issue-body">
+    <div class="issue-item">
+      <div class="issue-dot dot-crit"></div>
+      <div class="issue-content">
+        <div class="issue-title">deleteReport() has no org_id check — any user can delete any report</div>
+        <div class="issue-desc"><code>deleteReportAction</code> calls <code>deleteReport(id)</code> without verifying the report belongs to the requesting org. Any authenticated user who knows a report ID can delete another org's report. Classic privilege escalation.</div>
+        <div class="issue-fix">✦ Fix: Add <code>org_id</code> to the delete query: <code>.delete().eq('id', id).eq('org_id', user.org_id)</code>. Verify the returned count > 0 (if 0, the report didn't belong to this org).</div>
+        <div class="issue-file">lib/db/reports.ts · deleteReport() + app/(dashboard)/dashboard/reports/actions.ts</div>
+      </div>
+    </div>
+    <div class="issue-item">
+      <div class="issue-dot dot-crit"></div>
+      <div class="issue-content">
+        <div class="issue-title">/dashboard/reports/new has no authentication check</div>
+        <div class="issue-desc">The report generation page component does not call <code>getCurrentUser()</code> or <code>redirect('/login')</code>. Any visitor who navigates to <code>/dashboard/reports/new</code> sees the full report generation form.</div>
+        <div class="issue-fix">✦ Fix: Add <code>const user = await getCurrentUser(); if (!user) redirect('/login');</code> at the top of the page component. Same pattern as all other dashboard pages.</div>
+        <div class="issue-file">app/(dashboard)/dashboard/reports/new/page.tsx</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="issue-block">
+  <div class="issue-header high">HIGH — Missing Features</div>
+  <div class="issue-body">
+    <div class="issue-item">
+      <div class="issue-dot dot-high"></div>
+      <div class="issue-content">
+        <div class="issue-title">Webhook delivery job for status page subscribers does not exist</div>
+        <div class="issue-desc">Slack/Teams webhooks are stored in DB but no background job, cron, or event handler sends them when monitor status changes. Webhook subscribers receive zero notifications.</div>
+        <div class="issue-fix">✦ Fix: Add a <code>notifyStatusPageSubscribers(monitorId, newStatus, incident)</code> function. Call it from the check runner when monitor status changes. Decode webhook subscribers from the <code>webhook:type:url</code> email format and POST to each URL. Better long-term: add a dedicated <code>webhook_subscriptions</code> table.</div>
+        <div class="issue-file">lib/db/status-pages.ts · subscribeWebhookToStatusPage()</div>
+      </div>
+    </div>
+    <div class="issue-item">
+      <div class="issue-dot dot-high"></div>
+      <div class="issue-content">
+        <div class="issue-title">Email subscriber confirmation email never sent</div>
+        <div class="issue-desc">The subscribe endpoint generates a <code>confirmation_token</code> and stores it, but never sends a confirmation email to the subscriber. All subscribers are stored in an unconfirmed state permanently.</div>
+        <div class="issue-fix">✦ Fix: After <code>subscribeToStatusPage()</code> succeeds, call <code>sendEmail()</code> with a confirmation link: <code>/status/{slug}/confirm?token={confirmation_token}</code>. Add a confirm endpoint that sets <code>confirmed=true</code>.</div>
+      </div>
+    </div>
+    <div class="issue-item">
+      <div class="issue-dot dot-high"></div>
+      <div class="issue-content">
+        <div class="issue-title">AI report limit not enforced — unlimited generation on all plans</div>
+        <div class="issue-desc"><code>checkAiReportLimit()</code> always returns <code>{ allowed: true }</code>. generateReportAction doesn't even call it. All users can generate unlimited AI reports regardless of their plan.</div>
+        <div class="issue-fix">✦ Fix: Implement the monthly report COUNT query. Call <code>checkAiReportLimit(orgId)</code> at the start of <code>generateReportAction()</code>. Return 403 with plan upgrade suggestion if limit exceeded.</div>
+        <div class="issue-file">lib/utils/plan-limits.ts · line 201 + app/(dashboard)/dashboard/reports/actions.ts</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="issue-block">
+  <div class="issue-header med">MEDIUM — Design Issues</div>
+  <div class="issue-body">
+    <div class="issue-item">
+      <div class="issue-dot dot-med"></div>
+      <div class="issue-content">
+        <div class="issue-title">Webhooks stored as encoded email string — design smell</div>
+        <div class="issue-desc">Slack/Teams webhooks stored as <code>webhook:slack:https://hooks.slack.com/…</code> in the <code>email</code> column of <code>status_page_subscribers</code>. Makes querying, filtering, and managing webhooks extremely fragile. One schema change could break all webhook lookups.</div>
+        <div class="issue-fix">✦ Fix: Create a <code>status_page_webhooks</code> table (status_page_id, webhook_url, webhook_type, created_at). Migrate existing encoded entries. Update subscribe/unsubscribe endpoints.</div>
+        <div class="issue-file">lib/db/status-pages.ts · subscribeWebhookToStatusPage()</div>
+      </div>
+    </div>
+    <div class="issue-item">
+      <div class="issue-dot dot-med"></div>
+      <div class="issue-content">
+        <div class="issue-title">Public status page has no caching — every request hits DB during outages</div>
+        <div class="issue-desc"><code>export const dynamic = 'force-dynamic'</code> means every visit to <code>/status/{slug}</code> makes multiple Supabase queries. During an outage, this page receives the most traffic at the worst possible time.</div>
+        <div class="issue-fix">✦ Fix: Use Next.js <code>revalidate</code> (ISR) with a 30-second TTL. The page data changes infrequently — even 30-second caching reduces DB load by 95% during high-traffic outage events.</div>
+        <div class="issue-file">app/status/[slug]/page.tsx</div>
+      </div>
+    </div>
+    <div class="issue-item">
+      <div class="issue-dot dot-med"></div>
+      <div class="issue-content">
+        <div class="issue-title">Report generation has no pagination — OOM risk on large orgs</div>
+        <div class="issue-desc"><code>generateReport()</code> fetches all check_results for the period with no limit. An org with 100 monitors over a 90-day period could produce 100 × 90 × 24 × 60 = millions of rows, exhausting memory.</div>
+        <div class="issue-fix">✦ Fix: Add a hard limit (e.g. 50,000 rows) with a warning in the report if truncated. Or use DB-side aggregation (GROUP BY monitor_id, DATE) to pre-aggregate before returning raw rows.</div>
+        <div class="issue-file">lib/services/reports.ts · generateReport()</div>
+      </div>
+    </div>
+    <div class="issue-item">
+      <div class="issue-dot dot-med"></div>
+      <div class="issue-content">
+        <div class="issue-title">Change digest silently truncates at 200 events</div>
+        <div class="issue-desc">High-volume change-detection monitors produce more than 200 events but only 200 are included in the report. The user has no indication that the report is incomplete.</div>
+        <div class="issue-fix">✦ Fix: Return the total event count alongside the 200-item slice. Show a banner in the ReportViewer: "Showing 200 of 1,453 change events. Export CSV for full data."</div>
+      </div>
+    </div>
+    <div class="issue-item">
+      <div class="issue-dot dot-med"></div>
+      <div class="issue-content">
+        <div class="issue-title">reportType not a queryable DB column — stored inside JSON only</div>
+        <div class="issue-desc">Report type is stored only inside the <code>data</code> JSON blob. Cannot filter or sort reports by type in the DB layer without full-table scans.</div>
+        <div class="issue-fix">✦ Fix: Add a <code>report_type</code> text column to the reports table. Populate on insert. Index it. This enables "show me all uptime reports for the last 3 months" queries.</div>
+      </div>
+    </div>
+    <div class="issue-item">
+      <div class="issue-dot dot-med"></div>
+      <div class="issue-content">
+        <div class="issue-title">apexDomain() fails on IP-address monitors</div>
+        <div class="issue-desc">The domain grouping function splits on dots and assumes DNS names. Monitors with IP targets (e.g. <code>192.168.1.1</code>) produce invalid domain keys in site-health and security-audit reports.</div>
+        <div class="issue-fix">✦ Fix: Detect IP address format (regex or URL parse) before calling apexDomain(). Return the IP as-is as the group key for IP-targeted monitors.</div>
+        <div class="issue-file">lib/services/reports.ts · apexDomain()</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="issue-block">
+  <div class="issue-header low">LOW — UX / Missing Features</div>
+  <div class="issue-body">
+    <div class="issue-item"><div class="issue-dot dot-low"></div><div>
+      <div class="issue-title">No subscriber management UI — cannot view or remove subscribers per status page</div>
+      <div class="issue-fix">✦ Add a subscribers tab on the status page detail page. List email + confirmed status. Allow admin to remove individual subscribers.</div>
+    </div></div>
+    <div class="issue-item"><div class="issue-dot dot-low"></div><div>
+      <div class="issue-title">Reports list silently truncates at 20 — no pagination or load-more</div>
+      <div class="issue-fix">✦ Add pagination params to <code>getReportsForOrg()</code>. Add a "Load more" button or infinite scroll in the reports table.</div>
+    </div></div>
+    <div class="issue-item"><div class="issue-dot dot-low"></div><div>
+      <div class="issue-title">No reports REST API — reports are UI-only, no integration path</div>
+      <div class="issue-fix">✦ Add <code>GET /api/v1/reports</code> (list) and <code>GET /api/v1/reports/{id}</code> (single) with API key auth. Enables third-party integrations and scheduled reporting.</div>
+    </div></div>
+    <div class="issue-item"><div class="issue-dot dot-low"></div><div>
+      <div class="issue-title">Custom domain verification UI missing — DB fields exist but not exposed</div>
+      <div class="issue-fix">✦ Add a "Custom Domain" tab to the status page edit form. Show the DNS TXT verification token. Add a "Verify DNS" button that calls a verification endpoint.</div>
+    </div></div>
+    <div class="issue-item"><div class="issue-dot dot-low"></div><div>
+      <div class="issue-title">New monitors show 100% uptime on status pages before first check</div>
+      <div class="issue-fix">✦ Return <code>null</code> from <code>getUptimePercentage()</code> when no data. Render "Checking..." instead of 100%.</div>
+    </div></div>
+    <div class="issue-item"><div class="issue-dot dot-low"></div><div>
+      <div class="issue-title">Unsubscribe endpoint returns HTML — inconsistent with JSON subscribe response</div>
+      <div class="issue-fix">✦ Accept <code>Accept: application/json</code> header and return JSON for API consumers. Keep HTML for browser unsubscribe links.</div>
+    </div></div>
+  </div>
+</div>
+
+<h2>Suggestions &amp; Improvements</h2>
+
+<div class="suggest-box">
+  <h4>Immediate — Security</h4>
+  <div class="suggest-item">Add org_id check to deleteReport() — one-line fix, prevents privilege escalation</div>
+  <div class="suggest-item">Add authentication to /dashboard/reports/new — missing getCurrentUser() guard</div>
+  <div class="suggest-item">Send email confirmation to status page subscribers after subscribe API call</div>
+</div>
+
+<div class="suggest-box">
+  <h4>Short-Term — Functionality</h4>
+  <div class="suggest-item">Build webhook delivery job — notifyStatusPageSubscribers() called from check runner on status change</div>
+  <div class="suggest-item">Create dedicated status_page_webhooks table — retire the encoded email hack</div>
+  <div class="suggest-item">Add ISR caching (revalidate: 30) to /status/{slug} — critical for performance during outages</div>
+  <div class="suggest-item">Implement AI report monthly limit COUNT query — the TODO has been open long enough</div>
+</div>
+
+<div class="suggest-box">
+  <h4>Architecture</h4>
+  <div class="suggest-item">Add report_type column to reports table — enables filtering/sorting without JSON parsing</div>
+  <div class="suggest-item">Add Reports REST API (/api/v1/reports) — enables integrations, scheduled reporting, third-party tools</div>
+  <div class="suggest-item">Paginate generateReport() check_results fetch — prevent OOM on large orgs with long periods</div>
+  <div class="suggest-item">Add scheduled monthly report cron — plans mention "monthly" type but no auto-generation exists</div>
+</div>
+
+<div class="footer">
+  <span>Uptrue Engineering · Status Pages &amp; Reports · Report 3 of 6 · 27 April 2026</span>
+  <span>9 report types · 18 issues · 2 critical security</span>
+</div>
+</body></html>

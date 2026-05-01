@@ -40,13 +40,13 @@ const ROLE_DEFAULTS: Record<string, AdminPermissions> = {
     organisations:{ read: true, write: true },
     plans:        { read: true, write: true },
     tracker:      { read: true, write: true },
-    feature_flags:{ read: true, write: false },
+    feature_flags:{ read: true, write: true },
     blog:         { read: true, write: true },
-    aoe:          { read: true, write: false },
-    audit_log:    { read: true, write: false },
+    aoe:          { read: true, write: true },
+    audit_log:    { read: true, write: true },
     support:      { read: true, write: true },
-    system:       { read: true, write: false },
-    user360:      { read: true, write: false },
+    system:       { read: true, write: true },
+    user360:      { read: true, write: true },
     impersonate: true,
   },
   viewer: {
@@ -234,6 +234,23 @@ export async function canAccessAdminModule(
   if (!role || !role.is_active) return false
   const perms = parsePermissions(role.permissions as Json)
   return hasPermission(perms, module, 'read')
+}
+
+/**
+ * Server-side guard for write actions inside admin pages.
+ * Super admins always pass. Sub-admins must have write access to the module.
+ * Returns true if write access is granted, false otherwise.
+ */
+export async function canWriteAdminModule(
+  email: string,
+  isSuperAdmin: boolean,
+  module: keyof Omit<AdminPermissions, 'impersonate'>
+): Promise<boolean> {
+  if (isSuperAdmin) return true
+  const role = await getAdminRoleByEmail(email)
+  if (!role || !role.is_active) return false
+  const perms = parsePermissions(role.permissions as Json)
+  return hasPermission(perms, module, 'write')
 }
 
 /** Check if an email has any admin access (active role in admin_roles table) */

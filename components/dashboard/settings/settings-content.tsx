@@ -6,6 +6,7 @@ import { DataTable, type Column, type BulkAction } from '@/components/ui/data-ta
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import type { Organisation, User, Subscription, Invoice, ApiKey, Plan, UserCredit, CreditRule, Referral } from '@/lib/types'
 import type { SupportedCurrency } from '@/lib/utils/currency'
+import type { PageSection, CmsTheme } from '@/lib/types/cms'
 import { CurrentPlan } from '@/components/billing/current-plan'
 import { PricingTable } from '@/components/billing/pricing-table'
 import { InvoiceList } from '@/components/billing/invoice-list'
@@ -15,6 +16,7 @@ import { CompanyDetailsForm } from '@/components/dashboard/settings/company-deta
 import { OrgSettingsForm } from '@/components/dashboard/settings/org-settings-form'
 import { LogoUpload } from '@/components/ui/logo-upload'
 import { TeamInviteForm } from '@/components/dashboard/settings/team-invite-form'
+import { CmsManager } from '@/components/admin/cms-manager'
 
 interface SettingsContentProps {
   organisation: Organisation
@@ -35,6 +37,9 @@ interface SettingsContentProps {
   referralCode: string | null
   referrals: Referral[]
   defaultCurrency: SupportedCurrency
+  isSuperAdmin?: boolean
+  cmsSections?: PageSection[]
+  cmsTheme?: CmsTheme | null
 }
 
 export function SettingsContent({
@@ -56,6 +61,9 @@ export function SettingsContent({
   referralCode,
   referrals,
   defaultCurrency,
+  isSuperAdmin = false,
+  cmsSections = [],
+  cmsTheme = null,
 }: SettingsContentProps): React.ReactElement {
   const searchParams = useSearchParams()
   const initialTab = searchParams.get('tab') || 'organisation'
@@ -185,8 +193,8 @@ export function SettingsContent({
   const apiKeyColumns: Column<ApiKey>[] = [
     { key: 'name', label: 'Name', render: (k) => <span style={{ fontWeight: 500 }}>{k.name}</span> },
     { key: 'key_prefix', label: 'Prefix', render: (k) => <span style={{ fontFamily: 'monospace', fontSize: 13 }}>{k.key_prefix}...</span> },
-    { key: 'created_at', label: 'Created', render: (k) => <span className="table-muted">{new Date(k.created_at).toLocaleDateString()}</span> },
-    { key: 'last_used_at', label: 'Last Used', render: (k) => <span className="table-muted">{k.last_used_at ? new Date(k.last_used_at).toLocaleDateString() : 'Never'}</span> },
+    { key: 'created_at', label: 'Created', render: (k) => <span className="table-muted">{new Date(k.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span> },
+    { key: 'last_used_at', label: 'Last Used', render: (k) => <span className="table-muted">{k.last_used_at ? new Date(k.last_used_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Never'}</span> },
   ]
 
   const apiKeyBulkActions: BulkAction[] = [
@@ -251,7 +259,7 @@ export function SettingsContent({
       )}
 
       <div className="tabs-list">
-        {['organisation', 'billing', 'credits', 'referrals', 'company', 'api-keys'].map((t) => (
+        {(['organisation', 'billing', 'credits', 'referrals', 'company', 'api-keys'] as string[]).map((t) => (
           <button key={t} className={`tab-trigger${tab === t ? ' active' : ''}`} onClick={() => setTab(t)}>
             {t === 'api-keys' ? 'API Keys' : t.charAt(0).toUpperCase() + t.slice(1)}
           </button>
@@ -272,7 +280,7 @@ export function SettingsContent({
       )}
 
       {tab === 'credits' && (
-        <CreditsSection credits={credits} creditRules={creditRules} balancePence={creditBalance} />
+        <CreditsSection credits={credits} creditRules={creditRules} balancePence={creditBalance} currency={defaultCurrency} />
       )}
 
       {tab === 'referrals' && (
@@ -386,6 +394,10 @@ export function SettingsContent({
             </div>
           </div>
         </div>
+      )}
+
+      {tab === 'landing' && isSuperAdmin && (
+        <CmsManager initialSections={cmsSections} initialTheme={cmsTheme} />
       )}
     </div>
       <ConfirmDialog

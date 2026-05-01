@@ -67,6 +67,7 @@ const NAV_GROUPS: NavGroup[] = [
   {
     label: 'Content',
     items: [
+      // { href: '/admin/settings', label: 'Landing Page CMS', icon: IconGlobe },
       { href: '/admin/blog', label: 'Blog', icon: IconEdit },
       { href: '/admin/autoblog', label: 'Autoblog Engine', icon: IconActivity },
       { href: '/admin/pmb', label: 'Monitor Blogging', icon: IconActivity },
@@ -87,9 +88,16 @@ const NAV_GROUPS: NavGroup[] = [
   },
 ]
 
+const ALL_HREFS = NAV_GROUPS.flatMap((g) => g.items.map((i) => i.href))
+
+function getBestMatch(pathname: string): string | undefined {
+  return ALL_HREFS
+    .filter((h) => pathname === h || pathname.startsWith(h + '/'))
+    .sort((a, b) => b.length - a.length)[0]
+}
+
 function isActive(pathname: string, href: string): boolean {
-  if (href === '/admin') return pathname === '/admin'
-  return pathname.startsWith(href)
+  return getBestMatch(pathname) === href
 }
 
 function groupHasActive(pathname: string, items: NavItem[]): boolean {

@@ -189,7 +189,7 @@ export default function AdminCreditsPage(): React.ReactElement {
                         </span>
                       </td>
                       <td style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-                        {new Date(s.created_at).toLocaleDateString()}
+                        {new Date(s.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                       </td>
                       <td>
                         {s.status === 'pending' && (
@@ -222,7 +222,7 @@ export default function AdminCreditsPage(): React.ReactElement {
                         {s.status !== 'pending' && s.reviewed_by && (
                           <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
                             By {s.reviewed_by}
-                            {s.reviewed_at && ` on ${new Date(s.reviewed_at).toLocaleDateString()}`}
+                            {s.reviewed_at && ` on ${new Date(s.reviewed_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`}
                           </div>
                         )}
                       </td>

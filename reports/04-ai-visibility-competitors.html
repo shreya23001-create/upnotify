@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Uptrue — AI Visibility &amp; Competitor Monitoring Report</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8f9fa; color: #1a1a2e; font-size: 14px; line-height: 1.6; }
+  .page { max-width: 1100px; margin: 0 auto; padding: 40px 32px; }
+  h1 { font-size: 28px; font-weight: 800; color: #0f0f23; margin-bottom: 6px; }
+  h2 { font-size: 18px; font-weight: 700; color: #0f0f23; margin: 36px 0 14px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
+  h3 { font-size: 14px; font-weight: 700; color: #374151; margin: 20px 0 10px; }
+  .meta { color: #6b7280; font-size: 13px; margin-bottom: 32px; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; letter-spacing: .4px; text-transform: uppercase; }
+  .badge-green { background: #d1fae5; color: #065f46; }
+  .badge-yellow { background: #fef3c7; color: #92400e; }
+  .badge-red { background: #fee2e2; color: #991b1b; }
+  .badge-blue { background: #dbeafe; color: #1e40af; }
+  .badge-purple { background: #ede9fe; color: #5b21b6; }
+
+  .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 36px; }
+  .summary-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; text-align: center; }
+  .summary-card .num { font-size: 32px; font-weight: 800; color: #4f46e5; }
+  .summary-card .label { font-size: 12px; color: #6b7280; margin-top: 4px; }
+
+  .flow-section { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 28px; }
+  .flow-title { font-size: 15px; font-weight: 700; color: #0f0f23; margin-bottom: 18px; }
+  .flow-row { display: flex; align-items: flex-start; gap: 0; flex-wrap: wrap; }
+  .flow-step { background: #f8faff; border: 1.5px solid #c7d2fe; border-radius: 10px; padding: 14px 16px; min-width: 140px; flex: 1; }
+  .flow-step .step-num { font-size: 10px; font-weight: 800; color: #6366f1; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 4px; }
+  .flow-step .step-title { font-size: 13px; font-weight: 700; color: #1e1b4b; margin-bottom: 4px; }
+  .flow-step .step-desc { font-size: 11px; color: #6b7280; }
+  .flow-arrow { display: flex; align-items: center; padding: 0 6px; color: #9ca3af; font-size: 20px; flex-shrink: 0; margin-top: 22px; }
+  .flow-step.highlight { background: #ede9fe; border-color: #7c3aed; }
+  .flow-step.highlight .step-num { color: #7c3aed; }
+  .flow-step.highlight .step-title { color: #4c1d95; }
+  .flow-step.success { background: #d1fae5; border-color: #059669; }
+  .flow-step.success .step-num { color: #059669; }
+  .flow-step.warning { background: #fef3c7; border-color: #d97706; }
+  .flow-step.warning .step-num { color: #d97706; }
+
+  .flow-branch { margin-top: 14px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .branch-box { border-radius: 8px; padding: 12px 14px; }
+  .branch-yes { background: #d1fae5; border: 1px solid #6ee7b7; }
+  .branch-no { background: #fee2e2; border: 1px solid #fca5a5; }
+  .branch-box .branch-label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
+  .branch-yes .branch-label { color: #065f46; }
+  .branch-no .branch-label { color: #991b1b; }
+  .branch-box p { font-size: 11px; color: #374151; }
+
+  table { width: 100%; border-collapse: collapse; margin-bottom: 24px; font-size: 13px; }
+  th { background: #f1f5f9; text-align: left; padding: 10px 14px; font-weight: 700; color: #374151; font-size: 12px; text-transform: uppercase; letter-spacing: .4px; }
+  td { padding: 10px 14px; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #f8faff; }
+
+  .engine-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 28px; }
+  .engine-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px; }
+  .engine-card .engine-name { font-size: 13px; font-weight: 700; color: #1e1b4b; margin-bottom: 4px; }
+  .engine-card .engine-model { font-size: 11px; color: #6b7280; margin-bottom: 8px; }
+  .engine-card.active { border-color: #6366f1; background: #f8f7ff; }
+
+  .issue-block { background: #fff; border: 1px solid #e2e8f0; border-left: 4px solid #e2e8f0; border-radius: 8px; padding: 18px 20px; margin-bottom: 14px; }
+  .issue-block.critical { border-left-color: #dc2626; }
+  .issue-block.high { border-left-color: #f59e0b; }
+  .issue-block.medium { border-left-color: #3b82f6; }
+  .issue-block.low { border-left-color: #10b981; }
+  .issue-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .issue-title { font-size: 14px; font-weight: 700; color: #0f0f23; }
+  .issue-desc { font-size: 13px; color: #4b5563; margin-bottom: 12px; line-height: 1.6; }
+  .fix-box { background: #f0fdf4; border: 1px solid #86efac; border-radius: 6px; padding: 12px 14px; }
+  .fix-box .fix-label { font-size: 10px; font-weight: 800; color: #166534; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
+  .fix-box p { font-size: 12px; color: #166534; }
+  .file-path { font-family: 'SF Mono', monospace; font-size: 11px; color: #6b7280; margin-top: 8px; }
+
+  .suggestion-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px; }
+  .suggestion-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; }
+  .suggestion-card h4 { font-size: 13px; font-weight: 800; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #e2e8f0; }
+  .suggestion-card.immediate h4 { color: #dc2626; border-color: #fecaca; }
+  .suggestion-card.short-term h4 { color: #d97706; border-color: #fde68a; }
+  .suggestion-card.architecture h4 { color: #4f46e5; border-color: #c7d2fe; }
+  .suggestion-card ul { list-style: none; }
+  .suggestion-card ul li { font-size: 12px; color: #4b5563; padding: 6px 0; border-bottom: 1px solid #f3f4f6; display: flex; gap: 8px; align-items: flex-start; }
+  .suggestion-card ul li:last-child { border-bottom: none; }
+  .suggestion-card ul li::before { content: '→'; color: #9ca3af; flex-shrink: 0; margin-top: 1px; }
+
+  .section-box { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 28px; }
+  .print-note { background: #fef3c7; border: 1px solid #fcd34d; border-radius: 8px; padding: 12px 16px; font-size: 12px; color: #92400e; margin-bottom: 24px; }
+  @media print { .print-note { display: none; } body { background: #fff; } .page { padding: 20px; } }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="print-note">To save as PDF: File &rarr; Print &rarr; Save as PDF (or Cmd+P on Mac)</div>
+
+  <h1>AI Visibility &amp; Competitor Monitoring</h1>
+  <p class="meta">Uptrue &mdash; Feature Audit Report &nbsp;|&nbsp; Generated 2026-04-27 &nbsp;|&nbsp; Report 04 of 06</p>
+
+  <div class="summary-grid">
+    <div class="summary-card"><div class="num">7</div><div class="label">AI Citation Engines</div></div>
+    <div class="summary-card"><div class="num">4</div><div class="label">Core Flows Audited</div></div>
+    <div class="summary-card"><div class="num">8</div><div class="label">Issues Found</div></div>
+    <div class="summary-card"><div class="num">2</div><div class="label">Critical Issues</div></div>
+  </div>
+
+  <h2>Working Flows</h2>
+
+  <div class="flow-section">
+    <div class="flow-title">&#129302; Flow 1 &mdash; llms.txt Generation &amp; Publishing</div>
+    <div class="flow-row">
+      <div class="flow-step">
+        <div class="step-num">Trigger</div>
+        <div class="step-title">User Saves Brand Profile</div>
+        <div class="step-desc">Domain, description, keywords, product links saved to brand_profiles table</div>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step highlight">
+        <div class="step-num">Generate</div>
+        <div class="step-title">Claude Haiku Formats Content</div>
+        <div class="step-desc">Generates structured llms.txt with brand context, products, FAQs, links</div>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step">
+        <div class="step-num">Store</div>
+        <div class="step-title">Saved to DB + Cache Invalidated</div>
+        <div class="step-desc">Written to llms_txt_content column; CDN cache purged for the route</div>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step success">
+        <div class="step-num">Serve</div>
+        <div class="step-title">Public Route Responds</div>
+        <div class="step-desc">/[domain]/llms.txt returns content with text/plain header &amp; correct encoding</div>
+      </div>
+    </div>
+    <div class="flow-branch">
+      <div class="branch-box branch-yes">
+        <div class="branch-label">&#10003; Happy Path</div>
+        <p>AI crawlers (GPT, Gemini, Perplexity) fetch llms.txt and incorporate brand context into future answers about the domain</p>
+      </div>
+      <div class="branch-box branch-no">
+        <div class="branch-label">&#9888; Known Gap</div>
+        <p>No verification mechanism &mdash; Uptrue cannot confirm whether any AI engine actually fetched the file after generation</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="flow-section">
+    <div class="flow-title">&#128269; Flow 2 &mdash; AI Citation Detection (Manual Check)</div>
+    <div class="flow-row">
+      <div class="flow-step">
+        <div class="step-num">Trigger</div>
+        <div class="step-title">User Runs Citation Check</div>
+        <div class="step-desc">Selects AI engine + enters brand keyword or question to test</div>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step highlight">
+        <div class="step-num">Query</div>
+        <div class="step-title">Engine API Called</div>
+        <div class="step-desc">Route calls OpenAI / Gemini / Perplexity / Anthropic with brand-specific prompt</div>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step highlight">
+        <div class="step-num">Analyse</div>
+        <div class="step-title">Claude Sonnet Interprets Response</div>
+        <div class="step-desc">Checks if brand mentioned, sentiment, citation URL, competitor mentions, ranking position</div>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step success">
+        <div class="step-num">Store</div>
+        <div class="step-title">Result Saved &amp; Scored</div>
+        <div class="step-desc">Written to citation_checks with score 0-100, sentiment, raw_response, engine</div>
+      </div>
+    </div>
+    <div class="flow-branch">
+      <div class="branch-box branch-yes">
+        <div class="branch-label">&#10003; Brand Mentioned</div>
+        <p>Score calculated, citation_url captured, sentiment classified as positive/neutral/negative, trend chart updated</p>
+      </div>
+      <div class="branch-box branch-no">
+        <div class="branch-label">&#10007; Not Mentioned</div>
+        <p>Score 0 logged, content gap suggestions shown, llms.txt improvement tips triggered, competitor analysis recommended</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="flow-section">
+    <div class="flow-title">&#9201; Flow 3 &mdash; Scheduled Citation Monitoring (Cron)</div>
+    <div class="flow-row">
+      <div class="flow-step">
+        <div class="step-num">Cron</div>
+        <div class="step-title">Daily at 06:00 UTC</div>
+        <div class="step-desc">/api/cron/citation-checker triggered by Vercel cron scheduler</div>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step">
+        <div class="step-num">Load</div>
+        <div class="step-title">Fetch Active Monitors</div>
+        <div class="step-desc">Query citation_monitors where active = true for billing-enabled accounts only</div>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step warning">
+        <div class="step-num">Execute</div>
+        <div class="step-title">Run Engine Queries (Sequential)</div>
+        <div class="step-desc">One API call per engine x keyword combo &mdash; no parallelism, timeout risk at scale</div>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step highlight">
+        <div class="step-num">Alert</div>
+        <div class="step-title">Score Drop Detection</div>
+        <div class="step-desc">If score drops &gt;20% vs 7-day average, alert sent via email/Slack</div>
+      </div>
+    </div>
+    <div class="flow-branch">
+      <div class="branch-box branch-yes">
+        <div class="branch-label">&#10003; Normal Run</div>
+        <p>Results stored, trend charts updated, weekly digest queued for Sunday 08:00 UTC delivery</p>
+      </div>
+      <div class="branch-box branch-no">
+        <div class="branch-label">&#9888; Timeout Risk</div>
+        <p>With 100+ monitors, sequential API calls exceed Vercel's 10-60s cron limit &mdash; no batching or queue implemented yet</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="flow-section">
+    <div class="flow-title">&#127942; Flow 4 &mdash; Competitor Monitoring &amp; Health Score</div>
+    <div class="flow-row">
+      <div class="flow-step">
+        <div class="step-num">Config</div>
+        <div class="step-title">User Adds Competitor</div>
+        <div class="step-desc">Competitor domain saved to competitors table linked to user's brand profile</div>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step warning">
+        <div class="step-num">Fetch</div>
+        <div class="step-title">Competitor Page Scraped</div>
+        <div class="step-desc">HTTP GET to domain, first 8KB of raw HTML body extracted (no SSRF guard)</div>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step highlight">
+        <div class="step-num">Analyse</div>
+        <div class="step-title">Claude Scores Competitor</div>
+        <div class="step-desc">AI reviews for AI-readability, llms.txt presence, structured data, keyword coverage</div>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step success">
+        <div class="step-num">Report</div>
+        <div class="step-title">Health Score + Gap Analysis</div>
+        <div class="step-desc">Score 0-100 stored, recommendations generated, comparison table shown in dashboard</div>
+      </div>
+    </div>
+  </div>
+
+  <h2>AI Citation Engines</h2>
+  <div class="engine-grid">
+    <div class="engine-card active">
+      <div class="engine-name">ChatGPT / GPT-4o</div>
+      <div class="engine-model">OpenAI API &middot; chat completions</div>
+      <span class="badge badge-green">Active</span>
+    </div>
+    <div class="engine-card active">
+      <div class="engine-name">Google Gemini</div>
+      <div class="engine-model">Gemini Pro API</div>
+      <span class="badge badge-green">Active</span>
+    </div>
+    <div class="engine-card active">
+      <div class="engine-name">Perplexity AI</div>
+      <div class="engine-model">pplx-api &middot; sonar-large</div>
+      <span class="badge badge-green">Active</span>
+    </div>
+    <div class="engine-card active">
+      <div class="engine-name">Claude (Anthropic)</div>
+      <div class="engine-model">claude-sonnet-4-6</div>
+      <span class="badge badge-green">Active</span>
+    </div>
+    <div class="engine-card active">
+      <div class="engine-name">Microsoft Copilot</div>
+      <div class="engine-model">Bing API integration</div>
+      <span class="badge badge-yellow">Partial</span>
+    </div>
+    <div class="engine-card">
+      <div class="engine-name">Grok (xAI)</div>
+      <div class="engine-model">xAI API</div>
+      <span class="badge badge-purple">Planned</span>
+    </div>
+    <div class="engine-card">
+      <div class="engine-name">Meta AI</div>
+      <div class="engine-model">Llama API</div>
+      <span class="badge badge-purple">Planned</span>
+    </div>
+  </div>
+
+  <div class="section-box">
+    <h3>Citation Health Score Thresholds</h3>
+    <table>
+      <thead>
+        <tr><th>Score</th><th>Label</th><th>Meaning</th><th>Action Triggered</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>80&ndash;100</td><td><span class="badge badge-green">Excellent</span></td><td>Brand consistently cited with positive context</td><td>Weekly digest only</td></tr>
+        <tr><td>60&ndash;79</td><td><span class="badge badge-blue">Good</span></td><td>Brand mentioned but not always first or positive</td><td>Suggestions for content improvement shown</td></tr>
+        <tr><td>40&ndash;59</td><td><span class="badge badge-yellow">Fair</span></td><td>Occasional mentions, competitor outranking</td><td>Alert + gap analysis report generated</td></tr>
+        <tr><td>20&ndash;39</td><td><span class="badge badge-red">Poor</span></td><td>Rare mentions, potential negative sentiment</td><td>Immediate alert + llms.txt regen suggested</td></tr>
+        <tr><td>0&ndash;19</td><td><span class="badge badge-red">Critical</span></td><td>Not mentioned or actively misrepresented</td><td>Alert + escalation email to account owner</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Issues Found</h2>
+
+  <div class="issue-block critical">
+    <div class="issue-header">
+      <span class="badge badge-red">Critical</span>
+      <span class="issue-title">Citation Cron Runs Sequentially &mdash; Vercel Timeout Risk at Scale</span>
+    </div>
+    <p class="issue-desc">
+      The citation-checker cron runs all engine queries sequentially in a single serverless function. At 10+ monitors x 5 engines that is 50+ serial HTTP calls. Vercel cron functions have a 10&ndash;60 second execution limit depending on plan tier. With even moderate account growth, this will silently timeout and skip checks with no error logged or user notified.
+    </p>
+    <div class="fix-box">
+      <div class="fix-label">Recommended Fix</div>
+      <p>Introduce a queue-based approach: cron enqueues jobs into a citation_check_queue table, a separate worker route processes N checks per invocation. Alternatively use Promise.allSettled for parallel engine calls per monitor (max 5 concurrent). Add execution time tracking &mdash; log when cron exits before completing all monitors.</p>
+    </div>
+    <div class="file-path">&#128196; app/api/cron/citation-checker/route.ts &middot; lib/services/citation.ts</div>
+  </div>
+
+  <div class="issue-block critical">
+    <div class="issue-header">
+      <span class="badge badge-red">Critical</span>
+      <span class="issue-title">No Rate Limiting on Manual Citation Check Endpoint</span>
+    </div>
+    <p class="issue-desc">
+      When a user manually triggers citation checks, there is no rate limiting at the API layer. A user can call the endpoint repeatedly and exhaust the platform&rsquo;s shared OpenAI / Gemini / Perplexity API quota in minutes. Each citation check makes up to 5 external API calls. There is no per-user daily check quota enforced server-side.
+    </p>
+    <div class="fix-box">
+      <div class="fix-label">Recommended Fix</div>
+      <p>Add a rate limiter: max 20 manual checks per user per day. Track in citation_usage table (user_id, date, count). Return HTTP 429 with a clear message and quota-reset time. Show remaining quota in the UI. Paid plans get higher limits. Reuse the in-memory rate limiter already used in monitor routes.</p>
+    </div>
+    <div class="file-path">&#128196; app/api/citation/check/route.ts</div>
+  </div>
+
+  <div class="issue-block high">
+    <div class="issue-header">
+      <span class="badge badge-yellow">High</span>
+      <span class="issue-title">Competitor Scraper Has No SSRF Protection</span>
+    </div>
+    <p class="issue-desc">
+      The competitor monitoring feature accepts any URL from the user and makes a server-side HTTP request without validating the target IP. If a user enters an internal AWS metadata URL (169.254.169.254) or a private IP range, the server will attempt to fetch it. This is an SSRF vulnerability that could expose internal Vercel or AWS infrastructure details.
+    </p>
+    <div class="fix-box">
+      <div class="fix-label">Recommended Fix</div>
+      <p>Validate competitor URLs before fetching: block private IP ranges (10.x, 172.16-31.x, 192.168.x, 127.x, 169.254.x, ::1). Resolve DNS and check the resolved IP. Restrict to ports 80 and 443. Reject non-HTTPS schemes. The HTTP monitor checker already has SSRF protection in lib/utils/ssrf-guard.ts &mdash; reuse that exact validator.</p>
+    </div>
+    <div class="file-path">&#128196; lib/services/competitor-analyser.ts &middot; lib/utils/ssrf-guard.ts</div>
+  </div>
+
+  <div class="issue-block high">
+    <div class="issue-header">
+      <span class="badge badge-yellow">High</span>
+      <span class="issue-title">Competitor Body Truncated at 8KB of Raw HTML &mdash; Misses Key Content</span>
+    </div>
+    <p class="issue-desc">
+      The competitor scraper fetches the competitor homepage and truncates to 8KB of raw HTML before passing to Claude. Modern marketing pages with hero sections, feature lists, and pricing tables easily exceed 8KB of HTML. The AI analysis is therefore scoring based on nav bars and script tags rather than actual content. Gap analysis results are unreliable.
+    </p>
+    <div class="fix-box">
+      <div class="fix-label">Recommended Fix</div>
+      <p>Strip HTML tags first (extract visible text only using a regex tag stripper or DOM parser), then truncate the plain text to 32KB. This gives Claude access to 5-10x more meaningful content. Also cache the extracted text in competitor_snapshots table to enable re-analysis without re-fetching.</p>
+    </div>
+    <div class="file-path">&#128196; lib/services/competitor-analyser.ts</div>
+  </div>
+
+  <div class="issue-block medium">
+    <div class="issue-header">
+      <span class="badge badge-blue">Medium</span>
+      <span class="issue-title">llms.txt Fetch Not Verified After Generation</span>
+    </div>
+    <p class="issue-desc">
+      Uptrue generates and serves llms.txt but has no mechanism to verify AI crawlers are actually fetching it. The dashboard shows &ldquo;llms.txt active&rdquo; once the file is generated. Users may assume AI engines are indexing their brand when they are not. Without verification, the llms.txt feature provides false confidence.
+    </p>
+    <div class="fix-box">
+      <div class="fix-label">Recommended Fix</div>
+      <p>Add a weekly self-fetch verification cron: Uptrue fetches its own /[domain]/llms.txt endpoint and records HTTP status and response time in a llms_txt_checks table. Show last-verified timestamp and status in the dashboard. If verification fails (404, timeout), surface a warning banner to the user.</p>
+    </div>
+    <div class="file-path">&#128196; app/api/cron/ &middot; app/[domain]/llms.txt/route.ts</div>
+  </div>
+
+  <div class="issue-block medium">
+    <div class="issue-header">
+      <span class="badge badge-blue">Medium</span>
+      <span class="issue-title">Citation Analysis Prompt Not Versioned &mdash; Historical Scores Incomparable</span>
+    </div>
+    <p class="issue-desc">
+      The Claude prompt for analysing AI engine responses is hardcoded inline in the service function. If the prompt is changed (even to fix a bug), historical scores become incomparable. A score of 72 in March vs 72 in April may use completely different evaluation criteria. Trend charts can mislead users.
+    </p>
+    <div class="fix-box">
+      <div class="fix-label">Recommended Fix</div>
+      <p>Move prompts to a prompt_versions table with a version_id and created_at. Record prompt_version_id on every citation_checks row. When rendering trend charts, flag cross-version comparisons with a tooltip. This also enables A/B testing of prompt improvements without disrupting live score history.</p>
+    </div>
+    <div class="file-path">&#128196; lib/services/citation.ts &middot; lib/prompts/</div>
+  </div>
+
+  <div class="issue-block medium">
+    <div class="issue-header">
+      <span class="badge badge-blue">Medium</span>
+      <span class="issue-title">No Fallback or Retry When AI Engine API Returns Error</span>
+    </div>
+    <p class="issue-desc">
+      When an external AI engine API returns an error or rate-limit response, the citation check fails silently. The check is marked failed in the DB but no retry is attempted and users are not informed their scheduled check did not run. Over time this creates silent gaps in trend data that users interpret as low scores.
+    </p>
+    <div class="fix-box">
+      <div class="fix-label">Recommended Fix</div>
+      <p>Implement exponential backoff with 3 retries for transient errors (5xx, 429). Log failure reason distinctly: status 'api_error' vs 'no_mention' vs 'timeout'. Surface failed checks as gaps (not zeros) in trend charts. Send user notification email after 3 consecutive failed checks for the same monitor.</p>
+    </div>
+    <div class="file-path">&#128196; lib/services/citation.ts</div>
+  </div>
+
+  <div class="issue-block low">
+    <div class="issue-header">
+      <span class="badge badge-green">Low</span>
+      <span class="issue-title">Health Score Formula Hardcoded &mdash; Not Configurable or Explained to Users</span>
+    </div>
+    <p class="issue-desc">
+      The AI visibility health score uses a weighted formula with hardcoded constants. Users cannot see how their score is computed and the team cannot adjust weights for different industries (e.g., e-commerce vs SaaS) without a code deploy. This reduces trust in the metric and limits experimentation.
+    </p>
+    <div class="fix-box">
+      <div class="fix-label">Recommended Fix</div>
+      <p>Move score weights to a scoring_config JSON or admin table. Add a &ldquo;How is this score calculated?&rdquo; tooltip in the dashboard UI showing the current formula components. This builds user trust and enables A/B testing of scoring models to improve metric accuracy over time.</p>
+    </div>
+    <div class="file-path">&#128196; lib/services/health-score.ts</div>
+  </div>
+
+  <h2>Suggestions &amp; Improvements</h2>
+  <div class="suggestion-grid">
+    <div class="suggestion-card immediate">
+      <h4>Immediate (This Sprint)</h4>
+      <ul>
+        <li>Add SSRF validation to competitor URL input &mdash; reuse existing ssrf-guard.ts</li>
+        <li>Add per-user rate limit (20/day) on manual citation check endpoint</li>
+        <li>Fix body extraction: strip HTML before 8KB truncation in competitor scraper</li>
+        <li>Distinguish citation check failures from &ldquo;not mentioned&rdquo; in DB status field</li>
+      </ul>
+    </div>
+    <div class="suggestion-card short-term">
+      <h4>Short-Term (1&ndash;2 Sprints)</h4>
+      <ul>
+        <li>Queue-based citation cron to avoid Vercel timeout at scale</li>
+        <li>llms.txt weekly self-verification cron with last-verified UI indicator</li>
+        <li>Version citation analysis prompts, store version ID per check row</li>
+        <li>Exponential backoff with 3 retries for AI engine API errors</li>
+        <li>Weekly citation digest email via Resend template</li>
+      </ul>
+    </div>
+    <div class="suggestion-card architecture">
+      <h4>Architecture</h4>
+      <ul>
+        <li>Dedicated citation_check_queue table with worker route &mdash; decouple scheduling from execution</li>
+        <li>Cache competitor extracted text in competitor_snapshots for re-analysis without re-fetch</li>
+        <li>Adapter pattern for AI engines: one interface, one implementation per engine &mdash; add Grok + Meta AI easily</li>
+        <li>Citation trend anomaly detection: flag unusual drops before users notice them</li>
+        <li>Export citation history as CSV + PDF for enterprise reporting</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section-box">
+    <h3>Module Strengths</h3>
+    <table>
+      <thead><tr><th>Strength</th><th>Detail</th></tr></thead>
+      <tbody>
+        <tr><td>Multi-engine support</td><td>5 live AI engines with unified result schema &mdash; extensible for new engines via adapter pattern</td></tr>
+        <tr><td>Claude-as-analyser</td><td>Using Claude to interpret AI responses from other engines is architecturally clean and highly accurate</td></tr>
+        <tr><td>llms.txt generation</td><td>First-mover advantage &mdash; most uptime/monitoring competitors do not offer automated llms.txt generation</td></tr>
+        <tr><td>Health score system</td><td>0&ndash;100 scoring with actionable thresholds gives users a clear KPI to track and improve</td></tr>
+        <tr><td>Competitor gap analysis</td><td>Structured comparison output from Claude provides real decision-making value beyond raw scrape data</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</body>
+</html>

@@ -6,7 +6,7 @@ import type { Invoice } from '@/lib/types'
 export function InvoiceList({ invoices }: { invoices: Invoice[] }) {
   const columns: Column<Invoice>[] = [
     { key: 'created_at', label: 'Date', render: (i) => (
-      <span>{new Date(i.created_at).toLocaleDateString()}</span>
+      <span>{new Date(i.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
     )},
     { key: 'amount_gbp', label: 'Amount', render: (i) => {
       if (i.currency === 'inr') {
