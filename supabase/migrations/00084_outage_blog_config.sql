@@ -35,7 +35,7 @@ CREATE INDEX IF NOT EXISTS outage_rss_feeds_category_idx ON public.outage_rss_fe
 -- Add columns to public_incidents for service-group deduplication + resolution tracking
 ALTER TABLE public.public_incidents ADD COLUMN IF NOT EXISTS service_group TEXT;
 ALTER TABLE public.public_incidents ADD COLUMN IF NOT EXISTS blog_updated_at TIMESTAMPTZ;
-ALTER TABLE public.public_incidents ADD COLUMN IF NOT EXISTS blog_post_id BIGINT REFERENCES public.blog_posts(id) ON DELETE SET NULL;
+ALTER TABLE public.public_incidents ADD COLUMN IF NOT EXISTS blog_post_id UUID REFERENCES public.blog_posts(id) ON DELETE SET NULL;
 
 -- Index for service group deduplication queries
 CREATE INDEX IF NOT EXISTS public_incidents_service_group_open_idx
