@@ -1,0 +1,28 @@
+stages:
+  - deploy
+
+deploy_dev:
+  stage: deploy
+  script:
+    - npm install -g vercel
+    - vercel pull --yes --environment=production --token=$VERCEL_TOKEN
+    - vercel build --token=$VERCEL_TOKEN
+    - vercel deploy --prebuilt --token=$VERCEL_TOKEN
+  only:
+    - dev
+  environment:
+    name: development
+    url: https://uptrue-dev.vercel.app
+
+deploy_prod:
+  stage: deploy
+  script:
+    - npm install -g vercel
+    - vercel pull --yes --environment=production --token=$VERCEL_TOKEN
+    - vercel build --prod --token=$VERCEL_TOKEN
+    - vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN
+  only:
+    - master
+  environment:
+    name: production
+    url: https://uptrue.vercel.app
