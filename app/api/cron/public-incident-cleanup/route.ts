@@ -17,6 +17,7 @@ import { generateOutageBlogPost } from '@/lib/services/blog-generator'
 import { researchOutage } from '@/lib/services/outage-researcher'
 import { sendBlogApprovalEmail } from '@/lib/services/email'
 import { sendBlogApprovalTelegram } from '@/lib/services/telegram'
+import { getOutagePriorityMonitor, hasOpenBlogForServiceGroup } from '@/lib/db/outage-blog'
 import type { PublicMonitor } from '@/lib/db/public-monitors'
 
 export const dynamic = 'force-dynamic'
@@ -206,6 +207,42 @@ export async function GET(request: Request): Promise<NextResponse> {
           continue
         }
 
+        // Priority whitelist: only generate blogs for whitelisted monitors
+        const priorityMonitor = await getOutagePriorityMonitor(monitor.id)
+        if (!priorityMonitor || !priorityMonitor.is_active) {
+          logger.info('Skipping blog — monitor not in priority whitelist', { domain: monitor.domain })
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          await (supabase as unknown as any)
+            .from('public_incidents')
+            .update({ blog_generated_at: now.toISOString() })
+            .eq('id', incident.id)
+          blogsSkipped++
+          continue
+        }
+
+        // Service group deduplication: check if another monitor in the same service group already has an open blog
+        const serviceGroup = priorityMonitor.service_group
+        const existingBlogPostId = await hasOpenBlogForServiceGroup(serviceGroup)
+        if (existingBlogPostId) {
+          logger.info('Service group already has open blog — linking this incident to it', {
+            serviceGroup,
+            existingBlogPostId,
+            domain: monitor.domain,
+          })
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          await (supabase as unknown as any)
+            .from('public_incidents')
+            .update({
+              blog_generated_at: now.toISOString(),
+              blog_updated_at: now.toISOString(),
+              service_group: serviceGroup,
+              blog_post_id: existingBlogPostId,
+            })
+            .eq('id', incident.id)
+          blogsSkipped++
+          continue
+        }
+
         // For ongoing incidents: re-confirm site is still down before generating blog.
         // For already-resolved incidents: skip the live check — the outage was real, blog it.
         if (!incident.resolved_at) {
@@ -226,7 +263,7 @@ export async function GET(request: Request): Promise<NextResponse> {
         }
 
         try {
-          const research = await researchOutage(monitor.display_name, monitor.domain, monitor.status_page_url ?? undefined)
+          const research = await researchOutage(monitor.display_name, monitor.domain, monitor.status_page_url ?? undefined, monitor.category ?? undefined)
           const draft = await generateOutageBlogPost({
             siteDisplayName: monitor.display_name,
             siteDomain: monitor.domain,
@@ -249,7 +286,12 @@ export async function GET(request: Request): Promise<NextResponse> {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           await (supabase as unknown as any)
             .from('public_incidents')
-            .update({ blog_generated_at: now.toISOString() })
+            .update({
+              blog_generated_at: now.toISOString(),
+              blog_updated_at: now.toISOString(),
+              service_group: serviceGroup,
+              blog_post_id: draft.blogPostId,
+            })
             .eq('id', incident.id)
 
           // Send approval notifications

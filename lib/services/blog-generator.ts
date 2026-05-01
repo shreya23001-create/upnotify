@@ -175,12 +175,16 @@ export async function generateOutageBlogPost(ctx: OutageContext): Promise<Genera
   const hasResearch = ctx.research?.hasRealData
   const researchBlock = hasResearch ? buildResearchContext(ctx.research!) : ''
 
+  // Hybrid publish status — post immediately as "investigating", update on resolution
+  const statusLabel = '🔴 Status: Still investigating — this post will be updated when resolved.'
+
   const prompt = `You are a technical writer for Uptrue, an independent uptime monitoring platform.
 Write a blog post sharing Uptrue's perspective on a possible service issue we detected. The tone is calm, helpful, and informational — like a knowledgeable friend sharing what they're seeing, not a news reporter asserting facts. We are not in conflict with anyone.
 
 Site: ${ctx.siteDisplayName} (${ctx.siteDomain})
 Our monitors flagged a possible issue at: ${detectedAt}
 What our monitor saw: ${errorDetail}
+Status: ${statusLabel}
 
 ${hasResearch ? `WHAT WE FOUND WHEN WE LOOKED FURTHER (use this to enrich the post):
 ${researchBlock}` : 'No additional research data — write based on what our monitor detected only.'}
@@ -189,15 +193,16 @@ Write the post in Markdown as Uptrue's honest opinion and observation. The post 
 1. Open from Uptrue's perspective — "our monitors picked up what looks like an issue with ${ctx.siteDisplayName}" — frame the whole post as what we are seeing and what we think, not as reported fact. Use natural opinion language throughout: "it looks like", "from what we can see", "our monitors suggest", "it appears that", "based on what we're observing".
 2. Include a "What Our Monitors Are Showing" section — share what Uptrue detected (error type, time, what it could mean) in plain language. If the official status page has useful information, summarise it and link to it. If things are unclear, say so honestly — "we don't have a full picture yet".
 3. Include a "What People Are Saying" section if there are social/Reddit mentions — paraphrase naturally, do NOT copy verbatim. Credit generically: [reports on Reddit](url) or [posts on X](url). Do NOT include Reddit usernames, X/Twitter handles, or any personal identifiers whatsoever.
-4. Include a "What You Can Do in the Meantime" section with practical workarounds — helpful, not alarmist
-5. Include a "Keep an Eye on ${ctx.siteDisplayName} with Uptrue" section — a natural, low-key mention that Uptrue monitors services like this and readers can add their own for free at https://uptrue.io
-6. Close by noting that this is Uptrue's view based on what we detected at the time, that the situation may have already changed, and pointing readers to ${ctx.siteDisplayName}'s official status page for the authoritative update
-7. Be between 500–700 words
-8. Warm, human tone — conversational, helpful, never alarmist or sensational
-9. Do NOT include a title at the top (it is added separately)
-10. Cite sources with Markdown links: [source name](url)
-11. Do NOT fabricate anything. Every claim about cause, affected regions, user impact, or fix status must come directly from the research data provided above. If a section has no supporting data, say so explicitly — e.g. "we don't have details on what caused this yet" or "we haven't seen any official update on this". Do NOT include any personal usernames or social media handles.
-12. We have no connection to ${ctx.siteDisplayName} — mention this lightly and naturally if it fits ("as an independent monitoring service, all we can share is what our own checks detected")
+4. Include a "What You Can Do in the Meantime" section with practical workarounds — helpful, not alarmist.
+5. Include the status notice near the end: "${statusLabel}"
+6. Include a "Keep an Eye on ${ctx.siteDisplayName} with Uptrue" section — a natural, low-key mention that Uptrue monitors services like this and readers can add their own for free at https://uptrue.io
+7. Close by noting that this is Uptrue's view based on what we detected at the time, that the situation may have already changed, and pointing readers to ${ctx.siteDisplayName}'s official status page for the authoritative update
+8. Be between 500–700 words
+9. Warm, human tone — conversational, helpful, never alarmist or sensational
+10. Do NOT include a title at the top (it is added separately)
+11. Cite sources with Markdown links: [source name](url)
+12. Do NOT fabricate anything. Every claim about cause, affected regions, user impact, or fix status must come directly from the research data provided above. If a section has no supporting data, say so explicitly — e.g. "we don't have details on what caused this yet" or "we haven't seen any official update on this". Do NOT include any personal usernames or social media handles.
+13. We have no connection to ${ctx.siteDisplayName} — mention this lightly and naturally if it fits ("as an independent monitoring service, all we can share is what our own checks detected")
 
 Also provide:
 - EXCERPT: One sentence (max 160 chars) from Uptrue's perspective — e.g. "Our monitors picked up a possible issue with ${ctx.siteDisplayName} — here's what we're seeing."
@@ -331,5 +336,115 @@ Format your response EXACTLY like this:
     })) ?? [],
     approveToken: tokens.approveToken,
     rejectToken: tokens.rejectToken,
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Resolution update — called when incident is resolved
+// ---------------------------------------------------------------------------
+
+/**
+ * Updates an existing blog post when the incident resolves.
+ * Rewrites the status section and conclusion to reflect resolution.
+ * Updates blog_updated_at on the incident.
+ */
+export async function updateOutageBlogWithResolution(
+  blogPostId: string | number,
+  downtimeDuration: string,
+  resolvedAt: string
+): Promise<boolean> {
+  const supabase = createAdminClient()
+  const config = getServerConfig()
+
+  try {
+    // Fetch the blog post
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: post, error: fetchError } = await (supabase as any)
+      .from('blog_posts')
+      .select('id, content, title')
+      .eq('id', String(blogPostId))
+      .single()
+
+    if (fetchError || !post) {
+      logger.error('Failed to fetch blog post for resolution update', {
+        blogPostId,
+        error: fetchError?.message,
+      })
+      return false
+    }
+
+    const postContent = (post.content as { body?: string } | null | undefined) ?? {}
+    const currentBody = (postContent as { body?: string }).body ?? ''
+
+    if (!config.anthropic.apiKey) {
+      logger.warn('ANTHROPIC_API_KEY not set — skipping resolution update')
+      return false
+    }
+
+    const client = new Anthropic({ apiKey: config.anthropic.apiKey })
+    const resolvedDate = formatReadableDate(resolvedAt)
+
+    const updatePrompt = `You are updating a blog post about a service outage that has now resolved.
+
+Current post excerpt (first 500 chars):
+${currentBody.slice(0, 500)}
+
+The incident is now resolved. Rewrite ONLY the status section and conclusion (last 2-3 paragraphs) to reflect resolution:
+- Replace "🔴 Status: Still investigating..." with "✅ Status: Resolved at ${resolvedDate}"
+- Include the downtime duration: "${downtimeDuration}"
+- Keep the tone calm and factual
+- Do NOT rewrite the entire post — only update the status and ending
+
+Return ONLY the updated conclusion/ending section (last 2-3 paragraphs with the updated status). Do not include anything else.`
+
+    const message = await client.messages.create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 600,
+      messages: [{ role: 'user', content: updatePrompt }],
+    })
+
+    const updatedEnding = message.content.find(b => b.type === 'text')?.text ?? ''
+
+    if (!updatedEnding) {
+      logger.error('Resolution update returned empty text', { blogPostId })
+      return false
+    }
+
+    // Replace the status line and ending in the current body
+    const updatedBody = currentBody
+      .replace(/🔴 Status: Still investigating.*?(\n|$)/g, `✅ Status: Resolved at ${resolvedDate}\n`)
+      + '\n\n' + updatedEnding
+
+    // Update the blog post
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error: updateError } = await (supabase as any)
+      .from('blog_posts')
+      .update({
+        content: { ...(post.content as Record<string, unknown>), body: updatedBody },
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', String(blogPostId))
+
+    if (updateError) {
+      logger.error('Failed to update blog post with resolution', {
+        blogPostId,
+        error: updateError.message,
+      })
+      return false
+    }
+
+    logger.info('Blog post updated with resolution', {
+      blogPostId,
+      downtimeDuration,
+      resolvedAt,
+    })
+
+    return true
+  } catch (error) {
+    logger.error('Resolution update failed', {
+      blogPostId,
+      error: error instanceof Error ? error.message : 'Unknown',
+    })
+    return false
   }
 }

@@ -1,5 +1,6 @@
 import { getServerConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
+import { getOutageRssFeedsForCategory } from '@/lib/db/outage-blog'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -8,7 +9,7 @@ import { logger } from '@/lib/utils/logger'
 export interface SourceArticle {
   title: string
   url: string
-  source: string       // e.g. "Reddit", "Google News", "X (Twitter)", "Official Status Page"
+  source: string       // e.g. "Reddit", "Google News", "X (Twitter)", "HackerNews", "RSS Feed Name"
   snippet: string      // Short excerpt or tweet text
   publishedAt?: string
 }
@@ -16,7 +17,7 @@ export interface SourceArticle {
 export interface OutageResearch {
   officialStatus: string | null       // Text from official status page
   officialStatusUrl: string | null    // URL of status page
-  articles: SourceArticle[]           // News + Reddit + X mentions
+  articles: SourceArticle[]           // News + Reddit + X + HN + RSS mentions
   hasRealData: boolean                // False if all sources failed
 }
 
@@ -265,30 +266,153 @@ async function fetchXMentions(siteName: string): Promise<SourceArticle[]> {
 }
 
 // ---------------------------------------------------------------------------
+// 5. HackerNews (Algolia API, free, no auth)
+// ---------------------------------------------------------------------------
+
+async function fetchHackerNews(siteName: string): Promise<SourceArticle[]> {
+  const query = encodeURIComponent(`${siteName} down`)
+  const url = `https://hn.algolia.com/api/v1/search?query=${query}&tags=story&hitsPerPage=20&numericFilters=created_at_i>=${Math.floor(Date.now() / 1000) - 86400}`
+
+  try {
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), 8000)
+
+    const res = await fetch(url, {
+      signal: controller.signal,
+      headers: { 'User-Agent': 'Uptrue/1.0 (uptime monitor; contact@uptrue.io)' },
+    })
+    clearTimeout(timeout)
+
+    if (!res.ok) return []
+
+    const json = await res.json() as {
+      hits?: Array<{
+        title: string
+        url?: string
+        objectID: string
+        points: number
+        created_at: string
+      }>
+    }
+
+    const hits = json.hits ?? []
+
+    return hits
+      .filter(h => h.url && h.points > 2)
+      .slice(0, 5)
+      .map(h => ({
+        title: h.title,
+        url: h.url || `https://news.ycombinator.com/item?id=${h.objectID}`,
+        source: 'HackerNews',
+        snippet: h.title,
+        publishedAt: h.created_at,
+      }))
+  } catch (error) {
+    logger.warn('HackerNews fetch failed', { error: error instanceof Error ? error.message : 'Unknown' })
+    return []
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 6. Category-specific RSS feeds (admin-configurable)
+// ---------------------------------------------------------------------------
+
+async function fetchCategoryRssFeeds(siteName: string, domain: string, categorySlug?: string): Promise<SourceArticle[]> {
+  if (!categorySlug) return []
+
+  try {
+    const feeds = await getOutageRssFeedsForCategory(categorySlug)
+    if (feeds.length === 0) return []
+
+    const articles: SourceArticle[] = []
+    const cutoff = Date.now() - 48 * 60 * 60 * 1000 // 48 hours
+
+    for (const feed of feeds) {
+      try {
+        const controller = new AbortController()
+        const timeout = setTimeout(() => controller.abort(), 5000)
+
+        const res = await fetch(feed.feed_url, {
+          signal: controller.signal,
+          headers: { 'User-Agent': 'Uptrue/1.0 (uptime monitor; contact@uptrue.io)' },
+        })
+        clearTimeout(timeout)
+
+        if (!res.ok) continue
+
+        const xml = await res.text()
+        const items = xml.match(/<item>([\s\S]*?)<\/item>/g) ?? []
+
+        items.slice(0, 10).forEach(item => {
+          const title = item.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/)?.[1]
+            ?? item.match(/<title>(.*?)<\/title>/)?.[1]
+          const link = item.match(/<link>(.*?)<\/link>/)?.[1]
+            ?? item.match(/<guid[^>]*>(.*?)<\/guid>/)?.[1]
+          const pubDate = item.match(/<pubDate>(.*?)<\/pubDate>/)?.[1]
+          const desc = item.match(/<description><!\[CDATA\[(.*?)\]\]><\/description>/)?.[1]
+            ?? item.match(/<description>(.*?)<\/description>/)?.[1]
+
+          if (!title || !link) return
+
+          const text = (title + (desc || '')).toLowerCase()
+          const domainClean = domain.replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0]
+
+          if (!text.includes(domainClean.toLowerCase()) && !text.includes(siteName.toLowerCase())) return
+
+          if (pubDate) {
+            const published = new Date(pubDate).getTime()
+            if (isNaN(published) || published < cutoff) return
+          }
+
+          articles.push({
+            title: title.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>'),
+            url: link,
+            source: feed.source_name,
+            snippet: (desc || title).replace(/<[^>]+>/g, '').slice(0, 300),
+            publishedAt: pubDate,
+          })
+        })
+      } catch {
+        continue
+      }
+    }
+
+    return articles.slice(0, 5)
+  } catch (error) {
+    logger.warn('Category RSS fetch failed', { categorySlug, error: error instanceof Error ? error.message : 'Unknown' })
+    return []
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Main researcher — runs all sources in parallel
 // ---------------------------------------------------------------------------
 
 /**
- * Gathers outage intelligence from 4 free sources in parallel.
- * Designed to complete within 10 seconds — all fetches have 8s timeouts.
+ * Gathers outage intelligence from 6 free sources in parallel.
+ * Designed to complete within 10 seconds — all fetches have 5-8s timeouts.
  * Never throws — always returns a result even if all sources fail.
  */
-export async function researchOutage(siteName: string, domain: string, statusPageUrl?: string): Promise<OutageResearch> {
-  logger.info('Starting outage research', { siteName, domain, hasStoredStatusPage: !!statusPageUrl })
+export async function researchOutage(siteName: string, domain: string, statusPageUrl?: string, categorySlug?: string): Promise<OutageResearch> {
+  logger.info('Starting outage research', { siteName, domain, hasStoredStatusPage: !!statusPageUrl, categorySlug })
 
-  const [officialResult, newsArticles, redditPosts, xMentions] = await Promise.allSettled([
+  const [officialResult, newsArticles, redditPosts, xMentions, hnResults, rssResults] = await Promise.allSettled([
     fetchOfficialStatus(domain, statusPageUrl),
     fetchGoogleNews(siteName),
     fetchReddit(siteName, domain),
     fetchXMentions(siteName),
+    fetchHackerNews(siteName),
+    fetchCategoryRssFeeds(siteName, domain, categorySlug),
   ])
 
   const official = officialResult.status === 'fulfilled' ? officialResult.value : null
   const news = newsArticles.status === 'fulfilled' ? newsArticles.value : []
   const reddit = redditPosts.status === 'fulfilled' ? redditPosts.value : []
   const xPosts = xMentions.status === 'fulfilled' ? xMentions.value : []
+  const hn = hnResults.status === 'fulfilled' ? hnResults.value : []
+  const rss = rssResults.status === 'fulfilled' ? rssResults.value : []
 
-  const articles = [...news, ...reddit, ...xPosts]
+  const articles = [...news, ...reddit, ...xPosts, ...hn, ...rss]
 
   logger.info('Outage research complete', {
     siteName,
@@ -296,6 +420,8 @@ export async function researchOutage(siteName: string, domain: string, statusPag
     newsCount: news.length,
     redditCount: reddit.length,
     xCount: xPosts.length,
+    hnCount: hn.length,
+    rssCount: rss.length,
   })
 
   return {

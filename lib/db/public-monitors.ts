@@ -1,5 +1,6 @@
 import { createAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
+import { updateOutageBlogWithResolution } from '@/lib/services/blog-generator'
 
 // ============================================================
 // Types for public tracker tables (not in generated DB types yet)
@@ -471,9 +472,12 @@ export async function createPublicIncident(data: {
 
 export async function resolvePublicIncident(monitorId: string): Promise<void> {
   const supabase = createAdminClient()
-  const { data: incident } = await supabase
+  const now = new Date()
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: incident } = await (supabase as any)
     .from('public_incidents')
-    .select('*')
+    .select('id, started_at, blog_generated_at, blog_post_id')
     .eq('monitor_id', monitorId)
     .is('resolved_at', null)
     .order('started_at', { ascending: false })
@@ -483,8 +487,24 @@ export async function resolvePublicIncident(monitorId: string): Promise<void> {
   if (incident) {
     await supabase
       .from('public_incidents')
-      .update({ resolved_at: new Date().toISOString() })
+      .update({ resolved_at: now.toISOString() })
       .eq('id', incident.id)
+
+    // If incident has a linked blog post, update it with resolution details
+    if ((incident as { blog_generated_at?: string; blog_post_id?: number }).blog_generated_at && (incident as { blog_post_id?: number }).blog_post_id) {
+      const startTime = new Date((incident as { started_at: string }).started_at).getTime()
+      const endTime = now.getTime()
+      const durationMs = endTime - startTime
+      const durationMinutes = Math.ceil(durationMs / 60000)
+      const durationHours = Math.floor(durationMinutes / 60)
+      const durationRemainingMinutes = durationMinutes % 60
+
+      const downtimeDuration = durationHours > 0
+        ? `${durationHours}h ${durationRemainingMinutes}m`
+        : `${durationMinutes}m`
+
+      await updateOutageBlogWithResolution((incident as { blog_post_id: number }).blog_post_id, downtimeDuration, now.toISOString())
+    }
   }
 }
 

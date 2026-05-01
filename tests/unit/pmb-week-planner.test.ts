@@ -65,7 +65,13 @@ describe('PMB week-planner', () => {
     }
 
     // Generate runs (NEW: leaderboard only, no pairwise)
-    const allRuns: Array<{ post_type: string; category_slug: string; monitor_id: string | null; compare_monitor_id: string | null }> = []
+    interface LeaderboardRun {
+      post_type: string
+      category_slug: string
+      monitor_id: string | null
+      compare_monitor_id: string | null
+    }
+    const allRuns: LeaderboardRun[] = []
 
     for (const [slug, group] of byCategory.entries()) {
       // Leaderboard only (pairwise removed)
@@ -80,11 +86,11 @@ describe('PMB week-planner', () => {
     }
 
     // Assertions
-    expect(allRuns.length).toBe(2, 'Should create one leaderboard per category (2 categories)')
-    expect(allRuns.every(r => r.post_type === 'leaderboard')).toBe(true, 'All runs must be leaderboard type')
-    expect(allRuns.some(r => r.category_slug === 'fintech')).toBe(true, 'Should include fintech category')
-    expect(allRuns.some(r => r.category_slug === 'cloud')).toBe(true, 'Should include cloud category')
-    expect(allRuns.every(r => r.monitor_id === null && r.compare_monitor_id === null)).toBe(true, 'Leaderboard runs should not reference specific monitors')
+    expect(allRuns.length).toBe(2)
+    expect(allRuns.every(r => r.post_type === 'leaderboard')).toBe(true)
+    expect(allRuns.some(r => r.category_slug === 'fintech')).toBe(true)
+    expect(allRuns.some(r => r.category_slug === 'cloud')).toBe(true)
+    expect(allRuns.every(r => r.monitor_id === null && r.compare_monitor_id === null)).toBe(true)
   })
 
   it('produces zero pairwise runs', async () => {
@@ -111,7 +117,13 @@ describe('PMB week-planner', () => {
       byCategory.set(slug, group)
     }
 
-    const allRuns: Array<{ post_type: string }> = []
+    interface LeaderboardRun {
+      post_type: string
+      category_slug: string
+      monitor_id: null
+      compare_monitor_id: null
+    }
+    const allRuns: LeaderboardRun[] = []
 
     for (const [slug, group] of byCategory.entries()) {
       // Only leaderboard — NO pairwise loop
@@ -126,8 +138,8 @@ describe('PMB week-planner', () => {
     }
 
     const pairwiseCount = allRuns.filter(r => r.post_type === 'pairwise').length
-    expect(pairwiseCount).toBe(0, 'Zero pairwise posts should be generated')
-    expect(allRuns.length).toBe(1, 'Should generate only one leaderboard post')
+    expect(pairwiseCount).toBe(0)
+    expect(allRuns.length).toBe(1)
   })
 
   it('does not generate pairwise when category has only 1 monitor', async () => {
@@ -150,7 +162,13 @@ describe('PMB week-planner', () => {
       byCategory.set(slug, group)
     }
 
-    const allRuns: Array<{ post_type: string }> = []
+    interface LeaderboardRun {
+      post_type: string
+      category_slug: string
+      monitor_id: null
+      compare_monitor_id: null
+    }
+    const allRuns: LeaderboardRun[] = []
 
     for (const [slug, group] of byCategory.entries()) {
       // Needs ≥2 monitors for leaderboard
@@ -164,6 +182,6 @@ describe('PMB week-planner', () => {
       }
     }
 
-    expect(allRuns.length).toBe(0, 'Should not generate any posts for single-monitor category')
+    expect(allRuns.length).toBe(0)
   })
 })
