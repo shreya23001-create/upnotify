@@ -48,6 +48,27 @@ interface ClaudeDraft {
   }
 }
 
+// Structured result so the caller can persist *why* a generation failed.
+type ClaudeResult =
+  | { ok: true; draft: ClaudeDraft }
+  | { ok: false; reason: string }
+
+// Errors worth retrying with backoff (Anthropic transient).
+function isTransientAnthropicError(err: unknown): boolean {
+  if (!err) return false
+  const e = err as { status?: number; name?: string; message?: string }
+  if (typeof e.status === 'number' && [429, 500, 502, 503, 504, 529].includes(e.status)) return true
+  const msg = (e.message ?? '').toLowerCase()
+  return /\b(429|500|502|503|504|529|overloaded|rate[- ]?limit|timeout|timed out|temporarily unavailable|connection reset|socket hang up)\b/.test(msg)
+}
+
+const MAX_CLAUDE_ATTEMPTS = 3
+const CLAUDE_BACKOFF_MS = [500, 2000, 8000] as const // pre-attempt sleep for attempt N
+
+function sleep(ms: number): Promise<void> {
+  return new Promise(r => setTimeout(r, ms))
+}
+
 // ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
@@ -60,15 +81,16 @@ export async function generateCalendarBlogPost(row: CalendarRow): Promise<Calend
   })
 
   // 1. Generate draft via Claude
-  const draft = await generateDraftViaClaude(row)
-  if (!draft) {
+  const result = await generateDraftViaClaude(row)
+  if (!result.ok) {
     await updateCalendarRowResult(row.id, {
       status: 'failed',
       failed_at: new Date().toISOString(),
-      failure_reason: 'Claude generation returned null',
+      failure_reason: result.reason,
     })
     return null
   }
+  const draft = result.draft
 
   // 2. Slug — deterministic from primary keyword, dedupe-checked
   const reservedSlugs = await getAllReservedSlugs()
@@ -152,32 +174,69 @@ export async function generateCalendarBlogPost(row: CalendarRow): Promise<Calend
 // Claude generation
 // ---------------------------------------------------------------------------
 
-async function generateDraftViaClaude(row: CalendarRow): Promise<ClaudeDraft | null> {
+async function generateDraftViaClaude(row: CalendarRow): Promise<ClaudeResult> {
   const { anthropic } = getServerConfig()
   if (!anthropic.apiKey) {
     logger.error('calendar-blog-generator: ANTHROPIC_API_KEY not set')
-    return null
+    return { ok: false, reason: 'ANTHROPIC_API_KEY not set' }
   }
 
   const client = new Anthropic({ apiKey: anthropic.apiKey })
   const prompt = buildPrompt(row)
 
-  try {
-    const message = await client.messages.create({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 16000, // generous headroom — hub_foundational targets 1500-2000 words
-      messages: [{ role: 'user', content: prompt }],
-    })
+  let lastReason = 'Unknown failure'
 
-    const textContent = message.content.find(b => b.type === 'text')
-    if (!textContent || textContent.type !== 'text') return null
+  for (let attempt = 1; attempt <= MAX_CLAUDE_ATTEMPTS; attempt++) {
+    if (attempt > 1) {
+      const backoff = CLAUDE_BACKOFF_MS[Math.min(attempt - 1, CLAUDE_BACKOFF_MS.length - 1)]
+      logger.warn('calendar-blog-generator: retrying Claude call', { rowId: row.id, attempt, backoffMs: backoff })
+      await sleep(backoff)
+    }
 
-    return parseDraft(textContent.text)
-  } catch (error) {
-    const msg = error instanceof Error ? error.message : 'Unknown Claude error'
-    logger.error('calendar-blog-generator: Claude call failed', { rowId: row.id, error: msg })
-    return null
+    try {
+      const message = await client.messages.create({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 16000, // generous headroom — hub_foundational targets 1500-2000 words
+        messages: [{ role: 'user', content: prompt }],
+      })
+
+      const stopReason = message.stop_reason
+      if (stopReason === 'max_tokens') {
+        lastReason = `Claude response truncated at max_tokens (response was cut off mid-generation)`
+        logger.error('calendar-blog-generator: Claude truncated', { rowId: row.id, stopReason })
+        // Truncation is deterministic for this row+prompt — don't retry, fail fast
+        return { ok: false, reason: lastReason }
+      }
+
+      const textContent = message.content.find(b => b.type === 'text')
+      if (!textContent || textContent.type !== 'text') {
+        lastReason = `Claude response had no text block (stop_reason=${stopReason})`
+        logger.error('calendar-blog-generator: Claude no text block', { rowId: row.id, stopReason })
+        return { ok: false, reason: lastReason }
+      }
+
+      const parsed = parseDraft(textContent.text)
+      if (parsed.ok) return parsed
+      // Parser failure is also deterministic for this response — don't retry the same prompt
+      lastReason = parsed.reason
+      return { ok: false, reason: lastReason }
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error)
+      lastReason = `Claude API error: ${msg}`
+      logger.error('calendar-blog-generator: Claude call failed', {
+        rowId: row.id,
+        attempt,
+        transient: isTransientAnthropicError(error),
+        error: msg,
+      })
+      if (!isTransientAnthropicError(error)) {
+        return { ok: false, reason: lastReason }
+      }
+      // else: loop and retry
+    }
   }
+
+  return { ok: false, reason: `${lastReason} (after ${MAX_CLAUDE_ATTEMPTS} attempts)` }
 }
 
 function buildPrompt(row: CalendarRow): string {
@@ -241,7 +300,7 @@ Body must include at least one image placeholder using markdown syntax: \`![alt 
 Return only the JSON. No commentary.`
 }
 
-function parseDraft(text: string): ClaudeDraft | null {
+function parseDraft(text: string): ClaudeResult {
   // Extract JSON robustly — Claude may return:
   //   - Pure JSON
   //   - ```json ... ``` fenced block
@@ -269,26 +328,31 @@ function parseDraft(text: string): ClaudeDraft | null {
     if (!parsed.faqJsonb || typeof parsed.faqJsonb !== 'object') validations.push('faqJsonb missing/invalid')
 
     if (validations.length > 0) {
+      const reason = `Draft JSON parsed but invalid: ${validations.join('; ')}`
       logger.warn('calendar-blog-generator: draft validation failed', {
         errors: validations,
         responsePreview: text.slice(0, 300),
       })
-      return null
+      return { ok: false, reason }
     }
 
     return {
-      title: parsed.title as string,
-      excerpt: parsed.excerpt as string,
-      bodyMarkdown: parsed.bodyMarkdown as string,
-      faqJsonb: parsed.faqJsonb as ClaudeDraft['faqJsonb'],
+      ok: true,
+      draft: {
+        title: parsed.title as string,
+        excerpt: parsed.excerpt as string,
+        bodyMarkdown: parsed.bodyMarkdown as string,
+        faqJsonb: parsed.faqJsonb as ClaudeDraft['faqJsonb'],
+      },
     }
   } catch (error) {
+    const errMsg = error instanceof Error ? error.message : String(error)
     logger.warn('calendar-blog-generator: draft JSON parse failed', {
-      error: error instanceof Error ? error.message : String(error),
+      error: errMsg,
       responsePreview: text.slice(0, 500),
       jsonTextPreview: jsonText.slice(0, 300),
     })
-    return null
+    return { ok: false, reason: `Draft JSON parse failed: ${errMsg}` }
   }
 }
 
