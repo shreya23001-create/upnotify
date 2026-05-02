@@ -84,12 +84,11 @@ let cachedPublicConfig: PublicConfig | null = null
 export function getConfig(): PublicConfig {
   if (cachedPublicConfig) return cachedPublicConfig
 
+  // (resolveAppUrl defined at module bottom — see end of file)
+
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? ''
-  // Always use NEXT_PUBLIC_APP_URL — never the auto-generated Vercel preview URL
-  // Dev: NEXT_PUBLIC_APP_URL = https://dev.uptrue.io
-  // Prod: NEXT_PUBLIC_APP_URL = https://uptrue.io
-  const appUrl = (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000').trim()
+  const appUrl = resolveAppUrl()
   const adminEmails = process.env.ADMIN_EMAILS || ''
   const gaMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? ''
   const gtmId = process.env.NEXT_PUBLIC_GTM_ID ?? ''
@@ -238,4 +237,70 @@ export function getServerConfig(): ServerConfig {
   }
 
   return cachedServerConfig
+}
+
+/**
+ * Resolve the canonical app URL.
+ *
+ * Why this is more than just `process.env.NEXT_PUBLIC_APP_URL`:
+ *
+ * `NEXT_PUBLIC_*` vars in Next.js are inlined into the JS bundle at BUILD
+ * time. If a build was cached (or built with the wrong env-var scope on
+ * Vercel), the runtime can't override the inlined value — it'll always be
+ * whatever the build saw. This caused a real bug where digest emails
+ * shipped on the dev deploy contained `localhost:3000` links because the
+ * build cache had a stale value.
+ *
+ * Resolution order (first non-empty wins):
+ *   1. `APP_URL` — server-only env var (NOT inlined; always read at runtime)
+ *      — recommended setup: APP_URL=https://uptrue.io (prod), https://dev.uptrue.io (preview)
+ *   2. `NEXT_PUBLIC_APP_URL` — client-side compatibility
+ *      (subject to inlining; localhost values rejected when on Vercel)
+ *   3. Vercel runtime detection — uses VERCEL_ENV + VERCEL_GIT_COMMIT_REF
+ *      (always fresh from runtime; never inlined)
+ *   4. Vercel auto-generated branch URL — last-resort, may not be the alias
+ *   5. `http://localhost:3000` — local dev only
+ *
+ * On Vercel runtime with no resolvable URL, throws — silent localhost fallback
+ * is too dangerous (broken email links in production).
+ */
+function resolveAppUrl(): string {
+  // 1. Server-only override — never inlined, always runtime
+  const explicit = process.env.APP_URL?.trim()
+  if (explicit) return explicit
+
+  const onVercel = Boolean(process.env.VERCEL || process.env.VERCEL_ENV)
+
+  // 2. NEXT_PUBLIC_APP_URL — accept on local; reject localhost values on Vercel
+  const publicUrl = process.env.NEXT_PUBLIC_APP_URL?.trim()
+  if (publicUrl) {
+    if (!onVercel) return publicUrl
+    if (!publicUrl.includes('localhost') && !publicUrl.includes('127.0.0.1')) {
+      return publicUrl
+    }
+    // On Vercel with a localhost-y NEXT_PUBLIC_APP_URL — fall through to derive
+  }
+
+  // 3. Vercel runtime derivation (always read at runtime, not inlined)
+  if (onVercel) {
+    const vercelEnv = process.env.VERCEL_ENV
+    const branch = process.env.VERCEL_GIT_COMMIT_REF
+    const ciBranch = process.env.CI_COMMIT_REF_NAME // GitLab CI fallback
+
+    if (vercelEnv === 'production') return 'https://uptrue.io'
+    if (branch === 'dev' || ciBranch === 'dev') return 'https://dev.uptrue.io'
+    if (branch === 'master' || branch === 'main' || ciBranch === 'master') return 'https://uptrue.io'
+
+    // 4. Vercel auto-generated URL (won't be the alias, but valid URL)
+    const branchUrl = process.env.VERCEL_BRANCH_URL
+    if (branchUrl) return `https://${branchUrl}`
+    const vercelUrl = process.env.VERCEL_URL
+    if (vercelUrl) return `https://${vercelUrl}`
+  }
+
+  // 5. NEXT_PUBLIC_APP_URL even if localhost (last-resort, accepts inlined value)
+  if (publicUrl) return publicUrl
+
+  // 6. True local dev
+  return 'http://localhost:3000'
 }
