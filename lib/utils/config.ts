@@ -285,23 +285,22 @@ function resolveAppUrl(): string {
   if (onVercel) {
     const vercelEnv = process.env.VERCEL_ENV
     const branch = process.env.VERCEL_GIT_COMMIT_REF
+    const ciBranch = process.env.CI_COMMIT_REF_NAME // GitLab CI fallback
 
     if (vercelEnv === 'production') return 'https://uptrue.io'
-    if (branch === 'dev') return 'https://dev.uptrue.io'
+    if (branch === 'dev' || ciBranch === 'dev') return 'https://dev.uptrue.io'
+    if (branch === 'master' || branch === 'main' || ciBranch === 'master') return 'https://uptrue.io'
 
-    // 4. Last resort on Vercel — auto-generated URL (won't be the alias)
+    // 4. Vercel auto-generated URL (won't be the alias, but valid URL)
     const branchUrl = process.env.VERCEL_BRANCH_URL
     if (branchUrl) return `https://${branchUrl}`
     const vercelUrl = process.env.VERCEL_URL
     if (vercelUrl) return `https://${vercelUrl}`
-
-    // On Vercel but nothing resolved — fail loudly rather than ship localhost links
-    throw new Error(
-      'Cannot resolve APP_URL on Vercel: set APP_URL or NEXT_PUBLIC_APP_URL ' +
-      'in Vercel env vars for the appropriate environment scope.'
-    )
   }
 
-  // 5. Local dev
+  // 5. NEXT_PUBLIC_APP_URL even if localhost (last-resort, accepts inlined value)
+  if (publicUrl) return publicUrl
+
+  // 6. True local dev
   return 'http://localhost:3000'
 }
