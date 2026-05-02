@@ -45,11 +45,26 @@ Code only. The `uptrue-io/uptrue-app` repository. Dev team only.
 
 **`git push origin master` is a production deployment. It is NEVER allowed without the Boss explicitly saying "deploy to prod" or "push to master".**
 
+### Branch → Domain mapping (do not improvise)
+
+| Boss says | Branch | Domain |
+|---|---|---|
+| "deploy", "deploy on dev", "ship it", "push it", "dev release" | `dev` | https://dev.uptrue.io |
+| "deploy on prod", "prod release", "push to master", "go live" | `master` | https://uptrue.io + https://www.uptrue.io |
+
 - All work goes to `dev` only: `git push origin dev`
 - If you are about to run any command containing `origin master` — STOP. Ask first.
 - "Deploy it", "push it", "ship it" = `dev` only. Not master.
 - The only words that authorise a master push: **"deploy to prod"** or **"push to master"** — explicit, in that session, for that commit.
 - One approval does NOT carry forward to future commits or sessions.
+
+### Vercel routing (set 2026-05-02, do not change without reason)
+- `dev.uptrue.io` → project domain with `gitBranch: "dev"` → tracks dev branch deploys
+- `uptrue.io` → 307 redirect to `www.uptrue.io`
+- `www.uptrue.io` → production branch alias (master)
+- `uptrue-app.vercel.app` → Vercel default
+
+GitLab CI handles routing automatically: `.gitlab-ci.yml` runs `vercel deploy` (preview + alias) on dev, `vercel deploy --prod` on master.
 
 **Before every `git push`, state out loud which branch you are pushing to and why.**
 
