@@ -15,7 +15,7 @@ import os
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CSV_PATH = os.path.join(os.path.dirname(REPO_ROOT), 'keyword-research', 'Content_Calendar.csv')
-OUT_PATH = os.path.join(REPO_ROOT, 'scripts', '00085_seed_content_calendar.sql')
+OUT_PATH = os.path.join(REPO_ROOT, 'supabase', 'migrations', '00086_seed_content_calendar.sql')
 
 VALID_POST_TYPES = {'hub_foundational', 'troubleshooting', 'informational', 'commercial', 'combined_intent'}
 VALID_AUTHORS = {'Aradhna', 'Sachin', 'Steve', 'Krithi'}
