@@ -1,24 +1,30 @@
 stages:
   - deploy
 
+# Dev branch -> dev.uptrue.io
+# Drop --prebuilt: Vercel CLI 53 has trouble with Next.js 16 PPR segments.
+# Build server-side (Vercel infra) - canonical environment.
+# --meta gitCommitRef tells Vercel this deploy belongs to the 'dev' branch
+# so the dev.uptrue.io domain (gitBranch=dev) auto-aliases to it.
 deploy_dev:
   stage: deploy
   script:
     - npx vercel@latest pull --yes --environment=preview --token=$VERCEL_TOKEN
-    - npx vercel@latest build --token=$VERCEL_TOKEN
-    - npx vercel@latest deploy --prebuilt --token=$VERCEL_TOKEN
+    - DEPLOY_URL=$(npx vercel@latest deploy --token=$VERCEL_TOKEN --meta gitCommitRef=dev)
+    - echo "Deployed $DEPLOY_URL"
+    - npx vercel@latest alias set "$DEPLOY_URL" dev.uptrue.io --token=$VERCEL_TOKEN || true
   only:
     - dev
   environment:
     name: development
     url: https://dev.uptrue.io
 
+# Master branch -> uptrue.io / www.uptrue.io (production aliases auto-applied via --prod)
 deploy_prod:
   stage: deploy
   script:
     - npx vercel@latest pull --yes --environment=production --token=$VERCEL_TOKEN
-    - npx vercel@latest build --prod --token=$VERCEL_TOKEN
-    - npx vercel@latest deploy --prebuilt --prod --token=$VERCEL_TOKEN
+    - npx vercel@latest deploy --prod --token=$VERCEL_TOKEN
   only:
     - master
   environment:
