@@ -13,6 +13,8 @@ interface PlanRow {
   slug: string
   price_monthly_gbp: number
   price_annual_gbp: number | null
+  price_monthly_inr: number
+  price_annual_inr: number | null
 }
 
 interface CompetePlanRow {
@@ -27,6 +29,8 @@ interface SubRow {
   org_id: string
   status: string
   billing_cycle: string
+  stripe_subscription_id: string | null
+  razorpay_subscription_id: string | null
   plans: PlanRow
 }
 
@@ -142,7 +146,7 @@ export async function GET(request: Request): Promise<NextResponse> {
   // -------------------------------------------------------------------------
   const { data: subsRaw } = await supabase
     .from('subscriptions')
-    .select('id, org_id, status, billing_cycle, plans(name, slug, price_monthly_gbp, price_annual_gbp)')
+    .select('id, org_id, status, billing_cycle, stripe_subscription_id, razorpay_subscription_id, plans(name, slug, price_monthly_gbp, price_annual_gbp, price_monthly_inr, price_annual_inr)')
     .eq('status', 'active')
 
   const subs = (subsRaw ?? []) as unknown as SubRow[]
@@ -234,23 +238,35 @@ export async function GET(request: Request): Promise<NextResponse> {
   }))
 
   // -------------------------------------------------------------------------
-  // 6. MRR calculations — base plans
+  // 6. MRR calculations — base plans (split by currency)
   // -------------------------------------------------------------------------
   let baseMrrPence = 0
-  const planBreakdown: Record<string, { count: number; mrrPence: number }> = {}
+  let baseMrrPaise = 0
+  const planBreakdown: Record<string, { count: number; mrrPence: number; mrrPaise: number }> = {}
 
   for (const sub of subs) {
     const plan = sub.plans
     if (!plan) continue
-    // price_annual_gbp and price_monthly_gbp are stored in pence (integer) — no * 100 needed
-    const monthlyPence =
-      sub.billing_cycle === 'annual' && plan.price_annual_gbp != null
-        ? Math.round(plan.price_annual_gbp / 12)
-        : plan.price_monthly_gbp
-    baseMrrPence += monthlyPence
-    if (!planBreakdown[plan.name]) planBreakdown[plan.name] = { count: 0, mrrPence: 0 }
+    if (!planBreakdown[plan.name]) planBreakdown[plan.name] = { count: 0, mrrPence: 0, mrrPaise: 0 }
     planBreakdown[plan.name].count++
-    planBreakdown[plan.name].mrrPence += monthlyPence
+
+    if (sub.razorpay_subscription_id) {
+      // INR subscription via Razorpay — amounts are in paise
+      const monthlyPaise =
+        sub.billing_cycle === 'annual' && plan.price_annual_inr != null
+          ? Math.round(plan.price_annual_inr / 12)
+          : plan.price_monthly_inr
+      baseMrrPaise += monthlyPaise
+      planBreakdown[plan.name].mrrPaise += monthlyPaise
+    } else {
+      // GBP subscription via Stripe — amounts are in pence
+      const monthlyPence =
+        sub.billing_cycle === 'annual' && plan.price_annual_gbp != null
+          ? Math.round(plan.price_annual_gbp / 12)
+          : plan.price_monthly_gbp
+      baseMrrPence += monthlyPence
+      planBreakdown[plan.name].mrrPence += monthlyPence
+    }
   }
 
   // -------------------------------------------------------------------------
@@ -279,8 +295,10 @@ export async function GET(request: Request): Promise<NextResponse> {
     success: true,
     mrr: {
       basePence:    baseMrrPence,
+      basePaise:    baseMrrPaise,
       competePence: competeMrrPence,
       totalPence:   baseMrrPence + competeMrrPence,
+      totalPaise:   baseMrrPaise,
     },
     planBreakdown,
     competeBreakdown,

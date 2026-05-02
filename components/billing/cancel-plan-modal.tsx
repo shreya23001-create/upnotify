@@ -73,7 +73,12 @@ export function CancelPlanModal({ planName, isOpen, isPaused, pauseUntil, onClos
         // Hard redirect — guarantees fresh server-side data on the billing tab
         window.location.href = '/dashboard/settings?tab=billing&billing=cancelled'
       } else {
-        setError(data.error ?? 'Something went wrong. Please try again.')
+        const msg = data.error ?? 'Something went wrong. Please try again.'
+        // Surface a friendlier message when no payment provider is linked (e.g. test/mock subscriptions)
+        setError(msg.includes('no payment provider')
+          ? 'Your subscription cannot be cancelled automatically. Please contact support@uptrue.io.'
+          : msg
+        )
         setStep('reason')
       }
     } catch {

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import React, { useState } from 'react'
 import type { OrgWithUsers } from '@/lib/db/admin'
 
 interface AdminOrgsContentProps {
@@ -78,9 +78,8 @@ export function AdminOrgsContent({ organisations }: AdminOrgsContentProps): Reac
             {filtered.map(org => {
               const isOpen = expanded.has(org.id)
               return (
-                <>
+                <React.Fragment key={org.id}>
                   <tr
-                    key={org.id}
                     style={{ cursor: org.users.length > 0 ? 'pointer' : 'default' }}
                     onClick={() => org.users.length > 0 && toggleExpand(org.id)}
                   >
@@ -126,7 +125,7 @@ export function AdminOrgsContent({ organisations }: AdminOrgsContentProps): Reac
                       </td>
                     </tr>
                   ))}
-                </>
+                </React.Fragment>
               )
             })}
           </tbody>

@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { getCurrentUser } from '@/lib/db/users'
-import { canAccessAdminModule } from '@/lib/db/admin-roles'
+import { canAccessAdminModule, canWriteAdminModule } from '@/lib/db/admin-roles'
 import { getAllBlogPostsAdmin } from '@/lib/db/blog-posts'
 import { AdminBlogContent } from '@/components/admin/admin-blog-content'
 
@@ -9,13 +9,18 @@ export const dynamic = 'force-dynamic'
 export default async function AdminBlogPage(): Promise<React.ReactElement> {
   const user = await getCurrentUser()
   if (!user) redirect('/login')
-  if (!await canAccessAdminModule(user.email, !!user.is_super_admin, 'blog')) redirect('/admin')
+
+  const isSuperAdmin = !!user.is_super_admin
+  const [canRead, canWrite] = await Promise.all([
+    canAccessAdminModule(user.email, isSuperAdmin, 'blog'),
+    canWriteAdminModule(user.email, isSuperAdmin, 'blog'),
+  ])
+  if (!canRead) redirect('/admin')
 
   const posts = await getAllBlogPostsAdmin()
 
   const publishedCount = posts.filter(p => p.status === 'published').length
   const draftCount = posts.filter(p => p.status === 'draft').length
-  const archivedCount = posts.filter(p => p.status === 'archived').length
 
   return (
     <div>
@@ -48,12 +53,12 @@ export default async function AdminBlogPage(): Promise<React.ReactElement> {
         <div className="card">
           <div className="card-content-compact">
             <div className="stat-label">Archived</div>
-            <div className="stat-value">{archivedCount}</div>
+            <div className="stat-value">{posts.length - publishedCount - draftCount}</div>
           </div>
         </div>
       </div>
 
-      <AdminBlogContent posts={posts} />
+      <AdminBlogContent posts={posts} canWrite={canWrite} />
     </div>
   )
 }

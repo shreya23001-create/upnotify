@@ -8,6 +8,7 @@ import { generateReport, type ReportType } from '@/lib/services/reports'
 import { logger } from '@/lib/utils/logger'
 import { impersonationGuard } from '@/lib/auth/impersonation-guard'
 import { getServerConfig } from '@/lib/utils/config'
+import { getPlanLimits } from '@/lib/utils/plan-limits'
 
 export async function generateReportAction(formData: FormData): Promise<{ error?: string }> {
   const guard = await impersonationGuard()
@@ -19,6 +20,12 @@ export async function generateReportAction(formData: FormData): Promise<{ error?
   const workspaces = await getWorkspacesByOrg(user.org_id)
   const workspace = workspaces[0]
   if (!workspace) return { error: 'No workspace found' }
+
+  // Enforce plan gating — reports require a paid plan
+  const planLimits = await getPlanLimits(user.org_id)
+  if (!planLimits.hasAiPredictive && planLimits.aiReportLimit === 0) {
+    return { error: 'Reports are not available on the Free plan. Upgrade to unlock this feature.' }
+  }
 
   const type = (formData.get('type') as string) || 'on_demand'
   const reportType = (formData.get('report_type') as string) || 'uptime'

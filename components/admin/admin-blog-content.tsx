@@ -12,6 +12,7 @@ import { IconPlus, IconEdit, IconX } from '@/components/icons'
 
 interface AdminBlogContentProps {
   posts: BlogPost[]
+  canWrite?: boolean
 }
 
 type StatusFilter = 'all' | 'draft' | 'published' | 'archived' | 'pending_approval'
@@ -42,12 +43,12 @@ function SortIcon({ active, dir }: { active: boolean; dir: SortDir }): React.Rea
   return <span style={{ marginLeft: 4, fontSize: 11 }}>{dir === 'asc' ? '↑' : '↓'}</span>
 }
 
-export function AdminBlogContent({ posts }: AdminBlogContentProps): React.ReactElement {
+export function AdminBlogContent({ posts, canWrite = true }: AdminBlogContentProps): React.ReactElement {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
   const [search, setSearch] = useState('')
   const [sortKey, setSortKey] = useState<SortKey>('created_at')
   const [sortDir, setSortDir] = useState<SortDir>('desc')
-  const [page, setPage] = useState(1)
+    const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(100)
 
   // Selection
@@ -72,7 +73,7 @@ export function AdminBlogContent({ posts }: AdminBlogContentProps): React.ReactE
       setSortKey(key)
       setSortDir('asc')
     }
-    setPage(1)
+        setPage(1)
     setSelected(new Set())
   }
 
@@ -107,10 +108,10 @@ export function AdminBlogContent({ posts }: AdminBlogContentProps): React.ReactE
     return list
   }, [posts, statusFilter, search, sortKey, sortDir])
 
-  const totalPages = Math.max(1, Math.ceil(filteredPosts.length / pageSize))
+    const totalPages = Math.max(1, Math.ceil(filteredPosts.length / pageSize))
   const pagedPosts = filteredPosts.slice((page - 1) * pageSize, page * pageSize)
 
-  // ── Selection helpers — select/deselect across ALL filtered pages ──
+  // ── Selection helpers ─────────────────────────────────────
   const allSelected = filteredPosts.length > 0 && filteredPosts.every(p => selected.has(p.id))
   const someSelected = selected.size > 0
 
@@ -152,30 +153,24 @@ export function AdminBlogContent({ posts }: AdminBlogContentProps): React.ReactE
     setSuccess(null)
     setBulkWorking(true)
     const ids = Array.from(selected)
-    const BATCH = 100
+      const BATCH = 100
     const chunks: string[][] = []
     for (let i = 0; i < ids.length; i += BATCH) chunks.push(ids.slice(i, i + BATCH))
 
     let totalDone = 0
     let failed = false
 
-    for (const chunk of chunks) {
-      let result: { success: boolean; error?: string }
-      if (action === 'delete') {
-        result = await bulkDeleteBlogPostsAction(chunk)
-      } else {
-        const status = action === 'draft' ? 'draft' : action === 'archive' ? 'archived' : 'published'
-        result = await bulkUpdateBlogPostStatusAction(chunk, status)
-      }
-      if (!result.success) { failed = true; setError(result.error ?? 'Bulk action failed'); break }
-      totalDone += chunk.length
-      if (chunks.length > 1) setSuccess(`Processing… ${totalDone} / ${ids.length}`)
+    let result: { success: boolean; error?: string }
+    if (action === 'delete') {
+      result = await bulkDeleteBlogPostsAction(ids)
+      if (result.success) setSuccess(`${ids.length} post${ids.length !== 1 ? 's' : ''} deleted`)
+    } else {
+      const status = action === 'draft' ? 'draft' : action === 'archive' ? 'archived' : 'published'
+      result = await bulkUpdateBlogPostStatusAction(ids, status)
+      if (result.success) setSuccess(`${ids.length} post${ids.length !== 1 ? 's' : ''} moved to ${status}`)
     }
 
-    if (!failed) {
-      const label = action === 'delete' ? 'deleted' : action === 'draft' ? 'moved to draft' : action === 'archive' ? 'archived' : 'published'
-      setSuccess(`${totalDone} post${totalDone !== 1 ? 's' : ''} ${label}`)
-    }
+    if (!result.success) setError(result.error ?? 'Bulk action failed')
     setSelected(new Set())
     setBulkConfirm(null)
     setBulkWorking(false)
@@ -212,11 +207,13 @@ export function AdminBlogContent({ posts }: AdminBlogContentProps): React.ReactE
       )}
 
       {/* Toolbar */}
-      <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 20, flexWrap: 'wrap' }}>
-        <Link href="/admin/blog/new" className="btn btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-          <IconPlus size={16} />
-          New Post
-        </Link>
+      <div className="admin-toolbar" style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 20, flexWrap: 'wrap' }}>
+        {canWrite && (
+          <Link href="/admin/blog/new" className="btn btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            <IconPlus size={16} />
+            New Post
+          </Link>
+        )}
 
         <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
           {(['all', 'draft', 'published', 'archived', 'pending_approval'] as const).map(s => (
@@ -227,12 +224,14 @@ export function AdminBlogContent({ posts }: AdminBlogContentProps): React.ReactE
               style={{ textTransform: 'capitalize' }}
             >
               {s === 'pending_approval' ? 'Pending' : s}
-              <span style={{ marginLeft: 4, opacity: 0.7 }}>({statusCounts[s]})</span>
+              {statusCounts[s] > 0 && (
+                <span style={{ marginLeft: 4, opacity: 0.7 }}>({statusCounts[s]})</span>
+              )}
             </button>
           ))}
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 'auto' }}>
+  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 'auto' }}>
           <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>Per page:</label>
           <select
             value={pageSize}
@@ -244,14 +243,14 @@ export function AdminBlogContent({ posts }: AdminBlogContentProps): React.ReactE
               <option key={n} value={n}>{n}</option>
             ))}
           </select>
-          <input
-            type="text"
-            placeholder="Search posts..."
-            value={search}
-            onChange={e => { setSearch(e.target.value); setSelected(new Set()); setPage(1) }}
-            className="input"
-            style={{ maxWidth: 220 }}
-          />
+        <input
+          type="text"
+          placeholder="Search posts..."
+          value={search}
+          onChange={e => { setSearch(e.target.value); setSelected(new Set()); setPage(1) }}
+          className="input"
+          style={{ maxWidth: 260, marginLeft: 'auto' }}
+        />
         </div>
       </div>
 
@@ -350,7 +349,7 @@ export function AdminBlogContent({ posts }: AdminBlogContentProps): React.ReactE
               </tr>
             </thead>
             <tbody>
-              {pagedPosts.map(post => (
+              {filteredPosts.map(post => (
                 <tr key={post.id} style={selected.has(post.id) ? { background: 'var(--color-primary-subtle, #eff6ff)' } : undefined}>
                   <td>
                     <input
@@ -379,7 +378,9 @@ export function AdminBlogContent({ posts }: AdminBlogContentProps): React.ReactE
                   <td style={{ fontSize: '0.875rem' }}>{formatDate(post.created_at)}</td>
                   <td style={{ textAlign: 'right' }}>
                     <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-                      <Link
+                      {canWrite ? (
+                        <>
+                         <Link
                         href={`/admin/blog/${post.id}/preview`}
                         target="_blank"
                         rel="noopener noreferrer"
@@ -388,35 +389,48 @@ export function AdminBlogContent({ posts }: AdminBlogContentProps): React.ReactE
                       >
                         Preview
                       </Link>
-                      <Link
-                        href={`/admin/blog/${post.id}`}
-                        className="btn btn-sm btn-outline"
-                        style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}
-                      >
-                        <IconEdit size={14} />
-                        Edit
-                      </Link>
-                      {deleteConfirmId === post.id ? (
-                        <div style={{ display: 'flex', gap: 4 }}>
-                          <button
-                            onClick={() => handleDelete(post.id)}
-                            className="btn btn-sm btn-danger"
-                            disabled={deleting}
+                          <Link
+                            href={`/admin/blog/${post.id}`}
+                            className="btn btn-sm btn-outline"
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}
                           >
-                            {deleting ? 'Deleting...' : 'Confirm'}
-                          </button>
-                          <button onClick={() => setDeleteConfirmId(null)} className="btn btn-sm btn-outline">
-                            Cancel
-                          </button>
-                        </div>
+                            <IconEdit size={14} />
+                            Edit
+                          </Link>
+                          {deleteConfirmId === post.id ? (
+                            <div style={{ display: 'flex', gap: 4 }}>
+                              <button
+                                onClick={() => handleDelete(post.id)}
+                                className="btn btn-sm btn-danger"
+                                disabled={deleting}
+                              >
+                                {deleting ? 'Deleting...' : 'Confirm'}
+                              </button>
+                              <button
+                                onClick={() => setDeleteConfirmId(null)}
+                                className="btn btn-sm btn-outline"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => setDeleteConfirmId(post.id)}
+                              className="btn btn-sm btn-outline"
+                              style={{ color: 'var(--color-danger, #ef4444)' }}
+                            >
+                              Delete
+                            </button>
+                          )}
+                        </>
                       ) : (
-                        <button
-                          onClick={() => setDeleteConfirmId(post.id)}
+                        <Link
+                          href={`/admin/blog/${post.id}/preview`}
                           className="btn btn-sm btn-outline"
-                          style={{ color: 'var(--color-danger, #ef4444)' }}
+                          style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}
                         >
-                          Delete
-                        </button>
+                          View
+                        </Link>
                       )}
                     </div>
                   </td>
@@ -427,7 +441,7 @@ export function AdminBlogContent({ posts }: AdminBlogContentProps): React.ReactE
         </div>
       )}
 
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, marginTop: 12 }}>
+<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, marginTop: 12 }}>
         <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
           {filteredPosts.length === 0 ? 'No posts' : (
             <>

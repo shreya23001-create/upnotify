@@ -58,16 +58,23 @@ export function TicketList({ tickets }: TicketListProps): React.ReactElement {
   const [files,    setFiles]    = useState<File[]>([])
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
+  const [subjectError, setSubjectError] = useState('')
   const [items, setItems] = useState<SupportTicket[]>(tickets)
 
   async function handleSubmit(): Promise<void> {
-    if (!subject.trim() || !message.trim()) {
-      setError('Subject and message are required')
+    setSubjectError('')
+    setError('')
+
+    if (!subject.trim()) {
+      setSubjectError('Subject is required')
+      return
+    }
+    if (!message.trim()) {
+      setError('Message is required')
       return
     }
 
     setSubmitting(true)
-    setError('')
 
     try {
       // Upload attachments first if any
@@ -95,7 +102,7 @@ export function TicketList({ tickets }: TicketListProps): React.ReactElement {
       if (!res.ok) { setError(data.error ?? 'Failed to create ticket'); return }
 
       setItems(prev => [data.ticket!, ...prev])
-      setSubject(''); setMessage(''); setFiles([]); setShowForm(false)
+      setSubject(''); setMessage(''); setFiles([]); setSubjectError(''); setShowForm(false)
       router.push(`/dashboard/support/${data.ticket!.id}`)
     } catch {
       setError('Network error. Please try again.')
@@ -123,12 +130,16 @@ export function TicketList({ tickets }: TicketListProps): React.ReactElement {
           <h3 style={{ marginBottom: 16 }}>Raise a Support Ticket</h3>
           <div className="support-form-grid">
             <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-              <label className="form-label">Subject</label>
+              <label className="form-label">
+                Subject <span style={{ color: '#ef4444' }}>*</span>
+              </label>
               <input
-                type="text" className="form-input"
+                type="text" className={`form-input${subjectError ? ' form-input-error' : ''}`}
                 placeholder="Brief summary of your issue"
-                value={subject} onChange={e => setSubject(e.target.value)}
+                value={subject} onChange={e => { setSubject(e.target.value); if (subjectError) setSubjectError('') }}
+                required
               />
+              {subjectError && <p className="form-error" style={{ marginTop: 4, marginBottom: 0 }}>{subjectError}</p>}
             </div>
             <div className="form-group">
               <label className="form-label">Category</label>
@@ -178,7 +189,7 @@ export function TicketList({ tickets }: TicketListProps): React.ReactElement {
             <button className="btn btn-primary" onClick={handleSubmit} disabled={submitting}>
               {submitting ? 'Submitting...' : 'Submit Ticket'}
             </button>
-            <button className="btn btn-ghost" onClick={() => { setShowForm(false); setError(''); setFiles([]) }}>
+            <button className="btn btn-ghost" onClick={() => { setShowForm(false); setError(''); setSubjectError(''); setFiles([]) }}>
               Cancel
             </button>
           </div>

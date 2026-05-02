@@ -43,7 +43,14 @@ export async function signInWithEmail(
   if (error) {
     logger.error('Magic link sign in failed', { error: error.message })
     await writeAuditLog({ orgId: 'system', userId: null, action: 'auth.magic_link_failed', ipAddress: ip, userAgent, metadata: { email } })
-    return { error: 'Failed to send magic link. Please try again.' }
+    const msg = error.message?.toLowerCase() ?? ''
+    if (msg.includes('rate') || msg.includes('too many')) {
+      return { error: 'Too many attempts. Please wait a minute before trying again.' }
+    }
+    if (msg.includes('email') && msg.includes('not confirmed')) {
+      return { error: 'Please check your inbox — a magic link was already sent to this address.' }
+    }
+    return { error: 'Failed to send magic link. Please check your email address and try again.' }
   }
 
   await writeAuditLog({ orgId: 'system', userId: null, action: 'auth.magic_link_requested', ipAddress: ip, userAgent, metadata: { email } })

@@ -213,7 +213,8 @@ export function PricingTable({ plans, currentPlanSlug, subscription, creditBalan
 
   // Determine the index of the current plan for upgrade/downgrade logic
   const currentPlanIndex = directPlans.findIndex(p => p.slug === currentPlanSlug)
-  const effectiveCurrentIndex = currentPlanIndex >= 0 ? currentPlanIndex : 0 // Free if no subscription
+  // -1 means free/no subscription — all paid plans are higher tier
+  const effectiveCurrentIndex = currentPlanIndex >= 0 ? currentPlanIndex : -1
 
   async function handleRazorpayCancel(): Promise<void> {
     if (!cancelConfirm) { setCancelConfirm(true); return }
@@ -309,11 +310,14 @@ export function PricingTable({ plans, currentPlanSlug, subscription, creditBalan
 
       // 2b. Load Razorpay.js and open real checkout modal
       await loadRazorpayScript()
+      const isTestKey = (data.keyId ?? '').startsWith('rzp_test_')
       const rzp = new window.Razorpay({
         key:              data.keyId,
         subscription_id:  data.subscriptionId,
         name:             'Uptrue',
-        description:      `${data.planName ?? planSlug} · ${billingCycle === 'annual' ? 'Annual' : 'Monthly'} (incl. 18% GST)`,
+        description:      isTestKey
+          ? `${data.planName ?? planSlug} · TEST MODE — Use card: 5267 3181 8797 5449 (Razorpay test Mastercard)`
+          : `${data.planName ?? planSlug} · ${billingCycle === 'annual' ? 'Annual' : 'Monthly'} (incl. 18% GST)`,
         image:            '/logo.svg',
         prefill:          { email: data.userEmail ?? '', name: data.orgName ?? '' },
         theme:            { color: '#3b82f6' },

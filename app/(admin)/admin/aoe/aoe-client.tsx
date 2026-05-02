@@ -111,7 +111,7 @@ const CAMPAIGN_SETTING_KEY: Record<CampaignKey, string> = {
 // Component
 // ---------------------------------------------------------------------------
 
-export function AdminAoeClientPage(): React.ReactElement {
+export function AdminAoeClientPage({ canWrite = true }: { canWrite?: boolean }): React.ReactElement {
   const [stats, setStats] = useState<AoeStats | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState<string | null>(null)
@@ -178,7 +178,7 @@ export function AdminAoeClientPage(): React.ReactElement {
           <span style={{ fontWeight: 600, fontSize: 14 }}>AOE Master Switch</span>
           <button
             onClick={() => toggle('master_enabled', masterEnabled)}
-            disabled={saving === 'master_enabled'}
+            disabled={!canWrite || saving === 'master_enabled'}
             style={{
               padding: '6px 18px',
               borderRadius: 6,
@@ -304,7 +304,7 @@ export function AdminAoeClientPage(): React.ReactElement {
                       <td>
                         <button
                           onClick={() => toggle(settingKey, enabled)}
-                          disabled={!masterEnabled || saving === settingKey}
+                          disabled={!canWrite || !masterEnabled || saving === settingKey}
                           style={{
                             padding: '3px 12px',
                             borderRadius: 10,

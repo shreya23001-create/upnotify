@@ -347,7 +347,7 @@ export default function PricingRulesPage(): React.ReactElement {
                   </p>
                   <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>
                     Triggered {rule.trigger_count} times
-                    {rule.last_triggered_at && ` | Last: ${new Date(rule.last_triggered_at).toLocaleDateString()}`}
+                    {rule.last_triggered_at && ` | Last: ${new Date(rule.last_triggered_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`}
                   </p>
                 </div>
                 <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>

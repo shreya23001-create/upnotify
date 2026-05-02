@@ -30,7 +30,7 @@ export async function POST(request: Request): Promise<NextResponse> {
 
     const subWithPlan = await getSubscriptionWithPlan(user.org_id)
     if (!subWithPlan?.subscription) {
-      return NextResponse.json({ error: 'No active subscription found' }, { status: 400 })
+      return NextResponse.json({ error: 'No active subscription found. You may already be on the Free plan.' }, { status: 400 })
     }
 
     const sub = subWithPlan.subscription
@@ -61,18 +61,31 @@ export async function POST(request: Request): Promise<NextResponse> {
       const subRecord = sub as unknown as Record<string, unknown>
       const rzpSubId = subRecord.razorpay_subscription_id as string | null
 
-      // Razorpay subscription — cancel via Razorpay API
+      // Razorpay subscription — cancel immediately and downgrade to Free now
       if (rzpSubId) {
-        await cancelRazorpaySubscription(rzpSubId, true) // cancel at cycle end
+        try {
+          await cancelRazorpaySubscription(rzpSubId, false) // immediate cancel
+        } catch (rzpErr) {
+          const rzpError = rzpErr as { statusCode?: number; error?: { code?: string; description?: string } }
+          const description = rzpError?.error?.description ?? ''
+          const statusCode = rzpError?.statusCode ?? 0
+          logger.error('Razorpay cancel API call failed', { orgId: user.org_id, rzpSubId, statusCode, description })
+          const alreadyDone = statusCode === 404
+            || description.toLowerCase().includes('cancelled')
+            || description.toLowerCase().includes('completed')
+            || description.toLowerCase().includes('does not exist')
+          if (!alreadyDone) {
+            return NextResponse.json({ error: 'Failed to contact payment provider. Please try again.' }, { status: 400 })
+          }
+          logger.warn('Razorpay subscription already in terminal state — proceeding with DB cancel', { orgId: user.org_id, rzpSubId })
+        }
         const supabase = createAdminClient()
         await supabase
           .from('subscriptions')
-          .update({ status: 'cancelling' } as Record<string, unknown>)
+          .update({ status: 'canceled', canceled_at: new Date().toISOString() })
           .eq('id', sub.id)
-        // Do NOT enforce limits here — user keeps access until period end.
-        // The Razorpay webhook (subscription.cancelled) fires at period end and
-        // calls enforceDowngradeLimits at that point.
-        return NextResponse.json({ success: true, message: 'Subscription will cancel at the end of the current billing period.' })
+        await enforceDowngradeLimits(user.org_id, user.id)
+        return NextResponse.json({ success: true })
       }
 
       if (!sub.stripe_subscription_id) {

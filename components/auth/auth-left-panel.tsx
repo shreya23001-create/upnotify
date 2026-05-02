@@ -3,16 +3,25 @@
 import { useState, useCallback } from 'react'
 import Link from 'next/link'
 import { AuthCanvas } from './auth-canvas'
+import type { SupportedCurrency } from '@/lib/utils/currency'
 
-const SCENES = [
-  { title: 'Your monitors are watching.', sub: 'We check every 30 seconds, around the clock.' },
-  { title: 'Add your first monitor.', sub: 'We check every 30 seconds from multiple regions.' },
-  { title: 'Something goes wrong at 2:47am.', sub: "You're alerted instantly. Before your customers." },
-  { title: 'You fix it. Nobody noticed.', sub: 'Your status page kept customers calm.' },
-  { title: 'Most teams outgrow 3 monitors in a week.', sub: 'Starter is £10/yr. Cancel any time.' },
-]
+function buildScenes(currency: SupportedCurrency) {
+  const starterPrice = currency === 'inr' ? '₹999/yr' : '£10/yr'
+  return [
+    { title: 'Your monitors are watching.', sub: 'We check every 30 seconds, around the clock.' },
+    { title: 'Add your first monitor.', sub: 'We check every 30 seconds from multiple regions.' },
+    { title: 'Something goes wrong at 2:47am.', sub: "You're alerted instantly. Before your customers." },
+    { title: 'You fix it. Nobody noticed.', sub: 'Your status page kept customers calm.' },
+    { title: 'Most teams outgrow 3 monitors in a week.', sub: `Starter is ${starterPrice}. Cancel any time.` },
+  ]
+}
 
-export function AuthLeftPanel(): React.ReactElement {
+interface AuthLeftPanelProps {
+  currency?: SupportedCurrency
+}
+
+export function AuthLeftPanel({ currency = 'gbp' }: AuthLeftPanelProps): React.ReactElement {
+  const SCENES = buildScenes(currency)
   const [sceneIdx, setSceneIdx] = useState(0)
   const [caption, setCaption] = useState(SCENES[0])
 

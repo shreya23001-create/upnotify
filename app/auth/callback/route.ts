@@ -58,7 +58,10 @@ export async function GET(request: Request): Promise<NextResponse> {
 
     if (error) {
       logger.error('Auth callback failed', { error: error.message })
-      return NextResponse.redirect(`${origin}/login?error=auth_error`)
+      // Redirect to whichever page the link originated from (login or signup)
+      const fromSignup = nextPath.includes('signup') || searchParams.get('from') === 'signup'
+      const errorDest = fromSignup ? `${origin}/signup?error=auth_error` : `${origin}/login?error=auth_error`
+      return NextResponse.redirect(errorDest)
     }
 
     // Get the authenticated user

@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Multi-Location Monitor — Implementation Report</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: #1a1a2e;
+    background: #fff;
+    padding: 48px;
+    max-width: 900px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  /* ── Cover ── */
+  .cover {
+    border-bottom: 3px solid #6c63ff;
+    padding-bottom: 36px;
+    margin-bottom: 36px;
+  }
+  .cover-tag {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: #6c63ff;
+    margin-bottom: 12px;
+  }
+  .cover h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #0f0f1a;
+    line-height: 1.2;
+    margin-bottom: 8px;
+  }
+  .cover-sub {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 20px;
+  }
+  .cover-meta {
+    display: flex;
+    gap: 32px;
+    font-size: 12px;
+    color: #777;
+  }
+  .cover-meta strong { color: #333; }
+
+  /* ── Section headings ── */
+  h2 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #0f0f1a;
+    margin: 36px 0 12px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid #ececf5;
+  }
+  h3 {
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+    margin: 20px 0 8px;
+  }
+
+  p { margin-bottom: 10px; color: #333; }
+
+  /* ── Callout boxes ── */
+  .callout {
+    border-left: 4px solid #6c63ff;
+    background: #f5f4ff;
+    padding: 12px 16px;
+    border-radius: 0 6px 6px 0;
+    margin: 16px 0;
+    font-size: 12.5px;
+  }
+  .callout.warning { border-color: #f59e0b; background: #fffbeb; }
+  .callout.danger  { border-color: #ef4444; background: #fef2f2; }
+  .callout.success { border-color: #10b981; background: #f0fdf4; }
+  .callout-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: #6c63ff;
+    margin-bottom: 4px;
+  }
+  .callout.warning .callout-label { color: #d97706; }
+  .callout.danger  .callout-label { color: #dc2626; }
+  .callout.success .callout-label { color: #059669; }
+
+  /* ── Code blocks ── */
+  pre {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    background: #0f0f1a;
+    color: #e2e8f0;
+    padding: 16px 20px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 12px 0;
+    line-height: 1.7;
+  }
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    background: #ececf5;
+    color: #4338ca;
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+  pre code { background: none; color: inherit; padding: 0; }
+
+  /* Comment */
+  .cm  { color: #6272a4; }
+  /* Keyword */
+  .kw  { color: #ff79c6; }
+  /* String */
+  .st  { color: #f1fa8c; }
+  /* Type */
+  .ty  { color: #8be9fd; }
+  /* Function */
+  .fn  { color: #50fa7b; }
+  /* Number */
+  .nm  { color: #bd93f9; }
+
+  /* ── Tables ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14px 0;
+    font-size: 12px;
+  }
+  thead tr { background: #6c63ff; color: #fff; }
+  thead th {
+    text-align: left;
+    padding: 9px 12px;
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: .04em;
+  }
+  tbody tr:nth-child(even) { background: #f8f8fd; }
+  tbody td { padding: 8px 12px; border-bottom: 1px solid #ececf5; vertical-align: top; }
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .04em;
+  }
+  .tag-done    { background: #d1fae5; color: #065f46; }
+  .tag-pending { background: #fef3c7; color: #92400e; }
+  .tag-gap     { background: #fee2e2; color: #991b1b; }
+
+  /* ── Flow diagram ── */
+  .flow {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 16px 0;
+  }
+  .flow-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .flow-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+    width: 32px;
+  }
+  .flow-dot {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #6c63ff;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+  .flow-dot.phase { background: #0f0f1a; }
+  .flow-line {
+    width: 2px;
+    flex: 1;
+    min-height: 20px;
+    background: #d4d4f0;
+    margin: 2px 0;
+  }
+  .flow-body { padding: 4px 0 20px; }
+  .flow-title { font-weight: 600; font-size: 13px; color: #0f0f1a; margin-bottom: 4px; }
+  .flow-desc  { font-size: 12px; color: #555; }
+
+  /* ── Region grid ── */
+  .region-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin: 14px 0;
+  }
+  .region-card {
+    border: 1px solid #ececf5;
+    border-radius: 8px;
+    padding: 12px 14px;
+    background: #fafafe;
+  }
+  .region-flag  { font-size: 22px; margin-bottom: 4px; }
+  .region-id    { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #6c63ff; font-weight: 500; }
+  .region-label { font-size: 12px; color: #333; margin-top: 2px; }
+
+  /* ── File change list ── */
+  .file-change {
+    border: 1px solid #ececf5;
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 10px 0;
+  }
+  .file-change-header {
+    background: #0f0f1a;
+    padding: 8px 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    color: #8be9fd;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .file-change-body { padding: 12px 14px; font-size: 12px; color: #444; }
+  .diff-add { color: #10b981; font-family: 'JetBrains Mono', monospace; font-size: 11px; display: block; }
+  .diff-del { color: #ef4444; font-family: 'JetBrains Mono', monospace; font-size: 11px; display: block; text-decoration: line-through; opacity: .7; }
+
+  /* ── Page break hints ── */
+  .page-break { page-break-before: always; }
+
+  /* ── Footer ── */
+  .footer {
+    margin-top: 48px;
+    padding-top: 16px;
+    border-top: 1px solid #ececf5;
+    font-size: 11px;
+    color: #aaa;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  @media print {
+    body { padding: 24px; }
+    pre  { white-space: pre-wrap; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════
+     COVER
+══════════════════════════════════════════════ -->
+<div class="cover">
+  <div class="cover-tag">Uptrue · Engineering Report</div>
+  <h1>Multi-Location Monitor<br>Implementation Report</h1>
+  <p class="cover-sub">Architecture analysis, implementation details, current state, and roadmap for true distributed checking.</p>
+  <div class="cover-meta">
+    <div><strong>Date</strong><br>27 April 2026</div>
+    <div><strong>Branch</strong><br>dev_developer</div>
+    <div><strong>Status</strong><br>Phase 1 Complete — Region tagging live</div>
+    <div><strong>Author</strong><br>Dev Saxena</div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     1. EXECUTIVE SUMMARY
+══════════════════════════════════════════════ -->
+<h2>1. Executive Summary</h2>
+
+<p>This report documents the current state of monitor location checking in Uptrue, the changes shipped in this session, and what remains to achieve true geographically-distributed checking.</p>
+
+<div class="callout success">
+  <div class="callout-label">What shipped this session</div>
+  Region configuration (7 global locations), region tagging on every check result, and a new Location column in the Check History UI. The <code>region</code> field was always in the database schema — it was simply never being populated. It now is.
+</div>
+
+<div class="callout warning">
+  <div class="callout-label">Current limitation</div>
+  Both the primary check and the confirmation check still execute from the same Vercel serverless region. The region field now correctly records <em>where</em> the check ran. Routing checks to physically separate locations requires additional infrastructure (separate deployments or external workers) — the config and DB are ready for it.
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     2. HOW MONITORING WORKED BEFORE
+══════════════════════════════════════════════ -->
+<h2>2. How Monitoring Worked Before</h2>
+
+<p>The check runner at <code>app/api/cron/check-runner/route.ts</code> implemented a two-confirmation pattern:</p>
+
+<div class="flow">
+  <div class="flow-step">
+    <div class="flow-left"><div class="flow-dot">1</div><div class="flow-line"></div></div>
+    <div class="flow-body">
+      <div class="flow-title">Phase 1 — Primary check (all monitors in parallel)</div>
+      <div class="flow-desc">Dispatch all due monitors concurrently. Write result to <code>check_results</code>. <strong>Region: never set — always NULL.</strong></div>
+    </div>
+  </div>
+  <div class="flow-step">
+    <div class="flow-left"><div class="flow-dot">2</div><div class="flow-line"></div></div>
+    <div class="flow-body">
+      <div class="flow-title">Phase 2 — Handle UP monitors immediately</div>
+      <div class="flow-desc">Monitors that came back UP get their status updated and next check scheduled right away. Resolved incidents trigger recovery alerts.</div>
+    </div>
+  </div>
+  <div class="flow-step">
+    <div class="flow-left"><div class="flow-dot">3</div><div class="flow-line"></div></div>
+    <div class="flow-body">
+      <div class="flow-title">Phase 3 — Confirm DOWN monitors (after 5 s sleep)</div>
+      <div class="flow-desc">Monitors flagged DOWN in Phase 1 are re-checked. If still DOWN → incident created + alerts dispatched. If now UP → flap counter incremented. <strong>Region: never set — always NULL.</strong></div>
+    </div>
+  </div>
+</div>
+
+<div class="callout danger">
+  <div class="callout-label">Root cause of missing region data</div>
+  The <code>writeCheckResult()</code> function accepted an optional <code>region</code> parameter since the schema was created, but neither call site in the check runner ever passed it. All historical records have <code>region = NULL</code>.
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     3. CHANGES SHIPPED
+══════════════════════════════════════════════ -->
+<h2 class="page-break">3. Changes Shipped</h2>
+
+<h3>3.1 Region Configuration — <code>lib/config/regions.ts</code> (new file)</h3>
+
+<div class="region-grid">
+  <div class="region-card"><div class="region-flag">🇺🇸</div><div class="region-id">iad1</div><div class="region-label">US East — Virginia</div></div>
+  <div class="region-card"><div class="region-flag">🇺🇸</div><div class="region-id">sfo1</div><div class="region-label">US West — San Jose</div></div>
+  <div class="region-card"><div class="region-flag">🇬🇧</div><div class="region-id">lhr1</div><div class="region-label">EU West — London</div></div>
+  <div class="region-card"><div class="region-flag">🇩🇪</div><div class="region-id">fra1</div><div class="region-label">EU Central — Frankfurt</div></div>
+  <div class="region-card"><div class="region-flag">🇸🇬</div><div class="region-id">sin1</div><div class="region-label">Asia — Singapore</div></div>
+  <div class="region-card"><div class="region-flag">🇮🇳</div><div class="region-id">bom1</div><div class="region-label">Asia — Mumbai</div></div>
+  <div class="region-card"><div class="region-flag">🇦🇺</div><div class="region-id">syd1</div><div class="region-label">Oceania — Sydney</div></div>
+</div>
+
+<p><code>getCurrentRegion()</code> reads <code>process.env.VERCEL_REGION</code>, which Vercel automatically injects on every serverless invocation to match the physical data centre. Falls back to <code>iad1</code> on localhost.</p>
+
+<pre><span class="kw">export function</span> <span class="fn">getCurrentRegion</span>(): <span class="ty">string</span> {
+  <span class="kw">return</span> process.env.<span class="nm">VERCEL_REGION</span> ?? <span class="st">'iad1'</span>
+}
+
+<span class="kw">export function</span> <span class="fn">getRegionLabel</span>(regionId: <span class="ty">string</span> | <span class="ty">null</span> | <span class="ty">undefined</span>): <span class="ty">string</span> {
+  <span class="kw">if</span> (!regionId) <span class="kw">return</span> <span class="st">'—'</span>
+  <span class="kw">const</span> r = REGION_MAP.<span class="fn">get</span>(regionId)
+  <span class="kw">return</span> r ? <span class="st">`${r.flag} ${r.label}`</span> : regionId
+}</pre>
+
+
+<h3>3.2 Check Runner — region now populated</h3>
+
+<div class="file-change">
+  <div class="file-change-header">
+    <span>app/api/cron/check-runner/route.ts</span>
+    <span class="tag tag-done">Modified</span>
+  </div>
+  <div class="file-change-body">
+    <span class="diff-add">+ import { getCurrentRegion } from '@/lib/config/regions'</span>
+    <span class="diff-add">+ const currentRegion = getCurrentRegion()</span>
+    <br>
+    Phase 1 writeCheckResult:
+    <span class="diff-add">+   region: currentRegion,</span>
+    <br>
+    Phase 3 writeCheckResult:
+    <span class="diff-add">+   region: currentRegion,</span>
+  </div>
+</div>
+
+<p>Both the primary check and the confirmation check now write the <code>region</code> value. The <code>writeCheckResult()</code> function already accepted it — no DB migration needed.</p>
+
+
+<h3>3.3 Check History UI — Location column</h3>
+
+<div class="file-change">
+  <div class="file-change-header">
+    <span>components/monitors/check-results-history.tsx</span>
+    <span class="tag tag-done">Modified</span>
+  </div>
+  <div class="file-change-body">
+    <span class="diff-add">+ import { getRegionLabel } from '@/lib/config/regions'</span>
+    <br>
+    New column added between Status and Response Time:
+    <span class="diff-add">+ { key: 'region', label: 'Location', render: (r) => &lt;span className="table-muted"&gt;{getRegionLabel(r.region)}&lt;/span&gt; },</span>
+  </div>
+</div>
+
+<p>The Check History table now shows a <strong>Location</strong> column. Displays flag + city name for known region IDs (e.g. <em>🇬🇧 EU West (London)</em>). Falls back to the raw region ID for unknown values. Historical records with <code>NULL</code> region show <em>—</em>.</p>
+
+
+<!-- ══════════════════════════════════════════════
+     4. CURRENT ARCHITECTURE
+══════════════════════════════════════════════ -->
+<h2 class="page-break">4. Current Architecture</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Layer</th>
+      <th>Component</th>
+      <th>Status</th>
+      <th>Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Config</td>
+      <td>Region definitions</td>
+      <td><span class="tag tag-done">Done</span></td>
+      <td>7 regions, label + flag helpers</td>
+    </tr>
+    <tr>
+      <td>Check runner</td>
+      <td>Populate <code>region</code> field</td>
+      <td><span class="tag tag-done">Done</span></td>
+      <td>Uses <code>VERCEL_REGION</code> env var</td>
+    </tr>
+    <tr>
+      <td>DB</td>
+      <td><code>check_results.region</code> column</td>
+      <td><span class="tag tag-done">Done</span></td>
+      <td>Already existed, now being written</td>
+    </tr>
+    <tr>
+      <td>UI</td>
+      <td>Location column in Check History</td>
+      <td><span class="tag tag-done">Done</span></td>
+      <td>Flag + city label</td>
+    </tr>
+    <tr>
+      <td>Infrastructure</td>
+      <td>Checks from different physical regions</td>
+      <td><span class="tag tag-pending">Pending</span></td>
+      <td>Needs separate workers or deployments</td>
+    </tr>
+    <tr>
+      <td>API</td>
+      <td>Per-region uptime / response time stats</td>
+      <td><span class="tag tag-pending">Pending</span></td>
+      <td>Analytics broken down by region</td>
+    </tr>
+    <tr>
+      <td>UI</td>
+      <td>Per-region response time chart</td>
+      <td><span class="tag tag-pending">Pending</span></td>
+      <td>Bar/line chart per location</td>
+    </tr>
+    <tr>
+      <td>Logic</td>
+      <td>Majority-vote DOWN detection</td>
+      <td><span class="tag tag-pending">Pending</span></td>
+      <td>Only alert if N of M regions agree DOWN</td>
+    </tr>
+  </tbody>
+</table>
+
+
+<!-- ══════════════════════════════════════════════
+     5. ROADMAP — TRUE MULTI-REGION
+══════════════════════════════════════════════ -->
+<h2>5. Roadmap — True Multi-Region Checking</h2>
+
+<p>The following steps are needed to achieve checks from genuinely different physical locations.</p>
+
+<h3>Option A — Vercel Edge Config + Multiple Deployments (Recommended)</h3>
+<p>Deploy the check runner as a Vercel Edge Function in each target region. Vercel allows <code>regions</code> to be configured per function. Each deployment handles its own monitors and writes results with its own <code>VERCEL_REGION</code>.</p>
+
+<div class="callout">
+  <div class="callout-label">Effort</div>
+  Medium. Requires Vercel Pro or Enterprise for custom region pinning. No new infrastructure vendors.
+</div>
+
+<h3>Option B — External Workers (Fly.io / Railway)</h3>
+<p>Run lightweight check worker processes on Fly.io machines in each target region. Each worker polls a <code>check_jobs</code> queue, runs the check, and POSTs results back to the Uptrue API with its region ID.</p>
+
+<div class="callout">
+  <div class="callout-label">Effort</div>
+  High. New infrastructure, worker lifecycle management, auth between workers and API.
+</div>
+
+<h3>Option C — Ping/HTTP via Regional Probe APIs</h3>
+<p>For HTTP and Ping monitor types, delegate to third-party probe APIs (e.g. Updown.io probes, Freshping probes, or a custom edge network) and aggregate results. Lower infrastructure cost, less flexibility.</p>
+
+<div class="callout">
+  <div class="callout-label">Effort</div>
+  Low. Limited to monitor types the probe API supports.
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     6. MAJORITY-VOTE DETECTION LOGIC
+══════════════════════════════════════════════ -->
+<h2 class="page-break">6. Majority-Vote DOWN Detection (Future Logic)</h2>
+
+<p>Once checks run from multiple physical regions, the confirmation logic in <code>check-runner/route.ts</code> should be upgraded from "re-check from same location" to "check from N different locations, declare DOWN only if majority agree":</p>
+
+<pre><span class="cm">// Future Phase 3 — multi-region confirmation</span>
+<span class="kw">const</span> CONFIRMATION_REGIONS = [<span class="st">'iad1'</span>, <span class="st">'lhr1'</span>, <span class="st">'sin1'</span>]
+<span class="kw">const</span> QUORUM = <span class="nm">2</span> <span class="cm">// 2 of 3 must agree DOWN to create incident</span>
+
+<span class="kw">const</span> confirmations = <span class="kw">await</span> Promise.<span class="fn">allSettled</span>(
+  CONFIRMATION_REGIONS.<span class="fn">map</span>(region => <span class="fn">dispatchCheckerFromRegion</span>(monitor, region))
+)
+
+<span class="kw">const</span> downCount = confirmations.<span class="fn">filter</span>(
+  r => r.status === <span class="st">'fulfilled'</span> && r.value.status === <span class="st">'down'</span>
+).length
+
+<span class="kw">if</span> (downCount >= QUORUM) {
+  <span class="cm">// Create incident — confirmed from multiple locations</span>
+}</pre>
+
+
+<!-- ══════════════════════════════════════════════
+     7. FILES CHANGED
+══════════════════════════════════════════════ -->
+<h2>7. Files Changed This Session</h2>
+
+<table>
+  <thead>
+    <tr><th>File</th><th>Type</th><th>Change</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>lib/config/regions.ts</code></td>
+      <td><span class="tag tag-done">New</span></td>
+      <td>Region definitions, label helper, getCurrentRegion()</td>
+    </tr>
+    <tr>
+      <td><code>app/api/cron/check-runner/route.ts</code></td>
+      <td><span class="tag tag-done">Modified</span></td>
+      <td>Pass <code>region</code> to both writeCheckResult calls</td>
+    </tr>
+    <tr>
+      <td><code>components/monitors/check-results-history.tsx</code></td>
+      <td><span class="tag tag-done">Modified</span></td>
+      <td>Added Location column with flag + label</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>TypeScript</h3>
+<div class="callout success">
+  <div class="callout-label">Result</div>
+  <code>npx tsc --noEmit</code> — 0 errors. No <code>any</code> types introduced.
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     8. NEXT STEPS
+══════════════════════════════════════════════ -->
+<h2>8. Recommended Next Steps</h2>
+
+<table>
+  <thead>
+    <tr><th>#</th><th>Task</th><th>Priority</th><th>Effort</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>Add <code>region</code> filter to <code>/api/v1/monitors/[id]/stats</code> for per-location uptime %</td>
+      <td>High</td>
+      <td>Small</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>Show per-region response time on monitor detail page (bar chart)</td>
+      <td>High</td>
+      <td>Medium</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>Add <code>region</code> filter dropdown to Check History table</td>
+      <td>Medium</td>
+      <td>Small</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>Deploy check runner to 2nd Vercel region (Option A) for real geo-diversity</td>
+      <td>Medium</td>
+      <td>Medium</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>Implement majority-vote quorum logic in confirmation phase</td>
+      <td>Medium</td>
+      <td>Medium</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>Expose selected regions per monitor (user can choose which regions check their monitor)</td>
+      <td>Low</td>
+      <td>Large</td>
+    </tr>
+  </tbody>
+</table>
+
+
+<!-- FOOTER -->
+<div class="footer">
+  <span>Uptrue Engineering · Multi-Location Monitor Report · 27 April 2026</span>
+  <span>Branch: dev_developer · 0 TypeScript errors</span>
+</div>
+
+</body>
+</html>

@@ -311,16 +311,31 @@ async function handleSubscriptionCharged(sub: RzpSubscription, payment: RzpPayme
 
 async function handleSubscriptionCancelled(sub: RzpSubscription): Promise<void> {
   const supabase = createAdminClient()
+  const orgId = sub.notes?.org_id
 
+  // The cancel route already sets status='canceled' before this webhook arrives.
+  // Skip if already canceled to avoid a race-condition overwrite.
+  const { data: existing } = await supabase
+    .from('subscriptions')
+    .select('status')
+    .eq('razorpay_subscription_id', sub.id)
+    .maybeSingle()
+
+  if (existing?.status === 'canceled') {
+    logger.info('Razorpay webhook: subscription already canceled in DB — skipping', { subId: sub.id })
+    return
+  }
+
+  // Fallback: handle cancellations that arrive via webhook without going through our cancel route
+  // (e.g. cancelled directly in Razorpay dashboard)
   await supabase
     .from('subscriptions')
     .update({ status: 'canceled', canceled_at: new Date().toISOString() })
     .eq('razorpay_subscription_id', sub.id)
 
-  const orgId = sub.notes?.org_id
   if (orgId) await enforceDowngradeLimits(orgId)
 
-  logger.info('Razorpay: subscription cancelled', { subId: sub.id, orgId })
+  logger.info('Razorpay: subscription cancelled via webhook', { subId: sub.id, orgId })
 }
 
 async function handleSubscriptionHalted(sub: RzpSubscription): Promise<void> {

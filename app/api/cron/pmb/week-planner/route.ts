@@ -84,9 +84,8 @@ export async function GET(request: Request): Promise<NextResponse> {
     // Build category slug → category map for quick lookup
     const categoryMap = new Map(categories.map(c => [c.slug, c]))
 
-    // ── Build leaderboard runs only ──────────────────────────────────────────
-    // Group monitors by PMB category. For each category, create leaderboard only.
-    // Pairwise posts disabled — they are thin content and cause indexation issues.
+    // ── Build pairwise runs ──────────────────────────────────────────────────
+    // Group monitors by PMB category. For each category, create all pairings.
     const byCategory = new Map<string, typeof monitors>()
     for (const m of monitors) {
       const slug = m.pmb_category ?? m.category
@@ -99,8 +98,22 @@ export async function GET(request: Request): Promise<NextResponse> {
     const allRuns: Omit<CreatePmbRunInput, 'scheduled_for'>[] = []
 
     for (const [slug, group] of byCategory.entries()) {
+      // Pairwise: every unique pair in this category
+      for (let i = 0; i < group.length; i++) {
+        for (let j = i + 1; j < group.length; j++) {
+          allRuns.push({
+            run_key: pairwiseKey(group[i].domain, group[j].domain, weekStart),
+            post_type: 'pairwise',
+            category_slug: slug,
+            monitor_id: group[i].id,
+            compare_monitor_id: group[j].id,
+            period_type: 'weekly',
+            period_start: weekStart,
+          })
+        }
+      }
+
       // Leaderboard: one per category (needs ≥2 monitors)
-      // Pairwise runs removed — use monthly leaderboards for SEO-friendly content only
       if (group.length >= 2) {
         allRuns.push({
           run_key: leaderboardKey(slug, weekStart),

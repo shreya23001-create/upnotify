@@ -72,7 +72,7 @@ function statusColor(status: string): string {
   return '#ef4444'
 }
 
-export function AdminSystemClientPage(): React.ReactElement {
+export function AdminSystemClientPage({ canWrite = true }: { canWrite?: boolean }): React.ReactElement {
   const [health, setHealth] = useState<SystemHealth | null>(null)
   const [loading, setLoading] = useState(true)
   const [simMonitorId, setSimMonitorId] = useState('')
@@ -241,7 +241,7 @@ export function AdminSystemClientPage(): React.ReactElement {
                               color: trigState === 'ok' ? '#22c55e' : trigState === 'error' ? '#ef4444' : undefined,
                               borderColor: trigState === 'ok' ? '#22c55e' : trigState === 'error' ? '#ef4444' : undefined,
                             }}
-                            disabled={trigState === 'running'}
+                            disabled={!canWrite || trigState === 'running'}
                             onClick={() => triggerCron(key, cron.path)}
                           >
                             {trigState === 'running' ? '…' : trigState === 'ok' ? '✓ Done' : trigState === 'error' ? '✗ Error' : '▶ Run'}
@@ -441,7 +441,7 @@ export function AdminSystemClientPage(): React.ReactElement {
           <button
             className="btn btn-secondary"
             style={{ borderColor: '#f59e0b', color: '#f59e0b' }}
-            disabled={!simMonitorId.trim() || simRunning}
+            disabled={!canWrite || !simMonitorId.trim() || simRunning}
             onClick={async () => {
               setSimRunning(true)
               setSimResult(null)

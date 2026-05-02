@@ -20,8 +20,8 @@ interface EnrichedInvoice {
 }
 
 interface RevenueData {
-  mrr: { basePence: number; competePence: number; totalPence: number }
-  planBreakdown: Record<string, { count: number; mrrPence: number }>
+  mrr: { basePence: number; basePaise: number; competePence: number; totalPence: number; totalPaise: number }
+  planBreakdown: Record<string, { count: number; mrrPence: number; mrrPaise: number }>
   competeBreakdown: Record<string, { count: number; mrrPence: number }>
   totalRevenuePence: number
   revenueByCurrency: Record<string, number>
@@ -31,15 +31,20 @@ interface RevenueData {
   pagination: { page: number; limit: number; total: number; totalPages: number }
 }
 
+/** Format pence as £ */
 function gbp(pence: number): string {
   return `£${(pence / 100).toFixed(2)}`
+}
+
+/** Format paise as ₹ */
+function inr(paise: number): string {
+  return `₹${(paise / 100).toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
 }
 
 /** Format an amount (in smallest currency unit) for any currency */
 function formatAmount(smallestUnit: number, currency: string): string {
   const amount = smallestUnit / 100
   const cur = currency.toUpperCase()
-  // Currencies with no decimal places
   const zeroDec = new Set(['JPY', 'KRW', 'VND', 'IDR', 'CLP', 'BIF', 'GNF', 'ISK', 'KMF', 'MGA', 'PYG', 'RWF', 'UGX', 'XAF', 'XOF'])
   const displayAmount = zeroDec.has(cur) ? String(smallestUnit) : amount.toFixed(2)
   const symbols: Record<string, string> = { GBP: '£', USD: '$', EUR: '€', INR: '₹', AUD: 'A$', CAD: 'C$', SGD: 'S$', AED: 'AED ' }
@@ -147,9 +152,11 @@ export default function AdminRevenuePage(): React.ReactElement {
       {/* Top KPI stats */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 12, marginBottom: 16 }}>
         {[
-          { label: 'Total MRR', value: gbp(data?.mrr.totalPence ?? 0), color: 'var(--success)' },
-          { label: 'Base Plan MRR', value: gbp(data?.mrr.basePence ?? 0), color: 'var(--accent)' },
-          { label: 'Compete MRR', value: gbp(data?.mrr.competePence ?? 0), color: 'var(--accent)' },
+          { label: 'GBP MRR (Stripe)', value: gbp(data?.mrr.totalPence ?? 0), color: 'var(--success)' },
+          ...(data?.mrr.totalPaise ? [{ label: 'INR MRR (Razorpay)', value: inr(data.mrr.totalPaise), color: 'var(--success)' }] : []),
+          { label: 'Base Plan MRR (£)', value: gbp(data?.mrr.basePence ?? 0), color: 'var(--accent)' },
+          ...(data?.mrr.basePaise ? [{ label: 'Base Plan MRR (₹)', value: inr(data.mrr.basePaise), color: 'var(--accent)' }] : []),
+          { label: 'Compete MRR (£)', value: gbp(data?.mrr.competePence ?? 0), color: 'var(--accent)' },
           { label: 'GBP Revenue', value: gbp(data?.totalRevenuePence ?? 0), color: 'var(--success)' },
           { label: 'Active Subs', value: String(data?.activeSubscriptions ?? 0), color: 'var(--text-primary)' },
           { label: 'Compete Subs', value: String(data?.activeCompeteSubscriptions ?? 0), color: 'var(--text-primary)' },
@@ -186,13 +193,14 @@ export default function AdminRevenuePage(): React.ReactElement {
             <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>No active subscriptions.</p>
           ) : (
             <table className="table">
-              <thead><tr><th>Plan</th><th>Subscribers</th><th>MRR</th></tr></thead>
+              <thead><tr><th>Plan</th><th>Subscribers</th><th>MRR (£)</th><th>MRR (₹)</th></tr></thead>
               <tbody>
                 {planEntries.map(([name, info]) => (
                   <tr key={name}>
                     <td style={{ fontWeight: 600 }}>{name}</td>
                     <td>{info.count}</td>
-                    <td style={{ fontWeight: 600, color: 'var(--success)' }}>{gbp(info.mrrPence)}</td>
+                    <td style={{ fontWeight: 600, color: 'var(--success)' }}>{info.mrrPence ? gbp(info.mrrPence) : '—'}</td>
+                    <td style={{ fontWeight: 600, color: 'var(--success)' }}>{info.mrrPaise ? inr(info.mrrPaise) : '—'}</td>
                   </tr>
                 ))}
               </tbody>

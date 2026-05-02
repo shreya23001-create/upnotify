@@ -157,9 +157,7 @@ export async function getRecentCheckResultsByOrg(orgId: string, days: number = 3
 
 function formatSlotTime(base: Date, slotIndex: number, slotMinutes: number = 15): string {
   const time = new Date(base.getTime() + slotIndex * slotMinutes * 60 * 1000)
-  const h = String(time.getUTCHours()).padStart(2, '0')
-  const m = String(time.getUTCMinutes()).padStart(2, '0')
-  return `${h}:${m} UTC`
+  return time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 }
 
 /**
@@ -241,79 +239,4 @@ export async function getUptimeBarDataForRange(monitorId: string, range: string)
   }
 
   return slots
-}
-
-interface BulkUptimeResult {
-  uptimeData: Record<string, UptimeSlot[]>
-  uptimePercent: Record<string, number>
-}
-
-/**
- * Fetch bar chart data and uptime percentages for multiple monitors in a single DB query.
- * Use this on status pages with many monitors instead of N parallel per-monitor queries.
- */
-export async function getBulkUptimeDataForRange(
-  monitorIds: string[],
-  range: string,
-): Promise<BulkUptimeResult> {
-  if (monitorIds.length === 0) return { uptimeData: {}, uptimePercent: {} }
-
-  const config = rangeConfig[range] || rangeConfig['30d']
-  const supabase = createAdminClient()
-  const now = new Date()
-  const since = new Date(now.getTime() - config.hours * 60 * 60 * 1000)
-
-  const { data, error } = await supabase
-    .from('check_results')
-    .select('monitor_id, status, checked_at')
-    .in('monitor_id', monitorIds)
-    .gte('checked_at', since.toISOString())
-    .order('checked_at', { ascending: true })
-
-  if (error) {
-    logger.error('Failed to get bulk uptime data', { error: error.message })
-    const emptySlots = Array.from({ length: config.slots }, (_, i) => ({
-      slot: formatSlotTime(since, i, config.slotMinutes),
-      status: 'none' as const,
-    }))
-    return {
-      uptimeData: Object.fromEntries(monitorIds.map(id => [id, [...emptySlots]])),
-      uptimePercent: Object.fromEntries(monitorIds.map(id => [id, 100])),
-    }
-  }
-
-  const results = data ?? []
-  const uptimeData: Record<string, UptimeSlot[]> = {}
-  const uptimePercent: Record<string, number> = {}
-
-  for (const monitorId of monitorIds) {
-    const monitorResults = results.filter(r => r.monitor_id === monitorId)
-
-    const slots: UptimeSlot[] = []
-    for (let i = 0; i < config.slots; i++) {
-      const slotStart = new Date(since.getTime() + i * config.slotMinutes * 60 * 1000)
-      const slotEnd = new Date(slotStart.getTime() + config.slotMinutes * 60 * 1000)
-      const checksInSlot = monitorResults.filter(r => {
-        const t = new Date(r.checked_at).getTime()
-        return t >= slotStart.getTime() && t < slotEnd.getTime()
-      })
-      let status: UptimeSlot['status'] = 'none'
-      if (checksInSlot.length > 0) {
-        if (checksInSlot.some(c => c.status === 'down')) status = 'down'
-        else if (checksInSlot.some(c => c.status === 'degraded')) status = 'degraded'
-        else status = 'up'
-      }
-      slots.push({ slot: formatSlotTime(since, i, config.slotMinutes), status })
-    }
-    uptimeData[monitorId] = slots
-
-    if (monitorResults.length === 0) {
-      uptimePercent[monitorId] = 100
-    } else {
-      const upCount = monitorResults.filter(r => r.status === 'up').length
-      uptimePercent[monitorId] = Math.round((upCount / monitorResults.length) * 10000) / 100
-    }
-  }
-
-  return { uptimeData, uptimePercent }
 }

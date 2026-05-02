@@ -1,0 +1,370 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><title>Monitors & Check System — Audit Report</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;font-size:13px;color:#1a1a2e;background:#fff;padding:48px;max-width:960px;margin:0 auto;line-height:1.7}
+.cover{border-bottom:3px solid #7c3aed;padding-bottom:32px;margin-bottom:32px}
+.cover-tag{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#7c3aed;margin-bottom:10px}
+.cover h1{font-size:28px;font-weight:700;color:#0f0f1a;margin-bottom:8px}
+.cover-sub{font-size:13px;color:#555;margin-bottom:18px}
+.cover-meta{display:flex;gap:28px;font-size:12px;color:#777;flex-wrap:wrap}
+.cover-meta strong{color:#333;display:block}
+h2{font-size:16px;font-weight:700;color:#0f0f1a;margin:36px 0 12px;padding-bottom:6px;border-bottom:2px solid #ede9fe}
+h3{font-size:13px;font-weight:700;color:#5b21b6;margin:20px 0 7px}
+h4{font-size:12.5px;font-weight:600;color:#333;margin:14px 0 5px}
+p{margin-bottom:10px;color:#333}
+.callout{border-left:4px solid #7c3aed;background:#f5f3ff;padding:12px 16px;border-radius:0 6px 6px 0;margin:14px 0;font-size:12.5px}
+.callout.warn{border-color:#d97706;background:#fffbeb}
+.callout.danger{border-color:#dc2626;background:#fef2f2}
+.callout.ok{border-color:#059669;background:#f0fdf4}
+.callout.info{border-color:#0ea5e9;background:#f0f9ff}
+.callout-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#7c3aed;margin-bottom:4px}
+.callout.warn .callout-label{color:#b45309}
+.callout.danger .callout-label{color:#b91c1c}
+.callout.ok .callout-label{color:#047857}
+.callout.info .callout-label{color:#0369a1}
+pre{font-family:'JetBrains Mono',monospace;font-size:11px;background:#0f0f1a;color:#e2e8f0;padding:16px 20px;border-radius:8px;overflow-x:auto;margin:12px 0;line-height:1.75}
+code{font-family:'JetBrains Mono',monospace;font-size:11px;background:#ede9fe;color:#5b21b6;padding:1px 5px;border-radius:3px}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:12px}
+thead tr{background:#7c3aed;color:#fff}
+thead th{text-align:left;padding:9px 12px;font-weight:600;font-size:11px;letter-spacing:.04em}
+tbody tr:nth-child(even){background:#faf8ff}
+tbody td{padding:8px 12px;border-bottom:1px solid #ede9fe;vertical-align:top}
+.tag{display:inline-block;padding:2px 9px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.03em}
+.tag-crit{background:#fee2e2;color:#991b1b}
+.tag-high{background:#fef3c7;color:#92400e}
+.tag-med{background:#dbeafe;color:#1e40af}
+.tag-low{background:#d1fae5;color:#065f46}
+.tag-ok{background:#d1fae5;color:#065f46}
+.tag-fix{background:#ede9fe;color:#5b21b6}
+.flow-box{border:1px solid #ede9fe;border-radius:10px;overflow:hidden;margin:14px 0}
+.flow-header{background:#7c3aed;color:#fff;padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.flow-body{padding:16px;background:#faf8ff}
+.flow-step{display:flex;gap:14px;margin-bottom:10px;align-items:flex-start}
+.flow-num{background:#7c3aed;color:#fff;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.flow-text{font-size:12px;color:#333;padding-top:3px}
+.flow-text strong{color:#0f0f1a}
+.flow-arrow{text-align:center;color:#a78bfa;font-size:16px;margin:2px 0 4px 19px}
+.issue-block{border-radius:10px;overflow:hidden;margin:14px 0;border:1px solid #ede9fe}
+.issue-header{padding:10px 16px;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.issue-header.crit{background:#fee2e2;color:#991b1b}
+.issue-header.high{background:#fef3c7;color:#92400e}
+.issue-header.med{background:#dbeafe;color:#1e40af}
+.issue-header.low{background:#d1fae5;color:#065f46}
+.issue-body{padding:12px 16px;background:#fff}
+.issue-item{display:flex;gap:12px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid #f3f0ff}
+.issue-item:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.issue-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.dot-crit{background:#ef4444}
+.dot-high{background:#f59e0b}
+.dot-med{background:#3b82f6}
+.dot-low{background:#10b981}
+.issue-content{}
+.issue-title{font-weight:600;font-size:12.5px;color:#0f0f1a;margin-bottom:3px}
+.issue-desc{font-size:12px;color:#555;margin-bottom:4px}
+.issue-fix{font-size:11.5px;background:#f0fdf4;border-left:3px solid #10b981;padding:5px 10px;border-radius:0 4px 4px 0;color:#065f46}
+.issue-file{font-size:10.5px;color:#7c3aed;font-family:'JetBrains Mono',monospace;margin-top:3px}
+.type-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}
+.type-card{border:1px solid #ede9fe;border-radius:7px;padding:10px 12px;background:#faf8ff}
+.type-name{font-weight:700;font-size:12px;color:#4c1d95}
+.type-desc{font-size:11px;color:#555;margin-top:3px}
+.type-status{margin-top:5px}
+.suggest-box{background:#f5f3ff;border:1px solid #c4b5fd;border-radius:8px;padding:14px 18px;margin:14px 0}
+.suggest-box h4{color:#5b21b6;font-size:12.5px;font-weight:700;margin-bottom:8px}
+.suggest-item{font-size:12px;color:#333;margin-bottom:5px;display:flex;gap:8px}
+.suggest-item::before{content:'→';color:#7c3aed;font-weight:700;flex-shrink:0}
+.footer{margin-top:48px;padding-top:14px;border-top:1px solid #ede9fe;font-size:11px;color:#aaa;display:flex;justify-content:space-between}
+@media print{body{padding:24px}pre{white-space:pre-wrap}.flow-box{break-inside:avoid}.issue-block{break-inside:avoid}}
+</style></head><body>
+
+<div class="cover">
+  <div class="cover-tag">Uptrue · Engineering Audit — Report 1 of 6</div>
+  <h1>Monitors &amp; Check System</h1>
+  <p class="cover-sub">Complete audit of all 23 monitor types, the three-phase check runner, incident management, multi-channel alert dispatch, maintenance windows, and the new multi-location region tagging system.</p>
+  <div class="cover-meta">
+    <div><strong>Date</strong>27 April 2026</div>
+    <div><strong>Branch</strong>dev_developer</div>
+    <div><strong>Monitor Types</strong>23 active</div>
+    <div><strong>Cron Max Duration</strong>300 seconds</div>
+    <div><strong>Hard Monitor Limit</strong>100 per run</div>
+    <div><strong>Critical Issues</strong>1 broken feature</div>
+    <div><strong>Total Issues</strong>20</div>
+  </div>
+</div>
+
+<!-- ═══ WORKING FLOW ═══ -->
+<h2>Working Flow</h2>
+
+<div class="flow-box">
+  <div class="flow-header">Phase 1 — Primary Check (All Monitors in Parallel)</div>
+  <div class="flow-body">
+    <div class="flow-step"><div class="flow-num">1</div><div class="flow-text"><strong>getDueMonitors()</strong> — fetches up to 100 monitors where <code>next_check_at ≤ now</code> and <code>is_paused = false</code></div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step"><div class="flow-num">2</div><div class="flow-text"><strong>Maintenance filter</strong> — parallel calls to <code>isMonitorInMaintenance()</code> for each monitor. Maintenance monitors skip checks and update <code>next_check_at</code> only.</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step"><div class="flow-num">3</div><div class="flow-text"><strong>dispatchChecker(monitor)</strong> — routes to one of 23 checker functions based on <code>monitor.type</code>. Each checker runs the actual check (HTTP, DNS, SSL, etc.).</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step"><div class="flow-num">4</div><div class="flow-text"><strong>writeCheckResult()</strong> — saves result with status, response_time_ms, status_code, error_message, metadata, and <code>region</code> (from <code>VERCEL_REGION</code> env var).</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step"><div class="flow-num">5</div><div class="flow-text"><strong>patchMonitorConfig()</strong> — persists baseline values for change-detection monitors (IP, DNS, robots.txt hash, nameservers, WHOIS snapshot).</div></div>
+  </div>
+</div>
+
+<div class="flow-box">
+  <div class="flow-header">Phase 2 — Handle UP Monitors Immediately</div>
+  <div class="flow-body">
+    <div class="flow-step"><div class="flow-num">1</div><div class="flow-text">UP monitors (status ≠ 'down') are handled immediately — no wait.</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step"><div class="flow-num">2</div><div class="flow-text"><strong>Was previously DOWN?</strong> → <code>resolveIncident(monitorId)</code> sets <code>status=resolved</code>, records <code>resolved_at</code> and <code>duration_seconds</code>. Then <code>dispatchRecoveryAlerts()</code> fires to all enabled channels.</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step"><div class="flow-num">3</div><div class="flow-text"><strong>updateMonitorStatus()</strong> — sets new status, <code>last_checked_at=now</code>, <code>next_check_at = scheduleBase + check_interval_seconds</code>.</div></div>
+  </div>
+</div>
+
+<div class="flow-box">
+  <div class="flow-header">Phase 3 — Confirm DOWN Monitors (Anti-Flap, After 5-Second Sleep)</div>
+  <div class="flow-body">
+    <div class="flow-step"><div class="flow-num">1</div><div class="flow-text"><strong>sleep(5000ms)</strong> — waits before re-checking to avoid false positives from transient blips.</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step"><div class="flow-num">2</div><div class="flow-text"><strong>dispatchChecker(monitor)</strong> again — confirmation check from same region.</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step"><div class="flow-num">3</div><div class="flow-text"><strong>writeCheckResult()</strong> — saves with <code>metadata.isConfirmationCheck = true</code> and region.</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step"><div class="flow-num">4a</div><div class="flow-text"><strong>Still DOWN</strong> → <code>getOpenIncidentForMonitor()</code>. If no open incident → <code>createIncident()</code> → <code>dispatchAlerts()</code> to all enabled channels.</div></div>
+    <div class="flow-step"><div class="flow-num">4b</div><div class="flow-text"><strong>Now UP</strong> → <code>incrementFlapCount(monitor.id)</code> — logged as transient flap, no incident created.</div></div>
+  </div>
+</div>
+
+<div class="flow-box">
+  <div class="flow-header">Alert Dispatch Flow</div>
+  <div class="flow-body">
+    <div class="flow-step"><div class="flow-num">1</div><div class="flow-text">Fetch enabled alert channels for org, filtered by monitor severity.</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step"><div class="flow-num">2</div><div class="flow-text"><code>getAlertCopy()</code> — resolves 27 placeholders ({{monitorName}}, {{target}}, {{downDuration}}, {{daysUntilExpiry}}, etc.) into subject, headline, detail, shortText, voiceScript.</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step"><div class="flow-num">3</div><div class="flow-text"><strong>Parallel dispatch</strong> to: Email, Slack (Block Kit), Teams (MessageCard), Webhook (HMAC-signed JSON), Telegram (text), In-App (user_messages row for org admin).</div></div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step"><div class="flow-num">4</div><div class="flow-text">Each dispatch recorded in <code>alerts</code> table with status ('sent' or 'failed') + error_message if failed.</div></div>
+  </div>
+</div>
+
+<!-- ═══ MONITOR TYPES ═══ -->
+<h2>Monitor Types — Full Inventory</h2>
+<div class="type-grid">
+  <div class="type-card"><div class="type-name">http</div><div class="type-desc">HTTP/HTTPS uptime. Status code, redirects, timeout. 4xx=degraded, 5xx=down.</div><div class="type-status"><span class="tag tag-ok">✓ Stable</span></div></div>
+  <div class="type-card"><div class="type-name">ssl</div><div class="type-desc">Certificate expiry/validity. Thresholds: 7d=down, 30d=degraded. TLS version check.</div><div class="type-status"><span class="tag tag-ok">✓ Stable</span></div></div>
+  <div class="type-card"><div class="type-name">dns</div><div class="type-desc">A/AAAA/MX/NS/TXT record change detection vs stored baseline.</div><div class="type-status"><span class="tag tag-ok">✓ Stable</span></div></div>
+  <div class="type-card"><div class="type-name">keyword</div><div class="type-desc">Positive/negative keyword arrays in response body. Legacy single-keyword also supported.</div><div class="type-status"><span class="tag tag-ok">✓ Stable</span></div></div>
+  <div class="type-card"><div class="type-name">domain</div><div class="type-desc">Domain expiry via RDAP. 7d=down, 30d=degraded thresholds.</div><div class="type-status"><span class="tag tag-ok">✓ Stable</span></div></div>
+  <div class="type-card"><div class="type-name">port</div><div class="type-desc">TCP socket connectivity. Configurable port number.</div><div class="type-status"><span class="tag tag-ok">✓ Stable</span></div></div>
+  <div class="type-card"><div class="type-name">ping</div><div class="type-desc">HTTP HEAD request reachability. Lightweight uptime check.</div><div class="type-status"><span class="tag tag-ok">✓ Stable</span></div></div>
+  <div class="type-card"><div class="type-name">api</div><div class="type-desc">API endpoint with assertions: status code, body_contains, response_time.</div><div class="type-status"><span class="tag tag-ok">✓ Stable</span></div></div>
+  <div class="type-card"><div class="type-name">heartbeat</div><div class="type-desc">Scheduled task liveness via expected ping interval.</div><div class="type-status"><span class="tag tag-crit">⚠ Broken</span></div></div>
+  <div class="type-card"><div class="type-name">competitor</div><div class="type-desc">HTTP + maintenance/error keyword scan (first 8KB). 11 CMP patterns.</div><div class="type-status"><span class="tag tag-ok">✓ Stable</span></div></div>
+  <div class="type-card"><div class="type-name">security-headers</div><div class="type-desc">HSTS, CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy scoring.</div><div class="type-status"><span class="tag tag-ok">✓ Stable</span></div></div>
+  <div class="type-card"><div class="type-name">response-time</div><div class="type-desc">Response time vs threshold. 70% of threshold = degraded (hardcoded).</div><div class="type-status"><span class="tag tag-ok">✓ Stable</span></div></div>
+  <div class="type-card"><div class="type-name">robots-txt</div><div class="type-desc">SHA-256 hash change detection vs stored baseline.</div><div class="type-status"><span class="tag tag-ok">✓ Stable</span></div></div>
+  <div class="type-card"><div class="type-name">ip-change</div><div class="type-desc">DNS A record vs stored baseline IP.</div><div class="type-status"><span class="tag tag-ok">✓ Stable</span></div></div>
+  <div class="type-card"><div class="type-name">mx-health</div><div class="type-desc">MX records exist + primary MX resolves successfully.</div><div class="type-status"><span class="tag tag-ok">✓ Stable</span></div></div>
+  <div class="type-card"><div class="type-name">whois-change</div><div class="type-desc">SOA nsname/hostmaster/NS records vs baseline.</div><div class="type-status"><span class="tag tag-ok">✓ Stable</span></div></div>
+  <div class="type-card"><div class="type-name">sitemap</div><div class="type-desc">sitemap.xml structure validity + URL count check.</div><div class="type-status"><span class="tag tag-ok">✓ Stable</span></div></div>
+  <div class="type-card"><div class="type-name">redirect-chain</div><div class="type-desc">Redirect hops vs max (default 5). Final status code check.</div><div class="type-status"><span class="tag tag-ok">✓ Stable</span></div></div>
+  <div class="type-card"><div class="type-name">spf-dmarc</div><div class="type-desc">SPF all mechanism + DMARC policy enforcement level.</div><div class="type-status"><span class="tag tag-ok">✓ Stable</span></div></div>
+  <div class="type-card"><div class="type-name">blacklist</div><div class="type-desc">DNSBL check across Spamhaus, Spamcop, SORBS, Barracuda.</div><div class="type-status"><span class="tag tag-ok">✓ Stable</span></div></div>
+  <div class="type-card"><div class="type-name">page-size</div><div class="type-desc">Page size vs max KB (default 5000). 80% of max = degraded.</div><div class="type-status"><span class="tag tag-ok">✓ Stable</span></div></div>
+  <div class="type-card"><div class="type-name">cookie-consent</div><div class="type-desc">Cookie banner detection via regex (11 CMP providers).</div><div class="type-status"><span class="tag tag-ok">✓ Stable</span></div></div>
+  <div class="type-card"><div class="type-name">nameserver-change</div><div class="type-desc">NS record change vs stored baseline nameservers.</div><div class="type-status"><span class="tag tag-ok">✓ Stable</span></div></div>
+</div>
+
+<!-- ═══ ISSUES ═══ -->
+<h2>Issues Found</h2>
+
+<div class="issue-block">
+  <div class="issue-header crit">CRITICAL — Feature Broken</div>
+  <div class="issue-body">
+    <div class="issue-item">
+      <div class="issue-dot dot-crit"></div>
+      <div class="issue-content">
+        <div class="issue-title">Heartbeat monitor uses wrong timestamp — always reports UP</div>
+        <div class="issue-desc">The heartbeat checker reads <code>monitor.last_checked_at</code> to determine if a ping was received within the expected interval. But <code>last_checked_at</code> is updated by the cron runner after every status check — not by the user's actual heartbeat ping. The field is always recent, so all heartbeat monitors permanently report "up" even if the underlying job has stopped running.</div>
+        <div class="issue-fix">✦ Fix: Add a separate <code>last_heartbeat_at</code> column to monitors. Create a dedicated POST endpoint (e.g. <code>/api/v1/heartbeat/{monitorId}</code>) that updates this field when the user's job pings it. The checker should compare <code>last_heartbeat_at</code> (not <code>last_checked_at</code>) against <code>expectedIntervalSeconds</code>.</div>
+        <div class="issue-file">lib/checkers/heartbeat.ts</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="issue-block">
+  <div class="issue-header high">HIGH SEVERITY</div>
+  <div class="issue-body">
+    <div class="issue-item">
+      <div class="issue-dot dot-high"></div>
+      <div class="issue-content">
+        <div class="issue-title">No alert rate-limiting — flapping monitor can send 288 alerts/day</div>
+        <div class="issue-desc">If a monitor flaps between down and up every 5-minute cycle, the alert dispatcher fires a down alert + recovery alert on every cycle. With no throttle, this is up to 288 emails/Slack messages per day per monitor.</div>
+        <div class="issue-fix">✦ Fix: Add a <code>last_alert_sent_at</code> column to the monitors or alerts table. In <code>dispatchAlerts()</code>, skip dispatch if the last alert was sent less than 10 minutes ago (configurable per org). Log suppressed alerts.</div>
+        <div class="issue-file">lib/services/alert-dispatcher.ts</div>
+      </div>
+    </div>
+    <div class="issue-item">
+      <div class="issue-dot dot-high"></div>
+      <div class="issue-content">
+        <div class="issue-title">No retry queue for failed alert deliveries</div>
+        <div class="issue-desc">When a webhook, email, or Slack alert fails, it is logged as 'failed' in the alerts table and never retried. Users miss critical down notifications.</div>
+        <div class="issue-fix">✦ Fix: Add a <code>retry_after</code> column to the alerts table. A separate cron (or the same runner) picks up failed alerts with exponential backoff (1m → 5m → 15m, max 3 retries).</div>
+        <div class="issue-file">lib/services/alert-dispatcher.ts</div>
+      </div>
+    </div>
+    <div class="issue-item">
+      <div class="issue-dot dot-high"></div>
+      <div class="issue-content">
+        <div class="issue-title">100-monitor hard limit per cron run silently skips monitors</div>
+        <div class="issue-desc"><code>getDueMonitors()</code> is capped at 100. Organisations with &gt;100 monitors silently skip some every run. With 1-minute intervals, some monitors may never check.</div>
+        <div class="issue-fix">✦ Fix: Increase limit or implement a round-robin queue. Use a <code>priority</code> field (overdue monitors get highest priority). Or split into multiple cron invocations with offset.</div>
+        <div class="issue-file">lib/db/monitors.ts · getDueMonitors()</div>
+      </div>
+    </div>
+    <div class="issue-item">
+      <div class="issue-dot dot-high"></div>
+      <div class="issue-content">
+        <div class="issue-title">Maintenance window queried 100× per cron run — no caching</div>
+        <div class="issue-desc">For every monitor, <code>isMonitorInMaintenance()</code> makes a separate DB call. On a 100-monitor run this is 100 queries to the same table for the same time window.</div>
+        <div class="issue-fix">✦ Fix: Fetch all active maintenance windows once at the start of the runner. Pass them as a Map into the maintenance check function. Reduces 100 queries to 1.</div>
+        <div class="issue-file">lib/db/maintenance-windows.ts</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="issue-block">
+  <div class="issue-header med">MEDIUM SEVERITY</div>
+  <div class="issue-body">
+    <div class="issue-item">
+      <div class="issue-dot dot-med"></div>
+      <div class="issue-content">
+        <div class="issue-title">Race condition: config and status updates are two separate DB calls</div>
+        <div class="issue-desc">In the check runner, <code>patchMonitorConfig()</code> and <code>updateMonitorStatus()</code> are separate calls. If the runner crashes between them, the baseline is not persisted but the status is marked as checked — next run compares against stale baseline.</div>
+        <div class="issue-fix">✦ Fix: Combine into a single PATCH call that updates both <code>config</code> and status fields atomically. Or wrap in a Supabase RPC transaction.</div>
+        <div class="issue-file">app/api/cron/check-runner/route.ts</div>
+      </div>
+    </div>
+    <div class="issue-item">
+      <div class="issue-dot dot-med"></div>
+      <div class="issue-content">
+        <div class="issue-title">Flap count increments forever — never resets or decays</div>
+        <div class="issue-desc"><code>incrementFlapCount()</code> adds 1 each time a flap is detected but there is no reset condition, TTL, or windowed decay. Becomes a permanent ever-growing counter of no operational value.</div>
+        <div class="issue-fix">✦ Fix: Reset <code>flap_count</code> to 0 when the monitor has been stable for a configurable window (e.g. 24 hours without a flap). Or cap at 255 and reset.</div>
+        <div class="issue-file">lib/db/monitors.ts · incrementFlapCount()</div>
+      </div>
+    </div>
+    <div class="issue-item">
+      <div class="issue-dot dot-med"></div>
+      <div class="issue-content">
+        <div class="issue-title">DNS checkers have no explicit timeout — can hang indefinitely</div>
+        <div class="issue-desc"><code>dns.resolveMx()</code>, <code>dns.resolveTxt()</code> and others rely on OS-level DNS timeouts. If a DNS server is unresponsive, the check hangs until OS times out (can be 30+ seconds), blocking the runner.</div>
+        <div class="issue-fix">✦ Fix: Wrap all <code>dns.resolve*()</code> calls in <code>Promise.race([dnsPromise, timeout(8000)])</code>. Return <code>{ status: 'down', errorMessage: 'DNS timeout' }</code> on timeout.</div>
+        <div class="issue-file">lib/checkers/dns.ts, mx-health.ts, spf-dmarc.ts</div>
+      </div>
+    </div>
+    <div class="issue-item">
+      <div class="issue-dot dot-med"></div>
+      <div class="issue-content">
+        <div class="issue-title">New monitors show 100% uptime before first check (misleading)</div>
+        <div class="issue-desc"><code>getMonitorUptimePercentage()</code> returns 100 when no check results exist. Status pages and dashboard show "100% uptime" for a brand-new monitor with zero data.</div>
+        <div class="issue-fix">✦ Fix: Return <code>null</code> when <code>data.length === 0</code>. Render "No data yet" in the UI instead of 100%. File: <code>lib/db/check-results.ts:184</code>.</div>
+        <div class="issue-file">lib/db/check-results.ts</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="issue-block">
+  <div class="issue-header low">LOW / DESIGN NOTES</div>
+  <div class="issue-body">
+    <div class="issue-item">
+      <div class="issue-dot dot-low"></div>
+      <div class="issue-content">
+        <div class="issue-title">Alert copy placeholders not validated before dispatch</div>
+        <div class="issue-desc">If incident metadata is missing a field referenced in the alert template (e.g. <code>{{responseTime}}</code> when metadata.responseTimeMs is undefined), the literal placeholder string is sent in the alert email.</div>
+        <div class="issue-fix">✦ Fix: In <code>getAlertCopy()</code>, validate all required placeholders exist for the monitor type. Fall back to a generic value (e.g. "N/A") rather than leaving the raw token.</div>
+      </div>
+    </div>
+    <div class="issue-item">
+      <div class="issue-dot dot-low"></div>
+      <div class="issue-content">
+        <div class="issue-title">Competitor checker bypasses dispatchChecker() — called directly from cron</div>
+        <div class="issue-desc">The hourly competitor cron calls <code>checkCompetitorDomain()</code> directly instead of routing through <code>dispatchChecker()</code> like every other monitor type. Inconsistent architecture.</div>
+        <div class="issue-fix">✦ Fix: Use the existing <code>check()</code> wrapper adapter in <code>competitor.ts</code> via <code>dispatchChecker()</code> for consistency. Makes future changes (region tracking, error handling) apply automatically.</div>
+      </div>
+    </div>
+    <div class="issue-item">
+      <div class="issue-dot dot-low"></div>
+      <div class="issue-content">
+        <div class="issue-title">Response-time degraded threshold hardcoded at 70% — not user-configurable</div>
+        <div class="issue-desc">All response-time monitors use <code>degradedMs = thresholdMs × 0.7</code>. Some sites may want a different ratio.</div>
+        <div class="issue-fix">✦ Fix: Add optional <code>degradedPercent</code> (default 70) to <code>CheckerConfig</code>. Expose in the monitor edit form.</div>
+      </div>
+    </div>
+    <div class="issue-item">
+      <div class="issue-dot dot-low"></div>
+      <div class="issue-content">
+        <div class="issue-title">No bulk monitor operations (pause, delete, reconfigure)</div>
+        <div class="issue-desc">All monitor actions are individual queries. Users cannot bulk-pause all monitors for a domain or bulk-update check intervals.</div>
+        <div class="issue-fix">✦ Fix: Add batch API endpoints accepting an array of monitor IDs. Add checkbox multi-select to the monitors list UI.</div>
+      </div>
+    </div>
+    <div class="issue-item">
+      <div class="issue-dot dot-low"></div>
+      <div class="issue-content">
+        <div class="issue-title">Legacy keyword config (string) not migrated to array format</div>
+        <div class="issue-desc">Old monitors use <code>config.keyword</code> (string) + <code>config.shouldExist</code> (boolean). New monitors use <code>positiveKeywords[]</code> + <code>negativeKeywords[]</code>. Both work but there is no migration script.</div>
+        <div class="issue-fix">✦ Fix: Write a one-time migration that converts all <code>config.keyword</code> + <code>shouldExist</code> fields to the new array format. Remove legacy handling from checker after migration.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SUGGESTIONS ═══ -->
+<h2>Suggestions &amp; Improvements</h2>
+
+<div class="suggest-box">
+  <h4>Immediate Wins (1–3 days each)</h4>
+  <div class="suggest-item">Implement the heartbeat POST endpoint (<code>/api/v1/heartbeat/{id}</code>) — this is a complete feature break, not a minor bug</div>
+  <div class="suggest-item">Wire alert rate-limiting using existing <code>last_checked_at</code> pattern — protect users from notification spam</div>
+  <div class="suggest-item">Move maintenance window fetch to one call at runner start — free performance win, no schema change needed</div>
+  <div class="suggest-item">Return <code>null</code> from <code>getMonitorUptimePercentage()</code> when no data — prevents misleading 100% display</div>
+</div>
+
+<div class="suggest-box">
+  <h4>Short-Term (1–2 weeks)</h4>
+  <div class="suggest-item">Add alert retry queue — failed webhook/email alerts should be retried with backoff (1m → 5m → 15m, max 3 attempts)</div>
+  <div class="suggest-item">Implement DNS checker timeouts via <code>Promise.race()</code> — prevents hanging checks from blocking runner</div>
+  <div class="suggest-item">Add flap count decay — reset after 24h stable period, or use a windowed moving average</div>
+  <div class="suggest-item">Bulk monitor operations — users with many monitors need multi-select pause/delete/reconfigure</div>
+</div>
+
+<div class="suggest-box">
+  <h4>Architecture Suggestions</h4>
+  <div class="suggest-item">Increase or paginate monitor limit — use a cursor-based approach (<code>WHERE id &gt; last_cursor</code>) for fair distribution across large orgs</div>
+  <div class="suggest-item">True multi-region checks — deploy check runner to 2 Vercel regions; confirmation check routes to a different region for genuine geographic diversity</div>
+  <div class="suggest-item">Majority-vote incident creation — when multi-region is live, only create incident if ≥2 of 3 regions report DOWN</div>
+  <div class="suggest-item">Atomic config+status update — use a Supabase RPC to merge <code>patchMonitorConfig</code> and <code>updateMonitorStatus</code> into one call</div>
+</div>
+
+<table>
+  <thead><tr><th>Strength</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td>23 specialised monitor types</td><td>Covers uptime, DNS, SSL, email, security, performance, SEO, and change detection in one platform</td></tr>
+    <tr><td>SSRF protection</td><td>Comprehensive IP blocking including AWS metadata endpoint (169.254.169.254) and Aliyun (100.100.100.200)</td></tr>
+    <tr><td>Anti-flap confirmation</td><td>5-second re-check before creating incident eliminates false positives from transient blips</td></tr>
+    <tr><td>Incident deduplication</td><td>createIncident() checks for open incident first — prevents duplicate incidents on rapid status changes</td></tr>
+    <tr><td>Region tagging (new)</td><td>check_results.region now populated from VERCEL_REGION — foundation for multi-location analytics</td></tr>
+    <tr><td>Baseline persistence</td><td>Change-detection checkers return configUpdates which are atomically applied via patchMonitorConfig</td></tr>
+  </tbody>
+</table>
+
+<div class="footer">
+  <span>Uptrue Engineering · Monitors &amp; Check System · Report 1 of 6 · 27 April 2026</span>
+  <span>23 types · 20 issues · 1 critical (heartbeat broken)</span>
+</div>
+</body></html>

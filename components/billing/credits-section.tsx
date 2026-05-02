@@ -3,11 +3,17 @@
 import { useState, useCallback } from 'react'
 import { IconChevronDown, IconChevronUp } from '@/components/icons'
 import type { UserCredit, CreditRule } from '@/lib/types'
+import type { SupportedCurrency } from '@/lib/utils/currency'
+import { formatGbp, formatInr } from '@/lib/utils/currency'
+
+// 1 pence ≈ 1.07 paise (1 GBP ≈ ₹107). Used to convert stored GBP credit amounts for display.
+const GBP_PENCE_TO_INR_PAISE = 107
 
 interface CreditsSectionProps {
   credits: UserCredit[]
   creditRules: CreditRule[]
   balancePence: number
+  currency?: SupportedCurrency
 }
 
 interface CreditSubmission {
@@ -21,8 +27,9 @@ interface CreditSubmission {
   created_at: string
 }
 
-function formatPence(pence: number): string {
-  return `\u00A3${(pence / 100).toFixed(2)}`
+function formatAmount(pence: number, currency: SupportedCurrency = 'gbp'): string {
+  if (currency === 'inr') return formatInr(pence * GBP_PENCE_TO_INR_PAISE)
+  return formatGbp(pence)
 }
 
 function getCreditStatusLabel(credit: UserCredit): string {
@@ -40,7 +47,7 @@ function getCreditStatusClass(credit: UserCredit): string {
 const CREDIT_TYPES = [
   {
     key: 'trustpilot_review',
-    icon: '\u2B50',
+    icon: '⭐',
     label: 'Trustpilot Review',
     amount: 200,
     type: 'one-time',
@@ -50,7 +57,7 @@ const CREDIT_TYPES = [
   },
   {
     key: 'g2_review',
-    icon: '\uD83D\uDCDD',
+    icon: '📝',
     label: 'G2 Review',
     amount: 200,
     type: 'one-time',
@@ -60,7 +67,7 @@ const CREDIT_TYPES = [
   },
   {
     key: 'capterra_review',
-    icon: '\uD83D\uDCCA',
+    icon: '📊',
     label: 'Capterra Review',
     amount: 200,
     type: 'one-time',
@@ -70,7 +77,7 @@ const CREDIT_TYPES = [
   },
   {
     key: 'blog_post',
-    icon: '\u270D\uFE0F',
+    icon: '✍️',
     label: 'Blog Post / Tutorial',
     amount: 500,
     type: 'one-time',
@@ -80,7 +87,7 @@ const CREDIT_TYPES = [
   },
   {
     key: 'social_share',
-    icon: '\uD83D\uDCE2',
+    icon: '📢',
     label: 'Social Media Share',
     amount: 100,
     type: 'one-time',
@@ -90,7 +97,7 @@ const CREDIT_TYPES = [
   },
   {
     key: 'bug_report',
-    icon: '\uD83D\uDC1B',
+    icon: '🐛',
     label: 'Bug Report',
     amount: 300,
     type: 'one-time',
@@ -100,7 +107,7 @@ const CREDIT_TYPES = [
   },
 ]
 
-export function CreditsSection({ credits, creditRules, balancePence }: CreditsSectionProps): React.ReactElement {
+export function CreditsSection({ credits, creditRules, balancePence, currency = 'gbp' }: CreditsSectionProps): React.ReactElement {
   const [openAccordion, setOpenAccordion] = useState<string | null>(null)
   const [submissions, setSubmissions] = useState<CreditSubmission[]>([])
   const [submissionsLoaded, setSubmissionsLoaded] = useState(false)
@@ -173,6 +180,8 @@ export function CreditsSection({ credits, creditRules, balancePence }: CreditsSe
     return submissions.find(s => s.credit_type === key)
   }
 
+  const capAmount = formatAmount(1000, currency)
+
   return (
     <div className="space-y">
       {/* Balance card */}
@@ -180,14 +189,14 @@ export function CreditsSection({ credits, creditRules, balancePence }: CreditsSe
         <div className="card-content">
           <div className="stat-label">Credit Balance</div>
           <div style={{ fontSize: 28, fontWeight: 800, marginBottom: 4 }}>
-            {formatPence(balancePence)}
+            {formatAmount(balancePence, currency)}
           </div>
           <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>
-            Credits are automatically applied to your next Stripe invoice. Maximum {formatPence(1000)}/month.
+            Credits are automatically applied to your next invoice. Maximum {capAmount}/month.
           </p>
           {balancePence >= 1000 && (
             <p style={{ fontSize: 12, color: '#f59e0b', marginTop: 8 }}>
-              You have reached the monthly credit cap of {formatPence(1000)}.
+              You have reached the monthly credit cap of {capAmount}.
             </p>
           )}
         </div>
@@ -222,7 +231,7 @@ export function CreditsSection({ credits, creditRules, balancePence }: CreditsSe
                       </div>
                     </div>
                     <div className="credit-accordion-trigger-right">
-                      <span className="credit-accordion-trigger-amount">{formatPence(ct.amount)}</span>
+                      <span className="credit-accordion-trigger-amount">{formatAmount(ct.amount, currency)}</span>
                       {existing && (
                         <span className={`badge ${existing.status === 'approved' ? 'badge-success' : existing.status === 'rejected' ? 'badge-danger' : 'badge-warning'}`}>
                           {existing.status === 'approved' ? 'Approved' : existing.status === 'rejected' ? 'Rejected' : 'Pending'}
@@ -238,14 +247,14 @@ export function CreditsSection({ credits, creditRules, balancePence }: CreditsSe
 
                       {existing && existing.status === 'pending' && (
                         <div className="credit-submit-status credit-submit-status-pending">
-                          Pending review — submitted {new Date(existing.created_at).toLocaleDateString()}.
+                          Pending review — submitted {new Date(existing.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}.
                           We will notify you once reviewed.
                         </div>
                       )}
 
                       {existing && existing.status === 'approved' && (
                         <div className="credit-submit-status credit-submit-status-approved">
-                          Approved! {formatPence(existing.credit_amount_pence)} credit has been added to your account.
+                          Approved! {formatAmount(existing.credit_amount_pence, currency)} credit has been added to your account.
                         </div>
                       )}
 
@@ -315,7 +324,7 @@ export function CreditsSection({ credits, creditRules, balancePence }: CreditsSe
                   <div className="credit-history-info">
                     <span style={{ fontWeight: 500, fontSize: 14 }}>{credit.rule_key.replace(/_/g, ' ')}</span>
                     <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-                      {new Date(credit.earned_at).toLocaleDateString()}
+                      {new Date(credit.earned_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                     </span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -323,7 +332,7 @@ export function CreditsSection({ credits, creditRules, balancePence }: CreditsSe
                       {getCreditStatusLabel(credit)}
                     </span>
                     <span style={{ fontWeight: 600, fontSize: 14, color: 'var(--text-primary)' }}>
-                      {formatPence(credit.amount_pence)}
+                      {formatAmount(credit.amount_pence, currency)}
                     </span>
                   </div>
                 </div>

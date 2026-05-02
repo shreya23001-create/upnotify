@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import type { User360Profile } from '@/app/api/admin/user360/route'
@@ -404,8 +404,8 @@ export function AdminUsersContent(): React.ReactElement {
               </thead>
               <tbody>
                 {filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE).map(p => (
-                  <>
-                    <tr key={p.userId}>
+                  <React.Fragment key={p.userId}>
+                    <tr>
                       <td style={{ paddingLeft: 16 }}><ScoreBadge score={p.score} /></td>
                       <td>
                         {p.healthScore !== null && p.healthScoreLabel ? (
@@ -470,7 +470,7 @@ export function AdminUsersContent(): React.ReactElement {
                     </tr>
 
                     {expanded === p.userId && (
-                      <tr key={`${p.userId}-detail`}>
+                      <tr>
                         <td colSpan={10} style={{ padding: '20px 24px', background: 'var(--bg-secondary)', borderTop: '1px solid var(--border-light)' }}>
                           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: 24 }}>
 
@@ -622,7 +622,7 @@ export function AdminUsersContent(): React.ReactElement {
                         </td>
                       </tr>
                     )}
-                  </>
+                  </React.Fragment>
                 ))}
 
                 {filtered.length === 0 && !loading && (

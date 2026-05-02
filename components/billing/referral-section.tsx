@@ -87,7 +87,7 @@ export function ReferralSection({ referralCode, referrals }: ReferralSectionProp
                 <div key={ref.id} className="referral-list-item">
                   <div>
                     <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
-                      {new Date(ref.created_at).toLocaleDateString()}
+                      {new Date(ref.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                     </span>
                   </div>
                   <span className={`badge ${getStatusBadgeClass(ref.status)}`}>

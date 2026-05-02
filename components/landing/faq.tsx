@@ -1,9 +1,16 @@
 'use client'
 
 import { useState } from 'react'
-import { FAQ_ITEMS } from '@/lib/constants/faq'
+import { FAQ_ITEMS, type FaqItem } from '@/lib/constants/faq'
 
-export default function Faq(): React.ReactElement {
+interface FaqProps {
+  items?:    FaqItem[]
+  eyebrow?:  string
+  headline?: string
+}
+
+export default function Faq({ items, eyebrow, headline }: FaqProps): React.ReactElement {
+  const faqItems = items ?? FAQ_ITEMS
   const [openIndex, setOpenIndex] = useState<number | null>(0)
 
   function toggleItem(index: number): void {
@@ -14,12 +21,12 @@ export default function Faq(): React.ReactElement {
     <section className="section faq-section" id="faq">
       <div className="container">
         <div className="section-header">
-          <div className="section-eyebrow">Questions answered</div>
-          <h2 className="section-title">Frequently asked questions</h2>
+          <div className="section-eyebrow">{eyebrow ?? 'Questions answered'}</div>
+          <h2 className="section-title">{headline ?? 'Frequently asked questions'}</h2>
           <p className="section-sub">Everything you need to know about Uptrue</p>
         </div>
         <div className="faq-grid">
-          {FAQ_ITEMS.map((item, index) => (
+          {faqItems.map((item, index) => (
             <div
               key={index}
               className={`faq-item${openIndex === index ? ' open' : ''}`}

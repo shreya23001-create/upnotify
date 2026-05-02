@@ -2,10 +2,10 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getCurrentUser } from '@/lib/db/users'
-import { canAccessAdminModule } from '@/lib/db/admin-roles'
 import { MonitorLimitOverrideForm } from '@/components/admin/monitor-limit-override-form'
-import { WpMonitorLimitOverrideForm } from '@/components/admin/wp-monitor-limit-override-form'
 import { MonitorDomainCards } from '@/components/admin/monitor-domain-cards'
+import { canAccessAdminModule, canWriteAdminModule } from '@/lib/db/admin-roles'
+import { WpMonitorLimitOverrideForm } from '@/components/admin/wp-monitor-limit-override-form'
 
 export const dynamic = 'force-dynamic'
 
@@ -36,7 +36,12 @@ export default async function User360Page({
 }): Promise<React.ReactElement> {
   const user = await getCurrentUser()
   if (!user) redirect('/login')
-  if (!await canAccessAdminModule(user.email, !!user.is_super_admin, 'user360')) redirect('/admin')
+  const isSuperAdmin = !!user.is_super_admin
+  const [canRead] = await Promise.all([
+    canAccessAdminModule(user.email, isSuperAdmin, 'user360'),
+    canWriteAdminModule(user.email, isSuperAdmin, 'user360'),
+  ])
+  if (!canRead) redirect('/admin')
 
   const { org_id, email, period } = await searchParams
   const supabase = createAdminClient()
@@ -982,7 +987,6 @@ export default async function User360Page({
                 planLimit={activePlan?.monitor_limit ?? null}
               />
             </div>
-
             {/* WP Monitor Limit Override */}
             <div className="card" style={{ padding: 16, marginTop: 16 }}>
               <h3 style={{ fontSize: 13, fontWeight: 700, marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-muted)' }}>
