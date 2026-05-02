@@ -238,33 +238,42 @@ function checkInternalLinks(input: DoDInput): DoDCheck[] {
   const links = extractMarkdownLinks(input.bodyMarkdown)
   const internal = links.filter(l => isInternalLink(l.url))
 
-  const hubLinks = internal.filter(l => l.url.startsWith('/monitoring/'))
-  const toolLinks = internal.filter(l => l.url.startsWith('/tools/'))
-  const ctaLinks = internal.filter(l => /\/(signup|login|pricing)/.test(l.url))
+  // Dedupe by URL — same link appearing 3 times must not count as 3.
+  const uniqueUrls = new Set(internal.map(l => normalisePath(l.url)))
+  const hubLinks = [...uniqueUrls].filter(u => u.startsWith('/monitoring/'))
+  const toolLinks = [...uniqueUrls].filter(u => u.startsWith('/tools/'))
+  const ctaLinks = [...uniqueUrls].filter(u => /\/(signup|login|pricing)/.test(u))
 
   return [
     {
       id: 'links_hub',
-      label: 'Internal links — ≥2 to /monitoring/ hub',
+      label: 'Internal links — ≥2 unique to /monitoring/ hub',
       pass: hubLinks.length >= 2,
       severity: 'soft',
-      detail: `${hubLinks.length} hub link(s)`,
+      detail: `${hubLinks.length} unique hub link(s)`,
     },
     {
       id: 'links_tool',
       label: 'Internal links — ≥1 to /tools/',
       pass: toolLinks.length >= 1,
       severity: 'soft',
-      detail: `${toolLinks.length} tool link(s)`,
+      detail: `${toolLinks.length} unique tool link(s)`,
     },
     {
       id: 'links_cta',
       label: 'Internal link — ≥1 product CTA (signup/login/pricing)',
       pass: ctaLinks.length >= 1,
       severity: 'soft',
-      detail: `${ctaLinks.length} CTA link(s)`,
+      detail: `${ctaLinks.length} unique CTA link(s)`,
     },
   ]
+}
+
+/** Normalise a URL to its path portion (strip protocol/host) for dedupe. */
+function normalisePath(url: string): string {
+  if (url.startsWith('/')) return url.split('#')[0].split('?')[0]
+  const match = url.match(/^https?:\/\/(?:www\.)?uptrue\.io(\/.*?)(?:[#?].*)?$/i)
+  return match ? match[1] : url
 }
 
 function checkForbiddenPhrases(input: DoDInput): DoDCheck {

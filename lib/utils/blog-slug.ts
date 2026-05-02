@@ -64,6 +64,12 @@ export function slugifyPrimaryKeyword(primaryKeyword: string): string {
     slug = lastHyphen > 30 ? trimmed.slice(0, lastHyphen) : trimmed
   }
 
+  if (!slug) {
+    throw new Error(
+      `primaryKeyword "${primaryKeyword}" produced an empty slug after normalisation`
+    )
+  }
+
   return slug
 }
 

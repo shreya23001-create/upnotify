@@ -40,7 +40,9 @@ const VALID_POST_TYPES = new Set([
 const VALID_AUTHORS = new Set(['Aradhna', 'Sachin', 'Steve', 'Krithi'])
 
 function parseCsv(text: string): CsvRow[] {
-  const lines = text.split(/\r?\n/).filter(l => l.trim())
+  // Strip UTF-8 BOM if present (common in CSVs exported from Excel/Sheets).
+  const cleaned = text.charCodeAt(0) === 0xFEFF ? text.slice(1) : text
+  const lines = cleaned.split(/\r?\n/).filter(l => l.trim())
   if (lines.length < 2) throw new Error('CSV is empty')
 
   const headers = parseLine(lines[0])

@@ -110,3 +110,54 @@ describe('hasHardBrandViolations', () => {
     ).toBe(false)
   })
 })
+
+// ---------------------------------------------------------------------------
+// Edge case regression tests
+// ---------------------------------------------------------------------------
+
+describe('checkBrandGuards — URL variations', () => {
+  it('passes subdomain URL with trailing slash', () => {
+    const content = 'Try [Uptrue AI Visibility™](https://aivisibility.uptrue.io/) today.'
+    const result = checkBrandGuards(content, main)
+    expect(result.violations.filter(v => v.severity === 'hard')).toHaveLength(0)
+  })
+
+  it('passes subdomain URL with deep path', () => {
+    const content = '[Uptrue AI Visibility™ check](https://aivisibility.uptrue.io/check?domain=example.com)'
+    const result = checkBrandGuards(content, main)
+    expect(result.violations.filter(v => v.severity === 'hard')).toHaveLength(0)
+  })
+
+  it('flags uppercase variant of forbidden score', () => {
+    const content = 'See your UPTRUE AI VISIBILITY SCORE.'
+    const result = checkBrandGuards(content, main)
+    expect(result.violations.some(v => v.rule === 'forbidden_score')).toBe(true)
+  })
+
+  it('does not flag generic competitor brand mention', () => {
+    // "Google AI visibility" is a generic phrase, not our brand
+    const content = 'Google AI visibility for brands is improving.'
+    const result = checkBrandGuards(content, main)
+    // On main with no brand-prefix-required, this is allowed
+    expect(result.ok).toBe(true)
+  })
+
+  it('case-insensitively flags Score', () => {
+    const content = 'Your uptrue ai visibility score is 75.'
+    const result = checkBrandGuards(content, main)
+    expect(result.violations.some(v => v.rule === 'forbidden_score')).toBe(true)
+  })
+})
+
+describe('checkBrandGuards — empty content', () => {
+  it('passes on empty string', () => {
+    const result = checkBrandGuards('', main)
+    expect(result.ok).toBe(true)
+    expect(result.violations).toHaveLength(0)
+  })
+
+  it('passes on content with no brand mentions', () => {
+    const result = checkBrandGuards('# How to fix SSL\n\nRun certbot renew.', main)
+    expect(result.ok).toBe(true)
+  })
+})

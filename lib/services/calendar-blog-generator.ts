@@ -127,9 +127,17 @@ export async function generateCalendarBlogPost(row: CalendarRow): Promise<Calend
   if (!blogPostId) return null
 
   // 6. Approval tokens (reuses existing infrastructure)
+  // If token creation fails, delete the orphan blog post so the row can be
+  // retried cleanly — otherwise the post sits in DB with no way to approve.
   const tokens: ApprovalTokenPair | null = await createApprovalTokens(blogPostId)
   if (!tokens) {
-    logger.error('calendar-blog-generator: token creation failed', { blogPostId })
+    logger.error('calendar-blog-generator: token creation failed — cleaning up orphan blog post', { blogPostId })
+    await deleteOrphanBlogPost(blogPostId)
+    await updateCalendarRowResult(row.id, {
+      status: 'failed',
+      failed_at: new Date().toISOString(),
+      failure_reason: 'Token creation failed after blog post save; orphan removed',
+    })
     return null
   }
 
@@ -310,4 +318,19 @@ async function saveBlogPost(
     return null
   }
   return data.id as string
+}
+
+/**
+ * Delete a blog post that was saved but failed to get approval tokens.
+ * Cascade deletes any partial tokens via FK constraints.
+ */
+async function deleteOrphanBlogPost(blogPostId: string): Promise<void> {
+  const supabase = getRawClient()
+  const { error } = await supabase.from('blog_posts').delete().eq('id', blogPostId)
+  if (error) {
+    logger.error('calendar-blog-generator: orphan cleanup failed — manual delete required', {
+      blogPostId,
+      error: error.message,
+    })
+  }
 }

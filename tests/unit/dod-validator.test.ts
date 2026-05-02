@@ -161,3 +161,60 @@ describe('validateDoD — image present', () => {
     expect(result.softFails.some(c => c.id === 'image_present')).toBe(true)
   })
 })
+
+// ---------------------------------------------------------------------------
+// Edge case regression tests
+// ---------------------------------------------------------------------------
+
+describe('validateDoD — link dedupe (regression)', () => {
+  it('counts the same hub URL appearing 3 times as 1 unique hub link', () => {
+    const dupeBody = `# Title
+
+ssl certificate expired error mention. ssl certificate expired error.
+
+See [SSL hub](/monitoring/ssl-certificate-monitoring) for details.
+And [our SSL guide](/monitoring/ssl-certificate-monitoring) covers more.
+Plus [the SSL monitoring page](/monitoring/ssl-certificate-monitoring) again.
+Try [free SSL tool](/tools/ssl-checker) and [sign up](/signup).
+![](placeholder.svg)
+${' word'.repeat(820)}
+`.trim()
+
+    const result = validateDoD(makeInput({ bodyMarkdown: dupeBody }))
+    const hubCheck = [...result.passes, ...result.softFails, ...result.hardFails]
+      .find(c => c.id === 'links_hub')
+    // Same URL 3 times = 1 unique = should soft-fail (need 2 unique)
+    expect(hubCheck?.pass).toBe(false)
+    expect(hubCheck?.detail).toContain('1 unique')
+  })
+
+  it('passes when 2 different hub URLs each appear once', () => {
+    // goodBody has /monitoring/ssl... AND /monitoring/dns... — two unique
+    const result = validateDoD(makeInput())
+    const hubCheck = [...result.passes, ...result.softFails, ...result.hardFails]
+      .find(c => c.id === 'links_hub')
+    expect(hubCheck?.pass).toBe(true)
+  })
+
+  it('treats absolute uptrue.io URL same as relative path', () => {
+    const mixedBody = goodBody.replace(
+      '/monitoring/ssl-certificate-monitoring',
+      'https://uptrue.io/monitoring/ssl-certificate-monitoring'
+    )
+    // Should still count as same canonical hub link
+    const result = validateDoD(makeInput({ bodyMarkdown: mixedBody }))
+    const hubCheck = [...result.passes, ...result.softFails, ...result.hardFails]
+      .find(c => c.id === 'links_hub')
+    // /monitoring/ssl... appears via absolute, /monitoring/dns... appears via relative
+    // = 2 unique
+    expect(hubCheck?.pass).toBe(true)
+  })
+})
+
+describe('validateDoD — primary keyword case insensitivity', () => {
+  it('matches primary keyword in body regardless of case', () => {
+    const upperBody = goodBody.replace(/ssl certificate expired error/g, 'SSL CERTIFICATE EXPIRED ERROR')
+    const result = validateDoD(makeInput({ bodyMarkdown: upperBody }))
+    expect(result.hardFails.some(c => c.id === 'primary_kw_body')).toBe(false)
+  })
+})

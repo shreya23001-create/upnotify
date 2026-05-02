@@ -153,3 +153,52 @@ describe('validateSlug', () => {
     expect(validateSlug('monitoring')).toContain('reserved path')
   })
 })
+
+// ---------------------------------------------------------------------------
+// Edge case regression tests
+// ---------------------------------------------------------------------------
+
+describe('slugifyPrimaryKeyword — adversarial input', () => {
+  it('throws on keyword that produces empty slug after normalisation', () => {
+    expect(() => slugifyPrimaryKeyword('!!!@@@###')).toThrow()
+  })
+
+  it('handles trailing whitespace', () => {
+    expect(slugifyPrimaryKeyword('  ssl monitoring  ')).toBe('ssl-monitoring')
+  })
+
+  it('handles tabs and newlines', () => {
+    expect(slugifyPrimaryKeyword('ssl\tcertificate\nmonitoring')).toBe('ssl-certificate-monitoring')
+  })
+
+  it('handles emoji by stripping', () => {
+    const result = slugifyPrimaryKeyword('SSL 🔒 monitoring')
+    expect(result).toBe('ssl-monitoring')
+  })
+
+  it('handles repeated articles', () => {
+    // Only the FIRST leading article should be stripped
+    expect(slugifyPrimaryKeyword('the the best monitoring')).toBe('the-best-monitoring')
+  })
+})
+
+describe('generateUniqueSlug — boundary conditions', () => {
+  it('returns slug ≤ 60 chars even after disambiguation', () => {
+    const slug = generateUniqueSlug('ssl monitoring', ['ssl-monitoring'])
+    expect(slug.length).toBeLessThanOrEqual(60)
+  })
+
+  it('returns case-correct slug', () => {
+    const slug = generateUniqueSlug('SSL Monitoring', [])
+    expect(slug).toBe(slug.toLowerCase())
+  })
+
+  it('throws when degenerate base + 100+ collisions', () => {
+    // Base slug "a" + every disambiguator (-guide, -explained, -2026, -2026-2..99) collides
+    const collisions = [
+      'a', 'a-guide', 'a-explained', `a-${new Date().getUTCFullYear()}`,
+      ...Array.from({ length: 100 }, (_, i) => `a-${new Date().getUTCFullYear()}-${i + 2}`),
+    ]
+    expect(() => generateUniqueSlug('a', collisions)).toThrow(/Could not produce a unique slug/)
+  })
+})

@@ -181,10 +181,22 @@ interface RawReviewResponse {
 }
 
 function parseReviewResponse(text: string): Omit<ReviewOutput, 'generatedAt' | 'dodSummary'> {
-  // Extract JSON from response — Claude sometimes wraps in ```json ... ```
+  // Extract JSON from response. Claude may return:
+  //   - Pure JSON
+  //   - ```json ... ``` fenced block
+  //   - Prose preamble then JSON
   let jsonText = text.trim()
   const fenced = jsonText.match(/```(?:json)?\s*([\s\S]*?)```/)
-  if (fenced) jsonText = fenced[1].trim()
+  if (fenced) {
+    jsonText = fenced[1].trim()
+  } else {
+    // Fall back to first { ... last } if no fence
+    const first = jsonText.indexOf('{')
+    const last = jsonText.lastIndexOf('}')
+    if (first !== -1 && last > first) {
+      jsonText = jsonText.slice(first, last + 1)
+    }
+  }
 
   let parsed: RawReviewResponse
   try {
