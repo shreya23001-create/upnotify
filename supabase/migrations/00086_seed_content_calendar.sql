@@ -1,9 +1,11 @@
 -- =============================================================================
--- Seed: content_calendar — 168-page content plan
--- Generated from keyword-research/Content_Calendar.csv
--- Total valid rows: 133 (skipped 35 — wiki + invalid)
--- Idempotent: uses ON CONFLICT (url_path) DO NOTHING.
--- Run AFTER migration 00085 has been applied.
+-- Migration 00086 — Seed: content_calendar (168-page content plan)
+-- =============================================================================
+-- Companion to 00085_calendar_blog_digest.sql (the schema).
+-- Generated from keyword-research/Content_Calendar.csv via
+--   scripts/_generate_seed_sql.py (re-run if calendar changes).
+-- Total rows: 133 (35 wiki rows excluded — those go to aivisibility-app).
+-- Idempotent — ON CONFLICT (url_path) DO NOTHING.
 -- =============================================================================
 
 INSERT INTO content_calendar (
