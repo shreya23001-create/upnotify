@@ -165,7 +165,7 @@ async function generateDraftViaClaude(row: CalendarRow): Promise<ClaudeDraft | n
   try {
     const message = await client.messages.create({
       model: 'claude-sonnet-4-6',
-      max_tokens: 8000,
+      max_tokens: 16000, // generous headroom — hub_foundational targets 1500-2000 words
       messages: [{ role: 'user', content: prompt }],
     })
 
@@ -242,26 +242,51 @@ Return only the JSON. No commentary.`
 }
 
 function parseDraft(text: string): ClaudeDraft | null {
+  // Extract JSON robustly — Claude may return:
+  //   - Pure JSON
+  //   - ```json ... ``` fenced block
+  //   - Prose preamble (e.g. "Here is the JSON:") then JSON
+  //   - JSON followed by trailing prose
   let jsonText = text.trim()
   const fenced = jsonText.match(/```(?:json)?\s*([\s\S]*?)```/)
-  if (fenced) jsonText = fenced[1].trim()
+  if (fenced) {
+    jsonText = fenced[1].trim()
+  } else {
+    // Fallback: extract from first { to last } if no fence
+    const first = jsonText.indexOf('{')
+    const last = jsonText.lastIndexOf('}')
+    if (first !== -1 && last > first) {
+      jsonText = jsonText.slice(first, last + 1)
+    }
+  }
 
   try {
     const parsed = JSON.parse(jsonText) as Partial<ClaudeDraft>
-    if (typeof parsed.title !== 'string' || !parsed.title.trim()) return null
-    if (typeof parsed.bodyMarkdown !== 'string' || !parsed.bodyMarkdown.trim()) return null
-    if (typeof parsed.excerpt !== 'string') return null
-    if (!parsed.faqJsonb || typeof parsed.faqJsonb !== 'object') return null
+    const validations: string[] = []
+    if (typeof parsed.title !== 'string' || !parsed.title.trim()) validations.push('title missing/empty')
+    if (typeof parsed.bodyMarkdown !== 'string' || !parsed.bodyMarkdown.trim()) validations.push('bodyMarkdown missing/empty')
+    if (typeof parsed.excerpt !== 'string') validations.push('excerpt not a string')
+    if (!parsed.faqJsonb || typeof parsed.faqJsonb !== 'object') validations.push('faqJsonb missing/invalid')
+
+    if (validations.length > 0) {
+      logger.warn('calendar-blog-generator: draft validation failed', {
+        errors: validations,
+        responsePreview: text.slice(0, 300),
+      })
+      return null
+    }
 
     return {
-      title: parsed.title,
-      excerpt: parsed.excerpt,
-      bodyMarkdown: parsed.bodyMarkdown,
+      title: parsed.title as string,
+      excerpt: parsed.excerpt as string,
+      bodyMarkdown: parsed.bodyMarkdown as string,
       faqJsonb: parsed.faqJsonb as ClaudeDraft['faqJsonb'],
     }
   } catch (error) {
     logger.warn('calendar-blog-generator: draft JSON parse failed', {
       error: error instanceof Error ? error.message : String(error),
+      responsePreview: text.slice(0, 500),
+      jsonTextPreview: jsonText.slice(0, 300),
     })
     return null
   }
