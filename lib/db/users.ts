@@ -31,7 +31,12 @@ export async function getCurrentUser(): Promise<ImpersonatedUser | null> {
       return null
     }
 
-    if (realUser?.is_super_admin) {
+    // Allow impersonation if is_super_admin flag is set OR email is in ADMIN_EMAILS env
+    const adminEmailsRaw = process.env.ADMIN_EMAILS || ''
+    const adminEmails = adminEmailsRaw.split(',').map(e => e.trim().toLowerCase()).filter(Boolean)
+    const isAuthorisedToImpersonate = realUser?.is_super_admin || adminEmails.includes((realUser?.email ?? '').toLowerCase())
+
+    if (isAuthorisedToImpersonate) {
       // Use admin client to bypass RLS and load the impersonated user
       const adminClient = createAdminClient()
       const { data: impersonatedUser, error: impError } = await adminClient

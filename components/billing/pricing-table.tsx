@@ -213,7 +213,8 @@ export function PricingTable({ plans, currentPlanSlug, subscription, creditBalan
 
   // Determine the index of the current plan for upgrade/downgrade logic
   const currentPlanIndex = directPlans.findIndex(p => p.slug === currentPlanSlug)
-  const effectiveCurrentIndex = currentPlanIndex >= 0 ? currentPlanIndex : 0 // Free if no subscription
+  // -1 means free/no subscription — all paid plans are higher tier
+  const effectiveCurrentIndex = currentPlanIndex >= 0 ? currentPlanIndex : -1
 
   async function handleRazorpayCancel(): Promise<void> {
     if (!cancelConfirm) { setCancelConfirm(true); return }

@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Uptrue &mdash; Blog, Autoblog, PMB &amp; AOE Outreach Report</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8f9fa; color: #1a1a2e; font-size: 14px; line-height: 1.6; }
+  .page { max-width: 1100px; margin: 0 auto; padding: 40px 32px; }
+  h1 { font-size: 28px; font-weight: 800; color: #0f0f23; margin-bottom: 6px; }
+  h2 { font-size: 18px; font-weight: 700; color: #0f0f23; margin: 36px 0 14px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
+  h3 { font-size: 14px; font-weight: 700; color: #374151; margin: 20px 0 10px; }
+  .meta { color: #6b7280; font-size: 13px; margin-bottom: 32px; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; letter-spacing: .4px; text-transform: uppercase; }
+  .badge-green { background: #d1fae5; color: #065f46; }
+  .badge-yellow { background: #fef3c7; color: #92400e; }
+  .badge-red { background: #fee2e2; color: #991b1b; }
+  .badge-blue { background: #dbeafe; color: #1e40af; }
+  .badge-purple { background: #ede9fe; color: #5b21b6; }
+
+  .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 36px; }
+  .summary-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; text-align: center; }
+  .summary-card .num { font-size: 32px; font-weight: 800; color: #059669; }
+  .summary-card .label { font-size: 12px; color: #6b7280; margin-top: 4px; }
+
+  .flow-section { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 28px; }
+  .flow-title { font-size: 15px; font-weight: 700; color: #0f0f23; margin-bottom: 18px; }
+  .flow-row { display: flex; align-items: flex-start; gap: 0; flex-wrap: wrap; }
+  .flow-step { background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 10px; padding: 14px 16px; min-width: 130px; flex: 1; }
+  .flow-step .step-num { font-size: 10px; font-weight: 800; color: #059669; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 4px; }
+  .flow-step .step-title { font-size: 13px; font-weight: 700; color: #064e3b; margin-bottom: 4px; }
+  .flow-step .step-desc { font-size: 11px; color: #6b7280; }
+  .flow-arrow { display: flex; align-items: center; padding: 0 6px; color: #9ca3af; font-size: 20px; flex-shrink: 0; margin-top: 22px; }
+  .flow-step.highlight { background: #ede9fe; border-color: #7c3aed; }
+  .flow-step.highlight .step-num { color: #7c3aed; }
+  .flow-step.highlight .step-title { color: #4c1d95; }
+  .flow-step.warning { background: #fef3c7; border-color: #d97706; }
+  .flow-step.warning .step-num { color: #d97706; }
+  .flow-step.warning .step-title { color: #78350f; }
+  .flow-step.danger { background: #fee2e2; border-color: #fca5a5; }
+  .flow-step.danger .step-num { color: #dc2626; }
+  .flow-step.danger .step-title { color: #7f1d1d; }
+
+  .flow-branch { margin-top: 14px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .branch-box { border-radius: 8px; padding: 12px 14px; }
+  .branch-yes { background: #d1fae5; border: 1px solid #6ee7b7; }
+  .branch-no { background: #fee2e2; border: 1px solid #fca5a5; }
+  .branch-box .branch-label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
+  .branch-yes .branch-label { color: #065f46; }
+  .branch-no .branch-label { color: #991b1b; }
+  .branch-box p { font-size: 11px; color: #374151; }
+
+  table { width: 100%; border-collapse: collapse; margin-bottom: 24px; font-size: 13px; }
+  th { background: #f1f5f9; text-align: left; padding: 10px 14px; font-weight: 700; color: #374151; font-size: 12px; text-transform: uppercase; letter-spacing: .4px; }
+  td { padding: 10px 14px; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #f0fdf4; }
+
+  .system-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 28px; }
+  .system-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; }
+  .system-card .sys-name { font-size: 15px; font-weight: 800; color: #0f0f23; margin-bottom: 4px; }
+  .system-card .sys-sub { font-size: 12px; color: #6b7280; margin-bottom: 12px; }
+  .system-card ul { list-style: none; }
+  .system-card ul li { font-size: 12px; color: #4b5563; padding: 4px 0; border-bottom: 1px solid #f3f4f6; display: flex; gap: 8px; }
+  .system-card ul li:last-child { border-bottom: none; }
+  .system-card ul li::before { content: '•'; color: #059669; flex-shrink: 0; }
+
+  .issue-block { background: #fff; border: 1px solid #e2e8f0; border-left: 4px solid #e2e8f0; border-radius: 8px; padding: 18px 20px; margin-bottom: 14px; }
+  .issue-block.critical { border-left-color: #dc2626; }
+  .issue-block.high { border-left-color: #f59e0b; }
+  .issue-block.medium { border-left-color: #3b82f6; }
+  .issue-block.low { border-left-color: #10b981; }
+  .issue-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .issue-title { font-size: 14px; font-weight: 700; color: #0f0f23; }
+  .issue-desc { font-size: 13px; color: #4b5563; margin-bottom: 12px; line-height: 1.6; }
+  .fix-box { background: #f0fdf4; border: 1px solid #86efac; border-radius: 6px; padding: 12px 14px; }
+  .fix-box .fix-label { font-size: 10px; font-weight: 800; color: #166534; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
+  .fix-box p { font-size: 12px; color: #166534; }
+  .file-path { font-family: 'SF Mono', monospace; font-size: 11px; color: #6b7280; margin-top: 8px; }
+
+  .suggestion-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px; }
+  .suggestion-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; }
+  .suggestion-card h4 { font-size: 13px; font-weight: 800; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #e2e8f0; }
+  .suggestion-card.immediate h4 { color: #dc2626; border-color: #fecaca; }
+  .suggestion-card.short-term h4 { color: #d97706; border-color: #fde68a; }
+  .suggestion-card.architecture h4 { color: #059669; border-color: #6ee7b7; }
+  .suggestion-card ul { list-style: none; }
+  .suggestion-card ul li { font-size: 12px; color: #4b5563; padding: 6px 0; border-bottom: 1px solid #f3f4f6; display: flex; gap: 8px; align-items: flex-start; }
+  .suggestion-card ul li:last-child { border-bottom: none; }
+  .suggestion-card ul li::before { content: '→'; color: #9ca3af; flex-shrink: 0; margin-top: 1px; }
+
+  .section-box { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 28px; }
+  .print-note { background: #fef3c7; border: 1px solid #fcd34d; border-radius: 8px; padding: 12px 16px; font-size: 12px; color: #92400e; margin-bottom: 24px; }
+  @media print { .print-note { display: none; } body { background: #fff; } .page { padding: 20px; } }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="print-note">To save as PDF: File &rarr; Print &rarr; Save as PDF (or Cmd+P on Mac)</div>
+
+  <h1>Blog, Autoblog, PMB &amp; AOE Outreach</h1>
+  <p class="meta">Uptrue &mdash; Feature Audit Report &nbsp;|&nbsp; Generated 2026-04-27 &nbsp;|&nbsp; Report 05 of 06</p>
+
+  <div class="summary-grid">
+    <div class="summary-card"><div class="num">4</div><div class="label">Content Systems</div></div>
+    <div class="summary-card"><div class="num">5</div><div class="label">Cron Pipelines</div></div>
+    <div class="summary-card"><div class="num">9</div><div class="label">Issues Found</div></div>
+    <div class="summary-card"><div class="num">2</div><div class="label">Critical Issues</div></div>
+  </div>
+
+  <h2>Content Systems Overview</h2>
+  <div class="system-grid">
+    <div class="system-card">
+      <div class="sys-name">Blog (Manual)</div>
+      <div class="sys-sub">Editor-driven post creation with AI assistance</div>
+      <ul>
+        <li>Rich text editor with Claude Haiku autocomplete suggestions</li>
+        <li>SEO meta fields: title, description, canonical, og:image</li>
+        <li>Draft / Published / Scheduled status workflow</li>
+        <li>Category and tag taxonomy system</li>
+        <li>Slug auto-generation with manual override</li>
+      </ul>
+    </div>
+    <div class="system-card">
+      <div class="sys-name">Autoblog</div>
+      <div class="sys-sub">RSS-fed automated content pipeline</div>
+      <ul>
+        <li>User configures RSS feed sources per brand/topic</li>
+        <li>Cron fetches feeds, deduplicates, queues new items</li>
+        <li>LLM detector filters AI-generated source content</li>
+        <li>Claude Sonnet rewrites / summarises into original posts</li>
+        <li>Posts published to /blog with auto-SEO metadata</li>
+      </ul>
+    </div>
+    <div class="system-card">
+      <div class="sys-name">PMB (Press &amp; Media Blast)</div>
+      <div class="sys-sub">Scheduled press release and media outreach</div>
+      <ul>
+        <li>User creates press release draft in rich editor</li>
+        <li>Weekly and monthly scheduled distribution</li>
+        <li>Email delivery via Resend to media contact lists</li>
+        <li>Open rate tracking per recipient per blast</li>
+        <li>Monthly performance digest auto-generated</li>
+      </ul>
+    </div>
+    <div class="system-card">
+      <div class="sys-name">AOE (AI Outreach Engine)</div>
+      <div class="sys-sub">Automated prospect discovery-to-email funnel</div>
+      <ul>
+        <li>User defines target audience + outreach goal</li>
+        <li>Claude discovers relevant domains / contacts</li>
+        <li>Personalised email drafted per prospect via Claude Haiku</li>
+        <li>Email sequencing: initial + 2 follow-ups spaced by days</li>
+        <li>Reply detection + campaign pause on positive response</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Working Flows</h2>
+
+  <div class="flow-section">
+    <div class="flow-title">&#128240; Flow 1 &mdash; Autoblog RSS Pipeline (Feed to Published Post)</div>
+    <div class="flow-row">
+      <div class="flow-step">
+        <div class="step-num">Cron</div>
+        <div class="step-title">Feed Fetcher Runs</div>
+        <div class="step-desc">/api/cron/feed-fetcher polls configured RSS URLs every 6 hours</div>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step">
+        <div class="step-num">Dedupe</div>
+        <div class="step-title">New Items Identified</div>
+        <div class="step-desc">Compare item GUIDs against processed_feed_items table to skip duplicates</div>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step warning">
+        <div class="step-num">Filter</div>
+        <div class="step-title">LLM Detector Screens</div>
+        <div class="step-desc">Claude Haiku classifies content as human vs AI-generated. AI content skipped (fragile regex)</div>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step highlight">
+        <div class="step-num">Generate</div>
+        <div class="step-title">Claude Sonnet Rewrites</div>
+        <div class="step-desc">Rewrites in brand voice with original angle, title, meta, slug auto-generated</div>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step">
+        <div class="step-num">Publish</div>
+        <div class="step-title">Post Goes Live</div>
+        <div class="step-desc">Inserted into posts table with status=published, sitemap updated</div>
+      </div>
+    </div>
+    <div class="flow-branch">
+      <div class="branch-box branch-yes">
+        <div class="branch-label">&#10003; Happy Path</div>
+        <p>New RSS items every 6 hours become branded, SEO-optimised blog posts automatically. Trend topics surfaced daily.</p>
+      </div>
+      <div class="branch-box branch-no">
+        <div class="branch-label">&#9888; No Circuit Breaker</div>
+        <p>If Claude API returns errors, the cron keeps retrying the same items repeatedly. No dead-letter queue or failure threshold implemented.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="flow-section">
+    <div class="flow-title">&#128222; Flow 2 &mdash; PMB Press Blast Distribution</div>
+    <div class="flow-row">
+      <div class="flow-step">
+        <div class="step-num">Draft</div>
+        <div class="step-title">User Writes Press Release</div>
+        <div class="step-desc">Rich editor with AI polish suggestions, embargo date optional</div>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step">
+        <div class="step-num">Schedule</div>
+        <div class="step-title">Blast Scheduled</div>
+        <div class="step-desc">Weekly (Monday 09:00) or monthly (1st of month) schedule selected</div>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step highlight">
+        <div class="step-num">Send</div>
+        <div class="step-title">Resend Dispatches</div>
+        <div class="step-desc">Resend API called per recipient. No batching &mdash; individual calls per contact</div>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step">
+        <div class="step-num">Track</div>
+        <div class="step-title">Open &amp; Click Recorded</div>
+        <div class="step-desc">Resend webhook updates pmb_events table with open/click/bounce events</div>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step">
+        <div class="step-num">Digest</div>
+        <div class="step-title">Monthly Report</div>
+        <div class="step-desc">Performance digest auto-generated on 1st of next month via cron</div>
+      </div>
+    </div>
+    <div class="flow-branch">
+      <div class="branch-box branch-yes">
+        <div class="branch-label">&#10003; Successful Blast</div>
+        <p>All recipients receive personalised email, opens tracked via webhook, digest report generated month-end</p>
+      </div>
+      <div class="branch-box branch-no">
+        <div class="branch-label">&#9888; Large List Risk</div>
+        <p>Individual Resend API calls per recipient will hit rate limits on large lists (1000+ contacts). No batch send implementation.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="flow-section">
+    <div class="flow-title">&#128231; Flow 3 &mdash; AOE Discovery-to-Email Funnel</div>
+    <div class="flow-row">
+      <div class="flow-step">
+        <div class="step-num">Config</div>
+        <div class="step-title">User Defines Campaign</div>
+        <div class="step-desc">Target audience description, outreach goal, tone, daily send cap entered</div>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step highlight">
+        <div class="step-num">Discover</div>
+        <div class="step-title">Claude Finds Prospects</div>
+        <div class="step-desc">Claude Sonnet generates relevant domain list based on ICP description</div>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step warning">
+        <div class="step-num">Validate</div>
+        <div class="step-title">Email Format Check Only</div>
+        <div class="step-desc">Regex validates email format &mdash; no deliverability check, no MX lookup</div>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step highlight">
+        <div class="step-num">Draft</div>
+        <div class="step-title">Claude Haiku Personalises</div>
+        <div class="step-desc">Individual email drafted per prospect with company-specific context</div>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step">
+        <div class="step-num">Send</div>
+        <div class="step-title">Sequence Dispatched</div>
+        <div class="step-desc">Email 1 now, follow-up 1 at +3 days, follow-up 2 at +7 days (if no reply)</div>
+      </div>
+    </div>
+    <div class="flow-branch">
+      <div class="branch-box branch-yes">
+        <div class="branch-label">&#10003; Reply Detected</div>
+        <p>Resend webhook detects reply, campaign paused for that prospect, user notified, conversation flagged for manual follow-up</p>
+      </div>
+      <div class="branch-box branch-no">
+        <div class="branch-label">&#9888; No Reply</div>
+        <p>Follow-up 1 and 2 sent on schedule. After sequence completes, prospect marked as 'exhausted' &mdash; no further sends</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="flow-section">
+    <div class="flow-title">&#9881; Flow 4 &mdash; Cron Pipeline Overview</div>
+    <div class="flow-row">
+      <div class="flow-step">
+        <div class="step-num">Every 6h</div>
+        <div class="step-title">Feed Fetcher</div>
+        <div class="step-desc">/api/cron/feed-fetcher fetches all configured RSS feeds</div>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step">
+        <div class="step-num">Every 6h</div>
+        <div class="step-title">Topic Runner</div>
+        <div class="step-desc">/api/cron/topic-runner queues new items for Claude rewrite</div>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step">
+        <div class="step-num">Every 6h</div>
+        <div class="step-title">Post Generator</div>
+        <div class="step-desc">/api/cron/post-generator processes queue, calls Claude, publishes</div>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step">
+        <div class="step-num">Daily 09:00</div>
+        <div class="step-title">AOE Sequence Runner</div>
+        <div class="step-desc">/api/cron/aoe-runner sends scheduled follow-ups for active campaigns</div>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step warning">
+        <div class="step-num">Mon/1st</div>
+        <div class="step-title">PMB Blast Runner</div>
+        <div class="step-desc">/api/cron/pmb-runner dispatches press blasts &mdash; no batch send, risk at scale</div>
+      </div>
+    </div>
+  </div>
+
+  <h2>Issues Found</h2>
+
+  <div class="issue-block critical">
+    <div class="issue-header">
+      <span class="badge badge-red">Critical</span>
+      <span class="issue-title">Autoblog Cron Has No Circuit Breaker &mdash; Infinite Retry on Claude API Errors</span>
+    </div>
+    <p class="issue-desc">
+      When Claude API returns an error during post generation, the failed queue item is never marked as failed &mdash; it remains in the queue and the cron attempts it again on the next 6-hour cycle. If Claude is degraded for 12 hours, the same 50 items are retried 2+ times each. There is no dead-letter queue, no failure counter, and no retry limit. This wastes API quota and can cause infinite loops.
+    </p>
+    <div class="fix-box">
+      <div class="fix-label">Recommended Fix</div>
+      <p>Add an attempt_count column to the autoblog_queue table. Increment on each attempt. After 3 failed attempts, mark status as 'failed' and stop retrying. Log the failure reason. Surface failed items in the admin panel. Add a dead-letter view so editors can manually requeue or dismiss items.</p>
+    </div>
+    <div class="file-path">&#128196; app/api/cron/post-generator/route.ts &middot; lib/db/autoblog-queue.ts</div>
+  </div>
+
+  <div class="issue-block critical">
+    <div class="issue-header">
+      <span class="badge badge-red">Critical</span>
+      <span class="issue-title">AOE Email Validation Is Regex-Only &mdash; Sends to Invalid Addresses</span>
+    </div>
+    <p class="issue-desc">
+      The AOE prospect email validation only checks format (regex match for @ and domain). No MX record lookup is performed, no email deliverability verification, no disposable domain check. Claude-generated prospect emails are frequently guessed patterns (info@domain.com, contact@domain.com) that may not exist. Sending to invalid addresses hurts sender reputation and can cause domain blacklisting.
+    </p>
+    <div class="fix-box">
+      <div class="fix-label">Recommended Fix</div>
+      <p>Before sending any AOE email, perform a DNS MX record lookup to verify the domain has mail servers. Integrate a lightweight email verification API (e.g., Abstract API, ZeroBounce) for catch-all detection. Add a disposable domain blocklist. Track bounce rates per campaign and auto-pause campaigns exceeding 10% hard bounces.</p>
+    </div>
+    <div class="file-path">&#128196; lib/services/aoe-discovery.ts &middot; lib/utils/email-validator.ts</div>
+  </div>
+
+  <div class="issue-block high">
+    <div class="issue-header">
+      <span class="badge badge-yellow">High</span>
+      <span class="issue-title">PMB Blast Sends Individual Resend API Calls Per Recipient</span>
+    </div>
+    <p class="issue-desc">
+      The PMB blast runner makes one Resend API call per email recipient. Resend&rsquo;s free tier rate limit is 2 requests/second and paid tier is 100/second. A media list with 500 contacts will take 5+ seconds and 500 API calls. Resend supports batch send via their /emails/batch endpoint (up to 100 per call) but this is not used.
+    </p>
+    <div class="fix-box">
+      <div class="fix-label">Recommended Fix</div>
+      <p>Replace individual Resend calls with the batch endpoint: group recipients into chunks of 100 and call /emails/batch. This reduces 500 API calls to 5 calls, stays well under rate limits, and reduces cron execution time from minutes to seconds. Update pmb_events tracking to handle batch response format.</p>
+    </div>
+    <div class="file-path">&#128196; app/api/cron/pmb-runner/route.ts &middot; lib/services/email.ts</div>
+  </div>
+
+  <div class="issue-block high">
+    <div class="issue-header">
+      <span class="badge badge-yellow">High</span>
+      <span class="issue-title">LLM Detector Uses Fragile Regex Patterns &mdash; High False Negative Rate</span>
+    </div>
+    <p class="issue-desc">
+      The Autoblog LLM detector that filters AI-generated source content uses a regex-based approach (looks for phrases like &ldquo;As an AI language model&rdquo;, &ldquo;I cannot&rdquo;, &ldquo;certainly!&rdquo;). Modern AI-generated content from GPT-4o and Claude does not contain these patterns. The detector has a high false negative rate &mdash; AI content passes through and gets rewritten into Uptrue posts, creating plagiarism and content quality risks.
+    </p>
+    <div class="fix-box">
+      <div class="fix-label">Recommended Fix</div>
+      <p>Replace regex detector with a Claude Haiku classification call: send a short excerpt and ask &ldquo;Is this likely AI-generated? Respond yes/no with confidence 0-100.&rdquo; Cache results. Reject content with confidence &gt;70%. This is a single Haiku call (&lt;$0.001) and vastly more accurate than regex patterns against modern LLM outputs.</p>
+    </div>
+    <div class="file-path">&#128196; lib/services/llm-detector.ts</div>
+  </div>
+
+  <div class="issue-block medium">
+    <div class="issue-header">
+      <span class="badge badge-blue">Medium</span>
+      <span class="issue-title">Social Posting Feature Disconnected from Publishing Flow</span>
+    </div>
+    <p class="issue-desc">
+      There is social posting functionality in the codebase (Twitter/X, LinkedIn) but it is not wired into the Autoblog publish flow. When a new post goes live, no social post is created or queued. The feature exists as a standalone manual action only. Users would expect &ldquo;auto-publish to social&rdquo; given the blog is already automated.
+    </p>
+    <div class="fix-box">
+      <div class="fix-label">Recommended Fix</div>
+      <p>After a successful Autoblog post publish, call lib/services/social-poster.ts with the post title, excerpt, and URL. Make this configurable per user: on/off toggle per social platform in brand settings. Queue social posts via a social_post_queue table to avoid synchronous posting in the publish flow.</p>
+    </div>
+    <div class="file-path">&#128196; lib/services/social-poster.ts &middot; app/api/cron/post-generator/route.ts</div>
+  </div>
+
+  <div class="issue-block medium">
+    <div class="issue-header">
+      <span class="badge badge-blue">Medium</span>
+      <span class="issue-title">AOE Campaign Has No Unsubscribe / Opt-Out Mechanism</span>
+    </div>
+    <p class="issue-desc">
+      Emails sent by the AOE system do not include an unsubscribe link. This is a legal requirement under CAN-SPAM (US), GDPR (EU), and CASL (Canada). Users running AOE campaigns are at risk of regulatory fines and spam complaints. Resend requires commercial emails to include unsubscribe links, and repeated failures to do so will result in account suspension.
+    </p>
+    <div class="fix-box">
+      <div class="fix-label">Recommended Fix</div>
+      <p>Add a one-click unsubscribe link to all AOE email templates using Resend&rsquo;s built-in unsubscribe header support. Store opt-outs in an aoe_unsubscribes table keyed by email address. Before sending any email in any AOE sequence, check this table and skip opted-out addresses. Show opt-out count in campaign analytics.</p>
+    </div>
+    <div class="file-path">&#128196; lib/services/aoe-mailer.ts &middot; app/api/aoe/unsubscribe/route.ts</div>
+  </div>
+
+  <div class="issue-block medium">
+    <div class="issue-header">
+      <span class="badge badge-blue">Medium</span>
+      <span class="issue-title">Autoblog Queue Grows Unbounded &mdash; No Pruning or Archival</span>
+    </div>
+    <p class="issue-desc">
+      The autoblog_queue table accumulates all processed, failed, and completed items with no archival or pruning policy. With daily RSS processing across many users, this table will grow to millions of rows over time. Query performance degrades as the table grows and there is no cleanup cron.
+    </p>
+    <div class="fix-box">
+      <div class="fix-label">Recommended Fix</div>
+      <p>Add a weekly cron that moves completed queue items older than 30 days to an autoblog_queue_archive table (or deletes them). Create an index on (status, created_at) to keep active-item queries fast regardless of total table size. Log archive counts in the admin panel.</p>
+    </div>
+    <div class="file-path">&#128196; app/api/cron/ &middot; lib/db/autoblog-queue.ts</div>
+  </div>
+
+  <div class="issue-block low">
+    <div class="issue-header">
+      <span class="badge badge-green">Low</span>
+      <span class="issue-title">Blog Editor Has No Autosave &mdash; Users Lose Work on Navigation</span>
+    </div>
+    <p class="issue-desc">
+      The manual blog editor does not autosave drafts. If a user navigates away or the browser crashes, their work is lost. This is a standard UX expectation for any content editor and has already resulted in user complaints.
+    </p>
+    <div class="fix-box">
+      <div class="fix-label">Recommended Fix</div>
+      <p>Add debounced autosave: after 3 seconds of inactivity, silently PATCH /api/posts/[id] with current draft content. Show last-saved timestamp in editor toolbar. On editor mount, restore from last saved draft if exists. This requires only a debounce hook and a PATCH endpoint &mdash; low effort, high user value.</p>
+    </div>
+    <div class="file-path">&#128196; components/blog/editor.tsx &middot; app/api/posts/[id]/route.ts</div>
+  </div>
+
+  <div class="issue-block low">
+    <div class="issue-header">
+      <span class="badge badge-green">Low</span>
+      <span class="issue-title">PMB Contact Lists Are Stored as Plain Arrays &mdash; No Deduplication</span>
+    </div>
+    <p class="issue-desc">
+      PMB media contact lists are stored as JSON arrays with no deduplication check on insert. If a user imports the same CSV twice or manually adds a duplicate email, the same address receives two copies of every blast. This creates a poor recipient experience and counts double toward Resend usage quotas.
+    </p>
+    <div class="fix-box">
+      <div class="fix-label">Recommended Fix</div>
+      <p>Normalise contact storage: move to a pmb_contacts table with a unique constraint on (list_id, email). On import, use INSERT ... ON CONFLICT DO NOTHING to deduplicate automatically. Show deduplication counts in the import UI (&ldquo;3 duplicates skipped&rdquo;).</p>
+    </div>
+    <div class="file-path">&#128196; lib/db/pmb-contacts.ts &middot; app/api/pmb/contacts/route.ts</div>
+  </div>
+
+  <h2>Suggestions &amp; Improvements</h2>
+  <div class="suggestion-grid">
+    <div class="suggestion-card immediate">
+      <h4>Immediate (This Sprint)</h4>
+      <ul>
+        <li>Add attempt_count + failure status to autoblog_queue for circuit breaker</li>
+        <li>Add unsubscribe link to all AOE email templates (legal requirement)</li>
+        <li>Switch PMB blast to Resend batch endpoint (100 per call)</li>
+        <li>Add MX lookup to AOE email validation before first send</li>
+      </ul>
+    </div>
+    <div class="suggestion-card short-term">
+      <h4>Short-Term (1&ndash;2 Sprints)</h4>
+      <ul>
+        <li>Replace regex LLM detector with Claude Haiku classification call</li>
+        <li>Wire social posting into Autoblog publish flow (opt-in per user)</li>
+        <li>Add debounced autosave to blog editor (3-second debounce)</li>
+        <li>Normalise PMB contacts to deduplicated table</li>
+        <li>Add weekly autoblog_queue archival cron</li>
+      </ul>
+    </div>
+    <div class="suggestion-card architecture">
+      <h4>Architecture</h4>
+      <ul>
+        <li>Unified content queue: single post_queue table for all content types (autoblog, PMB, AOE) with type discriminator</li>
+        <li>AOE campaign builder UI with visual sequence editor and step timing controls</li>
+        <li>Content performance analytics: tie blog post traffic back to Autoblog source feeds for ROI measurement</li>
+        <li>PMB template library: reusable templates for press releases, product launches, announcements</li>
+        <li>AOE multi-touch attribution: track which touchpoint (email 1/2/3) drives replies</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section-box">
+    <h3>AI Model Usage by Feature</h3>
+    <table>
+      <thead>
+        <tr><th>Feature</th><th>Model</th><th>Use Case</th><th>Avg Tokens / Call</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Blog AI Assist</td><td>Claude Haiku</td><td>Autocomplete, sentence suggestions</td><td>~200 in / 100 out</td></tr>
+        <tr><td>Autoblog Rewrite</td><td>Claude Sonnet</td><td>Full article rewrite in brand voice</td><td>~1500 in / 1200 out</td></tr>
+        <tr><td>LLM Detector</td><td>Claude Haiku</td><td>AI content classification</td><td>~300 in / 10 out</td></tr>
+        <tr><td>AOE Discovery</td><td>Claude Sonnet</td><td>Prospect domain &amp; contact generation</td><td>~500 in / 800 out</td></tr>
+        <tr><td>AOE Email Draft</td><td>Claude Haiku</td><td>Personalised email per prospect</td><td>~400 in / 300 out</td></tr>
+        <tr><td>PMB AI Polish</td><td>Claude Haiku</td><td>Press release copy improvements</td><td>~800 in / 600 out</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</body>
+</html>

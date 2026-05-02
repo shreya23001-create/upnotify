@@ -6,6 +6,13 @@ import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { useWorkspace } from '@/components/providers/workspace-provider'
 import { useAuth } from '@/components/providers/auth-provider'
+import type { SupportedCurrency } from '@/lib/utils/currency'
+import { formatGbp, formatInr } from '@/lib/utils/currency'
+
+// Credit monthly cap: 1000 pence (£10) or equivalent INR (1000 × 107 paise = ₹1,070)
+function formatCreditCap(currency: SupportedCurrency): string {
+  return currency === 'inr' ? formatInr(1000 * 107) : formatGbp(1000)
+}
 import {
   IconDashboard, IconActivity, IconGlobe, IconAlertTriangle,
   IconBuilding, IconSettings, IconShield, IconChevronLeft, IconChevronRight,
@@ -43,7 +50,11 @@ const secondaryNavItems: NavItem[] = [
   { href: '/dashboard/help', label: 'Help', icon: IconHelpCircle },
 ]
 
-export function Sidebar(): React.ReactElement {
+interface SidebarProps {
+  currency?: SupportedCurrency
+}
+
+export function Sidebar({ currency = 'gbp' }: SidebarProps): React.ReactElement {
   const pathname = usePathname()
   const { isAgency } = useWorkspace()
   const { user } = useAuth()
@@ -165,7 +176,7 @@ export function Sidebar(): React.ReactElement {
 
       {/* Credits promo — collapsible, only for non-admin users */}
       {!collapsed && !user?.is_super_admin && (
-        <CreditsPromo />
+        <CreditsPromo currency={currency} />
       )}
 
       <div className="sidebar-collapse-btn-wrapper">
@@ -181,8 +192,9 @@ export function Sidebar(): React.ReactElement {
   )
 }
 
-function CreditsPromo(): React.ReactElement {
+function CreditsPromo({ currency = 'gbp' }: { currency?: SupportedCurrency }): React.ReactElement {
   const [open, setOpen] = useState(true)
+  const cap = formatCreditCap(currency)
 
   return (
     <div className="sidebar-credits-promo">
@@ -194,7 +206,7 @@ function CreditsPromo(): React.ReactElement {
         </span>
       </div>
       <div className={`sidebar-credits-promo-body${open ? '' : ' collapsed'}`}>
-        <div className="sidebar-credits-promo-text">Get up to £10/mo off your plan by referring friends.</div>
+        <div className="sidebar-credits-promo-text">Get up to {cap}/mo off your plan by referring friends.</div>
         <Link href="/dashboard/settings?tab=referrals" className="sidebar-credits-promo-link">
           Learn how →
         </Link>

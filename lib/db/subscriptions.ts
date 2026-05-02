@@ -11,7 +11,7 @@ export async function getSubscription(orgId: string): Promise<Subscription | nul
     .from('subscriptions')
     .select('*')
     .eq('org_id', orgId)
-    .in('status', ['active', 'cancelling'])
+    .in('status', ['active', 'cancelling', 'paused'])
     .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle()
@@ -103,12 +103,12 @@ export async function getSubscriptionWithPlan(
 ): Promise<{ subscription: Subscription; plan: Plan } | null> {
   const supabase = createAdminClient()
 
-  // Active or cancelling (paid until period end) — both have full plan limits
+  // Active, cancelling, or paused — all have an associated paid plan
   const { data: active } = await supabase
     .from('subscriptions')
     .select('*, plans(*)')
     .eq('org_id', orgId)
-    .in('status', ['active', 'cancelling'])
+    .in('status', ['active', 'cancelling', 'paused'])
     .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle()
@@ -142,6 +142,29 @@ export async function getSubscriptionWithPlan(
  * Create a 14-day reverse trial subscription for a new user.
  * Assigns the Builder plan with 'trialing' status and trial_ends_at set to 14 days from now.
  */
+/**
+ * Returns the payment provider used by the most recent subscription for this org,
+ * regardless of status. Used to keep currency consistent after cancellation.
+ */
+export async function getLastSubscriptionProvider(
+  orgId: string
+): Promise<'razorpay' | 'stripe' | null> {
+  const supabase = createAdminClient()
+  const { data } = await supabase
+    .from('subscriptions')
+    .select('razorpay_subscription_id, stripe_subscription_id')
+    .eq('org_id', orgId)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  if (!data) return null
+  const row = data as Record<string, unknown>
+  if (row.razorpay_subscription_id) return 'razorpay'
+  if (row.stripe_subscription_id) return 'stripe'
+  return null
+}
+
 export async function createTrialSubscription(orgId: string): Promise<Subscription | null> {
   const supabase = createAdminClient()
 

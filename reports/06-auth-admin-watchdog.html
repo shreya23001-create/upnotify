@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Uptrue &mdash; Auth, Team, Admin &amp; Watchdog Report</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8f9fa; color: #1a1a2e; font-size: 14px; line-height: 1.6; }
+  .page { max-width: 1100px; margin: 0 auto; padding: 40px 32px; }
+  h1 { font-size: 28px; font-weight: 800; color: #0f0f23; margin-bottom: 6px; }
+  h2 { font-size: 18px; font-weight: 700; color: #0f0f23; margin: 36px 0 14px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
+  h3 { font-size: 14px; font-weight: 700; color: #374151; margin: 20px 0 10px; }
+  .meta { color: #6b7280; font-size: 13px; margin-bottom: 32px; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; letter-spacing: .4px; text-transform: uppercase; }
+  .badge-green { background: #d1fae5; color: #065f46; }
+  .badge-yellow { background: #fef3c7; color: #92400e; }
+  .badge-red { background: #fee2e2; color: #991b1b; }
+  .badge-blue { background: #dbeafe; color: #1e40af; }
+  .badge-purple { background: #ede9fe; color: #5b21b6; }
+  .badge-gray { background: #f3f4f6; color: #374151; }
+
+  .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 36px; }
+  .summary-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; text-align: center; }
+  .summary-card .num { font-size: 32px; font-weight: 800; color: #dc2626; }
+  .summary-card .label { font-size: 12px; color: #6b7280; margin-top: 4px; }
+
+  .flow-section { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 28px; }
+  .flow-title { font-size: 15px; font-weight: 700; color: #0f0f23; margin-bottom: 18px; }
+  .flow-row { display: flex; align-items: flex-start; gap: 0; flex-wrap: wrap; }
+  .flow-step { background: #fafafa; border: 1.5px solid #d1d5db; border-radius: 10px; padding: 14px 16px; min-width: 130px; flex: 1; }
+  .flow-step .step-num { font-size: 10px; font-weight: 800; color: #6b7280; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 4px; }
+  .flow-step .step-title { font-size: 13px; font-weight: 700; color: #111827; margin-bottom: 4px; }
+  .flow-step .step-desc { font-size: 11px; color: #6b7280; }
+  .flow-arrow { display: flex; align-items: center; padding: 0 6px; color: #9ca3af; font-size: 20px; flex-shrink: 0; margin-top: 22px; }
+  .flow-step.highlight { background: #eff6ff; border-color: #3b82f6; }
+  .flow-step.highlight .step-num { color: #1d4ed8; }
+  .flow-step.highlight .step-title { color: #1e3a8a; }
+  .flow-step.success { background: #d1fae5; border-color: #059669; }
+  .flow-step.success .step-num { color: #059669; }
+  .flow-step.warning { background: #fef3c7; border-color: #d97706; }
+  .flow-step.warning .step-num { color: #d97706; }
+  .flow-step.warning .step-title { color: #78350f; }
+  .flow-step.danger { background: #fee2e2; border-color: #fca5a5; }
+  .flow-step.danger .step-num { color: #dc2626; }
+  .flow-step.danger .step-title { color: #7f1d1d; }
+
+  .flow-branch { margin-top: 14px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .branch-box { border-radius: 8px; padding: 12px 14px; }
+  .branch-yes { background: #d1fae5; border: 1px solid #6ee7b7; }
+  .branch-no { background: #fee2e2; border: 1px solid #fca5a5; }
+  .branch-box .branch-label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
+  .branch-yes .branch-label { color: #065f46; }
+  .branch-no .branch-label { color: #991b1b; }
+  .branch-box p { font-size: 11px; color: #374151; }
+
+  table { width: 100%; border-collapse: collapse; margin-bottom: 24px; font-size: 13px; }
+  th { background: #f1f5f9; text-align: left; padding: 10px 14px; font-weight: 700; color: #374151; font-size: 12px; text-transform: uppercase; letter-spacing: .4px; }
+  td { padding: 10px 14px; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #f8faff; }
+
+  .role-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 28px; }
+  .role-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 18px; }
+  .role-card .role-name { font-size: 14px; font-weight: 800; color: #0f0f23; margin-bottom: 6px; }
+  .role-card .role-scope { font-size: 11px; color: #6b7280; margin-bottom: 10px; }
+  .role-card ul { list-style: none; }
+  .role-card ul li { font-size: 12px; color: #4b5563; padding: 3px 0; display: flex; gap: 6px; }
+  .role-card ul li::before { content: '✓'; color: #059669; flex-shrink: 0; font-weight: 700; }
+  .role-card ul li.no::before { content: '✗'; color: #dc2626; }
+  .role-card.admin-role { border-color: #dc2626; background: #fff8f8; }
+  .role-card.admin-role .role-name { color: #991b1b; }
+
+  .issue-block { background: #fff; border: 1px solid #e2e8f0; border-left: 4px solid #e2e8f0; border-radius: 8px; padding: 18px 20px; margin-bottom: 14px; }
+  .issue-block.critical { border-left-color: #dc2626; }
+  .issue-block.high { border-left-color: #f59e0b; }
+  .issue-block.medium { border-left-color: #3b82f6; }
+  .issue-block.low { border-left-color: #10b981; }
+  .issue-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .issue-title { font-size: 14px; font-weight: 700; color: #0f0f23; }
+  .issue-desc { font-size: 13px; color: #4b5563; margin-bottom: 12px; line-height: 1.6; }
+  .fix-box { background: #f0fdf4; border: 1px solid #86efac; border-radius: 6px; padding: 12px 14px; }
+  .fix-box .fix-label { font-size: 10px; font-weight: 800; color: #166534; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
+  .fix-box p { font-size: 12px; color: #166534; }
+  .file-path { font-family: 'SF Mono', monospace; font-size: 11px; color: #6b7280; margin-top: 8px; }
+
+  .suggestion-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px; }
+  .suggestion-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; }
+  .suggestion-card h4 { font-size: 13px; font-weight: 800; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #e2e8f0; }
+  .suggestion-card.immediate h4 { color: #dc2626; border-color: #fecaca; }
+  .suggestion-card.short-term h4 { color: #d97706; border-color: #fde68a; }
+  .suggestion-card.architecture h4 { color: #1d4ed8; border-color: #bfdbfe; }
+  .suggestion-card ul { list-style: none; }
+  .suggestion-card ul li { font-size: 12px; color: #4b5563; padding: 6px 0; border-bottom: 1px solid #f3f4f6; display: flex; gap: 8px; align-items: flex-start; }
+  .suggestion-card ul li:last-child { border-bottom: none; }
+  .suggestion-card ul li::before { content: '→'; color: #9ca3af; flex-shrink: 0; margin-top: 1px; }
+
+  .security-callout { background: #fff5f5; border: 2px solid #fca5a5; border-radius: 10px; padding: 18px 20px; margin-bottom: 28px; }
+  .security-callout h3 { color: #991b1b; margin-bottom: 8px; font-size: 15px; }
+  .security-callout p { font-size: 13px; color: #7f1d1d; }
+
+  .section-box { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 28px; }
+  .print-note { background: #fef3c7; border: 1px solid #fcd34d; border-radius: 8px; padding: 12px 16px; font-size: 12px; color: #92400e; margin-bottom: 24px; }
+  @media print { .print-note { display: none; } body { background: #fff; } .page { padding: 20px; } }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="print-note">To save as PDF: File &rarr; Print &rarr; Save as PDF (or Cmd+P on Mac)</div>
+
+  <h1>Auth, Team, Admin &amp; Watchdog</h1>
+  <p class="meta">Uptrue &mdash; Feature Audit Report &nbsp;|&nbsp; Generated 2026-04-27 &nbsp;|&nbsp; Report 06 of 06</p>
+
+  <div class="security-callout">
+    <h3>&#9888;&#65039; Security Notice</h3>
+    <p>This report contains 3 critical security vulnerabilities identified during audit. These should be addressed before the next production deployment. See Issues section below for details and recommended fixes.</p>
+  </div>
+
+  <div class="summary-grid">
+    <div class="summary-card"><div class="num">3</div><div class="label">Auth Methods</div></div>
+    <div class="summary-card"><div class="num">4</div><div class="label">Permission Roles</div></div>
+    <div class="summary-card"><div class="num">10</div><div class="label">Issues Found</div></div>
+    <div class="summary-card"><div class="num">3</div><div class="label">Critical Security Issues</div></div>
+  </div>
+
+  <h2>Working Flows</h2>
+
+  <div class="flow-section">
+    <div class="flow-title">&#128274; Flow 1 &mdash; User Authentication (Magic Link + OAuth)</div>
+    <div class="flow-row">
+      <div class="flow-step">
+        <div class="step-num">Entry</div>
+        <div class="step-title">User Visits /login</div>
+        <div class="step-desc">Two options presented: email magic link or Google OAuth button</div>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step highlight">
+        <div class="step-num">Magic Link</div>
+        <div class="step-title">Supabase Sends OTP Email</div>
+        <div class="step-desc">Supabase auth.signInWithOtp() sends 6-digit OTP or magic link via Resend SMTP</div>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step highlight">
+        <div class="step-num">Verify</div>
+        <div class="step-title">Token Verified</div>
+        <div class="step-desc">Supabase verifies token server-side, issues JWT session cookie with 7-day expiry</div>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step success">
+        <div class="step-num">Session</div>
+        <div class="step-title">User Lands on Dashboard</div>
+        <div class="step-desc">Session cookie set, user record upserted in users table, onboarding check performed</div>
+      </div>
+    </div>
+    <div class="flow-branch">
+      <div class="branch-box branch-yes">
+        <div class="branch-label">&#10003; Existing User</div>
+        <p>Session created, redirected to /dashboard. Last login time updated in users table.</p>
+      </div>
+      <div class="branch-box branch-no">
+        <div class="branch-label">First Visit</div>
+        <p>User record created, redirected to /onboarding flow for brand profile setup and plan selection.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="flow-section">
+    <div class="flow-title">&#128100; Flow 2 &mdash; Team Member Invitation &amp; Role Assignment</div>
+    <div class="flow-row">
+      <div class="flow-step">
+        <div class="step-num">Invite</div>
+        <div class="step-title">Owner Sends Invite</div>
+        <div class="step-desc">Email + role selected in /settings/team. Invite record created with 48h expiry token.</div>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step highlight">
+        <div class="step-num">Email</div>
+        <div class="step-title">Resend Delivers Invite</div>
+        <div class="step-desc">Invite email with accept link sent via Resend. Link contains signed invite token.</div>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step">
+        <div class="step-num">Accept</div>
+        <div class="step-title">Invitee Clicks Link</div>
+        <div class="step-desc">Token verified, user created or matched, team_members record created with assigned role</div>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step success">
+        <div class="step-num">Access</div>
+        <div class="step-title">Scoped Access Granted</div>
+        <div class="step-desc">User can access organisation resources per their role. RLS policies enforce at DB layer.</div>
+      </div>
+    </div>
+    <div class="flow-branch">
+      <div class="branch-box branch-yes">
+        <div class="branch-label">&#10003; Valid Token</div>
+        <p>Team member added, invite marked as accepted, owner notified via email, member appears in /settings/team list</p>
+      </div>
+      <div class="branch-box branch-no">
+        <div class="branch-label">&#10007; Expired / Invalid</div>
+        <p>Error shown, invite marked as expired. Owner must resend. No automatic resend mechanism exists.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="flow-section">
+    <div class="flow-title">&#128373; Flow 3 &mdash; Admin Impersonation</div>
+    <div class="flow-row">
+      <div class="flow-step danger">
+        <div class="step-num">Admin Only</div>
+        <div class="step-title">Search for Target User</div>
+        <div class="step-desc">/admin/users search. Requires is_admin = true in users table.</div>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step danger">
+        <div class="step-num">Initiate</div>
+        <div class="step-title">Click &ldquo;Impersonate&rdquo;</div>
+        <div class="step-desc">POST /api/admin/impersonate with target user_id. Supabase admin client creates session.</div>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step warning">
+        <div class="step-num">Session</div>
+        <div class="step-title">Impersonation Cookie Set</div>
+        <div class="step-desc">impersonation_token set as unsigned cookie. Original admin session stored for restore.</div>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step warning">
+        <div class="step-num">Active</div>
+        <div class="step-title">Admin Acts As User</div>
+        <div class="step-desc">All actions attributed to target user. Audit log records impersonator_id (inconsistently).</div>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step success">
+        <div class="step-num">End</div>
+        <div class="step-title">Exit Impersonation</div>
+        <div class="step-desc">Original admin session restored from stored token. Impersonation session cleared.</div>
+      </div>
+    </div>
+    <div class="flow-branch">
+      <div class="branch-box branch-no">
+        <div class="branch-label">&#9888; Critical: Unsigned Cookie</div>
+        <p>impersonation_token cookie is unsigned. Any user who can set a cookie value could spoof an impersonation session and access another user's account without admin credentials.</p>
+      </div>
+      <div class="branch-box branch-no">
+        <div class="branch-label">&#9888; Incomplete Audit Log</div>
+        <p>Impersonation actions are not consistently attributed to the impersonator. Some writes in impersonation sessions appear as native user actions in audit logs.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="flow-section">
+    <div class="flow-title">&#128064; Flow 4 &mdash; Watchdog System (User Activity Monitor)</div>
+    <div class="flow-row">
+      <div class="flow-step">
+        <div class="step-num">Collect</div>
+        <div class="step-title">Activity Events Logged</div>
+        <div class="step-desc">Key user actions (login, plan change, monitor create/delete) written to watchdog_events table</div>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step">
+        <div class="step-num">Daily Cron</div>
+        <div class="step-title">Anomaly Detection Runs</div>
+        <div class="step-desc">/api/cron/watchdog checks for unusual patterns: bulk deletions, rapid plan downgrades, failed logins</div>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step highlight">
+        <div class="step-num">Evaluate</div>
+        <div class="step-title">Threshold Rules Applied</div>
+        <div class="step-desc">Hardcoded thresholds: &gt;10 failed logins/hour, &gt;5 monitor deletes in 1h, &gt;3 plan changes/day</div>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step warning">
+        <div class="step-num">Alert</div>
+        <div class="step-title">Admin Email Sent</div>
+        <div class="step-desc">Alert email to admin address only. No Slack/webhook option. No in-app admin notification.</div>
+      </div>
+    </div>
+  </div>
+
+  <h2>Permission Roles</h2>
+  <div class="role-grid">
+    <div class="role-card admin-role">
+      <div class="role-name">&#128274; Super Admin</div>
+      <div class="role-scope">Platform-level. is_admin = true in users table.</div>
+      <ul>
+        <li>Access all admin panel routes</li>
+        <li>Impersonate any user</li>
+        <li>View all billing data</li>
+        <li>Modify any user&rsquo;s plan</li>
+        <li>Access watchdog events</li>
+        <li>Delete any resource</li>
+      </ul>
+    </div>
+    <div class="role-card">
+      <div class="role-name">&#128081; Owner</div>
+      <div class="role-scope">Organisation-level. Created on signup.</div>
+      <ul>
+        <li>Manage all brand resources</li>
+        <li>Invite &amp; remove team members</li>
+        <li>Access billing &amp; plan settings</li>
+        <li>Manage API keys</li>
+        <li class="no">Cannot access other orgs</li>
+        <li class="no">Cannot access admin panel</li>
+      </ul>
+    </div>
+    <div class="role-card">
+      <div class="role-name">&#9997; Editor</div>
+      <div class="role-scope">Organisation-level. Invited by Owner.</div>
+      <ul>
+        <li>Create &amp; edit blog posts</li>
+        <li>Manage monitors</li>
+        <li>Run citation checks</li>
+        <li class="no">Cannot invite team members</li>
+        <li class="no">Cannot access billing</li>
+        <li class="no">Cannot delete brand</li>
+      </ul>
+    </div>
+    <div class="role-card">
+      <div class="role-name">&#128065; Viewer</div>
+      <div class="role-scope">Organisation-level. Read-only access.</div>
+      <ul>
+        <li>View dashboards &amp; reports</li>
+        <li>View monitor status</li>
+        <li>View citation scores</li>
+        <li class="no">Cannot create or edit anything</li>
+        <li class="no">Cannot access settings</li>
+        <li class="no">Cannot view billing</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Issues Found</h2>
+
+  <div class="issue-block critical">
+    <div class="issue-header">
+      <span class="badge badge-red">Critical &mdash; Security</span>
+      <span class="issue-title">Impersonation Cookie Is Unsigned &mdash; Session Spoofing Risk</span>
+    </div>
+    <p class="issue-desc">
+      The <code>impersonation_token</code> cookie that tracks active admin impersonation sessions is stored without a cryptographic signature. Any attacker who can write an arbitrary cookie value (via XSS or browser dev tools on a shared machine) can forge an impersonation session and access another user&rsquo;s account data. This bypasses all authentication. The cookie should be signed with a server secret before being stored on the client.
+    </p>
+    <div class="fix-box">
+      <div class="fix-label">Recommended Fix</div>
+      <p>Sign the impersonation token using HMAC-SHA256 with a server-side secret (IMPERSONATION_SECRET from getServerConfig()). Verify the signature server-side on every request that reads the cookie. Alternatively, store the impersonation state entirely server-side in a short-lived DB record keyed by a random session ID, with no sensitive data in the cookie at all.</p>
+    </div>
+    <div class="file-path">&#128196; app/api/admin/impersonate/route.ts &middot; middleware.ts &middot; lib/utils/cookies.ts</div>
+  </div>
+
+  <div class="issue-block critical">
+    <div class="issue-header">
+      <span class="badge badge-red">Critical &mdash; Security</span>
+      <span class="issue-title">Admin Panel Pages Lack Server-Side Permission Checks</span>
+    </div>
+    <p class="issue-desc">
+      Admin panel routes under /admin/* rely on a client-side redirect in the layout component to enforce access. If a user navigates directly to an admin API route (e.g., /api/admin/users, /api/admin/impersonate) without going through the layout, there is no server-side is_admin check on the API routes themselves. Middleware only checks authentication (session exists) but not the admin role. This means any authenticated user can call admin API endpoints directly.
+    </p>
+    <div class="fix-box">
+      <div class="fix-label">Recommended Fix</div>
+      <p>Add an explicit is_admin check at the top of every /api/admin/* route handler before any logic executes. Create a requireAdmin() helper in lib/auth/guards.ts that reads the current session, looks up users.is_admin, and returns a 403 if false. Call requireAdmin() as the first line of every admin route. Do not rely on layout-level redirects for security.</p>
+    </div>
+    <div class="file-path">&#128196; app/api/admin/*/route.ts &middot; lib/auth/guards.ts</div>
+  </div>
+
+  <div class="issue-block critical">
+    <div class="issue-header">
+      <span class="badge badge-red">Critical &mdash; Security</span>
+      <span class="issue-title">Auth Rate Limiting Not Wired to Login Endpoint</span>
+    </div>
+    <p class="issue-desc">
+      The in-memory rate limiter exists in lib/utils/rate-limiter.ts and is used on some monitor API routes, but it is not applied to the /api/auth/login or /api/auth/verify-otp endpoints. An attacker can send unlimited login attempts or OTP verification requests, enabling brute-force attacks against OTP codes (6-digit = 1,000,000 combinations, easily brute-forced at high request rates). Supabase has its own rate limiting but this should not be the only defense.
+    </p>
+    <div class="fix-box">
+      <div class="fix-label">Recommended Fix</div>
+      <p>Apply the existing rate limiter to /api/auth/* routes: max 10 login attempts per IP per 15 minutes. On 10th failure, add a 15-minute lockout. Log excessive attempts to watchdog_events for admin visibility. Also enable Supabase&rsquo;s built-in email OTP rate limiting in the Supabase dashboard (Auth &gt; Rate Limits) as a second layer.</p>
+    </div>
+    <div class="file-path">&#128196; app/api/auth/login/route.ts &middot; app/api/auth/verify-otp/route.ts &middot; lib/utils/rate-limiter.ts</div>
+  </div>
+
+  <div class="issue-block high">
+    <div class="issue-header">
+      <span class="badge badge-yellow">High</span>
+      <span class="issue-title">Impersonation Actions Not Consistently Attributed in Audit Log</span>
+    </div>
+    <p class="issue-desc">
+      When an admin is impersonating a user and performs actions (editing a monitor, changing a plan), those actions should be recorded with both the target user_id and the impersonator_id. Currently, some write operations during impersonation use the target user&rsquo;s session directly without recording the impersonator. This means post-incident investigations cannot determine whether a change was made by the user or an admin acting on their behalf.
+    </p>
+    <div class="fix-box">
+      <div class="fix-label">Recommended Fix</div>
+      <p>Add an impersonator_id column to all audit-relevant tables (monitor_events, billing_events, watchdog_events). When an impersonation session is active, the API middleware should inject impersonator_id into all write operations. Create a DB function or trigger that automatically populates this field when the impersonation cookie is present.</p>
+    </div>
+    <div class="file-path">&#128196; lib/auth/session.ts &middot; lib/db/audit.ts &middot; middleware.ts</div>
+  </div>
+
+  <div class="issue-block high">
+    <div class="issue-header">
+      <span class="badge badge-yellow">High</span>
+      <span class="issue-title">Team Member Role Checks Not Enforced at DB Layer for All Resources</span>
+    </div>
+    <p class="issue-desc">
+      RLS policies enforce team membership at the database layer, but the role within the team (Owner vs Editor vs Viewer) is only checked in application code, not in RLS policies. An Editor who knows the API endpoint for billing changes could craft a direct API call that the DB would not reject, relying entirely on application-level checks that may have gaps.
+    </p>
+    <div class="fix-box">
+      <div class="fix-label">Recommended Fix</div>
+      <p>Extend RLS policies to check team role for sensitive operations: billing_events (INSERT/UPDATE restricted to role IN ('owner')), monitor_deletes (restricted to role IN ('owner', 'editor')). Store the role in team_members table and reference it in RLS policy conditions. This makes role enforcement tamper-proof at the DB layer.</p>
+    </div>
+    <div class="file-path">&#128196; supabase/migrations/ &middot; lib/db/team-members.ts</div>
+  </div>
+
+  <div class="issue-block medium">
+    <div class="issue-header">
+      <span class="badge badge-blue">Medium</span>
+      <span class="issue-title">Watchdog Thresholds Are Hardcoded &mdash; Cannot Be Tuned Without Deploy</span>
+    </div>
+    <p class="issue-desc">
+      The watchdog anomaly detection uses hardcoded thresholds (10 failed logins/hour, 5 monitor deletes/hour, 3 plan changes/day). These are arbitrary values that cannot be adjusted without a code change and deployment. As Uptrue scales, these thresholds will generate too many false positives (for power users) or miss genuine attacks.
+    </p>
+    <div class="fix-box">
+      <div class="fix-label">Recommended Fix</div>
+      <p>Move thresholds to a watchdog_config table managed via the admin panel. Allow per-metric configuration with name, threshold, window_minutes, and severity. Add a test mode that simulates alerts without sending emails. This enables real-time tuning of sensitivity without code deploys.</p>
+    </div>
+    <div class="file-path">&#128196; app/api/cron/watchdog/route.ts &middot; lib/services/watchdog.ts</div>
+  </div>
+
+  <div class="issue-block medium">
+    <div class="issue-header">
+      <span class="badge badge-blue">Medium</span>
+      <span class="issue-title">Watchdog Alerts Only Go to Email &mdash; No Slack or In-App Notification</span>
+    </div>
+    <p class="issue-desc">
+      Watchdog anomaly alerts are sent only to a hardcoded admin email address. There is no Slack webhook, no in-app admin notification, and no way to route different alert types to different channels. If the admin email is unmonitored during off-hours, critical security events go unnoticed.
+    </p>
+    <div class="fix-box">
+      <div class="fix-label">Recommended Fix</div>
+      <p>Extend the watchdog alert system to support multiple channels: email (existing), Slack webhook (configurable in admin panel), and in-app notification badge visible on the /admin dashboard. For Critical severity events, send to all channels simultaneously. Use the same alert-channel abstraction already used in the monitor alert system.</p>
+    </div>
+    <div class="file-path">&#128196; lib/services/watchdog.ts &middot; lib/services/alert-dispatcher.ts</div>
+  </div>
+
+  <div class="issue-block medium">
+    <div class="issue-header">
+      <span class="badge badge-blue">Medium</span>
+      <span class="issue-title">Session Tokens Not Invalidated on Password or Email Change</span>
+    </div>
+    <p class="issue-desc">
+      When a user changes their email address or auth method (e.g., switches from magic link to Google OAuth), existing sessions from other browsers or devices remain valid. An attacker who has already captured a session token can continue to use it even after the user has updated their credentials. Industry standard is to invalidate all sessions on credential change.
+    </p>
+    <div class="fix-box">
+      <div class="fix-label">Recommended Fix</div>
+      <p>On email or auth method change, call Supabase&rsquo;s admin.auth.signOut(userId, 'others') to invalidate all other active sessions for that user. Show the user a confirmation: &ldquo;All other sessions have been signed out.&rdquo; Log this event to watchdog_events as a security-relevant action.</p>
+    </div>
+    <div class="file-path">&#128196; app/api/auth/update-email/route.ts &middot; lib/auth/session.ts</div>
+  </div>
+
+  <div class="issue-block low">
+    <div class="issue-header">
+      <span class="badge badge-green">Low</span>
+      <span class="issue-title">Admin User Search Returns Full User Objects Including Sensitive Fields</span>
+    </div>
+    <p class="issue-desc">
+      The /api/admin/users search endpoint returns full user records including encrypted_api_keys, billing_customer_id, and other sensitive fields that are not needed for the search result display. This creates unnecessary data exposure in network traffic and browser DevTools.
+    </p>
+    <div class="fix-box">
+      <div class="fix-label">Recommended Fix</div>
+      <p>Create a dedicated AdminUserSummary type that selects only the fields needed for the admin UI: id, email, created_at, plan, is_active, last_login. Use this type in the search query SELECT clause. Never return encrypted API keys or payment tokens to the frontend, even in admin context.</p>
+    </div>
+    <div class="file-path">&#128196; app/api/admin/users/route.ts &middot; lib/db/users.ts</div>
+  </div>
+
+  <div class="issue-block low">
+    <div class="issue-header">
+      <span class="badge badge-green">Low</span>
+      <span class="issue-title">Team Invite Links Do Not Expire on First Use</span>
+    </div>
+    <p class="issue-desc">
+      Team invitation links expire after 48 hours but are not invalidated after first use. If an invitation email is forwarded or the link is shared accidentally, a second person can use the same link to join the organisation under the invited email address. The invitee would then have two accounts joined to the same team slot.
+    </p>
+    <div class="fix-box">
+      <div class="fix-label">Recommended Fix</div>
+      <p>Mark invite tokens as used immediately upon the first successful acceptance (UPDATE team_invites SET used_at = NOW() WHERE token = ?). On acceptance, check used_at IS NULL before proceeding. Show a clear error for already-used tokens. This is a one-line DB update in the accept handler.</p>
+    </div>
+    <div class="file-path">&#128196; app/api/team/accept-invite/route.ts &middot; lib/db/team-invites.ts</div>
+  </div>
+
+  <h2>Suggestions &amp; Improvements</h2>
+  <div class="suggestion-grid">
+    <div class="suggestion-card immediate">
+      <h4>Immediate (This Sprint) &mdash; Security</h4>
+      <ul>
+        <li>Sign impersonation cookie with HMAC-SHA256 using server secret</li>
+        <li>Add requireAdmin() guard to all /api/admin/* route handlers</li>
+        <li>Wire existing rate limiter to /api/auth/login and /api/auth/verify-otp</li>
+        <li>Invalidate all sessions on email or auth method change</li>
+        <li>Mark invite tokens as used on first acceptance</li>
+      </ul>
+    </div>
+    <div class="suggestion-card short-term">
+      <h4>Short-Term (1&ndash;2 Sprints)</h4>
+      <ul>
+        <li>Extend RLS policies to enforce team role (not just membership) for billing/delete operations</li>
+        <li>Add impersonator_id to all audit-relevant write operations</li>
+        <li>Add Slack webhook + in-app notification to watchdog alert dispatch</li>
+        <li>Move watchdog thresholds to admin-configurable DB table</li>
+        <li>Restrict admin user search to AdminUserSummary fields only</li>
+      </ul>
+    </div>
+    <div class="suggestion-card architecture">
+      <h4>Architecture</h4>
+      <ul>
+        <li>Centralised audit log table with actor_id, impersonator_id, action, resource_type, resource_id, metadata &mdash; single source of truth for all system events</li>
+        <li>Role-based access control (RBAC) library: centralise all permission checks in lib/auth/rbac.ts to avoid scattered role checks across route handlers</li>
+        <li>Admin panel real-time activity feed using Supabase Realtime for live watchdog events</li>
+        <li>MFA (TOTP) support for admin accounts and optionally for all users as a plan feature</li>
+        <li>Session management page for users: see all active sessions, sign out individual devices</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section-box">
+    <h3>Admin Panel Sections &amp; Access Control</h3>
+    <table>
+      <thead>
+        <tr><th>Admin Section</th><th>Route</th><th>Server-Side Guard</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>User Management</td><td>/admin/users</td><td>Layout redirect only</td><td><span class="badge badge-red">Vulnerable</span></td></tr>
+        <tr><td>Revenue / Billing</td><td>/admin/revenue</td><td>Layout redirect only</td><td><span class="badge badge-red">Vulnerable</span></td></tr>
+        <tr><td>Vision vs Crozent</td><td>/admin/revenue/entities</td><td>Layout redirect only</td><td><span class="badge badge-red">Vulnerable</span></td></tr>
+        <tr><td>Impersonation</td><td>/api/admin/impersonate</td><td>is_admin DB check</td><td><span class="badge badge-green">Guarded</span></td></tr>
+        <tr><td>Watchdog Events</td><td>/admin/watchdog</td><td>Layout redirect only</td><td><span class="badge badge-red">Vulnerable</span></td></tr>
+        <tr><td>System Config</td><td>/admin/config</td><td>Layout redirect only</td><td><span class="badge badge-red">Vulnerable</span></td></tr>
+        <tr><td>API: List Users</td><td>/api/admin/users</td><td>None</td><td><span class="badge badge-red">No Guard</span></td></tr>
+        <tr><td>API: Update Plan</td><td>/api/admin/plans</td><td>None</td><td><span class="badge badge-red">No Guard</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-box">
+    <h3>Security Fix Priority Matrix</h3>
+    <table>
+      <thead>
+        <tr><th>Fix</th><th>Severity</th><th>Effort</th><th>Priority</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Sign impersonation cookie with HMAC</td><td><span class="badge badge-red">Critical</span></td><td>Low (2h)</td><td><strong>P0 — Ship this week</strong></td></tr>
+        <tr><td>requireAdmin() guard on all /api/admin/* routes</td><td><span class="badge badge-red">Critical</span></td><td>Low (3h)</td><td><strong>P0 — Ship this week</strong></td></tr>
+        <tr><td>Rate limit auth endpoints</td><td><span class="badge badge-red">Critical</span></td><td>Low (1h)</td><td><strong>P0 — Ship this week</strong></td></tr>
+        <tr><td>Extend RLS for team roles</td><td><span class="badge badge-yellow">High</span></td><td>Medium (1 day)</td><td>P1 — Next sprint</td></tr>
+        <tr><td>Consistent impersonation audit trail</td><td><span class="badge badge-yellow">High</span></td><td>Medium (1 day)</td><td>P1 — Next sprint</td></tr>
+        <tr><td>Invalidate sessions on credential change</td><td><span class="badge badge-blue">Medium</span></td><td>Low (2h)</td><td>P2 — This sprint if capacity</td></tr>
+        <tr><td>Watchdog multi-channel alerts</td><td><span class="badge badge-blue">Medium</span></td><td>Medium (1 day)</td><td>P2 — Next sprint</td></tr>
+        <tr><td>Invalidate invite on first use</td><td><span class="badge badge-green">Low</span></td><td>Very Low (30min)</td><td>P3 — Quick win</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</body>
+</html>

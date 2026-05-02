@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { getCurrentUser } from '@/lib/db/users'
-import { canAccessAdminModule } from '@/lib/db/admin-roles'
+import { canAccessAdminModule, canWriteAdminModule } from '@/lib/db/admin-roles'
 import { getAllTickets, countTicketsByStatus } from '@/lib/db/support'
 import type { TicketFilter } from '@/lib/db/support'
 
@@ -49,7 +49,12 @@ export default async function AdminSupportPage({ searchParams }: PageProps): Pro
   const user = await getCurrentUser()
   if (!user) redirect('/login')
 
-  if (!await canAccessAdminModule(user.email, !!user.is_super_admin, 'support')) redirect('/admin')
+  const isSuperAdmin = !!user.is_super_admin
+  const [canRead, canWrite] = await Promise.all([
+    canAccessAdminModule(user.email, isSuperAdmin, 'support'),
+    canWriteAdminModule(user.email, isSuperAdmin, 'support'),
+  ])
+  if (!canRead) redirect('/admin')
 
   const { status: statusFilter, priority: priorityFilter } = await searchParams
 
@@ -71,6 +76,9 @@ export default async function AdminSupportPage({ searchParams }: PageProps): Pro
           <h1 className="page-title">Support Tickets</h1>
           <p className="page-subtitle">All customer support requests</p>
         </div>
+        {!canWrite && (
+          <span className="badge badge-outline" style={{ fontSize: 12 }}>Read only</span>
+        )}
       </div>
 
       {/* Status filter tabs */}

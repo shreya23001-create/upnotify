@@ -1,5 +1,5 @@
-import { AdminTrustedLogos } from '@/components/admin/admin-trusted-logos'
-import { EmailProvidersContent } from '@/components/admin/email-providers-content'
+import { AdminSettingsContent } from '@/components/admin/admin-settings-content'
+import { getAllLandingSections, getCmsTheme } from '@/lib/db/page-sections'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
 
@@ -25,7 +25,11 @@ async function getTrustedLogos(): Promise<string[]> {
 }
 
 export default async function AdminSettingsPage(): Promise<React.ReactElement> {
-  const logos = await getTrustedLogos()
+  const [trustedLogos, cmsSections, cmsTheme] = await Promise.all([
+    getTrustedLogos(),
+    getAllLandingSections(),
+    getCmsTheme(),
+  ])
 
   return (
     <div>
@@ -33,15 +37,11 @@ export default async function AdminSettingsPage(): Promise<React.ReactElement> {
       <p className="admin-page-subtitle">Platform-wide configuration and content management.</p>
 
       <div style={{ marginTop: 32 }}>
-        <AdminTrustedLogos initialLogos={logos} />
-      </div>
-
-      <div style={{ marginTop: 32 }}>
-        <h2 style={{ fontSize: 15, fontWeight: 700, marginBottom: 4 }}>Email Configuration</h2>
-        <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 16 }}>
-          Manage email providers and control which service handles each type of outgoing email.
-        </p>
-        <EmailProvidersContent />
+        <AdminSettingsContent
+          cmsSections={cmsSections}
+          cmsTheme={cmsTheme}
+          trustedLogos={trustedLogos}
+        />
       </div>
     </div>
   )

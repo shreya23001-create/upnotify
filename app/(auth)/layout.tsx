@@ -1,10 +1,12 @@
 import Link from 'next/link'
 import { AuthLeftPanel } from '@/components/auth/auth-left-panel'
+import { getDefaultCurrency } from '@/lib/utils/geo.server'
 
-export default function AuthLayout({ children }: { children: React.ReactNode }): React.ReactElement {
+export default async function AuthLayout({ children }: { children: React.ReactNode }): Promise<React.ReactElement> {
+  const currency = await getDefaultCurrency()
   return (
     <div className="auth-page">
-      <AuthLeftPanel />
+      <AuthLeftPanel currency={currency} />
 
       {/* ── Right panel — form ── */}
       <div className="auth-right">

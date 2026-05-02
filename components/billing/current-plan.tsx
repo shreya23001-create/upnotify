@@ -18,6 +18,7 @@ export function CurrentPlan({ plan, subscription }: Props) {
   const sub = subscription as unknown as Record<string, unknown> | null
   const isPaused = sub?.status === 'paused'
   const isCancelling = sub?.status === 'cancelling'
+  const isTrialing = sub?.status === 'trialing'
   const pauseUntil = sub?.pause_until as string | null
   const currentPeriodEnd = sub?.current_period_end as string | null
 
@@ -70,7 +71,7 @@ export function CurrentPlan({ plan, subscription }: Props) {
               )}
               {!isPaused && !isCancelling && subscription.current_period_end && (
                 <p style={{ fontSize: 13, color: '#94a3b8', marginTop: 8 }}>
-                  Next billing: {new Date(subscription.current_period_end).toLocaleDateString()}
+                  Next billing: {new Date(subscription.current_period_end).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
                 </p>
               )}
             </div>
@@ -84,7 +85,7 @@ export function CurrentPlan({ plan, subscription }: Props) {
                   <button className="btn btn-secondary btn-sm" onClick={handleManage} disabled={isPending}>
                     {isPending ? 'Loading...' : 'Manage Billing'}
                   </button>
-                  {!isCancelling && (
+                  {!isCancelling && !isTrialing && (
                     <button
                       className="btn btn-ghost btn-sm"
                       style={{ fontSize: 12, color: 'var(--text-muted)' }}

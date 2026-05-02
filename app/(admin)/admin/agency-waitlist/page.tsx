@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 
 interface AgencyAiReport {
   strengths: string[]
@@ -200,8 +200,8 @@ export default function AdminAgencyWaitlistPage(): React.ReactElement {
                 </thead>
                 <tbody>
                   {entries.map(entry => (
-                    <>
-                      <tr key={entry.id}>
+                    <React.Fragment key={entry.id}>
+                      <tr>
                         <td style={{ fontWeight: 500 }}>{entry.name}</td>
                         <td style={{ fontSize: 13 }}>{entry.email}</td>
                         <td style={{ fontSize: 13 }}>{entry.business_name || '—'}</td>
@@ -249,7 +249,7 @@ export default function AdminAgencyWaitlistPage(): React.ReactElement {
                           )}
                         </td>
                         <td style={{ fontSize: 12, color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
-                          {new Date(entry.created_at).toLocaleDateString()}
+                          {new Date(entry.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                         </td>
                         <td>
                           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
@@ -292,7 +292,7 @@ export default function AdminAgencyWaitlistPage(): React.ReactElement {
                           {entry.reviewed_by && (
                             <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>
                               By {entry.reviewed_by}
-                              {entry.reviewed_at && ` on ${new Date(entry.reviewed_at).toLocaleDateString()}`}
+                              {entry.reviewed_at && ` on ${new Date(entry.reviewed_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`}
                             </div>
                           )}
                         </td>
@@ -300,7 +300,7 @@ export default function AdminAgencyWaitlistPage(): React.ReactElement {
 
                       {/* Expanded AI Report row */}
                       {expandedReport === entry.id && entry.ai_report && (
-                        <tr key={`${entry.id}-report`}>
+                        <tr>
                           <td colSpan={10} style={{ padding: 0 }}>
                             <div style={{
                               padding: '16px 24px',
@@ -399,7 +399,7 @@ export default function AdminAgencyWaitlistPage(): React.ReactElement {
                           </td>
                         </tr>
                       )}
-                    </>
+                    </React.Fragment>
                   ))}
                 </tbody>
               </table>

@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import { getUserProfile } from '@/lib/db/users'
 import { getWorkspacesByOrg, getWorkspacesByOrgAdmin } from '@/lib/db/workspaces'
 import { getSubscriptionWithPlan } from '@/lib/db/subscriptions'
+import { getDefaultCurrency } from '@/lib/utils/geo.server'
 import { Providers } from '@/components/providers'
 import { Sidebar } from '@/components/dashboard/sidebar'
 import { Header } from '@/components/dashboard/header'
@@ -42,12 +43,18 @@ export default async function DashboardLayout({ children }: { children: React.Re
   if (!profile) redirect('/login')
 
   const { user, organisation, isImpersonating } = profile
-  const [workspaces, subWithPlan] = await Promise.all([
+  const [workspaces, subWithPlan, geoCurrency] = await Promise.all([
     isImpersonating
       ? getWorkspacesByOrgAdmin(organisation.id)
       : getWorkspacesByOrg(organisation.id),
     getSubscriptionWithPlan(organisation.id),
+    getDefaultCurrency(),
   ])
+
+  const sub = subWithPlan?.subscription as Record<string, unknown> | null
+  const sidebarCurrency = sub?.razorpay_subscription_id ? 'inr'
+    : sub?.stripe_subscription_id ? 'gbp'
+    : geoCurrency
 
   // Org switching — user may be in their original org or an invited org
   const originalOrgId = (user as unknown as Record<string, unknown>).original_org_id as string | null
@@ -63,7 +70,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   return (
     <Providers user={user} organisation={organisation} workspaces={workspaces}>
       <div className="app-shell">
-        <Sidebar />
+        <Sidebar currency={sidebarCurrency} />
         <div className="main-wrapper">
           {isImpersonating && <ImpersonationBanner userEmail={user.email} />}
           {isInInvitedOrg && originalOrgName && (

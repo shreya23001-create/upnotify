@@ -11,10 +11,10 @@ import type { PublicMonitor } from '@/lib/db/public-monitors'
 import type { CheckerResult } from '@/lib/checkers/types'
 import { getServerConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
-import { startCronRun, endCronRun, getTriggeredBy, isCronRunning } from '@/lib/utils/cron-logger'
+import { startCronRun, endCronRun, getTriggeredBy } from '@/lib/utils/cron-logger'
 
 export const dynamic = 'force-dynamic'
-export const maxDuration = 120
+export const maxDuration = 60
 
 // ---------------------------------------------------------------------------
 // Blog generation is now handled by /api/cron/public-incident-cleanup
@@ -86,14 +86,6 @@ export async function GET(request: Request): Promise<NextResponse> {
   }
 
   const cronStart = Date.now()
-
-  // Concurrency guard — skip if a previous run is still active (within 115s).
-  const alreadyRunning = await isCronRunning('/api/cron/public-checks', 115_000)
-  if (alreadyRunning) {
-    logger.warn('Public check runner already running, skipping this invocation')
-    return NextResponse.json({ ok: true, skipped: true, reason: 'already_running' })
-  }
-
   const runId = await startCronRun('/api/cron/public-checks', getTriggeredBy(request))
 
   try {
