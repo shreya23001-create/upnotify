@@ -174,6 +174,59 @@ export async function generateCalendarBlogPost(row: CalendarRow): Promise<Calend
 // Claude generation
 // ---------------------------------------------------------------------------
 
+// Tool schema for Claude's structured output.
+// Using tool_use guarantees valid JSON — the SDK handles string escaping,
+// so markdown bodies with literal newlines/quotes can't break the parser.
+const SUBMIT_DRAFT_TOOL = {
+  name: 'submit_blog_draft',
+  description: 'Submit the generated blog post draft. Use this tool exactly once with all four fields populated.',
+  input_schema: {
+    type: 'object' as const,
+    properties: {
+      title: {
+        type: 'string',
+        description: '60 characters max. Must include the primary keyword.',
+      },
+      excerpt: {
+        type: 'string',
+        description: '150 characters max. Compelling summary used as meta description.',
+      },
+      bodyMarkdown: {
+        type: 'string',
+        description: 'Full markdown body — H1, intro hook, H2 sections, body paragraphs, mid-page CTA, conclusion. British English. Must include at least one image placeholder using ![alt](image-placeholder.svg). Must include all required internal links.',
+      },
+      faqJsonb: {
+        type: 'object',
+        description: 'JSON-LD FAQPage schema with 4-6 questions sourced from real search variants of the primary keyword.',
+        properties: {
+          '@type': { type: 'string', enum: ['FAQPage'] },
+          mainEntity: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                '@type': { type: 'string', enum: ['Question'] },
+                name: { type: 'string' },
+                acceptedAnswer: {
+                  type: 'object',
+                  properties: {
+                    '@type': { type: 'string', enum: ['Answer'] },
+                    text: { type: 'string' },
+                  },
+                  required: ['@type', 'text'],
+                },
+              },
+              required: ['@type', 'name', 'acceptedAnswer'],
+            },
+          },
+        },
+        required: ['@type', 'mainEntity'],
+      },
+    },
+    required: ['title', 'excerpt', 'bodyMarkdown', 'faqJsonb'],
+  },
+}
+
 async function generateDraftViaClaude(row: CalendarRow): Promise<ClaudeResult> {
   const { anthropic } = getServerConfig()
   if (!anthropic.apiKey) {
@@ -197,28 +250,28 @@ async function generateDraftViaClaude(row: CalendarRow): Promise<ClaudeResult> {
       const message = await client.messages.create({
         model: 'claude-sonnet-4-6',
         max_tokens: 16000, // generous headroom — hub_foundational targets 1500-2000 words
+        tools: [SUBMIT_DRAFT_TOOL],
+        tool_choice: { type: 'tool', name: SUBMIT_DRAFT_TOOL.name },
         messages: [{ role: 'user', content: prompt }],
       })
 
       const stopReason = message.stop_reason
       if (stopReason === 'max_tokens') {
-        lastReason = `Claude response truncated at max_tokens (response was cut off mid-generation)`
+        lastReason = `Claude response truncated at max_tokens (response cut off before tool call completed)`
         logger.error('calendar-blog-generator: Claude truncated', { rowId: row.id, stopReason })
-        // Truncation is deterministic for this row+prompt — don't retry, fail fast
         return { ok: false, reason: lastReason }
       }
 
-      const textContent = message.content.find(b => b.type === 'text')
-      if (!textContent || textContent.type !== 'text') {
-        lastReason = `Claude response had no text block (stop_reason=${stopReason})`
-        logger.error('calendar-blog-generator: Claude no text block', { rowId: row.id, stopReason })
+      const toolUse = message.content.find(b => b.type === 'tool_use')
+      if (!toolUse || toolUse.type !== 'tool_use') {
+        lastReason = `Claude returned no tool_use block (stop_reason=${stopReason})`
+        logger.error('calendar-blog-generator: Claude no tool_use block', { rowId: row.id, stopReason, contentTypes: message.content.map(b => b.type) })
         return { ok: false, reason: lastReason }
       }
 
-      const parsed = parseDraft(textContent.text)
-      if (parsed.ok) return parsed
-      // Parser failure is also deterministic for this response — don't retry the same prompt
-      lastReason = parsed.reason
+      const validated = validateDraftShape(toolUse.input)
+      if (validated.ok) return validated
+      lastReason = validated.reason
       return { ok: false, reason: lastReason }
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error)
@@ -274,85 +327,44 @@ function buildPrompt(row: CalendarRow): string {
 7. **No competitor pricing without dating** — if mentioned, add "as of May 2026".
 8. **Author byline:** include "By ${row.author}" near the top of the body.
 
-# Output format
+# Output
 
-Return a single JSON object (no markdown wrapper, no preamble):
+Submit the draft via the \`submit_blog_draft\` tool with title, excerpt, bodyMarkdown, and faqJsonb fields.
 
-{
-  "title": "60-char-max title with primary keyword",
-  "excerpt": "150-char-max compelling summary",
-  "bodyMarkdown": "Full markdown body — H1, intro hook, H2 sections, body, mid-page CTA, conclusion. Include British spelling.",
-  "faqJsonb": {
-    "@type": "FAQPage",
-    "mainEntity": [
-      { "@type": "Question", "name": "Question 1?", "acceptedAnswer": { "@type": "Answer", "text": "Answer 1" } },
-      { "@type": "Question", "name": "Question 2?", "acceptedAnswer": { "@type": "Answer", "text": "Answer 2" } },
-      { "@type": "Question", "name": "Question 3?", "acceptedAnswer": { "@type": "Answer", "text": "Answer 3" } },
-      { "@type": "Question", "name": "Question 4?", "acceptedAnswer": { "@type": "Answer", "text": "Answer 4" } }
-    ]
-  }
+- **bodyMarkdown:** Full markdown — H1, intro hook, H2 sections, body, mid-page CTA, conclusion. British spelling. Include at least one \`![alt text](image-placeholder.svg)\` placeholder.
+- **faqJsonb:** 4–6 FAQs. Source from real "how to / can I / why does" search variants of the primary keyword. Use the FAQPage JSON-LD schema.
+
+Call the tool exactly once with all four fields populated.`
 }
 
-Use 4–6 FAQ questions. Source FAQs from real "how to / can I / why does" search variants of the primary keyword.
+// Validate the tool_use input — the schema enforces shape, but defensive
+// validation catches edge cases (empty strings, missing FAQ entries) the
+// schema can't express.
+function validateDraftShape(input: unknown): ClaudeResult {
+  if (!input || typeof input !== 'object') {
+    return { ok: false, reason: 'Tool input was not an object' }
+  }
+  const obj = input as Record<string, unknown>
+  const validations: string[] = []
+  if (typeof obj.title !== 'string' || !obj.title.trim()) validations.push('title missing/empty')
+  if (typeof obj.bodyMarkdown !== 'string' || !obj.bodyMarkdown.trim()) validations.push('bodyMarkdown missing/empty')
+  if (typeof obj.excerpt !== 'string') validations.push('excerpt not a string')
+  if (!obj.faqJsonb || typeof obj.faqJsonb !== 'object') validations.push('faqJsonb missing/invalid')
 
-Body must include at least one image placeholder using markdown syntax: \`![alt text](image-placeholder.svg)\`.
-
-Return only the JSON. No commentary.`
-}
-
-function parseDraft(text: string): ClaudeResult {
-  // Extract JSON robustly — Claude may return:
-  //   - Pure JSON
-  //   - ```json ... ``` fenced block
-  //   - Prose preamble (e.g. "Here is the JSON:") then JSON
-  //   - JSON followed by trailing prose
-  let jsonText = text.trim()
-  const fenced = jsonText.match(/```(?:json)?\s*([\s\S]*?)```/)
-  if (fenced) {
-    jsonText = fenced[1].trim()
-  } else {
-    // Fallback: extract from first { to last } if no fence
-    const first = jsonText.indexOf('{')
-    const last = jsonText.lastIndexOf('}')
-    if (first !== -1 && last > first) {
-      jsonText = jsonText.slice(first, last + 1)
-    }
+  if (validations.length > 0) {
+    const reason = `Tool input invalid: ${validations.join('; ')}`
+    logger.warn('calendar-blog-generator: draft validation failed', { errors: validations })
+    return { ok: false, reason }
   }
 
-  try {
-    const parsed = JSON.parse(jsonText) as Partial<ClaudeDraft>
-    const validations: string[] = []
-    if (typeof parsed.title !== 'string' || !parsed.title.trim()) validations.push('title missing/empty')
-    if (typeof parsed.bodyMarkdown !== 'string' || !parsed.bodyMarkdown.trim()) validations.push('bodyMarkdown missing/empty')
-    if (typeof parsed.excerpt !== 'string') validations.push('excerpt not a string')
-    if (!parsed.faqJsonb || typeof parsed.faqJsonb !== 'object') validations.push('faqJsonb missing/invalid')
-
-    if (validations.length > 0) {
-      const reason = `Draft JSON parsed but invalid: ${validations.join('; ')}`
-      logger.warn('calendar-blog-generator: draft validation failed', {
-        errors: validations,
-        responsePreview: text.slice(0, 300),
-      })
-      return { ok: false, reason }
-    }
-
-    return {
-      ok: true,
-      draft: {
-        title: parsed.title as string,
-        excerpt: parsed.excerpt as string,
-        bodyMarkdown: parsed.bodyMarkdown as string,
-        faqJsonb: parsed.faqJsonb as ClaudeDraft['faqJsonb'],
-      },
-    }
-  } catch (error) {
-    const errMsg = error instanceof Error ? error.message : String(error)
-    logger.warn('calendar-blog-generator: draft JSON parse failed', {
-      error: errMsg,
-      responsePreview: text.slice(0, 500),
-      jsonTextPreview: jsonText.slice(0, 300),
-    })
-    return { ok: false, reason: `Draft JSON parse failed: ${errMsg}` }
+  return {
+    ok: true,
+    draft: {
+      title: obj.title as string,
+      excerpt: obj.excerpt as string,
+      bodyMarkdown: obj.bodyMarkdown as string,
+      faqJsonb: obj.faqJsonb as ClaudeDraft['faqJsonb'],
+    },
   }
 }
 
