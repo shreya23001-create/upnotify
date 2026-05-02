@@ -53,25 +53,26 @@ export async function GET(request: Request): Promise<NextResponse> {
       publishDate: claimed.publish_date,
     })
 
-    const draft = await generateCalendarBlogPost(claimed)
+    const generation = await generateCalendarBlogPost(claimed)
 
-    if (!draft) {
-      await endCronRun(runId, cronStart, 'error', { errorMessage: 'Generator returned null' })
-      return NextResponse.json({ ok: false, error: 'Generator returned null' })
+    if (!generation.ok) {
+      await endCronRun(runId, cronStart, 'error', { errorMessage: generation.reason })
+      return NextResponse.json({ ok: false, error: generation.reason, rowId: claimed.id })
     }
 
+    const { result } = generation
     await endCronRun(runId, cronStart, 'ok', {
-      summary: `drafted: ${draft.title}`,
+      summary: `drafted: ${result.title}`,
     })
 
     return NextResponse.json({
       ok: true,
       processed: 1,
-      blogPostId: draft.blogPostId,
-      title: draft.title,
-      slug: draft.slug,
-      dodPass: draft.review.dodSummary.pass,
-      hardFailCount: draft.review.dodSummary.hardFailCount,
+      blogPostId: result.blogPostId,
+      title: result.title,
+      slug: result.slug,
+      dodPass: result.review.dodSummary.pass,
+      hardFailCount: result.review.dodSummary.hardFailCount,
     })
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Unknown error'

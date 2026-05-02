@@ -34,6 +34,12 @@ export interface CalendarDraftResult {
   review: ReviewOutput
 }
 
+// Structured result so the cron route can surface the real reason in
+// its JSON response — no DB round-trip needed to debug a failure.
+export type CalendarGenerationResult =
+  | { ok: true; result: CalendarDraftResult }
+  | { ok: false; reason: string }
+
 interface ClaudeDraft {
   title: string
   excerpt: string
@@ -73,24 +79,27 @@ function sleep(ms: number): Promise<void> {
 // Public API
 // ---------------------------------------------------------------------------
 
-export async function generateCalendarBlogPost(row: CalendarRow): Promise<CalendarDraftResult | null> {
+export async function generateCalendarBlogPost(row: CalendarRow): Promise<CalendarGenerationResult> {
   logger.info('calendar-blog-generator: starting', {
     rowId: row.id,
     postType: row.post_type,
     primaryKeyword: row.primary_keyword,
   })
 
-  // 1. Generate draft via Claude
-  const result = await generateDraftViaClaude(row)
-  if (!result.ok) {
+  // Helper to fail consistently — persist reason to row and return structured result.
+  const fail = async (reason: string): Promise<CalendarGenerationResult> => {
     await updateCalendarRowResult(row.id, {
       status: 'failed',
       failed_at: new Date().toISOString(),
-      failure_reason: result.reason,
+      failure_reason: reason,
     })
-    return null
+    return { ok: false, reason }
   }
-  const draft = result.draft
+
+  // 1. Generate draft via Claude
+  const claudeResult = await generateDraftViaClaude(row)
+  if (!claudeResult.ok) return fail(claudeResult.reason)
+  const draft = claudeResult.draft
 
   // 2. Slug — deterministic from primary keyword, dedupe-checked
   const reservedSlugs = await getAllReservedSlugs()
@@ -100,15 +109,11 @@ export async function generateCalendarBlogPost(row: CalendarRow): Promise<Calend
   } catch (error) {
     const msg = error instanceof Error ? error.message : 'Slug generation failed'
     logger.error('calendar-blog-generator: slug generation failed', { rowId: row.id, error: msg })
-    await updateCalendarRowResult(row.id, {
-      status: 'failed',
-      failed_at: new Date().toISOString(),
-      failure_reason: msg,
-    })
-    return null
+    return fail(`Slug generation failed: ${msg}`)
   }
 
-  // 3. DoD validation
+  // 3. DoD validation (informational — flags soft/hard issues for digest review;
+  //    does NOT block save. Boss reviews flagged drafts in digest and rejects if needed.)
   const dod = validateDoD({
     slug,
     title: draft.title,
@@ -121,7 +126,9 @@ export async function generateCalendarBlogPost(row: CalendarRow): Promise<Calend
     existingSlugs: reservedSlugs,
   })
 
-  // 4. Reviewer pass — produces highlights + worries for the digest
+  // 4. Reviewer pass — produces highlights + worries for the digest. Reviewer
+  //    has graceful degradation (returns emptyReview on any failure) so it
+  //    never blocks the pipeline.
   const review = await reviewDraft({
     title: draft.title,
     bodyMarkdown: draft.bodyMarkdown,
@@ -134,7 +141,7 @@ export async function generateCalendarBlogPost(row: CalendarRow): Promise<Calend
 
   // 5. Save to blog_posts
   const blogPostId = await saveBlogPost(row, draft, slug, review, dod.pass)
-  if (!blogPostId) return null
+  if (!blogPostId) return fail('blog_posts insert failed (see Vercel logs for DB error)')
 
   // 6. Approval tokens (reuses existing infrastructure)
   // If token creation fails, delete the orphan blog post so the row can be
@@ -143,12 +150,7 @@ export async function generateCalendarBlogPost(row: CalendarRow): Promise<Calend
   if (!tokens) {
     logger.error('calendar-blog-generator: token creation failed — cleaning up orphan blog post', { blogPostId })
     await deleteOrphanBlogPost(blogPostId)
-    await updateCalendarRowResult(row.id, {
-      status: 'failed',
-      failed_at: new Date().toISOString(),
-      failure_reason: 'Token creation failed after blog post save; orphan removed',
-    })
-    return null
+    return fail('Token creation failed after blog post save; orphan removed')
   }
 
   // 7. Mark calendar row drafted
@@ -159,14 +161,17 @@ export async function generateCalendarBlogPost(row: CalendarRow): Promise<Calend
   })
 
   return {
-    blogPostId,
-    title: draft.title,
-    slug,
-    excerpt: draft.excerpt,
-    bodyMarkdown: draft.bodyMarkdown,
-    approveToken: tokens.approveToken,
-    rejectToken: tokens.rejectToken,
-    review,
+    ok: true,
+    result: {
+      blogPostId,
+      title: draft.title,
+      slug,
+      excerpt: draft.excerpt,
+      bodyMarkdown: draft.bodyMarkdown,
+      approveToken: tokens.approveToken,
+      rejectToken: tokens.rejectToken,
+      review,
+    },
   }
 }
 
@@ -177,9 +182,17 @@ export async function generateCalendarBlogPost(row: CalendarRow): Promise<Calend
 // Tool schema for Claude's structured output.
 // Using tool_use guarantees valid JSON — the SDK handles string escaping,
 // so markdown bodies with literal newlines/quotes can't break the parser.
+//
+// Required = title + bodyMarkdown only. excerpt and faqJsonb are recoverable
+// (we derive excerpt from body if missing; we use empty FAQ if missing — DoD
+// flags it as a soft/hard fail but the row still ships to the digest, where
+// Boss reviews and rejects if needed).
+//
+// Schemas WITHOUT enum constraints — strict enums on '@type' caused Claude
+// to omit faqJsonb entirely rather than risk a schema violation.
 const SUBMIT_DRAFT_TOOL = {
   name: 'submit_blog_draft',
-  description: 'Submit the generated blog post draft. Use this tool exactly once with all four fields populated.',
+  description: 'Submit the generated blog post draft. Call this tool exactly once. title and bodyMarkdown are required; excerpt and faqJsonb are strongly preferred for SEO but optional if you cannot produce them well.',
   input_schema: {
     type: 'object' as const,
     properties: {
@@ -187,43 +200,20 @@ const SUBMIT_DRAFT_TOOL = {
         type: 'string',
         description: '60 characters max. Must include the primary keyword.',
       },
+      bodyMarkdown: {
+        type: 'string',
+        description: 'Full markdown body — H1, intro hook, H2 sections, body paragraphs, mid-page CTA, conclusion. British English. Include at least one image placeholder using ![alt](image-placeholder.svg). Include the required internal links.',
+      },
       excerpt: {
         type: 'string',
         description: '150 characters max. Compelling summary used as meta description.',
       },
-      bodyMarkdown: {
-        type: 'string',
-        description: 'Full markdown body — H1, intro hook, H2 sections, body paragraphs, mid-page CTA, conclusion. British English. Must include at least one image placeholder using ![alt](image-placeholder.svg). Must include all required internal links.',
-      },
       faqJsonb: {
         type: 'object',
-        description: 'JSON-LD FAQPage schema with 4-6 questions sourced from real search variants of the primary keyword.',
-        properties: {
-          '@type': { type: 'string', enum: ['FAQPage'] },
-          mainEntity: {
-            type: 'array',
-            items: {
-              type: 'object',
-              properties: {
-                '@type': { type: 'string', enum: ['Question'] },
-                name: { type: 'string' },
-                acceptedAnswer: {
-                  type: 'object',
-                  properties: {
-                    '@type': { type: 'string', enum: ['Answer'] },
-                    text: { type: 'string' },
-                  },
-                  required: ['@type', 'text'],
-                },
-              },
-              required: ['@type', 'name', 'acceptedAnswer'],
-            },
-          },
-        },
-        required: ['@type', 'mainEntity'],
+        description: 'JSON-LD FAQPage schema. Set @type to "FAQPage" and provide a mainEntity array of 4-6 question/answer objects. Each question object should have @type "Question", a name (the question), and acceptedAnswer with @type "Answer" and text (the answer).',
       },
     },
-    required: ['title', 'excerpt', 'bodyMarkdown', 'faqJsonb'],
+    required: ['title', 'bodyMarkdown'],
   },
 }
 
@@ -340,32 +330,91 @@ Call the tool exactly once with all four fields populated.`
 // Validate the tool_use input — the schema enforces shape, but defensive
 // validation catches edge cases (empty strings, missing FAQ entries) the
 // schema can't express.
+// Hard-fail only when content is fundamentally unusable (no title, no body).
+// Soft-fallback for excerpt and faqJsonb — DoD validator catches these as
+// hard/soft fails and surfaces them to Boss in the digest, but the row still
+// ships rather than being a generation dead-end.
 function validateDraftShape(input: unknown): ClaudeResult {
   if (!input || typeof input !== 'object') {
     return { ok: false, reason: 'Tool input was not an object' }
   }
   const obj = input as Record<string, unknown>
-  const validations: string[] = []
-  if (typeof obj.title !== 'string' || !obj.title.trim()) validations.push('title missing/empty')
-  if (typeof obj.bodyMarkdown !== 'string' || !obj.bodyMarkdown.trim()) validations.push('bodyMarkdown missing/empty')
-  if (typeof obj.excerpt !== 'string') validations.push('excerpt not a string')
-  if (!obj.faqJsonb || typeof obj.faqJsonb !== 'object') validations.push('faqJsonb missing/invalid')
+  const keysPresent = Object.keys(obj).join(',') || '(none)'
 
-  if (validations.length > 0) {
-    const reason = `Tool input invalid: ${validations.join('; ')}`
-    logger.warn('calendar-blog-generator: draft validation failed', { errors: validations })
+  // Hard requirements
+  const hardFails: string[] = []
+  if (typeof obj.title !== 'string' || !obj.title.trim()) hardFails.push('title missing/empty')
+  if (typeof obj.bodyMarkdown !== 'string' || !obj.bodyMarkdown.trim()) hardFails.push('bodyMarkdown missing/empty')
+
+  if (hardFails.length > 0) {
+    const reason = `Tool input invalid: ${hardFails.join('; ')}. Keys present: [${keysPresent}]`
+    logger.warn('calendar-blog-generator: draft validation failed', { errors: hardFails, keysPresent })
     return { ok: false, reason }
+  }
+
+  const title = (obj.title as string).trim()
+  const bodyMarkdown = (obj.bodyMarkdown as string).trim()
+
+  // Soft fallbacks
+  let excerpt = typeof obj.excerpt === 'string' ? obj.excerpt.trim() : ''
+  if (!excerpt) {
+    excerpt = deriveExcerpt(bodyMarkdown)
+    logger.info('calendar-blog-generator: excerpt missing, derived from body', { excerptLen: excerpt.length })
+  }
+
+  const faqJsonb = normaliseFaqJsonb(obj.faqJsonb)
+  if (faqJsonb.mainEntity.length === 0) {
+    logger.warn('calendar-blog-generator: faqJsonb missing/empty — using empty FAQ; DoD will flag', { faqJsonbType: typeof obj.faqJsonb })
   }
 
   return {
     ok: true,
-    draft: {
-      title: obj.title as string,
-      excerpt: obj.excerpt as string,
-      bodyMarkdown: obj.bodyMarkdown as string,
-      faqJsonb: obj.faqJsonb as ClaudeDraft['faqJsonb'],
-    },
+    draft: { title, excerpt, bodyMarkdown, faqJsonb },
   }
+}
+
+// Derive a 150-char excerpt from the first paragraph of body (skip H1).
+function deriveExcerpt(body: string): string {
+  const lines = body.split('\n')
+  const firstParaLines: string[] = []
+  let started = false
+  for (const line of lines) {
+    const trimmed = line.trim()
+    if (!trimmed) {
+      if (started) break
+      continue
+    }
+    if (trimmed.startsWith('#')) continue // skip H1/H2
+    started = true
+    firstParaLines.push(trimmed)
+  }
+  const text = firstParaLines.join(' ').replace(/\s+/g, ' ')
+  return text.length > 150 ? `${text.slice(0, 147).trimEnd()}...` : text
+}
+
+// Coerce whatever Claude returned for faqJsonb into a valid FAQPage shape.
+// Accepts: object with mainEntity array, missing/null, or shape variations.
+function normaliseFaqJsonb(raw: unknown): ClaudeDraft['faqJsonb'] {
+  const empty: ClaudeDraft['faqJsonb'] = { '@type': 'FAQPage', mainEntity: [] }
+  if (!raw || typeof raw !== 'object') return empty
+  const r = raw as Record<string, unknown>
+  const mainEntity = Array.isArray(r.mainEntity) ? r.mainEntity : []
+  const validQs = mainEntity
+    .map(q => {
+      if (!q || typeof q !== 'object') return null
+      const qo = q as Record<string, unknown>
+      const name = typeof qo.name === 'string' ? qo.name.trim() : ''
+      const ans = qo.acceptedAnswer as Record<string, unknown> | undefined
+      const text = ans && typeof ans.text === 'string' ? ans.text.trim() : ''
+      if (!name || !text) return null
+      return {
+        '@type': 'Question' as const,
+        name,
+        acceptedAnswer: { '@type': 'Answer' as const, text },
+      }
+    })
+    .filter((q): q is ClaudeDraft['faqJsonb']['mainEntity'][number] => q !== null)
+  return { '@type': 'FAQPage', mainEntity: validQs }
 }
 
 // ---------------------------------------------------------------------------
