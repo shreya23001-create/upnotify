@@ -28,6 +28,15 @@ export async function createStatusPageAction(formData: FormData): Promise<{ erro
 
   if (!name || !slug) return { error: 'Name and slug are required' }
 
+  // Enforce plan limits first — give the right error before slug validation
+  const spLimit = await checkStatusPageLimit(user.org_id)
+  if (!spLimit.allowed) {
+    return { error: spLimit.limit === 0
+      ? 'Status pages are not available on your current plan. Upgrade to unlock this feature.'
+      : `Status page limit reached (${spLimit.currentCount}/${spLimit.limit}). Upgrade your plan for more.`
+    }
+  }
+
   // Reserved slugs — must not conflict with app routes under /status/
   const RESERVED_SLUGS = ['api', 'admin', 'dashboard', 'login', 'signup', 'health',
     'status', 'uptrue', 'app', 'www', 'mail', 'support', 'help', 'blog', 'pricing']
@@ -38,15 +47,6 @@ export async function createStatusPageAction(formData: FormData): Promise<{ erro
 
   if (await isSlugTaken(normSlug)) {
     return { error: `The URL "uptrue.io/status/${normSlug}" is already taken. Please choose a different slug.` }
-  }
-
-  // Enforce plan limits on status pages
-  const spLimit = await checkStatusPageLimit(user.org_id)
-  if (!spLimit.allowed) {
-    return { error: spLimit.limit === 0
-      ? 'Status pages are not available on your current plan. Upgrade to unlock this feature.'
-      : `Status page limit reached (${spLimit.currentCount}/${spLimit.limit}). Upgrade your plan for more.`
-    }
   }
 
   const monitorIds = monitorIdsStr ? monitorIdsStr.split(',').filter(Boolean) : []
@@ -60,7 +60,13 @@ export async function createStatusPageAction(formData: FormData): Promise<{ erro
     is_published: isPublished,
   })
 
-  if (!page) return { error: 'Failed to create status page' }
+  if (!page) {
+    // Race condition: slug was free at check time but taken by the time of insert
+    if (await isSlugTaken(normSlug)) {
+      return { error: `The URL "uptrue.io/status/${normSlug}" is already taken. Please choose a different slug.` }
+    }
+    return { error: 'Failed to create status page' }
+  }
 
   logger.info('Status page created', { pageId: page.id, slug })
   await devAuditLog({ orgId: user.org_id, userId: user.id, action: 'status_page.created', resourceType: 'status_page', resourceId: page.id, metadata: { slug } })

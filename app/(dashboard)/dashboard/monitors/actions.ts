@@ -45,9 +45,15 @@ function isSafeMonitorTarget(target: string, type: string): { safe: boolean; err
   }
 
   const hostname = parsed.hostname
+
+  // Reject bare hostnames with no TLD (e.g. "notaurl", "localhost" without dot)
+  if (!hostname.includes('.')) {
+    return { safe: false, error: 'Please enter a valid URL (e.g. https://example.com)' }
+  }
+
   for (const pattern of PRIVATE_IP_PATTERNS) {
     if (pattern.test(hostname)) {
-      return { safe: false, error: 'Private or localhost URLs cannot be monitored' }
+      return { safe: false, error: 'Monitor target URL is not permitted' }
     }
   }
 

@@ -27,6 +27,16 @@ export function LoginForm({ mode = 'login', next }: { mode?: 'login' | 'signup';
     if (mode === 'login') setHintEmail(readEmailHint())
   }, [mode])
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const urlError = params.get('error')
+    if (urlError === 'auth_error') {
+      setError('This magic link has expired or is invalid. Please request a new one below.')
+    } else if (urlError === 'no_code') {
+      setError('Invalid sign-in link. Please request a new magic link below.')
+    }
+  }, [])
+
   function getRefCode(): string | null {
     if (typeof window === 'undefined') return null
     return new URLSearchParams(window.location.search).get('ref')
@@ -130,6 +140,7 @@ export function LoginForm({ mode = 'login', next }: { mode?: 'login' | 'signup';
               name="fullname"
               type="text"
               placeholder="Your name"
+              autoComplete="name"
               disabled={isPending}
             />
           </div>
@@ -147,6 +158,7 @@ export function LoginForm({ mode = 'login', next }: { mode?: 'login' | 'signup';
             placeholder="you@company.com"
             defaultValue={hintEmail}
             required
+            autoComplete="email"
             disabled={isPending}
           />
         </div>

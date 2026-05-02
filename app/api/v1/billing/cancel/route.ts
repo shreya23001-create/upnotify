@@ -30,7 +30,7 @@ export async function POST(request: Request): Promise<NextResponse> {
 
     const subWithPlan = await getSubscriptionWithPlan(user.org_id)
     if (!subWithPlan?.subscription) {
-      return NextResponse.json({ error: 'No active subscription found' }, { status: 400 })
+      return NextResponse.json({ error: 'No active subscription found. You may already be on the Free plan.' }, { status: 400 })
     }
 
     const sub = subWithPlan.subscription
