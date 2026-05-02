@@ -4,10 +4,9 @@ stages:
 deploy_dev:
   stage: deploy
   script:
-    - npm install -g vercel
-    - vercel pull --yes --environment=production --token=$VERCEL_TOKEN
-    - vercel build --token=$VERCEL_TOKEN
-    - vercel deploy --prebuilt --token=$VERCEL_TOKEN
+    - npx vercel@latest pull --yes --environment=production --token=$VERCEL_TOKEN
+    - npx vercel@latest build --token=$VERCEL_TOKEN
+    - npx vercel@latest deploy --prebuilt --token=$VERCEL_TOKEN
   only:
     - dev
   environment:
@@ -17,10 +16,9 @@ deploy_dev:
 deploy_prod:
   stage: deploy
   script:
-    - npm install -g vercel
-    - vercel pull --yes --environment=production --token=$VERCEL_TOKEN
-    - vercel build --prod --token=$VERCEL_TOKEN
-    - vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN
+    - npx vercel@latest pull --yes --environment=production --token=$VERCEL_TOKEN
+    - npx vercel@latest build --prod --token=$VERCEL_TOKEN
+    - npx vercel@latest deploy --prebuilt --prod --token=$VERCEL_TOKEN
   only:
     - master
   environment:
