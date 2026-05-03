@@ -387,6 +387,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ]
 
   // Monitor type landing pages — static, one per monitor type
+  // Plus 5 industry-specific landings (D4-B): SaaS, e-commerce, fintech,
+  // API, banking. These sit IN /monitoring/* but are NOT real monitor types
+  // — they are SEO-only landings backed by their own static page.tsx files
+  // and rendered through the IndustryLandingPage shared template.
+  const industrySlugs = [
+    'saas-uptime-monitoring',
+    'ecommerce-uptime-monitoring',
+    'fintech-uptime-monitoring',
+    'api-uptime-monitoring',
+    'banking-uptime-monitoring',
+  ]
   const monitoringPages: MetadataRoute.Sitemap = [
     {
       url: 'https://uptrue.io/monitoring',
@@ -395,6 +406,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9,
     },
     ...getAllSlugs().map(slug => ({
+      url: `https://uptrue.io/monitoring/${slug}`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly' as const,
+      priority: 0.8,
+    })),
+    ...industrySlugs.map(slug => ({
       url: `https://uptrue.io/monitoring/${slug}`,
       lastModified: new Date(),
       changeFrequency: 'monthly' as const,
