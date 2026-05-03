@@ -10,6 +10,11 @@ const PUBLIC_ROUTES: ReadonlyArray<string> = [
   '/tracker',
   '/leaderboard',
   '/tools',
+  '/monitoring',
+  '/integrations',
+  '/wordpress-monitor',
+  '/free-uptime-monitoring',
+  '/changelog',
   '/terms',
   '/privacy',
   '/cookies',
@@ -39,6 +44,7 @@ export function isPublicRoute(pathname: string): boolean {
   if (pathname.startsWith('/blog/')) return true
   if (pathname.startsWith('/monitoring/')) return true
   if (pathname.startsWith('/tools/')) return true
+  if (pathname.startsWith('/integrations/')) return true
   if (pathname.startsWith('/api/cron/')) return true
   if (pathname.startsWith('/api/badge/')) return true
   if (pathname.startsWith('/api/v1/tracker/')) return true
