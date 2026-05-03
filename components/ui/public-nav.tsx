@@ -5,13 +5,12 @@ import { PublicNavClient } from './public-nav-client'
 // ── Default nav links (mirrors seeded DB content) ─────────────────────────────
 
 const DEFAULT_LINKS: NavContent['links'] = [
-  { label: 'Features', href: '/#features' },
-  { label: 'Pricing',  href: '/#pricing' },
-  { label: 'Score',    href: '/score',               badge: 'Free' },
-  { label: 'Tracker',  href: '/tracker',             badge: 'Free' },
-  { label: 'AI SEO',   href: '/tools/ai-seo-checker', badge: 'Free' },
-  { label: 'Tools',    href: '/tools',               badge: 'Free' },
-  { label: 'Blog',     href: '/blog' },
+  { label: 'Monitoring', href: '/monitoring' },
+  { label: 'WordPress',  href: '/wordpress-monitor', badge: 'Plugin' },
+  { label: 'Tools',      href: '/tools',             badge: 'Free' },
+  { label: 'Tracker',    href: '/tracker',           badge: 'Free' },
+  { label: 'Pricing',    href: '/#pricing' },
+  { label: 'Blog',       href: '/blog' },
 ]
 
 // ── Server wrapper — fetches CMS content, renders client inner ────────────────

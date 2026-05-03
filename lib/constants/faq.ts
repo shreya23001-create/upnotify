@@ -9,8 +9,8 @@ export const FAQ_ITEMS: FaqItem[] = [
     answer: 'When a check detects a potential issue, Uptrue waits 30 seconds and runs a second check from a different region. An incident is only created if both checks confirm the problem. This eliminates false alarms caused by temporary network blips or routing issues.',
   },
   {
-    question: 'What monitor types are available?',
-    answer: 'Uptrue supports 23 monitor types: HTTP/HTTPS uptime, SSL certificate expiry, DNS record changes, keyword presence, domain expiry, port availability, ping/ICMP, API endpoint validation, heartbeat (cron job monitoring), page change detection, security headers, response time, robots.txt, IP change, MX health, WHOIS/registrar, sitemap, redirect chain, SPF/DMARC, blacklist, page size, cookie consent, and nameserver monitoring.',
+    question: 'What monitor types does Uptrue support for website uptime monitoring?',
+    answer: 'Uptrue supports 24 monitor types covering uptime, security, and infrastructure: HTTP/HTTPS uptime, SSL certificate expiry, DNS record changes, keyword presence, domain expiry, port availability, ping/ICMP, API endpoint validation, heartbeat (cron job monitoring), page change detection, security headers, response time, robots.txt, IP change, MX health, WHOIS/registrar, sitemap, redirect chain, SPF/DMARC, blacklist, page size, cookie consent, nameserver monitoring, and Uptrue WordPress Monitor for site-internal scanning.',
   },
   {
     question: 'How do public status pages work?',
@@ -35,10 +35,6 @@ export const FAQ_ITEMS: FaqItem[] = [
   {
     question: 'Can I cancel or pause my subscription?',
     answer: 'Yes. You can cancel from Settings > Billing at any time. If cost is the concern, you can pause your subscription for up to 3 months — no charges, data preserved, resume anytime. We send reminders 14 and 3 days before billing resumes.',
-  },
-  {
-    question: 'What is Uptrue Compete?',
-    answer: 'Uptrue Compete is an add-on for Builder and Scale plans. It tracks competitor prices and stock levels, alerts you to changes, and lets you react fast. Add it to your plan for +£19/month (+$24/month or +₹1,999/month).',
   },
   {
     question: 'Where is my data stored?',

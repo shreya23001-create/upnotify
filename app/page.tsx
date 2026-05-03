@@ -167,7 +167,7 @@ export default async function LandingPage(): Promise<React.ReactElement> {
   // Nav/footer (page='global') are always pinned top/bottom — only landing sections are reorderable.
   const DEFAULT_SECTION_ORDER = [
     'ticker', 'hero', 'trusted_logos', 'stats_bar', 'features',
-    'how_it_works', 'ai_features', 'pricing', 'agency', 'faq',
+    'how_it_works', 'ai_features', 'ai_visibility_teaser', 'pricing', 'agency', 'faq',
     'downtime_calculator', 'testimonials', 'comparison_table', 'blog_preview', 'cta_band',
   ]
 
@@ -277,9 +277,15 @@ export default async function LandingPage(): Promise<React.ReactElement> {
             <div className="container">
               <div className="section-header">
                 <div className="section-eyebrow">{features?.eyebrow ?? 'Everything you need'}</div>
-                <h2 className="section-title">{features?.headline ?? 'Monitoring that actually works'}</h2>
+                <h2 className="section-title">{features?.headline ?? 'Website monitoring that actually works'}</h2>
                 <p className="section-sub">
-                  {features?.subheadline ?? 'From basic uptime to AI-powered insights. Built for agencies managing hundreds of sites and teams who need reliability.'}
+                  {features?.subheadline ?? (
+                    <>
+                      From <Link href="/monitoring/http-uptime-monitoring">HTTP uptime monitoring</Link>,{' '}
+                      <Link href="/monitoring/ssl-certificate-monitoring">SSL certificate monitoring</Link>, and{' '}
+                      <Link href="/monitoring/dns-monitoring">DNS monitoring</Link> to AI-powered insights — site monitoring built for agencies managing hundreds of sites and teams who need reliable website uptime monitoring.
+                    </>
+                  )}
                 </p>
               </div>
               <FeatureCarousel />
@@ -377,6 +383,56 @@ export default async function LandingPage(): Promise<React.ReactElement> {
                     </div>
                   </div>
                 </div>
+              </div>
+            </div>
+          </section>
+        )
+
+      case 'ai_visibility_teaser':
+        return (
+          <section key="ai_visibility_teaser" className="section" style={{ paddingTop: 0, paddingBottom: 'var(--space-10)' }}>
+            <div className="container">
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  flexWrap: 'wrap',
+                  gap: 'var(--space-4)',
+                  padding: 'var(--space-6) var(--space-8)',
+                  borderRadius: 'var(--radius-lg)',
+                  background: 'linear-gradient(135deg, #1e293b 0%, #312e81 100%)',
+                  color: '#fff',
+                }}
+              >
+                <div style={{ flex: '1 1 480px', minWidth: 0 }}>
+                  <div
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 700,
+                      letterSpacing: '0.1em',
+                      textTransform: 'uppercase',
+                      color: '#a5b4fc',
+                      marginBottom: 6,
+                    }}
+                  >
+                    🆕 New product
+                  </div>
+                  <div style={{ fontSize: 22, fontWeight: 700, marginBottom: 6 }}>
+                    Uptrue AI Visibility&trade;
+                  </div>
+                  <p style={{ fontSize: 15, color: '#cbd5e1', margin: 0, maxWidth: 640, lineHeight: 1.5 }}>
+                    See how ChatGPT, Claude, Perplexity, Gemini, Grok and Copilot cite your brand.
+                    Track AI search citations the way you track Google rankings — with weekly reports, competitor benchmarks, and citation alerts.
+                  </p>
+                </div>
+                <a
+                  href="https://aivisibility.uptrue.io"
+                  className="btn btn-primary btn-lg"
+                  style={{ flex: '0 0 auto' }}
+                >
+                  Explore AI Visibility&trade; →
+                </a>
               </div>
             </div>
           </section>

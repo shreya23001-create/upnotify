@@ -17,6 +17,14 @@ export const metadata: Metadata = {
 
 const TOOLS: { slug: string; title: string; description: string; tag: string; href?: string }[] = [
   {
+    slug: 'score',
+    href: '/score',
+    title: 'Website Health Score',
+    description:
+      'Free multi-check grade across 5 categories — uptime, SSL, DNS, security headers, and performance. Enter any URL and get an instant A+ to F score with actionable recommendations. No signup required.',
+    tag: 'Featured',
+  },
+  {
     slug: 'wordpress-monitor',
     href: '/monitoring/wordpress-site-monitor',
     title: 'WordPress Site Monitor Plugin',
