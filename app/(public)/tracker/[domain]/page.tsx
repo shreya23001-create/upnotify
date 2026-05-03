@@ -1,8 +1,8 @@
-import { notFound, redirect } from 'next/navigation'
+import { redirect } from 'next/navigation'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import {
-  getPublicMonitorByDomain,
+  getPublicMonitorByDomainIncludingInactive,
   getPublicCheckResults,
   getPublicIncidents,
   calculatePublicUptime,
@@ -14,6 +14,7 @@ import {
 import { getPublishedOutageBlogForSite } from '@/lib/db/blog-posts'
 import { TrackerSubscribeForm } from '@/components/tracker/tracker-subscribe-form'
 import { AlsoDownSection } from '@/components/tracker/also-down-section'
+import { TrackerSoftNotFound } from '@/components/tracker/tracker-soft-not-found'
 import { TRACKED_SITES } from '@/lib/constants/tracked-sites'
 import {
   SITE_INFO,
@@ -27,12 +28,30 @@ export const revalidate = 60
 export async function generateMetadata({ params }: { params: Promise<{ domain: string }> }): Promise<Metadata> {
   const { domain } = await params
   const decodedDomain = decodeURIComponent(domain)
-  const monitor = await getPublicMonitorByDomain(decodedDomain)
+  const canonicalDomain = normalisePublicMonitorDomain(decodedDomain)
+  const monitorAny = await getPublicMonitorByDomainIncludingInactive(canonicalDomain)
 
-  if (!monitor) {
-    return { title: 'Site Not Found | Uptrue Tracker' }
+  // Soft 404 — domain not in our tracker. Render with helpful content
+  // (related sites + signup CTA) but don't index the URL.
+  if (!monitorAny) {
+    return {
+      title: `${canonicalDomain || 'Site'} not in tracker — monitor any site free | Uptrue`,
+      description: `${canonicalDomain || 'This site'} isn't in the public Uptrue tracker yet. Monitor it yourself in 2 minutes on the Free plan, or browse other tracked sites.`,
+      robots: { index: false, follow: true },
+    }
   }
 
+  // Deactivated — site was tracked, isn't any more. Same robots:noindex
+  // so Google can deindex the old URL cleanly.
+  if (!monitorAny.is_active) {
+    return {
+      title: `${monitorAny.display_name} no longer tracked | Uptrue`,
+      description: `${monitorAny.display_name} was previously on the Uptrue public tracker and has been removed.`,
+      robots: { index: false, follow: false },
+    }
+  }
+
+  const monitor = monitorAny
   const siteInfo = SITE_INFO[monitor.domain]
   const siteName = siteInfo?.name ?? monitor.display_name
 
@@ -243,9 +262,21 @@ export default async function TrackerDomainPage({
     redirect(`/tracker/${canonicalDomain}`)
   }
 
-  const monitor = await getPublicMonitorByDomain(canonicalDomain)
+  // Look up including inactive so we can branch into:
+  //   - active row → render the full live-status page (200)
+  //   - inactive row → render "no longer tracked" soft page with
+  //     robots:noindex,nofollow (200)
+  //   - no row → render "we don't track this yet" soft page (200)
+  // generateMetadata sets the right robots header per branch.
+  const monitorAny = await getPublicMonitorByDomainIncludingInactive(canonicalDomain)
 
-  if (!monitor) notFound()
+  if (!monitorAny) {
+    return <TrackerSoftNotFound requestedDomain={canonicalDomain} variant="not-tracked" />
+  }
+  if (!monitorAny.is_active) {
+    return <TrackerSoftNotFound requestedDomain={monitorAny.display_name} variant="deactivated" />
+  }
+  const monitor = monitorAny
 
   // Derive site info before data fetches — needed for conditional queries
   const siteInfo = SITE_INFO[monitor.domain]

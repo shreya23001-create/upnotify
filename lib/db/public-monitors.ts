@@ -269,6 +269,35 @@ export async function getPublicMonitorByDomain(domain: string): Promise<PublicMo
   return data ? (data as unknown as PublicMonitor) : null
 }
 
+/**
+ * Like `getPublicMonitorByDomain` but includes inactive (deactivated) rows.
+ * Used by the tracker page to differentiate between three cases:
+ *   - active row → render the live status page (200)
+ *   - inactive row → render "this site is no longer tracked" with
+ *     `robots: noindex` so Google removes the URL from index
+ *   - no row at all → soft 404 page with related sites + signup CTA (200)
+ */
+export async function getPublicMonitorByDomainIncludingInactive(
+  domain: string
+): Promise<PublicMonitor | null> {
+  const normalised = normalisePublicMonitorDomain(domain)
+  const supabase = createAdminClient()
+  const { data, error } = await supabase
+    .from('public_monitors')
+    .select('*')
+    .eq('domain', normalised)
+    .maybeSingle()
+
+  if (error) {
+    logger.error('Failed to get public monitor by domain (incl inactive)', {
+      error: error.message,
+      domain: normalised,
+    })
+    return null
+  }
+  return data ? (data as unknown as PublicMonitor) : null
+}
+
 export async function getPublicMonitorById(id: string): Promise<PublicMonitor | null> {
   const supabase = createAdminClient()
   const { data, error } = await supabase
