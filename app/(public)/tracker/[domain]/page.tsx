@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import {
@@ -9,6 +9,7 @@ import {
   getPublicMonitorIncidentCount,
   getPublicMonitorAvgResponseTime,
   getCurrentlyDownSites,
+  normalisePublicMonitorDomain,
 } from '@/lib/db/public-monitors'
 import { getPublishedOutageBlogForSite } from '@/lib/db/blog-posts'
 import { TrackerSubscribeForm } from '@/components/tracker/tracker-subscribe-form'
@@ -233,7 +234,16 @@ export default async function TrackerDomainPage({
 }): Promise<React.ReactElement> {
   const { domain } = await params
   const decodedDomain = decodeURIComponent(domain)
-  const monitor = await getPublicMonitorByDomain(decodedDomain)
+  const canonicalDomain = normalisePublicMonitorDomain(decodedDomain)
+
+  // If the URL contains a non-canonical form (uppercase, www., scheme prefix,
+  // trailing slash), 308-redirect to the canonical /tracker/<domain> so we
+  // don't fragment SEO across multiple URLs that resolve the same row.
+  if (canonicalDomain && canonicalDomain !== decodedDomain) {
+    redirect(`/tracker/${canonicalDomain}`)
+  }
+
+  const monitor = await getPublicMonitorByDomain(canonicalDomain)
 
   if (!monitor) notFound()
 

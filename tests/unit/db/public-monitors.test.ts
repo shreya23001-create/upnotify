@@ -63,6 +63,7 @@ import {
   subscribeToPublicMonitor,
   getOpenPublicIncident,
   createPublicIncident,
+  normalisePublicMonitorDomain,
 } from '@/lib/db/public-monitors'
 
 // ---------------------------------------------------------------------------
@@ -405,5 +406,55 @@ describe('createPublicIncident', () => {
 
     const result = await createPublicIncident({ monitor_id: 'mon-1' })
     expect(result).toBeNull()
+  })
+})
+
+// ---------------------------------------------------------------------------
+// normalisePublicMonitorDomain — pure function, no DB
+// ---------------------------------------------------------------------------
+
+describe('normalisePublicMonitorDomain', () => {
+  it('lowercases the domain', () => {
+    expect(normalisePublicMonitorDomain('Google.com')).toBe('google.com')
+    expect(normalisePublicMonitorDomain('GOOGLE.COM')).toBe('google.com')
+    expect(normalisePublicMonitorDomain('GitHub.com')).toBe('github.com')
+  })
+
+  it('strips www. prefix', () => {
+    expect(normalisePublicMonitorDomain('www.google.com')).toBe('google.com')
+    expect(normalisePublicMonitorDomain('WWW.GOOGLE.COM')).toBe('google.com')
+  })
+
+  it('strips https:// and http:// schemes', () => {
+    expect(normalisePublicMonitorDomain('https://google.com')).toBe('google.com')
+    expect(normalisePublicMonitorDomain('http://google.com')).toBe('google.com')
+    expect(normalisePublicMonitorDomain('HTTPS://Google.com')).toBe('google.com')
+  })
+
+  it('strips trailing slash and any path', () => {
+    expect(normalisePublicMonitorDomain('google.com/')).toBe('google.com')
+    expect(normalisePublicMonitorDomain('google.com/some/path')).toBe('google.com')
+    expect(normalisePublicMonitorDomain('https://google.com/path?q=1')).toBe('google.com')
+  })
+
+  it('combines all transforms together', () => {
+    expect(normalisePublicMonitorDomain('  HTTPS://WWW.Google.com/  ')).toBe('google.com')
+    expect(normalisePublicMonitorDomain('http://WWW.example.org/index.html')).toBe('example.org')
+  })
+
+  it('passes already-canonical domains through unchanged', () => {
+    expect(normalisePublicMonitorDomain('google.com')).toBe('google.com')
+    expect(normalisePublicMonitorDomain('subdomain.example.org')).toBe('subdomain.example.org')
+  })
+
+  it('handles empty / whitespace input safely', () => {
+    expect(normalisePublicMonitorDomain('')).toBe('')
+    expect(normalisePublicMonitorDomain('   ')).toBe('')
+  })
+
+  it('preserves non-www subdomains', () => {
+    // www. is the only subdomain we strip; api.example.com etc. stay as-is
+    expect(normalisePublicMonitorDomain('api.example.com')).toBe('api.example.com')
+    expect(normalisePublicMonitorDomain('status.example.com')).toBe('status.example.com')
   })
 })
