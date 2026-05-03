@@ -50,7 +50,9 @@ const RELATED_TOOL: Record<string, { slug: string; label: string }> = {
   'spf-dmarc-monitoring':         { slug: 'spf-dmarc-checker',         label: 'free SPF & DMARC checker' },
   'blacklist-monitoring':         { slug: 'blacklist-checker',         label: 'free domain blacklist checker' },
   'page-size-monitoring':         { slug: 'website-speed-test',        label: 'free website speed test' },
-  'cookie-consent-monitoring':    { slug: 'http-status-checker',       label: 'free HTTP status checker' },
+  // cookie-consent and heartbeat have no genuinely-related single tool;
+  // skip rather than link weakly. The "Try the free tool" CTA simply
+  // doesn't render on those two slugs (relatedTool falsy → conditional skip).
   'nameserver-monitoring':        { slug: 'dns-lookup',                label: 'free DNS lookup tool' },
   'wordpress-site-monitor':       { slug: 'security-headers-checker',  label: 'free security headers checker' },
 }

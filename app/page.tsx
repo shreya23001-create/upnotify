@@ -167,8 +167,12 @@ export default async function LandingPage(): Promise<React.ReactElement> {
   // Nav/footer (page='global') are always pinned top/bottom — only landing sections are reorderable.
   const DEFAULT_SECTION_ORDER = [
     'ticker', 'hero', 'trusted_logos', 'stats_bar', 'features',
-    'how_it_works', 'ai_features', 'ai_visibility_teaser', 'pricing', 'agency', 'faq',
+    'how_it_works', 'ai_features', 'pricing', 'agency', 'faq',
     'downtime_calculator', 'testimonials', 'comparison_table', 'blog_preview', 'cta_band',
+    // 'ai_visibility_teaser' deliberately NOT in fallback list — only renders
+    // when explicitly seeded in page_sections with is_visible=true. Prevents the
+    // teaser CTA pointing at https://aivisibility.uptrue.io while that subdomain
+    // is not yet live (Boss flips visibility once AIV-2 infra is up).
   ]
 
   const landingSections = rawSections
