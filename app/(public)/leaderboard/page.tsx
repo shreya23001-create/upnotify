@@ -5,18 +5,45 @@ import { getLeaderboardEntries } from '@/lib/db/leaderboard'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Uptime Leaderboard — Most Reliable Websites | Uptrue',
+  title: 'Uptime Leaderboard — Most Reliable Websites Ranked by Uptime | Uptrue',
   description:
-    'See the most reliable websites ranked by uptime percentage. Real-time leaderboard powered by Uptrue monitoring data. Is your site in the top 50?',
+    'The top 50 most reliable websites ranked by 30-day uptime percentage. Real-time leaderboard powered by Uptrue monitoring data — see who is genuinely the most stable. Is your site in the top 50?',
   alternates: { canonical: 'https://uptrue.io/leaderboard' },
   openGraph: {
-    title: 'Uptime Leaderboard — Most Reliable Websites | Uptrue',
+    title: 'Uptime Leaderboard — Most Reliable Websites Ranked by Uptime | Uptrue',
     description:
       'The top 50 most reliable websites ranked by uptime. Real-time data from Uptrue monitoring.',
     url: 'https://uptrue.io/leaderboard',
     type: 'website',
   },
 }
+
+const FAQ = [
+  {
+    q: 'How is uptime calculated for the leaderboard?',
+    a: 'Each site on the leaderboard is checked from our edge network, and the percentage shown is the share of successful checks over the rolling last 30 days. A successful check means a 2xx HTTP response within the response-time threshold, with a valid SSL chain. Failures, timeouts, and 5xx errors all count as downtime.',
+  },
+  {
+    q: 'How often is the leaderboard updated?',
+    a: 'Every 5 minutes. The 30-day uptime percentage is recomputed continuously as new check results come in, so the rankings reflect the most recent monitoring data — not a snapshot from days ago.',
+  },
+  {
+    q: 'How can my site appear on the leaderboard?',
+    a: 'The leaderboard is curated from popular public sites we already monitor on the public tracker. To track your own uptime privately, sign up for a free Uptrue account — you get the same monitoring engine, alerts, and 30-day uptime stats on your own dashboard.',
+  },
+  {
+    q: 'What does it take to hit 99.99% uptime?',
+    a: 'Roughly 4.3 minutes of downtime per month, or 52 minutes per year. Sites at this tier typically run multi-region failover, CDN-fronted origins, and continuous SSL certificate monitoring. Most outages at this level come from DNS or certificate misconfiguration, not infrastructure failure.',
+  },
+  {
+    q: 'Why does a site I expected to be reliable rank low?',
+    a: 'The leaderboard is honest. Even well-known services have intermittent failures — slow SSL handshakes, regional outages, expired certificates, response time degradation. The leaderboard captures all of this, not just complete outages. Click any site to see its incident timeline.',
+  },
+  {
+    q: 'Can I get a badge for my site?',
+    a: 'Sites that rank in the top 10 can embed a "Top 10 on Uptrue Leaderboard" badge. The badge updates dynamically — if a site drops out of the top 10, the badge automatically reflects the new ranking.',
+  },
+]
 
 function getStatusColor(status: string): string {
   if (status === 'up') return 'var(--color-success, #22c55e)'
@@ -175,13 +202,71 @@ export default async function LeaderboardPage(): Promise<React.ReactElement> {
           </div>
         </div>
 
+        {/* Related continuous monitors */}
+        <section className="landing-section">
+          <div className="landing-container" style={{ maxWidth: 880 }}>
+            <h2 className="landing-section-title">Hit the leaderboard with your own monitors</h2>
+            <p className="landing-section-subtitle">
+              Sites at the top of this leaderboard run more than just an uptime check.
+              Match the standard with continuous monitoring across the categories that
+              matter:
+            </p>
+            <ul className="about-list" style={{ marginTop: 24, fontSize: 15, lineHeight: 1.9 }}>
+              <li><Link href="/monitoring/http-uptime-monitoring">HTTP uptime monitoring</Link> — the foundational check that drives the leaderboard percentage.</li>
+              <li><Link href="/monitoring/ssl-certificate-monitoring">SSL certificate monitoring</Link> — expired certificates are one of the top causes of uptime drops.</li>
+              <li><Link href="/monitoring/dns-monitoring">DNS record monitoring</Link> — DNS misconfiguration takes more sites offline than infrastructure failure.</li>
+              <li><Link href="/monitoring/response-time-monitoring">Response time monitoring</Link> — slow responses count against availability on most strict SLAs.</li>
+              <li><Link href="/monitoring/domain-expiry-monitoring">Domain expiry monitoring</Link> — expired domains are a common, embarrassing reason sites drop off the leaderboard.</li>
+            </ul>
+            <p style={{ marginTop: 20, fontSize: 14, color: 'var(--text-muted)' }}>
+              Or run a one-off <Link href="/score">website health score</Link> to see how
+              your site stacks up before you start monitoring.
+            </p>
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section className="landing-section" style={{ background: 'var(--bg-muted)' }}>
+          <div className="landing-container" style={{ maxWidth: 760 }}>
+            <h2 className="landing-section-title">Frequently asked questions</h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 24 }}>
+              {FAQ.map((item, i) => (
+                <div key={i} style={{ padding: '20px 24px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10 }}>
+                  <h3 style={{ margin: '0 0 8px', fontSize: 16, fontWeight: 600, color: 'var(--text-primary)' }}>{item.q}</h3>
+                  <p style={{ margin: 0, fontSize: 14, lineHeight: 1.7, color: 'var(--text-secondary)' }}>{item.a}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* JSON-LD FAQPage schema mirroring the FAQ array above */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'FAQPage',
+              mainEntity: FAQ.map((item) => ({
+                '@type': 'Question',
+                name: item.q,
+                acceptedAnswer: { '@type': 'Answer', text: item.a },
+              })),
+            }),
+          }}
+        />
+
         {/* CTA */}
         <div className="leaderboard-cta">
           <h2>Want your site on the leaderboard?</h2>
-          <p>Start monitoring your uptime for free and climb the rankings.</p>
-          <a href="/signup" className="btn btn-primary btn-lg">
+          <p>
+            Start monitoring your uptime for free and climb the rankings.{' '}
+            <Link href="/tools">Browse free tools</Link> or{' '}
+            <Link href="/signup">create an account</Link> to start.
+          </p>
+          <Link href="/signup" className="btn btn-primary btn-lg">
             Start Monitoring Free
-          </a>
+          </Link>
         </div>
       </div>
     </div>

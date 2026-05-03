@@ -4,14 +4,42 @@
  */
 
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { ScoreForm } from '@/components/score/score-form'
 
 export const metadata: Metadata = {
-  title: 'Free Website Health Score',
+  title: 'Free Website Health Score Checker — Test Site Health Online | Uptrue',
   description:
-    'Check your website health for free. Uptrue Score analyses uptime, SSL, DNS, security headers, and performance — giving you an instant grade from A+ to F.',
+    'Free website health score across 5 categories — uptime, SSL, DNS, security headers, and performance. Instant grade from A+ to F. No signup required. Pairs with continuous uptime monitoring.',
   alternates: { canonical: 'https://uptrue.io/score' },
 }
+
+const FAQ = [
+  {
+    q: 'What does the Website Health Score check?',
+    a: 'Five categories in a single test: uptime (does the site respond?), SSL (is the certificate valid and not near expiry?), DNS (do the records resolve correctly?), security headers (HSTS, CSP, X-Frame-Options and others), and performance (response time, TTFB). Each contributes to an overall A+ to F grade with specific recommendations for any failing checks.',
+  },
+  {
+    q: 'Is the Website Health Score free?',
+    a: 'Yes, completely free. No account, no email capture, no rate limit. You can score any public URL as many times as you want. The result page is shareable.',
+  },
+  {
+    q: 'How accurate is the score?',
+    a: 'The score reflects what the tool can measure from a single point-in-time check at the edge. Uptime, SSL chain, DNS resolution, header presence and response time are all directly observable and reported as-is. The score is a snapshot — for the trends that matter (uptime over weeks, SSL expiry alerts, response time degradation) you need continuous monitoring.',
+  },
+  {
+    q: 'Can I monitor these checks continuously instead of one-off?',
+    a: 'Yes. The Free Uptrue plan includes 3 monitors at email-alerts. Each of the five score categories maps to a continuous monitor type: HTTP uptime, SSL certificate monitoring, DNS monitoring, security headers monitoring, and response time monitoring. Set up once, get alerted whenever something breaks.',
+  },
+  {
+    q: 'How is this different from PageSpeed or GTmetrix?',
+    a: 'PageSpeed and GTmetrix focus on browser performance metrics. The Uptrue Health Score is broader — it includes infrastructure (DNS, SSL chain), security posture (headers), and uptime in a single grade designed for site owners and agencies, not just developers.',
+  },
+  {
+    q: 'What should I do if my score is low?',
+    a: 'Each failing check on the result page links to a specific fix or guide. For example, a missing HSTS header links to our security headers checker; an SSL chain warning links to the SSL certificate checker. You can also browse all our free website monitoring tools.',
+  },
+]
 
 export default function ScorePage(): React.ReactElement {
   return (
@@ -54,7 +82,72 @@ export default function ScorePage(): React.ReactElement {
         </div>
       </div>
 
-      
+      {/* Related continuous monitors — each score category maps to a continuous monitor type */}
+      <section className="landing-section">
+        <div className="landing-container" style={{ maxWidth: 880 }}>
+          <h2 className="landing-section-title">Score is a snapshot — monitor it continuously</h2>
+          <p className="landing-section-subtitle">
+            A one-off score tells you the state right now. To catch regressions before
+            customers do, set up continuous monitoring on the categories that matter to you.
+          </p>
+          <ul className="about-list" style={{ marginTop: 24, fontSize: 15, lineHeight: 1.9 }}>
+            <li><Link href="/monitoring/http-uptime-monitoring">HTTP uptime monitoring</Link> — be alerted the moment your site stops responding.</li>
+            <li><Link href="/monitoring/ssl-certificate-monitoring">SSL certificate monitoring</Link> — get warned 30, 14 and 3 days before expiry.</li>
+            <li><Link href="/monitoring/dns-monitoring">DNS record monitoring</Link> — detect unauthorised record changes within minutes.</li>
+            <li><Link href="/monitoring/security-headers-monitoring">Security headers monitoring</Link> — spot when HSTS, CSP or X-Frame-Options drop off.</li>
+            <li><Link href="/monitoring/response-time-monitoring">Response time monitoring</Link> — catch performance degradation before it bites.</li>
+          </ul>
+          <p style={{ marginTop: 20, fontSize: 14, color: 'var(--text-muted)' }}>
+            Or browse all <Link href="/tools">free website monitoring tools</Link> — SSL, DNS,
+            security headers, blacklist and more, no signup required.
+          </p>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="landing-section" style={{ background: 'var(--bg-muted)' }}>
+        <div className="landing-container" style={{ maxWidth: 760 }}>
+          <h2 className="landing-section-title">Frequently asked questions</h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 24 }}>
+            {FAQ.map((item, i) => (
+              <div key={i} style={{ padding: '20px 24px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10 }}>
+                <h3 style={{ margin: '0 0 8px', fontSize: 16, fontWeight: 600, color: 'var(--text-primary)' }}>{item.q}</h3>
+                <p style={{ margin: 0, fontSize: 14, lineHeight: 1.7, color: 'var(--text-secondary)' }}>{item.a}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* JSON-LD FAQPage schema mirroring the FAQ array above */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            mainEntity: FAQ.map((item) => ({
+              '@type': 'Question',
+              name: item.q,
+              acceptedAnswer: { '@type': 'Answer', text: item.a },
+            })),
+          }),
+        }}
+      />
+
+      {/* CTA */}
+      <section className="landing-cta">
+        <div className="landing-container">
+          <h2 className="cta-title">Turn the score into peace of mind</h2>
+          <p className="cta-subtitle">
+            The Free plan includes 3 monitors with email alerts. No credit card required.{' '}
+            <Link href="/signup">Start monitoring free</Link> in under 2 minutes.
+          </p>
+          <Link href="/signup" className="btn btn-primary btn-lg">
+            Sign Up Free
+          </Link>
+        </div>
+      </section>
     </div>
   )
 }
