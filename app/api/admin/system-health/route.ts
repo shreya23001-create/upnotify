@@ -18,12 +18,13 @@ interface CronRun {
 }
 
 async function getCronHistory(supabase: ReturnType<typeof createAdminClient>): Promise<Record<string, CronRun[]>> {
-  // Get last 5 runs per cron path in one query, ordered by ran_at desc
+  // Get last 5 runs per cron path in one query, ordered by ran_at desc.
+  // 5 × 27 crons = 135 rows minimum; 400 gives ample headroom for hot periods.
   const { data } = await untyped(supabase)
     .from('cron_run_log')
     .select('id, cron_path, status, triggered_by, duration_ms, result_summary, error_message, ran_at')
     .order('ran_at', { ascending: false })
-    .limit(200) // enough to cover 5 per cron × 13 crons with headroom
+    .limit(400)
 
   if (!data) return {}
 
@@ -59,6 +60,25 @@ function cronStatus(lastRun: string | null, maxGapMinutes: number, now: number):
   if (ageMinutes < maxGapMinutes) return 'healthy'
   if (ageMinutes < maxGapMinutes * 2) return 'stale'
   return 'error'
+}
+
+// Helper for crons that record their runs via startCronRun/endCronRun
+// (most non-data-driven crons). Returns the most recent ran_at as ISO
+// string, or null if the cron has never run / table is empty.
+async function lastRunFromCronLog(
+  supabase: ReturnType<typeof createAdminClient>,
+  path: string
+): Promise<string | null> {
+  const { data } = await untyped(supabase)
+    .from('cron_run_log')
+    .select('ran_at')
+    .eq('cron_path', path)
+    .order('ran_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+  if (!data) return null
+  const row = data as Record<string, unknown>
+  return (row.ran_at as string) ?? null
 }
 
 export async function GET(): Promise<NextResponse> {
@@ -100,7 +120,7 @@ export async function GET(): Promise<NextResponse> {
   const failedCheckCount = failedChecks.count ?? 0
   const failRate = totalCheckCount > 0 ? (failedCheckCount / totalCheckCount) * 100 : 0
 
-  // ── Cron last-run timestamps (all 13 crons) ───────────────────────────────
+  // ── Cron last-run timestamps (all 27 crons; matches vercel.json) ──────────
   const [
     lastUserCheck,
     lastPublicCheck,
@@ -121,6 +141,15 @@ export async function GET(): Promise<NextResponse> {
     lastAutoblogLlmDetector,
     lastAutoblogTopicRunner,
     lastAutoblogPostGenerator,
+    // New: Autoblog v2, Alerts, PMB, Maintenance/Billing
+    lastCalendarDraftRunner,
+    lastBossDigest,
+    lastAlertDigestFlusher,
+    lastDataRetention,
+    lastMonitorHealthReport,
+    lastPmbWeekPlanner,
+    lastPmbDailyPublisher,
+    lastPmbMonthlyGenerator,
   ] = await Promise.all([
     // check-runner
     supabase.from('check_results').select('checked_at').not('org_id', 'is', null)
@@ -195,6 +224,22 @@ export async function GET(): Promise<NextResponse> {
     untyped(supabase).from('cron_run_log').select('ran_at')
       .eq('cron_path', '/api/cron/autoblog/post-generator')
       .order('ran_at', { ascending: false }).limit(1).maybeSingle(),
+    // calendar/draft-runner — via cron_run_log
+    lastRunFromCronLog(supabase, '/api/cron/calendar/draft-runner'),
+    // boss-digest — via cron_run_log
+    lastRunFromCronLog(supabase, '/api/cron/boss-digest'),
+    // alert-digest-flusher — via cron_run_log
+    lastRunFromCronLog(supabase, '/api/cron/alert-digest-flusher'),
+    // data-retention — via cron_run_log
+    lastRunFromCronLog(supabase, '/api/cron/data-retention'),
+    // monitor-health-report — via cron_run_log
+    lastRunFromCronLog(supabase, '/api/cron/monitor-health-report'),
+    // pmb/week-planner — via cron_run_log
+    lastRunFromCronLog(supabase, '/api/cron/pmb/week-planner'),
+    // pmb/daily-publisher — via cron_run_log
+    lastRunFromCronLog(supabase, '/api/cron/pmb/daily-publisher'),
+    // pmb/monthly-generator — via cron_run_log
+    lastRunFromCronLog(supabase, '/api/cron/pmb/monthly-generator'),
   ])
 
   // ── Compete stats ─────────────────────────────────────────────────────────
@@ -367,6 +412,74 @@ export async function GET(): Promise<NextResponse> {
         lastRun: autoblogPostGeneratorAt,
         status: cronStatus(autoblogPostGeneratorAt, 15, now),
         history: cronHistory['/api/cron/autoblog/post-generator'] ?? [],
+      },
+      // ── Autoblog v2 (calendar-driven posts + Boss daily digest) ─────────
+      calendarDraftRunner: {
+        label: 'Autoblog v2 — Calendar Draft Runner',
+        schedule: 'Every hour',
+        path: '/api/cron/calendar/draft-runner',
+        lastRun: lastCalendarDraftRunner,
+        status: cronStatus(lastCalendarDraftRunner, 70, now),
+        history: cronHistory['/api/cron/calendar/draft-runner'] ?? [],
+      },
+      bossDigest: {
+        label: 'Autoblog v2 — Boss Daily Digest',
+        schedule: 'Daily 7am',
+        path: '/api/cron/boss-digest',
+        lastRun: lastBossDigest,
+        status: cronStatus(lastBossDigest, 1500, now),
+        history: cronHistory['/api/cron/boss-digest'] ?? [],
+      },
+      // ── Alerts (Smart Digest flusher) ───────────────────────────────────
+      alertDigestFlusher: {
+        label: 'Alert Digest Flusher',
+        schedule: 'Every 5 minutes',
+        path: '/api/cron/alert-digest-flusher',
+        lastRun: lastAlertDigestFlusher,
+        status: cronStatus(lastAlertDigestFlusher, 10, now),
+        history: cronHistory['/api/cron/alert-digest-flusher'] ?? [],
+      },
+      // ── PMB — Public Monitor Blog ──────────────────────────────────────
+      pmbWeekPlanner: {
+        label: 'PMB Week Planner',
+        schedule: 'Monday 5am',
+        path: '/api/cron/pmb/week-planner',
+        lastRun: lastPmbWeekPlanner,
+        status: cronStatus(lastPmbWeekPlanner, 10080, now),
+        history: cronHistory['/api/cron/pmb/week-planner'] ?? [],
+      },
+      pmbDailyPublisher: {
+        label: 'PMB Daily Publisher',
+        schedule: 'Every 5 minutes',
+        path: '/api/cron/pmb/daily-publisher',
+        lastRun: lastPmbDailyPublisher,
+        status: cronStatus(lastPmbDailyPublisher, 10, now),
+        history: cronHistory['/api/cron/pmb/daily-publisher'] ?? [],
+      },
+      pmbMonthlyGenerator: {
+        label: 'PMB Monthly Generator',
+        schedule: '1st of month, 7am',
+        path: '/api/cron/pmb/monthly-generator',
+        lastRun: lastPmbMonthlyGenerator,
+        status: cronStatus(lastPmbMonthlyGenerator, 44640, now),
+        history: cronHistory['/api/cron/pmb/monthly-generator'] ?? [],
+      },
+      // ── Maintenance & Billing ───────────────────────────────────────────
+      dataRetention: {
+        label: 'Data Retention',
+        schedule: 'Daily 2:30am',
+        path: '/api/cron/data-retention',
+        lastRun: lastDataRetention,
+        status: cronStatus(lastDataRetention, 1500, now),
+        history: cronHistory['/api/cron/data-retention'] ?? [],
+      },
+      monitorHealthReport: {
+        label: 'Monitor Health Report',
+        schedule: 'Daily 8am',
+        path: '/api/cron/monitor-health-report',
+        lastRun: lastMonitorHealthReport,
+        status: cronStatus(lastMonitorHealthReport, 1500, now),
+        history: cronHistory['/api/cron/monitor-health-report'] ?? [],
       },
     },
 
