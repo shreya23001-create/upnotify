@@ -117,6 +117,7 @@ describe('lib/utils/plan-limits', () => {
         hasWhiteLabel: false,
         hasVoiceCalls: false,
         checkIntervalSeconds: 600,
+        wpMonitors: 0,
       })
     })
 
@@ -140,6 +141,7 @@ describe('lib/utils/plan-limits', () => {
         hasWhiteLabel: false,
         hasVoiceCalls: false,
         checkIntervalSeconds: 600,
+        wpMonitors: 0,
       })
     })
 

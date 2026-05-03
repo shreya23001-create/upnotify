@@ -232,7 +232,7 @@ describe('check-runner cron route', () => {
       expect.objectContaining({
         org_id: 'org-001',
         monitor_id: 'mon-001',
-        title: 'Test Monitor is down',
+        title: 'Test Monitor is not responding',
         severity: 'high',
       })
     )

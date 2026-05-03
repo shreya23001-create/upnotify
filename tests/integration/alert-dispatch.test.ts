@@ -24,10 +24,51 @@ const mockSupabaseSelect = vi.fn()
 const mockSupabaseInsert = vi.fn()
 const mockSupabaseEq = vi.fn()
 
+// Default Smart Digest settings — Smart Digest off so every alert sends instantly,
+// matching the per-event behaviour these tests were written against.
+// Shape mirrors OrgAlertSettings in lib/db/alert-settings.ts.
+const DEFAULT_ORG_ALERT_SETTINGS = {
+  org_id: 'org-1',
+  mode: 'off' as const,
+  digest_window_minutes: 30,
+  instant_severity_floor: 'critical' as const,
+  same_host_grouping: true,
+  flap_badge_threshold: 3,
+  created_at: '',
+  updated_at: '',
+}
+
 vi.mock('@/lib/supabase/admin', () => ({
   createAdminClient: () => ({
     from: (table: string) => {
       mockSupabaseFrom(table)
+      // org_alert_settings is queried via .select().eq().maybeSingle()
+      // by getOrgAlertSettings — keep its branch isolated from the
+      // alert_channels chain used elsewhere.
+      if (table === 'org_alert_settings') {
+        return {
+          select: () => ({
+            eq: () => ({
+              maybeSingle: () => ({ data: DEFAULT_ORG_ALERT_SETTINGS, error: null }),
+            }),
+          }),
+          insert: () => ({
+            select: () => ({
+              single: () => ({ data: DEFAULT_ORG_ALERT_SETTINGS, error: null }),
+            }),
+          }),
+        }
+      }
+      // digest_buffer is touched by routeEmailEvent / bufferEvent. With
+      // Smart Digest off in defaults, these paths shouldn't fire — but
+      // return an empty no-op shape so any stray call doesn't crash.
+      if (table === 'digest_buffer') {
+        return {
+          select: () => ({ eq: () => ({ data: [], error: null }) }),
+          insert: () => ({ error: null }),
+          delete: () => ({ in: () => ({ error: null }) }),
+        }
+      }
       return {
         select: (...args: unknown[]) => {
           mockSupabaseSelect(...args)
