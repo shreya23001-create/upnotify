@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { RedirectChainCheckerTool } from '@/components/tools/redirect-chain-checker-tool'
 
 export const metadata: Metadata = {
@@ -165,8 +166,10 @@ export default function RedirectChainCheckerPage(): React.ReactElement {
           <div className="tools-cta">
             <h2>Monitor your redirects automatically</h2>
             <p>
-              Redirect chains can appear silently after deployments or CMS changes. Uptrue monitors
-              your URLs continuously and alerts you when a redirect chain changes or a loop appears.
+              Redirect chains often appear silently after deployments. Uptrue&apos;s{' '}
+              <Link href="/monitoring/redirect-chain-monitoring">redirect chain monitoring</Link> watches your URLs
+              continuously and alerts you when a chain changes or a loop appears. Pair it with{' '}
+              <Link href="/monitoring/http-uptime-monitoring">HTTP uptime monitoring</Link> for end-to-end coverage.
             </p>
             <a href="/signup" className="btn btn-primary btn-lg">
               Start Monitoring Free

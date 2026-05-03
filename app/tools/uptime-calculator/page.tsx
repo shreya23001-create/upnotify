@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { UptimeCalculatorTool } from '@/components/tools/uptime-calculator-tool'
 
 export const metadata: Metadata = {
@@ -241,8 +242,11 @@ export default function UptimeCalculatorPage(): React.ReactElement {
         <div className="tools-cta">
           <h2>Monitor your uptime automatically</h2>
           <p>
-            Stop calculating downtime manually. Let Uptrue track your uptime 24/7
-            and alert you the moment something goes wrong. Get started in under 2 minutes.
+            Stop calculating downtime manually. Uptrue&apos;s{' '}
+            <Link href="/monitoring/http-uptime-monitoring">HTTP uptime monitoring</Link> tracks your sites every
+            minute with two-region confirmation and pairs with{' '}
+            <Link href="/monitoring/heartbeat-monitoring">heartbeat monitoring</Link> for cron jobs and background
+            workers — alerting you the moment something goes wrong.
           </p>
           <a href="/signup" className="btn btn-primary btn-lg">
             Start Monitoring Free

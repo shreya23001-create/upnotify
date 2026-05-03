@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { RobotsTxtCheckerTool } from '@/components/tools/robots-txt-checker-tool'
 
 export const metadata: Metadata = {
@@ -118,8 +119,10 @@ export default function RobotsTxtCheckerPage(): React.ReactElement {
         <div className="tools-cta">
           <h2>Monitor your robots.txt for changes</h2>
           <p>
-            Uptrue can alert you the moment your robots.txt changes — protecting you from
-            accidental deployments that block search engines.
+            Uptrue&apos;s <Link href="/monitoring/robots-txt-monitoring">robots.txt change monitoring</Link>{' '}
+            alerts you the moment a deploy modifies your crawl rules. Pair it with{' '}
+            <Link href="/monitoring/sitemap-monitoring">sitemap validity monitoring</Link> so a broken
+            sitemap reference never silently sinks your indexation.
           </p>
           <a href="/signup" className="btn btn-primary btn-lg">
             Start Monitoring Free

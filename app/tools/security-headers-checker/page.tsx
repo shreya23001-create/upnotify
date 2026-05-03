@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { SecurityHeadersCheckerTool } from '@/components/tools/security-headers-checker-tool'
 
 export const metadata: Metadata = {
@@ -165,8 +166,11 @@ export default function SecurityHeadersCheckerPage(): React.ReactElement {
           <div className="tools-cta">
             <h2>Monitor your security headers 24/7</h2>
             <p>
-              Security headers can be accidentally removed during deployments. Uptrue checks your
-              headers daily and alerts you the moment a critical header disappears.
+              Security headers go missing in deployments more often than teams realise. Uptrue&apos;s{' '}
+              <Link href="/monitoring/security-headers-monitoring">security headers monitoring</Link> checks
+              every six hours and pairs naturally with{' '}
+              <Link href="/monitoring/ssl-certificate-monitoring">SSL certificate monitoring</Link> for the full
+              transport-security picture.
             </p>
             <a href="/signup" className="btn btn-primary btn-lg">
               Start Monitoring Free

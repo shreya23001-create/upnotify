@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { WebsiteSpeedTestTool } from '@/components/tools/website-speed-test-tool'
 
 export const metadata: Metadata = {
@@ -140,8 +141,10 @@ export default function WebsiteSpeedTestPage(): React.ReactElement {
         <div className="tools-cta">
           <h2>Monitor response time 24/7</h2>
           <p>
-            Uptrue checks your website every 30 seconds and alerts you the moment response
-            times degrade — before your users notice a slow site.
+            Uptrue&apos;s <Link href="/monitoring/response-time-monitoring">response time threshold monitoring</Link>{' '}
+            checks every minute and alerts you the moment latency drifts past your threshold. Pair it with{' '}
+            <Link href="/monitoring/page-size-monitoring">page size monitoring</Link> to catch deploys that
+            silently bloat the site — both contribute to slow page loads.
           </p>
           <a href="/signup" className="btn btn-primary btn-lg">
             Start Monitoring Free

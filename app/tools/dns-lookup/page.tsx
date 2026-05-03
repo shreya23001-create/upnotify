@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { DnsLookupTool } from '@/components/tools/dns-lookup-tool'
 
 export const metadata: Metadata = {
@@ -142,8 +143,11 @@ export default function DnsLookupPage(): React.ReactElement {
           <div className="tools-cta">
             <h2>Monitor DNS changes automatically</h2>
             <p>
-              Get alerted the moment a DNS record changes on your domain. Uptrue watches your DNS records
-              24/7 and notifies you via email, Slack, or webhook before issues affect your users.
+              Get alerted the moment a DNS record changes on your domain. Uptrue&apos;s{' '}
+              <Link href="/monitoring/dns-monitoring">DNS monitoring</Link> watches your records every six hours
+              and pairs naturally with{' '}
+              <Link href="/monitoring/nameserver-monitoring">nameserver change monitoring</Link> so a registrar
+              hijack or accidental edit reaches you within minutes — via email, Slack, Telegram, or webhook.
             </p>
             <a href="/signup" className="btn btn-primary btn-lg">
               Start Monitoring Free

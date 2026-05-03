@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { HttpStatusCheckerTool } from '@/components/tools/http-status-checker-tool'
 
 export const metadata: Metadata = {
@@ -165,8 +166,10 @@ export default function HttpStatusCheckerPage(): React.ReactElement {
           <div className="tools-cta">
             <h2>Monitor your URLs around the clock</h2>
             <p>
-              Know instantly when a page goes down, returns a 404, or starts redirecting incorrectly.
-              Uptrue checks every 30 seconds and alerts you before your users notice.
+              Uptrue&apos;s <Link href="/monitoring/http-uptime-monitoring">HTTP uptime monitoring</Link>{' '}
+              checks every minute and alerts you the moment a page goes down or returns the wrong status code.
+              Pair it with <Link href="/monitoring/redirect-chain-monitoring">redirect chain monitoring</Link> so a
+              broken 301 chain doesn&apos;t silently kill SEO between deploys.
             </p>
             <a href="/signup" className="btn btn-primary btn-lg">
               Start Monitoring Free

@@ -398,9 +398,12 @@ export default function AiSeoCheckerPage(): React.ReactElement {
                 Ready to monitor your AI search presence?
               </h3>
               <p style={{ color: 'var(--text-muted)', margin: '0 0 var(--space-6)' }}>
-                This checker gives you your technical readiness score. Uptrue AI Visibility goes further —
-                generate your llms.txt and track whether Perplexity, ChatGPT, and Gemini are
-                actually citing you for your target keywords.
+                This checker gives you a technical readiness score. Uptrue AI Visibility&trade; goes further —
+                generate your llms.txt and track whether Perplexity, ChatGPT, and Gemini are actually
+                citing you for your target keywords. Pair it with{' '}
+                <Link href="/monitoring/robots-txt-monitoring">robots.txt change monitoring</Link> and{' '}
+                <Link href="/monitoring/sitemap-monitoring">sitemap validity monitoring</Link> so an
+                accidental Disallow or broken sitemap never silently blocks AI crawlers.
               </p>
               <Link href="/signup?next=/dashboard/ai-visibility" className="btn btn-primary" style={{ marginRight: 'var(--space-3)' }}>
                 Get Started Free

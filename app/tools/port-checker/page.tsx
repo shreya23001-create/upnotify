@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { PortCheckerTool } from '@/components/tools/port-checker-tool'
 
 export const metadata: Metadata = {
@@ -118,8 +119,10 @@ export default function PortCheckerPage(): React.ReactElement {
         <div className="tools-cta">
           <h2>Monitor your ports 24/7</h2>
           <p>
-            Uptrue can monitor any TCP port and alert you instantly if it goes down.
-            Get notified by email, Slack, or webhook — before your users notice.
+            Uptrue&apos;s <Link href="/monitoring/port-monitoring">port check monitoring</Link> watches any TCP
+            port every minute and alerts you instantly if it stops accepting connections. Pair it with{' '}
+            <Link href="/monitoring/ping-monitoring">ping/reachability monitoring</Link> so you can tell a port
+            issue from a host outage at a glance.
           </p>
           <a href="/signup" className="btn btn-primary btn-lg">
             Start Monitoring Free

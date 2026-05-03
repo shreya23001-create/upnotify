@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { BlacklistCheckerTool } from '@/components/tools/blacklist-checker-tool'
 
 export const metadata: Metadata = {
@@ -118,8 +119,10 @@ export default function BlacklistCheckerPage(): React.ReactElement {
         <div className="tools-cta">
           <h2>Monitor your blacklist status 24/7</h2>
           <p>
-            Uptrue monitors your domain against spam blacklists continuously and alerts you
-            the moment you get listed — so you can fix it before it hurts your email deliverability.
+            Uptrue&apos;s <Link href="/monitoring/blacklist-monitoring">blacklist monitoring</Link> checks your
+            domain against spam blacklists daily and alerts you the moment you get listed. Pair it with{' '}
+            <Link href="/monitoring/mx-health-monitoring">MX health monitoring</Link> so a deliverability hit
+            never goes unnoticed.
           </p>
           <a href="/signup" className="btn btn-primary btn-lg">
             Start Monitoring Free

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { WhoisLookupTool } from '@/components/tools/whois-lookup-tool'
 
 export const metadata: Metadata = {
@@ -134,8 +135,10 @@ export default function WhoisLookupPage(): React.ReactElement {
           <div className="tools-cta">
             <h2>Never let your domain expire</h2>
             <p>
-              Uptrue monitors your domain expiry date and alerts you via email, Slack, or webhook
-              at 90, 30, and 7 days before expiry. Set it up once and forget about it.
+              Uptrue&apos;s <Link href="/monitoring/domain-expiry-monitoring">domain expiry monitoring</Link>{' '}
+              alerts you via email, Slack, or webhook at 90, 30, and 7 days before expiry. Pair it with{' '}
+              <Link href="/monitoring/whois-registrar-monitoring">WHOIS registrar monitoring</Link> to catch
+              unexpected ownership or registrar changes the moment they happen. Set up once and forget about it.
             </p>
             <a href="/signup" className="btn btn-primary btn-lg">
               Start Monitoring Free

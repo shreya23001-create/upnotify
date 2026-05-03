@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { SpfDmarcCheckerTool } from '@/components/tools/spf-dmarc-checker-tool'
 
 export const metadata: Metadata = {
@@ -134,8 +135,10 @@ export default function SpfDmarcCheckerPage(): React.ReactElement {
           <div className="tools-cta">
             <h2>Monitor SPF &amp; DMARC changes automatically</h2>
             <p>
-              Uptrue monitors your SPF and DMARC records for unexpected changes and alerts you the
-              moment something shifts. Protect your domain reputation before attackers exploit a misconfiguration.
+              Uptrue&apos;s <Link href="/monitoring/spf-dmarc-monitoring">SPF/DMARC validity monitoring</Link>{' '}
+              watches your authentication records and alerts you the moment something shifts. Pair it with{' '}
+              <Link href="/monitoring/mx-health-monitoring">MX health monitoring</Link> so a broken mail flow
+              never goes unnoticed — protecting your domain reputation before attackers exploit it.
             </p>
             <a href="/signup" className="btn btn-primary btn-lg">
               Start Monitoring Free
