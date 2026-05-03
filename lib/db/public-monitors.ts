@@ -234,17 +234,65 @@ export async function getPublicMonitorAvgResponseTime(monitorId: string, days: n
   return Math.round(times.reduce((sum, t) => sum + t, 0) / times.length)
 }
 
+/**
+ * Normalises a public-tracker domain string to the canonical form used in
+ * `public_monitors.domain` — lowercase, with any `www.`, scheme, or trailing
+ * slash stripped. Inputs like `Google.com`, `WWW.Google.com`,
+ * `https://google.com/` all map to `google.com` so a tracker URL hit
+ * still resolves the right row instead of 404'ing.
+ */
+export function normalisePublicMonitorDomain(input: string): string {
+  let d = input.trim().toLowerCase()
+  // Strip scheme
+  d = d.replace(/^https?:\/\//, '')
+  // Strip leading www.
+  d = d.replace(/^www\./, '')
+  // Strip any path / trailing slash
+  d = d.replace(/\/.*$/, '')
+  return d
+}
+
 export async function getPublicMonitorByDomain(domain: string): Promise<PublicMonitor | null> {
+  const normalised = normalisePublicMonitorDomain(domain)
   const supabase = createAdminClient()
   const { data, error } = await supabase
     .from('public_monitors')
     .select('*')
-    .eq('domain', domain)
+    .eq('domain', normalised)
     .eq('is_active', true)
     .maybeSingle()
 
   if (error) {
-    logger.error('Failed to get public monitor by domain', { error: error.message, domain })
+    logger.error('Failed to get public monitor by domain', { error: error.message, domain: normalised })
+    return null
+  }
+  return data ? (data as unknown as PublicMonitor) : null
+}
+
+/**
+ * Like `getPublicMonitorByDomain` but includes inactive (deactivated) rows.
+ * Used by the tracker page to differentiate between three cases:
+ *   - active row → render the live status page (200)
+ *   - inactive row → render "this site is no longer tracked" with
+ *     `robots: noindex` so Google removes the URL from index
+ *   - no row at all → soft 404 page with related sites + signup CTA (200)
+ */
+export async function getPublicMonitorByDomainIncludingInactive(
+  domain: string
+): Promise<PublicMonitor | null> {
+  const normalised = normalisePublicMonitorDomain(domain)
+  const supabase = createAdminClient()
+  const { data, error } = await supabase
+    .from('public_monitors')
+    .select('*')
+    .eq('domain', normalised)
+    .maybeSingle()
+
+  if (error) {
+    logger.error('Failed to get public monitor by domain (incl inactive)', {
+      error: error.message,
+      domain: normalised,
+    })
     return null
   }
   return data ? (data as unknown as PublicMonitor) : null

@@ -40,6 +40,54 @@ export interface ReviewOutput {
 // Public API
 // ---------------------------------------------------------------------------
 
+// Tool schema for guaranteed-valid JSON output (same approach as the
+// generator). Reviewer text is structured but short, so JSON.parse rarely
+// breaks — but tool_use removes the entire class of risk.
+const SUBMIT_REVIEW_TOOL = {
+  name: 'submit_blog_review',
+  description: 'Submit your review of the draft. Call exactly once with all fields.',
+  input_schema: {
+    type: 'object' as const,
+    properties: {
+      highlights: {
+        type: 'array',
+        items: { type: 'string' },
+        description: '2-4 bullets about what is good — specific, not generic.',
+      },
+      worries: {
+        type: 'array',
+        items: { type: 'string' },
+        description: '2-5 bullets about what to watch. If draft is clean, return ["No major concerns"].',
+      },
+      toneScore: {
+        type: 'integer',
+        minimum: 0,
+        maximum: 10,
+        description: '0-10 integer rating of how on-brand the tone is.',
+      },
+      factsToVerify: {
+        type: 'array',
+        items: { type: 'string' },
+        description: 'Specific claims that need source/verification. Empty array if none.',
+      },
+      legalSensitivities: {
+        type: 'array',
+        items: { type: 'string' },
+        description: 'Anything Harvey would flag. Empty array if nothing applies.',
+      },
+      recommendedAction: {
+        type: 'string',
+        description: 'One of: approve, edit, reject',
+      },
+      recommendedActionReason: {
+        type: 'string',
+        description: 'One sentence explaining the recommendation.',
+      },
+    },
+    required: ['highlights', 'worries', 'toneScore', 'recommendedAction', 'recommendedActionReason'],
+  },
+}
+
 export async function reviewDraft(input: ReviewInput): Promise<ReviewOutput> {
   const { anthropic } = getServerConfig()
 
@@ -53,17 +101,22 @@ export async function reviewDraft(input: ReviewInput): Promise<ReviewOutput> {
 
   try {
     const message = await client.messages.create({
-      model: 'claude-sonnet-4-6',
+      // Haiku 4.5 — short structured summary, ~5x cheaper than Sonnet.
+      // Generator (long-form post) stays on Sonnet where quality matters more.
+      model: 'claude-haiku-4-5-20251001',
       max_tokens: 2000,
+      tools: [SUBMIT_REVIEW_TOOL],
+      tool_choice: { type: 'tool', name: SUBMIT_REVIEW_TOOL.name },
       messages: [{ role: 'user', content: prompt }],
     })
 
-    const textContent = message.content.find(b => b.type === 'text')
-    if (!textContent || textContent.type !== 'text') {
-      throw new Error('Reviewer returned no text content')
+    const toolUse = message.content.find(b => b.type === 'tool_use')
+    if (!toolUse || toolUse.type !== 'tool_use') {
+      logger.warn('blog-reviewer: no tool_use block returned', { stopReason: message.stop_reason })
+      return emptyReview(input.dod)
     }
 
-    const parsed = parseReviewResponse(textContent.text)
+    const parsed = normaliseReviewInput(toolUse.input)
     return {
       ...parsed,
       generatedAt: new Date().toISOString(),
@@ -107,32 +160,7 @@ ${input.bodyMarkdown.length > 8000 ? '\n[... truncated ...]' : ''}
 \`\`\`
 
 ## Your task
-Return a JSON object with these EXACT keys (no extra prose, no preamble, just the JSON):
-
-{
-  "highlights": [
-    "2-4 bullet points about what's good — concrete, not generic",
-    "Mention specific phrases or sections that work"
-  ],
-  "worries": [
-    "2-5 bullet points about what to watch — be specific",
-    "Examples: 'Claims X stat — needs source', 'Mentions competitor Y pricing — verify accuracy', 'Tone too marketing-y in section Z'",
-    "If draft is clean, return ['No major concerns'] (still array of 1)"
-  ],
-  "toneScore": 0-10 integer,
-  "factsToVerify": [
-    "Specific claims that need source/verification",
-    "Statistics, version numbers, pricing claims, rate limits, dates"
-  ],
-  "legalSensitivities": [
-    "Anything Harvey would flag — competitor names, legal claims, customer quotes, etc.",
-    "Empty array if nothing applies"
-  ],
-  "recommendedAction": "approve" | "edit" | "reject",
-  "recommendedActionReason": "One sentence why"
-}
-
-Be honest. The Boss prefers a 'edit' verdict with specific changes over 'approve' on a marginal draft. Return only valid JSON, no markdown wrapper.`
+Submit your review via the \`submit_blog_review\` tool. Be honest — the Boss prefers an 'edit' verdict with specific changes over 'approve' on a marginal draft. Mention specific phrases or sections (not generic comments). For factsToVerify list specific claims (statistics, version numbers, pricing, rate limits, dates). For legalSensitivities flag competitor names, legal claims, customer quotes.`
 }
 
 function describeDoD(dod: DoDResult): string {
@@ -163,52 +191,20 @@ interface RawReviewResponse {
   recommendedActionReason?: unknown
 }
 
-function parseReviewResponse(text: string): Omit<ReviewOutput, 'generatedAt' | 'dodSummary'> {
-  // Extract JSON from response. Claude may return:
-  //   - Pure JSON
-  //   - ```json ... ``` fenced block
-  //   - Prose preamble then JSON
-  let jsonText = text.trim()
-  const fenced = jsonText.match(/```(?:json)?\s*([\s\S]*?)```/)
-  if (fenced) {
-    jsonText = fenced[1].trim()
-  } else {
-    // Fall back to first { ... last } if no fence
-    const first = jsonText.indexOf('{')
-    const last = jsonText.lastIndexOf('}')
-    if (first !== -1 && last > first) {
-      jsonText = jsonText.slice(first, last + 1)
-    }
-  }
-
-  let parsed: RawReviewResponse
-  try {
-    parsed = JSON.parse(jsonText) as RawReviewResponse
-  } catch {
-    logger.warn('blog-reviewer: response not valid JSON, returning conservative defaults')
-    return {
-      highlights: [],
-      worries: ['Reviewer response could not be parsed — manual review recommended'],
-      toneScore: 5,
-      factsToVerify: [],
-      legalSensitivities: [],
-      recommendedAction: 'edit',
-      recommendedActionReason: 'Reviewer JSON parse failed',
-    }
-  }
-
-  const action = String(parsed.recommendedAction ?? 'edit')
+function normaliseReviewInput(input: unknown): Omit<ReviewOutput, 'generatedAt' | 'dodSummary'> {
+  const obj = (input && typeof input === 'object' ? input : {}) as RawReviewResponse
+  const action = String(obj.recommendedAction ?? 'edit')
   const validAction: ReviewOutput['recommendedAction'] =
     action === 'approve' || action === 'reject' ? action : 'edit'
 
   return {
-    highlights: asStringArray(parsed.highlights),
-    worries: asStringArray(parsed.worries),
-    toneScore: clampNumber(parsed.toneScore, 0, 10, 5),
-    factsToVerify: asStringArray(parsed.factsToVerify),
-    legalSensitivities: asStringArray(parsed.legalSensitivities),
+    highlights: asStringArray(obj.highlights),
+    worries: asStringArray(obj.worries),
+    toneScore: clampNumber(obj.toneScore, 0, 10, 5),
+    factsToVerify: asStringArray(obj.factsToVerify),
+    legalSensitivities: asStringArray(obj.legalSensitivities),
     recommendedAction: validAction,
-    recommendedActionReason: String(parsed.recommendedActionReason ?? ''),
+    recommendedActionReason: String(obj.recommendedActionReason ?? ''),
   }
 }
 

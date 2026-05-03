@@ -1,40 +1,38 @@
 # Production Readiness Checklist
 
-Items that are intentionally limited to dev/staging and must be enabled before going live.
+Items that must be enabled or verified before going live.
 
 ---
 
-## Audit Logging — Enable in Production
+## Audit Logging — Status: ENABLED in all environments
 
-**Status:** Dev only  
-**File:** `lib/db/audit.ts` — `devAuditLog()` function  
-**What to do:** Remove the environment guard so audit logs write in production too.
+**File:** `lib/db/audit.ts`
+The historic dev-only environment guard has been removed; both
+`writeAuditLog()` and the `devAuditLog()` alias now write audit rows
+unconditionally in dev, staging and production.
 
-```typescript
-// Current (dev only):
-export async function devAuditLog(input: AuditLogInput): Promise<void> {
-  if (getEnvironment() === 'production') return   // ← REMOVE THIS LINE
-  await writeAuditLog(input)
-}
-```
+### Coverage matrix
 
-**Why it's gated:** Audit logging was added during QA testing phase. Before enabling in production, verify:
+| Surface | Action(s) logged | Where |
+|---|---|---|
+| **Authentication** | `auth.magic_link_requested`, `auth.magic_link_failed`, `auth.google_oauth_failed`, `auth.logout` | `lib/auth/actions.ts` |
+| **Authentication** | `auth.login.success`, `auth.login.failed` | `app/auth/callback/route.ts` |
+| **Monitors** | `monitor.created / updated / deleted / paused / resumed / bulk_*` | `app/(dashboard)/dashboard/monitors/actions.ts` |
+| **Alert channels** | `alert_channel.created / updated / deleted / enabled / disabled / bulk_*` | `app/(dashboard)/dashboard/alerts/actions.ts` |
+| **Status pages** | `status_page.created / updated / deleted / bulk_*` | `app/(dashboard)/dashboard/status-pages/actions.ts` |
+| **API keys** | `api_key.created / api_key.revoked` | `app/api/v1/api-keys/route.ts`, `app/api/v1/api-keys/revoke/route.ts` |
+| **Team** | `team.invited / team.accepted / team.removed` | `app/api/v1/team/route.ts`, `app/api/v1/team/accept/route.ts` |
+| **User data** | `user.data_export`, `user.delete` | `app/api/v1/user/export/route.ts`, `app/api/v1/user/delete/route.ts` |
+| **Admin** | `admin.role_created / role_updated / monitor_limit_override / wp_monitor_limit_override` | `app/(admin)/admin/team/actions.ts`, `app/(admin)/admin/user360/actions.ts` |
+| **Admin impersonation** | `admin.impersonate_start / impersonate_end` | `app/api/v1/admin/impersonate/route.ts` |
+| **Billing — Stripe** | `subscription.created / updated / canceled`, `compete_subscription.created`, `invoice.paid`, `invoice.payment_failed` | `app/api/webhooks/stripe/route.ts` |
+| **Billing — Razorpay** | `subscription.created / canceled / halted / resumed`, `invoice.paid` | `app/api/webhooks/razorpay/route.ts` |
+
+### Pre-launch verification
 - [ ] All audit log entries look correct in User 360 activity log on dev
-- [ ] No sensitive data is being logged in metadata fields
-- [ ] audit_log table has no RLS that blocks the user-context writes
-- [ ] Confirm performance is acceptable (audit log writes are fire-and-forget, should not block)
-
-**Actions covered by devAuditLog (will go live when guard removed):**
-- `monitor.created / updated / deleted / paused / resumed / bulk_*`
-- `alert_channel.created / updated / deleted / enabled / disabled / bulk_*`
-- `status_page.created / updated / deleted / bulk_*`
-
-**Actions already writing to production audit log (writeAuditLog directly):**
-- All admin actions (deactivate, activate, plan change, delete user)
-- Impersonation start/end
-- API key revoke
-- User data export
-- Team invite/remove
+- [ ] No sensitive data is being logged in metadata fields (no passwords, no card data, no auth tokens)
+- [ ] `audit_log` table has no RLS that blocks system-context writes (`org_id='system'` rows from auth events)
+- [ ] Performance acceptable — audit log writes are fire-and-forget, should not block user actions
 
 ---
 

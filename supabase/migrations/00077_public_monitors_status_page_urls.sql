@@ -1,5 +1,5 @@
 -- Migration: populate status_page_url for all known public monitors
--- Column was added in 00068_pmb.sql; this migration fills in the known URLs.
+-- Column was added in 00089_pmb.sql; this migration fills in the known URLs.
 
 UPDATE public_monitors SET status_page_url = 'https://status.claude.com/'          WHERE domain = 'anthropic.com';
 UPDATE public_monitors SET status_page_url = 'https://status.character.ai/'         WHERE domain = 'character.ai';

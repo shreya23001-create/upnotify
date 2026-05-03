@@ -14,7 +14,10 @@ export default async function AlertsPage() {
     <div>
       <div className="page-header">
         <h1 className="page-title">Alert Channels</h1>
-        <Link href="/dashboard/alerts/new" className="btn btn-primary">+ Add Channel</Link>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <Link href="/dashboard/alerts/notifications" className="btn btn-secondary">Notification preferences</Link>
+          <Link href="/dashboard/alerts/new" className="btn btn-primary">+ Add Channel</Link>
+        </div>
       </div>
       <AlertChannelsTable channels={channels} />
     </div>

@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic'
 import { redirect, notFound } from 'next/navigation'
 import { getUserProfile } from '@/lib/db/users'
 import { getInvoiceById } from '@/lib/db/subscriptions'
+import { getSellerEntityByCurrency } from '@/lib/db/seller-entities'
 import { InvoicePrint } from '@/components/billing/invoice-print'
 
 interface Props {
@@ -18,11 +19,17 @@ export default async function InvoicePage({ params }: Props): Promise<React.Reac
   const invoice = await getInvoiceById(id, organisation.id)
   if (!invoice) notFound()
 
+  // Fetch the issuing entity (Vision Ltd / Crozent / future) by currency.
+  // Helper guarantees a non-null result via hardcoded fallback so render
+  // never crashes even if migration 00092 hasn't run yet.
+  const seller = await getSellerEntityByCurrency(invoice.currency)
+
   return (
     <InvoicePrint
       invoice={invoice}
       organisation={organisation}
       userEmail={user.email}
+      seller={seller}
     />
   )
 }

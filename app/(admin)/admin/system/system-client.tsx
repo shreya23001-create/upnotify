@@ -6,6 +6,11 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 // Cron groups — defines display order and section labels
 // ---------------------------------------------------------------------------
 
+// Display order + grouping for all 27 crons. The set of keys here MUST
+// match the set of keys returned by /api/admin/system-health crons object;
+// any cron registered in the backend but missing here is silently hidden.
+// Per the "every cron must be registered" rule, keep this in lockstep
+// with vercel.json + system-health/route.ts.
 const CRON_GROUPS: { label: string; color: string; keys: string[] }[] = [
   {
     label: 'Core Platform',
@@ -31,6 +36,31 @@ const CRON_GROUPS: { label: string; color: string; keys: string[] }[] = [
     label: 'AOE — Automated Outreach Engine',
     color: '#10b981',
     keys: ['aoeQuotaManager', 'aoeSiteDiscovery', 'aoeOutreachChecker', 'aoeOutreachEmailer', 'aoeLastDayBurst', 'aoeDailySnapshot'],
+  },
+  {
+    label: 'Autoblog v1 — RSS-driven posts',
+    color: '#a855f7',
+    keys: ['autoblogFeedFetcher', 'autoblogLlmDetector', 'autoblogTopicRunner', 'autoblogPostGenerator'],
+  },
+  {
+    label: 'Autoblog v2 — Calendar + Boss Digest',
+    color: '#ec4899',
+    keys: ['calendarDraftRunner', 'bossDigest'],
+  },
+  {
+    label: 'Alert Smart Digest',
+    color: '#ef4444',
+    keys: ['alertDigestFlusher'],
+  },
+  {
+    label: 'PMB — Public Monitor Blog',
+    color: '#14b8a6',
+    keys: ['pmbWeekPlanner', 'pmbDailyPublisher', 'pmbMonthlyGenerator'],
+  },
+  {
+    label: 'Maintenance & Billing',
+    color: '#6b7280',
+    keys: ['publicIncidentCleanup', 'dataRetention', 'monitorHealthReport', 'razorpayRecovery'],
   },
 ]
 

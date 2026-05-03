@@ -2,24 +2,7 @@
 
 import { useEffect } from 'react'
 import type { Invoice, Organisation } from '@/lib/types'
-
-// ─── Seller details ──────────────────────────────────────────────────────────
-
-const SELLER_GBP = {
-  name: 'Vision Software Solutions Limited',
-  address: ['C/O Benison Solvers Limited', '1000 Great West Road', 'Brentford, United Kingdom, TW8 9DW'],
-  reg: 'Company No. 02710980',
-  vat: 'VAT No. GB 573 253 734',
-  email: 'billing@uptrue.io',
-}
-
-const SELLER_INR = {
-  name: 'CROZENT TECHLABS PRIVATE LIMITED',
-  address: ['Noida, Uttar Pradesh', 'India'],
-  reg: '',
-  gst: 'GST No. [PLACEHOLDER — TO BE ADDED BEFORE LAUNCH]',
-  email: 'billing@uptrue.io',
-}
+import type { SellerEntity } from '@/lib/db/seller-entities'
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -43,11 +26,11 @@ interface Props {
   invoice: Invoice
   organisation: Organisation
   userEmail: string
+  seller: SellerEntity
 }
 
-export function InvoicePrint({ invoice, organisation, userEmail }: Props): React.ReactElement {
+export function InvoicePrint({ invoice, organisation, userEmail, seller }: Props): React.ReactElement {
   const isInr = invoice.currency === 'inr'
-  const seller = isInr ? SELLER_INR : SELLER_GBP
 
   // Auto-trigger print dialog for Razorpay (INR) invoices — Stripe invoices open their own PDF
   useEffect(() => {
@@ -61,6 +44,11 @@ export function InvoicePrint({ invoice, organisation, userEmail }: Props): React
   const totalPaise = invoice.amount_gbp
   const baseAmountPaise = isInr ? Math.round(totalPaise / 1.18) : totalPaise
   const gstPaise = isInr ? totalPaise - baseAmountPaise : 0
+
+  const taxLine =
+    seller.tax_label && seller.tax_number
+      ? `${seller.tax_label} No. ${seller.tax_number}`
+      : null
 
   return (
     <div className="invoice-page">
@@ -95,13 +83,26 @@ export function InvoicePrint({ invoice, organisation, userEmail }: Props): React
         <div className="invoice-parties">
           <div className="invoice-from">
             <div className="invoice-label">From</div>
-            <div className="invoice-party-name">{seller.name}</div>
-            {seller.address.map((line, i) => (
+            <div className="invoice-party-name">{seller.legal_name}</div>
+            {seller.address_lines.map((line, i) => (
               <div key={i} className="invoice-party-detail">{line}</div>
             ))}
-            {SELLER_GBP.reg && !isInr && <div className="invoice-party-detail">{SELLER_GBP.reg}</div>}
-            {!isInr && <div className="invoice-party-detail">{SELLER_GBP.vat}</div>}
+            {seller.registration_number && (
+              <div className="invoice-party-detail">{seller.registration_number}</div>
+            )}
+            {taxLine && (
+              <div className="invoice-party-detail">{taxLine}</div>
+            )}
+            {seller.pan && (
+              <div className="invoice-party-detail">PAN: {seller.pan}</div>
+            )}
+            {seller.tan && (
+              <div className="invoice-party-detail">TAN: {seller.tan}</div>
+            )}
             <div className="invoice-party-detail">{seller.email}</div>
+            {seller.website && (
+              <div className="invoice-party-detail">{seller.website}</div>
+            )}
           </div>
           <div className="invoice-to">
             <div className="invoice-label">Bill To</div>

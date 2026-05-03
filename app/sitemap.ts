@@ -133,7 +133,67 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     },
     {
+      url: 'https://uptrue.io/tools/uptime',
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: 'https://uptrue.io/tools/security',
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: 'https://uptrue.io/tools/dns',
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: 'https://uptrue.io/tools/ai-seo',
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
       url: 'https://uptrue.io/score',
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: 'https://uptrue.io/free-uptime-monitoring',
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.9,
+    },
+    {
+      url: 'https://uptrue.io/integrations',
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: 'https://uptrue.io/integrations/slack',
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: 'https://uptrue.io/integrations/teams',
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: 'https://uptrue.io/integrations/telegram',
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: 'https://uptrue.io/integrations/webhook',
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.8,
@@ -387,6 +447,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ]
 
   // Monitor type landing pages — static, one per monitor type
+  // Plus 5 industry-specific landings (D4-B): SaaS, e-commerce, fintech,
+  // API, banking. These sit IN /monitoring/* but are NOT real monitor types
+  // — they are SEO-only landings backed by their own static page.tsx files
+  // and rendered through the IndustryLandingPage shared template.
+  const industrySlugs = [
+    'saas-uptime-monitoring',
+    'ecommerce-uptime-monitoring',
+    'fintech-uptime-monitoring',
+    'api-uptime-monitoring',
+    'banking-uptime-monitoring',
+  ]
   const monitoringPages: MetadataRoute.Sitemap = [
     {
       url: 'https://uptrue.io/monitoring',
@@ -395,6 +466,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9,
     },
     ...getAllSlugs().map(slug => ({
+      url: `https://uptrue.io/monitoring/${slug}`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly' as const,
+      priority: 0.8,
+    })),
+    ...industrySlugs.map(slug => ({
       url: `https://uptrue.io/monitoring/${slug}`,
       lastModified: new Date(),
       changeFrequency: 'monthly' as const,
@@ -427,17 +504,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       )
     }
 
-    // Published blog posts (dynamic — auto-generated outage posts etc.)
+    // Published blog posts (dynamic — auto-generated outage posts etc.).
+    // Excludes posts flagged noindex=true (Tier 3 permutation posts) so
+    // Search Console stops surfacing them. The blog [slug] page also
+    // emits robots:noindex,nofollow on those posts (see generateMetadata).
+    //
+    // NB: cast via `unknown` because the generated Database types do not yet
+    // know about the noindex column (added in migration 00095). Regenerate
+    // types after the migration is applied to remove the cast.
     const { data: blogData, error: blogError } = await supabase
       .from('blog_posts')
-      .select('slug, updated_at')
+      .select('slug, updated_at, noindex')
       .eq('status', 'published')
+      .or('noindex.is.null,noindex.eq.false')
 
     if (blogError) {
       logger.error('Sitemap: failed to fetch blog posts', { error: blogError.message })
     } else if (blogData) {
+      const rows = blogData as unknown as { slug: string; updated_at: string | null; noindex: boolean | null }[]
       dynamicPages.push(
-        ...(blogData as { slug: string; updated_at: string | null }[]).map((post) => ({
+        ...rows.map((post) => ({
           url: `https://uptrue.io/blog/${post.slug}`,
           lastModified: post.updated_at ? new Date(post.updated_at) : new Date(),
           changeFrequency: 'weekly' as const,

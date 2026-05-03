@@ -4,6 +4,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
 import { getServerConfig } from '@/lib/utils/config'
 import { enforceDowngradeLimits, notifyPlanChange } from '@/lib/services/plan-enforcement'
+import { writeAuditLog } from '@/lib/db/audit'
 import type Stripe from 'stripe'
 
 export const dynamic = 'force-dynamic'
@@ -57,6 +58,17 @@ async function handleCheckoutCompleted(
         logger.info('Compete subscription created from checkout', {
           orgId,
           competePlanSlug,
+        })
+        await writeAuditLog({
+          orgId,
+          userId: null,
+          action: 'compete_subscription.created',
+          resourceType: 'compete_subscription',
+          metadata: {
+            stripe_subscription_id: session.subscription,
+            compete_plan_slug: competePlanSlug,
+            source: 'stripe_webhook',
+          },
         })
       }
     }
@@ -165,6 +177,20 @@ async function handleCheckoutCompleted(
 
     logger.info('checkout: subscription inserted successfully', { orgId, planSlug })
 
+    await writeAuditLog({
+      orgId,
+      userId: null,
+      action: 'subscription.created',
+      resourceType: 'subscription',
+      metadata: {
+        stripe_subscription_id: session.subscription,
+        plan_slug: planSlug,
+        plan_name: plan.name,
+        billing_cycle: insertPayload.billing_cycle,
+        source: 'stripe_webhook',
+      },
+    })
+
     await enforceDowngradeLimits(orgId)
     await notifyPlanChange(orgId, plan.name ?? planSlug, 'upgraded')
   }
@@ -250,6 +276,20 @@ async function handleInvoicePaid(
     orgId: org.id,
     invoiceId: invoice.id,
   })
+
+  await writeAuditLog({
+    orgId: org.id,
+    userId: null,
+    action: 'invoice.paid',
+    resourceType: 'invoice',
+    metadata: {
+      stripe_invoice_id: invoice.id,
+      stripe_subscription_id: subId,
+      amount_paid: invoice.amount_paid,
+      currency: invoice.currency,
+      source: 'stripe_webhook',
+    },
+  })
 }
 
 async function handleInvoicePaymentFailed(
@@ -268,6 +308,30 @@ async function handleInvoicePaymentFailed(
     logger.warn('Subscription payment failed', {
       subscriptionId: subId,
     })
+
+    // Look up org for the audit log row.
+    const { data: subRow } = await supabase
+      .from('subscriptions')
+      .select('org_id')
+      .eq('stripe_subscription_id', subId)
+      .maybeSingle()
+
+    if (subRow?.org_id) {
+      await writeAuditLog({
+        orgId: subRow.org_id,
+        userId: null,
+        action: 'invoice.payment_failed',
+        resourceType: 'invoice',
+        metadata: {
+          stripe_invoice_id: invoice.id,
+          stripe_subscription_id: subId,
+          amount_due: invoice.amount_due,
+          currency: invoice.currency,
+          attempt_count: invoice.attempt_count,
+          source: 'stripe_webhook',
+        },
+      })
+    }
   }
 }
 
@@ -325,6 +389,34 @@ async function handleSubscriptionUpdated(
     .from('compete_subscriptions')
     .update(updateData)
     .eq('stripe_subscription_id', sub.id as string)
+
+  // Audit — log the status transition only when it actually changed.
+  // Spurious past_due→active and identical-status events get skipped to
+  // avoid filling the audit log with noise.
+  const finalStatus = isSpuriousActivation ? 'past_due' : incomingStatus
+  if (currentDbStatus && finalStatus !== currentDbStatus) {
+    const { data: subRow } = await supabase
+      .from('subscriptions')
+      .select('org_id')
+      .eq('stripe_subscription_id', sub.id as string)
+      .maybeSingle()
+
+    if (subRow?.org_id) {
+      await writeAuditLog({
+        orgId: subRow.org_id,
+        userId: null,
+        action: 'subscription.updated',
+        resourceType: 'subscription',
+        metadata: {
+          stripe_subscription_id: sub.id,
+          status_from: currentDbStatus,
+          status_to: finalStatus,
+          cancel_at_period_end: cancelAtPeriodEnd,
+          source: 'stripe_webhook',
+        },
+      })
+    }
+  }
 }
 
 async function handleSubscriptionDeleted(
@@ -403,6 +495,21 @@ async function handleSubscriptionDeleted(
   }
 
   logger.info('Subscription canceled + limits enforced', { subscriptionId: sub.id, orgId: subRecord?.org_id })
+
+  if (subRecord?.org_id) {
+    await writeAuditLog({
+      orgId: subRecord.org_id,
+      userId: null,
+      action: 'subscription.canceled',
+      resourceType: 'subscription',
+      resourceId: subRecord.id ?? undefined,
+      metadata: {
+        stripe_subscription_id: sub.id,
+        plan_id: subRecord.plan_id,
+        source: 'stripe_webhook',
+      },
+    })
+  }
 }
 
 export async function POST(request: Request): Promise<NextResponse> {

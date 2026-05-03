@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Uptrue nav — D4 pilot mockup</title>
+<style>
+  :root {
+    --brand-gradient: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --bg-page: #f8fafc;
+    --bg-muted: #e2e8f0;
+    --border: #e2e8f0;
+    --color-up: #16a34a;
+    --color-up-bg: #dcfce7;
+    --color-up-border: #86efac;
+    --space-2: 8px;
+    --space-4: 16px;
+    --space-6: 24px;
+    --space-8: 32px;
+    --radius-md: 6px;
+    --dur-fast: 120ms;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    background: var(--bg-page);
+    color: var(--text-primary);
+  }
+
+  .legend {
+    max-width: 1200px;
+    margin: var(--space-8) auto var(--space-6);
+    padding: 0 var(--space-6);
+  }
+  .legend h1 { font-size: 24px; margin: 0 0 8px; }
+  .legend p { color: var(--text-secondary); font-size: 14px; margin: 0; }
+  .label {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: var(--space-6) auto var(--space-2);
+    max-width: 1200px;
+    padding-left: var(--space-6);
+  }
+  .label-current { color: #64748b; }
+  .label-proposed { color: #2563eb; }
+
+  /* Match actual production CSS */
+  .pub-nav {
+    position: relative;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(16px) saturate(180%);
+    border-bottom: 1px solid var(--border);
+    height: 60px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .pub-nav-inner {
+    display: flex; align-items: center; justify-content: space-between;
+    height: 100%; max-width: 1200px; margin: 0 auto; padding: 0 var(--space-6);
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: var(--space-2);
+    font-size: 18px; font-weight: 800; color: var(--text-primary);
+    text-decoration: none;
+  }
+  .nav-logo-icon {
+    width: 32px; height: 32px;
+    background: var(--brand-gradient);
+    border-radius: var(--radius-md);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 800; font-size: 18px;
+  }
+  .nav-links {
+    display: flex; align-items: center; gap: 2px;
+    list-style: none; margin: 0; padding: 0;
+  }
+  .nav-links li a {
+    padding: 6px 12px; border-radius: var(--radius-md);
+    font-size: 13px; font-weight: 500; color: var(--text-secondary);
+    transition: all var(--dur-fast);
+    display: flex; align-items: center; gap: 4px;
+    text-decoration: none;
+  }
+  .nav-links li a:hover { color: var(--text-primary); background: var(--bg-muted); }
+  .nav-badge {
+    font-size: 9px; font-weight: 700; color: var(--color-up);
+    background: var(--color-up-bg); border: 1px solid var(--color-up-border);
+    padding: 1px 5px; border-radius: 9999px; line-height: 1.4;
+  }
+  .nav-new-pill {
+    font-size: 9px; font-weight: 700; color: #c026d3;
+    background: #fae8ff; border: 1px solid #f0abfc;
+    padding: 1px 5px; border-radius: 9999px; line-height: 1.4;
+  }
+  .nav-actions { display: flex; align-items: center; gap: var(--space-2); }
+  .btn {
+    padding: 6px 14px; border-radius: var(--radius-md);
+    font-size: 13px; font-weight: 600;
+    text-decoration: none;
+    transition: all var(--dur-fast);
+    border: 1px solid transparent;
+    cursor: pointer;
+  }
+  .btn-ghost { color: var(--text-secondary); background: transparent; }
+  .btn-ghost:hover { color: var(--text-primary); background: var(--bg-muted); }
+  .btn-primary {
+    color: #fff;
+    background: var(--brand-gradient);
+    box-shadow: 0 1px 2px rgba(15,23,42,0.08);
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 8px rgba(15,23,42,0.12); }
+
+  .new-marker {
+    position: relative;
+  }
+  .new-marker::after {
+    content: 'NEW';
+    position: absolute;
+    top: -6px;
+    right: -10px;
+    font-size: 8px;
+    font-weight: 800;
+    color: #fff;
+    background: #ef4444;
+    padding: 1px 5px;
+    border-radius: 9999px;
+    line-height: 1.4;
+  }
+
+  .footnote {
+    max-width: 1200px;
+    margin: var(--space-8) auto;
+    padding: var(--space-6);
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+  .footnote h3 { color: var(--text-primary); font-size: 14px; margin: 0 0 8px; }
+  .footnote ul { margin: 0; padding-left: 20px; }
+  .footnote li { margin-bottom: 4px; }
+  .footnote code { background: #f1f5f9; padding: 1px 6px; border-radius: 4px; font-size: 12px; }
+</style>
+</head>
+<body>
+
+<div class="legend">
+  <h1>Uptrue public nav — D4 pilot mockup</h1>
+  <p>Two versions, top to bottom. Highlighted item is the proposed change.</p>
+</div>
+
+<!-- ====================== CURRENT NAV (production today) ====================== -->
+<div class="label label-current">Current — uptrue.io today (no /monitoring entry anywhere)</div>
+<nav class="pub-nav">
+  <div class="pub-nav-inner">
+    <a href="/" class="nav-logo">
+      <div class="nav-logo-icon">U</div>
+      Uptrue
+    </a>
+    <ul class="nav-links">
+      <li><a href="/#features">Features</a></li>
+      <li><a href="/#pricing">Pricing</a></li>
+      <li><a href="/score">Score <span class="nav-badge">Free</span></a></li>
+      <li><a href="/tracker">Tracker <span class="nav-badge">Free</span></a></li>
+      <li><a href="/tools/ai-seo-checker">AI SEO <span class="nav-badge">Free</span></a></li>
+      <li><a href="/tools">Tools <span class="nav-badge">Free</span></a></li>
+      <li><a href="/blog">Blog</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="/login" class="btn btn-ghost">Log in</a>
+      <a href="/signup" class="btn btn-primary">Start Free</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ====================== PROPOSED NAV (after D4-A pilot) ====================== -->
+<div class="label label-proposed">Proposed — adds <code style="background:#dbeafe;padding:2px 6px;border-radius:4px;color:#1e40af;">Monitoring</code> as the first nav item</div>
+<nav class="pub-nav">
+  <div class="pub-nav-inner">
+    <a href="/" class="nav-logo">
+      <div class="nav-logo-icon">U</div>
+      Uptrue
+    </a>
+    <ul class="nav-links">
+      <li class="new-marker"><a href="/monitoring" style="color: #2563eb; font-weight: 600;">Monitoring</a></li>
+      <li><a href="/#features">Features</a></li>
+      <li><a href="/#pricing">Pricing</a></li>
+      <li><a href="/score">Score <span class="nav-badge">Free</span></a></li>
+      <li><a href="/tracker">Tracker <span class="nav-badge">Free</span></a></li>
+      <li><a href="/tools/ai-seo-checker">AI SEO <span class="nav-badge">Free</span></a></li>
+      <li><a href="/tools">Tools <span class="nav-badge">Free</span></a></li>
+      <li><a href="/blog">Blog</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="/login" class="btn btn-ghost">Log in</a>
+      <a href="/signup" class="btn btn-primary">Start Free</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ====================== ALTERNATIVE: trimmed (8 → 6 items) ====================== -->
+<div class="label label-proposed">Alternative — trim to 6 items by dropping <code style="background:#fee2e2;padding:2px 6px;border-radius:4px;color:#991b1b;">Features</code> and <code style="background:#fee2e2;padding:2px 6px;border-radius:4px;color:#991b1b;">AI SEO</code> (both are surfaced elsewhere)</div>
+<nav class="pub-nav">
+  <div class="pub-nav-inner">
+    <a href="/" class="nav-logo">
+      <div class="nav-logo-icon">U</div>
+      Uptrue
+    </a>
+    <ul class="nav-links">
+      <li class="new-marker"><a href="/monitoring" style="color: #2563eb; font-weight: 600;">Monitoring</a></li>
+      <li><a href="/tools">Tools <span class="nav-badge">Free</span></a></li>
+      <li><a href="/score">Score <span class="nav-badge">Free</span></a></li>
+      <li><a href="/tracker">Tracker <span class="nav-badge">Free</span></a></li>
+      <li><a href="/#pricing">Pricing</a></li>
+      <li><a href="/blog">Blog</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="/login" class="btn btn-ghost">Log in</a>
+      <a href="/signup" class="btn btn-primary">Start Free</a>
+    </div>
+  </div>
+</nav>
+
+<div class="footnote">
+  <h3>Why three layouts?</h3>
+  <ul>
+    <li><strong>Current</strong> — what's on uptrue.io today. 7 nav items. <code>/monitoring</code> is not linked from anywhere on the site (this is the SEO orphaning issue).</li>
+    <li><strong>Proposed</strong> (the version I committed locally) — adds <code>Monitoring</code> as the first item. Now 8 nav items. Every public page links to the monitoring hub. This is what the pilot diff includes.</li>
+    <li><strong>Alternative</strong> — trims to 6 items by dropping <code>Features</code> (covered by /monitoring + /tools detail pages) and <code>AI SEO</code> (still in /tools list and footer). Cleaner nav, same SEO benefit. Not in the pilot diff — would need your sign-off to swap to this.</li>
+  </ul>
+  <p style="margin-top: 12px;"><strong>Mobile behaviour:</strong> all three collapse to a hamburger menu below 900px (existing breakpoint).</p>
+</div>
+
+</body>
+</html>

@@ -7,6 +7,8 @@ import { sendSlackAlert } from './slack'
 import { sendWebhookAlert } from './webhook'
 import { sendTelegramAlert } from './telegram'
 import { sendUserMessage } from '@/lib/db/user-messages'
+import { getOrgAlertSettings, severityAtOrAboveFloor, type OrgAlertSettings } from '@/lib/db/alert-settings'
+import { hasPendingEventsForOrg, bufferEvent } from '@/lib/db/alert-buffer'
 import type { Incident, Monitor, AlertChannel } from '@/lib/types'
 
 interface AlertChannelConfig {
@@ -56,6 +58,12 @@ export async function dispatchAlerts(incident: Incident, monitor: Monitor): Prom
     metadata,
   })
 
+  // Smart Digest routing — applies to EMAIL channels only. Slack/Webhook/
+  // Telegram/Teams keep per-event behaviour because they have native
+  // threading/batching and the email-storm problem doesn't apply.
+  const orgSettings = await getOrgAlertSettings(incident.org_id)
+  const emailRouting = await routeEmailEvent(orgSettings, incident.severity, incident.org_id)
+
   // Dispatch to each channel in parallel
   const results = await Promise.allSettled(
     matchingChannels.map(async (channel: AlertChannel) => {
@@ -66,13 +74,39 @@ export async function dispatchAlerts(incident: Incident, monitor: Monitor): Prom
       try {
         switch (channel.type) {
           case 'email': {
-            const result = await sendAlertEmail({
-              to: channelConfig.email || '',
-              subject: copy.subject,
-              body: `${copy.headline}\n\n${copy.detail}\n\nView monitor: ${monitorUrl}`,
-            })
-            success = result.success
-            errorMessage = result.error
+            // Smart Digest decides whether this email goes out instantly,
+            // gets buffered for the digest, or both. See routeEmailEvent.
+            if (emailRouting.sendInstant) {
+              const result = await sendAlertEmail({
+                to: channelConfig.email || '',
+                subject: copy.subject,
+                body: `${copy.headline}\n\n${copy.detail}\n\nView monitor: ${monitorUrl}`,
+              })
+              success = result.success
+              errorMessage = result.error
+            } else {
+              // Buffered for digest — record as 'sent' (it WILL be sent in
+              // the digest); errorMessage stays empty.
+              success = true
+            }
+
+            if (emailRouting.alsoBuffer) {
+              await bufferEvent({
+                org_id: incident.org_id,
+                monitor_id: monitor.id,
+                incident_id: incident.id,
+                event_type: isResolved ? 'recovery' : 'open',
+                severity: incident.severity,
+                subject: copy.subject,
+                headline: copy.headline,
+                detail: copy.detail,
+                monitor_name: monitor.name,
+                monitor_target: monitor.target,
+                monitor_type: monitor.type,
+                metadata,
+                instant_sent_at: emailRouting.sendInstant ? new Date().toISOString() : null,
+              })
+            }
             break
           }
 
@@ -243,4 +277,61 @@ export async function dispatchAlerts(incident: Incident, monitor: Monitor): Prom
 export async function dispatchRecoveryAlerts(incident: Incident, monitor: Monitor): Promise<void> {
   // Reuse the same dispatcher — the message formatting handles resolved state
   await dispatchAlerts(incident, monitor)
+}
+
+// ---------------------------------------------------------------------------
+// Smart Digest routing
+// ---------------------------------------------------------------------------
+
+/**
+ * Decide how this incident's email should be delivered:
+ *   - sendInstant=true,  alsoBuffer=false → today's per-event behaviour (mode=off)
+ *   - sendInstant=true,  alsoBuffer=true  → bypasses buffer (critical floor) but
+ *                                            also queues for the digest so it
+ *                                            still appears in the timeline
+ *   - sendInstant=true,  alsoBuffer=true  → first event in this org's window —
+ *                                            sends instant + queues for digest
+ *   - sendInstant=false, alsoBuffer=true  → mid-window event — queue only,
+ *                                            digest will roll it up at flush
+ */
+async function routeEmailEvent(
+  settings: OrgAlertSettings,
+  severity: string,
+  orgId: string
+): Promise<{ sendInstant: boolean; alsoBuffer: boolean }> {
+  // Mode and severity-floor decisions are pure — no DB needed.
+  if (settings.mode === 'off') {
+    return decideEmailRouting(settings, severity, false)
+  }
+  if (severityAtOrAboveFloor(severity, settings.instant_severity_floor)) {
+    return decideEmailRouting(settings, severity, false)
+  }
+  // Only the "first in window?" branch needs a DB lookup.
+  const hasPending = await hasPendingEventsForOrg(orgId)
+  return decideEmailRouting(settings, severity, hasPending)
+}
+
+/**
+ * Pure routing decision — DB-free for unit testing.
+ *
+ *   off mode:                    sendInstant=true,  alsoBuffer=false (legacy behaviour)
+ *   smart, at/above floor:       sendInstant=true,  alsoBuffer=true  (still in digest for full story)
+ *   smart, below floor, no pending: sendInstant=true,  alsoBuffer=true  (first event opens window)
+ *   smart, below floor, pending: sendInstant=false, alsoBuffer=true  (mid-window — quiet collection)
+ */
+export function decideEmailRouting(
+  settings: OrgAlertSettings,
+  severity: string,
+  hasPendingEvents: boolean
+): { sendInstant: boolean; alsoBuffer: boolean } {
+  if (settings.mode === 'off') {
+    return { sendInstant: true, alsoBuffer: false }
+  }
+  if (severityAtOrAboveFloor(severity, settings.instant_severity_floor)) {
+    return { sendInstant: true, alsoBuffer: true }
+  }
+  if (!hasPendingEvents) {
+    return { sendInstant: true, alsoBuffer: true }
+  }
+  return { sendInstant: false, alsoBuffer: true }
 }
