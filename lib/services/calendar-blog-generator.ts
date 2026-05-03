@@ -96,6 +96,44 @@ export async function generateCalendarBlogPost(row: CalendarRow): Promise<Calend
     return { ok: false, reason }
   }
 
+  // 0. Idempotency check — if a previous run created a blog_post for this
+  //    calendar row but crashed before linking it (e.g., Vercel cron retry,
+  //    stuck-row reset), recover instead of regenerating. Without this, a
+  //    re-run would hit a slug collision at step 2 and mark the row
+  //    'failed' even though the work was already done.
+  const orphan = await findExistingBlogPostForCalendarRow(row.id)
+  if (orphan) {
+    logger.warn('calendar-blog-generator: detected orphan blog_post from prior run, recovering', {
+      rowId: row.id,
+      blogPostId: orphan.id,
+    })
+
+    // Ensure approval tokens exist; create them if the prior run crashed
+    // before that step.
+    const tokens = await ensureApprovalTokens(orphan.id)
+    if (!tokens) return fail('Recovery failed: could not create approval tokens for orphan post')
+
+    await updateCalendarRowResult(row.id, {
+      status: 'drafted',
+      blog_post_id: orphan.id,
+      generated_at: new Date().toISOString(),
+    })
+
+    return {
+      ok: true,
+      result: {
+        blogPostId: orphan.id,
+        title: orphan.title,
+        slug: orphan.slug,
+        excerpt: orphan.excerpt ?? '',
+        bodyMarkdown: orphan.bodyMarkdown,
+        approveToken: tokens.approveToken,
+        rejectToken: tokens.rejectToken,
+        review: orphan.review,
+      },
+    }
+  }
+
   // 1. Generate draft via Claude
   const claudeResult = await generateDraftViaClaude(row)
   if (!claudeResult.ok) return fail(claudeResult.reason)
@@ -447,6 +485,10 @@ async function saveBlogPost(
       delivery_method: 'digest',
       digest_status: 'pending',
       review_jsonb: { ...review, dodPass },
+      // Two-way link back to the source calendar row — used by the
+      // generator's idempotency check to detect orphans from a crashed
+      // prior run instead of regenerating + colliding on slug.
+      source_calendar_row_id: row.id,
     })
     .select('id')
     .single()
@@ -456,6 +498,98 @@ async function saveBlogPost(
     return null
   }
   return data.id as string
+}
+
+// ---------------------------------------------------------------------------
+// Idempotency helpers
+// ---------------------------------------------------------------------------
+
+interface OrphanBlogPost {
+  id: string
+  title: string
+  slug: string
+  excerpt: string | null
+  bodyMarkdown: string
+  review: ReviewOutput
+}
+
+/**
+ * Look for a blog_post that was created by a previous (crashed) run of the
+ * generator for this calendar row. Returns the orphan if found, so the
+ * caller can recover from it instead of regenerating.
+ *
+ * Only returns drafts (status='draft') — if the row is already published
+ * or pending_approval, the caller should respect that and not re-run.
+ *
+ * Uses .limit(1) + array index instead of .maybeSingle() so a pathological
+ * "two drafts for same row" state doesn't error out the lookup — we
+ * recover the most-recent orphan and let downstream cleanup deal with
+ * the older one.
+ */
+async function findExistingBlogPostForCalendarRow(
+  calendarRowId: string
+): Promise<OrphanBlogPost | null> {
+  const supabase = getRawClient()
+  const { data, error } = await supabase
+    .from('blog_posts')
+    .select('id, title, slug, excerpt, content, review_jsonb')
+    .eq('source_calendar_row_id', calendarRowId)
+    .eq('status', 'draft')
+    .order('created_at', { ascending: false })
+    .limit(1)
+
+  if (error) {
+    logger.error('calendar-blog-generator: orphan lookup failed', {
+      calendarRowId,
+      error: error.message,
+    })
+    return null
+  }
+
+  if (!data || data.length === 0) return null
+
+  const row = data[0]
+  const reviewJsonb = row.review_jsonb as ReviewOutput | null
+  return {
+    id: row.id as string,
+    title: row.title as string,
+    slug: row.slug as string,
+    excerpt: row.excerpt as string | null,
+    bodyMarkdown: row.content as string,
+    review: reviewJsonb ?? {
+      headline: '',
+      highlights: [],
+      worries: [],
+      dodSummary: { pass: false, hardFailCount: 0 },
+    } as unknown as ReviewOutput,
+  }
+}
+
+/**
+ * Ensure approval tokens exist for the given blog post — if they were never
+ * created (recovery from a crash mid-pipeline) create them now; if they
+ * already exist, return the existing pair.
+ */
+async function ensureApprovalTokens(blogPostId: string): Promise<ApprovalTokenPair | null> {
+  const supabase = getRawClient()
+  const { data: existing } = await supabase
+    .from('blog_approval_tokens')
+    .select('action, token')
+    .eq('blog_post_id', blogPostId)
+
+  if (existing && existing.length >= 2) {
+    const approve = existing.find((t) => (t as { action: string }).action === 'approve')
+    const reject = existing.find((t) => (t as { action: string }).action === 'reject')
+    if (approve && reject) {
+      return {
+        approveToken: (approve as { token: string }).token,
+        rejectToken: (reject as { token: string }).token,
+      }
+    }
+  }
+
+  // Tokens don't exist — create them via the canonical helper.
+  return createApprovalTokens(blogPostId)
 }
 
 /**

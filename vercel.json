@@ -98,7 +98,7 @@
     },
     {
       "path": "/api/cron/calendar/draft-runner",
-      "schedule": "0 * * * *"
+      "schedule": "0 8,14,20 * * *"
     },
     {
       "path": "/api/cron/boss-digest",
