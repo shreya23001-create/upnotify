@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
 import { checkRateLimit, AUTH_RATE_LIMIT } from '@/lib/utils/rate-limiter'
+import { writeAuditLog } from '@/lib/db/audit'
 // Trial removed — users start on Free plan
 import { recordReferralSignup } from '@/lib/db/referrals'
 import { acceptTeamInvite } from '@/lib/db/team'
@@ -52,12 +53,27 @@ export async function GET(request: Request): Promise<NextResponse> {
   // Validate redirect target to prevent open redirect attacks.
   const nextPath = isValidRedirectPath(nextParam) ? nextParam : '/dashboard'
 
+  // Capture request context for audit log entries below.
+  const ip =
+    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+    request.headers.get('x-real-ip') ||
+    undefined
+  const userAgent = request.headers.get('user-agent') ?? undefined
+
   if (code) {
     const supabase = await createClient()
     const { error } = await supabase.auth.exchangeCodeForSession(code)
 
     if (error) {
       logger.error('Auth callback failed', { error: error.message })
+      await writeAuditLog({
+        orgId: 'system',
+        userId: null,
+        action: 'auth.login.failed',
+        ipAddress: ip,
+        userAgent,
+        metadata: { reason: 'code_exchange_failed', error: error.message },
+      })
       // Redirect to whichever page the link originated from (login or signup)
       const fromSignup = nextPath.includes('signup') || searchParams.get('from') === 'signup'
       const errorDest = fromSignup ? `${origin}/signup?error=auth_error` : `${origin}/login?error=auth_error`
@@ -152,6 +168,29 @@ export async function GET(request: Request): Promise<NextResponse> {
           })
         }
       }
+
+      // Audit log — successful authentication (after any invite acceptance
+      // so the orgId reflects the final org the user landed in).
+      // Provider is read from app_metadata; magic link = "email", Google = "google".
+      const provider =
+        (user.app_metadata as { provider?: string } | null)?.provider ?? 'unknown'
+      const { data: dbUserForAudit } = await adminClient
+        .from('users')
+        .select('org_id')
+        .eq('id', user.id)
+        .single()
+      await writeAuditLog({
+        orgId: (dbUserForAudit?.org_id as string | undefined) ?? 'system',
+        userId: user.id,
+        action: 'auth.login.success',
+        ipAddress: ip,
+        userAgent,
+        metadata: {
+          email: user.email,
+          provider,
+          isNewUser,
+        },
+      })
     }
 
     return NextResponse.redirect(`${origin}${nextPath}`)

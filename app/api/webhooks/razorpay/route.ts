@@ -22,6 +22,7 @@ import { verifyRazorpayWebhook } from '@/lib/services/payments-razorpay'
 import { getStripe } from '@/lib/services/stripe'
 import { isProduction } from '@/lib/utils/environment'
 import { enforceDowngradeLimits, notifyPlanChange } from '@/lib/services/plan-enforcement'
+import { writeAuditLog } from '@/lib/db/audit'
 
 export const dynamic = 'force-dynamic'
 
@@ -246,6 +247,21 @@ async function handleSubscriptionActivated(sub: RzpSubscription): Promise<void> 
   await notifyPlanChange(orgId, plan.name ?? planSlug, 'upgraded')
 
   logger.info('Razorpay: subscription activated', { subId: sub.id, orgId, planSlug })
+
+  await writeAuditLog({
+    orgId,
+    userId: null,
+    action: 'subscription.created',
+    resourceType: 'subscription',
+    metadata: {
+      razorpay_subscription_id: sub.id,
+      plan_slug: planSlug,
+      plan_name: plan.name,
+      billing_cycle: cycle ?? 'monthly',
+      currency: 'inr',
+      source: 'razorpay_webhook',
+    },
+  })
 }
 
 async function handleSubscriptionCharged(sub: RzpSubscription, payment: RzpPayment | null): Promise<void> {
@@ -307,6 +323,20 @@ async function handleSubscriptionCharged(sub: RzpSubscription, payment: RzpPayme
     orgId,
     amountPaise: payment.amount,
   })
+
+  await writeAuditLog({
+    orgId,
+    userId: null,
+    action: 'invoice.paid',
+    resourceType: 'invoice',
+    metadata: {
+      razorpay_payment_id: payment.id,
+      razorpay_subscription_id: sub.id,
+      amount_paid: payment.amount,
+      currency: 'inr',
+      source: 'razorpay_webhook',
+    },
+  })
 }
 
 async function handleSubscriptionCancelled(sub: RzpSubscription): Promise<void> {
@@ -336,6 +366,19 @@ async function handleSubscriptionCancelled(sub: RzpSubscription): Promise<void> 
   if (orgId) await enforceDowngradeLimits(orgId)
 
   logger.info('Razorpay: subscription cancelled via webhook', { subId: sub.id, orgId })
+
+  if (orgId) {
+    await writeAuditLog({
+      orgId,
+      userId: null,
+      action: 'subscription.canceled',
+      resourceType: 'subscription',
+      metadata: {
+        razorpay_subscription_id: sub.id,
+        source: 'razorpay_webhook',
+      },
+    })
+  }
 }
 
 async function handleSubscriptionHalted(sub: RzpSubscription): Promise<void> {
@@ -351,6 +394,21 @@ async function handleSubscriptionHalted(sub: RzpSubscription): Promise<void> {
     subId: sub.id,
     orgId: sub.notes?.org_id,
   })
+
+  const orgId = sub.notes?.org_id
+  if (orgId) {
+    await writeAuditLog({
+      orgId,
+      userId: null,
+      action: 'subscription.halted',
+      resourceType: 'subscription',
+      metadata: {
+        razorpay_subscription_id: sub.id,
+        reason: 'all_payment_retries_failed',
+        source: 'razorpay_webhook',
+      },
+    })
+  }
 }
 
 async function handleSubscriptionResumed(sub: RzpSubscription): Promise<void> {
@@ -366,6 +424,20 @@ async function handleSubscriptionResumed(sub: RzpSubscription): Promise<void> {
     .eq('razorpay_subscription_id', sub.id)
 
   logger.info('Razorpay: subscription resumed', { subId: sub.id })
+
+  const orgId = sub.notes?.org_id
+  if (orgId) {
+    await writeAuditLog({
+      orgId,
+      userId: null,
+      action: 'subscription.resumed',
+      resourceType: 'subscription',
+      metadata: {
+        razorpay_subscription_id: sub.id,
+        source: 'razorpay_webhook',
+      },
+    })
+  }
 }
 
 async function handlePaymentFailed(payment: RzpPayment): Promise<void> {
