@@ -67,6 +67,7 @@ export default function MonitoringIndexPage() {
               </svg>
               Start Monitoring Free
             </Link>
+            <Link href="/tools" className="btn btn-ghost btn-lg">Try a Free Tool</Link>
             <Link href="/score" className="btn btn-ghost btn-lg">Score Your Site Free</Link>
           </div>
           <div style={{ display: 'flex', gap: 24, justifyContent: 'center', flexWrap: 'wrap', marginTop: 20 }}>

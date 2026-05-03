@@ -24,6 +24,37 @@ interface MonitorTypePage {
   relatedSlugs: string[]
 }
 
+// Per monitor type → most-related free tool. Used to link spot-check tool
+// from each monitoring hub page (satisfies the "≥1 link to /tools/*" SEO rule
+// and gives users a "try before you sign up" path). Slugs match
+// app/tools/<slug>/ directories — verified against the live tools index.
+const RELATED_TOOL: Record<string, { slug: string; label: string }> = {
+  'http-uptime-monitoring':       { slug: 'http-status-checker',       label: 'free HTTP status checker' },
+  'ssl-certificate-monitoring':   { slug: 'ssl-checker',               label: 'free SSL certificate checker' },
+  'dns-monitoring':               { slug: 'dns-lookup',                label: 'free DNS lookup tool' },
+  'keyword-monitoring':           { slug: 'http-status-checker',       label: 'free HTTP status checker' },
+  'domain-expiry-monitoring':     { slug: 'whois-lookup',              label: 'free WHOIS lookup' },
+  'port-monitoring':              { slug: 'port-checker',              label: 'free port checker' },
+  'ping-monitoring':              { slug: 'port-checker',              label: 'free port checker' },
+  'api-endpoint-monitoring':      { slug: 'http-status-checker',       label: 'free HTTP status checker' },
+  'heartbeat-monitoring':         { slug: 'http-status-checker',       label: 'free HTTP status checker' },
+  'page-change-detection':        { slug: 'http-status-checker',       label: 'free HTTP status checker' },
+  'security-headers-monitoring':  { slug: 'security-headers-checker',  label: 'free security headers checker' },
+  'response-time-monitoring':     { slug: 'website-speed-test',        label: 'free website speed test' },
+  'robots-txt-monitoring':        { slug: 'robots-txt-checker',        label: 'free robots.txt checker' },
+  'ip-change-monitoring':         { slug: 'dns-lookup',                label: 'free DNS lookup tool' },
+  'mx-health-monitoring':         { slug: 'spf-dmarc-checker',         label: 'free SPF & DMARC checker' },
+  'whois-registrar-monitoring':   { slug: 'whois-lookup',              label: 'free WHOIS lookup' },
+  'sitemap-monitoring':           { slug: 'robots-txt-checker',        label: 'free robots.txt checker' },
+  'redirect-chain-monitoring':    { slug: 'redirect-chain-checker',    label: 'free redirect chain checker' },
+  'spf-dmarc-monitoring':         { slug: 'spf-dmarc-checker',         label: 'free SPF & DMARC checker' },
+  'blacklist-monitoring':         { slug: 'blacklist-checker',         label: 'free domain blacklist checker' },
+  'page-size-monitoring':         { slug: 'website-speed-test',        label: 'free website speed test' },
+  'cookie-consent-monitoring':    { slug: 'http-status-checker',       label: 'free HTTP status checker' },
+  'nameserver-monitoring':        { slug: 'dns-lookup',                label: 'free DNS lookup tool' },
+  'wordpress-site-monitor':       { slug: 'security-headers-checker',  label: 'free security headers checker' },
+}
+
 const pages: MonitorTypePage[] = [
   {
     slug: 'http-uptime-monitoring',
@@ -425,26 +456,46 @@ export default async function MonitoringTypePage({ params }: { params: Promise<{
     .map(s => pages.find(p => p.slug === s))
     .filter(Boolean) as MonitorTypePage[]
 
+  // Combined JSON-LD: SoftwareApplication (the monitoring product) + FAQPage
+  // (the per-slug FAQ items rendered visibly on the page). Both share the
+  // same @graph so search engines see them as one structured-data document.
   const jsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'SoftwareApplication',
-    name: `${page.name} — Uptrue`,
-    description: page.description,
-    url: `https://uptrue.io/monitoring/${page.slug}`,
-    applicationCategory: 'BusinessApplication',
-    operatingSystem: 'Web',
-    offers: {
-      '@type': 'Offer',
-      price: '0',
-      priceCurrency: 'GBP',
-      description: 'Free plan available',
-    },
-    publisher: {
-      '@type': 'Organization',
-      name: 'Uptrue',
-      url: 'https://uptrue.io',
-    },
+    '@graph': [
+      {
+        '@type': 'SoftwareApplication',
+        name: `${page.name} — Uptrue`,
+        description: page.description,
+        url: `https://uptrue.io/monitoring/${page.slug}`,
+        applicationCategory: 'BusinessApplication',
+        operatingSystem: 'Web',
+        offers: {
+          '@type': 'Offer',
+          price: '0',
+          priceCurrency: 'GBP',
+          description: 'Free plan available',
+        },
+        publisher: {
+          '@type': 'Organization',
+          name: 'Uptrue',
+          url: 'https://uptrue.io',
+        },
+      },
+      {
+        '@type': 'FAQPage',
+        mainEntity: page.faq.map(item => ({
+          '@type': 'Question',
+          name: item.q,
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: item.a,
+          },
+        })),
+      },
+    ],
   }
+
+  const relatedTool = RELATED_TOOL[page.slug]
 
   return (
     <>
@@ -665,8 +716,18 @@ export default async function MonitoringTypePage({ params }: { params: Promise<{
           <h2 style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--text-primary)', marginBottom: 8 }}>
             Ready to set up {page.name}?
           </h2>
-          <p style={{ color: 'var(--text-secondary)', fontSize: 14, marginBottom: 24, maxWidth: 400, margin: '0 auto 24px' }}>
+          <p style={{ color: 'var(--text-secondary)', fontSize: 14, marginBottom: 24, maxWidth: 460, margin: '0 auto 24px' }}>
             Join teams who monitor their infrastructure with Uptrue. Free plan, no credit card required.
+            {relatedTool && (
+              <>
+                {' '}
+                Want to spot-check first? Run our{' '}
+                <Link href={`/tools/${relatedTool.slug}`} style={{ color: 'var(--accent)', fontWeight: 500 }}>
+                  {relatedTool.label}
+                </Link>
+                .
+              </>
+            )}
           </p>
           <Link href="/signup" className="btn btn-primary btn-lg">
             <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
