@@ -28,13 +28,20 @@ export interface PublishedBlogPostSummary {
   created_at: string
 }
 
-/** Get all published blog posts for public display — ordered by published_at descending */
+/** Get all published blog posts for public display — ordered by published_at descending.
+ *
+ * Excludes noindex=true posts (Tier 3 permutation posts flagged by migration
+ * 00096) so the public /blog index doesn't list them. The post itself remains
+ * reachable at /blog/<slug> so inbound links don't break, but the rendered
+ * page emits robots:noindex,nofollow.
+ */
 export async function getPublishedBlogPosts(): Promise<PublishedBlogPostSummary[]> {
   const supabase = createAdminClient()
   const { data, error } = await supabase
     .from('blog_posts')
     .select('id, title, slug, excerpt, category, tags, published_at, created_at')
     .eq('status', 'published')
+    .or('noindex.is.null,noindex.eq.false')
     .order('published_at', { ascending: false })
 
   if (error) {

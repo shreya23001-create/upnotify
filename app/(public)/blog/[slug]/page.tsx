@@ -31,10 +31,17 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const post = await getPost(slug)
   if (!post) return { title: 'Not Found' }
 
+  // Tier 3 permutation posts (auto-generated AI-vs-AI etc.) are flagged
+  // noindex=true via migration 00096 — emit robots:noindex,nofollow so
+  // Search Console stops flagging them as "Alternate page with proper
+  // canonical tag". Sitemap also excludes them (see app/sitemap.ts).
+  const isNoindex = (post as { noindex?: boolean }).noindex === true
+
   return {
     title: post.seo_title || `${post.title} | Uptrue`,
     description: post.seo_description || post.excerpt || '',
     alternates: { canonical: `https://uptrue.io/blog/${post.slug}` },
+    robots: isNoindex ? { index: false, follow: false } : undefined,
     openGraph: {
       title: post.seo_title || post.title,
       description: post.seo_description || post.excerpt || '',

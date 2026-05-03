@@ -480,17 +480,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       )
     }
 
-    // Published blog posts (dynamic — auto-generated outage posts etc.)
+    // Published blog posts (dynamic — auto-generated outage posts etc.).
+    // Excludes posts flagged noindex=true (Tier 3 permutation posts) so
+    // Search Console stops surfacing them. The blog [slug] page also
+    // emits robots:noindex,nofollow on those posts (see generateMetadata).
+    //
+    // NB: cast via `unknown` because the generated Database types do not yet
+    // know about the noindex column (added in migration 00095). Regenerate
+    // types after the migration is applied to remove the cast.
     const { data: blogData, error: blogError } = await supabase
       .from('blog_posts')
-      .select('slug, updated_at')
+      .select('slug, updated_at, noindex')
       .eq('status', 'published')
+      .or('noindex.is.null,noindex.eq.false')
 
     if (blogError) {
       logger.error('Sitemap: failed to fetch blog posts', { error: blogError.message })
     } else if (blogData) {
+      const rows = blogData as unknown as { slug: string; updated_at: string | null; noindex: boolean | null }[]
       dynamicPages.push(
-        ...(blogData as { slug: string; updated_at: string | null }[]).map((post) => ({
+        ...rows.map((post) => ({
           url: `https://uptrue.io/blog/${post.slug}`,
           lastModified: post.updated_at ? new Date(post.updated_at) : new Date(),
           changeFrequency: 'weekly' as const,
