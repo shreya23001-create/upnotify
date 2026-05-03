@@ -9,14 +9,20 @@ export default function PricingTable({ defaultCurrency = 'gbp' }: { defaultCurre
   const [isAnnual, setIsAnnual] = useState(true)
   const [currency, setCurrency] = useState<SupportedCurrency>(defaultCurrency)
   const [plans, setPlans] = useState<PlanDisplayData[]>([])
+  const [loading, setLoading] = useState(true)
+  const [fetchError, setFetchError] = useState(false)
 
   useEffect(() => {
     fetch('/api/v1/plans')
       .then(r => r.json())
       .then((data: { plans?: PlanDisplayData[] }) => {
         if (data.plans) setPlans(data.plans.filter(p => p.is_visible))
+        setLoading(false)
       })
-      .catch(() => {})
+      .catch(() => {
+        setLoading(false)
+        setFetchError(true)
+      })
   }, [])
 
   const highlightedSlug = 'builder'
@@ -72,6 +78,12 @@ export default function PricingTable({ defaultCurrency = 'gbp' }: { defaultCurre
           <p style={{ textAlign: 'center', fontSize: 13, color: 'var(--text-muted)', marginBottom: 24 }}>+ 18% GST · Secure checkout via Razorpay</p>
         )}
 
+        {loading && (
+          <p style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '40px 0' }}>Loading plans…</p>
+        )}
+        {fetchError && (
+          <p style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '40px 0' }}>Unable to load pricing. Please refresh the page.</p>
+        )}
         <div className="pricing-grid">
           {plans.map((plan) => {
             const isFree = plan.price_monthly_gbp === 0 && (!plan.price_annual_gbp || plan.price_annual_gbp === 0)
