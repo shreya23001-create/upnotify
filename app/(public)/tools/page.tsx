@@ -176,6 +176,48 @@ export default function ToolsIndexPage(): React.ReactElement {
           ))}
         </div>
 
+        {/* Pillar landings — 4 categorised umbrella pages for SEO + navigation */}
+        <section className="landing-section">
+          <div className="landing-container" style={{ maxWidth: 880 }}>
+            <h2 className="landing-section-title">Browse by category</h2>
+            <p className="landing-section-subtitle">
+              Each category landing groups the relevant free tools, explains what
+              they catch, and links to the matching continuous monitor types.
+            </p>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+              gap: 12,
+              marginTop: 24,
+            }}>
+              <Link href="/tools/uptime" className="tools-card">
+                <div className="tools-card-header">
+                  <h3 className="tools-card-title" style={{ fontSize: 16 }}>Uptime &amp; Performance</h3>
+                </div>
+                <p className="tools-card-desc">Status checker, speed test, health score, SLA calculator.</p>
+              </Link>
+              <Link href="/tools/security" className="tools-card">
+                <div className="tools-card-header">
+                  <h3 className="tools-card-title" style={{ fontSize: 16 }}>Website Security</h3>
+                </div>
+                <p className="tools-card-desc">SSL chain, security headers, blacklist, port checker.</p>
+              </Link>
+              <Link href="/tools/dns" className="tools-card">
+                <div className="tools-card-header">
+                  <h3 className="tools-card-title" style={{ fontSize: 16 }}>DNS &amp; Email</h3>
+                </div>
+                <p className="tools-card-desc">DNS lookup, WHOIS, SPF/DMARC authentication checker.</p>
+              </Link>
+              <Link href="/tools/ai-seo" className="tools-card">
+                <div className="tools-card-header">
+                  <h3 className="tools-card-title" style={{ fontSize: 16 }}>AI &amp; SEO</h3>
+                </div>
+                <p className="tools-card-desc">AI SEO Checker, redirect chains, robots.txt audit.</p>
+              </Link>
+            </div>
+          </div>
+        </section>
+
         {/* Related continuous monitors */}
         <section className="landing-section">
           <div className="landing-container" style={{ maxWidth: 880 }}>
