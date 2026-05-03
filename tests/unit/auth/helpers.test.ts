@@ -21,6 +21,49 @@ describe('isPublicRoute', () => {
   it('returns false for admin', () => {
     expect(isPublicRoute('/admin')).toBe(false)
   })
+
+  // Regression cases for the May 2026 hotfix — these public pages were
+  // shipping to prod but the proxy was redirecting them to /login because
+  // they weren't in PUBLIC_ROUTES (and the prefix matchers required a
+  // trailing slash). Lock them in so it can't happen again.
+  describe('marketing surfaces (May 2026 hotfix regression cases)', () => {
+    it('returns true for /monitoring exact (not just /monitoring/<slug>)', () => {
+      expect(isPublicRoute('/monitoring')).toBe(true)
+    })
+
+    it('returns true for /monitoring/<industry> children', () => {
+      expect(isPublicRoute('/monitoring/saas-uptime-monitoring')).toBe(true)
+      expect(isPublicRoute('/monitoring/http-uptime-monitoring')).toBe(true)
+    })
+
+    it('returns true for /integrations exact and children', () => {
+      expect(isPublicRoute('/integrations')).toBe(true)
+      expect(isPublicRoute('/integrations/slack')).toBe(true)
+      expect(isPublicRoute('/integrations/teams')).toBe(true)
+      expect(isPublicRoute('/integrations/telegram')).toBe(true)
+      expect(isPublicRoute('/integrations/webhook')).toBe(true)
+    })
+
+    it('returns true for /free-uptime-monitoring', () => {
+      expect(isPublicRoute('/free-uptime-monitoring')).toBe(true)
+    })
+
+    it('returns true for /wordpress-monitor', () => {
+      expect(isPublicRoute('/wordpress-monitor')).toBe(true)
+    })
+
+    it('returns true for /changelog', () => {
+      expect(isPublicRoute('/changelog')).toBe(true)
+    })
+
+    it('returns true for /tools exact and pillar children', () => {
+      expect(isPublicRoute('/tools')).toBe(true)
+      expect(isPublicRoute('/tools/uptime')).toBe(true)
+      expect(isPublicRoute('/tools/security')).toBe(true)
+      expect(isPublicRoute('/tools/dns')).toBe(true)
+      expect(isPublicRoute('/tools/ai-seo')).toBe(true)
+    })
+  })
 })
 
 describe('isAuthRoute', () => {
