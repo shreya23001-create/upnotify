@@ -3,11 +3,11 @@
  * Plugin Name: Uptrue Monitor
  * Plugin URI:  https://uptrue.io/monitoring/wordpress-site-monitor
  * Description: Monitor your site from the inside — file injections, rogue admin users, foreign-language content, brute force attacks, security misconfigurations, and more. Works standalone with a free monthly email report. No inbound ports. Works behind Cloudflare.
- * Version:     1.2.2
+ * Version:     1.2.3
  * Requires at least: 5.0
  * Requires PHP:      7.0
  * Tested up to:      6.9
- * Stable tag:        1.2.2
+ * Stable tag:        1.2.3
  * Author:      Uptrue
  * Author URI:  https://uptrue.io
  * License:     GPL v2 or later
@@ -17,7 +17,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define( 'UPTRUE_VERSION',      '1.2.2' );
+define( 'UPTRUE_VERSION',      '1.2.3' );
 define( 'UPTRUE_PLUGIN_FILE',  __FILE__ );
 
 function uptrue_api_base() {
@@ -861,7 +861,9 @@ function uptrue_page_settings() {
         $interval = isset( $_POST['uptrue_interval'] ) ? (int) wp_unslash( $_POST['uptrue_interval'] ) : 120;
         if ( ! in_array( $interval, array( 60, 120, 180, 240, 1440, 10080, 43200 ), true ) ) $interval = 120;
 
-        $raw_settings = $_POST['settings'] ?? array();
+        $raw_settings = isset( $_POST['settings'] ) && is_array( $_POST['settings'] )
+            ? array_map( 'sanitize_text_field', wp_unslash( $_POST['settings'] ) )
+            : array();
         $settings     = array();
         $check_keys   = array( 'scan_php_uploads', 'scan_js_uploads', 'scan_core_files', 'scan_htaccess',
                                'scan_exec_files', 'scan_theme_files', 'detect_new_users',

@@ -3,7 +3,7 @@ Contributors: uptrue
 Tags: security, monitoring, malware, file scan, uptime
 Requires at least: 5.0
 Tested up to: 6.9
-Stable tag: 1.2.2
+Stable tag: 1.2.3
 Requires PHP: 7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -157,6 +157,9 @@ No data is transmitted if no API token is saved. The plugin makes no outbound co
 
 == Changelog ==
 
+= 1.2.3 =
+* Hardened settings form: $_POST['settings'] now sanitised with array_map(sanitize_text_field, wp_unslash(...)) and is_array() guard before use, satisfying Plugin Check's unsanitised-input rule. Behaviour unchanged.
+
 = 1.2.2 =
 * File scanner now ignores WordPress directory-listing protection stubs (small "Silence is golden" index.php/index.html files dropped by core and many plugins) — eliminates false positives in /uploads/
 * Pricing link updated to homepage anchor
@@ -186,6 +189,9 @@ No data is transmitted if no API token is saved. The plugin makes no outbound co
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.2.3 =
+Defensive sanitisation on the settings form to satisfy WordPress.org Plugin Check. No functional change.
 
 = 1.2.2 =
 Eliminates false-positive "PHP file in /uploads/" findings caused by WordPress's own directory-protection stubs. Recommended upgrade.
