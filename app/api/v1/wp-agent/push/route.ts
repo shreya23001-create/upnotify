@@ -165,9 +165,18 @@ export async function POST(request: Request): Promise<Response> {
     return Response.json({ ok: true })
   }
 
+  // Strip WordPress directory-listing protection stubs ("// Silence is golden")
+  // before scoring or finding-creation. Older plugin versions (<= 1.2.1) include
+  // these in their scan results; the v1.2.2 plugin filters them locally. This is
+  // a server-side safety net so legacy installs don't keep poisoning health scores.
+  const isSilenceStub = (path: string): boolean => {
+    const base = path.split(/[\\/]/).pop()?.toLowerCase() ?? ''
+    return base === 'index.php' || base === 'index.html' || base === 'index.htm'
+  }
+
   const fileScan: WpFileScan = {
-    php_in_uploads: payload.file_scan?.php_in_uploads ?? [],
-    js_in_uploads: payload.file_scan?.js_in_uploads ?? [],
+    php_in_uploads: (payload.file_scan?.php_in_uploads ?? []).filter(p => !isSilenceStub(p)),
+    js_in_uploads: (payload.file_scan?.js_in_uploads ?? []).filter(p => !isSilenceStub(p)),
     htaccess_modified: payload.file_scan?.htaccess_modified ?? false,
     wpconfig_modified: payload.file_scan?.wpconfig_modified ?? false,
     suspicious_files: payload.file_scan?.suspicious_files ?? [],
