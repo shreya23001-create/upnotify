@@ -6,7 +6,7 @@
  * Version:     1.2.2
  * Requires at least: 5.0
  * Requires PHP:      7.0
- * Tested up to:      6.7
+ * Tested up to:      6.9
  * Stable tag:        1.2.2
  * Author:      Uptrue
  * Author URI:  https://uptrue.io

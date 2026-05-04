@@ -2,7 +2,7 @@
 Contributors: uptrue
 Tags: security, monitoring, malware, file scan, uptime
 Requires at least: 5.0
-Tested up to: 6.7
+Tested up to: 6.9
 Stable tag: 1.2.2
 Requires PHP: 7.0
 License: GPLv2 or later
@@ -92,7 +92,7 @@ No. All checks run in the background via WordPress cron and are not triggered by
 
 = What WordPress version does it require? =
 
-WordPress 5.0 or higher. The plugin is tested up to WordPress 6.7.
+WordPress 5.0 or higher. The plugin is tested up to WordPress 6.9.
 
 = What PHP version does it require? =
 
