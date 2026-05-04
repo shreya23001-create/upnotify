@@ -1,13 +1,13 @@
 <?php
 /**
- * Plugin Name: Uptrue WordPress Monitor
+ * Plugin Name: Uptrue Monitor
  * Plugin URI:  https://uptrue.io/monitoring/wordpress-site-monitor
- * Description: Monitor your WordPress site from the inside — file injections, rogue admin users, foreign-language content, brute force attacks, security misconfigurations, and more. Works standalone with a free monthly email report. No inbound ports. Works behind Cloudflare.
- * Version:     1.2.0
+ * Description: Monitor your site from the inside — file injections, rogue admin users, foreign-language content, brute force attacks, security misconfigurations, and more. Works standalone with a free monthly email report. No inbound ports. Works behind Cloudflare.
+ * Version:     1.2.2
  * Requires at least: 5.0
  * Requires PHP:      7.0
  * Tested up to:      6.7
- * Stable tag:        1.2.0
+ * Stable tag:        1.2.2
  * Author:      Uptrue
  * Author URI:  https://uptrue.io
  * License:     GPL v2 or later
@@ -17,18 +17,10 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define( 'UPTRUE_VERSION',      '1.2.0' );
+define( 'UPTRUE_VERSION',      '1.2.2' );
 define( 'UPTRUE_PLUGIN_FILE',  __FILE__ );
 
 function uptrue_api_base() {
-    // Priority: wp-config constant → saved option → hardcoded default
-    if ( defined( 'UPTRUE_API_BASE_URL' ) ) {
-        return rtrim( UPTRUE_API_BASE_URL, '/' );
-    }
-    $saved = get_option( 'uptrue_api_base_url', '' );
-    if ( $saved ) {
-        return rtrim( $saved, '/' );
-    }
     return 'https://uptrue.io/api/v1/wp-agent';
 }
 define( 'UPTRUE_OPT_TOKEN',    'uptrue_api_token' );
@@ -55,25 +47,24 @@ register_activation_hook( UPTRUE_PLUGIN_FILE, 'uptrue_activate' );
 register_deactivation_hook( UPTRUE_PLUGIN_FILE, 'uptrue_deactivate' );
 
 function uptrue_activate() {
+    // Schedule local checks only. No outbound HTTP — that requires user consent
+    // (saving an API token), which has not happened yet at activation time.
     add_filter( 'cron_schedules', 'uptrue_add_cron_intervals' );
     uptrue_schedule_crons();
-    uptrue_self_test();
 }
 
 function uptrue_deactivate() {
+    // Unschedule crons only. No outbound HTTP on deactivate — keeps the plugin
+    // silent on uninstall paths and avoids slowing down the deactivation request.
     uptrue_unschedule_crons();
-    $token = get_option( UPTRUE_OPT_TOKEN, '' );
-    if ( $token ) {
-        uptrue_api_post( '/event', array( 'event' => 'plugin_deactivated' ), $token );
-    }
 }
 
-// Re-register any missing cron jobs on every WP load.
+// Re-register any missing cron jobs on every WP load. Runs regardless of whether
+// the user has connected to Uptrue — local-only file scans and the standalone
+// monthly email report depend on these crons staying alive.
 add_action( 'plugins_loaded', 'uptrue_ensure_crons' );
 
 function uptrue_ensure_crons() {
-    if ( ! get_option( UPTRUE_OPT_TOKEN, '' ) ) return;
-
     $critical_hooks = array( UPTRUE_CRON_MAIN, UPTRUE_CRON_PHP, UPTRUE_CRON_REPORT, UPTRUE_CRON_PERMS );
     foreach ( $critical_hooks as $hook ) {
         if ( ! wp_next_scheduled( $hook ) ) {
@@ -565,14 +556,23 @@ function uptrue_scan_modified_plugin_files() {
 }
 
 function uptrue_scan_dir_for_extensions( $dir, $extensions ) {
-    $found = array();
+    $found        = array();
+    $silence_stub = array( 'index.php', 'index.html', 'index.htm' );
     if ( ! is_dir( $dir ) ) return $found;
     try {
         $it = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $dir, RecursiveDirectoryIterator::SKIP_DOTS ) );
         foreach ( $it as $file ) {
-            if ( in_array( strtolower( $file->getExtension() ), $extensions, true ) ) {
-                $found[] = str_replace( ABSPATH, '', $file->getPathname() );
+            if ( ! in_array( strtolower( $file->getExtension() ), $extensions, true ) ) {
+                continue;
             }
+            // Skip WordPress directory-listing protection stubs ("// Silence is golden").
+            // These are dropped by core and well-behaved plugins into every uploads
+            // sub-directory; they are defensive, not malicious. Real malware payloads
+            // are far larger than 200 bytes.
+            if ( in_array( strtolower( $file->getBasename() ), $silence_stub, true ) && $file->getSize() < 200 ) {
+                continue;
+            }
+            $found[] = str_replace( ABSPATH, '', $file->getPathname() );
         }
     } catch ( Exception $e ) { /* skip unreadable dirs */ }
     return $found;
@@ -714,18 +714,23 @@ add_action( 'rest_api_init', function () {
     register_rest_route( 'uptrue/v1', '/status', array(
         'methods'             => 'GET',
         'callback'            => 'uptrue_rest_status',
-        'permission_callback' => '__return_true',
+        'permission_callback' => 'uptrue_rest_permission',
     ) );
 } );
 
-function uptrue_rest_status( WP_REST_Request $request ) {
+function uptrue_rest_permission( WP_REST_Request $request ) {
     $token = get_option( UPTRUE_OPT_TOKEN, '' );
-    $auth  = $request->get_header( 'X-Uptrue-Token' );
-
-    if ( ! $token || $auth !== $token ) {
+    if ( ! $token ) {
+        return new WP_Error( 'unauthorized', 'Plugin not connected', array( 'status' => 401 ) );
+    }
+    $auth = $request->get_header( 'X-Uptrue-Token' );
+    if ( ! is_string( $auth ) || ! hash_equals( $token, $auth ) ) {
         return new WP_Error( 'unauthorized', 'Invalid token', array( 'status' => 401 ) );
     }
+    return true;
+}
 
+function uptrue_rest_status( WP_REST_Request $request ) {
     return array(
         'status'     => 'connected',
         'version'    => UPTRUE_VERSION,
@@ -751,17 +756,36 @@ function uptrue_admin_menu() {
 }
 
 // ============================================================
+// PLUGIN ROW ACTION LINKS (Plugins screen)
+// ============================================================
+
+add_filter( 'plugin_action_links_' . plugin_basename( UPTRUE_PLUGIN_FILE ), 'uptrue_plugin_action_links' );
+
+function uptrue_plugin_action_links( $links ) {
+    $custom = array(
+        'dashboard' => '<a href="' . esc_url( admin_url( 'admin.php?page=uptrue' ) ) . '">' . esc_html__( 'Dashboard', 'uptrue-monitor' ) . '</a>',
+        'settings'  => '<a href="' . esc_url( admin_url( 'admin.php?page=uptrue-settings' ) ) . '">' . esc_html__( 'Settings', 'uptrue-monitor' ) . '</a>',
+        'premium'   => '<a href="https://www.uptrue.io/#pricing" target="_blank" rel="noopener" style="color:#10b981;font-weight:600">' . esc_html__( 'Go Premium', 'uptrue-monitor' ) . '</a>',
+    );
+    return array_merge( $custom, $links );
+}
+
+// ============================================================
 // ADMIN PAGE — DASHBOARD
 // ============================================================
 
 function uptrue_page_dashboard() {
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_die( esc_html__( 'You do not have permission to access this page.', 'uptrue-monitor' ) );
+    }
+
     $token     = get_option( UPTRUE_OPT_TOKEN, '' );
     $last_push = get_option( UPTRUE_OPT_LAST_PUSH, null );
     $last_err  = get_option( UPTRUE_OPT_LAST_ERR, null );
-    $self_test = get_option( 'uptrue_self_test_ok', false );
+    $self_test = get_option( 'uptrue_self_test_ok', null );
     ?>
     <div class="wrap">
-        <h1>🛡️ Uptrue WordPress Monitor</h1>
+        <h1>🛡️ Uptrue Monitor</h1>
 
         <?php if ( ! $token ) : ?>
         <div class="notice notice-warning inline">
@@ -770,11 +794,23 @@ function uptrue_page_dashboard() {
         </div>
         <?php else : ?>
 
+        <?php
+        if ( null === $self_test ) {
+            $api_label = '— Not yet tested';
+            $api_color = '#64748b';
+        } elseif ( $self_test ) {
+            $api_label = '✅ Reachable';
+            $api_color = '#10b981';
+        } else {
+            $api_label = '⚠️ Check connection';
+            $api_color = '#f97316';
+        }
+        ?>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:20px 0;max-width:700px">
             <?php foreach ( array(
                 array( 'Status',    $token ? '✅ Connected'             : '❌ Not connected',    $token ? '#10b981' : '#ef4444' ),
                 array( 'Last Push', $last_push ? esc_html( $last_push ) : 'Never',               '#1e293b' ),
-                array( 'Uptrue API',$self_test  ? '✅ Reachable'        : '⚠️ Check connection', $self_test ? '#10b981' : '#f97316' ),
+                array( 'Uptrue API', $api_label, $api_color ),
             ) as $stat ) : ?>
             <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:16px">
                 <div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.06em;font-weight:600"><?php echo esc_html( $stat[0] ); ?></div>
@@ -805,8 +841,13 @@ function uptrue_page_dashboard() {
 // ============================================================
 
 function uptrue_page_settings() {
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_die( esc_html__( 'You do not have permission to access this page.', 'uptrue-monitor' ) );
+    }
+
     // Handle force-push action
-    if ( isset( $_GET['uptrue_push_now'] ) && wp_verify_nonce( $_GET['_wpnonce'] ?? '', 'uptrue_push_now' ) ) {
+    $push_nonce = isset( $_GET['_wpnonce'] ) ? sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ) : '';
+    if ( isset( $_GET['uptrue_push_now'] ) && wp_verify_nonce( $push_nonce, 'uptrue_push_now' ) ) {
         $token = get_option( UPTRUE_OPT_TOKEN, '' );
         if ( $token ) {
             uptrue_self_test();
@@ -817,7 +858,7 @@ function uptrue_page_settings() {
 
     if ( isset( $_POST['uptrue_save'] ) && check_admin_referer( 'uptrue_save_settings' ) ) {
         $token    = sanitize_text_field( wp_unslash( $_POST['uptrue_token'] ?? '' ) );
-        $interval = (int) ( $_POST['uptrue_interval'] ?? 120 );
+        $interval = isset( $_POST['uptrue_interval'] ) ? (int) wp_unslash( $_POST['uptrue_interval'] ) : 120;
         if ( ! in_array( $interval, array( 60, 120, 180, 240, 1440, 10080, 43200 ), true ) ) $interval = 120;
 
         $raw_settings = $_POST['settings'] ?? array();
@@ -859,8 +900,7 @@ function uptrue_page_settings() {
             <p><strong>Last push error:</strong> <?php echo esc_html( $last_err ); ?></p>
             <p style="font-size:13px">
                 <strong>401</strong> — Invalid API token. Copy the token from the Uptrue monitor setup page and paste it above.<br>
-                <strong>405</strong> — Wrong endpoint URL. If you need to point to a different environment, add <code>define( 'UPTRUE_API_BASE_URL', 'https://dev.uptrue.io/api/v1/wp-agent' );</code> to your wp-config.php.<br>
-                <strong>Network error</strong> — Your server may be blocking outbound HTTPS requests to uptrue.io.
+                <strong>Network error</strong> — Your server may be blocking outbound HTTPS requests to uptrue.io. Ask your host to allow connections to uptrue.io.
             </p>
         </div>
         <?php endif; ?>
@@ -951,6 +991,10 @@ function uptrue_page_settings() {
 // ============================================================
 
 function uptrue_page_cron() {
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_die( esc_html__( 'You do not have permission to access this page.', 'uptrue-monitor' ) );
+    }
+
     $interval      = get_option( UPTRUE_OPT_INTERVAL, 120 );
     $last_err      = get_option( UPTRUE_OPT_LAST_ERR, null );
     $cron_disabled = defined( 'DISABLE_WP_CRON' ) && DISABLE_WP_CRON;
@@ -1012,8 +1056,9 @@ function uptrue_page_cron() {
         </table>
 
         <?php
-        if ( isset( $_GET['uptrue_reschedule'] ) && wp_verify_nonce( $_GET['_wpnonce'] ?? '', 'uptrue_reschedule' ) ) {
-            $hook = sanitize_key( $_GET['uptrue_reschedule'] );
+        $resched_nonce = isset( $_GET['_wpnonce'] ) ? sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ) : '';
+        if ( isset( $_GET['uptrue_reschedule'] ) && wp_verify_nonce( $resched_nonce, 'uptrue_reschedule' ) ) {
+            $hook = sanitize_key( wp_unslash( $_GET['uptrue_reschedule'] ) );
             if ( array_key_exists( $hook, $jobs ) ) {
                 wp_schedule_single_event( time() + 60, $hook );
                 echo '<div class="notice notice-success inline" style="margin-top:12px"><p>Job rescheduled to run in 60 seconds.</p></div>';

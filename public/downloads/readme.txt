@@ -1,18 +1,18 @@
-=== Uptrue WordPress Monitor ===
+=== Uptrue Monitor ===
 Contributors: uptrue
 Tags: security, monitoring, malware, file scan, uptime
 Requires at least: 5.0
 Tested up to: 6.7
-Stable tag: 1.2.0
+Stable tag: 1.2.2
 Requires PHP: 7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Monitor your WordPress site from the inside — file injections, rogue admin users, foreign-language content, brute force attacks, and security misconfigurations.
+Monitor your site from the inside — file injections, rogue admin users, foreign-language content, brute force attacks, and security misconfigurations.
 
 == Description ==
 
-**Uptrue WordPress Monitor** keeps an eye on your WordPress site from the inside, detecting threats and misconfigurations that external uptime monitors will never catch.
+**Uptrue Monitor** keeps an eye on your WordPress site from the inside, detecting threats and misconfigurations that external uptime monitors will never catch.
 
 It works by running scheduled checks on your server and either sending findings to your Uptrue dashboard or emailing you a free monthly health report — no Uptrue account required to get started.
 
@@ -65,7 +65,7 @@ The plugin runs on a schedule using WordPress cron (every 60–240 minutes, conf
 
 = Privacy =
 
-This plugin sends site health data to Uptrue only when you save an API token. If no token is saved, no data leaves your server. See the Third Party Services section below for full details of what data is transmitted.
+This plugin does not contact any external service until you explicitly opt in by saving an Uptrue API token in **Uptrue → Settings**. With no token saved, the plugin runs only local checks on your server and (optionally) emails the monthly health report to your WordPress admin email. No data leaves your server in standalone mode. Saving a token is treated as your explicit consent for the plugin to begin transmitting site health data to Uptrue. Clearing the token field stops all transmission immediately. See the Third Party Services section below for the full list of fields sent.
 
 == Installation ==
 
@@ -128,10 +128,10 @@ This plugin transmits data to **Uptrue** (https://uptrue.io), a website monitori
 
 **When data is transmitted:**
 
-1. When you save an API token — a connectivity self-test is performed to verify the connection.
+1. When you save an API token — a one-time connectivity self-test is performed to verify the connection. This only runs after you have entered a token and clicked Save.
 2. On each scheduled cron run (every 60–240 minutes) — site health data is pushed to Uptrue.
 
-No data is transmitted if no API token is saved.
+No data is transmitted if no API token is saved. The plugin makes no outbound connections on activation or deactivation.
 
 **Data transmitted includes:**
 
@@ -157,6 +157,21 @@ No data is transmitted if no API token is saved.
 
 == Changelog ==
 
+= 1.2.2 =
+* File scanner now ignores WordPress directory-listing protection stubs (small "Silence is golden" index.php/index.html files dropped by core and many plugins) — eliminates false positives in /uploads/
+* Pricing link updated to homepage anchor
+* Plugin row on Plugins screen now shows Dashboard / Settings / Go Premium quick links
+* Removed user-facing reference to internal API URL — plugin always talks to https://uptrue.io
+
+= 1.2.1 =
+* Plugin renamed from "Uptrue WordPress Monitor" to "Uptrue Monitor" (slug unchanged)
+* No outbound connections are now made on plugin activation or deactivation — the plugin only contacts Uptrue after you save an API token (explicit opt-in)
+* Standalone mode is fully self-sufficient: file scans, security checks, and the monthly email report run with or without an Uptrue account
+* Hardened admin nonce validation (sanitize and unslash before verify)
+* REST API authorisation moved into permission_callback with hash_equals comparison
+* Added uninstall.php to clean up all plugin options and scheduled crons on plugin deletion
+* Added explicit capability checks (manage_options) to all admin page handlers
+
 = 1.2.0 =
 * Added foreign-language content detection — 10 scripts: Chinese, Russian, Arabic, Hindi, Thai, Japanese, Korean, Hebrew, Bengali, Georgian
 * Added security configuration checks: 2FA detection, backup plugin detection, XML-RPC status, REST API user enumeration, application passwords
@@ -171,6 +186,12 @@ No data is transmitted if no API token is saved.
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.2.2 =
+Eliminates false-positive "PHP file in /uploads/" findings caused by WordPress's own directory-protection stubs. Recommended upgrade.
+
+= 1.2.1 =
+Compliance and security hardening release. No outbound connections happen until you explicitly connect by saving an API token. Plugin renamed to "Uptrue Monitor" — slug and settings unchanged.
 
 = 1.2.0 =
 Major update — adds 10-language content injection detection, security configuration checks, brute force detection, and a free standalone monthly health report. No configuration changes required.
