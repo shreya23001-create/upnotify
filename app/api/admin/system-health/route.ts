@@ -147,7 +147,6 @@ export async function GET(): Promise<NextResponse> {
     lastAlertDigestFlusher,
     lastDataRetention,
     lastMonitorHealthReport,
-    lastPmbWeekPlanner,
     lastPmbDailyPublisher,
     lastPmbMonthlyGenerator,
   ] = await Promise.all([
@@ -234,8 +233,6 @@ export async function GET(): Promise<NextResponse> {
     lastRunFromCronLog(supabase, '/api/cron/data-retention'),
     // monitor-health-report — via cron_run_log
     lastRunFromCronLog(supabase, '/api/cron/monitor-health-report'),
-    // pmb/week-planner — via cron_run_log
-    lastRunFromCronLog(supabase, '/api/cron/pmb/week-planner'),
     // pmb/daily-publisher — via cron_run_log
     lastRunFromCronLog(supabase, '/api/cron/pmb/daily-publisher'),
     // pmb/monthly-generator — via cron_run_log
@@ -440,14 +437,9 @@ export async function GET(): Promise<NextResponse> {
         history: cronHistory['/api/cron/alert-digest-flusher'] ?? [],
       },
       // ── PMB — Public Monitor Blog ──────────────────────────────────────
-      pmbWeekPlanner: {
-        label: 'PMB Week Planner',
-        schedule: 'Monday 5am',
-        path: '/api/cron/pmb/week-planner',
-        lastRun: lastPmbWeekPlanner,
-        status: cronStatus(lastPmbWeekPlanner, 10080, now),
-        history: cronHistory['/api/cron/pmb/week-planner'] ?? [],
-      },
+      // pmbWeekPlanner removed 2026-05-05 — Boss decided weekly comparison
+      // posts weren't adding value. Cron deleted from vercel.json. Monthly
+      // generator + daily publisher remain.
       pmbDailyPublisher: {
         label: 'PMB Daily Publisher',
         schedule: 'Every 5 minutes',

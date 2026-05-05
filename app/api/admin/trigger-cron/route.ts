@@ -25,7 +25,6 @@ const ALLOWED_CRON_PATHS = new Set([
   '/api/cron/autoblog/llm-detector',
   '/api/cron/autoblog/topic-runner',
   '/api/cron/autoblog/post-generator',
-  '/api/cron/pmb/week-planner',
   '/api/cron/pmb/daily-publisher',
   '/api/cron/pmb/monthly-generator',
 ])

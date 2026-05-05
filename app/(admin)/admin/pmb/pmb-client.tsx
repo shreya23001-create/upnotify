@@ -741,7 +741,7 @@ function QueueTab({ runs, stats, today, startTransition }: {
           </thead>
           <tbody>
             {slice.length === 0 && (
-              <tr><td colSpan={6} className="admin-empty">No posts for today yet — week-planner runs Monday 5am UTC.</td></tr>
+              <tr><td colSpan={6} className="admin-empty">No posts queued for today. Monthly generator runs on the 1st at 7am UTC.</td></tr>
             )}
             {slice.map(r => {
               const label = r.post_type === 'pairwise'
@@ -799,7 +799,6 @@ function CronsTab({ cronHistory, expanded, setExpanded }: {
   const [triggerMsg,   setTriggerMsg]   = useState<Record<string, string>>({})
 
   const cronMeta: Record<string, { schedule: string; description: string }> = {
-    '/api/cron/pmb/week-planner':      { schedule: 'Mon 5:00 UTC', description: 'Plans the week — spreads posts Mon–Sun, dedup by run_key' },
     '/api/cron/pmb/daily-publisher':   { schedule: 'Every 5 min',  description: 'Picks today\'s queued posts and generates via Claude' },
     '/api/cron/pmb/monthly-generator': { schedule: '1st 7:00 UTC', description: 'Queues monthly leaderboard for each active category' },
     '/api/cron/public-checks':         { schedule: 'Every 5 min',  description: 'HTTP checks on all public monitors' },

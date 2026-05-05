@@ -55,7 +55,7 @@ const CRON_GROUPS: { label: string; color: string; keys: string[] }[] = [
   {
     label: 'PMB — Public Monitor Blog',
     color: '#14b8a6',
-    keys: ['pmbWeekPlanner', 'pmbDailyPublisher', 'pmbMonthlyGenerator'],
+    keys: ['pmbDailyPublisher', 'pmbMonthlyGenerator'],
   },
   {
     label: 'Maintenance & Billing',
