@@ -107,6 +107,10 @@
     {
       "path": "/api/cron/alert-digest-flusher",
       "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/cron/legal-review-overdue",
+      "schedule": "0 9 * * 1"
     }
   ]
 }

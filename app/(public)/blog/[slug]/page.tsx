@@ -72,7 +72,8 @@ function parseContent(raw: unknown): BlogContent | null {
         return parsed as BlogContent
       }
     } catch {
-      // not valid JSON
+      // Plain markdown string — treat as body directly
+      return { body: raw } as BlogContent
     }
   }
 

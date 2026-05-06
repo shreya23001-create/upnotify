@@ -12,7 +12,7 @@ export default function TermsOfServicePage(): React.ReactElement {
   return (
     <>
       <h1>Terms of Service</h1>
-      <p className="legal-updated">Last updated: 2 April 2026</p>
+      <p className="legal-updated">Last updated: 6 May 2026</p>
 
       <p>
         These Terms of Service (&quot;Terms&quot;) govern your access to and use of the Uptrue platform,
@@ -414,7 +414,50 @@ export default function TermsOfServicePage(): React.ReactElement {
         summaries, or alerts is at your sole discretion and risk.
       </p>
 
-      <h2>11A. Force Majeure</h2>
+      <h2>11A. Watchdog — Competitor Monitoring</h2>
+      <p>
+        The Watchdog feature allows you to monitor the uptime and response time of third-party websites
+        (&quot;Tracked Sites&quot;) by sending standard HTTP requests to their publicly accessible URLs,
+        the same way any web browser or visitor would.
+      </p>
+      <p>
+        By using Watchdog, you acknowledge and agree that:
+      </p>
+      <ul>
+        <li>
+          <strong>Informational use only.</strong> Data collected by Watchdog is provided for your internal
+          benchmarking and informational purposes only. It does not constitute a legal, commercial, or
+          technical assessment of any Tracked Site or its operator.
+        </li>
+        <li>
+          <strong>No affiliation.</strong> Uptrue has no affiliation, partnership, or commercial
+          relationship with any Tracked Site. Monitoring a site does not imply any endorsement,
+          sponsorship, or association.
+        </li>
+        <li>
+          <strong>Accuracy.</strong> Watchdog reflects observations made from Uptrue&apos;s monitoring
+          infrastructure at the time of each check. Results may not reflect the experience of all users
+          of a Tracked Site and may be affected by geographic, network, or temporary factors outside
+          our control.
+        </li>
+        <li>
+          <strong>Permitted use.</strong> You must not use Watchdog to facilitate unauthorised access to,
+          denial of service against, or any other harmful activity directed at any Tracked Site. You
+          are solely responsible for ensuring that your use of Watchdog complies with all applicable laws
+          and does not violate the terms of service of any Tracked Site.
+        </li>
+        <li>
+          <strong>AI summaries.</strong> Where Watchdog includes AI-generated summaries or analysis,
+          these are generated automatically and may contain errors or omissions. They do not constitute
+          professional advice of any kind.
+        </li>
+      </ul>
+      <p>
+        We reserve the right to restrict, suspend, or remove Watchdog access if we reasonably believe
+        it is being used in a manner that is harmful, unlawful, or inconsistent with these Terms.
+      </p>
+
+      <h2>11B. Force Majeure</h2>
       <p>
         We shall not be liable for any failure or delay in performing our obligations under these Terms
         where such failure or delay results from circumstances beyond our reasonable control, including
@@ -424,6 +467,7 @@ export default function TermsOfServicePage(): React.ReactElement {
         or any other force majeure event. During any such event, our obligations shall be suspended for
         the duration of the event.
       </p>
+
 
       <h2>12. Changes to These Terms</h2>
       <p>

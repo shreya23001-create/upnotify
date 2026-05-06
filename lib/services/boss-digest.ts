@@ -139,6 +139,7 @@ async function fetchPendingDigestPosts(): Promise<PendingDigestPost[]> {
     .select('id, title, slug, excerpt, content, post_type, primary_keyword, author, faq_jsonb, review_jsonb')
     .eq('delivery_method', 'digest')
     .eq('digest_status', 'pending')
+    .neq('post_type', 'commercial')
     .order('created_at', { ascending: true })
 
   if (error || !posts) {
