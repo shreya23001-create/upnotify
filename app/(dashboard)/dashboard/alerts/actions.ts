@@ -2,6 +2,7 @@
 
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
+import { randomBytes } from 'crypto'
 import { createAlertChannel, updateAlertChannel, deleteAlertChannel, toggleAlertChannel, bulkDeleteAlertChannels, bulkUpdateAlertChannelStatus, getAlertChannelById } from '@/lib/db/alerts'
 import { checkAlertChannelAccess } from '@/lib/utils/plan-limits'
 import { getCurrentUser } from '@/lib/db/users'
@@ -63,7 +64,9 @@ export async function createAlertChannelAction(formData: FormData): Promise<{ er
 
   if (type === 'webhook') {
     config.webhookUrl = formData.get('webhookUrl') as string
-    config.webhookSecret = formData.get('webhookSecret') as string
+    const providedSecret = (formData.get('webhookSecret') as string | null)?.trim()
+    // Always ensure a secret exists — auto-generate if the user left it blank
+    config.webhookSecret = providedSecret || randomBytes(32).toString('hex')
     if (!config.webhookUrl) return { error: 'Webhook URL is required' }
     if (!isValidWebhookUrl(config.webhookUrl as string)) return { error: 'Webhook URL must be a valid http:// or https:// URL' }
   }
@@ -126,7 +129,10 @@ export async function updateAlertChannelAction(channelId: string, formData: Form
   }
   if (type === 'webhook') {
     config.webhookUrl = formData.get('webhookUrl') as string
-    config.webhookSecret = formData.get('webhookSecret') as string
+    const existingConfig = (existing.config as Record<string, unknown> | null) ?? {}
+    const updatedSecret = (formData.get('webhookSecret') as string | null)?.trim()
+    // Preserve existing secret if user left field blank; auto-generate if never set
+    config.webhookSecret = updatedSecret || (existingConfig.webhookSecret as string) || randomBytes(32).toString('hex')
     if (config.webhookUrl && !isValidWebhookUrl(config.webhookUrl as string)) return { error: 'Webhook URL must be a valid http:// or https:// URL' }
   }
 

@@ -363,18 +363,22 @@ export function HeroDashboardMockup(): React.ReactElement {
                   <>
                     <div className="hm-modal-body">
                       <div className="hm-form-row">
-                        <label className="hm-form-label">Monitor name</label>
+                        <label className="hm-form-label" htmlFor="hm-monitor-name">Monitor name</label>
                         <input
                           className="hm-form-input"
+                          id="hm-monitor-name"
+                          name="hm-monitor-name"
                           placeholder="My Website"
                           value={form.name}
                           onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
                         />
                       </div>
                       <div className="hm-form-row">
-                        <label className="hm-form-label">URL to monitor</label>
+                        <label className="hm-form-label" htmlFor="hm-monitor-url">URL to monitor</label>
                         <input
                           className="hm-form-input"
+                          id="hm-monitor-url"
+                          name="hm-monitor-url"
                           placeholder="https://example.com"
                           value={form.url}
                           onChange={e => setForm(f => ({ ...f, url: e.target.value }))}
@@ -382,15 +386,15 @@ export function HeroDashboardMockup(): React.ReactElement {
                       </div>
                       <div className="hm-form-row hm-form-two">
                         <div>
-                          <label className="hm-form-label">Type</label>
-                          <select className="hm-form-select" value={form.type} onChange={e => setForm(f => ({ ...f, type: e.target.value }))}>
+                          <label className="hm-form-label" htmlFor="hm-monitor-type">Type</label>
+                          <select id="hm-monitor-type" name="hm-monitor-type" className="hm-form-select" value={form.type} onChange={e => setForm(f => ({ ...f, type: e.target.value }))}>
                             <option>HTTP</option><option>SSL</option><option>Domain</option>
                             <option>Ping</option><option>API</option><option>Port</option>
                           </select>
                         </div>
                         <div>
-                          <label className="hm-form-label">Check every</label>
-                          <select className="hm-form-select" value={form.interval} onChange={e => setForm(f => ({ ...f, interval: e.target.value }))}>
+                          <label className="hm-form-label" htmlFor="hm-monitor-interval">Check every</label>
+                          <select id="hm-monitor-interval" name="hm-monitor-interval" className="hm-form-select" value={form.interval} onChange={e => setForm(f => ({ ...f, interval: e.target.value }))}>
                             <option value="30s">30 seconds</option>
                             <option value="1m">1 minute</option>
                             <option value="5m">5 minutes</option>
@@ -706,7 +710,7 @@ export function HeroDashboardMockup(): React.ReactElement {
                 <table className="mm-table">
                   <thead>
                     <tr>
-                      <th style={{ width: '18px' }}><input type="checkbox" style={{ accentColor: 'var(--brand-blue)', width: '10px', height: '10px' }} readOnly /></th>
+                      <th style={{ width: '18px' }}><input type="checkbox" name="select-all" id="hm-select-all" style={{ accentColor: 'var(--brand-blue)', width: '10px', height: '10px' }} readOnly aria-label="Select all monitors" /></th>
                       <th>Monitor</th><th>Type</th><th>Status</th><th>Uptime (90d)</th><th>Response</th><th>Last check</th>
                     </tr>
                   </thead>
@@ -714,7 +718,7 @@ export function HeroDashboardMockup(): React.ReactElement {
 
                     {/* Row 1 */}
                     <tr className="hm-clickable-row" onClick={() => toggleRow('r1')}>
-                      <td><input type="checkbox" style={{ accentColor: 'var(--brand-blue)', width: '10px', height: '10px' }} readOnly /></td>
+                      <td><input type="checkbox" name="hm-row-r1" id="hm-row-r1" style={{ accentColor: 'var(--brand-blue)', width: '10px', height: '10px' }} readOnly aria-label="Select row 1" /></td>
                       <td><div className="mm-monitor-name">api.acmecorp.com</div><div className="mm-monitor-url">https://api.acmecorp.com/health</div></td>
                       <td><span className="mm-type-tag">HTTP</span></td>
                       <td><StatusBadge status="up" /></td>
@@ -738,7 +742,7 @@ export function HeroDashboardMockup(): React.ReactElement {
 
                     {/* Row 2 — checkout.shop.io (animated) */}
                     <tr className="hm-clickable-row" style={{ background: pd.rowBg }} onClick={() => toggleRow('r2')}>
-                      <td><input type="checkbox" style={{ accentColor: 'var(--brand-blue)', width: '10px', height: '10px' }} readOnly /></td>
+                      <td><input type="checkbox" name="hm-row-r2" id="hm-row-r2" style={{ accentColor: 'var(--brand-blue)', width: '10px', height: '10px' }} readOnly aria-label="Select row 2" /></td>
                       <td><div className="mm-monitor-name">checkout.shop.io</div><div className="mm-monitor-url">https://checkout.shop.io</div></td>
                       <td><span className="mm-type-tag">HTTP</span></td>
                       <td><StatusBadge status={pd.status} /></td>
@@ -769,7 +773,7 @@ export function HeroDashboardMockup(): React.ReactElement {
 
                     {/* Row 3 */}
                     <tr className="hm-clickable-row" onClick={() => toggleRow('r3')}>
-                      <td><input type="checkbox" style={{ accentColor: 'var(--brand-blue)', width: '10px', height: '10px' }} readOnly /></td>
+                      <td><input type="checkbox" name="hm-row-r3" id="hm-row-r3" style={{ accentColor: 'var(--brand-blue)', width: '10px', height: '10px' }} readOnly aria-label="Select row 3" /></td>
                       <td><div className="mm-monitor-name">cdn.assets.io</div><div className="mm-monitor-url">https://cdn.assets.io</div></td>
                       <td><span className="mm-type-tag">HTTP</span></td>
                       <td><StatusBadge status="up" /></td>
@@ -793,7 +797,7 @@ export function HeroDashboardMockup(): React.ReactElement {
 
                     {/* Row 4 */}
                     <tr className="hm-clickable-row" onClick={() => toggleRow('r4')}>
-                      <td><input type="checkbox" style={{ accentColor: 'var(--brand-blue)', width: '10px', height: '10px' }} readOnly /></td>
+                      <td><input type="checkbox" name="hm-row-r4" id="hm-row-r4" style={{ accentColor: 'var(--brand-blue)', width: '10px', height: '10px' }} readOnly aria-label="Select row 4" /></td>
                       <td><div className="mm-monitor-name">blog.example.com</div><div className="mm-monitor-url">https://blog.example.com</div></td>
                       <td><span className="mm-type-tag">SSL</span></td>
                       <td><StatusBadge status="up" /></td>
@@ -819,7 +823,7 @@ export function HeroDashboardMockup(): React.ReactElement {
                     {userMonitors.map(m => (
                       <>
                         <tr key={m.id} className="hm-clickable-row hm-new-row" onClick={() => toggleRow(m.id)}>
-                          <td><input type="checkbox" style={{ accentColor: 'var(--brand-blue)', width: '10px', height: '10px' }} readOnly /></td>
+                          <td><input type="checkbox" name={`hm-row-${m.id}`} id={`hm-row-${m.id}`} style={{ accentColor: 'var(--brand-blue)', width: '10px', height: '10px' }} readOnly aria-label={`Select ${m.name}`} /></td>
                           <td><div className="mm-monitor-name">{m.name}</div><div className="mm-monitor-url">{m.url}</div></td>
                           <td><span className="mm-type-tag">{m.type}</span></td>
                           <td>

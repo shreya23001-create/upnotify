@@ -129,6 +129,26 @@ export default function AlertsPage(): React.ReactElement {
           </section>
 
           <section className="help-section">
+            <h2 className="help-section-title">Smart Digest — fewer emails, same urgency</h2>
+            <p>
+              Smart Digest is the default alert delivery mode for all Uptrue accounts. Instead of sending
+              one email per event (which causes an email storm during outages), Smart Digest works like this:
+            </p>
+            <ul className="help-list">
+              <li><strong>First event</strong> in a 30-minute window → sent <strong>instantly</strong>. You know within seconds.</li>
+              <li><strong>Subsequent events</strong> in the same window → collected and rolled up into one digest email when the window closes.</li>
+              <li><strong>Critical-severity events</strong> always bypass the window and send instantly regardless.</li>
+            </ul>
+            <p>
+              The result is 80–95% fewer emails during incidents with no loss of urgency on the alert that matters most — the first one.
+            </p>
+            <p>
+              You can switch back to per-event mode (one email per event) or adjust the digest window
+              at any time from <Link href="/dashboard/alerts/notifications">Alerts → Notification Preferences</Link>.
+            </p>
+          </section>
+
+          <section className="help-section">
             <h2 className="help-section-title">Setting up a channel step by step</h2>
             <ol className="help-steps">
               <li>Go to <strong>Alert Channels</strong> in the sidebar.</li>

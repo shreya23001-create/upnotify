@@ -46,7 +46,7 @@ export async function saveNotificationSettingsAction(formData: FormData): Promis
   await devAuditLog({
     orgId: user.org_id,
     userId: user.id,
-    action: 'alert_settings.updated',
+    action: mode === 'off' ? 'alert_settings.smart_digest_disabled' : 'alert_settings.updated',
     resourceType: 'org_alert_settings',
     resourceId: user.org_id,
     metadata: { mode, digest_window_minutes, instant_severity_floor },

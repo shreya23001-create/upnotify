@@ -32,8 +32,8 @@ export async function createStatusPageAction(formData: FormData): Promise<{ erro
   const spLimit = await checkStatusPageLimit(user.org_id)
   if (!spLimit.allowed) {
     return { error: spLimit.limit === 0
-      ? 'Status pages are not available on your current plan. Upgrade to unlock this feature.'
-      : `Status page limit reached (${spLimit.currentCount}/${spLimit.limit}). Upgrade your plan for more.`
+      ? 'Status pages are not available on the Free plan. Upgrade to Lite or higher to create a status page.'
+      : `Status page limit reached (${spLimit.currentCount}/${spLimit.limit}). Upgrade your plan to create more.`
     }
   }
 

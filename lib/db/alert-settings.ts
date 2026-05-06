@@ -17,7 +17,7 @@ export interface OrgAlertSettings {
 }
 
 const DEFAULT_SETTINGS: Omit<OrgAlertSettings, 'org_id' | 'created_at' | 'updated_at'> = {
-  mode: 'off',
+  mode: 'smart',
   digest_window_minutes: 30,
   instant_severity_floor: 'critical',
   same_host_grouping: true,
@@ -51,6 +51,7 @@ export async function getOrgAlertSettings(orgId: string): Promise<OrgAlertSettin
   if (data) return data as OrgAlertSettings
 
   // First-touch: insert defaults so the next read is fast.
+  // New orgs always start on Smart Digest (mode='smart').
   const insert = { org_id: orgId, ...DEFAULT_SETTINGS }
   const { data: inserted, error: insertErr } = await supabase
     .from('org_alert_settings')

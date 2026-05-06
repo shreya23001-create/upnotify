@@ -36,16 +36,16 @@ export default async function NotificationsSettingsPage() {
                 <div>
                   <div style={{ fontWeight: 500 }}>Off — every event sends an email immediately</div>
                   <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>
-                    Today&apos;s default. One email per incident open and one per recovery, per channel. Best if you have very few monitors.
+                    One email per incident open and one per recovery, per channel. Best if you have very few monitors.
                   </div>
                 </div>
               </label>
               <label style={{ display: 'flex', alignItems: 'flex-start', gap: 12, padding: 12, border: '1px solid var(--border)', borderRadius: 6, cursor: 'pointer' }}>
                 <input type="radio" name="mode" value="smart" defaultChecked={settings.mode === 'smart'} style={{ marginTop: 4 }} />
                 <div>
-                  <div style={{ fontWeight: 500 }}>Smart Digest — first event instant, then group</div>
+                  <div style={{ fontWeight: 500 }}>Smart Digest — first event instant, then group <span style={{ fontSize: 11, background: 'var(--accent)', color: '#fff', borderRadius: 4, padding: '1px 6px', marginLeft: 6 }}>Default</span></div>
                   <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>
-                    Recommended if you have ≥5 monitors. Cuts email volume by 80–95% during outages and flap.
+                    Recommended for all accounts. Cuts email volume by 80–95% during outages with no loss of urgency on the first alert.
                   </div>
                 </div>
               </label>

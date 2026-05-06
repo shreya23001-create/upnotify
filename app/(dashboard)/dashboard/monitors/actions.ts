@@ -3,6 +3,7 @@
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { createMonitor, updateMonitor, deleteMonitor, pauseMonitor, resumeMonitor, bulkDeleteMonitors, bulkUpdateMonitorStatus, getMonitorById } from '@/lib/db/monitors'
+import { getStatusPagesByMonitorId } from '@/lib/db/status-pages'
 import { getCurrentUser } from '@/lib/db/users'
 import { getWorkspacesByOrg } from '@/lib/db/workspaces'
 import { checkMonitorLimit, getPlanLimits } from '@/lib/utils/plan-limits'
@@ -306,6 +307,13 @@ export async function updateMonitorAction(monitorId: string, formData: FormData)
   logger.info('Monitor updated', { monitorId })
   await devAuditLog({ orgId: user.org_id, userId: user.id, action: 'monitor.updated', resourceType: 'monitor', resourceId: monitorId, metadata: { name } })
   revalidatePath('/dashboard/monitors')
+
+  // Revalidate any public status pages that display this monitor
+  const linkedStatusPages = await getStatusPagesByMonitorId(monitorId)
+  for (const sp of linkedStatusPages) {
+    revalidatePath(`/status/${sp.slug}`)
+  }
+
   return { success: true }
 }
 

@@ -3,6 +3,19 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
 import type { StatusPage } from '@/lib/types'
 
+export async function getStatusPagesByMonitorId(monitorId: string): Promise<StatusPage[]> {
+  const supabase = createAdminClient()
+  const { data, error } = await supabase
+    .from('status_pages')
+    .select('id, slug, monitor_ids')
+    .contains('monitor_ids', [monitorId])
+  if (error) {
+    logger.error('Failed to get status pages by monitor', { error: error.message })
+    return []
+  }
+  return (data ?? []) as unknown as StatusPage[]
+}
+
 export async function getStatusPagesByWorkspace(workspaceId: string): Promise<StatusPage[]> {
   const supabase = await createClient()
   const { data, error } = await supabase

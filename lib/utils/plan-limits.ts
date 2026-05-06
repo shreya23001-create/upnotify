@@ -73,12 +73,12 @@ function extractLimits(plan: Record<string, unknown>): PlanLimits {
 export async function getPlanLimits(orgId: string): Promise<PlanLimits> {
   const supabase = createAdminClient()
 
-  // Active or cancelling (paid until period end) — same limits apply
+  // Active, cancelling (paid until period end), or paused — all retain plan limits
   const { data: sub } = await supabase
     .from('subscriptions')
     .select('*, plans(*)')
     .eq('org_id', orgId)
-    .in('status', ['active', 'cancelling'])
+    .in('status', ['active', 'cancelling', 'paused'])
     .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle()
