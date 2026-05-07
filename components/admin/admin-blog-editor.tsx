@@ -130,23 +130,26 @@ export function AdminBlogEditor({ post }: AdminBlogEditorProps): React.ReactElem
   const handleSave = useCallback(async (publishNow?: boolean): Promise<void> => {
     setError(null)
     setSuccess(null)
+
+    if (publishNow && !content.trim()) {
+      setError('Cannot publish an empty post. Add some content or save as draft.')
+      return
+    }
+
     setSaving(true)
 
     const finalStatus = publishNow ? 'published' : status
     const finalPublishedAt = publishNow && !publishedAt ? new Date().toISOString().slice(0, 16) : publishedAt
-
-    const contentObj = JSON.stringify({
-      body: content,
-      midCta: midCta.heading ? midCta : undefined,
-      endCta: endCta.heading ? endCta : undefined,
-    })
 
     const formData = new FormData()
     if (post?.id) formData.set('id', post.id)
     formData.set('title', title)
     formData.set('slug', slug)
     formData.set('excerpt', excerpt)
-    formData.set('content', contentObj)
+    // Raw markdown — the server action wraps this into { body, midCta?, endCta? }.
+    // Sending as a JSON-stringified object here used to double-encode and silently
+    // drop CTAs (fixed alongside the calendar-blog-generator content-shape bug).
+    formData.set('content', content)
     formData.set('category', category)
     formData.set('status', finalStatus)
     formData.set('seo_title', seoTitle)
@@ -154,6 +157,12 @@ export function AdminBlogEditor({ post }: AdminBlogEditorProps): React.ReactElem
     formData.set('og_image_url', ogImageUrl)
     formData.set('published_at', finalPublishedAt)
     formData.set('tags', tags)
+    formData.set('mid_cta_heading', midCta.heading)
+    formData.set('mid_cta_label', midCta.buttonLabel)
+    formData.set('mid_cta_url', midCta.buttonUrl)
+    formData.set('end_cta_heading', endCta.heading)
+    formData.set('end_cta_label', endCta.buttonLabel)
+    formData.set('end_cta_url', endCta.buttonUrl)
 
     const result = isEditing ? await updateBlogPostAction(formData) : await createBlogPostAction(formData)
     setSaving(false)
@@ -183,7 +192,12 @@ export function AdminBlogEditor({ post }: AdminBlogEditorProps): React.ReactElem
           <button onClick={() => handleSave(false)} disabled={saving || !title || !slug} className="btn btn-secondary">
             {saving ? 'Saving...' : 'Save Draft'}
           </button>
-          <button onClick={() => handleSave(true)} disabled={saving || !title || !slug} className="btn btn-primary">
+          <button
+            onClick={() => handleSave(true)}
+            disabled={saving || !title || !slug || !content.trim()}
+            className="btn btn-primary"
+            title={!content.trim() ? 'Add content before publishing' : undefined}
+          >
             <IconCheck size={14} /> {saving ? 'Publishing...' : 'Publish'}
           </button>
         </div>

@@ -565,12 +565,15 @@ async function findExistingBlogPostForCalendarRow(
 
   const row = data[0]
   const reviewJsonb = row.review_jsonb as ReviewOutput | null
+  // content is stored as a JSONB object { body: "..." } since the May 2026 fix
+  // — read the body field rather than casting the whole column to string.
+  const contentObj = (row.content ?? {}) as { body?: string }
   return {
     id: row.id as string,
     title: row.title as string,
     slug: row.slug as string,
     excerpt: row.excerpt as string | null,
-    bodyMarkdown: row.content as string,
+    bodyMarkdown: contentObj.body ?? '',
     review: reviewJsonb ?? {
       headline: '',
       highlights: [],

@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { BlogCardImage } from '@/components/ui/blog-card-image'
 import { BlogShareSubscribe } from '@/components/blog/blog-share-subscribe'
+import { logger } from '@/lib/utils/logger'
 
 export const revalidate = 300 // ISR: revalidate every 5 minutes
 
@@ -56,7 +57,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
  * Parses the content JSONB field robustly.
  * Supabase normally returns JSONB as a JS object, but handles JSON-string edge cases too.
  */
-function parseContent(raw: unknown): BlogContent | null {
+function parseContent(raw: unknown, slug: string): BlogContent | null {
   if (!raw) return null
 
   // Normal case: Supabase returns JSONB as a JS object
@@ -64,7 +65,15 @@ function parseContent(raw: unknown): BlogContent | null {
     return raw as BlogContent
   }
 
-  // Edge case: JSONB came back as a JSON string — parse it
+  // Edge case: JSONB came back as a primitive (string/number/bool). Migration
+  // 00100 + 00103 + the DB CHECK constraint should make this impossible —
+  // log it so we catch any new writer that bypasses the guards.
+  logger.warn('Blog post content is not an object — content corruption detected', {
+    slug,
+    rawType: typeof raw,
+    isArray: Array.isArray(raw),
+  })
+
   if (typeof raw === 'string') {
     try {
       const parsed = JSON.parse(raw)
@@ -178,7 +187,7 @@ export default async function DynamicBlogPost({ params }: { params: Promise<{ sl
 
   if (!post) notFound()
 
-  const content = parseContent(post.content)
+  const content = parseContent(post.content, post.slug)
   const isStatic = content?.type === 'static'
   const rawHtml = (content as Record<string, unknown> | null)?.html as string | undefined
   const body = rawHtml ?? (content?.body ?? '')

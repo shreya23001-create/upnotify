@@ -1,5 +1,10 @@
 # Uptrue — Changelog
 
+## Unreleased — dev branch
+
+### Fixed
+- **Blog content corruption — permanent fix.** The May 2 calendar-generator regression that saved raw markdown into the JSONB content column has been closed off at four layers: (1) `normaliseContent` helper in `lib/db/blog-posts.ts` wraps every write into an object shape, (2) admin editor stops double-encoding via `JSON.stringify` and now sends CTA fields separately so they aren't silently dropped, (3) admin Publish button is disabled when body is empty + server-side guard rejects publish-with-no-content, (4) DB-level CHECK constraint in migration `00103` makes a non-object content value impossible regardless of caller. Calendar-generator orphan recovery and the public blog renderer were also hardened. Test plan: [docs/test-plans/2026-05-07-blog-content-shape-permanent-fix.md](docs/test-plans/2026-05-07-blog-content-shape-permanent-fix.md).
+
 ## v1.0.0 — 17 April 2026 — First Public Release
 
 ### What's in v1.0.0
