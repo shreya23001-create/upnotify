@@ -16,8 +16,13 @@ export default async function EditAlertChannelPage({
   if (!channel) notFound()
 
   return (
-    <div>
-      <h1 className="page-title" style={{ marginBottom: 24 }}>Edit Alert Channel</h1>
+    <div className="db-content">
+      <div className="db-page-header">
+        <div className="db-page-title">Edit Alert Channel</div>
+        <div className="db-page-actions">
+          <a href="/dashboard/alerts" className="btn btn-secondary btn-sm">← Back</a>
+        </div>
+      </div>
       <div className="card">
         <div className="card-content">
           <EditAlertChannelForm channel={channel} />

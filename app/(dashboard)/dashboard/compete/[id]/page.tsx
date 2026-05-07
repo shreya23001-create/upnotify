@@ -213,22 +213,19 @@ export default async function ProductDetailPage({ params, searchParams }: PagePr
   const pageUrl = (path: string) => `/dashboard/compete/${id}?period=${path}`
 
   return (
-    <div>
-      <div className="page-header">
+    <div className="db-content">
+      <div className="db-page-header">
         <div>
-          <Link href="/dashboard/compete" className="compete-back-link">
-            <IconArrowLeft size={16} />
-            <span>Back to Compete</span>
-          </Link>
-          <h1 className="page-title">{product.name}</h1>
-          <p className="page-subtitle">
+          <Link href="/dashboard/compete" className="db-breadcrumb">← Back to Compete</Link>
+          <div className="db-page-title">{product.name}</div>
+          <div className="db-page-sub">
             <a href={product.url} target="_blank" rel="noopener noreferrer" className="compete-product-url">
               {product.domain}
             </a>
             {product.is_own_product && (
               <span className="compete-badge compete-badge-own" style={{ marginLeft: 8 }}>Your Product</span>
             )}
-          </p>
+          </div>
         </div>
       </div>
 

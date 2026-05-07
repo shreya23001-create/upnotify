@@ -17,9 +17,9 @@ export default async function IncidentsPage(): Promise<React.ReactElement> {
   const incidents = await getAllIncidentsByOrg(user.org_id, 200)
 
   return (
-    <div>
-      <div className="page-header">
-        <h1 className="page-title">Incidents</h1>
+    <div className="db-content">
+      <div className="db-page-header">
+        <div className="db-page-title">Incidents</div>
       </div>
       <IncidentsTable incidents={incidents} />
     </div>

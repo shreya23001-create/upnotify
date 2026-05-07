@@ -72,10 +72,12 @@ export default function NewWordPressMonitorPage(): React.ReactElement {
   }
 
   return (
-    <div>
-      <div className="page-header">
-        <h1 className="page-title">Add WordPress Monitor</h1>
-        <a href="/dashboard/monitors/scan" className="btn btn-ghost">← Back</a>
+    <div className="db-content">
+      <div className="db-page-header">
+        <div className="db-page-title">Add WordPress Monitor</div>
+        <div className="db-page-actions">
+          <a href="/dashboard/monitors/scan" className="btn btn-ghost btn-sm">← Back</a>
+        </div>
       </div>
 
       {/* Step indicator */}

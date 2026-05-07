@@ -17,10 +17,12 @@ export default async function NewMonitorManualPage({
   const minCheckInterval = planLimits?.checkIntervalSeconds ?? 600
 
   return (
-    <div>
-      <div className="page-header">
-        <h1 className="page-title">Create Monitor</h1>
-        <Link href="/dashboard/monitors" className="btn btn-ghost">← Back</Link>
+    <div className="db-content">
+      <div className="db-page-header">
+        <div className="db-page-title">Create Monitor</div>
+        <div className="db-page-actions">
+          <Link href="/dashboard/monitors" className="btn btn-ghost btn-sm">← Back</Link>
+        </div>
       </div>
       {isPaid ? (
         <PaidMonitorCreator />

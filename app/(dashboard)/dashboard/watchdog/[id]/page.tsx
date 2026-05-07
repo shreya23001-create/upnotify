@@ -26,16 +26,12 @@ export default async function WatchdogDetailPage({
   if (!competitor) notFound()
 
   return (
-    <div>
-      <div className="page-header">
+    <div className="db-content">
+      <div className="db-page-header">
         <div>
-          <div style={{ marginBottom: 6 }}>
-            <Link href="/dashboard/watchdog" style={{ fontSize: 13, color: 'var(--text-muted)', textDecoration: 'none' }}>
-              ← Watchdog
-            </Link>
-          </div>
-          <h1 className="page-title">{competitor.display_name}</h1>
-          <p className="page-subtitle">{competitor.domain}</p>
+          <Link href="/dashboard/watchdog" className="db-breadcrumb">← Watchdog</Link>
+          <div className="db-page-title">{competitor.display_name}</div>
+          <div className="db-page-sub">{competitor.domain}</div>
         </div>
       </div>
 

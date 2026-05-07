@@ -19,13 +19,11 @@ export default async function WatchdogPage(): Promise<React.ReactElement> {
   ])
 
   return (
-    <div>
-      <div className="page-header">
+    <div className="db-content">
+      <div className="db-page-header">
         <div>
-          <h1 className="page-title">Watchdog</h1>
-          <p className="page-subtitle">
-            Monitor competitor uptime and compare their reliability against your own sites.
-          </p>
+          <div className="db-page-title">Watchdog</div>
+          <div className="db-page-sub">Monitor competitor uptime and compare their reliability against your own sites.</div>
         </div>
       </div>
 

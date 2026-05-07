@@ -11,12 +11,12 @@ export default async function AlertsPage() {
   const channels = await getAlertChannelsByOrg(user.org_id)
 
   return (
-    <div>
-      <div className="page-header">
-        <h1 className="page-title">Alert Channels</h1>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <Link href="/dashboard/alerts/notifications" className="btn btn-secondary">Notification preferences</Link>
-          <Link href="/dashboard/alerts/new" className="btn btn-primary">+ Add Channel</Link>
+    <div className="db-content">
+      <div className="db-page-header">
+        <div className="db-page-title">Alert Channels</div>
+        <div className="db-page-actions">
+          <Link href="/dashboard/alerts/notifications" className="btn btn-secondary btn-sm">Notification preferences</Link>
+          <Link href="/dashboard/alerts/new" className="btn btn-primary btn-sm">+ Add Channel</Link>
         </div>
       </div>
       <AlertChannelsTable channels={channels} />

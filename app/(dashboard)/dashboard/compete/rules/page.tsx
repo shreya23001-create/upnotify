@@ -211,23 +211,23 @@ export default function PricingRulesPage(): React.ReactElement {
 
   if (loading) {
     return (
-      <div>
-        <h1 className="page-title">Pricing Rules</h1>
+      <div className="db-content">
+        <div className="db-page-title">Pricing Rules</div>
         <p style={{ color: 'var(--text-muted)' }}>Loading...</p>
       </div>
     )
   }
 
   return (
-    <div>
-      <div className="page-header">
+    <div className="db-content">
+      <div className="db-page-header">
         <div>
-          <h1 className="page-title">Pricing Rules</h1>
-          <p className="page-subtitle">
-            Set rules to get alerts or automatically update your prices when competitors change theirs.
-          </p>
+          <div className="db-page-title">Pricing Rules</div>
+          <div className="db-page-sub">Set rules to get alerts or automatically update your prices when competitors change theirs.</div>
         </div>
-        <button className="btn btn-primary" onClick={() => setShowCreate(true)}>Create Rule</button>
+        <div className="db-page-actions">
+          <button className="btn btn-primary btn-sm" onClick={() => setShowCreate(true)}>Create Rule</button>
+        </div>
       </div>
 
       {message && (

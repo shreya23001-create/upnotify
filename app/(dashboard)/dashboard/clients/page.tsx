@@ -15,10 +15,12 @@ export default async function ClientsPage() {
   const clientWorkspaces = workspaces.filter((w) => !w.is_internal)
 
   return (
-    <div>
-      <div className="page-header">
-        <h1 className="page-title">Clients</h1>
-        <button className="btn btn-primary" disabled>+ Add Client</button>
+    <div className="db-content">
+      <div className="db-page-header">
+        <div className="db-page-title">Clients</div>
+        <div className="db-page-actions">
+          <button className="btn btn-primary btn-sm" disabled>+ Add Client</button>
+        </div>
       </div>
       {clientWorkspaces.length === 0 ? (
         <div className="empty-state"><p>No client workspaces yet.</p></div>

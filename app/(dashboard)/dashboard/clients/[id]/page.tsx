@@ -22,9 +22,9 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
   const openIncidents = incidents.filter((i) => i.status !== 'resolved')
 
   return (
-    <div>
-      <div className="page-header">
-        <h1 className="page-title">{workspace.name}</h1>
+    <div className="db-content">
+      <div className="db-page-header">
+        <div className="db-page-title">{workspace.name}</div>
         {openIncidents.length > 0 && <span className="badge badge-danger">{openIncidents.length} open incidents</span>}
       </div>
       <div className="grid-3" style={{ marginBottom: 24 }}>

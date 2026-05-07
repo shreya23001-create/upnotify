@@ -25,8 +25,8 @@ export default function HelpIndexPage(): React.ReactElement {
       <HelpSidebar currentPath={pathname} />
       <div className="help-main">
         <div className="help-hero">
-          <h1 className="page-title">Help Center</h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: 16, marginTop: 8, marginBottom: 24 }}>
+          <h1 className="db-page-title">Help Center</h1>
+          <p className="help-hero-sub">
             Everything you need to know about monitoring your websites with Uptrue.
           </p>
           <input
@@ -44,12 +44,8 @@ export default function HelpIndexPage(): React.ReactElement {
             <Link key={topic.href} href={topic.href} className="card card-link help-topic-card">
               <div className="card-content">
                 <div className="help-topic-icon">{topic.icon}</div>
-                <h2 style={{ fontSize: 17, fontWeight: 700, marginBottom: 6, color: 'var(--text-primary)' }}>
-                  {topic.title}
-                </h2>
-                <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                  {topic.description}
-                </p>
+                <h2 className="help-topic-title">{topic.title}</h2>
+                <p className="help-topic-desc">{topic.description}</p>
               </div>
             </Link>
           ))}

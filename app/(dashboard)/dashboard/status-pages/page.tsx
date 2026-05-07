@@ -14,10 +14,12 @@ export default async function StatusPagesPage() {
   const statusPages = defaultWorkspace ? await getStatusPagesByWorkspace(defaultWorkspace.id) : []
 
   return (
-    <div>
-      <div className="page-header">
-        <h1 className="page-title">Status Pages</h1>
-        <Link href="/dashboard/status-pages/new" className="btn btn-primary">+ Create Status Page</Link>
+    <div className="db-content">
+      <div className="db-page-header">
+        <div className="db-page-title">Status Pages</div>
+        <div className="db-page-actions">
+          <Link href="/dashboard/status-pages/new" className="btn btn-primary btn-sm">+ Create Status Page</Link>
+        </div>
       </div>
       <StatusPagesTable pages={statusPages} />
     </div>

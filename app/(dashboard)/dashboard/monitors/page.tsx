@@ -26,10 +26,12 @@ export default async function MonitorsPage({
   const uptimeData: Record<string, Awaited<ReturnType<typeof getUptimeBarData>>> = Object.fromEntries(uptimeEntries)
 
   return (
-    <div>
-      <div className="page-header">
-        <h1 className="page-title">Monitors</h1>
-        <AddMonitorButton hasMonitors={monitors.length > 0} />
+    <div className="db-content">
+      <div className="db-page-header">
+        <div className="db-page-title">Monitors</div>
+        <div className="db-page-actions">
+          <AddMonitorButton hasMonitors={monitors.length > 0} />
+        </div>
       </div>
       <MonitorTable monitors={monitors} uptimeData={uptimeData} initialSearch={search ?? ''} />
     </div>

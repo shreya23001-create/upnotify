@@ -52,10 +52,12 @@ export function WpSetupRequired({ monitor, token }: WpSetupRequiredProps): React
   }
 
   return (
-    <div>
-      <div className="page-header">
-        <h1 className="page-title">Finish WordPress Monitor Setup</h1>
-        <a href="/dashboard/monitors" className="btn btn-ghost">← All Monitors</a>
+    <div className="db-content">
+      <div className="db-page-header">
+        <div className="db-page-title">Finish WordPress Monitor Setup</div>
+        <div className="db-page-actions">
+          <a href="/dashboard/monitors" className="btn btn-ghost btn-sm">← All Monitors</a>
+        </div>
       </div>
 
       {/* Step indicator */}

@@ -11,10 +11,12 @@ export default async function ReportsPage() {
   const reports = await getReportsForOrg(user.org_id)
 
   return (
-    <div>
-      <div className="page-header">
-        <h1 className="page-title">Reports</h1>
-        <Link href="/dashboard/reports/new" className="btn btn-primary">+ Generate Report</Link>
+    <div className="db-content">
+      <div className="db-page-header">
+        <div className="db-page-title">Reports</div>
+        <div className="db-page-actions">
+          <Link href="/dashboard/reports/new" className="btn btn-primary btn-sm">+ Generate Report</Link>
+        </div>
       </div>
       <ReportsTable reports={reports} />
     </div>
