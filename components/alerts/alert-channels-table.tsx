@@ -6,6 +6,8 @@ import { DataTable, type Column, type BulkAction } from '@/components/ui/data-ta
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { deleteAlertChannelAction, toggleAlertChannelAction, bulkDeleteAlertChannelsAction, bulkEnableAlertChannelsAction, bulkDisableAlertChannelsAction } from '@/app/(dashboard)/dashboard/alerts/actions'
 import { useToast } from '@/components/ui/toast'
+import { Pagination } from '@/components/ui/pagination'
+import type { PaginationMeta } from '@/lib/utils/pagination'
 import type { AlertChannel } from '@/lib/types'
 
 const typeLabels: Record<string, string> = {
@@ -41,7 +43,7 @@ interface PendingConfirm {
   ids: string[]
 }
 
-export function AlertChannelsTable({ channels }: { channels: AlertChannel[] }) {
+export function AlertChannelsTable({ channels, pagination }: { channels: AlertChannel[]; pagination?: PaginationMeta }) {
   const [isPending, startTransition] = useTransition()
   const [pendingConfirm, setPendingConfirm] = useState<PendingConfirm | null>(null)
   const [testingChannelId, setTestingChannelId] = useState<string | null>(null)
@@ -271,6 +273,7 @@ export function AlertChannelsTable({ channels }: { channels: AlertChannel[] }) {
         confirmText={confirmProps.confirmText}
         variant={confirmProps.variant}
       />
+      {pagination && <Pagination {...pagination} />}
     </>
   )
 }

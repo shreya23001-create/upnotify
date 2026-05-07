@@ -22,11 +22,13 @@ export default async function ScanPage(): Promise<React.ReactElement> {
   const remaining = planLimit === null ? 999 : Math.max(0, planLimit - existingCount)
 
   return (
-    <div>
-      <div className="page-header">
-        <h1 className="page-title">Add Monitors</h1>
-        <a href="/dashboard/monitors/new/manual" className="btn btn-ghost" style={{ fontSize: 13 }}>✏️ Add specific monitor instead</a>
-        <a href="/dashboard/monitors" className="btn btn-ghost">← Back</a>
+    <div className="db-content">
+      <div className="db-page-header">
+        <div className="db-page-title">Add Monitors</div>
+        <div className="db-page-actions">
+          <a href="/dashboard/monitors/new/manual" className="btn btn-ghost btn-sm">✏️ Add specific monitor instead</a>
+          <a href="/dashboard/monitors" className="btn btn-ghost btn-sm">← Back</a>
+        </div>
       </div>
       <ScanClient
         remaining={remaining}

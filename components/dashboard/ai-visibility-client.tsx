@@ -28,7 +28,7 @@ export function AiVisibilityClient({
   return (
     <div>
       {/* Tab switcher */}
-      <div className="db-tabs" style={{ marginBottom: 24 }}>
+      <div className="db-tabs db-tabs-spaced">
         <button className={`db-tab${tab === 'llms' ? ' db-tab-active' : ''}`} onClick={() => setTab('llms')}>
           llms.txt Generator
         </button>

@@ -329,6 +329,21 @@ function buildPrompt(row: CalendarRow): string {
     combined_intent: '1,000–1,500',
   }
 
+  const commercialGuardrails = row.post_type === 'commercial' ? `
+
+# Commercial / comparison page guardrails (MANDATORY — legal-reviewed)
+
+This post is a comparison or commercial page. All of the following rules are HARD requirements. Violating any of them will cause the post to fail legal review.
+
+1. **Primary sources only.** Every factual claim (price, feature, SLA, limit) must be verifiable to a primary source — the competitor's own website, official docs, or press release. Cite inline: "(Source: [title](URL), dd MMM yyyy)". If a fact cannot be verified, **omit it** — do not estimate or invent.
+2. **Neutral language.** State facts; do not evaluate them. FORBIDDEN: "inferior", "overpriced", "clunky", "outdated", "too slow", "poor", "weak". ALLOWED: "UptimeRobot™ checks every 5 minutes on its free plan; Uptrue checks every 1 minute."
+3. **Trade mark usage.** Use ™ or ® on first occurrence per page for each competitor brand (e.g. UptimeRobot™, Pingdom®). Nominative use only — do not imply affiliation or endorsement.
+4. **No performance claims** without a dated, reproducible source. When in doubt, omit.
+5. **Corrections footer (required verbatim — include before the final CTA):**
+   > Spotted something out of date or incorrect? Email [corrections@uptrue.io](mailto:corrections@uptrue.io) and we will review within 5 working days.
+6. **No mention of "Watchdog"** anywhere on this page. Watchdog is an internal-only feature and must not appear in public-facing comparison pages.
+7. **Anchor-text mix:** 20% exact match / 50% partial match / 30% generic (e.g. "learn more", "read the guide").` : ''
+
   return `You are writing a blog post for Uptrue (uptrue.io) — a website monitoring suite covering uptime, SSL, DNS, security headers, WordPress health, and more.
 
 # Post specification
@@ -340,7 +355,7 @@ function buildPrompt(row: CalendarRow): string {
 - **Hub:** ${row.hub ?? 'general'}
 - **Author byline:** ${row.author}
 - **Word count target:** ${wordCountTarget[row.post_type] ?? '1,200–1,500'} words
-
+${commercialGuardrails}
 # Hard rules
 
 1. **British English** spelling throughout (organisation, colour, monitoring)
@@ -473,7 +488,7 @@ async function saveBlogPost(
       title: draft.title,
       slug,
       excerpt: draft.excerpt,
-      content: draft.bodyMarkdown,
+      content: { body: draft.bodyMarkdown },
       status: 'draft',
       auto_generated: true,
       post_type: row.post_type,

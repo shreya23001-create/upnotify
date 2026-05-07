@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react'
 import { bulkCreateMonitorsAction } from '../actions'
 import type { BulkCreateItem } from '../actions'
+import { WordPressIcon } from '../../help/help-sidebar'
 
 interface ScanFinding {
   type: string
@@ -222,7 +223,7 @@ export function ScanClient({
                 border: '1.5px solid #21759b40', background: 'linear-gradient(135deg, #21759b08, #0073aa08)',
                 cursor: 'pointer', transition: 'border-color 0.15s',
               }}>
-                <WpIcon size={32} />
+                <WordPressIcon size={32} />
                 <div style={{ flex: 1, textAlign: 'left' }}>
                   <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 3 }}>Uptrue WordPress Monitor</div>
                   <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>

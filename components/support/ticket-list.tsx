@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import type { SupportTicket, TicketCategory, TicketPriority } from '@/lib/db/support'
+import { CustomSelect } from '@/components/ui/custom-select'
 
 interface TicketListProps {
   tickets: SupportTicket[]
@@ -31,7 +32,21 @@ const PRIORITY_CLASS: Record<string, string> = {
   low:    'support-priority-low',
 }
 
-/** Stable human-readable ticket number derived from UUID — no DB column needed */
+const CATEGORY_OPTIONS = [
+  { value: 'general',         label: 'General',         icon: '💬' },
+  { value: 'billing',         label: 'Billing',         icon: '💳' },
+  { value: 'technical',       label: 'Technical',       icon: '🔧' },
+  { value: 'feature_request', label: 'Feature Request', icon: '✨' },
+  { value: 'bug',             label: 'Bug Report',      icon: '🐛' },
+]
+
+const PRIORITY_OPTIONS = [
+  { value: 'low',    label: 'Low',    icon: '🔵' },
+  { value: 'normal', label: 'Normal', icon: '🟡' },
+  { value: 'high',   label: 'High',   icon: '🟠' },
+  { value: 'urgent', label: 'Urgent', icon: '🔴' },
+]
+
 function ticketNumber(id: string): string {
   const hex = id.replace(/-/g, '').slice(0, 8)
   const num = parseInt(hex, 16) % 100000
@@ -50,14 +65,14 @@ function timeAgo(dateStr: string): string {
 
 export function TicketList({ tickets }: TicketListProps): React.ReactElement {
   const router = useRouter()
-  const [showForm, setShowForm] = useState(false)
-  const [subject,  setSubject]  = useState('')
-  const [category, setCategory] = useState<TicketCategory>('general')
-  const [priority, setPriority] = useState<TicketPriority>('normal')
-  const [message,  setMessage]  = useState('')
-  const [files,    setFiles]    = useState<File[]>([])
+  const [showForm,  setShowForm]  = useState(false)
+  const [subject,   setSubject]   = useState('')
+  const [category,  setCategory]  = useState<TicketCategory>('general')
+  const [priority,  setPriority]  = useState<TicketPriority>('normal')
+  const [message,   setMessage]   = useState('')
+  const [files,     setFiles]     = useState<File[]>([])
   const [submitting, setSubmitting] = useState(false)
-  const [error, setError] = useState('')
+  const [error,      setError]      = useState('')
   const [subjectError, setSubjectError] = useState('')
   const [items, setItems] = useState<SupportTicket[]>(tickets)
 
@@ -65,19 +80,11 @@ export function TicketList({ tickets }: TicketListProps): React.ReactElement {
     setSubjectError('')
     setError('')
 
-    if (!subject.trim()) {
-      setSubjectError('Subject is required')
-      return
-    }
-    if (!message.trim()) {
-      setError('Message is required')
-      return
-    }
+    if (!subject.trim()) { setSubjectError('Subject is required'); return }
+    if (!message.trim())  { setError('Message is required'); return }
 
     setSubmitting(true)
-
     try {
-      // Upload attachments first if any
       const attachmentUrls: string[] = []
       for (const file of files) {
         const fd = new FormData()
@@ -113,7 +120,6 @@ export function TicketList({ tickets }: TicketListProps): React.ReactElement {
 
   return (
     <div>
-      {/* Header */}
       <div className="support-list-header">
         <div>
           <h2 className="support-list-title">Support Tickets</h2>
@@ -124,70 +130,78 @@ export function TicketList({ tickets }: TicketListProps): React.ReactElement {
         </button>
       </div>
 
-      {/* New ticket form */}
       {showForm && (
         <div className="card support-form-card">
-          <h3 style={{ marginBottom: 16 }}>Raise a Support Ticket</h3>
+          <h3 className="support-form-title">Raise a Support Ticket</h3>
           <div className="support-form-grid">
-            <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+            <div className="form-group support-form-full">
               <label className="form-label">
-                Subject <span style={{ color: '#ef4444' }}>*</span>
+                Subject <span className="form-required">*</span>
               </label>
               <input
-                type="text" className={`form-input${subjectError ? ' form-input-error' : ''}`}
+                type="text"
+                className={`form-input${subjectError ? ' form-input-error' : ''}`}
                 placeholder="Brief summary of your issue"
-                value={subject} onChange={e => { setSubject(e.target.value); if (subjectError) setSubjectError('') }}
+                value={subject}
+                onChange={e => { setSubject(e.target.value); if (subjectError) setSubjectError('') }}
                 required
               />
-              {subjectError && <p className="form-error" style={{ marginTop: 4, marginBottom: 0 }}>{subjectError}</p>}
+              {subjectError && <p className="form-field-error">{subjectError}</p>}
             </div>
+
             <div className="form-group">
               <label className="form-label">Category</label>
-              <select className="form-input" value={category} onChange={e => setCategory(e.target.value as TicketCategory)}>
-                <option value="general">General</option>
-                <option value="billing">Billing</option>
-                <option value="technical">Technical</option>
-                <option value="feature_request">Feature Request</option>
-                <option value="bug">Bug Report</option>
-              </select>
+              <CustomSelect
+                options={CATEGORY_OPTIONS}
+                value={category}
+                onChange={v => setCategory(v as TicketCategory)}
+                disabled={submitting}
+              />
             </div>
+
             <div className="form-group">
               <label className="form-label">Priority</label>
-              <select className="form-input" value={priority} onChange={e => setPriority(e.target.value as TicketPriority)}>
-                <option value="low">Low</option>
-                <option value="normal">Normal</option>
-                <option value="high">High</option>
-                <option value="urgent">Urgent</option>
-              </select>
+              <CustomSelect
+                options={PRIORITY_OPTIONS}
+                value={priority}
+                onChange={v => setPriority(v as TicketPriority)}
+                disabled={submitting}
+              />
             </div>
-            <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+
+            <div className="form-group support-form-full">
               <label className="form-label">Message</label>
               <textarea
                 className="form-input support-textarea"
                 placeholder="Describe your issue in detail..."
-                value={message} onChange={e => setMessage(e.target.value)}
+                value={message}
+                onChange={e => setMessage(e.target.value)}
                 rows={5}
               />
             </div>
-            <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-              <label className="form-label">Attachments <span style={{ fontWeight: 400, color: 'var(--text-muted)' }}>(optional — max 5MB each)</span></label>
+
+            <div className="form-group support-form-full">
+              <label className="form-label">
+                Attachments <span className="form-label-optional">(optional — max 5MB each)</span>
+              </label>
               <input
                 type="file" multiple accept="image/*,.pdf,.txt,.log,.csv,.zip"
-                className="form-input"
-                style={{ paddingTop: 8, paddingBottom: 8, cursor: 'pointer' }}
+                className="form-input support-file-input"
                 onChange={e => setFiles(Array.from(e.target.files ?? []))}
               />
               {files.length > 0 && (
-                <div style={{ marginTop: 6, fontSize: 12, color: 'var(--text-muted)' }}>
+                <div className="support-file-names">
                   {files.map(f => f.name).join(', ')}
                 </div>
               )}
             </div>
           </div>
+
           {error && <p className="form-error">{error}</p>}
+
           <div className="support-form-actions">
             <button className="btn btn-primary" onClick={handleSubmit} disabled={submitting}>
-              {submitting ? 'Submitting...' : 'Submit Ticket'}
+              {submitting ? 'Submitting…' : 'Submit Ticket'}
             </button>
             <button className="btn btn-ghost" onClick={() => { setShowForm(false); setError(''); setSubjectError(''); setFiles([]) }}>
               Cancel
@@ -196,7 +210,6 @@ export function TicketList({ tickets }: TicketListProps): React.ReactElement {
         </div>
       )}
 
-      {/* Empty state */}
       {items.length === 0 && !showForm && (
         <div className="card support-empty">
           <p className="support-empty-title">No tickets yet</p>
@@ -206,15 +219,10 @@ export function TicketList({ tickets }: TicketListProps): React.ReactElement {
         </div>
       )}
 
-      {/* Ticket list */}
       {items.length > 0 && (
         <div className="support-ticket-list">
           {items.map(ticket => (
-            <a
-              key={ticket.id}
-              href={`/dashboard/support/${ticket.id}`}
-              className="card support-ticket-row"
-            >
+            <a key={ticket.id} href={`/dashboard/support/${ticket.id}`} className="card support-ticket-row">
               <div className="support-ticket-row-main">
                 <div className="support-ticket-subject">
                   <span className="support-ticket-number">{ticketNumber(ticket.id)}</span>

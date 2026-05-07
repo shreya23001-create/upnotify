@@ -11,7 +11,7 @@ export default function PrivacyPolicyPage(): React.ReactElement {
   return (
     <>
       <h1>Privacy Policy</h1>
-      <p className="legal-updated">Last updated: 2 April 2026</p>
+      <p className="legal-updated">Last updated: 6 May 2026</p>
 
       <p>
         This Privacy Policy explains how Vision Software Solutions Limited, a company registered in England and Wales with
@@ -210,6 +210,32 @@ export default function PrivacyPolicyPage(): React.ReactElement {
       <p>
         The legal basis for this processing is our legitimate interest (Article 6(1)(f)) in providing
         effective customer support and maintaining the security and integrity of the Service.
+      </p>
+
+      <h2>4C. Watchdog — Competitor Monitoring Data</h2>
+      <p>
+        When you use the Watchdog feature to monitor third-party websites (&quot;Tracked Sites&quot;),
+        Uptrue sends standard HTTP requests to the URLs you configure and records:
+      </p>
+      <ul>
+        <li>The URL you have chosen to monitor</li>
+        <li>HTTP response codes, response times, and SSL certificate status returned by that URL</li>
+        <li>Timestamps of each check and any detected downtime events</li>
+      </ul>
+      <p>
+        Uptrue does <strong>not</strong> collect any personal data from Tracked Sites. Checks are
+        performed against publicly accessible URLs only and do not attempt to authenticate or access
+        any non-public content.
+      </p>
+      <p>
+        Watchdog data is stored within your account and is subject to the same retention, security,
+        and access controls as all other monitoring data described in this Policy. It is not shared
+        with, provided to, or made accessible by any Tracked Site or its operators.
+      </p>
+      <p>
+        The legal basis for this processing is the performance of our contract with you (Article
+        6(1)(b) UK GDPR) — you have configured Watchdog and we process the resulting data to deliver
+        the monitoring service you have requested.
       </p>
 
       <h2>5. Third-Party Data Processors</h2>

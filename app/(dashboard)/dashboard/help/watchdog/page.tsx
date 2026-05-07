@@ -128,6 +128,22 @@ export default function WatchdogHelpPage(): React.ReactElement {
             </ul>
           </section>
 
+          <section className="help-section">
+            <h2 className="help-section-title">Important notice</h2>
+            <p>
+              Watchdog monitors publicly accessible URLs using standard HTTP requests — the same way any
+              web browser or visitor would. Data reflects Uptrue&apos;s independent observations and is not
+              provided by, endorsed by, or affiliated with any of the services you choose to monitor.
+            </p>
+            <p>
+              Results are for informational and benchmarking purposes only. You are responsible for
+              ensuring your use of Watchdog complies with the terms of service of any site you choose
+              to track. See our{' '}
+              <Link href="/terms#watchdog">Terms of Service</Link> and{' '}
+              <Link href="/privacy">Privacy Policy</Link> for full details.
+            </p>
+          </section>
+
           <div className="help-next-links">
             <p className="help-next-label">Next up</p>
             <Link href="/dashboard/help/credits" className="help-next-link">

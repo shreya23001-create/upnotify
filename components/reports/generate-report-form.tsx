@@ -2,16 +2,50 @@
 
 import { useState, useTransition } from 'react'
 import { generateReportAction } from '@/app/(dashboard)/dashboard/reports/actions'
+import { CustomSelect } from '@/components/ui/custom-select'
+
+const SCHEDULE_OPTIONS = [
+  { value: 'on_demand', label: 'On Demand', icon: '⚡' },
+  { value: 'monthly',   label: 'Monthly',   icon: '📅' },
+  { value: 'custom',    label: 'Custom',     icon: '✏️' },
+]
+
+const REPORT_TYPE_OPTIONS = [
+  { value: 'uptime',                label: 'Uptime Report',           icon: '📊', group: 'Monitoring Reports' },
+  { value: 'performance',           label: 'Performance Report',      icon: '⚡', group: 'Monitoring Reports' },
+  { value: 'incident',              label: 'Incident Report',         icon: '🚨', group: 'Monitoring Reports' },
+  { value: 'sla',                   label: 'SLA Compliance Report',   icon: '✅', group: 'Monitoring Reports' },
+  { value: 'site-health',           label: 'Site Health Report',      icon: '🏥', group: 'Advanced Reports' },
+  { value: 'security-audit',        label: 'Security Audit Report',   icon: '🛡️', group: 'Advanced Reports' },
+  { value: 'availability-summary',  label: 'Availability Summary',    icon: '🗓️', group: 'Advanced Reports' },
+  { value: 'change-digest',         label: 'Change Detection Digest', icon: '🔍', group: 'Advanced Reports' },
+  { value: 'response-trend',        label: 'Response Time Trends',    icon: '📈', group: 'Advanced Reports' },
+]
+
+const DELIVERY_OPTIONS = [
+  { value: 'dashboard', label: 'View in dashboard only', icon: '🖥️' },
+  { value: 'email',     label: 'Send to email',           icon: '📧' },
+  { value: 'webhook',   label: 'Send via webhook',        icon: '🔗' },
+]
 
 export function GenerateReportForm(): React.ReactElement {
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
+  const [scheduleType, setScheduleType] = useState('on_demand')
+  const [reportType, setReportType] = useState('uptime')
+  const [delivery, setDelivery] = useState('dashboard')
 
-  // Default to last month
   const now = new Date()
   const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1)
   const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0)
   const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1)
+
+  function setDates(start: Date, end: Date) {
+    const s = document.getElementById('period_start') as HTMLInputElement | null
+    const e = document.getElementById('period_end') as HTMLInputElement | null
+    if (s) s.value = start.toISOString().split('T')[0]
+    if (e) e.value = end.toISOString().split('T')[0]
+  }
 
   function handleSubmit(formData: FormData): void {
     setError(null)
@@ -26,76 +60,49 @@ export function GenerateReportForm(): React.ReactElement {
       {error && <div className="form-error">{error}</div>}
 
       {isPending && (
-        <div style={{ padding: 16, borderRadius: 10, background: '#eff6ff', border: '1px solid #bfdbfe', marginBottom: 20, fontSize: 14, color: '#3b82f6', fontWeight: 500 }}>
-          Generating report with AI summary... This may take 15-30 seconds.
+        <div className="report-generating-banner">
+          <span className="report-generating-icon">✨</span>
+          Generating report with AI summary… This may take 15–30 seconds.
         </div>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+      <div className="report-form-grid">
         <div className="form-group">
           <label className="form-label">Schedule Type</label>
-          <select className="form-select" name="type" disabled={isPending}>
-            <option value="on_demand">On Demand</option>
-            <option value="monthly">Monthly</option>
-            <option value="custom">Custom</option>
-          </select>
+          <CustomSelect
+            name="type"
+            options={SCHEDULE_OPTIONS}
+            value={scheduleType}
+            onChange={setScheduleType}
+            disabled={isPending}
+          />
         </div>
 
         <div className="form-group">
           <label className="form-label">Report Type</label>
-          <select className="form-select" name="report_type" disabled={isPending}>
-            <optgroup label="Monitoring Reports">
-              <option value="uptime">Uptime Report</option>
-              <option value="performance">Performance Report</option>
-              <option value="incident">Incident Report</option>
-              <option value="sla">SLA Compliance Report</option>
-            </optgroup>
-            <optgroup label="Advanced Reports">
-              <option value="site-health">Site Health Report</option>
-              <option value="security-audit">Security Audit Report</option>
-              <option value="availability-summary">Availability Summary</option>
-              <option value="change-digest">Change Detection Digest</option>
-              <option value="response-trend">Response Time Trends</option>
-            </optgroup>
-          </select>
+          <CustomSelect
+            name="report_type"
+            options={REPORT_TYPE_OPTIONS}
+            value={reportType}
+            onChange={setReportType}
+            disabled={isPending}
+          />
           <span className="form-hint">
-            Site Health: all checks per domain in one card. Security Audit: posture score + risk analysis. Availability: uptime per domain. Change Digest: all changes detected. Response Trend: daily performance charts.
+            Site Health: all checks per domain. Security Audit: posture score + risk analysis. Availability: uptime per domain. Change Digest: all changes detected. Response Trend: daily performance charts.
           </span>
         </div>
       </div>
 
       <div className="form-group">
         <label className="form-label">Quick Select</label>
-        <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
-          <button type="button" className="btn btn-sm btn-secondary" onClick={() => {
-            const startInput = document.getElementById('period_start') as HTMLInputElement
-            const endInput = document.getElementById('period_end') as HTMLInputElement
-            if (startInput && endInput) {
-              startInput.value = lastMonthStart.toISOString().split('T')[0]
-              endInput.value = lastMonthEnd.toISOString().split('T')[0]
-            }
-          }}>Last Month</button>
-          <button type="button" className="btn btn-sm btn-secondary" onClick={() => {
-            const startInput = document.getElementById('period_start') as HTMLInputElement
-            const endInput = document.getElementById('period_end') as HTMLInputElement
-            if (startInput && endInput) {
-              startInput.value = thisMonthStart.toISOString().split('T')[0]
-              endInput.value = now.toISOString().split('T')[0]
-            }
-          }}>This Month</button>
-          <button type="button" className="btn btn-sm btn-secondary" onClick={() => {
-            const startInput = document.getElementById('period_start') as HTMLInputElement
-            const endInput = document.getElementById('period_end') as HTMLInputElement
-            const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-            if (startInput && endInput) {
-              startInput.value = sevenDaysAgo.toISOString().split('T')[0]
-              endInput.value = now.toISOString().split('T')[0]
-            }
-          }}>Last 7 Days</button>
+        <div className="report-quick-dates">
+          <button type="button" className="btn btn-sm btn-secondary" onClick={() => setDates(lastMonthStart, lastMonthEnd)}>Last Month</button>
+          <button type="button" className="btn btn-sm btn-secondary" onClick={() => setDates(thisMonthStart, now)}>This Month</button>
+          <button type="button" className="btn btn-sm btn-secondary" onClick={() => setDates(new Date(Date.now() - 7 * 86400_000), now)}>Last 7 Days</button>
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+      <div className="report-form-grid">
         <div className="form-group">
           <label className="form-label">Period Start</label>
           <input className="form-input" id="period_start" name="period_start" type="date" required defaultValue={lastMonthStart.toISOString().split('T')[0]} disabled={isPending} />
@@ -106,54 +113,50 @@ export function GenerateReportForm(): React.ReactElement {
         </div>
       </div>
 
-      {/* Delivery Options */}
-      <div className="form-group" style={{ marginTop: 16 }}>
+      <div className="form-group">
         <label className="form-label">Deliver Report</label>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, cursor: 'pointer' }}>
-            <input type="radio" name="delivery" value="dashboard" defaultChecked disabled={isPending} />
-            <span>View in dashboard only</span>
-          </label>
-          <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, cursor: 'pointer' }}>
-            <input type="radio" name="delivery" value="email" disabled={isPending} />
-            <span>Send to email</span>
-          </label>
-          <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, cursor: 'pointer' }}>
-            <input type="radio" name="delivery" value="webhook" disabled={isPending} />
-            <span>Send via webhook</span>
-          </label>
+        <CustomSelect
+          name="delivery"
+          options={DELIVERY_OPTIONS}
+          value={delivery}
+          onChange={setDelivery}
+          disabled={isPending}
+        />
+      </div>
+
+      {delivery === 'email' && (
+        <div className="form-group">
+          <label className="form-label">Email Recipients</label>
+          <input
+            className="form-input"
+            name="delivery_emails"
+            type="text"
+            placeholder="email1@example.com, email2@example.com"
+            disabled={isPending}
+          />
+          <span className="form-hint">Comma-separated email addresses. Leave blank to send to your own email.</span>
         </div>
-      </div>
+      )}
 
-      {/* Email recipients (shown when email delivery selected) */}
-      <div className="form-group" id="email-delivery-fields" style={{ marginTop: 8 }}>
-        <label className="form-label">Email Recipients</label>
-        <input
-          className="form-input"
-          name="delivery_emails"
-          type="text"
-          placeholder="email1@example.com, email2@example.com"
-          disabled={isPending}
-        />
-        <span className="form-hint">Comma-separated email addresses. Leave blank to send to your own email.</span>
-      </div>
+      {delivery === 'webhook' && (
+        <div className="form-group">
+          <label className="form-label">Webhook URL</label>
+          <input
+            className="form-input"
+            name="delivery_webhook"
+            type="url"
+            placeholder="https://hooks.slack.com/services/..."
+            disabled={isPending}
+          />
+          <span className="form-hint">Report sent as JSON POST with HMAC signature. Works with Slack, Teams, or any webhook receiver.</span>
+        </div>
+      )}
 
-      {/* Webhook URL (shown when webhook delivery selected) */}
-      <div className="form-group" style={{ marginTop: 8 }}>
-        <label className="form-label">Webhook URL</label>
-        <input
-          className="form-input"
-          name="delivery_webhook"
-          type="url"
-          placeholder="https://hooks.slack.com/services/..."
-          disabled={isPending}
-        />
-        <span className="form-hint">Report will be sent as JSON POST with HMAC signature. Works with Slack, Teams, or any webhook receiver.</span>
+      <div className="form-actions">
+        <button type="submit" className="btn btn-primary" disabled={isPending}>
+          {isPending ? 'Generating Report…' : 'Generate Report'}
+        </button>
       </div>
-
-      <button type="submit" className="btn btn-primary" disabled={isPending} style={{ marginTop: 12 }}>
-        {isPending ? 'Generating Report...' : 'Generate Report'}
-      </button>
     </form>
   )
 }

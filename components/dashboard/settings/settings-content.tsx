@@ -258,10 +258,18 @@ export function SettingsContent({
         </div>
       )}
 
-      <div className="tabs-list">
+      {/* <div className="tabs-list">
         {(['organisation', 'billing', 'credits', 'referrals', 'company', 'api-keys'] as string[]).map((t) => (
           <button key={t} className={`tab-trigger${tab === t ? ' active' : ''}`} onClick={() => setTab(t)}>
             {t === 'api-keys' ? 'API Keys' : t.charAt(0).toUpperCase() + t.slice(1)}
+          </button>
+        ))}
+      </div> */}
+
+      <div className="tabs-list">
+        {(['organisation', 'billing', 'credits', 'referrals', 'company'] as string[]).map((t) => (
+          <button key={t} className={`tab-trigger${tab === t ? ' active' : ''}`} onClick={() => setTab(t)}>
+            {t.charAt(0).toUpperCase() + t.slice(1)}
           </button>
         ))}
       </div>

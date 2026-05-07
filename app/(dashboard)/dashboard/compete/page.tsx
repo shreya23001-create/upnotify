@@ -30,13 +30,11 @@ export default async function CompetePage(): Promise<React.ReactElement> {
     const hasPaidBasePlan = baseSub?.subscription?.status === 'active'
 
     return (
-      <div>
-        <div className="page-header">
+      <div className="db-content">
+        <div className="db-page-header">
           <div>
-            <h1 className="page-title">Uptrue Compete</h1>
-            <p className="page-subtitle">
-              Track competitor prices, stock levels and get alerted when things change.
-            </p>
+            <div className="db-page-title">Uptrue Compete</div>
+            <div className="db-page-sub">Track competitor prices, stock levels and get alerted when things change.</div>
           </div>
         </div>
         <CompetePlanSelector plans={competePlans} hasPaidBasePlan={hasPaidBasePlan ?? false} />
@@ -54,17 +52,15 @@ export default async function CompetePage(): Promise<React.ReactElement> {
   const competitorProducts = products.filter(p => !p.is_own_product)
 
   return (
-    <div>
-      <div className="page-header">
+    <div className="db-content">
+      <div className="db-page-header">
         <div>
-          <h1 className="page-title">Compete</h1>
-          <p className="page-subtitle">
-            Track and compare product prices across your competitors.
-          </p>
+          <div className="db-page-title">Compete</div>
+          <div className="db-page-sub">Track and compare product prices across your competitors.</div>
         </div>
-        <div className="page-header-actions">
-          <Link href="/dashboard/compete/connect" className="btn btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        <div className="db-page-actions">
+          <Link href="/dashboard/compete/connect" className="btn btn-secondary btn-sm">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 4 }}><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
             Connect Store
           </Link>
         </div>

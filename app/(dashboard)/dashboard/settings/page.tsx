@@ -57,8 +57,10 @@ export default async function SettingsPage(): Promise<React.ReactElement> {
   else if (lastProvider === 'stripe') effectiveCurrency = 'gbp'
 
   return (
-    <div>
-      <h1 className="page-title" style={{ marginBottom: 24 }}>Settings</h1>
+    <div className="db-content">
+      <div className="db-page-header">
+        <div className="db-page-title">Settings</div>
+      </div>
       <SettingsContent
         organisation={organisation}
         members={members}
@@ -85,3 +87,4 @@ export default async function SettingsPage(): Promise<React.ReactElement> {
     </div>
   )
 }
+

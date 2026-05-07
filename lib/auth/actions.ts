@@ -18,9 +18,15 @@ export async function signInWithEmail(
   const origin = formData.get('origin') as string | null
   const ref = formData.get('ref') as string | null
   const next = formData.get('next') as string | null
+  const fullname = formData.get('fullname') as string | null
+  const isSignup = formData.get('fullname') !== null
 
   if (!email) {
     return { error: 'Email is required' }
+  }
+
+  if (isSignup && !fullname?.trim()) {
+    return { error: 'Full name is required' }
   }
 
   const supabase = await createClient()

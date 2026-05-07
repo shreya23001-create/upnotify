@@ -110,43 +110,43 @@ export function AgencyWaitlistPopup({ isOpen, onClose }: AgencyWaitlistPopupProp
             <form onSubmit={handleSubmit}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 <div className="form-group">
-                  <label className="form-label">Your Name *</label>
-                  <input className="form-input" value={name} onChange={e => setName(e.target.value)} placeholder="John Smith" required disabled={submitting} />
+                  <label className="form-label" htmlFor="aw-name">Your Name *</label>
+                  <input id="aw-name" name="aw-name" className="form-input" value={name} onChange={e => setName(e.target.value)} placeholder="John Smith" required disabled={submitting} />
                 </div>
                 <div className="form-group">
-                  <label className="form-label">Email *</label>
-                  <input className="form-input" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="john@agency.com" required disabled={submitting} />
+                  <label className="form-label" htmlFor="aw-email">Email *</label>
+                  <input id="aw-email" name="aw-email" className="form-input" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="john@agency.com" required disabled={submitting} />
                 </div>
                 <div className="form-group">
                   <label className="form-label">Phone Number</label>
                   <div style={{ display: 'flex', gap: 6 }}>
-                    <select className="form-select" value={phoneCode} onChange={e => setPhoneCode(e.target.value)} style={{ width: 100, flexShrink: 0 }} disabled={submitting}>
+                    <select id="aw-phone-code" name="aw-phone-code" className="form-select" value={phoneCode} onChange={e => setPhoneCode(e.target.value)} style={{ width: 100, flexShrink: 0 }} disabled={submitting}>
                       {COUNTRY_CODES.map(c => (
                         <option key={c.code} value={c.code}>{c.code} {c.country}</option>
                       ))}
                     </select>
-                    <input className="form-input" value={phoneNumber} onChange={e => setPhoneNumber(e.target.value)} placeholder="7911123456" disabled={submitting} />
+                    <input id="aw-phone-number" name="aw-phone-number" className="form-input" value={phoneNumber} onChange={e => setPhoneNumber(e.target.value)} placeholder="7911123456" disabled={submitting} />
                   </div>
                 </div>
                 <div className="form-group">
-                  <label className="form-label">Business Name *</label>
-                  <input className="form-input" value={businessName} onChange={e => setBusinessName(e.target.value)} placeholder="Acme Digital Agency" required disabled={submitting} />
+                  <label className="form-label" htmlFor="aw-business-name">Business Name *</label>
+                  <input id="aw-business-name" name="aw-business-name" className="form-input" value={businessName} onChange={e => setBusinessName(e.target.value)} placeholder="Acme Digital Agency" required disabled={submitting} />
                 </div>
                 <div className="form-group">
-                  <label className="form-label">Website</label>
-                  <input className="form-input" value={website} onChange={e => setWebsite(e.target.value)} placeholder="https://agency.com" disabled={submitting} />
+                  <label className="form-label" htmlFor="aw-website">Website</label>
+                  <input id="aw-website" name="aw-website" className="form-input" value={website} onChange={e => setWebsite(e.target.value)} placeholder="https://agency.com" disabled={submitting} />
                 </div>
                 <div className="form-group">
-                  <label className="form-label">Number of Clients</label>
-                  <input className="form-input" type="number" value={numClients} onChange={e => setNumClients(e.target.value)} placeholder="e.g. 50" min="1" disabled={submitting} />
+                  <label className="form-label" htmlFor="aw-num-clients">Number of Clients</label>
+                  <input id="aw-num-clients" name="aw-num-clients" className="form-input" type="number" value={numClients} onChange={e => setNumClients(e.target.value)} placeholder="e.g. 50" min="1" disabled={submitting} />
                 </div>
                 <div className="form-group">
-                  <label className="form-label">Country</label>
-                  <input className="form-input" value={country} onChange={e => setCountry(e.target.value)} placeholder="United Kingdom" disabled={submitting} />
+                  <label className="form-label" htmlFor="aw-country">Country</label>
+                  <input id="aw-country" name="aw-country" className="form-input" value={country} onChange={e => setCountry(e.target.value)} placeholder="United Kingdom" disabled={submitting} />
                 </div>
                 <div className="form-group">
-                  <label className="form-label">City</label>
-                  <input className="form-input" value={city} onChange={e => setCity(e.target.value)} placeholder="London" disabled={submitting} />
+                  <label className="form-label" htmlFor="aw-city">City</label>
+                  <input id="aw-city" name="aw-city" className="form-input" value={city} onChange={e => setCity(e.target.value)} placeholder="London" disabled={submitting} />
                 </div>
               </div>
 

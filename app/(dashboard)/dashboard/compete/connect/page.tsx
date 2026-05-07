@@ -23,17 +23,12 @@ export default async function ConnectStorePage(): Promise<React.ReactElement> {
   const apiKeys = await getApiKeysByOrg(user.org_id)
 
   return (
-    <div>
-      <div className="page-header">
+    <div className="db-content">
+      <div className="db-page-header">
         <div>
-          <Link href="/dashboard/compete" className="compete-back-link">
-            <IconArrowLeft size={16} />
-            <span>Back to Compete</span>
-          </Link>
-          <h1 className="page-title">Connect Your Store</h1>
-          <p className="page-subtitle">
-            Send product and price data directly from your ecommerce platform.
-          </p>
+          <Link href="/dashboard/compete" className="db-breadcrumb">← Back to Compete</Link>
+          <div className="db-page-title">Connect Your Store</div>
+          <div className="db-page-sub">Send product and price data directly from your ecommerce platform.</div>
         </div>
       </div>
 

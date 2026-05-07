@@ -65,49 +65,32 @@ interface UptimeSlot {
   status: 'up' | 'down' | 'degraded' | 'none'
 }
 
-export async function getUptimeBarData(monitorId: string): Promise<UptimeSlot[]> {
+const UPTIME_BAR_MAX = 144
+
+export async function getUptimeBarData(monitorId: string, checkIntervalSeconds: number = 300): Promise<UptimeSlot[]> {
   const supabase = createAdminClient()
-  const now = new Date()
-  const twelveHoursAgo = new Date(now.getTime() - 12 * 60 * 60 * 1000)
+  // Look back far enough to fill ~144 bars, minimum 12 hours
+  const lookbackMs = Math.max(12 * 60 * 60 * 1000, checkIntervalSeconds * UPTIME_BAR_MAX * 1000)
+  const since = new Date(Date.now() - lookbackMs)
 
   const { data, error } = await supabase
     .from('check_results')
     .select('status, checked_at')
     .eq('monitor_id', monitorId)
-    .gte('checked_at', twelveHoursAgo.toISOString())
-    .order('checked_at', { ascending: true })
+    .gte('checked_at', since.toISOString())
+    .order('checked_at', { ascending: false })
+    .limit(UPTIME_BAR_MAX)
 
   if (error) {
     logger.error('Failed to get uptime bar data', { error: error.message })
-    return Array.from({ length: 48 }, (_, i) => ({
-      slot: formatSlotTime(twelveHoursAgo, i),
-      status: 'none' as const,
-    }))
+    return []
   }
 
-  const results = data ?? []
-  const slots: UptimeSlot[] = []
-
-  for (let i = 0; i < 48; i++) {
-    const slotStart = new Date(twelveHoursAgo.getTime() + i * 15 * 60 * 1000)
-    const slotEnd = new Date(slotStart.getTime() + 15 * 60 * 1000)
-
-    const checksInSlot = results.filter(r => {
-      const t = new Date(r.checked_at).getTime()
-      return t >= slotStart.getTime() && t < slotEnd.getTime()
-    })
-
-    let status: UptimeSlot['status'] = 'none'
-    if (checksInSlot.length > 0) {
-      if (checksInSlot.some(c => c.status === 'down')) status = 'down'
-      else if (checksInSlot.some(c => c.status === 'degraded')) status = 'degraded'
-      else status = 'up'
-    }
-
-    slots.push({ slot: formatSlotTime(twelveHoursAgo, i), status })
-  }
-
-  return slots
+  // Return oldest-first so bars render left-to-right chronologically
+  return (data ?? []).reverse().map(r => ({
+    slot: new Date(r.checked_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    status: (r.status === 'up' || r.status === 'down' || r.status === 'degraded' ? r.status : 'none') as UptimeSlot['status'],
+  }))
 }
 
 /**

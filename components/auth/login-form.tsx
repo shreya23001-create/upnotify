@@ -130,7 +130,7 @@ export function LoginForm({ mode = 'login', next }: { mode?: 'login' | 'signup';
       </div>
 
       {/* Email form */}
-      <form action={handleEmailSubmit}>
+      <form action={handleEmailSubmit} autoComplete="on">
         {mode === 'signup' && (
           <div className="auth-input-wrap">
             <label className="auth-label" htmlFor="fullname">Full name</label>
@@ -141,6 +141,7 @@ export function LoginForm({ mode = 'login', next }: { mode?: 'login' | 'signup';
               type="text"
               placeholder="Your name"
               autoComplete="name"
+              required
               disabled={isPending}
             />
           </div>

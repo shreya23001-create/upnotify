@@ -2,8 +2,10 @@ import { GenerateReportForm } from '@/components/reports/generate-report-form'
 
 export default function NewReportPage() {
   return (
-    <div>
-      <h1 className="page-title" style={{ marginBottom: 24 }}>Generate Report</h1>
+    <div className="db-content">
+      <div className="db-page-header">
+        <div className="db-page-title">Generate Report</div>
+      </div>
       <div className="card">
         <div className="card-content">
           <GenerateReportForm />

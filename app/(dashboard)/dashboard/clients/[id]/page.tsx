@@ -22,9 +22,9 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
   const openIncidents = incidents.filter((i) => i.status !== 'resolved')
 
   return (
-    <div>
-      <div className="page-header">
-        <h1 className="page-title">{workspace.name}</h1>
+    <div className="db-content">
+      <div className="db-page-header">
+        <div className="db-page-title">{workspace.name}</div>
         {openIncidents.length > 0 && <span className="badge badge-danger">{openIncidents.length} open incidents</span>}
       </div>
       <div className="grid-3" style={{ marginBottom: 24 }}>
@@ -32,7 +32,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
         <div className="card"><div className="card-content-compact"><div className="stat-label">Up</div><div className="stat-value stat-value-green">{monitors.filter(m => m.status === 'up').length}</div></div></div>
         <div className="card"><div className="card-content-compact"><div className="stat-label">Down</div><div className="stat-value stat-value-red">{monitors.filter(m => m.status === 'down').length}</div></div></div>
       </div>
-      <MonitorTable monitors={monitors} uptimeData={Object.fromEntries(await Promise.all(monitors.map(async (m) => [m.id, await getUptimeBarData(m.id)] as const)))} />
+      <MonitorTable monitors={monitors} uptimeData={Object.fromEntries(await Promise.all(monitors.map(async (m) => [m.id, await getUptimeBarData(m.id, m.check_interval_seconds)] as const)))} />
     </div>
   )
 }

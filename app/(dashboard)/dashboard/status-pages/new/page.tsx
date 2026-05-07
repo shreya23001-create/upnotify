@@ -13,8 +13,10 @@ export default async function NewStatusPagePage() {
   const monitors = defaultWorkspace ? await getMonitorsByWorkspace(defaultWorkspace.id) : []
 
   return (
-    <div>
-      <h1 className="page-title" style={{ marginBottom: 24 }}>Create Status Page</h1>
+    <div className="db-content">
+      <div className="db-page-header">
+        <div className="db-page-title">Create Status Page</div>
+      </div>
       <div className="card">
         <div className="card-content">
           <CreateStatusPageForm monitors={monitors} />

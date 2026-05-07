@@ -160,7 +160,13 @@ export function IconNameserverChange({ size = 18, className }: IconProps) {
 }
 
 export function IconWordpress({ size = 18, className }: IconProps) {
-  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><polyline points="6,8 8.5,16 12,12 15.5,16 18,8"/></svg>
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width={size} height={size} className={className} aria-label="WordPress">
+      <circle cx="256" cy="256" r="248" fill="#21759b" />
+      <path fill="#fff" d="M38.4 256c0 86.6 50.3 161.7 123.5 197.9L58.1 163.7C45.5 193.5 38.4 226.9 38.4 256zm336.8-10.1c0-27-9.7-45.7-18-60.2-11.1-18-21.5-33.2-21.5-51.2 0-20.1 15.2-38.8 36.7-38.8.97 0 1.9.1 2.84.16C338.8 63 299 48 256 48c-57.2 0-107.5 29.3-136.8 73.7 3.84.12 7.46.19 10.6.19 17.2 0 43.8-2.1 43.8-2.1 8.86-.52 9.9 12.5 1.05 13.5 0 0-8.91 1.05-18.8 1.57l59.9 178.3 36-107.8-25.6-70.5c-8.86-.52-17.2-1.57-17.2-1.57-8.86-.52-7.82-14 1.04-13.5 0 0 27.1 2.1 43.3 2.1 17.2 0 43.8-2.1 43.8-2.1 8.87-.52 9.91 12.5 1.05 13.5 0 0-8.92 1.05-18.8 1.57l59.4 176.8 16.4-54.7c7.1-22.7 12.5-39 12.5-53z"/>
+      <path fill="#fff" d="M259.4 273.6l-49.3 143.3c14.7 4.33 30.3 6.69 46.4 6.69 19.1 0 37.5-3.3 54.6-9.3-.44-.7-.84-1.44-1.17-2.24L259.4 273.6zm150.5-99.4c.78 5.76 1.22 11.9 1.22 18.5 0 18.3-3.42 38.8-13.7 64.5l-55 159c53.5-31.2 89.5-89.1 89.5-155.2 0-31.8-8.13-61.7-22-87.8z"/>
+    </svg>
+  )
 }
 
 /* Admin icons */

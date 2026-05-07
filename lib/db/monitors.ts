@@ -286,3 +286,23 @@ export async function bulkUpdateMonitorStatus(ids: string[], orgId: string, isPa
   logger.info('Bulk updated monitor status', { count: ids.length, isPaused, orgId })
   return true
 }
+
+export async function getMonitorsByWorkspacePaged(
+  workspaceId: string, page: number, pageSize: number
+): Promise<{ data: Monitor[]; total: number }> {
+  const supabase = await createClient()
+  const from = (page - 1) * pageSize
+  const to = from + pageSize - 1
+  const { data, error, count } = await supabase
+    .from('monitors')
+    .select('*', { count: 'exact' })
+    .eq('workspace_id', workspaceId)
+    .order('created_at', { ascending: false })
+    .range(from, to)
+
+  if (error) {
+    logger.error('Failed to get monitors paged', { error: error.message })
+    return { data: [], total: 0 }
+  }
+  return { data: data ?? [], total: count ?? 0 }
+}
