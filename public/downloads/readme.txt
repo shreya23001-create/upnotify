@@ -1,9 +1,9 @@
 === Uptrue Monitor ===
-Contributors: uptrue
+Contributors: sachindiwaker
 Tags: security, monitoring, malware, file scan, uptime
 Requires at least: 5.0
 Tested up to: 6.9
-Stable tag: 1.2.3
+Stable tag: 1.2.4
 Requires PHP: 7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -157,6 +157,10 @@ No data is transmitted if no API token is saved. The plugin makes no outbound co
 
 == Changelog ==
 
+= 1.2.4 =
+* Updated readme Contributors to author's WordPress.org username
+* Moved admin menu to position 81 (below Settings) to avoid collision with WP core menu items
+
 = 1.2.3 =
 * Hardened settings form: $_POST['settings'] now sanitised with array_map(sanitize_text_field, wp_unslash(...)) and is_array() guard before use, satisfying Plugin Check's unsanitised-input rule. Behaviour unchanged.
 
@@ -189,6 +193,9 @@ No data is transmitted if no API token is saved. The plugin makes no outbound co
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.2.4 =
+Addresses WP.org review feedback: contributor username corrected, admin menu repositioned to coexist with WordPress core navigation.
 
 = 1.2.3 =
 Defensive sanitisation on the settings form to satisfy WordPress.org Plugin Check. No functional change.

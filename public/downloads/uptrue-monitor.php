@@ -3,11 +3,11 @@
  * Plugin Name: Uptrue Monitor
  * Plugin URI:  https://uptrue.io/monitoring/wordpress-site-monitor
  * Description: Monitor your site from the inside — file injections, rogue admin users, foreign-language content, brute force attacks, security misconfigurations, and more. Works standalone with a free monthly email report. No inbound ports. Works behind Cloudflare.
- * Version:     1.2.3
+ * Version:     1.2.4
  * Requires at least: 5.0
  * Requires PHP:      7.0
  * Tested up to:      6.9
- * Stable tag:        1.2.3
+ * Stable tag:        1.2.4
  * Author:      Uptrue
  * Author URI:  https://uptrue.io
  * License:     GPL v2 or later
@@ -17,7 +17,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define( 'UPTRUE_VERSION',      '1.2.3' );
+define( 'UPTRUE_VERSION',      '1.2.4' );
 define( 'UPTRUE_PLUGIN_FILE',  __FILE__ );
 
 function uptrue_api_base() {
@@ -749,7 +749,9 @@ add_action( 'admin_menu', 'uptrue_admin_menu' );
 
 function uptrue_admin_menu() {
     $icon = 'dashicons-shield-alt';
-    add_menu_page( 'Uptrue', 'Uptrue', 'manage_options', 'uptrue', 'uptrue_page_dashboard', $icon, 25 );
+    // Menu position 81 — sits below WP core's Settings group (80), avoids collision
+    // with Comments (25) and respects WP.org's "don't compete with core items" guideline.
+    add_menu_page( 'Uptrue', 'Uptrue', 'manage_options', 'uptrue', 'uptrue_page_dashboard', $icon, 81 );
     add_submenu_page( 'uptrue', 'Dashboard',  'Dashboard',   'manage_options', 'uptrue',          'uptrue_page_dashboard' );
     add_submenu_page( 'uptrue', 'Settings',   'Settings',    'manage_options', 'uptrue-settings', 'uptrue_page_settings' );
     add_submenu_page( 'uptrue', 'Cron Status','Cron Status', 'manage_options', 'uptrue-cron',     'uptrue_page_cron' );
