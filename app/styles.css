@@ -700,66 +700,125 @@ html.dark .stat-icon-yellow { background: rgba(245,158,11,0.15); }
 
 /* WordPress setup wizard
    ------------------------------------------------------- */
-.wp-wizard { max-width: 640px; margin: 0 auto; }
+/* WordPress wizard — full-width layout */
+.wp-wizard { display: flex; flex-direction: column; gap: 0; }
 
-/* Step indicator */
-.wp-steps { display: flex; align-items: center; margin-bottom: 32px; }
+/* Step indicator bar */
+.wp-steps {
+  display: flex; align-items: center;
+  padding: 20px 32px 20px 190px; margin-bottom: 0;
+  background: var(--bg-card); border: 1px solid var(--border-primary);
+  border-radius: 14px; margin-bottom: 20px;
+}
 .wp-step { display: flex; align-items: center; flex: 1; }
 .wp-step-inner { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
 .wp-step-circle {
-  width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center;
+  width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center;
   justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0;
-  background: var(--bg-muted); color: var(--text-muted); transition: all 0.2s;
+  background: var(--bg-muted); color: var(--text-muted); border: 2px solid var(--border-primary);
+  transition: all 0.2s;
 }
-.wp-step-circle.done { background: var(--color-up); color: #fff; }
-.wp-step-circle.active { background: var(--accent); color: #fff; box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent); }
-.wp-step-label { font-size: 12px; font-weight: 600; color: var(--text-muted); white-space: nowrap; transition: color 0.2s; }
+.wp-step-circle.done { background: var(--color-up); color: #fff; border-color: var(--color-up); }
+.wp-step-circle.active { background: var(--accent); color: #fff; border-color: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 15%, transparent); }
+.wp-step-label { font-size: 13px; font-weight: 600; color: var(--text-muted); white-space: nowrap; transition: color 0.2s; }
 .wp-step-label.active { color: var(--accent); }
 .wp-step-label.done { color: var(--color-up); }
-.wp-step-line { flex: 1; height: 2px; background: var(--border-primary); margin: 0 12px; transition: background 0.2s; }
+.wp-step-line { flex: 1; height: 2px; background: var(--border-primary); margin: 0 16px; transition: background 0.3s; border-radius: 2px; }
 .wp-step-line.done { background: var(--color-up); }
 
-/* Wizard card */
-.wp-card { background: var(--bg-card); border: 1px solid var(--border-primary); border-radius: 14px; padding: 28px; }
-.wp-card-title { font-size: 17px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
-.wp-card-sub { font-size: 13px; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.6; }
+/* Main two-column layout */
+.wp-body { display: grid; grid-template-columns: 1fr 340px; gap: 20px; align-items: start; }
+
+/* Left: install steps card */
+.wp-card {
+  background: var(--bg-card); border: 1px solid var(--border-primary);
+  border-radius: 14px; padding: 32px 36px 28px;
+}
+.wp-card-title { font-size: 20px; font-weight: 800; color: var(--text-primary); margin-bottom: 6px; letter-spacing: -0.3px; }
+.wp-card-sub { font-size: 14px; color: var(--text-secondary); margin-bottom: 32px; line-height: 1.6; }
 
 /* Install steps */
-.wp-install-steps { display: flex; flex-direction: column; gap: 20px; }
-.wp-install-step { display: flex; gap: 16px; }
+.wp-install-steps { display: flex; flex-direction: column; gap: 0; }
+.wp-install-step {
+  display: flex; gap: 20px;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--border-primary);
+}
+.wp-install-step:last-child { border-bottom: none; padding-bottom: 0; }
 .wp-install-step-num {
-  width: 28px; height: 28px; border-radius: 50%; background: var(--accent); color: #fff;
-  display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700;
-  flex-shrink: 0; margin-top: 2px;
+  width: 32px; height: 32px; border-radius: 50%;
+  background: color-mix(in srgb, var(--accent) 12%, var(--bg-muted));
+  border: 2px solid color-mix(in srgb, var(--accent) 30%, var(--border-primary));
+  color: var(--accent);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; flex-shrink: 0; margin-top: 1px;
 }
 .wp-install-step-body { flex: 1; }
-.wp-install-step-title { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; }
-.wp-install-step-desc { font-size: 12px; color: var(--text-secondary); margin-bottom: 0; line-height: 1.6; }
+.wp-install-step-title { font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
+.wp-install-step-desc { font-size: 13px; color: var(--text-secondary); margin-bottom: 0; line-height: 1.65; }
 
-/* Token row */
-.wp-token-row { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
-.wp-token {
-  flex: 1; padding: 10px 14px; background: var(--bg-muted); border-radius: 8px;
-  font-size: 13px; font-family: var(--font-mono, monospace); word-break: break-all;
-  border: 1px solid var(--border-input); color: var(--text-primary);
+/* Token display */
+.wp-token-row {
+  display: inline-flex; align-items: stretch; gap: 0;
+  margin-top: 12px; border-radius: 10px; overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border-primary));
+  background: color-mix(in srgb, var(--accent) 5%, var(--bg-muted));
 }
+.wp-token {
+  flex: 1; padding: 12px 16px;
+  font-size: 13px; font-family: var(--font-mono, monospace);
+  word-break: break-all; color: var(--accent); font-weight: 600;
+  background: transparent; border: none; letter-spacing: 0.02em;
+}
+.wp-token-copy {
+  padding: 0 18px; font-size: 13px; font-weight: 600;
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--accent); border: none; border-left: 1px solid color-mix(in srgb, var(--accent) 25%, var(--border-primary));
+  cursor: pointer; transition: background 0.15s; white-space: nowrap; font-family: inherit;
+}
+.wp-token-copy:hover { background: color-mix(in srgb, var(--accent) 20%, transparent); }
+.wp-token-copy.copied { color: var(--color-up); background: color-mix(in srgb, var(--color-up) 10%, transparent); }
+
+/* Right sidebar panel */
+.wp-side-panel {
+  display: flex; flex-direction: column; gap: 16px; position: sticky; top: 24px;
+}
+.wp-side-card {
+  background: var(--bg-card); border: 1px solid var(--border-primary);
+  border-radius: 14px; padding: 20px 22px;
+}
+.wp-side-card-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-muted); margin-bottom: 12px; }
+.wp-side-tip { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+.wp-side-tip + .wp-side-tip { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border-primary); }
+.wp-side-tip-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+/* Download button — block, full-width within step body */
+.wp-download-btn { display: flex !important; width: 394.18px; height: 44.8px; justify-content: center; margin-bottom: 10px; }
+
+/* CTA button — full-width */
+.wp-cta { margin-top: 28px; }
+.wp-cta-btn { display: flex !important; width: 394.18px !important; height: 44.8px !important; justify-content: center; padding: 14px 24px !important; font-size: 15px !important; font-weight: 700 !important; border-radius: 10px !important; margin-left: 50px; }
 
 /* Verify / waiting state */
-.wp-waiting { text-align: center; padding: 8px 0; }
-.wp-waiting-icon { font-size: 48px; margin-bottom: 16px; }
-.wp-waiting-title { font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
-.wp-waiting-desc { font-size: 14px; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.6; }
-.wp-waiting-foot { font-size: 12px; color: var(--text-muted); margin-top: 20px; }
-.wp-waiting-back { color: var(--accent); background: none; border: none; cursor: pointer; padding: 0; font-size: 12px; font-family: inherit; }
+.wp-waiting {
+  background: var(--bg-card); border: 1px solid var(--border-primary);
+  border-radius: 14px; padding: 64px 40px;
+  text-align: center;
+}
+.wp-waiting-icon { font-size: 56px; margin-bottom: 20px; line-height: 1; }
+.wp-waiting-title { font-size: 22px; font-weight: 800; color: var(--text-primary); margin-bottom: 10px; letter-spacing: -0.3px; }
+.wp-waiting-desc { font-size: 15px; color: var(--text-secondary); margin-bottom: 28px; line-height: 1.7; max-width: 480px; margin-left: auto; margin-right: auto; }
+.wp-waiting-foot { font-size: 13px; color: var(--text-muted); margin-top: 24px; line-height: 1.6; }
+.wp-waiting-back { color: var(--accent); background: none; border: none; cursor: pointer; padding: 0; font-size: 13px; font-family: inherit; font-weight: 600; }
 .wp-waiting-back:hover { text-decoration: underline; }
-.wp-dots { display: flex; justify-content: center; gap: 6px; }
+.wp-dots { display: flex; justify-content: center; gap: 8px; margin-bottom: 8px; }
 .wp-dot {
-  width: 8px; height: 8px; border-radius: 50%; background: var(--accent);
+  width: 9px; height: 9px; border-radius: 50%; background: var(--accent);
   animation: wp-pulse 1.2s ease-in-out infinite;
 }
 .wp-dot:nth-child(2) { animation-delay: 0.2s; }
 .wp-dot:nth-child(3) { animation-delay: 0.4s; }
-@keyframes wp-pulse { 0%, 80%, 100% { transform: scale(0.7); opacity: 0.5; } 40% { transform: scale(1); opacity: 1; } }
+@keyframes wp-pulse { 0%, 80%, 100% { transform: scale(0.7); opacity: 0.4; } 40% { transform: scale(1); opacity: 1; } }
 
 /* Monitor help panel */
 .monitor-help-panel { background: var(--bg-card); border: 1px solid var(--border-primary); border-radius: 14px; overflow: hidden; }
