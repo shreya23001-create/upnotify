@@ -62,3 +62,23 @@ export async function deleteReport(id: string): Promise<boolean> {
   }
   return true
 }
+
+export async function getReportsForOrgPaged(
+  orgId: string, page: number, pageSize: number
+): Promise<{ data: Report[]; total: number }> {
+  const supabase = createAdminClient()
+  const from = (page - 1) * pageSize
+  const to = from + pageSize - 1
+  const { data, error, count } = await supabase
+    .from('reports')
+    .select('*', { count: 'exact' })
+    .eq('org_id', orgId)
+    .order('generated_at', { ascending: false })
+    .range(from, to)
+
+  if (error) {
+    logger.error('Failed to get reports paged', { error: error.message })
+    return { data: [], total: 0 }
+  }
+  return { data: data ?? [], total: count ?? 0 }
+}

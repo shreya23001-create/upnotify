@@ -1015,7 +1015,7 @@ html.dark .pub-nav {
 .testimonial-card.t3::before { background: linear-gradient(90deg, #8b5cf6, #3b82f6); }
 .testimonial-quote {
   font-size: 36px; color: var(--border-strong); line-height: 1; margin-bottom: var(--space-4);
-  font-family: Georgia, serif;
+  font-family: var(--font-inter, 'Inter', system-ui, sans-serif);
 }
 .testimonial-text {
   font-size: 16px; color: var(--text-primary); line-height: 1.7;

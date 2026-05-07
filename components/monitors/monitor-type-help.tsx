@@ -277,7 +277,7 @@ const helpData: Record<string, MonitorHelp> = {
     ],
   },
   wordpress: {
-    emoji: '🔌',
+    emoji: '__wp__',
     name: 'Uptrue WordPress Monitor',
     what: 'A lightweight plugin installed on your WordPress site pushes security and health data to Uptrue on a schedule. Unlike external monitors, this runs from inside your site — detecting threats that HTTP checks can never see.',
     targetLabel: 'Enter your WordPress site URL',
@@ -295,34 +295,23 @@ const helpData: Record<string, MonitorHelp> = {
 function Accordion({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false)
   return (
-    <div style={{
-      borderBottom: '1px solid var(--border-primary, #e5e7eb)',
-    }}>
-      <button
-        type="button"
-        onClick={() => setOpen(o => !o)}
-        style={{
-          width: '100%', background: 'none', border: 'none', cursor: 'pointer',
-          textAlign: 'left', padding: '10px 0', display: 'flex',
-          justifyContent: 'space-between', alignItems: 'flex-start', gap: 8,
-        }}
-      >
-        <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', lineHeight: 1.4 }}>{q}</span>
-        <span style={{
-          fontSize: 16, color: 'var(--text-muted)',
-          flexShrink: 0, marginTop: 1,
-          transform: open ? 'rotate(45deg)' : 'none',
-          transition: 'transform 0.15s',
-          display: 'inline-block',
-        }}>+</span>
+    <div className="monitor-faq">
+      <button type="button" onClick={() => setOpen(o => !o)} className="monitor-faq-btn">
+        <span className="monitor-faq-q">{q}</span>
+        <span className={`monitor-faq-icon${open ? ' open' : ''}`}>+</span>
       </button>
-      {open && (
-        <p style={{
-          fontSize: 13, color: 'var(--text-secondary)',
-          lineHeight: 1.65, margin: '0 0 10px',
-        }}>{a}</p>
-      )}
+      {open && <p className="monitor-faq-answer">{a}</p>}
     </div>
+  )
+}
+
+function WordPressLogo() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="28" height="28" aria-label="WordPress">
+      <circle cx="256" cy="256" r="248" fill="#21759b" />
+      <path fill="#fff" d="M38.4 256c0 86.6 50.3 161.7 123.5 197.9L58.1 163.7C45.5 193.5 38.4 226.9 38.4 256zm336.8-10.1c0-27-9.7-45.7-18-60.2-11.1-18-21.5-33.2-21.5-51.2 0-20.1 15.2-38.8 36.7-38.8.97 0 1.9.1 2.84.16C338.8 63 299 48 256 48c-57.2 0-107.5 29.3-136.8 73.7 3.84.12 7.46.19 10.6.19 17.2 0 43.8-2.1 43.8-2.1 8.86-.52 9.9 12.5 1.05 13.5 0 0-8.91 1.05-18.8 1.57l59.9 178.3 36-107.8-25.6-70.5c-8.86-.52-17.2-1.57-17.2-1.57-8.86-.52-7.82-14 1.04-13.5 0 0 27.1 2.1 43.3 2.1 17.2 0 43.8-2.1 43.8-2.1 8.87-.52 9.91 12.5 1.05 13.5 0 0-8.92 1.05-18.8 1.57l59.4 176.8 16.4-54.7c7.1-22.7 12.5-39 12.5-53z"/>
+      <path fill="#fff" d="M259.4 273.6l-49.3 143.3c14.7 4.33 30.3 6.69 46.4 6.69 19.1 0 37.5-3.3 54.6-9.3-.44-.7-.84-1.44-1.17-2.24L259.4 273.6zm150.5-99.4c.78 5.76 1.22 11.9 1.22 18.5 0 18.3-3.42 38.8-13.7 64.5l-55 159c53.5-31.2 89.5-89.1 89.5-155.2 0-31.8-8.13-61.7-22-87.8z"/>
+    </svg>
   )
 }
 
@@ -331,51 +320,26 @@ export function MonitorTypeHelp({ type }: { type: string }) {
   if (!help) return null
 
   return (
-    <div style={{
-      background: 'var(--bg-subtle)',
-      border: '1.5px solid var(--border-primary)',
-      borderRadius: 12,
-      padding: '24px 24px 20px',
-      height: '100%',
-      boxSizing: 'border-box',
-    }}>
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
-        <span style={{ fontSize: 28 }}>{help.emoji}</span>
-        <span style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)' }}>{help.name}</span>
+    <div className="monitor-help-panel">
+      <div className="monitor-help-header">
+        {help.emoji === '__wp__'
+          ? <span className="monitor-help-icon monitor-help-icon-svg"><WordPressLogo /></span>
+          : <span className="monitor-help-icon">{help.emoji}</span>
+        }
+        <span className="monitor-help-name">{help.name}</span>
       </div>
-
-      {/* What it does */}
-      <p style={{
-        fontSize: 13, lineHeight: 1.7,
-        color: 'var(--text-secondary)',
-        marginBottom: 18,
-      }}>{help.what}</p>
-
-      {/* Target hint */}
-      <div style={{
-        background: 'var(--bg-card)',
-        border: '1px solid var(--border-primary)',
-        borderRadius: 8,
-        padding: '10px 14px',
-        marginBottom: 20,
-      }}>
-        <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, color: 'var(--text-muted)', marginBottom: 4 }}>
-          {help.targetLabel}
+      <div className="monitor-help-body">
+        <p className="monitor-help-desc">{help.what}</p>
+        <div className="monitor-help-target">
+          <div className="monitor-help-target-label">{help.targetLabel}</div>
+          <div className="monitor-help-target-hint">{help.targetHint}</div>
         </div>
-        <div style={{ fontSize: 13, color: 'var(--text-secondary)', fontFamily: 'monospace' }}>
-          {help.targetHint}
+        <div className="monitor-help-faqs-label">Common questions</div>
+        <div>
+          {help.faqs.map((faq, i) => (
+            <Accordion key={i} q={faq.q} a={faq.a} />
+          ))}
         </div>
-      </div>
-
-      {/* FAQs */}
-      <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, color: 'var(--text-muted)', marginBottom: 4 }}>
-        Common questions
-      </div>
-      <div>
-        {help.faqs.map((faq, i) => (
-          <Accordion key={i} q={faq.q} a={faq.a} />
-        ))}
       </div>
     </div>
   )

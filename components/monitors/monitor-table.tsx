@@ -8,7 +8,9 @@ import { MonitorStatusBadge } from './monitor-status-badge'
 import { UptimeBar } from './uptime-bar'
 import { MonitorTypeIcon } from './monitor-type-icon'
 import { pauseMonitorAction, resumeMonitorAction, deleteMonitorAction, bulkDeleteMonitorsAction, bulkPauseMonitorsAction, bulkResumeMonitorsAction } from '@/app/(dashboard)/dashboard/monitors/actions'
+import { Pagination } from '@/components/ui/pagination'
 import type { Monitor } from '@/lib/types'
+import type { PaginationMeta } from '@/lib/utils/pagination'
 
 interface UptimeSlot { slot: string; status: 'up' | 'down' | 'degraded' | 'none' }
 
@@ -16,6 +18,7 @@ interface MonitorTableProps {
   monitors: Monitor[]
   uptimeData: Record<string, UptimeSlot[]>
   initialSearch?: string
+  pagination?: PaginationMeta
 }
 
 interface PendingConfirm {
@@ -24,7 +27,7 @@ interface PendingConfirm {
   isPaused?: boolean
 }
 
-export function MonitorTable({ monitors, uptimeData, initialSearch = '' }: MonitorTableProps) {
+export function MonitorTable({ monitors, uptimeData, initialSearch = '', pagination }: MonitorTableProps) {
   const [isPending, startTransition] = useTransition()
   const [pendingConfirm, setPendingConfirm] = useState<PendingConfirm | null>(null)
 
@@ -193,6 +196,7 @@ export function MonitorTable({ monitors, uptimeData, initialSearch = '' }: Monit
         confirmText={confirmProps.confirmText}
         variant={confirmProps.variant}
       />
+      {pagination && <Pagination {...pagination} />}
     </>
   )
 }

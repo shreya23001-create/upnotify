@@ -5,9 +5,11 @@ import Link from 'next/link'
 import { DataTable, type Column, type BulkAction } from '@/components/ui/data-table'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { deleteReportAction } from '@/app/(dashboard)/dashboard/reports/actions'
+import { Pagination } from '@/components/ui/pagination'
 import type { Report } from '@/lib/types'
+import type { PaginationMeta } from '@/lib/utils/pagination'
 
-export function ReportsTable({ reports }: { reports: Report[] }) {
+export function ReportsTable({ reports, pagination }: { reports: Report[]; pagination?: PaginationMeta }) {
   const [isPending, startTransition] = useTransition()
   const [deleteIds, setDeleteIds] = useState<string[]>([])
 
@@ -87,6 +89,7 @@ export function ReportsTable({ reports }: { reports: Report[] }) {
         confirmText={deleteIds.length === 1 ? 'Delete' : 'Delete All'}
         variant="danger"
       />
+      {pagination && <Pagination {...pagination} />}
     </>
   )
 }

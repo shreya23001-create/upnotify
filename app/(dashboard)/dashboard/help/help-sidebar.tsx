@@ -1,6 +1,9 @@
 'use client'
 
 import Link from 'next/link'
+import { IconWordpress } from '@/components/icons'
+
+export { IconWordpress as WordPressIcon }
 
 interface HelpTopic {
   href: string
@@ -30,7 +33,7 @@ export const helpTopics: HelpTopic[] = [
     href: '/dashboard/help/wordpress',
     title: 'WordPress Plugin',
     description: 'Install the free Uptrue plugin to monitor your WordPress site from the inside — file injections, rogue users, security config, and more.',
-    icon: '🔌',
+    icon: '__wp__',
     keywords: ['wordpress', 'plugin', 'wp', 'file injection', 'security', 'health', 'agent', 'brute force', 'foreign language'],
   },
   {
@@ -119,27 +122,56 @@ interface HelpSidebarProps {
   isSuperAdmin?: boolean
 }
 
+interface SidebarSection {
+  label: string
+  topics: HelpTopic[]
+}
+
+function buildSections(topics: HelpTopic[]): SidebarSection[] {
+  const monitoring = ['getting-started', 'monitors', 'wordpress', 'alerts', 'status-pages', 'incidents']
+  const features   = ['watchdog', 'ai-visibility', 'tools', 'compete']
+  const account    = ['billing', 'credits', 'referrals', 'cancel-pause']
+
+  function slug(href: string) { return href.split('/').pop() ?? '' }
+
+  return [
+    { label: 'Monitoring',    topics: topics.filter(t => monitoring.includes(slug(t.href))) },
+    { label: 'Features',      topics: topics.filter(t => features.includes(slug(t.href))) },
+    { label: 'Account',       topics: topics.filter(t => account.includes(slug(t.href))) },
+    { label: 'Admin',         topics: topics.filter(t => t.adminOnly) },
+  ].filter(s => s.topics.length > 0)
+}
+
 export function HelpSidebar({ currentPath, isSuperAdmin = false }: HelpSidebarProps): React.ReactElement {
   const visibleTopics = helpTopics.filter(topic => !topic.adminOnly || isSuperAdmin)
+  const sections = buildSections(visibleTopics)
 
   return (
     <nav className="help-sidebar" aria-label="Help topics navigation">
       <div className="help-sidebar-title">
-        <Link href="/dashboard/help">Help Topics</Link>
+        <Link href="/dashboard/help">Help Center</Link>
       </div>
-      <ul className="help-sidebar-list">
-        {visibleTopics.map((topic) => (
-          <li key={topic.href}>
-            <Link
-              href={topic.href}
-              className={`help-sidebar-link${currentPath === topic.href ? ' active' : ''}`}
-            >
-              <span className="help-sidebar-icon">{topic.icon}</span>
-              <span>{topic.title}</span>
-            </Link>
-          </li>
-        ))}
-      </ul>
+      {sections.map((section, i) => (
+        <div key={section.label}>
+          {i > 0 && <div className="help-sidebar-divider" />}
+          <div className="help-sidebar-section">{section.label}</div>
+          <ul className="help-sidebar-list">
+            {section.topics.map((topic) => (
+              <li key={topic.href}>
+                <Link
+                  href={topic.href}
+                  className={`help-sidebar-link${currentPath === topic.href ? ' active' : ''}`}
+                >
+                  <span className="help-sidebar-icon">
+                    {topic.icon === '__wp__' ? <IconWordpress size={16} /> : topic.icon}
+                  </span>
+                  <span>{topic.title}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
     </nav>
   )
 }

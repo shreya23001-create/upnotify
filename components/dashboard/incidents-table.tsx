@@ -2,6 +2,8 @@
 
 import { useState, useTransition } from 'react'
 import type { IncidentWithMonitor } from '@/lib/db/incidents'
+import { Pagination } from '@/components/ui/pagination'
+import type { PaginationMeta } from '@/lib/utils/pagination'
 
 type TabFilter = 'open' | 'resolved' | 'all'
 
@@ -41,7 +43,7 @@ function formatDate(dateStr: string): string {
   })
 }
 
-export function IncidentsTable({ incidents }: { incidents: IncidentWithMonitor[] }): React.ReactElement {
+export function IncidentsTable({ incidents, pagination }: { incidents: IncidentWithMonitor[]; pagination?: PaginationMeta }): React.ReactElement {
   const [tab, setTab] = useState<TabFilter>('open')
   const [isPending, startTransition] = useTransition()
   const [updatingId, setUpdatingId] = useState<string | null>(null)
@@ -287,6 +289,7 @@ export function IncidentsTable({ incidents }: { incidents: IncidentWithMonitor[]
           </table>
         </div>
       )}
+      {pagination && <Pagination {...pagination} />}
     </div>
   )
 }

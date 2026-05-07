@@ -3,15 +3,13 @@
 import React, { useState, useEffect } from 'react'
 
 export function ThemeToggle(): React.ReactElement {
-  const [dark, setDark] = useState<boolean>(() => {
-    if (typeof window === 'undefined') return true
-    const saved = localStorage.getItem('uptrue_theme')
-    return saved !== 'light'
-  })
+  const [dark, setDark] = useState(false)
 
   useEffect(() => {
-    document.documentElement.classList.toggle('dark', dark)
-  }, [dark])
+    const saved = localStorage.getItem('uptrue_theme')
+    const isDark = saved !== 'light'
+    setDark(isDark)
+  }, [])
 
   function toggle(): void {
     const newDark = !dark
@@ -25,8 +23,9 @@ export function ThemeToggle(): React.ReactElement {
       className="theme-toggle"
       onClick={toggle}
       title={dark ? 'Switch to light mode' : 'Switch to dark mode'}
+      suppressHydrationWarning
     >
-      {dark ? '\u2600\uFE0F' : '\uD83C\uDF19'}
+      {dark ? '☀️' : '🌙'}
     </button>
   )
 }

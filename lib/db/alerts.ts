@@ -167,3 +167,23 @@ export async function bulkUpdateAlertChannelStatus(ids: string[], orgId: string,
   logger.info('Bulk updated alert channel status', { count: ids.length, isEnabled, orgId })
   return true
 }
+
+export async function getAlertChannelsByOrgPaged(
+  orgId: string, page: number, pageSize: number
+): Promise<{ data: AlertChannel[]; total: number }> {
+  const supabase = await createClient()
+  const from = (page - 1) * pageSize
+  const to = from + pageSize - 1
+  const { data, error, count } = await supabase
+    .from('alert_channels')
+    .select('*', { count: 'exact' })
+    .eq('org_id', orgId)
+    .order('created_at', { ascending: false })
+    .range(from, to)
+
+  if (error) {
+    logger.error('Failed to get alert channels paged', { error: error.message })
+    return { data: [], total: 0 }
+  }
+  return { data: data ?? [], total: count ?? 0 }
+}

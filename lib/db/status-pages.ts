@@ -175,3 +175,23 @@ export async function bulkUpdateStatusPageVisibility(ids: string[], orgId: strin
   logger.info('Bulk updated status page visibility', { count: ids.length, isPublished, orgId })
   return true
 }
+
+export async function getStatusPagesByWorkspacePaged(
+  workspaceId: string, page: number, pageSize: number
+): Promise<{ data: StatusPage[]; total: number }> {
+  const supabase = await createClient()
+  const from = (page - 1) * pageSize
+  const to = from + pageSize - 1
+  const { data, error, count } = await supabase
+    .from('status_pages')
+    .select('*', { count: 'exact' })
+    .eq('workspace_id', workspaceId)
+    .order('created_at', { ascending: false })
+    .range(from, to)
+
+  if (error) {
+    logger.error('Failed to get status pages paged', { error: error.message })
+    return { data: [], total: 0 }
+  }
+  return { data: data ?? [], total: count ?? 0 }
+}

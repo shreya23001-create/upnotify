@@ -221,3 +221,24 @@ export async function getOpenIncidentForMonitor(monitorId: string): Promise<Inci
   if (error) return null
   return data
 }
+
+export async function getAllIncidentsByOrgPaged(
+  orgId: string, page: number, pageSize: number
+): Promise<{ data: IncidentWithMonitor[]; total: number }> {
+  const supabase = await createClient()
+  const from = (page - 1) * pageSize
+  const to = from + pageSize - 1
+  const { data, error, count } = await supabase
+    .from('incidents')
+    .select('*, monitors(name)', { count: 'exact' })
+    .eq('org_id', orgId)
+    .order('started_at', { ascending: false })
+    .range(from, to)
+
+  if (error) return { data: [], total: 0 }
+  const mapped = (data ?? []).map(row => {
+    const { monitors, ...rest } = row as typeof row & { monitors: { name: string } | null }
+    return { ...rest, monitor_name: monitors?.name ?? null }
+  })
+  return { data: mapped, total: count ?? 0 }
+}

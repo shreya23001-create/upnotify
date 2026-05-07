@@ -6,13 +6,15 @@ import { DataTable, type Column, type BulkAction } from '@/components/ui/data-ta
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { deleteStatusPageAction, bulkDeleteStatusPagesAction, bulkPublishStatusPagesAction, bulkUnpublishStatusPagesAction } from '@/app/(dashboard)/dashboard/status-pages/actions'
 import type { StatusPage } from '@/lib/types'
+import { Pagination } from '@/components/ui/pagination'
+import type { PaginationMeta } from '@/lib/utils/pagination'
 
 interface PendingConfirm {
   type: 'delete' | 'bulk-delete' | 'bulk-publish' | 'bulk-unpublish'
   ids: string[]
 }
 
-export function StatusPagesTable({ pages }: { pages: StatusPage[] }) {
+export function StatusPagesTable({ pages, pagination }: { pages: StatusPage[]; pagination?: PaginationMeta }) {
   const [isPending, startTransition] = useTransition()
   const [pendingConfirm, setPendingConfirm] = useState<PendingConfirm | null>(null)
 
@@ -122,6 +124,7 @@ export function StatusPagesTable({ pages }: { pages: StatusPage[] }) {
         confirmText={confirmProps.confirmText}
         variant={confirmProps.variant}
       />
+      {pagination && <Pagination {...pagination} />}
     </>
   )
 }

@@ -906,7 +906,7 @@ export const MONITOR_TYPES: MonitorTypeDefinition[] = [
     type: 'wordpress',
     slug: 'wordpress-site-monitor',
     name: 'Uptrue WordPress Monitor',
-    emoji: '🔌',
+    emoji: '__wp__',
     tagline: 'Deep WordPress security and health monitoring via a lightweight plugin',
     defaultInterval: 7200,
     minInterval: 3600,

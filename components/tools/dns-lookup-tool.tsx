@@ -270,7 +270,7 @@ export function DnsLookupTool(): React.ReactElement {
         }
         .dns-record-value {
           display: block;
-          font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+          font-family: var(--font-mono, 'JetBrains Mono', monospace);
           font-size: 13px;
           color: var(--text-primary);
           background: var(--bg-muted);
