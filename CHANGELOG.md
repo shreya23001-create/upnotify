@@ -3,6 +3,7 @@
 ## Unreleased — dev branch
 
 ### Cost / Infra
+- **Logger honours `LOG_LEVEL` env var.** Added an env-var override to `lib/utils/logger.ts` so production can be set to `LOG_LEVEL=warn` to drop routine info logs from Vercel Observability event volume (which bills per-event over the included pool). Default behaviour is unchanged: dev shows debug+, staging/prod show info+. Set `LOG_LEVEL=warn` in Vercel production env vars after deploy to take effect. Fully reversible — unset the env var or set `LOG_LEVEL=info` to restore the prior verbosity. Expected saving: $15-20/mo on the Observability Events line.
 - **Vercel cost runaway — disabled redundant Git Integration auto-deploys.** Bill for ~25 days hit $120.84 against a $20 included credit; root cause was double-builds on every push (GitLab CI's `vercel deploy` AND Vercel's Git Integration both firing on `dev` and `master`, plus Vercel auto-building every feature branch). Fix: added `"git": { "deploymentEnabled": false }` to `vercel.json` so GitLab CI is the sole deployer. GitLab CI is already restricted to `dev` and `master` via `only:` blocks in `.gitlab-ci.yml`, so feature branches no longer trigger any Vercel build. Domain aliasing for `dev.uptrue.io` continues to work via the explicit `vercel alias set` step in `.gitlab-ci.yml`. Expected saving: ~50% of the build-minutes line, ~$35-50/mo.
 
 ### Fixed
