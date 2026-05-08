@@ -2,6 +2,9 @@
 
 ## Unreleased — dev branch
 
+### Cost / Infra
+- **Vercel cost runaway — disabled redundant Git Integration auto-deploys.** Bill for ~25 days hit $120.84 against a $20 included credit; root cause was double-builds on every push (GitLab CI's `vercel deploy` AND Vercel's Git Integration both firing on `dev` and `master`, plus Vercel auto-building every feature branch). Fix: added `"git": { "deploymentEnabled": false }` to `vercel.json` so GitLab CI is the sole deployer. GitLab CI is already restricted to `dev` and `master` via `only:` blocks in `.gitlab-ci.yml`, so feature branches no longer trigger any Vercel build. Domain aliasing for `dev.uptrue.io` continues to work via the explicit `vercel alias set` step in `.gitlab-ci.yml`. Expected saving: ~50% of the build-minutes line, ~$35-50/mo.
+
 ### Fixed
 - **Blog content corruption — permanent fix.** The May 2 calendar-generator regression that saved raw markdown into the JSONB content column has been closed off at four layers: (1) `normaliseContent` helper in `lib/db/blog-posts.ts` wraps every write into an object shape, (2) admin editor stops double-encoding via `JSON.stringify` and now sends CTA fields separately so they aren't silently dropped, (3) admin Publish button is disabled when body is empty + server-side guard rejects publish-with-no-content, (4) DB-level CHECK constraint in migration `00103` makes a non-object content value impossible regardless of caller. Calendar-generator orphan recovery and the public blog renderer were also hardened. Test plan: [docs/test-plans/2026-05-07-blog-content-shape-permanent-fix.md](docs/test-plans/2026-05-07-blog-content-shape-permanent-fix.md).
 
