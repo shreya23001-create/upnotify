@@ -13,6 +13,7 @@ import {
 } from '@/lib/db/public-monitors'
 import { getPublishedOutageBlogForSite } from '@/lib/db/blog-posts'
 import { TrackerSubscribeForm } from '@/components/tracker/tracker-subscribe-form'
+import { TimelineBarGraph } from '@/components/ui/timeline-bar-graph'
 import { AlsoDownSection } from '@/components/tracker/also-down-section'
 import { TrackerSoftNotFound } from '@/components/tracker/tracker-soft-not-found'
 import { TRACKED_SITES } from '@/lib/constants/tracked-sites'
@@ -132,13 +133,20 @@ function formatTimeAgoSeconds(dateStr: string | null): string {
 function buildUptimeBars(
   checks: Array<{ status: string; checked_at: string }>,
   totalSlots: number
-): Array<{ status: string; count: number }> {
+): Array<{ status: string; count: number; timestamp: string }> {
+  const now = Date.now()
+  const windowMs = 7 * 24 * 60 * 60 * 1000
+  const slotDuration = windowMs / totalSlots
+  const windowStart = now - windowMs
+
   if (checks.length === 0) {
-    return Array(totalSlots).fill({ status: 'unknown', count: 0 })
+    return Array.from({ length: totalSlots }, (_, i) => ({
+      status: 'unknown',
+      count: 0,
+      timestamp: new Date(windowStart + i * slotDuration).toISOString(),
+    }))
   }
 
-  const now = Date.now()
-  const slotDuration = (7 * 24 * 60 * 60 * 1000) / totalSlots
   const slots: Array<{ up: number; down: number; degraded: number }> = Array.from(
     { length: totalSlots },
     () => ({ up: 0, down: 0, degraded: 0 })
@@ -154,21 +162,16 @@ function buildUptimeBars(
     }
   }
 
-  return slots.map((slot) => {
+  return slots.map((slot, i) => {
+    const timestamp = new Date(windowStart + i * slotDuration).toISOString()
     const total = slot.up + slot.down + slot.degraded
-    if (total === 0) return { status: 'unknown', count: 0 }
-    if (slot.down > 0) return { status: 'down', count: total }
-    if (slot.degraded > 0) return { status: 'degraded', count: total }
-    return { status: 'up', count: total }
+    if (total === 0) return { status: 'unknown', count: 0, timestamp }
+    if (slot.down > 0) return { status: 'down', count: total, timestamp }
+    if (slot.degraded > 0) return { status: 'degraded', count: total, timestamp }
+    return { status: 'up', count: total, timestamp }
   })
 }
 
-function getBarColor(status: string): string {
-  if (status === 'up') return 'var(--color-success, #22c55e)'
-  if (status === 'down') return 'var(--color-danger, #ef4444)'
-  if (status === 'degraded') return 'var(--color-warning, #f59e0b)'
-  return 'var(--border-primary, #334155)'
-}
 
 interface FaqItem {
   question: string
@@ -388,20 +391,16 @@ export default async function TrackerDomainPage({
       {/* Uptime bars */}
       <div className="tracker-uptime-section">
         <h2 className="tracker-section-heading">7-Day Uptime History</h2>
-        <div className="tracker-uptime-bars">
-          {uptimeBars.map((bar, i) => (
-            <div
-              key={i}
-              className="tracker-uptime-bar"
-              style={{ background: getBarColor(bar.status) }}
-              title={`${bar.status} (${bar.count} checks)`}
-            />
-          ))}
-        </div>
-        <div className="tracker-uptime-legend">
-          <span>7 days ago</span>
-          <span>Now</span>
-        </div>
+        <TimelineBarGraph
+          data={uptimeBars.map(bar => ({
+            timestamp: bar.timestamp,
+            status: (bar.status === 'unknown' ? 'none' : bar.status) as 'up' | 'down' | 'degraded' | 'none',
+            tooltipLabel: bar.count > 0 ? `${bar.status} · ${bar.count} check${bar.count !== 1 ? 's' : ''}` : undefined,
+          }))}
+          intervalSeconds={Math.round((7 * 24 * 3600) / 60)}
+          height={32}
+          label=""
+        />
       </div>
 
       {/* Open incidents */}

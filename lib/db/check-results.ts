@@ -62,40 +62,74 @@ export async function getLatestCheckResult(monitorId: string): Promise<CheckResu
 
 interface UptimeSlot {
   slot: string
+  timestamp: string   // ISO 8601 — slot start time, used by TimelineBarGraph
   status: 'up' | 'down' | 'degraded' | 'none'
 }
 
-const UPTIME_BAR_MAX = 144
+// Max bars shown in the 24h table column — floors at 5-min granularity (288 slots)
+const UPTIME_BAR_MAX = 288
 
 export async function getUptimeBarData(monitorId: string, checkIntervalSeconds: number = 300): Promise<UptimeSlot[]> {
   const supabase = createAdminClient()
-  // Look back far enough to fill ~144 bars, minimum 12 hours
-  const lookbackMs = Math.max(12 * 60 * 60 * 1000, checkIntervalSeconds * UPTIME_BAR_MAX * 1000)
-  const since = new Date(Date.now() - lookbackMs)
+
+  // Fixed 24-hour window — always the same period regardless of check interval
+  const now = new Date()
+  const since = new Date(now.getTime() - 24 * 60 * 60 * 1000)
+
+  // Slot duration: use the monitor's own interval, but never smaller than 300s
+  // so we never exceed 288 bars (86400 / 300 = 288)
+  const slotSeconds = Math.max(checkIntervalSeconds, Math.ceil(86400 / UPTIME_BAR_MAX))
+  const numSlots = Math.floor(86400 / slotSeconds)
 
   const { data, error } = await supabase
     .from('check_results')
     .select('status, checked_at')
     .eq('monitor_id', monitorId)
     .gte('checked_at', since.toISOString())
-    .order('checked_at', { ascending: false })
-    .limit(UPTIME_BAR_MAX)
+    .order('checked_at', { ascending: true })
 
   if (error) {
     logger.error('Failed to get uptime bar data', { error: error.message })
-    return []
+    return Array.from({ length: numSlots }, (_, i) => ({
+      slot: new Date(since.getTime() + i * slotSeconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      timestamp: new Date(since.getTime() + i * slotSeconds * 1000).toISOString(),
+      status: 'none' as const,
+    }))
   }
 
-  // Return oldest-first so bars render left-to-right chronologically
-  return (data ?? []).reverse().map(r => ({
-    slot: new Date(r.checked_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-    status: (r.status === 'up' || r.status === 'down' || r.status === 'degraded' ? r.status : 'none') as UptimeSlot['status'],
-  }))
+  const results = data ?? []
+  const slots: UptimeSlot[] = []
+
+  for (let i = 0; i < numSlots; i++) {
+    const slotStart = new Date(since.getTime() + i * slotSeconds * 1000)
+    const slotEnd   = new Date(slotStart.getTime() + slotSeconds * 1000)
+
+    const checksInSlot = results.filter(r => {
+      const t = new Date(r.checked_at).getTime()
+      return t >= slotStart.getTime() && t < slotEnd.getTime()
+    })
+
+    let status: UptimeSlot['status'] = 'none'
+    if (checksInSlot.length > 0) {
+      if (checksInSlot.some(c => c.status === 'down'))     status = 'down'
+      else if (checksInSlot.some(c => c.status === 'degraded')) status = 'degraded'
+      else status = 'up'
+    }
+
+    slots.push({
+      slot: slotStart.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      timestamp: slotStart.toISOString(),
+      status,
+    })
+  }
+
+  return slots
 }
 
 /**
  * Get recent check results for all monitors in an organisation.
  * Used by the dashboard charts to show uptime and response time trends.
+ * IDs are chunked into batches of 50 to avoid PostgREST URL-length limits.
  */
 export async function getRecentCheckResultsByMonitorIds(monitorIds: string[], days: number = 30): Promise<CheckResult[]> {
   if (monitorIds.length === 0) return []
@@ -103,19 +137,29 @@ export async function getRecentCheckResultsByMonitorIds(monitorIds: string[], da
   const since = new Date()
   since.setDate(since.getDate() - days)
 
-  const { data, error } = await supabase
-    .from('check_results')
-    .select('*')
-    .in('monitor_id', monitorIds)
-    .gte('checked_at', since.toISOString())
-    .order('checked_at', { ascending: true })
-    .limit(5000)
-
-  if (error) {
-    logger.error('Failed to get check results by monitor IDs', { error: error.message })
-    return []
+  const CHUNK = 50
+  const chunks: string[][] = []
+  for (let i = 0; i < monitorIds.length; i += CHUNK) {
+    chunks.push(monitorIds.slice(i, i + CHUNK))
   }
-  return data ?? []
+
+  const results = await Promise.all(chunks.map(async (chunk) => {
+    const { data, error } = await supabase
+      .from('check_results')
+      .select('*')
+      .in('monitor_id', chunk)
+      .gte('checked_at', since.toISOString())
+      .order('checked_at', { ascending: true })
+      .limit(5000)
+
+    if (error) {
+      logger.error('Failed to get check results by monitor IDs', { error: error.message })
+      return []
+    }
+    return data ?? []
+  }))
+
+  return results.flat()
 }
 
 export async function getRecentCheckResultsByOrg(orgId: string, days: number = 30): Promise<CheckResult[]> {
@@ -195,6 +239,7 @@ export async function getUptimeBarDataForRange(monitorId: string, range: string)
     logger.error('Failed to get uptime bar data for range', { error: error.message })
     return Array.from({ length: config.slots }, (_, i) => ({
       slot: formatSlotTime(since, i, config.slotMinutes),
+      timestamp: new Date(since.getTime() + i * config.slotMinutes * 60 * 1000).toISOString(),
       status: 'none' as const,
     }))
   }
@@ -218,7 +263,7 @@ export async function getUptimeBarDataForRange(monitorId: string, range: string)
       else status = 'up'
     }
 
-    slots.push({ slot: formatSlotTime(since, i, config.slotMinutes), status })
+    slots.push({ slot: formatSlotTime(since, i, config.slotMinutes), timestamp: slotStart.toISOString(), status })
   }
 
   return slots

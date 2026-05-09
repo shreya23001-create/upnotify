@@ -7625,6 +7625,101 @@ section.hero .hero-mockup {
   width: 18px; height: 18px; accent-color: var(--accent, #3b82f6); cursor: pointer;
 }
 
+/* ── TimelineBarGraph ──────────────────────────────────────────────────────── */
+:root      { --tlbg-none: #d1d5db; }  /* light mode no-data bar */
+html.dark  { --tlbg-none: #374151; }  /* dark  mode no-data bar */
+
+.tlbg-wrap { display: flex; flex-direction: column; gap: 6px; width: 100%; }
+
+.tlbg-label { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
+
+.tlbg-track {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  width: 100%;
+  overflow: hidden;
+}
+
+.tlbg-bar-wrap {
+  flex: 1;
+  min-width: 1px;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  cursor: pointer;
+}
+
+.tlbg-bar {
+  width: 100%;
+  border-radius: 3px 3px 0 0;
+  transition: filter var(--dur-fast, 120ms) ease, transform var(--dur-fast, 120ms) ease;
+  flex-shrink: 0;
+}
+
+.tlbg-bar-hovered {
+  filter: brightness(1.18);
+  transform: scaleY(1.06);
+  transform-origin: bottom;
+}
+
+/* Tooltip — rendered via portal at document.body so no parent overflow:hidden clips it */
+.tlbg-tooltip-portal {
+  background: var(--bg-card, #fff);
+  border: 1px solid var(--border-primary, #eaedf3);
+  border-radius: var(--radius-md, 10px);
+  box-shadow: var(--shadow-md, 0 4px 16px rgba(0,0,0,.12));
+  padding: 7px 10px;
+  white-space: nowrap;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  pointer-events: none;
+  animation: tlbgTooltipIn 80ms ease;
+}
+
+@keyframes tlbgTooltipIn {
+  from { opacity: 0; transform: translate(var(--tlbg-tx, -50%), calc(-100% - 6px)); }
+  to   { opacity: 1; transform: translate(var(--tlbg-tx, -50%), calc(-100% - 10px)); }
+}
+
+.tlbg-tooltip-portal::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: var(--bg-card, #fff);
+  filter: drop-shadow(0 1px 0 var(--border-primary, #eaedf3));
+}
+
+.tlbg-tooltip-ts     { font-size: 12px; font-weight: 600; color: var(--text-primary); font-family: var(--font-mono, monospace); }
+.tlbg-tooltip-val    { font-size: 11px; color: var(--text-muted); }
+.tlbg-tooltip-status { font-size: 11px; font-weight: 600; }
+
+.tlbg-footer {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text-muted);
+  padding: 0 2px;
+}
+
+.tlbg-empty {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 20px;
+  color: var(--text-muted);
+  font-size: 13px;
+  border: 1px dashed var(--border-primary);
+  border-radius: var(--radius-md, 10px);
+  background: var(--bg-muted);
+}
+
+/* ── /TimelineBarGraph ─────────────────────────────────────────────────────── */
+
 /* Responsive */
 @media (max-width: 640px) {
   .cms-color-grid { grid-template-columns: 1fr 1fr; }

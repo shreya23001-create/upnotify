@@ -1,6 +1,8 @@
 'use client'
 
-interface UptimeSlot { slot: string; status: 'up' | 'down' | 'degraded' | 'none' }
+import { TimelineBarGraph } from '@/components/ui/timeline-bar-graph'
+
+interface UptimeSlot { slot: string; timestamp: string; status: 'up' | 'down' | 'degraded' | 'none' }
 
 interface Props {
   slots: UptimeSlot[]
@@ -18,18 +20,12 @@ export function MonitorUptimeBars({ slots, uptimePercent, rangeLabel = '30 days'
         <span className="uptime-bar-pct" style={{ color: pctColor }}>{uptimePercent.toFixed(2)}% uptime</span>
       </div>
 
-      <div className="uptime-bar-grid">
-        {slots.map((slot, i) => {
-          const cls = slot.status === 'up' ? 'uptime-bar-cell uptime-bar-cell-up'
-            : slot.status === 'down' ? 'uptime-bar-cell uptime-bar-cell-down'
-            : slot.status === 'degraded' ? 'uptime-bar-cell uptime-bar-cell-degraded'
-            : 'uptime-bar-cell uptime-bar-cell-none'
-          const label = slot.status === 'up' ? 'Operational'
-            : slot.status === 'down' ? 'Down'
-            : slot.status === 'degraded' ? 'Degraded'
-            : 'No data'
-          return <div key={i} className={cls} title={`${slot.slot}: ${label}`} />
-        })}
+      <div style={{ padding: '16px 20px' }}>
+        <TimelineBarGraph
+          data={slots.map(s => ({ timestamp: s.timestamp, status: s.status }))}
+          height={32}
+          showFooter={false}
+        />
       </div>
 
       <div className="uptime-bar-footer">

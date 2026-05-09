@@ -43,22 +43,24 @@ function formatDate(dateStr: string): string {
   })
 }
 
-export function IncidentsTable({ incidents, pagination }: { incidents: IncidentWithMonitor[]; pagination?: PaginationMeta }): React.ReactElement {
-  const [tab, setTab] = useState<TabFilter>('open')
+export function IncidentsTable({
+  incidents,
+  pagination,
+  openTotal,
+  resolvedTotal,
+  activeTab,
+}: {
+  incidents: IncidentWithMonitor[]
+  pagination?: PaginationMeta
+  openTotal: number
+  resolvedTotal: number
+  activeTab: TabFilter
+}): React.ReactElement {
   const [isPending, startTransition] = useTransition()
   const [updatingId, setUpdatingId] = useState<string | null>(null)
   const [resolutionNotes, setResolutionNotes] = useState<Record<string, string>>({})
   const [localIncidents, setLocalIncidents] = useState(incidents)
   const [showResolveForm, setShowResolveForm] = useState<string | null>(null)
-
-  const filtered = localIncidents.filter(inc => {
-    if (tab === 'open') return inc.status !== 'resolved'
-    if (tab === 'resolved') return inc.status === 'resolved'
-    return true
-  })
-
-  const openCount = localIncidents.filter(i => i.status !== 'resolved').length
-  const resolvedCount = localIncidents.filter(i => i.status === 'resolved').length
 
   async function handleStatusChange(incidentId: string, newStatus: string): Promise<void> {
     if (newStatus === 'resolved') {
@@ -134,35 +136,37 @@ export function IncidentsTable({ incidents, pagination }: { incidents: IncidentW
     return STATUS_ORDER.slice(idx + 1) as unknown as string[]
   }
 
+  const tabHref = (t: TabFilter) => `?tab=${t}&page=1`
+
   return (
     <div>
-      {/* Tab filters */}
+      {/* Tab filters \u2014 URL-driven so pagination resets on tab change */}
       <div className="incidents-tabs">
-        <button
-          className={`incidents-tab${tab === 'open' ? ' incidents-tab-active' : ''}`}
-          onClick={() => setTab('open')}
+        <a
+          href={tabHref('open')}
+          className={`incidents-tab${activeTab === 'open' ? ' incidents-tab-active' : ''}`}
         >
-          Open ({openCount})
-        </button>
-        <button
-          className={`incidents-tab${tab === 'resolved' ? ' incidents-tab-active' : ''}`}
-          onClick={() => setTab('resolved')}
+          Open ({openTotal})
+        </a>
+        <a
+          href={tabHref('resolved')}
+          className={`incidents-tab${activeTab === 'resolved' ? ' incidents-tab-active' : ''}`}
         >
-          Resolved ({resolvedCount})
-        </button>
-        <button
-          className={`incidents-tab${tab === 'all' ? ' incidents-tab-active' : ''}`}
-          onClick={() => setTab('all')}
+          Resolved ({resolvedTotal})
+        </a>
+        <a
+          href="?tab=all&page=1"
+          className={`incidents-tab${activeTab === 'all' ? ' incidents-tab-active' : ''}`}
         >
-          All ({localIncidents.length})
-        </button>
+          All ({openTotal + resolvedTotal})
+        </a>
       </div>
 
-      {filtered.length === 0 ? (
+      {localIncidents.length === 0 ? (
         <div className="empty-state">
           <div className="empty-state-icon">{'\u2705'}</div>
           <p>
-            {tab === 'open' ? 'No open incidents. Everything looks good!' : 'No incidents found.'}
+            {activeTab === 'open' ? 'No open incidents. Everything looks good!' : 'No incidents found.'}
           </p>
         </div>
       ) : (
@@ -180,7 +184,7 @@ export function IncidentsTable({ incidents, pagination }: { incidents: IncidentW
               </tr>
             </thead>
             <tbody>
-              {filtered.map(inc => (
+              {localIncidents.map(inc => (
                 <tr key={inc.id}>
                   <td>
                     <span className="incident-title">{inc.title}</span>
@@ -223,7 +227,7 @@ export function IncidentsTable({ incidents, pagination }: { incidents: IncidentW
                   <td className="table-cell-muted">
                     {formatDate(inc.started_at)}
                   </td>
-                  <td className="table-cell-muted">
+                  <td className="table-cell-muted" suppressHydrationWarning>
                     {formatDuration(inc.duration_seconds, inc.started_at, inc.resolved_at)}
                   </td>
                   <td>

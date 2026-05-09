@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useMemo, useRef } from 'react'
+import { TimelineBarGraph } from '@/components/ui/timeline-bar-graph'
 import Link from 'next/link'
 import { useWorkspace } from '@/components/providers/workspace-provider'
 import type { Monitor, Incident } from '@/lib/types'
@@ -35,18 +36,21 @@ function fmtTime(dateStr: string): string {
 }
 
 /** Average response times grouped by day for last 7 days */
-function buildResponseChart(checkResults: CheckResult[]): { label: string; avg: number }[] {
-  const dayMap: Record<string, { sum: number; count: number }> = {}
+function buildResponseChart(checkResults: CheckResult[]): { label: string; date: Date; avg: number }[] {
+  const dayMap: Record<string, { sum: number; count: number; date: Date }> = {}
   for (const r of checkResults) {
     if (!r.response_time_ms) continue
     const d = new Date(r.checked_at)
-    const key = `${d.getDate()}/${d.getMonth() + 1}`
-    if (!dayMap[key]) dayMap[key] = { sum: 0, count: 0 }
+    const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`
+    if (!dayMap[key]) {
+      dayMap[key] = { sum: 0, count: 0, date: new Date(d.getFullYear(), d.getMonth(), d.getDate(), 12, 0, 0) }
+    }
     dayMap[key].sum += r.response_time_ms
     dayMap[key].count++
   }
-  return Object.entries(dayMap)
-    .map(([label, v]) => ({ label, avg: Math.round(v.sum / v.count) }))
+  return Object.values(dayMap)
+    .map(v => ({ date: v.date, avg: Math.round(v.sum / v.count), label: `${v.date.getDate()}/${v.date.getMonth() + 1}` }))
+    .sort((a, b) => a.date.getTime() - b.date.getTime())
     .slice(-7)
 }
 
@@ -367,19 +371,19 @@ function ResponseChart({ checkResults }: { checkResults: CheckResult[] }) {
             </div>
             <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Avg response · latest day</div>
           </div>
-          <div className="chart-placeholder">
-            {days.map((d, i) => (
-              <div
-                key={i}
-                className="chart-bar"
-                style={{
-                  height: `${Math.max(6, Math.round((d.avg / maxAvg) * 100))}%`,
-                  background: barColor(d.avg),
-                  opacity: 0.85,
-                }}
-                title={`${d.label}: ${d.avg}ms`}
-              />
-            ))}
+          <div style={{ padding: '8px 20px 4px' }}>
+            <TimelineBarGraph
+              data={days.map(d => ({
+                timestamp: d.date.toISOString(),
+                value: maxAvg > 0 ? Math.max(6, Math.round((d.avg / maxAvg) * 100)) : 6,
+                status: d.avg < 500 ? 'up' : d.avg < 1500 ? 'degraded' : 'down',
+                tooltipLabel: `${d.avg}ms`,
+              }))}
+              intervalSeconds={86400}
+              height={80}
+              scaleByValue
+              showFooter={false}
+            />
           </div>
           <div className="chart-x-labels">
             {days.map((d, i) => <span key={i}>{d.label}</span>)}

@@ -29,6 +29,7 @@ const typeLabels: Record<string, { up?: string; down?: string; degraded?: string
   'page-size':        { up: 'OK',         down: 'Oversized', degraded: 'Large' },
   'cookie-consent':   { up: 'Present',    down: 'Missing' },
   'heartbeat':        { up: 'Alive',      down: 'Missed' },
+  'wordpress':       { up: 'Connected',    down: 'Not Connected', degraded: 'Partially Connected' },
 }
 
 const defaultLabels = { up: 'Up', down: 'Down', degraded: 'Degraded', paused: 'Paused', unknown: 'Unknown' }
