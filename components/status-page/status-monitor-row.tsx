@@ -1,9 +1,10 @@
 'use client'
 
 import { MonitorTypeIcon } from '@/components/monitors/monitor-type-icon'
+import { TimelineBarGraph } from '@/components/ui/timeline-bar-graph'
 import type { Monitor } from '@/lib/types'
 
-interface UptimeSlot { slot: string; status: 'up' | 'down' | 'degraded' | 'none' }
+interface UptimeSlot { slot: string; timestamp: string; status: 'up' | 'down' | 'degraded' | 'none' }
 
 interface Props {
   monitor: Monitor
@@ -74,13 +75,11 @@ export function StatusMonitorRow({ monitor, uptimeSlots, uptimePercent, range }:
         ) : (
           <>
             <div className="sp-uptime-bars">
-              {uptimeSlots.map((slot, i) => {
-                const tickClass = slot.status === 'up' ? 'sp-uptime-tick ok'
-                  : slot.status === 'down' ? 'sp-uptime-tick down-t'
-                  : slot.status === 'degraded' ? 'sp-uptime-tick warn-t'
-                  : 'sp-uptime-tick none'
-                return <div key={i} className={tickClass} title={`${slot.slot}: ${slot.status}`} />
-              })}
+              <TimelineBarGraph
+                data={uptimeSlots.map(s => ({ timestamp: s.timestamp, status: s.status }))}
+                height={20}
+                showFooter={false}
+              />
             </div>
             <span className="sp-uptime-pct" style={{ color: pctColor }}>{uptimePercent.toFixed(2)}%</span>
             <span className="sp-bars-range-label">{rangeLabel}</span>

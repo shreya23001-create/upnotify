@@ -14,16 +14,17 @@ export const metadata: Metadata = {
 export default async function IncidentsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string }>
+  searchParams: Promise<{ page?: string; tab?: string }>
 }): Promise<React.ReactElement> {
   const user = await getCurrentUser()
   if (!user) redirect('/login')
 
-  const { page: pageParam } = await searchParams
+  const { page: pageParam, tab: tabParam } = await searchParams
   const page = parsePage(pageParam)
   const pageSize = DEFAULT_PAGE_SIZE
+  const tab = tabParam === 'resolved' ? 'resolved' : tabParam === 'open' ? 'open' : undefined
 
-  const { data: incidents, total } = await getAllIncidentsByOrgPaged(user.org_id, page, pageSize)
+  const { data: incidents, total, openTotal, resolvedTotal } = await getAllIncidentsByOrgPaged(user.org_id, page, pageSize, tab)
   const pagination = getPaginationMeta(page, pageSize, total)
 
   return (
@@ -31,7 +32,13 @@ export default async function IncidentsPage({
       <div className="db-page-header">
         <div className="db-page-title">Incidents</div>
       </div>
-      <IncidentsTable incidents={incidents} pagination={pagination} />
+      <IncidentsTable
+        incidents={incidents}
+        pagination={pagination}
+        openTotal={openTotal}
+        resolvedTotal={resolvedTotal}
+        activeTab={tab ?? 'all'}
+      />
     </div>
   )
 }

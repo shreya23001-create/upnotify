@@ -5,14 +5,14 @@ import Link from 'next/link'
 import { DataTable, type Column, type BulkAction } from '@/components/ui/data-table'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { MonitorStatusBadge } from './monitor-status-badge'
-import { UptimeBar } from './uptime-bar'
+import { TimelineBarGraph } from '@/components/ui/timeline-bar-graph'
 import { MonitorTypeIcon } from './monitor-type-icon'
 import { pauseMonitorAction, resumeMonitorAction, deleteMonitorAction, bulkDeleteMonitorsAction, bulkPauseMonitorsAction, bulkResumeMonitorsAction } from '@/app/(dashboard)/dashboard/monitors/actions'
 import { Pagination } from '@/components/ui/pagination'
 import type { Monitor } from '@/lib/types'
 import type { PaginationMeta } from '@/lib/utils/pagination'
 
-interface UptimeSlot { slot: string; status: 'up' | 'down' | 'degraded' | 'none' }
+interface UptimeSlot { slot: string; timestamp: string; status: 'up' | 'down' | 'degraded' | 'none' }
 
 interface MonitorTableProps {
   monitors: Monitor[]
@@ -88,7 +88,19 @@ export function MonitorTable({ monitors, uptimeData, initialSearch = '', paginat
   const columns: Column<Monitor>[] = [
     { key: 'type', label: 'Type', render: (m) => <MonitorTypeIcon type={m.type} /> },
     { key: 'name', label: 'Name', render: (m) => <Link href={m.type === 'wordpress' ? `/dashboard/monitors/${m.id}/wordpress` : `/dashboard/monitors/${m.id}`} className="table-link">{m.name}</Link> },
-    { key: 'uptime', label: 'Uptime (12h)', sortable: false, searchable: false, render: (m) => <UptimeBar slots={uptimeData[m.id] || []} /> },
+    { key: 'uptime', label: 'Uptime (24h)', sortable: false, searchable: false, render: (m) => {
+      const slotSeconds = Math.max(m.check_interval_seconds, Math.ceil(86400 / 288))
+      const numSlots    = Math.floor(86400 / slotSeconds)
+      return (
+        <TimelineBarGraph
+          data={(uptimeData[m.id] || []).map(s => ({ timestamp: s.timestamp, status: s.status }))}
+          intervalSeconds={slotSeconds}
+          maxBars={numSlots}
+          height={24}
+          showFooter={false}
+        />
+      )
+    }},
     { key: 'status', label: 'Status', render: (m) => <MonitorStatusBadge status={m.status} monitorType={m.type} /> },
     { key: 'last_checked_at', label: 'Last Checked', render: (m) => <span className="table-muted">{m.last_checked_at ? timeAgo(m.last_checked_at) : 'Never'}</span> },
     {

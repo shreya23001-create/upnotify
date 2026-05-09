@@ -223,22 +223,34 @@ export async function getOpenIncidentForMonitor(monitorId: string): Promise<Inci
 }
 
 export async function getAllIncidentsByOrgPaged(
-  orgId: string, page: number, pageSize: number
-): Promise<{ data: IncidentWithMonitor[]; total: number }> {
+  orgId: string, page: number, pageSize: number, statusFilter?: 'open' | 'resolved'
+): Promise<{ data: IncidentWithMonitor[]; total: number; openTotal: number; resolvedTotal: number }> {
   const supabase = await createClient()
   const from = (page - 1) * pageSize
   const to = from + pageSize - 1
-  const { data, error, count } = await supabase
+
+  let query = supabase
     .from('incidents')
     .select('*, monitors(name)', { count: 'exact' })
     .eq('org_id', orgId)
     .order('started_at', { ascending: false })
     .range(from, to)
 
-  if (error) return { data: [], total: 0 }
+  if (statusFilter === 'open') query = query.neq('status', 'resolved')
+  else if (statusFilter === 'resolved') query = query.eq('status', 'resolved')
+
+  const { data, error, count } = await query
+
+  // Fetch open/resolved totals for tab counts
+  const [{ count: openCount }, { count: resolvedCount }] = await Promise.all([
+    supabase.from('incidents').select('id', { count: 'exact', head: true }).eq('org_id', orgId).neq('status', 'resolved'),
+    supabase.from('incidents').select('id', { count: 'exact', head: true }).eq('org_id', orgId).eq('status', 'resolved'),
+  ])
+
+  if (error) return { data: [], total: 0, openTotal: 0, resolvedTotal: 0 }
   const mapped = (data ?? []).map(row => {
     const { monitors, ...rest } = row as typeof row & { monitors: { name: string } | null }
     return { ...rest, monitor_name: monitors?.name ?? null }
   })
-  return { data: mapped, total: count ?? 0 }
+  return { data: mapped, total: count ?? 0, openTotal: openCount ?? 0, resolvedTotal: resolvedCount ?? 0 }
 }
