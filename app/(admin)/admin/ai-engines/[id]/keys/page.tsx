@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { getAllEnginesAdmin, getEngineKeys } from '@/lib/db/ai-engines'
 import { notFound } from 'next/navigation'
 import { DeleteKeyButton } from './delete-key-button'
+import { TestKeyButton }   from './test-key-button'
 
 export const metadata: Metadata = { title: 'Engine API Keys — Admin' }
 
@@ -83,7 +84,10 @@ export default async function EngineKeysPage({ params }: PageProps): Promise<Rea
                       </span>
                     </td>
                     <td>
-                      <DeleteKeyButton keyId={key.id} />
+                      <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+                        <TestKeyButton keyId={key.id} />
+                        <DeleteKeyButton keyId={key.id} />
+                      </div>
                     </td>
                   </tr>
                 )

@@ -26,9 +26,21 @@ export interface AiEngine {
   signal_note:    string
   sort_order:     number
   admin_notes:    string | null
+  // Provider-side model identifier (e.g. claude-haiku-4-5-20251001).
+  // NULL for search-only engines (exa, copilot — Bing) that do not take a model.
+  // Migration 00104.
+  model_id:       string | null
   created_at:     string
   updated_at:     string
 }
+
+// Result of looking up a key for the admin "Test" button.
+// Discriminated union so the API route can distinguish a missing key from
+// a successful lookup whose decryption failed (which is what happens if
+// AI_ENGINE_ENCRYPTION_SECRET was rotated since the key was added).
+export type EngineKeyForTesting =
+  | { ok: true;  apiKey: string; engineSlug: string; modelId: string | null }
+  | { ok: false; reason: 'not_found' | 'decryption_failed' | 'no_engine'; message: string }
 
 export interface AiEngineKey {
   id:            string
@@ -248,4 +260,57 @@ export async function acquireEngineKey(engineId: string): Promise<string | null>
 function getNextMonthReset(): string {
   const now = new Date()
   return new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString()
+}
+
+// ---------------------------------------------------------------------------
+// Admin-only — fetch + decrypt a key for the "Test" button without touching
+// the usage counter. Distinct from acquireEngineKey() so a test click never
+// burns a slot in the rotation pool. Two sequential lookups (key → engine)
+// rather than a JOIN to keep the AnySupabase typing manageable.
+// ---------------------------------------------------------------------------
+export async function getEngineKeyForTesting(keyId: string): Promise<EngineKeyForTesting> {
+  const supabase = createAdminClient() as AnySupabase
+
+  const { data: keyRow, error: keyErr } = await supabase
+    .from('ai_engine_keys')
+    .select('engine_id, encrypted_key, key_iv, key_tag')
+    .eq('id', keyId)
+    .single()
+
+  if (keyErr || !keyRow) {
+    return { ok: false, reason: 'not_found', message: 'Key not found.' }
+  }
+
+  const { data: engineRow, error: engineErr } = await supabase
+    .from('ai_engines')
+    .select('slug, model_id')
+    .eq('id', keyRow.engine_id)
+    .single()
+
+  if (engineErr || !engineRow?.slug) {
+    return { ok: false, reason: 'no_engine', message: 'Engine for this key was not found.' }
+  }
+
+  let apiKey: string
+  try {
+    apiKey = decryptValue({
+      encrypted: keyRow.encrypted_key,
+      iv:        keyRow.key_iv,
+      tag:       keyRow.key_tag,
+    } as EncryptedValue)
+  } catch (err) {
+    logger.error('getEngineKeyForTesting decryption failed', { keyId, error: String(err) })
+    return {
+      ok: false,
+      reason: 'decryption_failed',
+      message: 'Decryption failed — likely AI_ENGINE_ENCRYPTION_SECRET was rotated since this key was added. Delete and re-add the key.',
+    }
+  }
+
+  return {
+    ok:         true,
+    apiKey,
+    engineSlug: engineRow.slug as string,
+    modelId:    (engineRow.model_id as string | null) ?? null,
+  }
 }

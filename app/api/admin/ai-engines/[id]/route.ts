@@ -16,7 +16,7 @@ export async function PATCH(
   catch { return NextResponse.json({ error: 'Invalid request.' }, { status: 400 }) }
 
   const allowed = ['name', 'slug', 'description', 'type', 'signal_quality', 'signal_note',
-                   'is_free', 'is_active', 'sort_order', 'admin_notes']
+                   'is_free', 'is_active', 'sort_order', 'admin_notes', 'model_id']
   const update: Record<string, unknown> = {}
   for (const key of allowed) {
     if (key in body) update[key] = body[key]

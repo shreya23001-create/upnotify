@@ -18,7 +18,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   try { body = await request.json() }
   catch { return NextResponse.json({ error: 'Invalid request.' }, { status: 400 }) }
 
-  const { name, slug, description, type, signal_quality, signal_note, is_free, is_active, sort_order, admin_notes } = body
+  const { name, slug, description, type, signal_quality, signal_note, is_free, is_active, sort_order, admin_notes, model_id } = body
 
   if (!name || !slug || !type || !signal_quality) {
     return NextResponse.json({ error: 'name, slug, type, and signal_quality are required.' }, { status: 400 })
@@ -36,6 +36,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     is_active:      Boolean(is_active ?? true),
     sort_order:     Number(sort_order ?? 99),
     admin_notes:    admin_notes ? String(admin_notes) : null,
+    model_id:       model_id ? String(model_id) : null,
   })
 
   if (!engine) return NextResponse.json({ error: 'Failed to create engine.' }, { status: 500 })
