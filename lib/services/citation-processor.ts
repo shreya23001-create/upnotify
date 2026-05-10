@@ -174,6 +174,22 @@ const ENGINE_QUERY_MAP: Record<string, EngineQueryFn> = {
   copilot:    (_engine, key, kw, domain) => queryBingCopilot(key, kw, domain),
 }
 
+// Public dispatcher — used by citation-processor itself (with keyword) and
+// by profile-introspector (with a substituted introspection prompt). The
+// per-engine wrappers don't treat "keyword" semantically; they pass it as
+// the user message and check whether the response/URLs contain the domain.
+// Same logic works for both feature modes.
+export async function runEngineQuery(
+  engine:  AiEngine,
+  apiKey:  string,
+  message: string,
+  domain:  string,
+): Promise<{ cited: boolean; confidence: 'high' | 'medium' | 'indicative'; responseText: string; sourceUrls: string[] } | null> {
+  const queryFn = ENGINE_QUERY_MAP[engine.slug]
+  if (!queryFn) return null
+  return queryFn(engine, apiKey, message, domain)
+}
+
 // ---------------------------------------------------------------------------
 // Main processor — call this directly, no HTTP self-call needed
 // ---------------------------------------------------------------------------

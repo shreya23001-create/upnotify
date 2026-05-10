@@ -3,23 +3,25 @@
 import { useState } from 'react'
 import type { AiEngine } from '@/lib/db/ai-engines'
 import type { LlmsTxtGeneration, CitationCheckRun } from '@/lib/db/ai-visibility'
+import type { ProfileRun } from '@/lib/db/ai-profile'
 
 interface Props {
   engines:                AiEngine[]
   freeEngineIds:          string[]
   llmsGenerations:        LlmsTxtGeneration[]
   citationRuns:           CitationCheckRun[]
+  profileRuns:            ProfileRun[]
   planSlug:               string
   canGenerateLlms:        boolean
   llmsBlockReason?:       string
-  citationRunsThisMonth:  number
+  citationRunsThisMonth:  number   // combined citation + profile count (shared quota)
   citationLimit:          number
 }
 
-type Tab = 'llms' | 'citation'
+type Tab = 'llms' | 'citation' | 'profile'
 
 export function AiVisibilityClient({
-  engines, freeEngineIds, llmsGenerations, citationRuns,
+  engines, freeEngineIds, llmsGenerations, citationRuns, profileRuns,
   planSlug, canGenerateLlms, llmsBlockReason,
   citationRunsThisMonth, citationLimit,
 }: Props): React.ReactElement {
@@ -34,6 +36,12 @@ export function AiVisibilityClient({
         </button>
         <button className={`db-tab${tab === 'citation' ? ' db-tab-active' : ''}`} onClick={() => setTab('citation')}>
           AI Citation Monitor
+          {citationLimit > 0 && (
+            <span className="db-tab-badge">{citationRunsThisMonth}/{citationLimit} used</span>
+          )}
+        </button>
+        <button className={`db-tab${tab === 'profile' ? ' db-tab-active' : ''}`} onClick={() => setTab('profile')}>
+          AI Profile
           {citationLimit > 0 && (
             <span className="db-tab-badge">{citationRunsThisMonth}/{citationLimit} used</span>
           )}
@@ -54,6 +62,16 @@ export function AiVisibilityClient({
           engines={engines}
           freeEngineIds={freeEngineIds}
           runs={citationRuns}
+          planSlug={planSlug}
+          runsThisMonth={citationRunsThisMonth}
+          monthlyLimit={citationLimit}
+        />
+      )}
+      {tab === 'profile' && (
+        <ProfileTab
+          engines={engines}
+          freeEngineIds={freeEngineIds}
+          runs={profileRuns}
           planSlug={planSlug}
           runsThisMonth={citationRunsThisMonth}
           monthlyLimit={citationLimit}
@@ -418,6 +436,195 @@ function CitationTab({ engines, freeEngineIds, runs, planSlug, runsThisMonth, mo
                     <div className="ai-vis-run-right">
                       {run.summary && (
                         <div className="ai-vis-run-score">{run.summary.score}/100</div>
+                      )}
+                      <span className="ai-vis-run-status" style={{ color: statusColor }}>{run.status}</span>
+                    </div>
+                  </a>
+                )
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// AI Profile Tab — introspection: "what does AI think my site is?"
+// ---------------------------------------------------------------------------
+function ProfileTab({ engines, freeEngineIds, runs, planSlug, runsThisMonth, monthlyLimit }: {
+  engines:        AiEngine[]
+  freeEngineIds:  string[]
+  runs:           ProfileRun[]
+  planSlug:       string
+  runsThisMonth:  number
+  monthlyLimit:   number
+}) {
+  const [domain, setDomain]            = useState('')
+  const [selectedEngines, setSelected] = useState<string[]>(
+    planSlug === 'free' ? freeEngineIds : engines.filter(e => e.type === 'citation' || e.type === 'both').map(e => e.id),
+  )
+  const [loading, setLoading]          = useState(false)
+  const [error, setError]              = useState('')
+  const [runId, setRunId]              = useState<string | null>(null)
+
+  // Profile uses the same engine pool as citation (any engine that can answer)
+  const profileEngines = engines.filter(e => e.type === 'citation' || e.type === 'both')
+  const canRun = planSlug === 'free' || runsThisMonth < monthlyLimit
+
+  function toggleEngine(id: string) {
+    if (planSlug === 'free' && !freeEngineIds.includes(id)) return
+    setSelected(s => s.includes(id) ? s.filter(x => x !== id) : [...s, id])
+  }
+
+  async function handleRun(e: React.FormEvent) {
+    e.preventDefault()
+    if (!canRun) return
+    setLoading(true)
+    setError('')
+    setRunId(null)
+    try {
+      const res = await fetch('/api/ai-visibility/profile-check', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ domain: domain.trim(), engineIds: selectedEngines }),
+      })
+      const data = await res.json()
+      if (!res.ok) { setError(data.error ?? 'Failed to start AI Profile.'); return }
+      setRunId(data.runId)
+    } catch {
+      setError('An error occurred. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const remainingRuns = Math.max(0, monthlyLimit - runsThisMonth)
+
+  return (
+    <div>
+      {planSlug === 'free' && (
+        <div className="ai-vis-free-notice">
+          <strong>Free plan:</strong> AI Profile is available with free-tier engines (Copilot, Exa).{' '}
+          <a href="/dashboard/settings?tab=billing">Upgrade to Lite</a> to use all engines.
+        </div>
+      )}
+
+      {planSlug !== 'free' && (
+        <div className="ai-vis-usage-bar">
+          <span className="ai-vis-usage-text">
+            {runsThisMonth} / {monthlyLimit} AI Visibility runs used this month (citations + profile combined)
+            {remainingRuns > 0 ? ` · ${remainingRuns} remaining` : ' · Resets on the 1st'}
+          </span>
+          <div className="ai-vis-usage-track">
+            <div className="ai-vis-usage-fill"
+              style={{ width: `${Math.min((runsThisMonth / monthlyLimit) * 100, 100)}%` }} />
+          </div>
+        </div>
+      )}
+
+      <div className="ai-vis-grid">
+        {/* Run panel */}
+        <div className="ai-vis-panel">
+          <h2 className="ai-vis-panel-title">Run AI Profile</h2>
+          <p className="ai-vis-panel-desc">
+            Discover what AI engines actually think about your site. We ask each engine a set of introspection
+            questions about your domain and capture their responses — useful for spotting miscategorisations,
+            knowledge gaps, and unrecognised brand opportunities.
+          </p>
+
+          {!canRun && (
+            <div className="ai-vis-limit-notice">
+              <div className="ai-vis-limit-text">
+                You&apos;ve used all {monthlyLimit} AI Visibility runs for this month. Resets on the 1st.
+              </div>
+              <a href="/dashboard/settings?tab=billing" className="ai-vis-upgrade-link">Upgrade for more →</a>
+            </div>
+          )}
+
+          <form onSubmit={handleRun} style={{ opacity: canRun ? 1 : 0.5, pointerEvents: canRun ? 'auto' : 'none' }}>
+            <div className="ai-vis-form-group">
+              <label className="ai-vis-label">Your domain</label>
+              <input className="ai-vis-input" type="text" value={domain}
+                onChange={e => setDomain(e.target.value)} placeholder="e.g. mywebsite.com" required />
+              <span className="ai-vis-hint">
+                We&apos;ll ask each AI engine a set of questions about this domain. Prompts are managed by your admin.
+              </span>
+            </div>
+
+            <div className="ai-vis-form-group">
+              <label className="ai-vis-label">AI engines to ask</label>
+              <div className="ai-vis-engine-grid">
+                {profileEngines.map(engine => {
+                  const isFreeEngine = freeEngineIds.includes(engine.id)
+                  const locked = planSlug === 'free' && !isFreeEngine
+                  return (
+                    <label key={engine.id}
+                      className={`ai-vis-engine-chip ${selectedEngines.includes(engine.id) ? 'ai-vis-engine-chip-on' : ''} ${locked ? 'ai-vis-engine-chip-locked' : ''}`}
+                      title={locked ? 'Upgrade to access this engine' : undefined}>
+                      <input type="checkbox" checked={selectedEngines.includes(engine.id)}
+                        onChange={() => toggleEngine(engine.id)} disabled={locked} style={{ display: 'none' }} />
+                      <span className="ai-vis-engine-name">{engine.name}</span>
+                      {locked
+                        ? <span className="ai-vis-signal ai-vis-signal-locked">Upgrade</span>
+                        : <span className={`ai-vis-signal ai-vis-signal-${engine.signal_quality}`}>{engine.signal_quality}</span>
+                      }
+                    </label>
+                  )
+                })}
+              </div>
+            </div>
+
+            {error && <div className="ai-vis-error">{error}</div>}
+
+            <button type="submit" className="btn btn-primary btn-block" disabled={loading || selectedEngines.length === 0}>
+              {loading ? 'Running AI Profile…' : 'Run AI Profile'}
+            </button>
+            <p className="ai-vis-plan-note">Each run uses one AI Visibility credit (shared with citation checks).</p>
+          </form>
+
+          {runId && (
+            <div className="ai-vis-run-started">
+              <div className="ai-vis-run-icon">✓</div>
+              <div>
+                <div className="ai-vis-run-title">AI Profile complete</div>
+                <div className="ai-vis-run-desc">
+                  We&apos;ve gathered responses from each engine. Click below to see what they said.
+                </div>
+                <a href={`/dashboard/ai-visibility/profile/${runId}`} className="ai-vis-run-link">View profile →</a>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Recent profile runs */}
+        <div className="ai-vis-panel">
+          <h2 className="ai-vis-panel-title">Recent profiles</h2>
+          {runs.length === 0 ? (
+            <div className="ai-vis-empty">
+              <div className="ai-vis-empty-icon">🪞</div>
+              <p>No AI Profile runs yet. Run your first to see how AI engines describe your site.</p>
+            </div>
+          ) : (
+            <div className="ai-vis-runs-list">
+              {runs.map(run => {
+                const statusColor = run.status === 'complete' ? '#22c55e' : run.status === 'failed' ? '#ef4444' : '#f59e0b'
+                const recognisedCt = run.summary?.recognised_by.length ?? 0
+                const totalEngines = run.engine_ids.length
+                return (
+                  <a key={run.id} href={`/dashboard/ai-visibility/profile/${run.id}`} className="ai-vis-run-item">
+                    <div className="ai-vis-run-item-left">
+                      <div className="ai-vis-run-domain">{run.domain}</div>
+                      <div className="ai-vis-run-meta">
+                        {totalEngines} engine{totalEngines !== 1 ? 's' : ''} ·{' '}
+                        {run.prompt_ids.length} prompt{run.prompt_ids.length !== 1 ? 's' : ''} ·{' '}
+                        {new Date(run.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+                      </div>
+                    </div>
+                    <div className="ai-vis-run-right">
+                      {run.status === 'complete' && (
+                        <div className="ai-vis-run-score">{recognisedCt}/{totalEngines} recognise</div>
                       )}
                       <span className="ai-vis-run-status" style={{ color: statusColor }}>{run.status}</span>
                     </div>

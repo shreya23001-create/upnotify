@@ -27,6 +27,7 @@ const SEARCH_INDEX: SearchItem[] = [
   { href: '/admin/tracker', label: 'Public Tracker', group: 'Product', keywords: 'tracker public sites monitoring uptime' },
   { href: '/admin/feature-flags', label: 'Feature Flags', group: 'Product', keywords: 'feature flags toggles enable disable' },
   { href: '/admin/ai-engines', label: 'AI Engines', group: 'Product', keywords: 'ai engines keys api chatgpt perplexity claude gemini' },
+  { href: '/admin/ai-profile-prompts', label: 'AI Profile Prompts', group: 'Product', keywords: 'ai profile prompts introspection visibility questions' },
   // Content
   { href: '/admin/blog', label: 'Blog', group: 'Content', keywords: 'blog posts content articles outage' },
   { href: '/admin/aoe', label: 'AOE Outreach', group: 'Content', keywords: 'aoe outreach ssl email automated campaigns' },

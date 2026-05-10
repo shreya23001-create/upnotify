@@ -62,6 +62,7 @@ const NAV_GROUPS: NavGroup[] = [
       { href: '/admin/tracker', label: 'Public Tracker', icon: IconGlobe },
       { href: '/admin/feature-flags', label: 'Feature Flags', icon: IconToggle },
       { href: '/admin/ai-engines', label: 'AI Engines', icon: IconActivity },
+      { href: '/admin/ai-profile-prompts', label: 'AI Profile Prompts', icon: IconEdit },
     ],
   },
   {

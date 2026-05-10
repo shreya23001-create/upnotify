@@ -163,6 +163,40 @@ export async function getCitationRunsThisMonth(orgId: string): Promise<number> {
   return count ?? 0
 }
 
+// Combined count — citation runs + AI Profile runs share one quota bucket
+// (Boss decision 2026-05-10). Both feature canRun* checks must use this so a
+// user can't exceed the plan limit by mixing feature types.
+// Implemented as a sum of two count queries to avoid a UNION (the tables have
+// different row shapes — only the create timestamp matters here).
+export async function getAiVisibilityRunsThisMonth(orgId: string): Promise<number> {
+  const supabase = await createClient() as AnySupabase
+  const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString()
+
+  const [citationRes, profileRes] = await Promise.all([
+    supabase
+      .from('citation_check_runs')
+      .select('id', { count: 'exact', head: true })
+      .eq('org_id', orgId)
+      .gte('created_at', startOfMonth)
+      .neq('status', 'failed'),
+    supabase
+      .from('ai_profile_runs')
+      .select('id', { count: 'exact', head: true })
+      .eq('org_id', orgId)
+      .gte('created_at', startOfMonth)
+      .neq('status', 'failed'),
+  ])
+
+  if (citationRes.error) {
+    logger.error('getAiVisibilityRunsThisMonth: citation count failed', { error: citationRes.error.message })
+  }
+  if (profileRes.error) {
+    logger.error('getAiVisibilityRunsThisMonth: profile count failed', { error: profileRes.error.message })
+  }
+
+  return (citationRes.count ?? 0) + (profileRes.count ?? 0)
+}
+
 export async function canRunCitationCheck(
   orgId: string,
   planSlug: string,
@@ -190,12 +224,13 @@ export async function canRunCitationCheck(
     }
   }
 
-  const used = await getCitationRunsThisMonth(orgId)
+  // Use combined citation + AI Profile count — quota is shared.
+  const used = await getAiVisibilityRunsThisMonth(orgId)
 
   if (used >= monthlyLimit) {
     return {
       allowed: false,
-      reason: `You have used all ${monthlyLimit} citation checks for this month. Resets on the 1st.`,
+      reason: `You have used all ${monthlyLimit} AI Visibility runs (citations + profile combined) for this month. Resets on the 1st.`,
     }
   }
   return { allowed: true }
