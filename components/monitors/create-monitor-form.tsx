@@ -48,9 +48,9 @@ function getDefaultIntervalForType(type: string, minCheckInterval: number): numb
   return Math.max(recommended, minCheckInterval)
 }
 
-export function CreateMonitorForm({ minCheckInterval = 600 }: { minCheckInterval?: number }): React.ReactElement {
-  const [type, setType] = useState('http')
-  const [interval, setInterval] = useState(() => getDefaultIntervalForType('http', minCheckInterval))
+export function CreateMonitorForm({ minCheckInterval = 600, defaultType = 'http' }: { minCheckInterval?: number; defaultType?: string }): React.ReactElement {
+  const [type, setType] = useState(defaultType)
+  const [interval, setInterval] = useState(() => getDefaultIntervalForType(defaultType, minCheckInterval))
   const [severity, setSeverity] = useState('P2')
   const [method, setMethod] = useState('GET')
   const [target, setTarget] = useState('')

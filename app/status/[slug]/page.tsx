@@ -95,9 +95,6 @@ export default async function PublicStatusPage({
   const openIncidents = incidents.filter(i => i.status !== 'resolved')
 
   const anyDown = monitors.some(m => m.status === 'down')
-  const navDotColor = anyDown ? 'var(--color-down)'
-    : openIncidents.length > 0 ? 'var(--color-warn)'
-    : 'var(--color-up)'
   const navStatusText = anyDown ? 'Major Outage'
     : openIncidents.length > 0 ? 'Partial Outage'
     : 'All Systems Operational'
@@ -112,18 +109,13 @@ export default async function PublicStatusPage({
           <img src="/favicon.svg" alt="Uptrue" className="sp-nav-uptrue-logo" />
           {statusPage.name} — Status
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <a
-            href="https://uptrue.io"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="sp-nav-powered"
-          >
+        <div className="sp-nav-right">
+          <a href="https://uptrue.io" target="_blank" rel="noopener noreferrer" className="sp-nav-powered">
             Powered by <span className="sp-nav-powered-brand">Uptrue</span>
           </a>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div className="sp-nav-brand-dot" style={{ background: navDotColor }} />
-            <span style={{ fontSize: 12, fontWeight: 600, color: navDotColor }}>{navStatusText}</span>
+          <div className={`sp-nav-status ${anyDown ? 'down' : openIncidents.length > 0 ? 'warn' : 'up'}`}>
+            <div className={`sp-nav-dot${anyDown || openIncidents.length > 0 ? ' pulse' : ''}`} />
+            {navStatusText}
           </div>
         </div>
       </nav>
@@ -142,14 +134,24 @@ export default async function PublicStatusPage({
         {/* Active incidents */}
         {openIncidents.length > 0 && (
           <>
-            <div className="sp-section-title" style={{ marginBottom: 'var(--space-3)' }}>Active Incident</div>
+            <div className="sp-section-label">Active Incident</div>
             {openIncidents.map(inc => (
-              <div key={inc.id} className="sp-incident-card" style={{ marginBottom: 'var(--space-5)' }}>
+              <div key={inc.id} className="sp-incident-card active" style={{ marginBottom: 12 }}>
                 <div className="sp-incident-header">
-                  <svg width="16" height="16" fill="none" stroke="#92400e" strokeWidth="2.5" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                  </svg>
-                  <div className="sp-incident-title">{inc.title}</div>
+                  <div className="sp-incident-icon warn">
+                    <svg width="14" height="14" fill="none" stroke="#d97706" strokeWidth="2.5" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                  </div>
+                  <div className="sp-incident-info">
+                    <div className="sp-incident-title">{inc.title}</div>
+                    <div className="sp-incident-meta">
+                      Started {new Date(inc.started_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+                    </div>
+                  </div>
+                  <div className="sp-incident-badge-wrap">
+                    <span className="sp-incident-badge-active">ONGOING</span>
+                  </div>
                 </div>
               </div>
             ))}
@@ -157,11 +159,11 @@ export default async function PublicStatusPage({
         )}
 
         {/* Current Status */}
-        <div className="sp-section-title">Current Status</div>
+        <div className="sp-section-label">Current Status</div>
         <StatusTimeRangeLinks slug={slug} currentRange={range} />
         <div className="sp-card">
           {monitors.length === 0 ? (
-            <div style={{ padding: 'var(--space-5)', color: 'var(--text-muted)', fontSize: 14 }}>
+            <div style={{ padding: '20px', color: '#94a3b8', fontSize: 14 }}>
               No monitors configured for this status page.
             </div>
           ) : (
@@ -178,19 +180,16 @@ export default async function PublicStatusPage({
         </div>
 
         {/* Incident History */}
-        <div className="sp-section-title">Incident History</div>
+        <div className="sp-section-label">Incident History</div>
         <div className="sp-card">
           {incidents.length === 0 ? (
-            <div style={{ padding: 'var(--space-4) var(--space-5)', textAlign: 'center', color: 'var(--text-muted)', fontSize: 12 }}>
+            <div style={{ padding: '20px 24px', textAlign: 'center', color: '#94a3b8', fontSize: 13 }}>
               No incidents recorded in this period.
             </div>
           ) : (
-            <>
+            <div style={{ padding: 16 }}>
               <StatusIncidentList incidents={incidents} />
-              <div style={{ padding: 'var(--space-4) var(--space-5)', textAlign: 'center', color: 'var(--text-muted)', fontSize: 12, borderTop: '1px solid var(--border-primary)' }}>
-                No other incidents in this period
-              </div>
-            </>
+            </div>
           )}
         </div>
 
