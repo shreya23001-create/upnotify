@@ -36,7 +36,7 @@ export function StatusIncidentList({ incidents }: { incidents: Incident[] }): Re
                 </div>
                 <div>
                   <div className="sp-incident-update-time">
-                    {new Date(inc.resolved_at).toLocaleString('en-GB', { timeStyle: 'short', timeZoneName: 'short' })}
+                    {new Date(inc.resolved_at).toLocaleString('en-GB', { hour: '2-digit', minute: '2-digit', timeZoneName: 'short' })}
                   </div>
                   <div className="sp-incident-update-msg">Services returned to normal operation.</div>
                   <div className="sp-incident-update-status" style={{ color: 'var(--color-up)' }}>Status: Resolved</div>
@@ -50,7 +50,7 @@ export function StatusIncidentList({ incidents }: { incidents: Incident[] }): Re
               </div>
               <div>
                 <div className="sp-incident-update-time">
-                  {new Date(inc.started_at).toLocaleString('en-GB', { timeStyle: 'short', timeZoneName: 'short' })}
+                  {new Date(inc.started_at).toLocaleString('en-GB', { hour: '2-digit', minute: '2-digit', timeZoneName: 'short' })}
                 </div>
                 <div className="sp-incident-update-msg">Incident detected. Our team began investigating.</div>
                 <div className="sp-incident-update-status" style={{ color: 'var(--color-warn)' }}>Status: Investigating</div>
