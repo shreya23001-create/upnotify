@@ -6,9 +6,11 @@ import type { Monitor } from '@/lib/types'
 interface Props {
   monitors: Monitor[]
   openIncidents: number
+  name: string
+  logoUrl: string | null
 }
 
-export function StatusOverallBanner({ monitors, openIncidents }: Props): React.ReactElement {
+export function StatusOverallBanner({ monitors, openIncidents, name, logoUrl }: Props): React.ReactElement {
   const allUp = monitors.length === 0 || monitors.every(m => m.status === 'up')
   const anyDown = monitors.some(m => m.status === 'down')
 
@@ -34,6 +36,22 @@ export function StatusOverallBanner({ monitors, openIncidents }: Props): React.R
 
   return (
     <div className="sp-hero">
+      {/* Logo + page name */}
+      <div className="sp-hero-brand">
+        <div className="sp-hero-logo">
+          {logoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={logoUrl} alt={name} style={{ width: 40, height: 40, objectFit: 'contain' }} />
+          ) : (
+            <svg width="24" height="24" fill="none" stroke="white" strokeWidth="2.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+          )}
+        </div>
+        <h1 className="sp-hero-title">{name}</h1>
+      </div>
+
+      {/* Status badge */}
       <div className={`sp-overall-status ${statusClass}`}>
         <div className={`sp-overall-icon ${iconClass}`}>
           {isDown || isWarn ? (
@@ -51,6 +69,7 @@ export function StatusOverallBanner({ monitors, openIncidents }: Props): React.R
           <div className="sp-overall-sub">{subText}</div>
         </div>
       </div>
+
       <div className="sp-updated">Last updated: {lastUpdated}</div>
     </div>
   )

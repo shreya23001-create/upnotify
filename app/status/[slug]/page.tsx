@@ -108,26 +108,33 @@ export default async function PublicStatusPage({
       {/* Nav */}
       <nav className="sp-nav">
         <div className="sp-nav-brand">
-          <div className="sp-nav-logo">
-            {orgLogoUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={orgLogoUrl} alt={statusPage.name} style={{ width: 22, height: 22, objectFit: 'contain' }} />
-            ) : (
-              <svg width="16" height="16" fill="none" stroke="white" strokeWidth="2.5" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-              </svg>
-            )}
-          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/favicon.svg" alt="Uptrue" className="sp-nav-uptrue-logo" />
           {statusPage.name} — Status
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div className="sp-nav-brand-dot" style={{ background: navDotColor }} />
-          <span style={{ fontSize: 12, fontWeight: 600, color: navDotColor }}>{navStatusText}</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <a
+            href="https://uptrue.io"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="sp-nav-powered"
+          >
+            Powered by <span className="sp-nav-powered-brand">Uptrue</span>
+          </a>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div className="sp-nav-brand-dot" style={{ background: navDotColor }} />
+            <span style={{ fontSize: 12, fontWeight: 600, color: navDotColor }}>{navStatusText}</span>
+          </div>
         </div>
       </nav>
 
       {/* Hero — overall status */}
-      <StatusOverallBanner monitors={monitors} openIncidents={openIncidents.length} />
+      <StatusOverallBanner
+        monitors={monitors}
+        openIncidents={openIncidents.length}
+        name={statusPage.name}
+        logoUrl={orgLogoUrl}
+      />
 
       {/* Main content */}
       <div className="sp-content">
