@@ -318,7 +318,7 @@ export function PricingTable({ plans, currentPlanSlug, subscription, creditBalan
         description:      isTestKey
           ? `${data.planName ?? planSlug} · TEST MODE — Use card: 5267 3181 8797 5449 (Razorpay test Mastercard)`
           : `${data.planName ?? planSlug} · ${billingCycle === 'annual' ? 'Annual' : 'Monthly'} (incl. 18% GST)`,
-        image:            '/logo.svg',
+        image:            `${process.env.NEXT_PUBLIC_APP_URL ?? 'https://uptrue.io'}/logo.svg`,
         prefill:          { email: data.userEmail ?? '', name: data.orgName ?? '' },
         theme:            { color: '#3b82f6' },
         handler:          (_response: unknown) => {
