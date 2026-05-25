@@ -337,7 +337,10 @@ export default async function LandingPage(): Promise<React.ReactElement> {
                       <div key={f.title} className="ai-feature-item">
                         <div className={`ai-feature-icon ${f.color}`}>{f.icon}</div>
                         <div className="ai-feature-body">
-                          <h4>{f.title}</h4>
+                          {/* engineering-app#75 — was an h4 directly after an
+                              h2, skipping h3. Demoted to h3 so screen-reader
+                              users get a sequential heading hierarchy. */}
+                          <h3>{f.title}</h3>
                           <p>{f.description}</p>
                         </div>
                       </div>
