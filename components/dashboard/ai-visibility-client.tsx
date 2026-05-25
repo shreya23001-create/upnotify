@@ -107,6 +107,22 @@ function LlmsTxtTab({ engines, generations, planSlug, canGenerate, blockReason }
   async function handleGenerate(e: React.FormEvent) {
     e.preventDefault()
     if (!canGenerate) return
+
+    // Client-side validation. The HTML5 `required` attribute on the input
+    // only checks empty-string and lets whitespace-only values through, so
+    // an explicit trim check is needed before any network call. The server
+    // also rejects empty domains with a 400 — this is the friendly belt to
+    // that suspenders.
+    const trimmedDomain = domain.trim()
+    if (!trimmedDomain) {
+      setError('Please enter a valid domain (e.g. mywebsite.com).')
+      return
+    }
+    if (selectedEngines.length === 0) {
+      setError('Select at least one AI engine.')
+      return
+    }
+
     setLoading(true)
     setError('')
     setGenerated(null)
@@ -114,10 +130,17 @@ function LlmsTxtTab({ engines, generations, planSlug, canGenerate, blockReason }
       const res = await fetch('/api/ai-visibility/generate-llms', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ domain: domain.trim(), engineIds: selectedEngines }),
+        body: JSON.stringify({ domain: trimmedDomain, engineIds: selectedEngines }),
       })
-      const data = await res.json()
-      if (!res.ok) { setError(data.error ?? 'Generation failed.'); return }
+
+      // Defend against non-JSON 5xx and the rare empty-body case — both used
+      // to surface as `Cannot read properties of undefined` on data.error and
+      // crash the dashboard to a white screen.
+      let data: { error?: string; content?: string } = {}
+      try { data = await res.json() } catch { /* keep data empty */ }
+
+      if (!res.ok) { setError(data.error ?? 'Generation failed. Please try again.'); return }
+      if (!data.content) { setError('No content returned. Please try again.'); return }
       setGenerated(data.content)
     } catch {
       setError('An error occurred. Please try again.')
