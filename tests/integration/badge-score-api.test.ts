@@ -94,7 +94,7 @@ describe('GET /api/badge/score/[domain]', () => {
 
       expect(body).toContain('<svg')
       expect(body).toContain('</svg>')
-      expect(body).toContain('uptrue score')
+      expect(body).toContain('Uptrue score')
       expect(body).toContain('A')
     })
 
