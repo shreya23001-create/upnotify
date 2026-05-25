@@ -22,6 +22,10 @@ const csp = [
   `connect-src 'self' ${SUPABASE} https://api.stripe.com ${RAZORPAY} ${GTM} ${GA} ${CLARITY} wss:`,
   // Frames: Stripe + Razorpay Checkout
   `frame-src 'self' ${STRIPE} ${RAZORPAY} ${GTM}`,
+  // Anti-clickjacking — no third-party iframe can embed our pages. Mirrors
+  // `X-Frame-Options: DENY` already sent below, but `frame-ancestors` is the
+  // modern equivalent and is the one browsers honour when both are present.
+  `frame-ancestors 'none'`,
   `object-src 'none'`,
   `base-uri 'self'`,
   `form-action 'self'`,
