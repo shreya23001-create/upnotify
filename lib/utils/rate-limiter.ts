@@ -74,6 +74,28 @@ export const PUBLIC_UNSUBSCRIBE_RATE_LIMIT: RateLimitOptions = {
   windowMs: 60 * 1000,
 }
 
+/**
+ * Contact form: 5 requests per hour per IP.
+ * Tight enough to block spam-relay abuse; loose enough that a human
+ * filling out the form a couple of times is never inconvenienced.
+ */
+export const CONTACT_FORM_RATE_LIMIT: RateLimitOptions = {
+  maxRequests: 5,
+  windowMs: 60 * 60 * 1000,
+}
+
+/**
+ * Expensive LLM-backed endpoints (citation checks, AI extraction, etc.):
+ * 10 requests per hour per IP. Each call burns paid token quota, so a
+ * tighter window is justified even though latency-sensitive features
+ * (e.g. dashboard widgets) may need to bypass this with authenticated
+ * org-scoped limits at a higher layer.
+ */
+export const AI_EXPENSIVE_RATE_LIMIT: RateLimitOptions = {
+  maxRequests: 10,
+  windowMs: 60 * 60 * 1000,
+}
+
 // ---------------------------------------------------------------------------
 // Store
 // ---------------------------------------------------------------------------
