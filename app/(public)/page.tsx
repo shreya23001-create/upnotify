@@ -37,8 +37,14 @@ import type {
   PageSection,
 } from '@/lib/types/cms'
 
-// force-dynamic: homepage fetches live DB data (Ticker, BlogPreview, TrustedLogos, CMS).
-export const dynamic = 'force-dynamic'
+// engineering-app#69 — homepage was force-dynamic, which caused every visitor
+// to trigger a fresh SSR + multiple Supabase queries (Ticker, BlogPreview,
+// TrustedLogos, CMS sections). At Product Hunt launch traffic (500-2,000
+// concurrent users) the page failed to serve. Switched to ISR with a 600s
+// (10-minute) revalidate — Vercel serves the cached page from the edge,
+// queries only run once per 10 minutes, ticker/blog updates land within
+// 10 min without a deploy.
+export const revalidate = 600
 
 export const metadata: Metadata = {
   title: 'Uptrue — Website Monitoring Suite for Agencies & Teams',

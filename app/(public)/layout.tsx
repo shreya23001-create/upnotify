@@ -1,17 +1,14 @@
 import { PublicNav } from '@/components/ui/public-nav'
 import { PublicFooter } from '@/components/ui/public-footer'
 
-// Force dynamic rendering across the whole public surface so the CMS-driven
-// nav and footer (page_sections rows) are fresh on every request. Belt-and-
-// braces with the noStore() inside PublicNav itself.
-//
-// This single file is the canonical home for nav + footer on every public
-// page. Adding a new public route = drop the page.tsx anywhere under
-// app/(public)/ and it inherits nav/footer automatically.
-//
-// Routes that should NOT have the public nav (auth, dashboard, admin, status
-// pages, transactional flows) live OUTSIDE this group at app/(auth), etc.
-export const dynamic = 'force-dynamic'
+// engineering-app#69 — removed `export const dynamic = 'force-dynamic'`.
+// That single line previously cascaded onto EVERY public page, killing ISR
+// and capping the site at ~150 concurrent users (full load-test results in
+// the issue). The CMS-driven nav now caches via `unstable_cache` inside
+// PublicNav (60s revalidate, tag 'nav') and PublicFooter (no DB call apart
+// from getLandingSection — caches via Next.js fetch dedup). Individual
+// pages opt into the appropriate ISR window via their own `revalidate`
+// export.
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   return (

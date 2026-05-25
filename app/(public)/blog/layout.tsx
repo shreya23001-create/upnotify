@@ -1,6 +1,8 @@
-export const dynamic = 'force-dynamic'
-
 import type { Metadata } from 'next'
+
+// engineering-app#69 — removed `export const dynamic = 'force-dynamic'`.
+// Blog content is cache-friendly; individual pages set their own ISR window
+// (e.g. blog/[slug] has `revalidate = 300`; blog/page.tsx caches the index).
 
 export const metadata: Metadata = {
   title: {
@@ -19,11 +21,12 @@ export const metadata: Metadata = {
 }
 
 export default function BlogLayout({ children }: { children: React.ReactNode }): React.ReactElement {
+  // No <main> here — the (public)/layout.tsx already wraps everything in
+  // <main id="main-content"> (engineering-app#75). Using <div> avoids the
+  // nested-landmark a11y regression.
   return (
     <div className="blog-layout">
-      
-      <main className="blog-main" style={{ paddingTop: 0, paddingLeft: 0, paddingRight: 0 }}>{children}</main>
-      
+      <div className="blog-main" style={{ paddingTop: 0, paddingLeft: 0, paddingRight: 0 }}>{children}</div>
     </div>
   )
 }

@@ -2,7 +2,10 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { getLeaderboardEntries } from '@/lib/db/leaderboard'
 
-export const dynamic = 'force-dynamic'
+// engineering-app#69 — was force-dynamic; load test showed the page
+// killed sessions at 50+ concurrent users (heavy aggregation query).
+// 5-minute ISR is plenty for a 30-day rolling leaderboard.
+export const revalidate = 300
 
 export const metadata: Metadata = {
   title: 'Uptime Leaderboard — Most Reliable Websites Ranked by Uptime | Uptrue',
