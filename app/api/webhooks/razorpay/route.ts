@@ -21,6 +21,7 @@ import { logger } from '@/lib/utils/logger'
 import { verifyRazorpayWebhook } from '@/lib/services/payments-razorpay'
 import { getStripe } from '@/lib/services/stripe'
 import { isProduction } from '@/lib/utils/environment'
+import { getServerConfig } from '@/lib/utils/config'
 import { enforceDowngradeLimits, notifyPlanChange } from '@/lib/services/plan-enforcement'
 import { writeAuditLog } from '@/lib/db/audit'
 
@@ -457,17 +458,21 @@ export async function POST(request: Request): Promise<NextResponse> {
   const body      = await request.text()
   const signature = request.headers.get('x-razorpay-signature') ?? ''
 
-  // Verify signature (required in production; skipped locally if no secret set)
-  if (isProduction()) {
-    if (!verifyRazorpayWebhook(body, signature)) {
-      logger.error('Razorpay webhook: invalid signature')
-      return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
-    }
-  } else if (signature) {
-    // In dev/staging, verify if secret is set; otherwise allow unverified for testing
-    if (!verifyRazorpayWebhook(body, signature)) {
-      logger.warn('Razorpay webhook: signature mismatch (non-production — continuing)')
-    }
+  // engineering-app#62 — verify signature in EVERY environment whenever the
+  // webhook secret is configured. Previously dev/staging accepted unsigned
+  // requests, which let anyone POST a fake subscription.activated event to
+  // dev.uptrue.io and forge plan changes against any org id they could
+  // guess. The env name is not the right signal; the presence of the secret
+  // is. If the secret isn't set, the integration isn't wired up — return
+  // 503 rather than silently accepting unsigned payloads.
+  const { razorpay } = getServerConfig()
+  if (!razorpay.webhookSecret) {
+    logger.error('Razorpay webhook: RAZORPAY_WEBHOOK_SECRET not configured')
+    return NextResponse.json({ error: 'Razorpay webhook not configured' }, { status: 503 })
+  }
+  if (!verifyRazorpayWebhook(body, signature)) {
+    logger.error('Razorpay webhook: invalid signature', { env: isProduction() ? 'prod' : 'non-prod' })
+    return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
   }
 
   let event: RzpWebhookEvent

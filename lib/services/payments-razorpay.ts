@@ -183,11 +183,18 @@ export async function cancelRazorpaySubscription(
 export function verifyRazorpayWebhook(body: string, signature: string): boolean {
   const { razorpay } = getServerConfig()
   if (!razorpay.webhookSecret) return false
+  if (!signature) return false
   const expected = crypto
     .createHmac('sha256', razorpay.webhookSecret)
     .update(body)
     .digest('hex')
-  return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected))
+  // crypto.timingSafeEqual throws on length mismatch. Guard with an equal-
+  // length check first so a malformed/missing signature returns false
+  // cleanly rather than 500-ing the webhook route.
+  const sigBuf = Buffer.from(signature)
+  const expectedBuf = Buffer.from(expected)
+  if (sigBuf.length !== expectedBuf.length) return false
+  return crypto.timingSafeEqual(sigBuf, expectedBuf)
 }
 
 /**
