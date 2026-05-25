@@ -6,6 +6,7 @@ import { getSubscriptionWithPlan } from '@/lib/db/subscriptions'
 import { logger } from '@/lib/utils/logger'
 import { generateLlmsTxtDashboard } from '@/lib/services/llms-txt'
 import { checkRateLimit, AI_EXPENSIVE_RATE_LIMIT } from '@/lib/utils/rate-limiter'
+import { cleanDomainForAi } from '@/lib/utils/sanitize-ai-input'
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   const rate = checkRateLimit(request, AI_EXPENSIVE_RATE_LIMIT, 'ai-generate-llms')
@@ -26,7 +27,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   const { domain, engineIds = [] } = body
   if (!domain?.trim()) return NextResponse.json({ error: 'Domain is required.' }, { status: 400 })
 
-  const cleanDomain = domain.replace(/^https?:\/\//, '').replace(/\/.*$/, '').toLowerCase().trim()
+  // Sanitise prompt-bound input — strip control chars + LLM delimiters, cap
+  // length. engineering-app#81.
+  const cleanDomain = cleanDomainForAi(domain)
 
   // Check plan limit
   const sub = await getSubscriptionWithPlan(user.org_id)
