@@ -228,12 +228,18 @@ export async function getUptimeBarDataForRange(monitorId: string, range: string)
   const now = new Date()
   const since = new Date(now.getTime() - config.hours * 60 * 60 * 1000)
 
+  // PostgREST silently caps unlimited SELECTs at 1,000 rows; a 1-minute
+  // monitor over 90 days has 129,600 rows. Bumping to 50,000 covers the
+  // common cases (7d/30d at any interval, 90d at 5-min+). Very high-frequency
+  // monitors over the full 90-day range still risk truncation — addressed
+  // later by a pre-aggregation table.
   const { data, error } = await supabase
     .from('check_results')
     .select('status, checked_at')
     .eq('monitor_id', monitorId)
     .gte('checked_at', since.toISOString())
     .order('checked_at', { ascending: true })
+    .limit(50000)
 
   if (error) {
     logger.error('Failed to get uptime bar data for range', { error: error.message })

@@ -88,16 +88,40 @@ export async function deleteStatusPage(id: string): Promise<boolean> {
 }
 
 export async function getUptimePercentage(monitorId: string, days: number = 90): Promise<number> {
+  // Compute uptime entirely in the database with two HEAD counts instead of
+  // fetching every check_results row and counting in JS. PostgREST silently
+  // caps unlimited SELECT queries at 1,000 rows, which broke the original
+  // implementation: a 1-minute monitor over 30 days produces 43,200 rows,
+  // so the page rendered an uptime % calculated from only ~16 hours of data.
+  // HEAD + count='exact' is also faster — no row payload returned.
   const supabase = createAdminClient()
   const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString()
-  const { data, error } = await supabase
-    .from('check_results')
-    .select('status')
-    .eq('monitor_id', monitorId)
-    .gte('checked_at', since)
-  if (error || !data || data.length === 0) return 100
-  const upCount = data.filter(r => r.status === 'up').length
-  return Math.round((upCount / data.length) * 10000) / 100
+
+  const [totalRes, upRes] = await Promise.all([
+    supabase.from('check_results')
+      .select('*', { count: 'exact', head: true })
+      .eq('monitor_id', monitorId)
+      .gte('checked_at', since),
+    supabase.from('check_results')
+      .select('*', { count: 'exact', head: true })
+      .eq('monitor_id', monitorId)
+      .eq('status', 'up')
+      .gte('checked_at', since),
+  ])
+
+  if (totalRes.error) {
+    logger.error('getUptimePercentage: total count failed', { error: totalRes.error.message })
+    return 100
+  }
+  if (upRes.error) {
+    logger.error('getUptimePercentage: up count failed', { error: upRes.error.message })
+    return 100
+  }
+
+  const total = totalRes.count ?? 0
+  const up = upRes.count ?? 0
+  if (total === 0) return 100
+  return Math.round((up / total) * 10000) / 100
 }
 
 export async function subscribeToStatusPage(statusPageId: string, email: string): Promise<{ success: boolean; error?: string }> {
