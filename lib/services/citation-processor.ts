@@ -38,6 +38,44 @@ async function readErrorBody(res: Response): Promise<string> {
   } catch { return '' }
 }
 
+/**
+ * Citation detection with domain-boundary awareness.
+ *
+ * The naive `text.toLowerCase().includes(domain.toLowerCase())` previously
+ * matched substrings, so "notuptrue.io" and "uptrue.io.evil.com" were
+ * counted as citations of "uptrue.io". This implementation tokenises every
+ * host-like sequence in the text and compares each to the target — either
+ * by exact equality or as a `.target` suffix (which is how legitimate
+ * subdomains like `www.uptrue.io` should match). engineering-app#82.
+ *
+ * Boundary rule for a host token:
+ *   - preceded by: start-of-string, OR a character that's not part of a
+ *                  hostname (so '.', '-', alphanumerics fail; whitespace,
+ *                  slashes, quotes, colons, parens, etc. all succeed)
+ *   - composed of: [a-z0-9.-] starting and ending with [a-z0-9] so trailing
+ *                  dots and hyphens don't get pulled into the token
+ *   - path / port / query are not part of host chars, so URLs like
+ *     `uptrue.io/pricing` or `uptrue.io:3000/health` yield `uptrue.io` as
+ *     the host token.
+ */
+export function isCited(text: string, domain: string): boolean {
+  if (!text || !domain) return false
+  const targetLc = domain.toLowerCase()
+  const textLc = text.toLowerCase()
+  const hostTokenRegex = /[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?/g
+  let match: RegExpExecArray | null
+  while ((match = hostTokenRegex.exec(textLc)) !== null) {
+    const before = match.index === 0 ? '' : textLc[match.index - 1]
+    // Mid-hostname match (the char before the token is itself a hostname
+    // char) means we're inside a bigger token — not a real domain boundary.
+    if (before && /[a-z0-9.-]/.test(before)) continue
+    const host = match[0]
+    if (host === targetLc) return true
+    if (host.endsWith('.' + targetLc)) return true
+  }
+  return false
+}
+
 // ---------------------------------------------------------------------------
 // Engine query functions
 // ---------------------------------------------------------------------------
@@ -58,7 +96,7 @@ async function queryPerplexity(apiKey: string, model: string, keyword: string, d
   const data = await res.json() as { choices: { message: { content: string } }[]; citations?: string[] }
   const responseText = data.choices?.[0]?.message?.content ?? ''
   const sourceUrls   = (data.citations ?? []).filter((u): u is string => typeof u === 'string')
-  const cited        = sourceUrls.some(u => u.includes(domain))
+  const cited        = sourceUrls.some(u => isCited(u, domain))
   return { cited, confidence: 'high', responseText: responseText.slice(0, 500), sourceUrls }
 }
 
@@ -84,7 +122,7 @@ async function queryGenericLlm(
   if (!res.ok) throw new Error(`LLM API error: ${res.status} ${endpoint} — ${await readErrorBody(res)}`)
   const data = await res.json() as { choices: { message: { content: string } }[] }
   const responseText = data.choices?.[0]?.message?.content ?? ''
-  const cited = responseText.toLowerCase().includes(domain.toLowerCase())
+  const cited = isCited(responseText, domain)
   return { cited, confidence: 'medium', responseText: responseText.slice(0, 500), sourceUrls: [] }
 }
 
@@ -116,7 +154,7 @@ async function queryAnthropic(
   if (!res.ok) throw new Error(`Anthropic API error: ${res.status} — ${await readErrorBody(res)}`)
   const data = await res.json() as { content?: { type: string; text?: string }[] }
   const responseText = data.content?.find(c => c.type === 'text')?.text ?? ''
-  const cited = responseText.toLowerCase().includes(domain.toLowerCase())
+  const cited = isCited(responseText, domain)
   return { cited, confidence: 'medium', responseText: responseText.slice(0, 500), sourceUrls: [] }
 }
 
@@ -132,7 +170,7 @@ async function queryExa(apiKey: string, keyword: string, domain: string): Promis
   if (!res.ok) throw new Error(`Exa API error: ${res.status}`)
   const data = await res.json() as { results: { url: string; title?: string }[] }
   const sourceUrls   = (data.results ?? []).map(r => r.url).filter(Boolean)
-  const cited        = sourceUrls.some(u => u.toLowerCase().includes(domain.toLowerCase()))
+  const cited        = sourceUrls.some(u => isCited(u, domain))
   const responseText = (data.results ?? []).slice(0, 3).map(r => `${r.title ?? ''} — ${r.url}`).join('\n')
   return { cited, confidence: 'high', responseText: responseText.slice(0, 500), sourceUrls }
 }
@@ -148,7 +186,7 @@ async function queryBingCopilot(apiKey: string, keyword: string, domain: string)
   if (!res.ok) throw new Error(`Bing API error: ${res.status}`)
   const data = await res.json() as { webPages?: { value: { url: string; name: string }[] } }
   const sourceUrls   = (data.webPages?.value ?? []).map(r => r.url).filter(Boolean)
-  const cited        = sourceUrls.some(u => u.toLowerCase().includes(domain.toLowerCase()))
+  const cited        = sourceUrls.some(u => isCited(u, domain))
   const responseText = (data.webPages?.value ?? []).slice(0, 3).map(r => `${r.name} — ${r.url}`).join('\n')
   return { cited, confidence: 'high', responseText: responseText.slice(0, 500), sourceUrls }
 }
