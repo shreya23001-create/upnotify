@@ -96,6 +96,17 @@ export const AI_EXPENSIVE_RATE_LIMIT: RateLimitOptions = {
   windowMs: 60 * 60 * 1000,
 }
 
+/**
+ * Per-user burst limit for citation checks: 3 requests per minute.
+ * Stacks on top of AI_EXPENSIVE_RATE_LIMIT (per-IP) and the plan-level
+ * monthly counter — a user can't bypass the monthly cap by opening tabs
+ * faster than the race-condition guard can insert. engineering-app#86.
+ */
+export const AI_CITATION_USER_RATE_LIMIT: RateLimitOptions = {
+  maxRequests: 3,
+  windowMs: 60 * 1000,
+}
+
 // ---------------------------------------------------------------------------
 // Store
 // ---------------------------------------------------------------------------
@@ -198,11 +209,24 @@ export function checkRateLimit(
   options: RateLimitOptions,
   routeKey: string = 'global',
 ): RateLimitResult {
-  // Lazy-start the cleanup timer on first call
-  startCleanup()
+  return checkRateLimitByKey(`${routeKey}:${getClientIp(request)}`, options)
+}
 
-  const ip = getClientIp(request)
-  const key = `${routeKey}:${ip}`
+/**
+ * Same sliding-window check, but keyed by an arbitrary string instead of the
+ * caller's IP. Use this when the abuse vector is a single authenticated user
+ * spinning up many tabs or making rapid-fire calls — `user.id` is the right
+ * bucket then, not the IP they share with a corporate VPN.
+ *
+ * Engine API keys for AI-visibility are a shared resource (one Anthropic /
+ * OpenAI / Perplexity key per workspace); a single user can otherwise burn
+ * everyone else's monthly quota in seconds. engineering-app#86.
+ */
+export function checkRateLimitByKey(
+  key: string,
+  options: RateLimitOptions,
+): RateLimitResult {
+  startCleanup()
   const now = Date.now()
   const windowStart = now - options.windowMs
 
@@ -224,7 +248,7 @@ export function checkRateLimit(
 
   // Check limit
   if (entry.timestamps.length >= options.maxRequests) {
-    logger.warn('Rate limit exceeded', { ip, routeKey, count: entry.timestamps.length })
+    logger.warn('Rate limit exceeded', { key, count: entry.timestamps.length })
     return { allowed: false, remaining: 0, resetAt }
   }
 
