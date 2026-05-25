@@ -67,12 +67,31 @@ function isPrivateOrLocalhost(host: string): boolean {
 }
 
 // ---------------------------------------------------------------------------
-// Known port → service map
+// Allowed ports — explicit allowlist of common web/mail ports.
+// SSH (22), MySQL (3306), PostgreSQL (5432), Redis (6379), MongoDB (27017)
+// were intentionally dropped: probing them on third-party hosts looks like
+// reconnaissance, attracts abuse complaints, and risks Vercel suspending the
+// outbound IP. engineering-app#63.
 // ---------------------------------------------------------------------------
+
+const ALLOWED_PORTS = new Set<number>([
+  21,   // FTP control
+  25,   // SMTP
+  53,   // DNS (TCP)
+  80,   // HTTP
+  110,  // POP3
+  143,  // IMAP
+  443,  // HTTPS
+  465,  // SMTPS
+  587,  // SMTP Submission
+  993,  // IMAPS
+  995,  // POP3S
+  8080, // HTTP Alt
+  8443, // HTTPS Alt
+])
 
 const PORT_SERVICE_MAP: Record<number, string> = {
   21: 'FTP',
-  22: 'SSH',
   25: 'SMTP',
   53: 'DNS',
   80: 'HTTP',
@@ -83,12 +102,8 @@ const PORT_SERVICE_MAP: Record<number, string> = {
   587: 'SMTP Submission',
   993: 'IMAPS',
   995: 'POP3S',
-  3306: 'MySQL',
-  5432: 'PostgreSQL',
-  6379: 'Redis',
   8080: 'HTTP Alt',
   8443: 'HTTPS Alt',
-  27017: 'MongoDB',
 }
 
 // ---------------------------------------------------------------------------
@@ -212,6 +227,15 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     if (isNaN(port) || port < 1 || port > 65535) {
       return NextResponse.json(
         { error: 'Port must be a number between 1 and 65535' },
+        { status: 400 }
+      )
+    }
+
+    if (!ALLOWED_PORTS.has(port)) {
+      return NextResponse.json(
+        {
+          error: 'Port not allowed. The Uptrue port checker only supports common web and mail ports — see https://uptrue.io/help/tools for the full list.',
+        },
         { status: 400 }
       )
     }
