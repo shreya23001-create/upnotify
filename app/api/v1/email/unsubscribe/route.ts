@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { updateEmailPreferences } from '@/lib/db/email-nurture'
 import { logger } from '@/lib/utils/logger'
 import { getServerConfig } from '@/lib/utils/config'
+import { checkRateLimit, PUBLIC_UNSUBSCRIBE_RATE_LIMIT } from '@/lib/utils/rate-limiter'
 
 export const dynamic = 'force-dynamic'
 
@@ -31,6 +32,14 @@ function decodeToken(token: string): string | null {
  * Returns an HTML confirmation page.
  */
 export async function GET(request: NextRequest): Promise<NextResponse> {
+  const rate = checkRateLimit(request, PUBLIC_UNSUBSCRIBE_RATE_LIMIT, 'email-unsubscribe')
+  if (!rate.allowed) {
+    return new NextResponse(renderPage('Slow down', 'Too many requests. Please wait a minute and try again.', true), {
+      status: 429,
+      headers: { 'Content-Type': 'text/html; charset=utf-8', 'Retry-After': String(Math.max(1, Math.ceil((rate.resetAt - Date.now()) / 1000))) },
+    })
+  }
+
   const token = request.nextUrl.searchParams.get('token')
 
   if (!token) {
