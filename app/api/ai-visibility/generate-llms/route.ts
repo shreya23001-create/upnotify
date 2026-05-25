@@ -5,8 +5,17 @@ import { canGenerateLlmsTxt, saveLlmsTxtGeneration, getLlmsTxtGenerationCount } 
 import { getSubscriptionWithPlan } from '@/lib/db/subscriptions'
 import { logger } from '@/lib/utils/logger'
 import { generateLlmsTxtDashboard } from '@/lib/services/llms-txt'
+import { checkRateLimit, AI_EXPENSIVE_RATE_LIMIT } from '@/lib/utils/rate-limiter'
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
+  const rate = checkRateLimit(request, AI_EXPENSIVE_RATE_LIMIT, 'ai-generate-llms')
+  if (!rate.allowed) {
+    return NextResponse.json(
+      { error: 'Too many requests. Please try again later.' },
+      { status: 429, headers: { 'Retry-After': String(Math.max(1, Math.ceil((rate.resetAt - Date.now()) / 1000))) } },
+    )
+  }
+
   const user = await getCurrentUser()
   if (!user) return NextResponse.json({ error: 'Unauthorised.' }, { status: 401 })
 

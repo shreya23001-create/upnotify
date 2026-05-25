@@ -5,11 +5,23 @@ import { canRunCitationCheck, createCitationRun, getCitationRunsThisMonth } from
 import { getSubscriptionWithPlan } from '@/lib/db/subscriptions'
 import { processCitationRun } from '@/lib/services/citation-processor'
 import { logger } from '@/lib/utils/logger'
+import { checkRateLimit, AI_EXPENSIVE_RATE_LIMIT } from '@/lib/utils/rate-limiter'
 
 // Allow up to 60s — Exa + multiple keywords can take ~10-20s
 export const maxDuration = 60
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
+  // Cost-abuse guard: cap before the auth check so anonymous flood-tests
+  // can't burn DB calls. Plan limits still enforce per-org caps inside the
+  // handler; this is per-IP defence-in-depth on top.
+  const rate = checkRateLimit(request, AI_EXPENSIVE_RATE_LIMIT, 'ai-citation-check')
+  if (!rate.allowed) {
+    return NextResponse.json(
+      { error: 'Too many requests. Please try again later.' },
+      { status: 429, headers: { 'Retry-After': String(Math.max(1, Math.ceil((rate.resetAt - Date.now()) / 1000))) } },
+    )
+  }
+
   const user = await getCurrentUser()
   if (!user) return NextResponse.json({ error: 'Unauthorised.' }, { status: 401 })
 
