@@ -81,12 +81,18 @@ export async function getUptimeBarData(monitorId: string, checkIntervalSeconds: 
   const slotSeconds = Math.max(checkIntervalSeconds, Math.ceil(86400 / UPTIME_BAR_MAX))
   const numSlots = Math.floor(86400 / slotSeconds)
 
+  // PostgREST silently caps unbounded selects at 1,000 rows. A 1-minute
+  // monitor over 24 hours produces 1,440 rows, so the bar chart was missing
+  // the last ~8 hours of data. Cap at 1,440 explicitly — covers 24h at 1-min
+  // intervals, far more than we need for the slot bucketing below.
+  // engineering-app#57.
   const { data, error } = await supabase
     .from('check_results')
     .select('status, checked_at')
     .eq('monitor_id', monitorId)
     .gte('checked_at', since.toISOString())
     .order('checked_at', { ascending: true })
+    .limit(1440)
 
   if (error) {
     logger.error('Failed to get uptime bar data', { error: error.message })
@@ -131,7 +137,15 @@ export async function getUptimeBarData(monitorId: string, checkIntervalSeconds: 
  * Used by the dashboard charts to show uptime and response time trends.
  * IDs are chunked into batches of 50 to avoid PostgREST URL-length limits.
  */
-export async function getRecentCheckResultsByMonitorIds(monitorIds: string[], days: number = 30): Promise<CheckResult[]> {
+/**
+ * Lightweight projection of CheckResult — only the fields the dashboard
+ * stats API actually renders. Excluding metadata (2–5 KB per row of JSONB)
+ * cuts the wire payload by ~30× on a 5,000-row response.
+ * engineering-app#59.
+ */
+export type DashboardCheckResult = Pick<CheckResult, 'status' | 'response_time_ms' | 'checked_at' | 'monitor_id'>
+
+export async function getRecentCheckResultsByMonitorIds(monitorIds: string[], days: number = 30): Promise<DashboardCheckResult[]> {
   if (monitorIds.length === 0) return []
   const supabase = createAdminClient()
   const since = new Date()
@@ -146,7 +160,7 @@ export async function getRecentCheckResultsByMonitorIds(monitorIds: string[], da
   const results = await Promise.all(chunks.map(async (chunk) => {
     const { data, error } = await supabase
       .from('check_results')
-      .select('*')
+      .select('status, response_time_ms, checked_at, monitor_id')
       .in('monitor_id', chunk)
       .gte('checked_at', since.toISOString())
       .order('checked_at', { ascending: true })
@@ -156,20 +170,20 @@ export async function getRecentCheckResultsByMonitorIds(monitorIds: string[], da
       logger.error('Failed to get check results by monitor IDs', { error: error.message })
       return []
     }
-    return data ?? []
+    return (data ?? []) as DashboardCheckResult[]
   }))
 
   return results.flat()
 }
 
-export async function getRecentCheckResultsByOrg(orgId: string, days: number = 30): Promise<CheckResult[]> {
+export async function getRecentCheckResultsByOrg(orgId: string, days: number = 30): Promise<DashboardCheckResult[]> {
   const supabase = createAdminClient()
   const since = new Date()
   since.setDate(since.getDate() - days)
 
   const { data, error } = await supabase
     .from('check_results')
-    .select('*')
+    .select('status, response_time_ms, checked_at, monitor_id')
     .eq('org_id', orgId)
     .gte('checked_at', since.toISOString())
     .order('checked_at', { ascending: true })
@@ -179,7 +193,7 @@ export async function getRecentCheckResultsByOrg(orgId: string, days: number = 3
     logger.error('Failed to get recent check results by org', { error: error.message, orgId })
     return []
   }
-  return data ?? []
+  return (data ?? []) as DashboardCheckResult[]
 }
 
 function formatSlotTime(base: Date, slotIndex: number, slotMinutes: number = 15): string {
