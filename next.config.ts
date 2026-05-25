@@ -27,6 +27,16 @@ const csp = [
   `form-action 'self'`,
 ].join('; ');
 
+// Hard SEO rule: only production (master deploy) is indexable. Every other
+// Vercel env — preview, dev — must serve noindex,nofollow at both the meta
+// layer (app/layout.tsx) and the HTTP layer (X-Robots-Tag). The header
+// guarantees coverage for redirects, image responses, JSON endpoints, and
+// any path the meta tag never reaches.
+const IS_PRODUCTION_HOST = process.env.VERCEL_ENV === 'production';
+const NON_PROD_NOINDEX_HEADERS: { key: string; value: string }[] = IS_PRODUCTION_HOST
+  ? []
+  : [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }];
+
 const nextConfig: NextConfig = {
   headers: async (): Promise<
     { source: string; headers: { key: string; value: string }[] }[]
@@ -40,6 +50,7 @@ const nextConfig: NextConfig = {
         { key: 'Referrer-Policy',           value: 'strict-origin-when-cross-origin' },
         { key: 'Permissions-Policy',        value: 'geolocation=(), microphone=(), camera=(), accelerometer=*, gyroscope=*' },
         { key: 'Content-Security-Policy',   value: csp },
+        ...NON_PROD_NOINDEX_HEADERS,
       ],
     },
   ],
