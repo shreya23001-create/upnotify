@@ -1,5 +1,4 @@
-import { NextResponse } from 'next/server'
-import { getServerConfig } from '@/lib/utils/config'
+﻿import { NextResponse } from 'next/server'
 import { logger } from '@/lib/utils/logger'
 import { startCronRun, endCronRun, getTriggeredBy } from '@/lib/utils/cron-logger'
 import {
@@ -8,20 +7,14 @@ import {
   resetStuckGeneratingRows,
 } from '@/lib/db/content-calendar'
 import { generateCalendarBlogPost } from '@/lib/services/calendar-blog-generator'
+import { requireCronAuth } from '@/lib/auth/cron-auth'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 300
 
 export async function GET(request: Request): Promise<NextResponse> {
-  const authHeader = request.headers.get('authorization')
-  const { cron } = getServerConfig()
-
-  if (cron.secret && authHeader !== `Bearer ${cron.secret}`) {
-    const isVercelCron = request.headers.get('x-vercel-cron')
-    if (!isVercelCron) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-  }
+  const unauth = requireCronAuth(request)
+  if (unauth) return unauth
 
   const cronStart = Date.now()
   const runId = await startCronRun('/api/cron/calendar/draft-runner', getTriggeredBy(request))

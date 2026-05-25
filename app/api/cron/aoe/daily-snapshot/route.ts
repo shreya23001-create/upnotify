@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // AOE — Automated Outreach Engine
 // Cron: daily-snapshot — runs daily at 9am UTC
 // Sends a digest email to ADMIN_EMAILS with quota, pipeline, and campaign stats
@@ -6,7 +6,6 @@
 
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { getServerConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
 import { startCronRun, endCronRun, getTriggeredBy } from '@/lib/utils/cron-logger'
 import { AOE_CONFIG } from '@/lib/aoe/config'
@@ -14,6 +13,7 @@ import { getCurrentMonth, getQuotaForDashboard } from '@/lib/aoe/db/aoe-email-qu
 import { getAoeCampaignStats } from '@/lib/aoe/db/aoe-outreach-log'
 import { getDiscoveryStats } from '@/lib/aoe/db/aoe-site-discovery'
 import { sendEmail } from '@/lib/services/email'
+import { requireCronAuth } from '@/lib/auth/cron-auth'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60
@@ -241,15 +241,8 @@ function buildSnapshotEmail(data: {
 // ---------------------------------------------------------------------------
 
 export async function GET(request: Request): Promise<NextResponse> {
-  const authHeader = request.headers.get('authorization')
-  const { cron } = getServerConfig()
-
-  if (cron.secret && authHeader !== `Bearer ${cron.secret}`) {
-    const isVercelCron = request.headers.get('x-vercel-cron')
-    if (!isVercelCron) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-  }
+  const unauth = requireCronAuth(request)
+  if (unauth) return unauth
 
   const cronStart = Date.now()
   const runId = await startCronRun('/api/cron/aoe/daily-snapshot', getTriggeredBy(request))

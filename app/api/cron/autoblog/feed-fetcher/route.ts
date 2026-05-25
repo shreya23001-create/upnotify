@@ -1,29 +1,22 @@
-// =============================================================================
+﻿// =============================================================================
 // Cron: autoblog/feed-fetcher
 // Schedule: Every 6 hours
 // Purpose: Fetch all enabled RSS/API sources, store new items in autoblog_feed_items
 // =============================================================================
 
 import { NextResponse } from 'next/server'
-import { getServerConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
 import { startCronRun, endCronRun, getTriggeredBy } from '@/lib/utils/cron-logger'
 import { getEnabledAutoblogSources, upsertFeedItems, updateSourceFetchStats } from '@/lib/db/autoblog'
 import { fetchFeeds } from '@/lib/services/feed-fetcher'
+import { requireCronAuth } from '@/lib/auth/cron-auth'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60
 
 export async function GET(request: Request): Promise<NextResponse> {
-  const authHeader = request.headers.get('authorization')
-  const { cron } = getServerConfig()
-
-  if (cron.secret && authHeader !== `Bearer ${cron.secret}`) {
-    const isVercelCron = request.headers.get('x-vercel-cron')
-    if (!isVercelCron) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-  }
+  const unauth = requireCronAuth(request)
+  if (unauth) return unauth
 
   const cronStart = Date.now()
   const runId = await startCronRun('/api/cron/autoblog/feed-fetcher', getTriggeredBy(request))

@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+﻿import { NextResponse } from 'next/server'
 import { getDueMonitors, getAllActiveMonitors, updateMonitorStatus, incrementFlapCount, patchMonitorConfig } from '@/lib/db/monitors'
 import { writeCheckResult } from '@/lib/db/check-results'
 import { createIncident, resolveIncident, getOpenIncidentForMonitor } from '@/lib/db/incidents'
@@ -6,12 +6,12 @@ import { isMonitorInMaintenance } from '@/lib/db/maintenance-windows'
 import { dispatchChecker } from '@/lib/services/checker'
 import { dispatchAlerts, dispatchRecoveryAlerts } from '@/lib/services/alert-dispatcher'
 import { getAlertCopy } from '@/lib/utils/alert-copy'
-import { getServerConfig } from '@/lib/utils/config'
 import { getCurrentRegion } from '@/lib/config/regions'
 import { logger } from '@/lib/utils/logger'
 import { startCronRun, endCronRun, getTriggeredBy } from '@/lib/utils/cron-logger'
 import type { Monitor } from '@/lib/types'
 import type { CheckerResult } from '@/lib/checkers/types'
+import { requireCronAuth } from '@/lib/auth/cron-auth'
 
 
 export const dynamic = 'force-dynamic'
@@ -27,16 +27,8 @@ interface FirstCheckResult {
 }
 
 export async function GET(request: Request): Promise<NextResponse> {
-  const authHeader = request.headers.get('authorization')
-  const { cron } = getServerConfig()
-  const cronSecret = cron.secret
-
-  if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-    const isVercelCron = request.headers.get('x-vercel-cron')
-    if (!isVercelCron) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-  }
+  const unauth = requireCronAuth(request)
+  if (unauth) return unauth
 
   const cronStart = Date.now()
   const currentRegion = getCurrentRegion()

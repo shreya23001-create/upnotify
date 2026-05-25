@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Cron: /api/cron/competitor-checks
  * Schedule: Every hour (0 * * * * in vercel.json)
  *
@@ -25,9 +25,9 @@ import {
   getOrgUserIds,
 } from '@/lib/db/competitor-monitors'
 import { sendUserMessage } from '@/lib/db/user-messages'
-import { getServerConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
 import { startCronRun, endCronRun, getTriggeredBy } from '@/lib/utils/cron-logger'
+import { requireCronAuth } from '@/lib/auth/cron-auth'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60
@@ -40,16 +40,8 @@ function sleep(ms: number): Promise<void> {
 
 export async function GET(request: Request): Promise<NextResponse> {
   // Auth: cron secret or Vercel platform header
-  const authHeader = request.headers.get('authorization')
-  const { cron } = getServerConfig()
-  const cronSecret = cron.secret
-
-  if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-    const isVercelCron = request.headers.get('x-vercel-cron')
-    if (!isVercelCron) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-  }
+  const unauth = requireCronAuth(request)
+  if (unauth) return unauth
 
   const cronStart = Date.now()
   const runId = await startCronRun('/api/cron/competitor-checks', getTriggeredBy(request))

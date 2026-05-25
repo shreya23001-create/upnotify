@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+﻿import { NextResponse } from 'next/server'
 import { getUsersForNurture } from '@/lib/db/email-nurture'
 import {
   sendTrialEndingEmail,
@@ -7,9 +7,9 @@ import {
 } from '@/lib/services/email-nurture'
 import { sendPauseReminders } from '@/lib/services/plan-enforcement'
 import { getEmailRateStatus } from '@/lib/services/email'
-import { getServerConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
 import { startCronRun, endCronRun, getTriggeredBy } from '@/lib/utils/cron-logger'
+import { requireCronAuth } from '@/lib/auth/cron-auth'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60
@@ -32,16 +32,8 @@ function daysBetween(dateA: Date, dateB: Date): number {
 
 export async function GET(request: Request): Promise<NextResponse> {
   // Auth check — same pattern as check-runner
-  const authHeader = request.headers.get('authorization')
-  const { cron } = getServerConfig()
-  const cronSecret = cron.secret
-
-  if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-    const isVercelCron = request.headers.get('x-vercel-cron')
-    if (!isVercelCron) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-  }
+  const unauth = requireCronAuth(request)
+  if (unauth) return unauth
 
   const cronStart = Date.now()
   const runId = await startCronRun('/api/cron/nurture-emails', getTriggeredBy(request))

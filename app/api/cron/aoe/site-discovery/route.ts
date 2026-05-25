@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // AOE — Automated Outreach Engine
 // Cron: site-discovery — runs weekly (Sunday 2am UTC)
 // Source: Tranco top-1M CSV zip — random window from rank 5001–50000
@@ -9,13 +9,13 @@
 
 import { createInflateRaw } from 'zlib'
 import { NextResponse } from 'next/server'
-import { getServerConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
 import { startCronRun, endCronRun, getTriggeredBy } from '@/lib/utils/cron-logger'
 import { getAoeSettings } from '@/lib/aoe/db/aoe-settings'
 import { insertDiscoveredSite, domainExists } from '@/lib/aoe/db/aoe-site-discovery'
 import { findContactEmail } from '@/lib/aoe/services/email-finder'
 import { detectPlatform } from '@/lib/aoe/services/platform-detector'
+import { requireCronAuth } from '@/lib/auth/cron-auth'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 300
@@ -168,14 +168,8 @@ async function processBatch(
 // ---------------------------------------------------------------------------
 
 export async function GET(request: Request): Promise<NextResponse> {
-  const authHeader = request.headers.get('authorization')
-  const { cron }   = getServerConfig()
-
-  if (cron.secret && authHeader !== `Bearer ${cron.secret}`) {
-    if (!request.headers.get('x-vercel-cron')) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-  }
+  const unauth = requireCronAuth(request)
+  if (unauth) return unauth
 
   const cronStart = Date.now()
   const runId     = await startCronRun('/api/cron/aoe/site-discovery', getTriggeredBy(request))

@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // AOE — Automated Outreach Engine
 // Cron: last-day-burst — runs daily at 11pm UTC
 // On the last day of the month: sends all remaining quota minus 2% hard reserve
@@ -7,7 +7,6 @@
 
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { getServerConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
 import { startCronRun, endCronRun, getTriggeredBy } from '@/lib/utils/cron-logger'
 import { AOE_CONFIG } from '@/lib/aoe/config'
@@ -19,6 +18,7 @@ import { categorizeSite } from '@/lib/aoe/db/aoe-site-checks'
 import { sendAoeEmail } from '@/lib/aoe/services/email-sender'
 import { buildAoeEmail } from '@/lib/aoe/email-templates'
 import type { AoeSiteDiscovery } from '@/lib/aoe/types'
+import { requireCronAuth } from '@/lib/auth/cron-auth'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 300
@@ -56,16 +56,8 @@ export async function GET(request: Request): Promise<NextResponse> {
     logger.warn('AOE last-day-burst blocked — not production environment')
     return NextResponse.json({ skipped: true, reason: 'Not production environment — AOE email sending is blocked' })
   }
-
-  const authHeader = request.headers.get('authorization')
-  const { cron } = getServerConfig()
-
-  if (cron.secret && authHeader !== `Bearer ${cron.secret}`) {
-    const isVercelCron = request.headers.get('x-vercel-cron')
-    if (!isVercelCron) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-  }
+  const unauth = requireCronAuth(request)
+  if (unauth) return unauth
 
   const cronStart = Date.now()
   const runId = await startCronRun('/api/cron/aoe/last-day-burst', getTriggeredBy(request))

@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // Cron: autoblog/post-generator
 // Schedule: Every 10 minutes
 // Purpose: Pick one queued autoblog run and generate the post via Claude API
@@ -6,7 +6,7 @@
 // =============================================================================
 
 import { NextResponse } from 'next/server'
-import { getServerConfig, getConfig } from '@/lib/utils/config'
+import { getConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
 import { startCronRun, endCronRun, getTriggeredBy } from '@/lib/utils/cron-logger'
 import {
@@ -21,20 +21,14 @@ import { scrapeArticles } from '@/lib/services/article-scraper'
 import type { DetectedLLM } from '@/lib/services/llm-detector'
 import type { TrackerContext } from '@/lib/services/autoblog-generator'
 import type { FeedItem } from '@/lib/services/feed-fetcher'
+import { requireCronAuth } from '@/lib/auth/cron-auth'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 300
 
 export async function GET(request: Request): Promise<NextResponse> {
-  const authHeader = request.headers.get('authorization')
-  const { cron } = getServerConfig()
-
-  if (cron.secret && authHeader !== `Bearer ${cron.secret}`) {
-    const isVercelCron = request.headers.get('x-vercel-cron')
-    if (!isVercelCron) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-  }
+  const unauth = requireCronAuth(request)
+  if (unauth) return unauth
 
   const cronStart = Date.now()
   const runId = await startCronRun('/api/cron/autoblog/post-generator', getTriggeredBy(request))

@@ -103,10 +103,14 @@ function makeMonitor(overrides: Record<string, unknown> = {}): Record<string, un
 }
 
 function makeRequest(url: string = 'https://uptrue.io/api/cron/check-runner', headers: Record<string, string> = {}): Request {
+  // Cron auth contract (engineering-app#60): Vercel sends Authorization with
+  // the real CRON_SECRET when invoking each scheduled URL. Tests mirror that
+  // by injecting the config-mock's secret. The legacy `x-vercel-cron` header
+  // bypass was removed because it was server-spoofable.
   return new Request(url, {
     method: 'GET',
     headers: {
-      'x-vercel-cron': 'true',
+      authorization: 'Bearer test-cron-secret',
       ...headers,
     },
   })
@@ -152,14 +156,16 @@ describe('check-runner cron route', () => {
     delete process.env.CRON_SECRET
   })
 
-  it('allows request from Vercel cron even without auth header', async () => {
-    process.env.CRON_SECRET = 'test-secret'
-    mockGetDueMonitors.mockResolvedValue([])
-
-    const req = makeRequest()
+  it('rejects request with X-Vercel-Cron header but no valid Bearer token (regression for engineering-app#60)', async () => {
+    // The legacy bypass — `X-Vercel-Cron: true` without a valid Authorization
+    // header — must now return 401. Any attacker could spoof this header, so
+    // the route can no longer treat it as proof of a real Vercel invocation.
+    const req = new Request('https://uptrue.io/api/cron/check-runner', {
+      method: 'GET',
+      headers: { 'x-vercel-cron': 'true' },
+    })
     const response = await GET(req)
-    expect(response.status).toBe(200)
-    delete process.env.CRON_SECRET
+    expect(response.status).toBe(401)
   })
 
   // ── Happy path — monitors fetched and checked ──────────────────────
