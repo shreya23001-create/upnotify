@@ -14,6 +14,14 @@ export async function GET(
     if (!user) return NextResponse.json({ error: 'Unauthorised' }, { status: 401 })
 
     const { id } = await params
+
+    // Reject malformed IDs at the route layer before they reach Supabase.
+    // Monitor IDs are UUIDs (per the migration that introduced the column);
+    // any other shape is a defence-in-depth fail-closed.  engineering-app#72.
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
+      return NextResponse.json({ error: 'Invalid monitor ID' }, { status: 400 })
+    }
+
     const url = new URL(request.url)
     const days = parseInt(url.searchParams.get('days') ?? '30', 10)
     const safeDays = [7, 30, 90].includes(days) ? days : 30
