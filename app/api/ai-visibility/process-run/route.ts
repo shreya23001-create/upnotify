@@ -10,8 +10,17 @@ import { checkRateLimit, AI_EXPENSIVE_RATE_LIMIT } from '@/lib/utils/rate-limite
 export const maxDuration = 60
 
 function isAuthorised(request: NextRequest): boolean {
-  const secret = request.headers.get('x-internal-secret')
-  return secret === (process.env.CRON_SECRET ?? '')
+  const envSecret = process.env.CRON_SECRET
+  const headerSecret = request.headers.get('x-internal-secret')
+
+  // Reject both missing-env-var and missing-header cases explicitly so an
+  // unconfigured environment fails closed. Previously a `null === ''` check
+  // looked safe but a request with an explicitly-empty header (`X-Internal-
+  // Secret: `) reads as the empty string and would have matched the
+  // fallback-to-empty env. engineering-app#80.
+  if (!envSecret) return false
+  if (!headerSecret) return false
+  return headerSecret === envSecret
 }
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
