@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // Cron: autoblog/topic-runner
 // Schedule: Every 2 hours
 // Purpose: Check due custom topics and queue them for generation
@@ -6,7 +6,6 @@
 // =============================================================================
 
 import { NextResponse } from 'next/server'
-import { getServerConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
 import { startCronRun, endCronRun, getTriggeredBy } from '@/lib/utils/cron-logger'
 import {
@@ -19,6 +18,7 @@ import {
 } from '@/lib/db/autoblog'
 import { getTrackerContext } from '@/lib/services/autoblog-generator'
 import type { AutoblogTopic, AutoblogFeedItem } from '@/lib/db/autoblog'
+import { requireCronAuth } from '@/lib/auth/cron-auth'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 30
@@ -48,15 +48,8 @@ function filterItemsBySourceIds(
 }
 
 export async function GET(request: Request): Promise<NextResponse> {
-  const authHeader = request.headers.get('authorization')
-  const { cron } = getServerConfig()
-
-  if (cron.secret && authHeader !== `Bearer ${cron.secret}`) {
-    const isVercelCron = request.headers.get('x-vercel-cron')
-    if (!isVercelCron) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-  }
+  const unauth = requireCronAuth(request)
+  if (unauth) return unauth
 
   const cronStart = Date.now()
   const runId = await startCronRun('/api/cron/autoblog/topic-runner', getTriggeredBy(request))

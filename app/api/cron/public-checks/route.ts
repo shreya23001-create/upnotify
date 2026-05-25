@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+﻿import { NextResponse } from 'next/server'
 import {
   getActivePublicMonitors,
   writePublicCheckResult,
@@ -9,9 +9,9 @@ import {
 } from '@/lib/db/public-monitors'
 import type { PublicMonitor } from '@/lib/db/public-monitors'
 import type { CheckerResult } from '@/lib/checkers/types'
-import { getServerConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
 import { startCronRun, endCronRun, getTriggeredBy } from '@/lib/utils/cron-logger'
+import { requireCronAuth } from '@/lib/auth/cron-auth'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60
@@ -74,16 +74,8 @@ async function runHttpCheck(monitor: PublicMonitor): Promise<CheckerResult> {
 }
 
 export async function GET(request: Request): Promise<NextResponse> {
-  const authHeader = request.headers.get('authorization')
-  const { cron } = getServerConfig()
-  const cronSecret = cron.secret
-
-  if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-    const isVercelCron = request.headers.get('x-vercel-cron')
-    if (!isVercelCron) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-  }
+  const unauth = requireCronAuth(request)
+  if (unauth) return unauth
 
   const cronStart = Date.now()
   const runId = await startCronRun('/api/cron/public-checks', getTriggeredBy(request))

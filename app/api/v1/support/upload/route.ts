@@ -49,7 +49,21 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       })
 
     if (uploadError) {
-      logger.error('Support file upload failed', { error: uploadError.message })
+      const msg = uploadError.message ?? ''
+      logger.error('Support file upload failed', { error: msg, file: safeName, type: file.type })
+
+      // Surface the underlying cause to logs so ops/devs can diagnose, but
+      // keep the user-facing message generic. The most common production
+      // cause we've seen is the storage bucket not being provisioned on a
+      // fresh Supabase project — `Bucket not found` returns here and the
+      // operator needs to create `support-attachments` in Storage.
+      // engineering-app#49.
+      if (/bucket.*not.*found/i.test(msg)) {
+        return NextResponse.json(
+          { error: 'File uploads are temporarily unavailable. Please paste the content into the message body or email support@uptrue.io.' },
+          { status: 503 },
+        )
+      }
       return NextResponse.json({ error: 'Upload failed. Please try again.' }, { status: 500 })
     }
 

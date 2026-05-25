@@ -37,8 +37,14 @@ import type {
   PageSection,
 } from '@/lib/types/cms'
 
-// force-dynamic: homepage fetches live DB data (Ticker, BlogPreview, TrustedLogos, CMS).
-export const dynamic = 'force-dynamic'
+// engineering-app#69 — homepage was force-dynamic, which caused every visitor
+// to trigger a fresh SSR + multiple Supabase queries (Ticker, BlogPreview,
+// TrustedLogos, CMS sections). At Product Hunt launch traffic (500-2,000
+// concurrent users) the page failed to serve. Switched to ISR with a 600s
+// (10-minute) revalidate — Vercel serves the cached page from the edge,
+// queries only run once per 10 minutes, ticker/blog updates land within
+// 10 min without a deploy.
+export const revalidate = 600
 
 export const metadata: Metadata = {
   title: 'Uptrue — Website Monitoring Suite for Agencies & Teams',
@@ -337,7 +343,10 @@ export default async function LandingPage(): Promise<React.ReactElement> {
                       <div key={f.title} className="ai-feature-item">
                         <div className={`ai-feature-icon ${f.color}`}>{f.icon}</div>
                         <div className="ai-feature-body">
-                          <h4>{f.title}</h4>
+                          {/* engineering-app#75 — was an h4 directly after an
+                              h2, skipping h3. Demoted to h3 so screen-reader
+                              users get a sequential heading hierarchy. */}
+                          <h3>{f.title}</h3>
                           <p>{f.description}</p>
                         </div>
                       </div>

@@ -9,12 +9,22 @@ import {
 import { getSubscriptionWithPlan } from '@/lib/db/subscriptions'
 import { processProfileRun } from '@/lib/services/profile-introspector'
 import { logger } from '@/lib/utils/logger'
+import { checkRateLimit, AI_EXPENSIVE_RATE_LIMIT } from '@/lib/utils/rate-limiter'
+import { cleanDomainForAi } from '@/lib/utils/sanitize-ai-input'
 
 // 5 prompts × up to 7 engines × ~3s each = ~100s typical. Vercel Pro caps
 // per-function maxDuration at 300s — give ourselves headroom.
 export const maxDuration = 300
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
+  const rate = checkRateLimit(request, AI_EXPENSIVE_RATE_LIMIT, 'ai-profile-check')
+  if (!rate.allowed) {
+    return NextResponse.json(
+      { error: 'Too many requests. Please try again later.' },
+      { status: 429, headers: { 'Retry-After': String(Math.max(1, Math.ceil((rate.resetAt - Date.now()) / 1000))) } },
+    )
+  }
+
   const user = await getCurrentUser()
   if (!user) return NextResponse.json({ error: 'Unauthorised.' }, { status: 401 })
 
@@ -27,7 +37,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   if (!domain?.trim()) return NextResponse.json({ error: 'Domain is required.' }, { status: 400 })
   if (engineIds.length === 0) return NextResponse.json({ error: 'Select at least one AI engine.' }, { status: 400 })
 
-  const cleanDomain = domain.replace(/^https?:\/\//, '').replace(/\/.*$/, '').toLowerCase().trim()
+  // Sanitise prompt-bound input — strip control chars + LLM delimiters, cap
+  // length. engineering-app#81.
+  const cleanDomain = cleanDomainForAi(domain)
 
   const sub             = await getSubscriptionWithPlan(user.org_id)
   const planSlug        = sub?.plan?.slug ?? 'free'

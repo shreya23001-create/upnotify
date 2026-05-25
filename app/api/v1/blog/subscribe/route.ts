@@ -1,10 +1,19 @@
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
+import { checkRateLimit, PUBLIC_SUBSCRIBE_RATE_LIMIT } from '@/lib/utils/rate-limiter'
 
 export const dynamic = 'force-dynamic'
 
 export async function POST(request: Request): Promise<NextResponse> {
+  const rate = checkRateLimit(request, PUBLIC_SUBSCRIBE_RATE_LIMIT, 'blog-subscribe')
+  if (!rate.allowed) {
+    return NextResponse.json(
+      { error: 'Too many requests. Please try again later.' },
+      { status: 429, headers: { 'Retry-After': String(Math.max(1, Math.ceil((rate.resetAt - Date.now()) / 1000))) } },
+    )
+  }
+
   let body: { email?: string; source?: string }
   try {
     body = await request.json() as { email?: string; source?: string }

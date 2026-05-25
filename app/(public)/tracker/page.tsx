@@ -8,7 +8,11 @@ import type { PublicMonitor } from '@/lib/db/public-monitors'
 
 const PAGE_SIZE = 20
 
-export const dynamic = 'force-dynamic'
+// engineering-app#69 — tracker index was force-dynamic (failed at 150+
+// concurrent users). 60s revalidate matches the check-runner cadence:
+// users see status updates within a minute of the underlying change
+// while the DB is queried at most once per minute regardless of traffic.
+export const revalidate = 60
 
 export const metadata: Metadata = {
   title: 'Is It Down? Live Website Status Tracker — Real-Time Uptime | Uptrue',

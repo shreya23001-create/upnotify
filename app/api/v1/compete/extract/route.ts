@@ -3,8 +3,17 @@ import { getCurrentUser } from '@/lib/db/users'
 import { checkCompeteAccess } from '@/lib/utils/plan-limits'
 import { extractPrice } from '@/lib/services/price-extraction'
 import { logger } from '@/lib/utils/logger'
+import { checkRateLimit, AI_EXPENSIVE_RATE_LIMIT } from '@/lib/utils/rate-limiter'
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
+  const rate = checkRateLimit(request, AI_EXPENSIVE_RATE_LIMIT, 'compete-extract')
+  if (!rate.allowed) {
+    return NextResponse.json(
+      { error: 'Too many requests. Please try again later.' },
+      { status: 429, headers: { 'Retry-After': String(Math.max(1, Math.ceil((rate.resetAt - Date.now()) / 1000))) } },
+    )
+  }
+
   try {
     const user = await getCurrentUser()
     if (!user) {

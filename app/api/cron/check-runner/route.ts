@@ -1,17 +1,17 @@
-import { NextResponse } from 'next/server'
+﻿import { NextResponse } from 'next/server'
 import { getDueMonitors, getAllActiveMonitors, updateMonitorStatus, incrementFlapCount, patchMonitorConfig } from '@/lib/db/monitors'
 import { writeCheckResult } from '@/lib/db/check-results'
 import { createIncident, resolveIncident, getOpenIncidentForMonitor } from '@/lib/db/incidents'
-import { isMonitorInMaintenance } from '@/lib/db/maintenance-windows'
+import { getMaintenanceSetForMonitors } from '@/lib/db/maintenance-windows'
 import { dispatchChecker } from '@/lib/services/checker'
 import { dispatchAlerts, dispatchRecoveryAlerts } from '@/lib/services/alert-dispatcher'
 import { getAlertCopy } from '@/lib/utils/alert-copy'
-import { getServerConfig } from '@/lib/utils/config'
 import { getCurrentRegion } from '@/lib/config/regions'
 import { logger } from '@/lib/utils/logger'
 import { startCronRun, endCronRun, getTriggeredBy } from '@/lib/utils/cron-logger'
 import type { Monitor } from '@/lib/types'
 import type { CheckerResult } from '@/lib/checkers/types'
+import { requireCronAuth } from '@/lib/auth/cron-auth'
 
 
 export const dynamic = 'force-dynamic'
@@ -27,16 +27,8 @@ interface FirstCheckResult {
 }
 
 export async function GET(request: Request): Promise<NextResponse> {
-  const authHeader = request.headers.get('authorization')
-  const { cron } = getServerConfig()
-  const cronSecret = cron.secret
-
-  if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-    const isVercelCron = request.headers.get('x-vercel-cron')
-    if (!isVercelCron) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-  }
+  const unauth = requireCronAuth(request)
+  if (unauth) return unauth
 
   const cronStart = Date.now()
   const currentRegion = getCurrentRegion()
@@ -54,21 +46,17 @@ export async function GET(request: Request): Promise<NextResponse> {
     const allMonitors = force ? await getAllActiveMonitors() : await getDueMonitors()
     logger.info('Check runner started', { dueMonitors: allMonitors.length, force })
 
-    // Filter out monitors in maintenance (parallel DB calls)
-    const maintenanceChecks = await Promise.allSettled(
-      allMonitors.map(async (m) => ({
-        monitor: m,
-        inMaintenance: await isMonitorInMaintenance(m.id, m.org_id),
-      }))
-    )
+    // Batch the maintenance lookup into a single DB query rather than firing
+    // one isMonitorInMaintenance() call per monitor — at 100+ monitors per
+    // cron tick the per-monitor pattern produced a thundering herd on the
+    // maintenance_windows table. engineering-app#58.
+    const maintenanceSet = await getMaintenanceSetForMonitors(allMonitors)
 
     const monitors: Monitor[] = []
     const maintenanceUpdates: Promise<void>[] = []
 
-    for (const r of maintenanceChecks) {
-      if (r.status !== 'fulfilled') continue
-      const { monitor: m, inMaintenance } = r.value
-      if (inMaintenance) {
+    for (const m of allMonitors) {
+      if (maintenanceSet.has(m.id)) {
         const now = new Date()
         maintenanceUpdates.push(updateMonitorStatus(m.id, {
           status: m.status,

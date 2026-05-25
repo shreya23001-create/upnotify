@@ -4,6 +4,7 @@ import { sendEmail } from '@/lib/services/email'
 import { getServerConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
 import { escapeHtml } from '@/lib/utils/escape-html'
+import { checkRateLimit, AUTH_RATE_LIMIT } from '@/lib/utils/rate-limiter'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const db = () => createAdminClient() as any
@@ -11,6 +12,13 @@ const db = () => createAdminClient() as any
 const EXPIRY_HOURS = 24
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
+  // Token brute-force guard: 10 attempts per 15 min per IP. Tokens are
+  // 32-byte hex (untractable to guess) but a rate limit is cheap belt+braces.
+  const rate = checkRateLimit(req, AUTH_RATE_LIMIT, 'contact-verify')
+  if (!rate.allowed) {
+    return NextResponse.redirect(new URL('/contact?error=rate-limited', req.url))
+  }
+
   const token = req.nextUrl.searchParams.get('token')
 
   if (!token) {

@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // AOE — Automated Outreach Engine
 // Cron: outreach-checker — runs nightly at 3am UTC
 // Performs silent HTTP + SSL checks on sites in the discovery queue
@@ -7,7 +7,6 @@
 // =============================================================================
 
 import { NextResponse } from 'next/server'
-import { getServerConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
 import { startCronRun, endCronRun, getTriggeredBy } from '@/lib/utils/cron-logger'
 import { AOE_CONFIG } from '@/lib/aoe/config'
@@ -22,6 +21,7 @@ import {
 import { logSiteCheck, categorizeSite, deleteOldSiteChecks } from '@/lib/aoe/db/aoe-site-checks'
 import { checkSite } from '@/lib/aoe/services/site-checker'
 import type { AoeSiteDiscovery } from '@/lib/aoe/types'
+import { requireCronAuth } from '@/lib/auth/cron-auth'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 300 // 5 minutes
@@ -109,15 +109,8 @@ async function processSite(
 
 export async function GET(request: Request): Promise<NextResponse> {
   // Auth check
-  const authHeader = request.headers.get('authorization')
-  const { cron } = getServerConfig()
-
-  if (cron.secret && authHeader !== `Bearer ${cron.secret}`) {
-    const isVercelCron = request.headers.get('x-vercel-cron')
-    if (!isVercelCron) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-  }
+  const unauth = requireCronAuth(request)
+  if (unauth) return unauth
 
   const cronStart = Date.now()
   const runId = await startCronRun('/api/cron/aoe/outreach-checker', getTriggeredBy(request))

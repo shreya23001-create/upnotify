@@ -129,12 +129,15 @@ describe('GET /api/cron/public-checks', () => {
       expect(body.ok).toBe(true)
     })
 
-    it('allows Vercel cron header to bypass auth', async () => {
+    it('rejects request with X-Vercel-Cron header but no valid Bearer token (regression for engineering-app#60)', async () => {
+      // engineering-app#60: the X-Vercel-Cron header is plain HTTP — any
+      // attacker can spoof it. The route must require a real Authorization
+      // Bearer token, even if X-Vercel-Cron is also set.
       mockGetActivePublicMonitors.mockResolvedValue([])
       const request = createRequest({ vercelCron: true })
       const response = await GET(request)
 
-      expect(response.status).toBe(200)
+      expect(response.status).toBe(401)
     })
   })
 
