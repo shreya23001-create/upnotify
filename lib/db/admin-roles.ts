@@ -111,14 +111,21 @@ function parseModulePermission(val: unknown): { read: boolean; write: boolean } 
 
 export async function getAllAdminRoles(): Promise<AdminRole[]> {
   const supabase = createAdminClient()
+  // engineering-app#73 — bounded select. Admin-roles is a small table
+  // (a handful of internal staff) so 500 is well above realistic upper
+  // limits; if we ever hit it, the warn below makes the cap visible.
   const { data, error } = await supabase
     .from('admin_roles')
     .select('*')
     .order('created_at', { ascending: true })
+    .limit(500)
 
   if (error) {
     logger.error('Failed to get admin roles', { error: error.message })
     return []
+  }
+  if (data && data.length === 500) {
+    logger.warn('admin_roles listing hit the 500-row cap — review limit')
   }
   return data ?? []
 }
