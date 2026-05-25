@@ -32,9 +32,15 @@ vi.mock('@/lib/db/incidents', () => ({
   getOpenIncidentForMonitor: (...args: unknown[]) => mockGetOpenIncidentForMonitor(...args),
 }))
 
-const mockIsMonitorInMaintenance = vi.fn()
+// engineering-app#58 — the check-runner used to call isMonitorInMaintenance
+// per monitor; it now calls getMaintenanceSetForMonitors once with the full
+// monitor list and gets back a Set of in-maintenance IDs. The test mock
+// returns a Set built from whatever IDs the per-test setup wants treated as
+// in-maintenance, defaulting to empty.
+const mockMaintenanceSet = vi.fn<(monitors: Array<{ id: string }>) => Promise<Set<string>>>(async () => new Set<string>())
 vi.mock('@/lib/db/maintenance-windows', () => ({
-  isMonitorInMaintenance: (...args: unknown[]) => mockIsMonitorInMaintenance(...args),
+  getMaintenanceSetForMonitors: (...args: unknown[]) =>
+    mockMaintenanceSet(...(args as [Array<{ id: string }>])),
 }))
 
 const mockDispatchChecker = vi.fn()
@@ -131,7 +137,7 @@ function downResult(): CheckerResult {
 describe('check-runner cron route', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    mockIsMonitorInMaintenance.mockResolvedValue(false)
+    mockMaintenanceSet.mockResolvedValue(new Set())
     mockUpdateMonitorStatus.mockResolvedValue(undefined)
     mockWriteCheckResult.mockResolvedValue(undefined)
     mockGetOpenIncidentForMonitor.mockResolvedValue(null)
@@ -205,7 +211,9 @@ describe('check-runner cron route', () => {
   it('skips monitors in maintenance window', async () => {
     const monitor = makeMonitor()
     mockGetDueMonitors.mockResolvedValue([monitor])
-    mockIsMonitorInMaintenance.mockResolvedValue(true)
+    // Return a set containing the monitor's id so the check-runner treats it
+    // as in maintenance and skips dispatch.
+    mockMaintenanceSet.mockResolvedValueOnce(new Set<string>([monitor.id as string]))
 
     const response = await GET(makeRequest())
     const body = await response.json()
