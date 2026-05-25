@@ -87,6 +87,11 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
+  other: {
+    // SaaSHub directory verification. Required permanently — SaaSHub re-checks
+    // periodically; removing the tag would un-verify the listing.
+    "saashub-verification": "l5obg5hu6ag6",
+  },
 }
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
