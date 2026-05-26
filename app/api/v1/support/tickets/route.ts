@@ -83,11 +83,12 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }
 
     const body = await request.json() as Record<string, unknown>
-    const { subject, category, priority, message } = body as {
-      subject?:  string
-      category?: string
-      priority?: string
-      message?:  string
+    const { subject, category, priority, message, attachments } = body as {
+      subject?:     string
+      category?:    string
+      priority?:    string
+      message?:     string
+      attachments?: unknown
     }
 
     if (!subject || typeof subject !== 'string' || subject.trim().length < 3) {
@@ -108,6 +109,14 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       priority:     (validPriorities.includes(priority as TicketPriority) ? priority : 'normal') as TicketPriority,
       firstMessage: message.trim(),
       authorName:   (auth.name ?? auth.email ?? 'User'),
+      firstMessageAttachments: Array.isArray(attachments)
+        ? (attachments as Array<Record<string, unknown>>).map(a => ({
+            path: typeof a?.path === 'string' ? a.path : '',
+            name: typeof a?.name === 'string' ? a.name : undefined,
+            mime: typeof a?.mime === 'string' ? a.mime : undefined,
+            size: typeof a?.size === 'number' ? a.size : undefined,
+          }))
+        : undefined,
     })
 
     if (!ticket) {

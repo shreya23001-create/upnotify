@@ -54,7 +54,11 @@ export async function POST(
     }
 
     const body = await request.json() as Record<string, unknown>
-    const { message, author_name } = body as { message?: string; author_name?: string }
+    const { message, author_name, attachments } = body as {
+      message?:     string
+      author_name?: string
+      attachments?: unknown
+    }
 
     if (!message || typeof message !== 'string' || message.trim().length < 1) {
       return NextResponse.json({ error: 'Message body is required' }, { status: 400 })
@@ -71,6 +75,14 @@ export async function POST(
       authorType,
       authorName,
       body:       message.trim(),
+      attachments: Array.isArray(attachments)
+        ? (attachments as Array<Record<string, unknown>>).map(a => ({
+            path: typeof a?.path === 'string' ? a.path : '',
+            name: typeof a?.name === 'string' ? a.name : undefined,
+            mime: typeof a?.mime === 'string' ? a.mime : undefined,
+            size: typeof a?.size === 'number' ? a.size : undefined,
+          }))
+        : undefined,
     })
 
     if (!newMessage) {

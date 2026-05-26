@@ -30,6 +30,14 @@ export interface SupportTicket {
   org_name:       string | null
 }
 
+export interface SupportAttachment {
+  path:        string         // durable storage path (e.g. <org_id>/<ts>-<rand>.png)
+  name?:       string         // original filename for display
+  mime?:       string
+  size?:       number
+  signed_url?: string         // populated on read by getMessages()
+}
+
 export interface SupportMessage {
   id:          string
   ticket_id:   string
@@ -37,6 +45,7 @@ export interface SupportMessage {
   author_type: AuthorType
   author_name: string | null
   body:        string
+  attachments: SupportAttachment[]
   created_at:  string
 }
 
@@ -56,6 +65,68 @@ export interface TicketFilter {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function untyped(client: unknown): any { return client }
 
+// Strip everything except the durable fields we trust. The client supplies
+// these from the /api/v1/support/upload response; we never accept a raw URL
+// here — the read path regenerates signed URLs from `path` instead, so an
+// attacker can't smuggle in arbitrary links via the messages POST body.
+function sanitiseAttachmentList(input: unknown): SupportAttachment[] {
+  if (!Array.isArray(input)) return []
+  const out: SupportAttachment[] = []
+  for (const item of input) {
+    if (!item || typeof item !== 'object') continue
+    const rec = item as Record<string, unknown>
+    const path = typeof rec.path === 'string' ? rec.path : null
+    if (!path) continue
+    // Defence in depth: storage paths look like "<org_uuid>/<ts>-<rand>.<ext>".
+    // Reject anything containing path traversal or absolute prefixes.
+    if (path.includes('..') || path.startsWith('/') || path.length > 512) continue
+    out.push({
+      path,
+      name: typeof rec.name === 'string' ? rec.name.slice(0, 256) : undefined,
+      mime: typeof rec.mime === 'string' ? rec.mime.slice(0, 128) : undefined,
+      size: typeof rec.size === 'number' && rec.size > 0 ? rec.size : undefined,
+    })
+    if (out.length >= 10) break // hard cap per message
+  }
+  return out
+}
+
+const ATTACHMENT_SIGNED_URL_TTL_SECONDS = 60 * 60 // 1 hour — refreshed on every page load
+
+async function attachSignedUrls(messages: SupportMessage[]): Promise<SupportMessage[]> {
+  const paths: string[] = []
+  for (const m of messages) {
+    for (const a of m.attachments ?? []) {
+      if (a.path) paths.push(a.path)
+    }
+  }
+  if (paths.length === 0) return messages
+
+  const supabase = createAdminClient()
+  // createSignedUrls is a single round-trip — better than N calls to createSignedUrl.
+  const { data, error } = await untyped(supabase).storage
+    .from('support-attachments')
+    .createSignedUrls(paths, ATTACHMENT_SIGNED_URL_TTL_SECONDS)
+
+  if (error || !Array.isArray(data)) {
+    logger.error('Failed to sign attachment URLs', { error: error?.message, count: paths.length })
+    return messages
+  }
+
+  const urlByPath = new Map<string, string>()
+  for (const row of data as Array<{ path?: string | null; signedUrl?: string | null }>) {
+    if (row?.path && row.signedUrl) urlByPath.set(row.path, row.signedUrl)
+  }
+
+  return messages.map(m => ({
+    ...m,
+    attachments: (m.attachments ?? []).map(a => ({
+      ...a,
+      signed_url: urlByPath.get(a.path),
+    })),
+  }))
+}
+
 // ---------------------------------------------------------------------------
 // Tickets — user-scoped (uses server client with RLS)
 // ---------------------------------------------------------------------------
@@ -68,6 +139,7 @@ export async function createTicket(params: {
   priority:  TicketPriority
   firstMessage: string
   authorName: string
+  firstMessageAttachments?: SupportAttachment[]
 }): Promise<SupportTicket | null> {
   const supabase = await createClient()
 
@@ -100,6 +172,7 @@ export async function createTicket(params: {
       author_type: 'user',
       author_name: params.authorName,
       body:        params.firstMessage,
+      attachments: sanitiseAttachmentList(params.firstMessageAttachments),
     })
 
   if (msgError) {
@@ -260,7 +333,11 @@ export async function getMessages(ticketId: string): Promise<SupportMessage[]> {
     logger.error('Failed to get messages', { error: error.message, ticketId })
     return []
   }
-  return (data ?? []) as SupportMessage[]
+  const messages = ((data ?? []) as SupportMessage[]).map(m => ({
+    ...m,
+    attachments: Array.isArray(m.attachments) ? m.attachments : [],
+  }))
+  return await attachSignedUrls(messages)
 }
 
 export async function addMessage(params: {
@@ -269,6 +346,7 @@ export async function addMessage(params: {
   authorType: AuthorType
   authorName: string
   body:       string
+  attachments?: SupportAttachment[]
 }): Promise<SupportMessage | null> {
   const supabase = createAdminClient()
 
@@ -280,6 +358,7 @@ export async function addMessage(params: {
       author_type: params.authorType,
       author_name: params.authorName,
       body:        params.body,
+      attachments: sanitiseAttachmentList(params.attachments),
     })
     .select()
     .single()
@@ -312,5 +391,14 @@ export async function addMessage(params: {
     .update(ticketUpdates)
     .eq('id', params.ticketId)
 
-  return message as SupportMessage
+  // Sign URLs on the newly-inserted row so the client can render the
+  // freshly uploaded files immediately, without a page refresh.
+  const normalised: SupportMessage = {
+    ...(message as SupportMessage),
+    attachments: Array.isArray((message as SupportMessage).attachments)
+      ? (message as SupportMessage).attachments
+      : [],
+  }
+  const [signed] = await attachSignedUrls([normalised])
+  return signed
 }

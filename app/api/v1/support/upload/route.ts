@@ -88,8 +88,11 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     return NextResponse.json({
       success: true,
-      url: signed.signedUrl,    // immediately usable, expires in 7 days
-      path: safeName,           // durable — store this for regenerating URLs later
+      url:  signed.signedUrl,    // immediately usable, expires in 7 days
+      path: safeName,            // durable — store this for regenerating URLs later
+      name: file.name,           // original filename for display
+      mime: file.type,           // for choosing inline vs link rendering
+      size: file.size,           // bytes — for display
     })
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Unknown error'

@@ -5188,6 +5188,16 @@ html.dark .support-badge-closed   { background: rgba(148,163,184,0.1); color: #9
 .support-message-time    { font-size: 12px; color: var(--text-muted); }
 .support-message-body    { font-size: 14px; color: var(--text-secondary); line-height: 1.7; white-space: pre-wrap; word-break: break-word; }
 
+/* Attachments inside a message */
+.support-attachments       { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.support-attachment-row    { display: inline-flex; align-items: center; gap: 8px; padding: 6px 10px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 6px; font-size: 13px; color: var(--text-secondary); text-decoration: none; transition: background 0.15s, border-color 0.15s; }
+.support-attachment-row:hover { background: var(--bg-hover); border-color: var(--accent); color: var(--text-primary); }
+.support-attachment-broken { opacity: 0.7; cursor: default; }
+.support-attachment-size   { font-size: 11px; color: var(--text-muted); }
+.support-attachment-image  { display: inline-block; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; line-height: 0; transition: border-color 0.15s; }
+.support-attachment-image:hover { border-color: var(--accent); }
+.support-attachment-image img   { display: block; max-width: 220px; max-height: 160px; object-fit: cover; }
+
 /* Reply + closed */
 .support-reply-card    { padding: 20px; }
 .support-closed-notice { padding: 16px 20px; font-size: 14px; color: var(--text-muted); text-align: center; }
