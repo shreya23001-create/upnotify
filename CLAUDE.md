@@ -50,7 +50,7 @@ Code only. The `uptrue-io/uptrue-app` repository. Dev team only.
 | Boss says | Branch | Domain |
 |---|---|---|
 | "deploy", "deploy on dev", "ship it", "push it", "dev release" | `dev` | https://dev.uptrue.io |
-| "deploy on prod", "prod release", "push to master", "go live" | `master` | https://uptrue.io + https://www.uptrue.io |
+| "deploy on prod", "prod release", "push to master", "go live" | `master` | https://uptrue.io (canonical) + https://www.uptrue.io (307 → apex) |
 
 - All work goes to `dev` only: `git push origin dev`
 - If you are about to run any command containing `origin master` — STOP. Ask first.
@@ -58,11 +58,23 @@ Code only. The `uptrue-io/uptrue-app` repository. Dev team only.
 - The only words that authorise a master push: **"deploy to prod"** or **"push to master"** — explicit, in that session, for that commit.
 - One approval does NOT carry forward to future commits or sessions.
 
-### Vercel routing (set 2026-05-02, do not change without reason)
+### Vercel routing (canonical host: apex, decided 2026-05-26)
 - `dev.uptrue.io` → project domain with `gitBranch: "dev"` → tracks dev branch deploys
-- `uptrue.io` → 307 redirect to `www.uptrue.io`
-- `www.uptrue.io` → production branch alias (master)
+- `uptrue.io` → **production branch alias (master)** — canonical host
+- `www.uptrue.io` → 307 redirect to `uptrue.io`
 - `uptrue-app.vercel.app` → Vercel default
+
+**Why apex:** Google has already indexed apex URLs (sitemap + canonical
+tags both point there). Email infrastructure (`alerts@`, `reports@`,
+`security@`) uses the apex domain. Shorter URL for marketing. Flipping
+from the earlier 2026-05-02 routing (apex → www) preserves the existing
+Google index — no re-crawl, no ranking volatility.
+
+**Code expectations (already in place; do not change):**
+- `app/sitemap.ts` emits `https://uptrue.io/...` URLs
+- `app/layout.tsx` `metadataBase = new URL('https://uptrue.io')`
+- Page-level `alternates.canonical` declarations all use apex
+- `NEXT_PUBLIC_APP_URL=https://uptrue.io` in Vercel production env vars
 
 GitLab CI handles routing automatically: `.gitlab-ci.yml` runs `vercel deploy` (preview + alias) on dev, `vercel deploy --prod` on master.
 
