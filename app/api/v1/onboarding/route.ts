@@ -81,9 +81,20 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       }, { status: 403 })
     }
 
+    // engineering-app#55 — was a check-once-create-many off-by-one. Lite user
+    // at 1/3 monitors passed the limit check above (1 < 3), then the loop
+    // below created up to 4 more, ending at 5 monitors on a 3-cap plan.
+    // Compute remaining headroom once and slice the request to fit.
+    // Pattern lifted from bulkCreateMonitorsAction.
+    const remaining = limitCheck.limit === null
+      ? Number.POSITIVE_INFINITY
+      : Math.max(0, limitCheck.limit - limitCheck.currentCount)
+    const toCreate = monitors.slice(0, remaining)
+    const skipped = monitors.length - toCreate.length
+
     const results: MonitorResultItem[] = []
 
-    for (const monitorReq of monitors) {
+    for (const monitorReq of toCreate) {
       // Validate monitor type
       const allowedTypes = ['http', 'ssl', 'dns', 'keyword']
       if (!allowedTypes.includes(monitorReq.type)) {
@@ -159,6 +170,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     logger.info('Onboarding monitors created', {
       orgId: user.org_id,
       count: results.length,
+      skipped,
     })
 
     // Send welcome email (fire-and-forget, does not block response)
@@ -167,7 +179,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       logger.error('Failed to send welcome email during onboarding', { userId: user.id, error: errMsg })
     })
 
-    return NextResponse.json({ success: true, monitors: results })
+    return NextResponse.json({ success: true, monitors: results, skipped })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error'
     logger.error('Onboarding API error', { error: message })
