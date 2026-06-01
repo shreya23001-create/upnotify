@@ -27,7 +27,9 @@ img { max-width: 100%; display: block; }
   --bg-skeleton: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
   --text-primary: #1a1a2e;
   --text-secondary: #475569;
-  --text-muted: #94a3b8;
+  /* engineering-app#75 — #94a3b8 was 3.47:1 vs --bg-primary, failing WCAG AA.
+     Slate-500 #64748b clears 4.5:1 on every light background we paint it on. */
+  --text-muted: #64748b;
   --text-link: #3b82f6;
   --border-primary: #eaedf3;
   --border-input: #e2e8f0;
@@ -72,7 +74,9 @@ html.dark {
   --bg-skeleton: linear-gradient(90deg, #1a1d27 25%, #242736 50%, #1a1d27 75%);
   --text-primary: #e8eaf0;
   --text-secondary: #a0a8b8;
-  --text-muted: #6b7280;
+  /* engineering-app#75 — #6b7280 was 4.09:1 vs --bg-primary, failing WCAG AA.
+     Gray-400 #9ca3af gives ~6.4:1 on every dark background we paint it on. */
+  --text-muted: #9ca3af;
   --text-link: #60a5fa;
   --border-primary: #2a2d3a;
   --border-input: #2a2d3a;
