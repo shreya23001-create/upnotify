@@ -3,7 +3,7 @@
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { randomBytes } from 'crypto'
-import { createAlertChannel, updateAlertChannel, deleteAlertChannel, toggleAlertChannel, bulkDeleteAlertChannels, bulkUpdateAlertChannelStatus, getAlertChannelById } from '@/lib/db/alerts'
+import { createAlertChannel, updateAlertChannel, deleteAlertChannel, toggleAlertChannel, bulkDeleteAlertChannels, bulkUpdateAlertChannelStatus, getAlertChannelById, countAlertsForChannel, countAlertsForChannels } from '@/lib/db/alerts'
 import { checkAlertChannelAccess } from '@/lib/utils/plan-limits'
 import { getCurrentUser } from '@/lib/db/users'
 import { getWorkspacesByOrg } from '@/lib/db/workspaces'
@@ -164,6 +164,21 @@ export async function deleteAlertChannelAction(channelId: string): Promise<{ err
     return { error: 'Alert channel not found' }
   }
 
+  // engineering-app#53 — refuse delete when the channel has historical
+  // delivered alerts. The FK on `alerts.channel_id` cascades, so deleting
+  // would silently wipe the incident audit trail. Disable instead preserves
+  // the record and is the right action for "I want this channel off but
+  // keep history".
+  const alertCount = await countAlertsForChannel(channelId)
+  if (alertCount > 0) {
+    return {
+      error: `Cannot delete — "${existing.name}" has delivered ${alertCount} alert${alertCount === 1 ? '' : 's'}. Disable it instead to keep the audit trail. Contact support if you need to remove the records too.`,
+    }
+  }
+  if (alertCount < 0) {
+    return { error: 'Could not verify channel history. Please try again.' }
+  }
+
   const success = await deleteAlertChannel(channelId)
   if (!success) return { error: 'Failed to delete alert channel' }
   await devAuditLog({ orgId: user.org_id, userId: user.id, action: 'alert_channel.deleted', resourceType: 'alert_channel', resourceId: channelId })
@@ -195,6 +210,22 @@ export async function bulkDeleteAlertChannelsAction(ids: string[]): Promise<{ er
 
   const user = await getCurrentUser()
   if (!user) return { error: 'Not authenticated' }
+
+  // engineering-app#53 — same guard as single-delete. If ANY selected
+  // channel has delivered alerts, refuse the whole batch and name the
+  // first offender so the user can de-select or disable instead.
+  const counts = await countAlertsForChannels(ids)
+  const linked = Object.entries(counts).filter(([, n]) => n > 0)
+  const failed = Object.entries(counts).filter(([, n]) => n < 0)
+  if (failed.length > 0) {
+    return { error: 'Could not verify channel history. Please try again.' }
+  }
+  if (linked.length > 0) {
+    const totalAlerts = linked.reduce((sum, [, n]) => sum + n, 0)
+    return {
+      error: `Cannot delete — ${linked.length} of ${ids.length} selected channel${linked.length === 1 ? '' : 's'} have delivered ${totalAlerts} alert${totalAlerts === 1 ? '' : 's'}. Disable them instead to keep the audit trail, or remove just the channels with no history.`,
+    }
+  }
 
   const success = await bulkDeleteAlertChannels(ids, user.org_id)
   if (!success) return { error: 'Failed to delete alert channels' }

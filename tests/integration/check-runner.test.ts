@@ -81,6 +81,15 @@ vi.mock('@/lib/utils/config', () => ({
   }),
 }))
 
+// engineering-app#77 — the cron-lock helper touches Supabase. Mock it to
+// always return acquired so the unit-level check-runner tests aren't
+// gated on a real DB. The lock-held / release behaviour is exercised
+// separately in tests/unit/cron-lock.test.ts.
+vi.mock('@/lib/utils/cron-lock', () => ({
+  acquireCronLock: vi.fn().mockResolvedValue(true),
+  releaseCronLock: vi.fn().mockResolvedValue(undefined),
+}))
+
 // ---------------------------------------------------------------------------
 // Import module under test (AFTER mocks are set up)
 // ---------------------------------------------------------------------------

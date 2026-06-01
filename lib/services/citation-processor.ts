@@ -12,6 +12,7 @@ import {
 import { getUserById } from '@/lib/db/users'
 import { sendCitationReportEmail } from '@/lib/services/email'
 import { logger } from '@/lib/utils/logger'
+import { cleanDomainForAi, cleanKeywordForAi } from '@/lib/utils/sanitize-ai-input'
 
 // ---------------------------------------------------------------------------
 // Hardcoded fallback model IDs.
@@ -260,10 +261,20 @@ export async function processCitationRun(runId: string): Promise<{
       continue
     }
 
+    // engineering-app#83 — re-sanitise both fields at the processor layer.
+    // The route already sanitises before insert (lib/utils/sanitize-ai-input),
+    // but anything downstream that calls processCitationRun() with values
+    // read straight from the DB (cron retry, profile-introspector, admin
+    // re-run tooling) would otherwise pass unsanitised payloads to the model.
+    // Defence in depth — idempotent if the input is already clean.
+    const safeDomain = cleanDomainForAi(run.domain)
+
     let engineCited = false
-    for (const keyword of run.keywords) {
+    for (const rawKeyword of run.keywords) {
+      const keyword = cleanKeywordForAi(rawKeyword)
+      if (!keyword) continue
       try {
-        const result = await queryFn(engine, apiKey, keyword, run.domain)
+        const result = await queryFn(engine, apiKey, keyword, safeDomain)
         results.push({
           run_id: runId, engine_id: engine.id, keyword,
           cited: result.cited, confidence: result.confidence,

@@ -72,10 +72,29 @@ export async function createStatusPage(input: {
 }
 
 export async function updateStatusPage(id: string, updates: {
-  name?: string; slug?: string; monitor_ids?: string[]; is_published?: boolean
+  name?: string; slug?: string; monitor_ids?: string[]; is_published?: boolean; custom_domain?: string | null
 }): Promise<StatusPage | null> {
+  // engineering-app#52 — custom_domain was previously accepted as raw text
+  // with no format validation. Normalise + validate at the DB-layer so any
+  // caller (action, API, future admin tooling) gets the same guard. Empty
+  // string and null both clear the field.
+  const normalised: typeof updates = { ...updates }
+  if (updates.custom_domain !== undefined) {
+    const raw = updates.custom_domain
+    if (raw === null || raw === '') {
+      normalised.custom_domain = null
+    } else {
+      const { isValidCustomDomain, normaliseDomain } = await import('@/lib/utils/validate-domain')
+      const host = normaliseDomain(raw)
+      if (!isValidCustomDomain(host)) {
+        logger.warn('Rejected malformed status page custom_domain', { pageId: id, raw: raw.slice(0, 64) })
+        return null
+      }
+      normalised.custom_domain = host
+    }
+  }
   const supabase = createAdminClient()
-  const { data, error } = await supabase.from('status_pages').update(updates).eq('id', id).select().single()
+  const { data, error } = await supabase.from('status_pages').update(normalised).eq('id', id).select().single()
   if (error) { logger.error('Failed to update status page', { error: error.message }); return null }
   return data
 }

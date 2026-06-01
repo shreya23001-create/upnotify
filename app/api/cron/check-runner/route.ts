@@ -12,10 +12,16 @@ import { startCronRun, endCronRun, getTriggeredBy } from '@/lib/utils/cron-logge
 import type { Monitor } from '@/lib/types'
 import type { CheckerResult } from '@/lib/checkers/types'
 import { requireCronAuth } from '@/lib/auth/cron-auth'
+import { acquireCronLock, releaseCronLock } from '@/lib/utils/cron-lock'
 
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 300
+
+// engineering-app#77 — name + TTL for the overlap lock. TTL slightly above
+// maxDuration so a crashed run self-heals on the next cron tick.
+const CRON_LOCK_NAME    = 'check-runner'
+const CRON_LOCK_TTL_MS  = 6 * 60 * 1000 // 6 minutes
 
 function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms))
@@ -29,6 +35,15 @@ interface FirstCheckResult {
 export async function GET(request: Request): Promise<NextResponse> {
   const unauth = requireCronAuth(request)
   if (unauth) return unauth
+
+  // engineering-app#77 — refuse to start a parallel run while a previous
+  // one is still in flight. The TTL-with-prune pattern means a crashed
+  // run self-heals after CRON_LOCK_TTL_MS; we don't need a babysitter cron.
+  const gotLock = await acquireCronLock(CRON_LOCK_NAME, CRON_LOCK_TTL_MS)
+  if (!gotLock) {
+    logger.warn('Check runner skipped — previous run still in progress')
+    return NextResponse.json({ ok: true, skipped: 'lock_held' })
+  }
 
   const cronStart = Date.now()
   const currentRegion = getCurrentRegion()
@@ -211,5 +226,10 @@ export async function GET(request: Request): Promise<NextResponse> {
     logger.error('Check runner error', { error: message })
     await endCronRun(runId, cronStart, 'error', { errorMessage: message })
     return NextResponse.json({ error: 'Internal error' }, { status: 500 })
+  } finally {
+    // engineering-app#77 — release on every exit path (success, throw,
+    // explicit return). TTL would reclaim it eventually, but releasing
+    // explicitly lets the next cron tick start without waiting.
+    await releaseCronLock(CRON_LOCK_NAME)
   }
 }
