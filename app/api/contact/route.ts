@@ -6,6 +6,7 @@ import { sendEmail } from '@/lib/services/email'
 import { getServerConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
 import { escapeHtml } from '@/lib/utils/escape-html'
+import { checkRateLimit, CONTACT_FORM_RATE_LIMIT } from '@/lib/utils/rate-limiter'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const db = () => createAdminClient() as any
@@ -13,6 +14,21 @@ const db = () => createAdminClient() as any
 const SUBJECTS = ['General Enquiry', 'Agency Enquiry', 'Partnership', 'Billing', 'Feature Request']
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
+  // Anti-spam-relay: 5 submissions per hour per IP. Returns 429 with
+  // Retry-After so well-behaved clients (and CDNs) can back off cleanly.
+  const rate = checkRateLimit(req, CONTACT_FORM_RATE_LIMIT, 'contact-form')
+  if (!rate.allowed) {
+    return NextResponse.json(
+      { error: 'Too many submissions. Please try again later.' },
+      {
+        status: 429,
+        headers: {
+          'Retry-After': String(Math.max(1, Math.ceil((rate.resetAt - Date.now()) / 1000))),
+        },
+      },
+    )
+  }
+
   try {
     const body = await req.json() as {
       name?: string; email?: string; subject?: string; message?: string

@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // Cron: autoblog/llm-detector
 // Schedule: Daily 7am
 // Purpose: Detect new LLM launches in feed items and queue them for generation
@@ -6,7 +6,6 @@
 // =============================================================================
 
 import { NextResponse } from 'next/server'
-import { getServerConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
 import { startCronRun, endCronRun, getTriggeredBy } from '@/lib/utils/cron-logger'
 import {
@@ -18,20 +17,14 @@ import {
 } from '@/lib/db/autoblog'
 import { detectLLMLaunches } from '@/lib/services/llm-detector'
 import type { AutoblogFeedItem } from '@/lib/db/autoblog'
+import { requireCronAuth } from '@/lib/auth/cron-auth'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 30
 
 export async function GET(request: Request): Promise<NextResponse> {
-  const authHeader = request.headers.get('authorization')
-  const { cron } = getServerConfig()
-
-  if (cron.secret && authHeader !== `Bearer ${cron.secret}`) {
-    const isVercelCron = request.headers.get('x-vercel-cron')
-    if (!isVercelCron) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-  }
+  const unauth = requireCronAuth(request)
+  if (unauth) return unauth
 
   const cronStart = Date.now()
   const runId = await startCronRun('/api/cron/autoblog/llm-detector', getTriggeredBy(request))

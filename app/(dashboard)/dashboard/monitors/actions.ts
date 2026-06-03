@@ -180,45 +180,18 @@ export async function createMonitorAction(formData: FormData): Promise<{ error?:
   redirect('/dashboard/monitors')
 }
 
-export async function createMonitorAfterPaymentAction(formData: FormData): Promise<{ error?: string }> {
-  const guard2 = await impersonationGuard()
-  if (guard2.isBlocked) return { error: guard2.error }
-
-  const user = await getCurrentUser()
-  if (!user) return { error: 'Not authenticated' }
-
-  const workspaces = await getWorkspacesByOrg(user.org_id)
-  const workspace = workspaces[0]
-  if (!workspace) return { error: 'No workspace found' }
-
-  const name = formData.get('name') as string
-  const type = formData.get('type') as string
-  const target = formData.get('target') as string
-  const intervalStr = formData.get('check_interval_seconds') as string
-  const severity = formData.get('severity') as string || 'P2'
-
-  if (!name || !type || !target) return { error: 'Missing monitor data' }
-
-  const config: Record<string, unknown> = {}
-  if (type === 'keyword') {
-    const positiveStr = formData.get('positiveKeywords') as string
-    const negativeStr = formData.get('negativeKeywords') as string
-    try { config.positiveKeywords = positiveStr ? JSON.parse(positiveStr) : [] } catch { config.positiveKeywords = [] }
-    try { config.negativeKeywords = negativeStr ? JSON.parse(negativeStr) : [] } catch { config.negativeKeywords = [] }
-  }
-  if (type === 'port') { config.port = parseInt(formData.get('port') as string || '80', 10) }
-  if (type === 'heartbeat') { config.expectedIntervalSeconds = parseInt(formData.get('expectedInterval') as string || '300', 10) }
-  if (type === 'api') { config.method = formData.get('method') as string || 'GET' }
-
-  const monitor = await createMonitor({
-    org_id: user.org_id, workspace_id: workspace.id, name, type, target,
-    check_interval_seconds: intervalStr ? parseInt(intervalStr, 10) : 300, severity, config,
-  })
-
-  if (!monitor) return { error: 'Failed to create monitor' }
-  logger.info('Monitor created after payment', { monitorId: monitor.id, name, type })
-  redirect('/dashboard/monitors')
-}
+// engineering-app#55 — `createMonitorAfterPaymentAction` was removed here
+// (was at lines 183-221). It was leftover from the old usage-based billing
+// model (per the comment in createMonitorAction at line 92-93) and bypassed
+// the plan-limit check entirely: it read pending monitor data from
+// `localStorage.uptrue_pending_monitor` (caller-controlled) and called
+// `createMonitor()` directly with no `checkMonitorLimit()`.
+//
+// Exploit was trivial: DevTools → set the localStorage key → navigate to
+// `/dashboard/monitors/new/manual?paid=true` → monitor created over plan
+// cap, no payment. Removed along with PaidMonitorCreator + the ?paid=true
+// route branch; legitimate monitor creation goes through createMonitorAction
+// (above) which has the limit check at L84-90.
 
 export async function updateMonitorAction(monitorId: string, formData: FormData): Promise<{ error?: string; success?: boolean }> {
   const guardUpdate = await impersonationGuard()

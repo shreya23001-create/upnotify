@@ -49,15 +49,51 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       })
 
     if (uploadError) {
-      logger.error('Support file upload failed', { error: uploadError.message })
+      const msg = uploadError.message ?? ''
+      logger.error('Support file upload failed', { error: msg, file: safeName, type: file.type })
+
+      // Surface the underlying cause to logs so ops/devs can diagnose, but
+      // keep the user-facing message generic. The most common production
+      // cause we've seen is the storage bucket not being provisioned on a
+      // fresh Supabase project — `Bucket not found` returns here and the
+      // operator needs to create `support-attachments` in Storage.
+      // engineering-app#49.
+      if (/bucket.*not.*found/i.test(msg)) {
+        return NextResponse.json(
+          { error: 'File uploads are temporarily unavailable. Please paste the content into the message body or email support@uptrue.io.' },
+          { status: 503 },
+        )
+      }
       return NextResponse.json({ error: 'Upload failed. Please try again.' }, { status: 500 })
     }
 
-    const { data: { publicUrl } } = supabase.storage
+    // Private bucket (per migration 00106) — return a signed URL with a
+    // 7-day TTL. 7 days is "effectively permanent" for normal support
+    // workflows; an older attachment view will need to regenerate the URL
+    // from the storage path stored on the ticket. engineering-app#49.
+    const SIGNED_URL_TTL_SECONDS = 7 * 24 * 60 * 60
+    const { data: signed, error: signErr } = await supabase.storage
       .from('support-attachments')
-      .getPublicUrl(safeName)
+      .createSignedUrl(safeName, SIGNED_URL_TTL_SECONDS)
 
-    return NextResponse.json({ success: true, url: publicUrl })
+    if (signErr || !signed?.signedUrl) {
+      logger.error('Support file uploaded but signed URL generation failed', { error: signErr?.message, file: safeName })
+      // File is uploaded but unreachable — surface as a soft failure so the
+      // user knows the file is there even if the link is currently broken.
+      return NextResponse.json(
+        { error: 'File uploaded but URL generation failed. Please ping support.' },
+        { status: 500 },
+      )
+    }
+
+    return NextResponse.json({
+      success: true,
+      url:  signed.signedUrl,    // immediately usable, expires in 7 days
+      path: safeName,            // durable — store this for regenerating URLs later
+      name: file.name,           // original filename for display
+      mime: file.type,           // for choosing inline vs link rendering
+      size: file.size,           // bytes — for display
+    })
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Unknown error'
     logger.error('Support upload route error', { error: message })

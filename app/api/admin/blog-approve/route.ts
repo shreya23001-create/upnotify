@@ -4,6 +4,7 @@ import { validateAndUseToken } from '@/lib/db/blog-approval-tokens'
 import { postOutageBlogToSocial } from '@/lib/services/social-poster'
 import { getConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
+import { escapeHtml } from '@/lib/utils/escape-html'
 
 export const dynamic = 'force-dynamic'
 
@@ -11,14 +12,22 @@ export const dynamic = 'force-dynamic'
 // HTML response pages (opened in browser via email link)
 // ---------------------------------------------------------------------------
 
+// `colour` is only ever passed a known-safe hex literal from this file, so it
+// doesn't need escaping. `heading` and `message` are interpolated into the
+// HTML body and MUST be escaped — they take strings derived from blog post
+// titles, which are user-controlled data from the DB and can carry HTML.
+// engineering-app#61 — previously this template emitted post.title raw, which
+// rendered <script> / <img onerror=> payloads in the admin's browser session.
 function successPage(heading: string, message: string, colour: string): Response {
+  const safeHeading = escapeHtml(heading)
+  const safeMessage = escapeHtml(message)
   return new Response(
     `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>${heading} — Uptrue</title>
+  <title>${safeHeading} — Uptrue</title>
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
     body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f4f4f7;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px}
@@ -32,8 +41,8 @@ function successPage(heading: string, message: string, colour: string): Response
 <body>
   <div class="card">
     <div class="icon">${colour === '#16a34a' ? '✅' : '🗑️'}</div>
-    <h1>${heading}</h1>
-    <p>${message}</p>
+    <h1>${safeHeading}</h1>
+    <p>${safeMessage}</p>
     <a href="https://uptrue.io/admin/blog">View Blog Admin</a>
   </div>
 </body>
@@ -43,6 +52,10 @@ function successPage(heading: string, message: string, colour: string): Response
 }
 
 function errorPage(message: string): Response {
+  // engineering-app#61 — escape any caller-supplied message string to keep
+  // the error template safe for blog-derived inputs (post.title leaks into
+  // the failure paths above).
+  const safeMessage = escapeHtml(message)
   return new Response(
     `<!DOCTYPE html>
 <html lang="en">
@@ -63,7 +76,7 @@ function errorPage(message: string): Response {
   <div class="card">
     <div class="icon">⚠️</div>
     <h1>Something went wrong</h1>
-    <p>${message}</p>
+    <p>${safeMessage}</p>
   </div>
 </body>
 </html>`,

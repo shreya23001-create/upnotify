@@ -27,6 +27,34 @@ function slugify(text: string): string {
     .replace(/^-|-$/g, '')
 }
 
+interface CtaFields { heading: string; buttonLabel: string; buttonUrl: string }
+
+// Read CTA triplet from FormData. Returns the CTA only if heading is set —
+// matches the editor convention where an empty heading means "no CTA".
+function readCta(formData: FormData, prefix: string): CtaFields | null {
+  const heading = ((formData.get(`${prefix}_heading`) as string) ?? '').trim()
+  if (!heading) return null
+  return {
+    heading,
+    buttonLabel: ((formData.get(`${prefix}_label`) as string) ?? '').trim(),
+    buttonUrl: ((formData.get(`${prefix}_url`) as string) ?? '').trim(),
+  }
+}
+
+// Build the content JSONB object from raw editor fields. Always returns an
+// object — never a string or null — so the DB CHECK constraint and the
+// renderer both stay happy.
+function buildContentObject(
+  body: string,
+  midCta: CtaFields | null,
+  endCta: CtaFields | null
+): Record<string, unknown> {
+  const content: Record<string, unknown> = { body }
+  if (midCta) content.midCta = midCta
+  if (endCta) content.endCta = endCta
+  return content
+}
+
 /** Create a new blog post */
 export async function createBlogPostAction(formData: FormData): Promise<ActionResult> {
   const user = await getCurrentUser()
@@ -35,25 +63,35 @@ export async function createBlogPostAction(formData: FormData): Promise<ActionRe
   const title = (formData.get('title') as string)?.trim()
   const slug = (formData.get('slug') as string)?.trim() || slugify(title)
   const excerpt = (formData.get('excerpt') as string)?.trim() || null
-  const content = (formData.get('content') as string)?.trim() || ''
+  const body = (formData.get('content') as string) ?? ''
   const category = (formData.get('category') as string)?.trim() || null
   const status = (formData.get('status') as string) || 'draft'
   const seoTitle = (formData.get('seo_title') as string)?.trim() || null
   const seoDescription = (formData.get('seo_description') as string)?.trim() || null
+  const ogImageUrl = (formData.get('og_image_url') as string)?.trim() || null
   const publishedAt = (formData.get('published_at') as string)?.trim() || null
+  const tagsRaw = (formData.get('tags') as string)?.trim() || ''
+  const tags = tagsRaw ? tagsRaw.split(',').map(t => t.trim()).filter(Boolean) : null
+  const midCta = readCta(formData, 'mid_cta')
+  const endCta = readCta(formData, 'end_cta')
 
   if (!title) return { success: false, error: 'Title is required' }
   if (!slug) return { success: false, error: 'Slug is required' }
+  if (status === 'published' && !body.trim()) {
+    return { success: false, error: 'Cannot publish a post with no content. Add a body or save as draft.' }
+  }
 
   const post = await createBlogPost({
     title,
     slug,
     excerpt,
-    content: { body: content },
+    content: buildContentObject(body, midCta, endCta),
     category,
     status,
     seo_title: seoTitle,
     seo_description: seoDescription,
+    og_image_url: ogImageUrl,
+    tags,
     published_at: status === 'published' && !publishedAt
       ? new Date().toISOString()
       : publishedAt,
@@ -80,25 +118,35 @@ export async function updateBlogPostAction(formData: FormData): Promise<ActionRe
   const title = (formData.get('title') as string)?.trim()
   const slug = (formData.get('slug') as string)?.trim()
   const excerpt = (formData.get('excerpt') as string)?.trim() || null
-  const content = (formData.get('content') as string)?.trim() || ''
+  const body = (formData.get('content') as string) ?? ''
   const category = (formData.get('category') as string)?.trim() || null
   const status = (formData.get('status') as string) || 'draft'
   const seoTitle = (formData.get('seo_title') as string)?.trim() || null
   const seoDescription = (formData.get('seo_description') as string)?.trim() || null
+  const ogImageUrl = (formData.get('og_image_url') as string)?.trim() || null
   const publishedAt = (formData.get('published_at') as string)?.trim() || null
+  const tagsRaw = (formData.get('tags') as string)?.trim() || ''
+  const tags = tagsRaw ? tagsRaw.split(',').map(t => t.trim()).filter(Boolean) : null
+  const midCta = readCta(formData, 'mid_cta')
+  const endCta = readCta(formData, 'end_cta')
 
   if (!title) return { success: false, error: 'Title is required' }
   if (!slug) return { success: false, error: 'Slug is required' }
+  if (status === 'published' && !body.trim()) {
+    return { success: false, error: 'Cannot publish a post with no content. Add a body or save as draft.' }
+  }
 
   const post = await updateBlogPost(id, {
     title,
     slug,
     excerpt,
-    content: { body: content },
+    content: buildContentObject(body, midCta, endCta),
     category,
     status,
     seo_title: seoTitle,
     seo_description: seoDescription,
+    og_image_url: ogImageUrl,
+    tags,
     published_at: status === 'published' && !publishedAt
       ? new Date().toISOString()
       : publishedAt,

@@ -12,6 +12,7 @@ import { markSiteOptedOut } from '@/lib/aoe/db/aoe-site-discovery'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
 import { AOE_CONFIG } from '@/lib/aoe/config'
+import { checkRateLimit, PUBLIC_UNSUBSCRIBE_RATE_LIMIT } from '@/lib/utils/rate-limiter'
 
 export const dynamic = 'force-dynamic'
 
@@ -78,6 +79,14 @@ function confirmationPage(success: boolean): string {
 // ---------------------------------------------------------------------------
 
 export async function GET(request: Request): Promise<NextResponse> {
+  const rate = checkRateLimit(request, PUBLIC_UNSUBSCRIBE_RATE_LIMIT, 'outreach-unsubscribe')
+  if (!rate.allowed) {
+    return new NextResponse(confirmationPage(false), {
+      status: 429,
+      headers: { 'Content-Type': 'text/html', 'Retry-After': String(Math.max(1, Math.ceil((rate.resetAt - Date.now()) / 1000))) },
+    })
+  }
+
   const { searchParams } = new URL(request.url)
   const messageId = searchParams.get('id')
   const sig       = searchParams.get('sig')

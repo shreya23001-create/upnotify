@@ -5,6 +5,7 @@ import { getCitationRunById, getCitationResults } from '@/lib/db/ai-visibility'
 import { getActiveEngines } from '@/lib/db/ai-engines'
 import type { CitationCheckResult, CitationCheckRun } from '@/lib/db/ai-visibility'
 import type { AiEngine } from '@/lib/db/ai-engines'
+import { aggregateCompetitorsByKeyword, perKeywordVisibility } from '@/lib/utils/citation-aggregations'
 
 export const metadata: Metadata = { title: 'Citation Run — AI Visibility' }
 
@@ -129,10 +130,13 @@ function CompletedState({ run, results, engineMap }: {
     byKeyword[r.keyword].push(r)
   }
 
-  // Detect competitor domains from source URLs (domains that aren't the user's domain)
-  const competitorDomains = detectCompetitors(results, run.domain)
+  // Per-keyword visibility table at the top — Q1 surfaced as keyword-level, not just one global score
+  const perKeyword = perKeywordVisibility(results, engineMap)
 
-  // Build remediation tips based on results
+  // Per-keyword competitor leaderboard — Q2 deep view, replaces the one-line CTA
+  const competitorLeaderboard = aggregateCompetitorsByKeyword(results, run.domain)
+
+  // Build remediation tips based on results (Q3/Q4 deferred to Phase 1.75)
   const remediations = buildRemediations(run, results, engineMap)
 
   return (
@@ -147,10 +151,44 @@ function CompletedState({ run, results, engineMap }: {
         </div>
       )}
 
-      {/* Engine breakdown */}
+      {/* Per-keyword visibility table — surfaces Q1 at keyword granularity */}
+      {perKeyword.length > 0 && (
+        <div className="ai-vis-panel" style={{ marginBottom: 24 }}>
+          <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 14 }}>Visibility by keyword</h3>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+            <thead>
+              <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                <th style={{ textAlign: 'left',  padding: '8px 6px', fontWeight: 600, color: 'var(--text-muted)' }}>Keyword</th>
+                <th style={{ textAlign: 'right', padding: '8px 6px', fontWeight: 600, color: 'var(--text-muted)', width: 110 }}>Visibility</th>
+                <th style={{ textAlign: 'left',  padding: '8px 6px', fontWeight: 600, color: 'var(--text-muted)' }}>Cited by</th>
+              </tr>
+            </thead>
+            <tbody>
+              {perKeyword.map(row => (
+                <tr key={row.keyword} style={{ borderBottom: '1px solid var(--border)' }}>
+                  <td style={{ padding: '10px 6px', fontWeight: 600 }}>&ldquo;{row.keyword}&rdquo;</td>
+                  <td style={{ padding: '10px 6px', textAlign: 'right' }}>
+                    <span style={{
+                      fontWeight: 700,
+                      color: row.scorePct >= 50 ? '#16a34a' : row.scorePct > 0 ? '#f59e0b' : '#dc2626',
+                    }}>
+                      {row.scorePct}% ({row.citedEngines.length}/{row.totalEngines})
+                    </span>
+                  </td>
+                  <td style={{ padding: '10px 6px', color: 'var(--text-secondary)' }}>
+                    {row.citedEngines.length > 0 ? row.citedEngines.join(', ') : <span style={{ color: 'var(--text-muted)' }}>None</span>}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Engine breakdown — overall pills */}
       {summary && (summary.cited_by.length > 0 || summary.not_cited_by.length > 0) && (
         <div className="ai-vis-panel" style={{ marginBottom: 24 }}>
-          <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 14 }}>Engine breakdown</h3>
+          <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 14 }}>Engine breakdown (any keyword)</h3>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
             {run.engine_ids.map(engId => {
               const engine = engineMap[engId]
@@ -163,7 +201,7 @@ function CompletedState({ run, results, engineMap }: {
                   border: `1px solid ${cited ? 'rgba(34,197,94,0.25)' : 'rgba(239,68,68,0.25)'}`,
                   color: cited ? '#16a34a' : '#dc2626',
                 }}>
-                  <span style={{ fontWeight: 600 }}>{engine?.name ?? engId}</span>
+                  <span style={{ fontWeight: 600 }}>{engine?.name ?? '[deactivated engine]'}</span>
                   <span>{cited ? '✓ Cited' : '✗ Not cited'}</span>
                 </div>
               )
@@ -172,33 +210,64 @@ function CompletedState({ run, results, engineMap }: {
         </div>
       )}
 
-      {/* Competitor CTA — shown when competitors appear in results */}
-      {competitorDomains.length > 0 && (
-        <div style={{
-          marginBottom: 24,
-          padding: '18px 20px',
-          background: 'rgba(245,158,11,0.06)',
-          border: '1px solid rgba(245,158,11,0.25)',
-          borderRadius: 12,
-          display: 'flex', alignItems: 'flex-start', gap: 14,
-        }}>
-          <span style={{ fontSize: 22, flexShrink: 0 }}>👀</span>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 6 }}>
-              Competitors are being cited instead of you
-            </div>
-            <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 12, lineHeight: 1.6 }}>
-              We spotted <strong>{competitorDomains.slice(0, 3).join(', ')}{competitorDomains.length > 3 ? ` +${competitorDomains.length - 3} more` : ''}</strong> appearing
-              in AI responses for your target keywords. Add them to Watchdog to get alerted when their content changes.
-            </div>
-            <a href="/dashboard/watchdog" className="btn btn-sm" style={{
-              background: 'rgba(245,158,11,0.12)', color: '#b45309',
-              border: '1px solid rgba(245,158,11,0.3)', borderRadius: 8,
-              padding: '6px 14px', fontSize: 13, fontWeight: 600, textDecoration: 'none', display: 'inline-block',
-            }}>
-              Track in Watchdog →
-            </a>
-          </div>
+      {/* Per-keyword competitor leaderboard — answers Q2 properly */}
+      {Object.keys(competitorLeaderboard).length > 0 && (
+        <div className="ai-vis-panel" style={{ marginBottom: 24 }}>
+          <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 6 }}>Who&apos;s winning instead of you</h3>
+          <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 18 }}>
+            For each keyword, the domains AI engines surfaced as sources, ranked by how many engines cited each.
+            <strong style={{ color: 'var(--text-primary)' }}> Bold</strong> rows are you.
+          </p>
+          {Object.entries(competitorLeaderboard).map(([keyword, entries]) => {
+            const maxCount = Math.max(...entries.map(e => e.engineCount), 1)
+            return (
+              <div key={keyword} style={{ marginBottom: 20 }}>
+                <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-secondary)' }}>
+                  &ldquo;{keyword}&rdquo;
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                  {entries.slice(0, 8).map(entry => {
+                    const widthPct = (entry.engineCount / maxCount) * 100
+                    const barColor = entry.isUser
+                      ? (entry.engineCount > 0 ? '#22c55e' : '#94a3b8')
+                      : '#6366f1'
+                    return (
+                      <div key={entry.domain} style={{
+                        display: 'grid',
+                        gridTemplateColumns: '240px 1fr 60px',
+                        gap: 12, alignItems: 'center', fontSize: 13,
+                      }}>
+                        <span style={{
+                          fontWeight: entry.isUser ? 700 : 500,
+                          color: entry.isUser ? 'var(--text-primary)' : 'var(--text-secondary)',
+                          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                        }}>
+                          {entry.domain}{entry.isUser ? '  ← you' : ''}
+                        </span>
+                        <div style={{
+                          height: 12, background: 'var(--surface-sunken)',
+                          borderRadius: 4, overflow: 'hidden',
+                        }}>
+                          <div style={{
+                            height: '100%', width: `${widthPct}%`,
+                            background: barColor, transition: 'width 0.3s ease',
+                          }} />
+                        </div>
+                        <span style={{ fontVariantNumeric: 'tabular-nums', color: 'var(--text-muted)' }}>
+                          {entry.engineCount} engine{entry.engineCount !== 1 ? 's' : ''}
+                        </span>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )
+          })}
+          <a href="/dashboard/watchdog" style={{
+            fontSize: 12, color: 'var(--text-muted)', textDecoration: 'none',
+          }}>
+            Track these competitors in Watchdog →
+          </a>
         </div>
       )}
 
@@ -220,7 +289,14 @@ function CompletedState({ run, results, engineMap }: {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                   {keyResults.map(result => {
                     const engine = engineMap[result.engine_id]
-                    return <ResultRow key={result.id} result={result} engineName={engine?.name ?? result.engine_id} />
+                    return (
+                      <ResultRow
+                        key={result.id}
+                        result={result}
+                        engineName={engine?.name ?? '[deactivated engine]'}
+                        userDomain={run.domain}
+                      />
+                    )
                   })}
                 </div>
               )}
@@ -248,9 +324,13 @@ function CompletedState({ run, results, engineMap }: {
 }
 
 // ---------------------------------------------------------------------------
-// Result row
+// Result row — shows all source URLs (no slice) and highlights the user's
+// domain in any matching response text or URL so it's obvious WHY a result
+// was marked Cited.
 // ---------------------------------------------------------------------------
-function ResultRow({ result, engineName }: { result: CitationCheckResult; engineName: string }): React.ReactElement {
+function ResultRow({ result, engineName, userDomain }: {
+  result: CitationCheckResult; engineName: string; userDomain: string
+}): React.ReactElement {
   const citedColor  = result.cited === true ? '#22c55e' : result.cited === false ? '#ef4444' : '#94a3b8'
   const citedLabel  = result.cited === true ? '✓ Cited' : result.cited === false ? '✗ Not cited' : '— Unknown'
   const confLabels: Record<string, string> = { high: 'High confidence', medium: 'Medium confidence', indicative: 'Indicative' }
@@ -273,28 +353,67 @@ function ResultRow({ result, engineName }: { result: CitationCheckResult; engine
         <div style={{
           fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6,
           background: 'var(--surface-sunken)', borderRadius: 8, padding: '10px 14px',
-          maxHeight: 120, overflow: 'hidden',
+          maxHeight: 240, overflowY: 'auto',
         }}>
-          {result.response_text.slice(0, 400)}{result.response_text.length > 400 ? '…' : ''}
+          <DomainHighlightedText text={result.response_text} domain={userDomain} />
         </div>
       )}
 
       {result.source_urls.length > 0 && (
         <div style={{ marginTop: 10, display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-          {result.source_urls.slice(0, 4).map((url, i) => (
-            <a key={i} href={url} target="_blank" rel="noopener noreferrer" style={{
-              fontSize: 11, color: 'var(--color-primary)', textDecoration: 'none',
-              background: 'rgba(59,130,246,0.08)', padding: '2px 8px', borderRadius: 8,
-              border: '1px solid rgba(59,130,246,0.2)',
-              maxWidth: 240, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-            }}>
-              {url}
-            </a>
-          ))}
+          {result.source_urls.map((url, i) => {
+            const containsDomain = url.toLowerCase().includes(userDomain.toLowerCase())
+            return (
+              <a key={i} href={url} target="_blank" rel="noopener noreferrer" style={{
+                fontSize: 11,
+                color: containsDomain ? '#15803d' : 'var(--color-primary)',
+                textDecoration: 'none',
+                background: containsDomain ? 'rgba(34,197,94,0.12)' : 'rgba(59,130,246,0.08)',
+                padding: '2px 8px', borderRadius: 8,
+                border: `1px solid ${containsDomain ? 'rgba(34,197,94,0.35)' : 'rgba(59,130,246,0.2)'}`,
+                fontWeight: containsDomain ? 700 : 400,
+                maxWidth: 320, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+              }}>
+                {url}
+              </a>
+            )
+          })}
         </div>
       )}
     </div>
   )
+}
+
+// Highlight occurrences of the user's domain in response text. Server-rendered
+// (no JS needed) — splits the text on the domain substring (case-insensitive)
+// and wraps matches in a <mark>.
+function DomainHighlightedText({ text, domain }: { text: string; domain: string }): React.ReactElement {
+  if (!domain) return <>{text}</>
+  const lower = text.toLowerCase()
+  const needle = domain.toLowerCase()
+  const parts: React.ReactNode[] = []
+  let cursor = 0
+  while (cursor < text.length) {
+    const idx = lower.indexOf(needle, cursor)
+    if (idx === -1) {
+      parts.push(text.slice(cursor))
+      break
+    }
+    if (idx > cursor) parts.push(text.slice(cursor, idx))
+    parts.push(
+      <mark
+        key={idx}
+        style={{
+          background: 'rgba(34,197,94,0.25)', color: '#15803d',
+          padding: '1px 4px', borderRadius: 4, fontWeight: 600,
+        }}
+      >
+        {text.slice(idx, idx + needle.length)}
+      </mark>,
+    )
+    cursor = idx + needle.length
+  }
+  return <>{parts}</>
 }
 
 // ---------------------------------------------------------------------------
@@ -345,34 +464,9 @@ function RemediationTip({ priority, title, body, link, linkLabel }: {
   )
 }
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-function extractDomain(url: string): string {
-  try { return new URL(url).hostname.replace(/^www\./, '') }
-  catch { return '' }
-}
-
-function detectCompetitors(results: CitationCheckResult[], ownDomain: string): string[] {
-  const clean = ownDomain.replace(/^www\./, '')
-  const found = new Set<string>()
-  for (const r of results) {
-    for (const url of r.source_urls) {
-      const d = extractDomain(url)
-      if (d && d !== clean && !d.endsWith(clean)) found.add(d)
-    }
-  }
-  // Return up to 5, sorted by frequency
-  const freq: Record<string, number> = {}
-  for (const r of results) {
-    for (const url of r.source_urls) {
-      const d = extractDomain(url)
-      if (found.has(d)) freq[d] = (freq[d] ?? 0) + 1
-    }
-  }
-  return [...found].sort((a, b) => (freq[b] ?? 0) - (freq[a] ?? 0)).slice(0, 5)
-}
+// detectCompetitors / extractDomain helpers removed — replaced by
+// aggregateCompetitorsByKeyword in lib/utils/citation-aggregations.ts which
+// powers the per-keyword leaderboard above.
 
 interface RemediationItem {
   priority:  'high' | 'medium' | 'low'

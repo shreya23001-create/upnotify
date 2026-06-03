@@ -15,6 +15,7 @@ interface EngineForm {
   is_active:      boolean
   sort_order:     string
   admin_notes:    string
+  model_id:       string
 }
 
 export default function NewEnginePage(): React.ReactElement {
@@ -23,6 +24,7 @@ export default function NewEnginePage(): React.ReactElement {
     name: '', slug: '', description: '', type: 'both',
     signal_quality: 'medium', signal_note: '',
     is_free: false, is_active: true, sort_order: '99', admin_notes: '',
+    model_id: '',
   })
   const [loading, setLoading] = useState(false)
   const [error, setError]     = useState('')
@@ -45,7 +47,11 @@ export default function NewEnginePage(): React.ReactElement {
       const res = await fetch('/api/admin/ai-engines', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, sort_order: parseInt(form.sort_order, 10) }),
+        body: JSON.stringify({
+          ...form,
+          sort_order: parseInt(form.sort_order, 10),
+          model_id:   form.model_id.trim() === '' ? null : form.model_id.trim(),
+        }),
       })
       const data = await res.json() as { engine?: { id: string }; error?: string }
       if (!res.ok) { setError(data.error ?? 'Failed to create engine.'); return }
@@ -131,6 +137,18 @@ export default function NewEnginePage(): React.ReactElement {
               <input className="admin-form-input" type="number" min="0" value={form.sort_order}
                 onChange={e => set('sort_order', e.target.value)} />
             </div>
+          </div>
+
+          <div className="admin-form-group" style={{ marginTop: 16 }}>
+            <label className="admin-form-label">
+              Model ID <span style={{ fontWeight: 400, color: 'var(--text-muted)' }}>(provider-side identifier)</span>
+            </label>
+            <input className="admin-form-input" value={form.model_id}
+              onChange={e => set('model_id', e.target.value)}
+              placeholder="e.g. claude-haiku-4-5-20251001 — leave blank for search-only engines" />
+            <span className="admin-form-hint">
+              The model the citation checker will call. Update without a code deploy when providers rotate models.
+            </span>
           </div>
 
           <div style={{ marginTop: 20, display: 'flex', flexDirection: 'column', gap: 0 }}>

@@ -84,6 +84,39 @@ export async function deleteAlertChannel(id: string): Promise<boolean> {
   return true
 }
 
+/**
+ * Count historical `alerts` rows that reference this channel.
+ *
+ * Why: the FK is `on delete cascade`, so deleting a channel silently wipes
+ * the incident-alert audit trail with it. engineering-app#53. Callers
+ * (delete action + bulk delete action) check this first and refuse the
+ * delete when > 0, pointing the user at the toggle/disable path instead.
+ */
+export async function countAlertsForChannel(channelId: string): Promise<number> {
+  const supabase = createAdminClient()
+  const { count, error } = await supabase
+    .from('alerts')
+    .select('id', { count: 'exact', head: true })
+    .eq('channel_id', channelId)
+  if (error) {
+    logger.error('Failed to count alerts for channel', { error: error.message, channelId })
+    // Fail-closed: if we can't verify, refuse the delete by returning a non-zero
+    // sentinel. Better a confusing error than a silent audit-trail wipe.
+    return -1
+  }
+  return count ?? 0
+}
+
+export async function countAlertsForChannels(channelIds: string[]): Promise<Record<string, number>> {
+  if (channelIds.length === 0) return {}
+  const supabase = createAdminClient()
+  const counts: Record<string, number> = {}
+  await Promise.all(channelIds.map(async (id) => {
+    counts[id] = await countAlertsForChannel(id)
+  }))
+  return counts
+}
+
 export async function getAlertChannelById(id: string): Promise<AlertChannel | null> {
   const supabase = createAdminClient()
   const { data, error } = await supabase

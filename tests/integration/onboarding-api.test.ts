@@ -214,6 +214,80 @@ describe('POST /api/v1/onboarding', () => {
       expect(response.status).toBe(403)
       expect(body.error).toContain('Monitor limit reached')
     })
+
+    // engineering-app#55 — used to be a check-once-create-many off-by-one:
+    // a Lite user at 1/3 monitors passed the gate (1 < 3) and the loop then
+    // created up to 4 more, ending at 5 on a 3-cap plan. Now the route
+    // computes `remaining = limit - currentCount` and slices the request.
+    it('caps the create loop at remaining headroom under the plan limit', async () => {
+      mockCheckMonitorLimit.mockResolvedValue({
+        allowed: true,
+        currentCount: 1,
+        limit: 3,   // 2 monitors of headroom
+      })
+
+      const request = createRequest({
+        url: 'https://example.com',
+        monitors: [
+          { type: 'http',    name: 'a', target: 'https://example.com' },
+          { type: 'ssl',     name: 'b', target: 'https://example.com' },
+          { type: 'dns',     name: 'c', target: 'https://example.com' },
+          { type: 'keyword', name: 'd', target: 'https://example.com' },
+        ],
+      })
+      const response = await POST(request)
+      const body = await response.json()
+
+      expect(response.status).toBe(200)
+      expect(mockCreateMonitor).toHaveBeenCalledTimes(2)        // capped at headroom
+      expect(body.monitors).toHaveLength(2)
+      expect(body.skipped).toBe(2)
+    })
+
+    it('reports skipped = 0 when the request fits the headroom', async () => {
+      mockCheckMonitorLimit.mockResolvedValue({
+        allowed: true,
+        currentCount: 0,
+        limit: 10,
+      })
+
+      const request = createRequest({
+        url: 'https://example.com',
+        monitors: [
+          { type: 'http', name: 'a', target: 'https://example.com' },
+          { type: 'ssl',  name: 'b', target: 'https://example.com' },
+        ],
+      })
+      const response = await POST(request)
+      const body = await response.json()
+
+      expect(response.status).toBe(200)
+      expect(mockCreateMonitor).toHaveBeenCalledTimes(2)
+      expect(body.skipped).toBe(0)
+    })
+
+    it('treats unlimited (limit=null) as no cap on the loop', async () => {
+      mockCheckMonitorLimit.mockResolvedValue({
+        allowed: true,
+        currentCount: 99,
+        limit: null,   // unlimited plan
+      })
+
+      const request = createRequest({
+        url: 'https://example.com',
+        monitors: [
+          { type: 'http', name: 'a', target: 'https://example.com' },
+          { type: 'ssl',  name: 'b', target: 'https://example.com' },
+          { type: 'dns',  name: 'c', target: 'https://example.com' },
+        ],
+      })
+      const response = await POST(request)
+      const body = await response.json()
+
+      expect(response.status).toBe(200)
+      expect(mockCreateMonitor).toHaveBeenCalledTimes(3)
+      expect(body.skipped).toBe(0)
+    })
   })
 
   describe('successful monitor creation', () => {

@@ -2,6 +2,23 @@ import { getEnvironment } from './environment'
 
 type LogLevel = 'debug' | 'info' | 'warn' | 'error'
 
+const LEVEL_PRIORITY: Record<LogLevel, number> = {
+  debug: 0,
+  info: 1,
+  warn: 2,
+  error: 3,
+}
+
+// LOG_LEVEL is infrastructure (controls Vercel Observability event volume),
+// not feature config — read directly like environment.ts does for VERCEL_ENV.
+function getMinLevel(): LogLevel {
+  const raw = process.env.LOG_LEVEL
+  if (raw === 'debug' || raw === 'info' || raw === 'warn' || raw === 'error') {
+    return raw
+  }
+  return getEnvironment() === 'development' ? 'debug' : 'info'
+}
+
 interface LogEntry {
   level: LogLevel
   message: string
@@ -23,7 +40,7 @@ function formatEntry(entry: LogEntry): string {
 function log(level: LogLevel, message: string, data?: Record<string, unknown>): void {
   const environment = getEnvironment()
 
-  if (level === 'debug' && environment !== 'development') {
+  if (LEVEL_PRIORITY[level] < LEVEL_PRIORITY[getMinLevel()]) {
     return
   }
 

@@ -92,6 +92,13 @@ export const helpTopics: HelpTopic[] = [
     icon: '✨',
     keywords: ['ai', 'seo', 'geo', 'aeo', 'llms', 'llms.txt', 'citation', 'visibility', 'chatgpt', 'perplexity', 'gemini', 'ai search'],
   },
+  {
+    href: '/dashboard/help/ai-profile',
+    title: 'AI Profile',
+    description: 'Discover what AI engines actually think your site is. Find miscategorisations, knowledge gaps, and recognition issues before they cost you traffic.',
+    icon: '🪞',
+    keywords: ['ai', 'profile', 'introspection', 'category', 'recognition', 'awareness', 'chatgpt', 'claude', 'gemini', 'perplexity'],
+  },
   // Compete help hidden — launching in v1.5
   {
     href: '/dashboard/help/incidents',
@@ -129,7 +136,7 @@ interface SidebarSection {
 
 function buildSections(topics: HelpTopic[]): SidebarSection[] {
   const monitoring = ['getting-started', 'monitors', 'wordpress', 'alerts', 'status-pages', 'incidents']
-  const features   = ['watchdog', 'ai-visibility', 'tools', 'compete']
+  const features   = ['watchdog', 'ai-visibility', 'ai-profile', 'tools', 'compete']
   const account    = ['billing', 'credits', 'referrals', 'cancel-pause']
 
   function slug(href: string) { return href.split('/').pop() ?? '' }

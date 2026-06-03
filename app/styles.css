@@ -27,7 +27,9 @@ img { max-width: 100%; display: block; }
   --bg-skeleton: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
   --text-primary: #1a1a2e;
   --text-secondary: #475569;
-  --text-muted: #94a3b8;
+  /* engineering-app#75 — #94a3b8 was 3.47:1 vs --bg-primary, failing WCAG AA.
+     Slate-500 #64748b clears 4.5:1 on every light background we paint it on. */
+  --text-muted: #64748b;
   --text-link: #3b82f6;
   --border-primary: #eaedf3;
   --border-input: #e2e8f0;
@@ -72,7 +74,9 @@ html.dark {
   --bg-skeleton: linear-gradient(90deg, #1a1d27 25%, #242736 50%, #1a1d27 75%);
   --text-primary: #e8eaf0;
   --text-secondary: #a0a8b8;
-  --text-muted: #6b7280;
+  /* engineering-app#75 — #6b7280 was 4.09:1 vs --bg-primary, failing WCAG AA.
+     Gray-400 #9ca3af gives ~6.4:1 on every dark background we paint it on. */
+  --text-muted: #9ca3af;
   --text-link: #60a5fa;
   --border-primary: #2a2d3a;
   --border-input: #2a2d3a;
@@ -5188,6 +5192,16 @@ html.dark .support-badge-closed   { background: rgba(148,163,184,0.1); color: #9
 .support-message-time    { font-size: 12px; color: var(--text-muted); }
 .support-message-body    { font-size: 14px; color: var(--text-secondary); line-height: 1.7; white-space: pre-wrap; word-break: break-word; }
 
+/* Attachments inside a message */
+.support-attachments       { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.support-attachment-row    { display: inline-flex; align-items: center; gap: 8px; padding: 6px 10px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 6px; font-size: 13px; color: var(--text-secondary); text-decoration: none; transition: background 0.15s, border-color 0.15s; }
+.support-attachment-row:hover { background: var(--bg-hover); border-color: var(--accent); color: var(--text-primary); }
+.support-attachment-broken { opacity: 0.7; cursor: default; }
+.support-attachment-size   { font-size: 11px; color: var(--text-muted); }
+.support-attachment-image  { display: inline-block; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; line-height: 0; transition: border-color 0.15s; }
+.support-attachment-image:hover { border-color: var(--accent); }
+.support-attachment-image img   { display: block; max-width: 220px; max-height: 160px; object-fit: cover; }
+
 /* Reply + closed */
 .support-reply-card    { padding: 20px; }
 .support-closed-notice { padding: 16px 20px; font-size: 14px; color: var(--text-muted); text-align: center; }
@@ -5994,8 +6008,11 @@ section.hero::before {
   background: var(--bg-card);
 }
 .sp-label {
+  /* WCAG AA (engineering-app#75) — text-muted (#94a3b8 light / #6b7280 dark)
+     fails 4.5:1 contrast for normal-weight text. Bumped to text-secondary
+     so the subdued look stays but the ratio passes. */
   text-align: center; font-size: 11px; font-weight: 600;
-  text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-secondary);
   margin-bottom: 20px;
 }
 .sp-logos {
@@ -6003,12 +6020,37 @@ section.hero::before {
   gap: 40px; flex-wrap: wrap;
 }
 .sp-logo-item {
+  /* WCAG AA — opacity:0.55 on text-secondary effectively halved contrast to
+     ~3:1, failing 4.5:1. Bumped to 0.85 default; hover still promotes to
+     full text-primary as the interactive cue. */
   font-size: 16px; font-weight: 800;
   color: var(--text-secondary); letter-spacing: -0.02em;
-  transition: color 0.2s; cursor: default; user-select: none;
-  opacity: 0.55;
+  transition: color 0.2s, opacity 0.2s; cursor: default; user-select: none;
+  opacity: 0.85;
 }
-.sp-logo-item:hover { color: var(--text-primary); opacity: 0.85; }
+.sp-logo-item:hover { color: var(--text-primary); opacity: 1; }
+
+/* Skip link — keyboard-only navigation aid (engineering-app#75). Hidden
+   off-screen until focused, then slides into the top-left of the viewport
+   so screen-reader and keyboard users can jump past the nav. */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--text-primary);
+  color: var(--bg-card);
+  padding: 8px 16px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  z-index: 1000;
+  border-radius: 0 0 4px 0;
+}
+.skip-link:focus {
+  top: 0;
+  outline: 2px solid var(--accent, #3b82f6);
+  outline-offset: 2px;
+}
 
 /* ============================================================
    STATS BAR — preview classes

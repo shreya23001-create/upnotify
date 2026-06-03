@@ -6,6 +6,12 @@ import { GoogleTagManager } from "@/components/analytics/google-tag-manager"
 import { MicrosoftClarity } from "@/components/analytics/microsoft-clarity"
 import "./styles.css"
 
+// Hard SEO rule: only the production host (uptrue.io / www.uptrue.io) is
+// indexable. Vercel sets VERCEL_ENV='production' only on master deploys —
+// any other environment (preview/dev/local) must emit noindex,nofollow so
+// Google never crawls duplicate content under dev.uptrue.io.
+const IS_PRODUCTION_HOST = process.env.VERCEL_ENV === "production"
+
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"], display: "swap" })
 const jetbrainsMono = JetBrains_Mono({ variable: "--font-mono", subsets: ["latin"], display: "swap" })
 
@@ -76,16 +82,31 @@ export const metadata: Metadata = {
     ],
     apple: "/favicon.svg",
   },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-    },
+  robots: IS_PRODUCTION_HOST
+    ? {
+        index: true,
+        follow: true,
+        googleBot: {
+          index: true,
+          follow: true,
+          "max-video-preview": -1,
+          "max-image-preview": "large",
+          "max-snippet": -1,
+        },
+      }
+    : {
+        // Non-production: emit noindex,nofollow at the meta layer.
+        // X-Robots-Tag header (in next.config.ts) repeats this at the HTTP
+        // layer so cached responses and 30x redirects also carry the signal.
+        index: false,
+        follow: false,
+        nocache: true,
+        googleBot: { index: false, follow: false },
+      },
+  other: {
+    // SaaSHub directory verification. Required permanently — SaaSHub re-checks
+    // periodically; removing the tag would un-verify the listing.
+    "saashub-verification": "l5obg5hu6ag6",
   },
 }
 

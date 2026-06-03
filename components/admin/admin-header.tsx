@@ -21,6 +21,7 @@ const PAGE_TITLES: Record<string, string> = {
   '/admin/emails': 'Email & Nurture',
   '/admin/settings': 'Settings',
   '/admin/ai-engines': 'AI Engines',
+  '/admin/ai-profile-prompts': 'AI Profile Prompts',
   '/admin/aoe': 'AOE Outreach',
   '/admin/audit-log': 'Audit Log',
   '/admin/system': 'System Health',

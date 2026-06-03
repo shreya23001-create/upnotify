@@ -34,6 +34,8 @@ const PUBLIC_ROUTES: ReadonlyArray<string> = [
   '/credits',
   '/referrals',
   '/compete',
+  '/help',
+  '/api-docs',
 ]
 
 export function isPublicRoute(pathname: string): boolean {

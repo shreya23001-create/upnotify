@@ -15,6 +15,7 @@ interface EngineForm {
   is_active:      boolean
   sort_order:     string
   admin_notes:    string
+  model_id:       string
 }
 
 export default function EditEnginePage(): React.ReactElement {
@@ -31,7 +32,7 @@ export default function EditEnginePage(): React.ReactElement {
     async function load() {
       try {
         const res  = await fetch('/api/admin/ai-engines')
-        const data = await res.json() as { engines?: { id: string; name: string; slug: string; description: string; type: string; signal_quality: string; signal_note: string; is_free: boolean; is_active: boolean; sort_order: number; admin_notes: string | null }[] }
+        const data = await res.json() as { engines?: { id: string; name: string; slug: string; description: string; type: string; signal_quality: string; signal_note: string; is_free: boolean; is_active: boolean; sort_order: number; admin_notes: string | null; model_id: string | null }[] }
         const engine = data.engines?.find(e => e.id === params.id)
         if (!engine) { setError('Engine not found.'); setLoading(false); return }
         setForm({
@@ -45,6 +46,7 @@ export default function EditEnginePage(): React.ReactElement {
           is_active:      engine.is_active,
           sort_order:     String(engine.sort_order),
           admin_notes:    engine.admin_notes ?? '',
+          model_id:       engine.model_id ?? '',
         })
       } catch {
         setError('Failed to load engine.')
@@ -68,6 +70,7 @@ export default function EditEnginePage(): React.ReactElement {
         body: JSON.stringify({
           ...form,
           sort_order: parseInt(form.sort_order, 10),
+          model_id:   form.model_id.trim() === '' ? null : form.model_id.trim(),
         }),
       })
       const data = await res.json()
@@ -165,6 +168,20 @@ export default function EditEnginePage(): React.ReactElement {
               <input className="admin-form-input" type="number" min="0" value={form.sort_order}
                 onChange={e => set('sort_order', e.target.value)} />
             </div>
+          </div>
+
+          <div className="admin-form-group" style={{ marginTop: 16 }}>
+            <label className="admin-form-label">
+              Model ID <span style={{ fontWeight: 400, color: 'var(--text-muted)' }}>(provider-side model identifier)</span>
+            </label>
+            <input className="admin-form-input" value={form.model_id}
+              onChange={e => set('model_id', e.target.value)}
+              placeholder="e.g. claude-haiku-4-5-20251001, gpt-4o-mini, gemini-2.0-flash" />
+            <span className="admin-form-hint">
+              Leave blank for search-only engines (Exa, Bing). For LLM engines, this is the model the citation
+              checker and the &quot;Test&quot; button will call. Update here when the provider rotates models —
+              no code deploy needed.
+            </span>
           </div>
 
           <div style={{ marginTop: 20, display: 'flex', flexDirection: 'column', gap: 0 }}>

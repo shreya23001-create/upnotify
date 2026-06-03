@@ -2,6 +2,12 @@ import type { Metadata } from 'next'
 import { getPublishedBlogPosts, type PublishedBlogPostSummary } from '@/lib/db/blog-posts'
 import { BlogIndexClient } from './blog-index-client'
 
+// engineering-app#69 — the blog index fetches every published post on each
+// request. Was inheriting the parent layout's force-dynamic, so every visit
+// re-queried the DB and the page failed at 150+ concurrent users. 300s
+// revalidate matches blog/[slug] — new posts appear within 5 minutes.
+export const revalidate = 300
+
 export const metadata: Metadata = {
   alternates: { canonical: 'https://uptrue.io/blog' },
 }

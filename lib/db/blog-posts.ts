@@ -6,7 +6,7 @@ export interface BlogPostInput {
   title: string
   slug: string
   excerpt?: string | null
-  content?: Record<string, unknown> | string | null
+  content?: Record<string, unknown> | null
   category?: string | null
   status?: string
   seo_title?: string | null
@@ -15,6 +15,23 @@ export interface BlogPostInput {
   tags?: string[] | null
   published_at?: string | null
   author_id?: string | null
+}
+
+// Coerces any input shape into a JSONB object — never a primitive.
+// Postgres accepts JSON strings/numbers/bools as valid JSONB values, but the
+// blog renderer expects { body | html } and 404s on anything else. Every write
+// goes through this so the corruption that broke calendar-blog-generator on
+// 2026-05-02 (saving raw markdown directly into a JSONB column) cannot recur
+// from any caller, present or future.
+export function normaliseContent(input: unknown): Record<string, unknown> {
+  if (input == null) return {}
+  if (typeof input === 'string') {
+    return input.length > 0 ? { body: input } : {}
+  }
+  if (typeof input === 'object' && !Array.isArray(input)) {
+    return input as Record<string, unknown>
+  }
+  return {}
 }
 
 export interface PublishedBlogPostSummary {
@@ -123,7 +140,7 @@ export async function createBlogPost(input: BlogPostInput): Promise<BlogPost | n
       title: input.title,
       slug: input.slug,
       excerpt: input.excerpt ?? null,
-      content: (input.content ?? {}) as unknown as Record<string, never>,
+      content: normaliseContent(input.content) as unknown as Record<string, never>,
       category: input.category ?? null,
       status: input.status ?? 'draft',
       seo_title: input.seo_title ?? null,
@@ -152,7 +169,7 @@ export async function updateBlogPost(id: string, input: Partial<BlogPostInput>):
   if (input.title !== undefined) updateData.title = input.title
   if (input.slug !== undefined) updateData.slug = input.slug
   if (input.excerpt !== undefined) updateData.excerpt = input.excerpt
-  if (input.content !== undefined) updateData.content = input.content as unknown as Record<string, never>
+  if (input.content !== undefined) updateData.content = normaliseContent(input.content) as unknown as Record<string, never>
   if (input.category !== undefined) updateData.category = input.category
   if (input.status !== undefined) updateData.status = input.status
   if (input.seo_title !== undefined) updateData.seo_title = input.seo_title

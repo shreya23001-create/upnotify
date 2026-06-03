@@ -4,7 +4,7 @@
  * Keeping it here avoids HTTP-to-self calls that die on Vercel serverless.
  */
 
-import { acquireEngineKey, getActiveEngines } from '@/lib/db/ai-engines'
+import { acquireEngineKey, getActiveEngines, type AiEngine } from '@/lib/db/ai-engines'
 import {
   getCitationRunById, updateCitationRunStatus,
   saveCitationResults, type CitationSummary,
@@ -12,31 +12,98 @@ import {
 import { getUserById } from '@/lib/db/users'
 import { sendCitationReportEmail } from '@/lib/services/email'
 import { logger } from '@/lib/utils/logger'
+import { cleanDomainForAi, cleanKeywordForAi } from '@/lib/utils/sanitize-ai-input'
+
+// ---------------------------------------------------------------------------
+// Hardcoded fallback model IDs.
+// Source of truth is engine.model_id (DB column added in migration 00104).
+// These fallbacks only kick in if the column is NULL — which should not
+// happen for the default seeded engines but can for new ones the admin
+// adds before configuring a model.
+// ---------------------------------------------------------------------------
+const FALLBACK_MODEL_BY_SLUG: Record<string, string> = {
+  perplexity: 'sonar',
+  chatgpt:    'gpt-4o-mini',
+  claude:     'claude-haiku-4-5-20251001',
+  gemini:     'gemini-2.0-flash',
+  grok:       'grok-2-1212',
+}
+
+// Read up to 300 chars of an error response body so failures surface what
+// the provider actually said (auth_error, model not found, rate limited, etc.)
+// rather than a bare HTTP status code.
+async function readErrorBody(res: Response): Promise<string> {
+  try {
+    const text = await res.text()
+    return text.slice(0, 300)
+  } catch { return '' }
+}
+
+/**
+ * Citation detection with domain-boundary awareness.
+ *
+ * The naive `text.toLowerCase().includes(domain.toLowerCase())` previously
+ * matched substrings, so "notuptrue.io" and "uptrue.io.evil.com" were
+ * counted as citations of "uptrue.io". This implementation tokenises every
+ * host-like sequence in the text and compares each to the target — either
+ * by exact equality or as a `.target` suffix (which is how legitimate
+ * subdomains like `www.uptrue.io` should match). engineering-app#82.
+ *
+ * Boundary rule for a host token:
+ *   - preceded by: start-of-string, OR a character that's not part of a
+ *                  hostname (so '.', '-', alphanumerics fail; whitespace,
+ *                  slashes, quotes, colons, parens, etc. all succeed)
+ *   - composed of: [a-z0-9.-] starting and ending with [a-z0-9] so trailing
+ *                  dots and hyphens don't get pulled into the token
+ *   - path / port / query are not part of host chars, so URLs like
+ *     `uptrue.io/pricing` or `uptrue.io:3000/health` yield `uptrue.io` as
+ *     the host token.
+ */
+export function isCited(text: string, domain: string): boolean {
+  if (!text || !domain) return false
+  const targetLc = domain.toLowerCase()
+  const textLc = text.toLowerCase()
+  const hostTokenRegex = /[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?/g
+  let match: RegExpExecArray | null
+  while ((match = hostTokenRegex.exec(textLc)) !== null) {
+    const before = match.index === 0 ? '' : textLc[match.index - 1]
+    // Mid-hostname match (the char before the token is itself a hostname
+    // char) means we're inside a bigger token — not a real domain boundary.
+    if (before && /[a-z0-9.-]/.test(before)) continue
+    const host = match[0]
+    if (host === targetLc) return true
+    if (host.endsWith('.' + targetLc)) return true
+  }
+  return false
+}
 
 // ---------------------------------------------------------------------------
 // Engine query functions
 // ---------------------------------------------------------------------------
-async function queryPerplexity(apiKey: string, keyword: string, domain: string): Promise<{
+async function queryPerplexity(apiKey: string, model: string, keyword: string, domain: string): Promise<{
   cited: boolean; confidence: 'high' | 'medium' | 'indicative'; responseText: string; sourceUrls: string[]
 }> {
   const res = await fetch('https://api.perplexity.ai/chat/completions', {
     method: 'POST',
     headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'sonar',
+      model,
       messages: [{ role: 'user', content: keyword }],
       return_citations: true,
     }),
     signal: AbortSignal.timeout(20000),
   })
-  if (!res.ok) throw new Error(`Perplexity API error: ${res.status}`)
+  if (!res.ok) throw new Error(`Perplexity API error: ${res.status} ${await readErrorBody(res)}`)
   const data = await res.json() as { choices: { message: { content: string } }[]; citations?: string[] }
   const responseText = data.choices?.[0]?.message?.content ?? ''
   const sourceUrls   = (data.citations ?? []).filter((u): u is string => typeof u === 'string')
-  const cited        = sourceUrls.some(u => u.includes(domain))
+  const cited        = sourceUrls.some(u => isCited(u, domain))
   return { cited, confidence: 'high', responseText: responseText.slice(0, 500), sourceUrls }
 }
 
+// Generic OpenAI-shape chat completions caller. Used by ChatGPT, Gemini's
+// OpenAI-compat endpoint, and Grok (xAI). NOT compatible with Anthropic —
+// see queryAnthropic below.
 async function queryGenericLlm(
   apiKey: string, endpoint: string, model: string, keyword: string, domain: string,
 ): Promise<{ cited: boolean; confidence: 'high' | 'medium' | 'indicative'; responseText: string; sourceUrls: string[] }> {
@@ -53,10 +120,42 @@ async function queryGenericLlm(
     }),
     signal: AbortSignal.timeout(20000),
   })
-  if (!res.ok) throw new Error(`LLM API error: ${res.status} ${endpoint}`)
+  if (!res.ok) throw new Error(`LLM API error: ${res.status} ${endpoint} — ${await readErrorBody(res)}`)
   const data = await res.json() as { choices: { message: { content: string } }[] }
   const responseText = data.choices?.[0]?.message?.content ?? ''
-  const cited = responseText.toLowerCase().includes(domain.toLowerCase())
+  const cited = isCited(responseText, domain)
+  return { cited, confidence: 'medium', responseText: responseText.slice(0, 500), sourceUrls: [] }
+}
+
+// Anthropic Messages API has a different shape from the OpenAI standard:
+//   - auth header is `x-api-key` (not `Authorization: Bearer`)
+//   - `anthropic-version` header is required
+//   - `system` is a top-level field, not a message role
+//   - response is `content[].text`, not `choices[0].message.content`
+// Calling Anthropic through queryGenericLlm produces a 401 immediately
+// (wrong auth header). Bug introduced + fixed 2026-05-10.
+async function queryAnthropic(
+  apiKey: string, model: string, keyword: string, domain: string,
+): Promise<{ cited: boolean; confidence: 'high' | 'medium' | 'indicative'; responseText: string; sourceUrls: string[] }> {
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'x-api-key':         apiKey,
+      'anthropic-version': '2023-06-01',
+      'content-type':      'application/json',
+    },
+    body: JSON.stringify({
+      model,
+      max_tokens: 400,
+      system: 'You are a helpful assistant. When you reference external sources, always mention the domain name explicitly.',
+      messages: [{ role: 'user', content: keyword }],
+    }),
+    signal: AbortSignal.timeout(20000),
+  })
+  if (!res.ok) throw new Error(`Anthropic API error: ${res.status} — ${await readErrorBody(res)}`)
+  const data = await res.json() as { content?: { type: string; text?: string }[] }
+  const responseText = data.content?.find(c => c.type === 'text')?.text ?? ''
+  const cited = isCited(responseText, domain)
   return { cited, confidence: 'medium', responseText: responseText.slice(0, 500), sourceUrls: [] }
 }
 
@@ -72,7 +171,7 @@ async function queryExa(apiKey: string, keyword: string, domain: string): Promis
   if (!res.ok) throw new Error(`Exa API error: ${res.status}`)
   const data = await res.json() as { results: { url: string; title?: string }[] }
   const sourceUrls   = (data.results ?? []).map(r => r.url).filter(Boolean)
-  const cited        = sourceUrls.some(u => u.toLowerCase().includes(domain.toLowerCase()))
+  const cited        = sourceUrls.some(u => isCited(u, domain))
   const responseText = (data.results ?? []).slice(0, 3).map(r => `${r.title ?? ''} — ${r.url}`).join('\n')
   return { cited, confidence: 'high', responseText: responseText.slice(0, 500), sourceUrls }
 }
@@ -88,21 +187,46 @@ async function queryBingCopilot(apiKey: string, keyword: string, domain: string)
   if (!res.ok) throw new Error(`Bing API error: ${res.status}`)
   const data = await res.json() as { webPages?: { value: { url: string; name: string }[] } }
   const sourceUrls   = (data.webPages?.value ?? []).map(r => r.url).filter(Boolean)
-  const cited        = sourceUrls.some(u => u.toLowerCase().includes(domain.toLowerCase()))
+  const cited        = sourceUrls.some(u => isCited(u, domain))
   const responseText = (data.webPages?.value ?? []).slice(0, 3).map(r => `${r.name} — ${r.url}`).join('\n')
   return { cited, confidence: 'high', responseText: responseText.slice(0, 500), sourceUrls }
 }
 
-const ENGINE_QUERY_MAP: Record<string, (key: string, keyword: string, domain: string) => Promise<{
-  cited: boolean; confidence: 'high' | 'medium' | 'indicative'; responseText: string; sourceUrls: string[]
-}>> = {
-  perplexity: (key, kw, domain) => queryPerplexity(key, kw, domain),
-  chatgpt:    (key, kw, domain) => queryGenericLlm(key, 'https://api.openai.com/v1/chat/completions', 'gpt-4o-mini', kw, domain),
-  claude:     (key, kw, domain) => queryGenericLlm(key, 'https://api.anthropic.com/v1/messages', 'claude-haiku-4-5-20251001', kw, domain),
-  gemini:     (key, kw, domain) => queryGenericLlm(key, 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', 'gemini-1.5-flash', kw, domain),
-  grok:       (key, kw, domain) => queryGenericLlm(key, 'https://api.x.ai/v1/chat/completions', 'grok-beta', kw, domain),
-  exa:        (key, kw, domain) => queryExa(key, kw, domain),
-  copilot:    (key, kw, domain) => queryBingCopilot(key, kw, domain),
+// Engine query dispatch. Each entry receives the engine row so it can read
+// engine.model_id (admin-configurable per migration 00104). Search-only
+// engines (exa, copilot) ignore model_id — they don't take a model parameter.
+type EngineQueryFn = (
+  engine: AiEngine, apiKey: string, keyword: string, domain: string,
+) => Promise<{ cited: boolean; confidence: 'high' | 'medium' | 'indicative'; responseText: string; sourceUrls: string[] }>
+
+function modelFor(engine: AiEngine): string {
+  return engine.model_id ?? FALLBACK_MODEL_BY_SLUG[engine.slug] ?? ''
+}
+
+const ENGINE_QUERY_MAP: Record<string, EngineQueryFn> = {
+  perplexity: (engine, key, kw, domain) => queryPerplexity(key, modelFor(engine), kw, domain),
+  chatgpt:    (engine, key, kw, domain) => queryGenericLlm(key, 'https://api.openai.com/v1/chat/completions', modelFor(engine), kw, domain),
+  claude:     (engine, key, kw, domain) => queryAnthropic(key, modelFor(engine), kw, domain),
+  gemini:     (engine, key, kw, domain) => queryGenericLlm(key, 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', modelFor(engine), kw, domain),
+  grok:       (engine, key, kw, domain) => queryGenericLlm(key, 'https://api.x.ai/v1/chat/completions', modelFor(engine), kw, domain),
+  exa:        (_engine, key, kw, domain) => queryExa(key, kw, domain),
+  copilot:    (_engine, key, kw, domain) => queryBingCopilot(key, kw, domain),
+}
+
+// Public dispatcher — used by citation-processor itself (with keyword) and
+// by profile-introspector (with a substituted introspection prompt). The
+// per-engine wrappers don't treat "keyword" semantically; they pass it as
+// the user message and check whether the response/URLs contain the domain.
+// Same logic works for both feature modes.
+export async function runEngineQuery(
+  engine:  AiEngine,
+  apiKey:  string,
+  message: string,
+  domain:  string,
+): Promise<{ cited: boolean; confidence: 'high' | 'medium' | 'indicative'; responseText: string; sourceUrls: string[] } | null> {
+  const queryFn = ENGINE_QUERY_MAP[engine.slug]
+  if (!queryFn) return null
+  return queryFn(engine, apiKey, message, domain)
 }
 
 // ---------------------------------------------------------------------------
@@ -137,10 +261,20 @@ export async function processCitationRun(runId: string): Promise<{
       continue
     }
 
+    // engineering-app#83 — re-sanitise both fields at the processor layer.
+    // The route already sanitises before insert (lib/utils/sanitize-ai-input),
+    // but anything downstream that calls processCitationRun() with values
+    // read straight from the DB (cron retry, profile-introspector, admin
+    // re-run tooling) would otherwise pass unsanitised payloads to the model.
+    // Defence in depth — idempotent if the input is already clean.
+    const safeDomain = cleanDomainForAi(run.domain)
+
     let engineCited = false
-    for (const keyword of run.keywords) {
+    for (const rawKeyword of run.keywords) {
+      const keyword = cleanKeywordForAi(rawKeyword)
+      if (!keyword) continue
       try {
-        const result = await queryFn(apiKey, keyword, run.domain)
+        const result = await queryFn(engine, apiKey, keyword, safeDomain)
         results.push({
           run_id: runId, engine_id: engine.id, keyword,
           cited: result.cited, confidence: result.confidence,

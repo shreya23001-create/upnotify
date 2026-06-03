@@ -39,6 +39,19 @@ function formatDate(str: string): string {
   })
 }
 
+function formatBytes(n: number | undefined): string {
+  if (!n || n < 1) return ''
+  if (n < 1024)              return `${n} B`
+  if (n < 1024 * 1024)       return `${(n / 1024).toFixed(1)} KB`
+  return `${(n / (1024 * 1024)).toFixed(1)} MB`
+}
+
+function attachmentDisplayName(path: string, name?: string): string {
+  if (name) return name
+  const file = path.split('/').pop() ?? path
+  return file
+}
+
 /** Stable human-readable ticket number derived from UUID */
 function ticketNumber(id: string): string {
   const hex = id.replace(/-/g, '').slice(0, 8)
@@ -79,14 +92,21 @@ export function TicketThread({ ticket, messages, isAdmin = false }: TicketThread
 
     try {
       // Upload attachments first if any
-      const attachmentUrls: string[] = []
+      const uploadedAttachments: Array<{ path: string; name?: string; mime?: string; size?: number }> = []
       for (const file of replyFiles) {
         const fd = new FormData()
         fd.append('file', file)
         const upRes = await fetch('/api/v1/support/upload', { method: 'POST', body: fd })
         if (upRes.ok) {
-          const upData = await upRes.json() as { url?: string }
-          if (upData.url) attachmentUrls.push(upData.url)
+          const upData = await upRes.json() as { path?: string; name?: string; mime?: string; size?: number }
+          if (upData.path) {
+            uploadedAttachments.push({
+              path: upData.path,
+              name: upData.name,
+              mime: upData.mime,
+              size: upData.size,
+            })
+          }
         } else {
           setError(`Failed to upload "${file.name}". Please try again.`)
           setSending(false)
@@ -97,7 +117,7 @@ export function TicketThread({ ticket, messages, isAdmin = false }: TicketThread
       const res = await fetch(`/api/v1/support/tickets/${ticket.id}/messages`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: reply, attachments: attachmentUrls }),
+        body: JSON.stringify({ message: reply, attachments: uploadedAttachments }),
       })
       const data = await res.json() as { message?: SupportMessage; error?: string }
       if (!res.ok) { setError(data.error ?? 'Failed to send reply'); return }
@@ -207,6 +227,36 @@ export function TicketThread({ ticket, messages, isAdmin = false }: TicketThread
               <span className="support-message-time">{formatDate(msg.created_at)}</span>
             </div>
             <div className="support-message-body">{msg.body}</div>
+            {msg.attachments && msg.attachments.length > 0 && (
+              <div className="support-attachments">
+                {msg.attachments.map(att => {
+                  const url   = att.signed_url
+                  const label = attachmentDisplayName(att.path, att.name)
+                  const isImg = (att.mime ?? '').startsWith('image/')
+                  if (!url) {
+                    return (
+                      <div key={att.path} className="support-attachment-row support-attachment-broken">
+                        📎 {label} <span style={{ color: 'var(--text-muted)', fontSize: 11 }}>(link expired — refresh page)</span>
+                      </div>
+                    )
+                  }
+                  if (isImg) {
+                    return (
+                      <a key={att.path} href={url} target="_blank" rel="noopener noreferrer" className="support-attachment-image" title={label}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={url} alt={label} loading="lazy" />
+                      </a>
+                    )
+                  }
+                  return (
+                    <a key={att.path} href={url} target="_blank" rel="noopener noreferrer" className="support-attachment-row">
+                      <span>📎 {label}</span>
+                      {att.size != null && <span className="support-attachment-size">{formatBytes(att.size)}</span>}
+                    </a>
+                  )
+                })}
+              </div>
+            )}
           </div>
         ))}
       </div>

@@ -20,7 +20,6 @@ async function isAdmin(): Promise<boolean> {
 }
 
 const PMB_CRON_PATHS = [
-  '/api/cron/pmb/week-planner',
   '/api/cron/pmb/daily-publisher',
   '/api/cron/pmb/monthly-generator',
   '/api/cron/public-checks',

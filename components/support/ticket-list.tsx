@@ -85,14 +85,21 @@ export function TicketList({ tickets }: TicketListProps): React.ReactElement {
 
     setSubmitting(true)
     try {
-      const attachmentUrls: string[] = []
+      const uploadedAttachments: Array<{ path: string; name?: string; mime?: string; size?: number }> = []
       for (const file of files) {
         const fd = new FormData()
         fd.append('file', file)
         const upRes = await fetch('/api/v1/support/upload', { method: 'POST', body: fd })
         if (upRes.ok) {
-          const upData = await upRes.json() as { url?: string }
-          if (upData.url) attachmentUrls.push(upData.url)
+          const upData = await upRes.json() as { path?: string; name?: string; mime?: string; size?: number }
+          if (upData.path) {
+            uploadedAttachments.push({
+              path: upData.path,
+              name: upData.name,
+              mime: upData.mime,
+              size: upData.size,
+            })
+          }
         } else {
           setError(`Failed to upload "${file.name}". Please try again.`)
           setSubmitting(false)
@@ -103,7 +110,7 @@ export function TicketList({ tickets }: TicketListProps): React.ReactElement {
       const res = await fetch('/api/v1/support/tickets', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ subject, category, priority, message, attachments: attachmentUrls }),
+        body: JSON.stringify({ subject, category, priority, message, attachments: uploadedAttachments }),
       })
       const data = await res.json() as { ticket?: SupportTicket; error?: string }
       if (!res.ok) { setError(data.error ?? 'Failed to create ticket'); return }

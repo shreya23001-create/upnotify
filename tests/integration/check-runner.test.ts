@@ -32,9 +32,15 @@ vi.mock('@/lib/db/incidents', () => ({
   getOpenIncidentForMonitor: (...args: unknown[]) => mockGetOpenIncidentForMonitor(...args),
 }))
 
-const mockIsMonitorInMaintenance = vi.fn()
+// engineering-app#58 — the check-runner used to call isMonitorInMaintenance
+// per monitor; it now calls getMaintenanceSetForMonitors once with the full
+// monitor list and gets back a Set of in-maintenance IDs. The test mock
+// returns a Set built from whatever IDs the per-test setup wants treated as
+// in-maintenance, defaulting to empty.
+const mockMaintenanceSet = vi.fn<(monitors: Array<{ id: string }>) => Promise<Set<string>>>(async () => new Set<string>())
 vi.mock('@/lib/db/maintenance-windows', () => ({
-  isMonitorInMaintenance: (...args: unknown[]) => mockIsMonitorInMaintenance(...args),
+  getMaintenanceSetForMonitors: (...args: unknown[]) =>
+    mockMaintenanceSet(...(args as [Array<{ id: string }>])),
 }))
 
 const mockDispatchChecker = vi.fn()
@@ -75,6 +81,15 @@ vi.mock('@/lib/utils/config', () => ({
   }),
 }))
 
+// engineering-app#77 — the cron-lock helper touches Supabase. Mock it to
+// always return acquired so the unit-level check-runner tests aren't
+// gated on a real DB. The lock-held / release behaviour is exercised
+// separately in tests/unit/cron-lock.test.ts.
+vi.mock('@/lib/utils/cron-lock', () => ({
+  acquireCronLock: vi.fn().mockResolvedValue(true),
+  releaseCronLock: vi.fn().mockResolvedValue(undefined),
+}))
+
 // ---------------------------------------------------------------------------
 // Import module under test (AFTER mocks are set up)
 // ---------------------------------------------------------------------------
@@ -103,10 +118,14 @@ function makeMonitor(overrides: Record<string, unknown> = {}): Record<string, un
 }
 
 function makeRequest(url: string = 'https://uptrue.io/api/cron/check-runner', headers: Record<string, string> = {}): Request {
+  // Cron auth contract (engineering-app#60): Vercel sends Authorization with
+  // the real CRON_SECRET when invoking each scheduled URL. Tests mirror that
+  // by injecting the config-mock's secret. The legacy `x-vercel-cron` header
+  // bypass was removed because it was server-spoofable.
   return new Request(url, {
     method: 'GET',
     headers: {
-      'x-vercel-cron': 'true',
+      authorization: 'Bearer test-cron-secret',
       ...headers,
     },
   })
@@ -127,7 +146,7 @@ function downResult(): CheckerResult {
 describe('check-runner cron route', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    mockIsMonitorInMaintenance.mockResolvedValue(false)
+    mockMaintenanceSet.mockResolvedValue(new Set())
     mockUpdateMonitorStatus.mockResolvedValue(undefined)
     mockWriteCheckResult.mockResolvedValue(undefined)
     mockGetOpenIncidentForMonitor.mockResolvedValue(null)
@@ -152,14 +171,16 @@ describe('check-runner cron route', () => {
     delete process.env.CRON_SECRET
   })
 
-  it('allows request from Vercel cron even without auth header', async () => {
-    process.env.CRON_SECRET = 'test-secret'
-    mockGetDueMonitors.mockResolvedValue([])
-
-    const req = makeRequest()
+  it('rejects request with X-Vercel-Cron header but no valid Bearer token (regression for engineering-app#60)', async () => {
+    // The legacy bypass — `X-Vercel-Cron: true` without a valid Authorization
+    // header — must now return 401. Any attacker could spoof this header, so
+    // the route can no longer treat it as proof of a real Vercel invocation.
+    const req = new Request('https://uptrue.io/api/cron/check-runner', {
+      method: 'GET',
+      headers: { 'x-vercel-cron': 'true' },
+    })
     const response = await GET(req)
-    expect(response.status).toBe(200)
-    delete process.env.CRON_SECRET
+    expect(response.status).toBe(401)
   })
 
   // ── Happy path — monitors fetched and checked ──────────────────────
@@ -199,7 +220,9 @@ describe('check-runner cron route', () => {
   it('skips monitors in maintenance window', async () => {
     const monitor = makeMonitor()
     mockGetDueMonitors.mockResolvedValue([monitor])
-    mockIsMonitorInMaintenance.mockResolvedValue(true)
+    // Return a set containing the monitor's id so the check-runner treats it
+    // as in maintenance and skips dispatch.
+    mockMaintenanceSet.mockResolvedValueOnce(new Set<string>([monitor.id as string]))
 
     const response = await GET(makeRequest())
     const body = await response.json()
