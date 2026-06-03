@@ -1,5 +1,7 @@
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
+import { getCurrentUser } from '@/lib/db/users'
+import { canAccessAdminModule } from '@/lib/db/admin-roles'
 import { getBlogPostById } from '@/lib/db/blog-posts'
 import { BlogCardImage } from '@/components/ui/blog-card-image'
 
@@ -91,6 +93,12 @@ const STATUS_COLOURS: Record<string, string> = {
 }
 
 export default async function AdminBlogPreviewPage({ params }: PreviewPageProps): Promise<React.ReactElement> {
+  const user = await getCurrentUser()
+  if (!user) redirect('/login')
+
+  const canRead = await canAccessAdminModule(user.email, !!user.is_super_admin, 'blog')
+  if (!canRead) redirect('/admin')
+
   const { id } = await params
   const post = await getBlogPostById(id)
   if (!post) notFound()

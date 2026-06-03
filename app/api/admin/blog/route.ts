@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { getCurrentUser } from '@/lib/db/users'
+import { canAccessAdminModule, canWriteAdminModule } from '@/lib/db/admin-roles'
 import {
   getAllBlogPostsAdmin,
   getBlogPostById,
@@ -11,20 +12,21 @@ import { logger } from '@/lib/utils/logger'
 
 export const dynamic = 'force-dynamic'
 
-async function isAdmin(): Promise<{ isAdmin: boolean; userId: string }> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user?.email) return { isAdmin: false, userId: '' }
-
-  const adminEmailsRaw = process.env.ADMIN_EMAILS || ''
-  const adminEmails = adminEmailsRaw.split(',').map(e => e.trim().toLowerCase()).filter(Boolean)
-  return { isAdmin: adminEmails.includes(user.email.toLowerCase()), userId: user.id }
+async function getBlogAccess(): Promise<{ canRead: boolean; canWrite: boolean; userId: string }> {
+  const user = await getCurrentUser()
+  if (!user?.email) return { canRead: false, canWrite: false, userId: '' }
+  const isSuperAdmin = !!user.is_super_admin
+  const [canRead, canWrite] = await Promise.all([
+    canAccessAdminModule(user.email, isSuperAdmin, 'blog'),
+    canWriteAdminModule(user.email, isSuperAdmin, 'blog'),
+  ])
+  return { canRead, canWrite, userId: user.id }
 }
 
 /** GET — List all blog posts (admin only) */
 export async function GET(): Promise<NextResponse> {
-  const { isAdmin: admin } = await isAdmin()
-  if (!admin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  const { canRead } = await getBlogAccess()
+  if (!canRead) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   const posts = await getAllBlogPostsAdmin()
   return NextResponse.json({ success: true, posts })
@@ -32,8 +34,8 @@ export async function GET(): Promise<NextResponse> {
 
 /** POST — Create a new blog post */
 export async function POST(request: Request): Promise<NextResponse> {
-  const { isAdmin: admin, userId } = await isAdmin()
-  if (!admin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  const { canWrite, userId } = await getBlogAccess()
+  if (!canWrite) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   const body = await request.json() as {
     title: string
@@ -66,8 +68,8 @@ export async function POST(request: Request): Promise<NextResponse> {
 
 /** PATCH — Update an existing blog post */
 export async function PATCH(request: Request): Promise<NextResponse> {
-  const { isAdmin: admin } = await isAdmin()
-  if (!admin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  const { canWrite } = await getBlogAccess()
+  if (!canWrite) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   const body = await request.json() as {
     id: string
@@ -104,8 +106,8 @@ export async function PATCH(request: Request): Promise<NextResponse> {
 
 /** DELETE — Delete a blog post */
 export async function DELETE(request: Request): Promise<NextResponse> {
-  const { isAdmin: admin } = await isAdmin()
-  if (!admin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  const { canWrite } = await getBlogAccess()
+  if (!canWrite) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   const { searchParams } = new URL(request.url)
   const id = searchParams.get('id')

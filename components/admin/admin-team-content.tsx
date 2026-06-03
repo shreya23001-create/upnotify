@@ -75,12 +75,14 @@ interface AdminTeamContentProps {
 const ROLE_LABELS: Record<string, string> = {
   super_admin: 'Super Admin',
   admin: 'Admin',
+  blog_editor: 'Blog Editor',
   viewer: 'Viewer',
 }
 
 const ROLE_BADGE_CLASSES: Record<string, string> = {
   super_admin: 'badge badge-danger',
   admin: 'badge badge-default',
+  blog_editor: 'badge badge-info',
   viewer: 'badge badge-outline',
 }
 
@@ -216,6 +218,7 @@ export function AdminTeamContent({ adminRoles, currentUserEmail }: AdminTeamCont
               style={{ fontSize: 13, padding: '4px 8px', width: 'auto', minWidth: 120 }}
             >
               <option value="admin">Admin</option>
+              <option value="blog_editor">Blog Editor</option>
               <option value="viewer">Viewer</option>
             </select>
           )
@@ -294,6 +297,7 @@ export function AdminTeamContent({ adminRoles, currentUserEmail }: AdminTeamCont
       options: [
         { label: 'Super Admin', value: 'super_admin' },
         { label: 'Admin', value: 'admin' },
+        { label: 'Blog Editor', value: 'blog_editor' },
         { label: 'Viewer', value: 'viewer' },
       ],
     },
@@ -369,6 +373,7 @@ export function AdminTeamContent({ adminRoles, currentUserEmail }: AdminTeamCont
                     disabled={isPending}
                   >
                     <option value="admin">Admin</option>
+                    <option value="blog_editor">Blog Editor</option>
                     <option value="viewer">Viewer</option>
                   </select>
                 </div>
