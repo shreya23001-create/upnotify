@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { getCurrentUser } from '@/lib/db/users'
+import { canWriteAdminModule } from '@/lib/db/admin-roles'
 import {
   createBlogPost,
   updateBlogPost,
@@ -15,6 +16,15 @@ interface ActionResult {
   success: boolean
   error?: string
   id?: string
+}
+
+type CurrentUser = NonNullable<Awaited<ReturnType<typeof getCurrentUser>>>
+
+async function getBlogWriteUser(): Promise<CurrentUser | null> {
+  const user = await getCurrentUser()
+  if (!user) return null
+  const canWrite = await canWriteAdminModule(user.email, !!user.is_super_admin, 'blog')
+  return canWrite ? user : null
 }
 
 function slugify(text: string): string {
@@ -57,8 +67,8 @@ function buildContentObject(
 
 /** Create a new blog post */
 export async function createBlogPostAction(formData: FormData): Promise<ActionResult> {
-  const user = await getCurrentUser()
-  if (!user?.is_super_admin) return { success: false, error: 'Unauthorised' }
+  const user = await getBlogWriteUser()
+  if (!user) return { success: false, error: 'Unauthorised' }
 
   const title = (formData.get('title') as string)?.trim()
   const slug = (formData.get('slug') as string)?.trim() || slugify(title)
@@ -109,8 +119,8 @@ export async function createBlogPostAction(formData: FormData): Promise<ActionRe
 
 /** Update an existing blog post */
 export async function updateBlogPostAction(formData: FormData): Promise<ActionResult> {
-  const user = await getCurrentUser()
-  if (!user?.is_super_admin) return { success: false, error: 'Unauthorised' }
+  const user = await getBlogWriteUser()
+  if (!user) return { success: false, error: 'Unauthorised' }
 
   const id = formData.get('id') as string
   if (!id) return { success: false, error: 'Post ID is required' }
@@ -164,8 +174,8 @@ export async function updateBlogPostAction(formData: FormData): Promise<ActionRe
 
 /** Bulk delete blog posts */
 export async function bulkDeleteBlogPostsAction(ids: string[]): Promise<ActionResult & { deleted?: number }> {
-  const user = await getCurrentUser()
-  if (!user?.is_super_admin) return { success: false, error: 'Unauthorised' }
+  const user = await getBlogWriteUser()
+  if (!user) return { success: false, error: 'Unauthorised' }
   if (!ids.length) return { success: false, error: 'No posts selected' }
 
   const result = await bulkDeleteBlogPosts(ids)
@@ -176,8 +186,8 @@ export async function bulkDeleteBlogPostsAction(ids: string[]): Promise<ActionRe
 
 /** Bulk update blog post status */
 export async function bulkUpdateBlogPostStatusAction(ids: string[], status: string): Promise<ActionResult & { updated?: number }> {
-  const user = await getCurrentUser()
-  if (!user?.is_super_admin) return { success: false, error: 'Unauthorised' }
+  const user = await getBlogWriteUser()
+  if (!user) return { success: false, error: 'Unauthorised' }
   if (!ids.length) return { success: false, error: 'No posts selected' }
 
   const allowed = ['draft', 'published', 'archived']
@@ -191,8 +201,8 @@ export async function bulkUpdateBlogPostStatusAction(ids: string[], status: stri
 
 /** Delete a blog post */
 export async function deleteBlogPostAction(id: string): Promise<ActionResult> {
-  const user = await getCurrentUser()
-  if (!user?.is_super_admin) return { success: false, error: 'Unauthorised' }
+  const user = await getBlogWriteUser()
+  if (!user) return { success: false, error: 'Unauthorised' }
 
   if (!id) return { success: false, error: 'Post ID is required' }
 

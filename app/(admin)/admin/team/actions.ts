@@ -34,7 +34,7 @@ export async function addAdminAction(formData: FormData): Promise<ActionResult> 
       return { success: false, error: 'Admin users must use a Gmail address for OAuth login.' }
     }
 
-    if (!['super_admin', 'admin', 'viewer'].includes(role)) {
+    if (!['super_admin', 'admin', 'blog_editor', 'viewer'].includes(role)) {
       return { success: false, error: 'Invalid role.' }
     }
 
@@ -72,7 +72,7 @@ export async function updateAdminAction(formData: FormData): Promise<ActionResul
       return { success: false, error: 'Admin ID is required.' }
     }
 
-    if (role && !['super_admin', 'admin', 'viewer'].includes(role)) {
+    if (role && !['super_admin', 'admin', 'blog_editor', 'viewer'].includes(role)) {
       return { success: false, error: 'Invalid role.' }
     }
 
