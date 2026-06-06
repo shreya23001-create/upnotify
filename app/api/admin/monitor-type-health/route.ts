@@ -1,6 +1,13 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { logger } from '@/lib/utils/logger'
+
+// Explicit caps — PostgREST silently truncates at 1,000 rows when no .limit() is
+// passed, which previously dropped 141 of our 1,141 active monitors and orphaned
+// every check_result whose monitor_id wasn't in the first 1k. Bump both ends.
+const MONITORS_CAP = 10000
+const CHECKS_CAP   = 200000
 
 export const dynamic = 'force-dynamic'
 
@@ -29,13 +36,16 @@ async function isAdmin(): Promise<boolean> {
 export async function computeMonitorTypeHealth(windowHours: number): Promise<MonitorTypeHealth[]> {
   const supabase = createAdminClient()
 
-  // Fetch all active monitors
   const { data: monitors } = await supabase
     .from('monitors')
     .select('id, type')
     .eq('is_paused', false)
+    .limit(MONITORS_CAP)
 
   if (!monitors || monitors.length === 0) return []
+  if (monitors.length >= MONITORS_CAP) {
+    logger.warn('monitor-type-health: monitors cap hit — raise MONITORS_CAP', { returned: monitors.length })
+  }
 
   const monitorIdToType = new Map<string, string>()
   const typeMonitorCount = new Map<string, number>()
@@ -44,13 +54,20 @@ export async function computeMonitorTypeHealth(windowHours: number): Promise<Mon
     typeMonitorCount.set(m.type, (typeMonitorCount.get(m.type) ?? 0) + 1)
   }
 
-  // Fetch check results in window
+  // .order is required: without it PostgREST scans the (monitor_id, checked_at)
+  // index in monitor_id order, so the .limit cap saturates on the first few
+  // monitors and the remaining types vanish from the aggregation entirely.
   const cutoff = new Date(Date.now() - windowHours * 60 * 60 * 1000).toISOString()
   const { data: checks } = await supabase
     .from('check_results')
     .select('monitor_id, status, response_time_ms, error_message')
     .gte('checked_at', cutoff)
-    .limit(50000)
+    .order('checked_at', { ascending: false })
+    .limit(CHECKS_CAP)
+
+  if ((checks?.length ?? 0) >= CHECKS_CAP) {
+    logger.warn('monitor-type-health: checks cap hit — partial window returned', { windowHours, returned: checks?.length ?? 0 })
+  }
 
   // Aggregate by type
   interface TypeAgg {
