@@ -88,6 +88,18 @@ export function MonitorTable({ monitors, uptimeData, initialSearch = '', paginat
   const columns: Column<Monitor>[] = [
     { key: 'type', label: 'Type', render: (m) => <MonitorTypeIcon type={m.type} /> },
     { key: 'name', label: 'Name', render: (m) => <Link href={m.type === 'wordpress' ? `/dashboard/monitors/${m.id}/wordpress` : `/dashboard/monitors/${m.id}`} className="table-link">{m.name}</Link> },
+    { key: 'target', label: 'URL', render: (m) => (
+      <a
+        href={m.target}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="table-link"
+        title={m.target}
+        style={{ display: 'inline-block', maxWidth: 280, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle' }}
+      >
+        {m.target.replace(/^https?:\/\//, '').replace(/\/$/, '')}
+      </a>
+    ) },
     { key: 'uptime', label: 'Uptime (24h)', sortable: false, searchable: false, render: (m) => {
       const slotSeconds = Math.max(m.check_interval_seconds, Math.ceil(86400 / 288))
       const numSlots    = Math.floor(86400 / slotSeconds)
