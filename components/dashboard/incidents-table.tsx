@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useEffect, useState, useTransition } from 'react'
 import type { IncidentWithMonitor } from '@/lib/db/incidents'
 import { Pagination } from '@/components/ui/pagination'
 import type { PaginationMeta } from '@/lib/utils/pagination'
@@ -61,6 +61,16 @@ export function IncidentsTable({
   const [resolutionNotes, setResolutionNotes] = useState<Record<string, string>>({})
   const [localIncidents, setLocalIncidents] = useState(incidents)
   const [showResolveForm, setShowResolveForm] = useState<string | null>(null)
+
+  // Re-sync local state when the server sends a new page/tab of incidents.
+  // Pagination navigates via router.push (soft navigation), so this client
+  // component stays mounted and useState(incidents) is NOT re-initialised —
+  // without this effect the table would keep showing the first page's rows.
+  // localIncidents still exists so optimistic status/resolve edits apply
+  // instantly without a refetch.
+  useEffect(() => {
+    setLocalIncidents(incidents)
+  }, [incidents])
 
   async function handleStatusChange(incidentId: string, newStatus: string): Promise<void> {
     if (newStatus === 'resolved') {

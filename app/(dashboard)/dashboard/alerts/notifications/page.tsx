@@ -21,8 +21,8 @@ export default async function NotificationsSettingsPage() {
         </div>
       </div>
 
-      <div className="card" style={{ maxWidth: 720 }}>
-        <div className="card-body">
+      <div className="card" >
+        <div className="card-content">
           <p className="form-hint" style={{ fontSize: 14 }}>
             Smart Digest groups alert emails so you stop getting one email per event.
             The first event in a window sends instantly so you know something is happening.
@@ -62,7 +62,7 @@ export default async function NotificationsSettingsPage() {
                 id="digest_window_minutes"
                 name="digest_window_minutes"
                 defaultValue={String(settings.digest_window_minutes)}
-                className="form-control"
+                className="form-select"
                 style={{ maxWidth: 240 }}
               >
                 <option value="5">5 minutes</option>
@@ -79,7 +79,7 @@ export default async function NotificationsSettingsPage() {
                 id="instant_severity_floor"
                 name="instant_severity_floor"
                 defaultValue={settings.instant_severity_floor}
-                className="form-control"
+                className="form-select"
                 style={{ maxWidth: 240 }}
               >
                 <option value="critical">Critical only (recommended)</option>

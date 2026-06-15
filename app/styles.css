@@ -117,7 +117,26 @@ html.dark {
 .sidebar-logo-link { display: flex; align-items: center; gap: 10px; text-decoration: none; }
 .sidebar-logo-img { display: block; filter: brightness(0) invert(1); }
 .sidebar-logo-mark { width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; background: var(--accent-gradient); border-radius: 8px; font-size: 16px; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
-.sidebar-nav { flex: 1; padding: 12px 12px; display: flex; flex-direction: column; gap: 0; overflow-y: auto; }
+.sidebar-nav { flex: 1; padding: 12px 12px; display: flex; flex-direction: column; gap: 0; overflow-y: auto; overscroll-behavior: contain; }
+
+/* Floating overlay scrollbar — thin, rounded, auto-hides until hover/scroll.
+   Constant track width so nav content never shifts; transparent track + thumb
+   make the bar appear to float over the dark sidebar. */
+.sidebar-nav { scrollbar-width: thin; scrollbar-color: transparent transparent; transition: scrollbar-color 0.3s ease; }
+.sidebar-nav:hover, .sidebar-nav:focus-within { scrollbar-color: rgba(148,163,184,0.45) transparent; }
+.sidebar-nav::-webkit-scrollbar { width: 8px; }
+.sidebar-nav::-webkit-scrollbar-track { background: transparent; }
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  border-radius: 8px;
+  border: 2px solid transparent;   /* inset → ~4px visible thumb, floating look */
+  background-clip: padding-box;
+  transition: background-color 0.3s ease;
+}
+.sidebar-nav:hover::-webkit-scrollbar-thumb,
+.sidebar-nav:focus-within::-webkit-scrollbar-thumb { background-color: rgba(148,163,184,0.45); }
+.sidebar-nav::-webkit-scrollbar-thumb:hover { background-color: rgba(148,163,184,0.7); }
+
 .sidebar-section { display: flex; flex-direction: column; gap: 2px; }
 .sidebar-section-title { padding: 16px 14px 6px; font-size: 11px; font-weight: 700; color: var(--sidebar-section-text, rgba(148,163,184,0.6)); text-transform: uppercase; letter-spacing: 1.2px; }
 .sidebar-divider { height: 1px; background: var(--sidebar-border, rgba(255,255,255,0.08)); margin: 8px 14px; }
@@ -5323,14 +5342,17 @@ html.dark .monitor-stat-icon.icon-red { background: rgba(239,68,68,0.15); }
   display: flex; align-items: center; gap: 8px; cursor: pointer;
 }
 .sidebar-credits-promo-icon { font-size: 16px; flex-shrink: 0; }
-.sidebar-credits-promo-title { font-size: 13px; font-weight: 700; color: var(--text-primary); flex: 1; }
+/* Sidebar is always dark (var(--sidebar-bg) falls back to #0f172a in both
+   themes), so these must use fixed light colours — not var(--text-primary)/
+   --text-muted, which go dark in light mode and become invisible here. */
+.sidebar-credits-promo-title { font-size: 13px; font-weight: 700; color: #e2e8f0; flex: 1; }
 .sidebar-credits-promo-toggle {
-  font-size: 10px; color: var(--text-muted); transition: transform 0.2s;
+  font-size: 10px; color: rgba(148,163,184,0.75); transition: transform 0.2s;
   display: flex; align-items: center;
 }
 .sidebar-credits-promo-body { overflow: hidden; transition: max-height 0.3s ease, opacity 0.2s ease; max-height: 80px; opacity: 1; }
 .sidebar-credits-promo-body.collapsed { max-height: 0; opacity: 0; }
-.sidebar-credits-promo-text { font-size: 12px; color: var(--text-muted); padding-top: 6px; }
+.sidebar-credits-promo-text { font-size: 12px; color: rgba(148,163,184,0.9); padding-top: 6px; }
 .sidebar-credits-promo-link {
   display: inline-block; margin-top: 6px; font-size: 12px; font-weight: 600;
   color: #3b82f6; text-decoration: none;
