@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState, useTransition, useCallback, useEffect } from 'react'
+import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { DataTable, type Column, type BulkAction } from '@/components/ui/data-table'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
@@ -18,6 +19,8 @@ interface MonitorTableProps {
   monitors: Monitor[]
   uptimeData: Record<string, UptimeSlot[]>
   initialSearch?: string
+  initialStatus?: string
+  initialType?: string
   pagination?: PaginationMeta
 }
 
@@ -27,9 +30,35 @@ interface PendingConfirm {
   isPaused?: boolean
 }
 
-export function MonitorTable({ monitors, uptimeData, initialSearch = '', pagination }: MonitorTableProps) {
+export function MonitorTable({ monitors, uptimeData, initialSearch = '', initialStatus = '', initialType = '', pagination }: MonitorTableProps) {
   const [isPending, startTransition] = useTransition()
   const [pendingConfirm, setPendingConfirm] = useState<PendingConfirm | null>(null)
+
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+
+  // Push search/filter changes into the URL so the server query (the single
+  // source of truth for pagination) re-runs. Always reset to page 1.
+  const updateParams = useCallback((updates: Record<string, string>) => {
+    const params = new URLSearchParams(searchParams.toString())
+    for (const [key, value] of Object.entries(updates)) {
+      if (value) params.set(key, value)
+      else params.delete(key)
+    }
+    params.delete('page')
+    const qs = params.toString()
+    router.push(qs ? `${pathname}?${qs}` : pathname)
+  }, [pathname, router, searchParams])
+
+  // Local search box value for snappy typing; pushed to the URL (debounced).
+  const [searchInput, setSearchInput] = useState(initialSearch)
+  useEffect(() => { setSearchInput(initialSearch) }, [initialSearch])
+  useEffect(() => {
+    if (searchInput === initialSearch) return
+    const t = setTimeout(() => updateParams({ search: searchInput }), 400)
+    return () => clearTimeout(t)
+  }, [searchInput, initialSearch, updateParams])
 
   function handlePauseResume(id: string, isPaused: boolean): void {
     setPendingConfirm({ type: 'pause', ids: [id], isPaused })
@@ -204,7 +233,11 @@ export function MonitorTable({ monitors, uptimeData, initialSearch = '', paginat
         columns={columns}
         data={monitors}
         searchPlaceholder="Search monitors..."
-        initialSearch={initialSearch}
+        serverMode
+        searchValue={searchInput}
+        onSearchChange={setSearchInput}
+        controlledFilterValues={{ status: initialStatus, type: initialType }}
+        onFilterChange={(key, value) => updateParams({ [key]: value })}
         filters={filters}
         bulkActions={bulkActions}
         emptyIcon="📡"

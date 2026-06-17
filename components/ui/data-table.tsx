@@ -33,6 +33,17 @@ interface DataTableProps<T extends { id: string }> {
   emptyMessage?: string
   emptyAction?: { label: string; href: string }
   emptyIcon?: string
+  /**
+   * When true the table is a passive view of `data`: search, filtering and
+   * pagination are owned by the parent (typically via the URL / server query)
+   * and the table renders exactly the rows it is given. Use `searchValue` /
+   * `filterValues` for controlled inputs and the on*Change callbacks to react.
+   */
+  serverMode?: boolean
+  searchValue?: string
+  onSearchChange?: (value: string) => void
+  controlledFilterValues?: Record<string, string>
+  onFilterChange?: (key: string, value: string) => void
 }
 
 export function DataTable<T extends { id: string }>({
@@ -46,6 +57,11 @@ export function DataTable<T extends { id: string }>({
   emptyMessage = 'No data found.',
   emptyAction,
   emptyIcon = '📊',
+  serverMode = false,
+  searchValue,
+  onSearchChange,
+  controlledFilterValues,
+  onFilterChange,
 }: DataTableProps<T>) {
   const [search, setSearch] = useState(initialSearch)
   const [filterValues, setFilterValues] = useState<Record<string, string>>({})
@@ -55,25 +71,35 @@ export function DataTable<T extends { id: string }>({
   const [page, setPage] = useState(0)
   const [pageSize, setPageSize] = useState(initialPageSize)
 
+  // In serverMode the parent owns search/filter state (via the URL); otherwise
+  // the table manages it locally.
+  const effectiveSearch = serverMode ? (searchValue ?? '') : search
+  const effectiveFilterValues = serverMode ? (controlledFilterValues ?? {}) : filterValues
+  const filtersActive = Boolean(effectiveSearch) || Object.values(effectiveFilterValues).some(Boolean)
+
   const filtered = useMemo(() => {
     let result = [...data]
 
-    // Search
-    if (search) {
-      const q = search.toLowerCase()
-      const searchableCols = columns.filter(c => c.searchable !== false)
-      result = result.filter(row =>
-        searchableCols.some(col => {
-          const val = (row as Record<string, unknown>)[col.key]
-          return val != null && String(val).toLowerCase().includes(q)
-        })
-      )
-    }
+    // In serverMode the rows are already searched/filtered server-side — only
+    // apply client-side search/filter when the table owns that state.
+    if (!serverMode) {
+      // Search
+      if (search) {
+        const q = search.toLowerCase()
+        const searchableCols = columns.filter(c => c.searchable !== false)
+        result = result.filter(row =>
+          searchableCols.some(col => {
+            const val = (row as Record<string, unknown>)[col.key]
+            return val != null && String(val).toLowerCase().includes(q)
+          })
+        )
+      }
 
-    // Filters
-    for (const [key, value] of Object.entries(filterValues)) {
-      if (value) {
-        result = result.filter(row => String((row as Record<string, unknown>)[key]) === value)
+      // Filters
+      for (const [key, value] of Object.entries(filterValues)) {
+        if (value) {
+          result = result.filter(row => String((row as Record<string, unknown>)[key]) === value)
+        }
       }
     }
 
@@ -91,10 +117,11 @@ export function DataTable<T extends { id: string }>({
     }
 
     return result
-  }, [data, search, filterValues, sortKey, sortDir, columns])
+  }, [data, search, filterValues, sortKey, sortDir, columns, serverMode])
 
-  const totalPages = Math.ceil(filtered.length / pageSize)
-  const paged = filtered.slice(page * pageSize, (page + 1) * pageSize)
+  // serverMode rows are already the current page — never slice them again.
+  const totalPages = serverMode ? 1 : Math.ceil(filtered.length / pageSize)
+  const paged = serverMode ? filtered : filtered.slice(page * pageSize, (page + 1) * pageSize)
 
   const toggleSort = useCallback((key: string) => {
     if (sortKey === key) {
@@ -122,7 +149,10 @@ export function DataTable<T extends { id: string }>({
     }
   }, [paged, selectedIds.size])
 
-  if (data.length === 0) {
+  // Show the full "create your first" empty state only when there is genuinely
+  // no data. In serverMode with an active search/filter we keep the toolbar so
+  // the user can clear it (handled by the "no results" row in the table body).
+  if (data.length === 0 && !(serverMode && filtersActive)) {
     return (
       <div className="empty-state">
         <div className="empty-state-icon">{emptyIcon}</div>
@@ -144,15 +174,21 @@ export function DataTable<T extends { id: string }>({
           className="data-table-search"
           type="text"
           placeholder={searchPlaceholder}
-          value={search}
-          onChange={e => { setSearch(e.target.value); setPage(0) }}
+          value={effectiveSearch}
+          onChange={e => {
+            if (serverMode) { onSearchChange?.(e.target.value) }
+            else { setSearch(e.target.value); setPage(0) }
+          }}
         />
         {filters.map(f => (
           <select
             key={f.key}
             className="data-table-filter"
-            value={filterValues[f.key] || ''}
-            onChange={e => { setFilterValues(prev => ({ ...prev, [f.key]: e.target.value })); setPage(0) }}
+            value={effectiveFilterValues[f.key] || ''}
+            onChange={e => {
+              if (serverMode) { onFilterChange?.(f.key, e.target.value) }
+              else { setFilterValues(prev => ({ ...prev, [f.key]: e.target.value })); setPage(0) }
+            }}
           >
             <option value="">{f.label}</option>
             {f.options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
@@ -206,6 +242,13 @@ export function DataTable<T extends { id: string }>({
           </tr>
         </thead>
         <tbody>
+          {serverMode && paged.length === 0 && (
+            <tr>
+              <td colSpan={columns.length + (bulkActions.length > 0 ? 1 : 0)} style={{ textAlign: 'center', padding: '32px 16px', color: 'var(--text-muted)' }}>
+                No results match your search or filters.
+              </td>
+            </tr>
+          )}
           {paged.map(row => (
             <tr key={row.id} className={selectedIds.has(row.id) ? 'selected' : ''}>
               {bulkActions.length > 0 && (
@@ -230,7 +273,7 @@ export function DataTable<T extends { id: string }>({
       </table>
       </div>
 
-      {filtered.length > pageSize && (
+      {!serverMode && filtered.length > pageSize && (
         <div className="data-table-pagination">
           <span>Showing {page * pageSize + 1}–{Math.min((page + 1) * pageSize, filtered.length)} of {filtered.length}</span>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
