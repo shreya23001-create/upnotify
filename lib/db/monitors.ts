@@ -288,15 +288,30 @@ export async function bulkUpdateMonitorStatus(ids: string[], orgId: string, isPa
 }
 
 export async function getMonitorsByWorkspacePaged(
-  workspaceId: string, page: number, pageSize: number
+  workspaceId: string,
+  page: number,
+  pageSize: number,
+  filters?: { search?: string; status?: string; type?: string }
 ): Promise<{ data: Monitor[]; total: number }> {
   const supabase = await createClient()
   const from = (page - 1) * pageSize
   const to = from + pageSize - 1
-  const { data, error, count } = await supabase
+
+  let query = supabase
     .from('monitors')
     .select('*', { count: 'exact' })
     .eq('workspace_id', workspaceId)
+
+  const search = filters?.search?.trim()
+  if (search) {
+    // Strip characters that would break PostgREST's `or` filter syntax.
+    const term = search.replace(/[%,()]/g, ' ').trim()
+    if (term) query = query.or(`name.ilike.%${term}%,target.ilike.%${term}%`)
+  }
+  if (filters?.status) query = query.eq('status', filters.status)
+  if (filters?.type) query = query.eq('type', filters.type)
+
+  const { data, error, count } = await query
     .order('created_at', { ascending: false })
     .range(from, to)
 
