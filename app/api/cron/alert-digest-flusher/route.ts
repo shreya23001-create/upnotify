@@ -79,20 +79,16 @@ export async function GET(request: Request): Promise<NextResponse> {
 
 async function flushOrg(orgId: string): Promise<{ sent: number; failed: number; error?: string }> {
   const settings = await getOrgAlertSettings(orgId)
+  const events = await getPendingEventsForOrg(orgId)
+  if (events.length === 0) return { sent: 0, failed: 0 }
 
-  // Defensive: if settings flipped to 'off' between buffering and flush,
-  // events should not be turned into a digest. Mark them digested so they
-  // don't hang around forever (they were already sent as per-event during
-  // the brief window where mode was 'smart').
+  // Defensive: if settings flipped to 'off' mid-window, drain the buffer
+  // without sending (they already went out as instant during the smart window).
   if (settings.mode === 'off') {
-    const events = await getPendingEventsForOrg(orgId)
     await markEventsDigested(events.map(e => e.id))
     logger.info('alert-digest-flusher: org switched to off mid-window, draining buffer', { orgId, drained: events.length })
     return { sent: 0, failed: 0 }
   }
-
-  const events = await getPendingEventsForOrg(orgId)
-  if (events.length === 0) return { sent: 0, failed: 0 }
 
   // Resolve email recipients — every enabled email channel for this org
   // whose severity filter matches at least one event in the buffer.
@@ -105,6 +101,8 @@ async function flushOrg(orgId: string): Promise<{ sent: number; failed: number; 
     .eq('type', 'email')
 
   if (channelErr) {
+    // Transient DB error and NO email was sent — leave events un-digested so
+    // the next tick retries. (No spam risk: nothing went out this run.)
     logger.error('alert-digest-flusher: failed to load email channels', { orgId, error: channelErr.message })
     return { sent: 0, failed: 1, error: channelErr.message }
   }
@@ -116,60 +114,64 @@ async function flushOrg(orgId: string): Promise<{ sent: number; failed: number; 
     return { sent: 0, failed: 0 }
   }
 
-  const eventSeverities = new Set(events.map(e => e.severity))
-
-  const digest = buildDigestEmail(events, {
-    sameHostGrouping: settings.same_host_grouping,
-    flapBadgeThreshold: settings.flap_badge_threshold,
-  })
-
   let sent = 0
   let failed = 0
   let lastError: string | undefined
 
-  for (const ch of channels) {
-    // Channel-level severity filter: skip channels that don't match any
-    // event's severity. Edge case: a channel set to 'critical only' should
-    // not get a digest where everything is warning-only.
-    const filter = ch.severity_filter ?? []
-    const overlaps = filter.length === 0 || filter.some(f => eventSeverities.has(f))
-    if (!overlaps) continue
+  // From here an email WILL be attempted, so the buffer MUST be marked digested
+  // on every exit path — even if a send/build/insert throws. Otherwise the same
+  // digest re-sends every 5 min (the production bug). Matches KB §6 #5.
+  try {
+    const eventSeverities = new Set(events.map(e => e.severity))
 
-    const to = ch.config?.email
-    if (!to) {
-      failed += 1
-      lastError = `Channel ${ch.id} has no email address`
-      continue
-    }
+    const digest = buildDigestEmail(events, {
+      sameHostGrouping: settings.same_host_grouping,
+      flapBadgeThreshold: settings.flap_badge_threshold,
+    })
 
-    const result = await sendEmail(to, digest.subject, digest.bodyHtml, 'incident_notification')
-    if (result.success) {
-      sent += 1
-    } else {
-      failed += 1
-      lastError = result.error
-    }
+    for (const ch of channels) {
+      // Channel-level severity filter: skip channels that don't match any
+      // event's severity (e.g. a 'critical only' channel vs a warning-only digest).
+      const filter = ch.severity_filter ?? []
+      const overlaps = filter.length === 0 || filter.some(f => eventSeverities.has(f))
+      if (!overlaps) continue
 
-    // Audit row in alerts table — one per channel per digest send. Use the
-    // most recent event's incident_id as the representative (alerts.incident_id
-    // is non-nullable; per-flush audit lives in cron-runs separately).
-    const representativeIncidentId = events[events.length - 1]?.incident_id
-    if (representativeIncidentId) {
-      await supabase.from('alerts').insert({
-        org_id: orgId,
-        incident_id: representativeIncidentId,
-        channel_id: ch.id,
-        status: result.success ? 'sent' : 'failed',
-        sent_at: result.success ? new Date().toISOString() : null,
-        error_message: result.error || null,
-      })
+      const to = ch.config?.email
+      if (!to) {
+        failed += 1
+        lastError = `Channel ${ch.id} has no email address`
+        continue
+      }
+
+      const result = await sendEmail(to, digest.subject, digest.bodyHtml, 'incident_notification')
+      if (result.success) {
+        sent += 1
+      } else {
+        failed += 1
+        lastError = result.error
+      }
+
+      // Audit row — guarded so a failed insert can never abort the flush
+      // (which would skip the mark-digested below and re-send next tick).
+      const representativeIncidentId = events[events.length - 1]?.incident_id
+      if (representativeIncidentId) {
+        try {
+          await supabase.from('alerts').insert({
+            org_id: orgId,
+            incident_id: representativeIncidentId,
+            channel_id: ch.id,
+            status: result.success ? 'sent' : 'failed',
+            sent_at: result.success ? new Date().toISOString() : null,
+            error_message: result.error || null,
+          })
+        } catch (e) {
+          logger.error('alert-digest-flusher: audit insert failed', { orgId, channelId: ch.id, error: e instanceof Error ? e.message : 'unknown' })
+        }
+      }
     }
+  } finally {
+    await markEventsDigested(events.map(e => e.id))
   }
-
-  // Mark all events digested even if some channels failed — we don't want
-  // to re-digest the same events on the next flusher tick. Failed sends are
-  // recorded in the alerts table for retry/inspection.
-  await markEventsDigested(events.map(e => e.id))
 
   return { sent, failed, error: lastError }
 }
