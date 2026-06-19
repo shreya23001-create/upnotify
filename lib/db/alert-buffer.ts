@@ -162,31 +162,58 @@ export async function getOrgsReadyToFlush(): Promise<Array<{
   return ready
 }
 
+// PostgREST silently caps an unbounded select at 1000 rows. A flapping fleet
+// can buffer far more than that, so we PAGE through with .range() until a short
+// page comes back — otherwise only the oldest 1000 are ever fetched (and the
+// rest never get digested → the same digest re-sends forever).
+const PENDING_PAGE = 1000
+
 export async function getPendingEventsForOrg(orgId: string): Promise<BufferedEvent[]> {
   const supabase = client()
-  const { data, error } = await supabase
-    .from('pending_alert_events')
-    .select('*')
-    .eq('org_id', orgId)
-    .is('digested_at', null)
-    .order('created_at', { ascending: true })
+  const all: BufferedEvent[] = []
+  let from = 0
 
-  if (error || !data) {
-    logger.error('alert-buffer: fetch pending failed', { orgId, error: error?.message })
-    return []
+  for (;;) {
+    const { data, error } = await supabase
+      .from('pending_alert_events')
+      .select('*')
+      .eq('org_id', orgId)
+      .is('digested_at', null)
+      .order('created_at', { ascending: true })
+      .range(from, from + PENDING_PAGE - 1)
+
+    if (error) {
+      logger.error('alert-buffer: fetch pending failed', { orgId, error: error.message, from })
+      break
+    }
+    if (!data || data.length === 0) break
+    all.push(...(data as BufferedEvent[]))
+    if (data.length < PENDING_PAGE) break
+    from += PENDING_PAGE
   }
-  return data as BufferedEvent[]
+
+  return all
 }
+
+// A single .in('id', [...]) with ~1000 uuids builds an oversized request that
+// PostgREST rejects (URI/query limit) — the update then silently fails and the
+// events never get digested. Chunk the ids so each statement stays small.
+const MARK_CHUNK = 200
 
 export async function markEventsDigested(eventIds: string[]): Promise<void> {
   if (eventIds.length === 0) return
   const supabase = client()
-  const { error } = await supabase
-    .from('pending_alert_events')
-    .update({ digested_at: new Date().toISOString() })
-    .in('id', eventIds)
+  const now = new Date().toISOString()
 
-  if (error) {
-    logger.error('alert-buffer: mark-digested failed', { error: error.message, count: eventIds.length })
+  for (let i = 0; i < eventIds.length; i += MARK_CHUNK) {
+    const batch = eventIds.slice(i, i + MARK_CHUNK)
+    const { error } = await supabase
+      .from('pending_alert_events')
+      .update({ digested_at: now })
+      .in('id', batch)
+
+    if (error) {
+      logger.error('alert-buffer: mark-digested batch failed', { error: error.message, count: batch.length })
+    }
   }
 }

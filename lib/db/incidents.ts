@@ -222,6 +222,26 @@ export async function getOpenIncidentForMonitor(monitorId: string): Promise<Inci
   return data
 }
 
+/**
+ * How many incidents this monitor has opened in the last `sinceMinutes`.
+ * Used for flap suppression: a monitor opening many incidents per hour is
+ * flapping, and we suppress its alerts to stop digest-buffer flooding
+ * (the "1000 events" email-storm). The incident is still recorded; only the
+ * alert/email is skipped.
+ */
+export async function countRecentIncidentsForMonitor(monitorId: string, sinceMinutes: number): Promise<number> {
+  const supabase = createAdminClient()
+  const since = new Date(Date.now() - sinceMinutes * 60 * 1000).toISOString()
+  const { count, error } = await supabase
+    .from('incidents')
+    .select('id', { count: 'exact', head: true })
+    .eq('monitor_id', monitorId)
+    .gte('started_at', since)
+
+  if (error) return 0 // fail open — don't suppress real alerts on a count error
+  return count ?? 0
+}
+
 export async function getAllIncidentsByOrgPaged(
   orgId: string, page: number, pageSize: number, statusFilter?: 'open' | 'resolved'
 ): Promise<{ data: IncidentWithMonitor[]; total: number; openTotal: number; resolvedTotal: number }> {

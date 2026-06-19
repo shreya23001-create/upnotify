@@ -1,7 +1,7 @@
 ﻿import { NextResponse } from 'next/server'
 import { getDueMonitors, getAllActiveMonitors, updateMonitorStatus, incrementFlapCount, patchMonitorConfig } from '@/lib/db/monitors'
 import { writeCheckResult } from '@/lib/db/check-results'
-import { createIncident, resolveIncident, getOpenIncidentForMonitor } from '@/lib/db/incidents'
+import { createIncident, resolveIncident, getOpenIncidentForMonitor, countRecentIncidentsForMonitor } from '@/lib/db/incidents'
 import { getMaintenanceSetForMonitors } from '@/lib/db/maintenance-windows'
 import { dispatchChecker } from '@/lib/services/checker'
 import { dispatchAlerts, dispatchRecoveryAlerts } from '@/lib/services/alert-dispatcher'
@@ -22,6 +22,21 @@ export const maxDuration = 300
 // maxDuration so a crashed run self-heals on the next cron tick.
 const CRON_LOCK_NAME    = 'check-runner'
 const CRON_LOCK_TTL_MS  = 6 * 60 * 1000 // 6 minutes
+
+// Flap suppression — a monitor that opens more than FLAP_SUPPRESS_THRESHOLD
+// incidents within FLAP_SUPPRESS_WINDOW_MIN minutes is flapping. We still RECORD
+// the incident (dashboard/history), but skip the alert/email so the digest buffer
+// doesn't flood (the "1000 events" email-storm). Applies to down AND recovery alerts.
+const FLAP_SUPPRESS_WINDOW_MIN = 60
+const FLAP_SUPPRESS_THRESHOLD  = 5
+
+// Two-confirmation down detection — KB (PRODUCT-REQUIREMENTS §3 / FEATURES.md)
+// specifies a 30-second wait before the confirming re-check. The previous 5s
+// was too aggressive: a transient blip is still failing 5s later → false
+// "confirmed down" → incident → flapping/email-storm. 30s lets brief blips
+// recover (logged as flap, no alert). (Region-diverse re-check is still TODO —
+// needs multi-region checker infra; tracked separately.)
+const CONFIRMATION_DELAY_MS = 30_000
 
 function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms))
@@ -137,10 +152,15 @@ export async function GET(request: Request): Promise<NextResponse> {
           logger.info('Monitor recovered', { monitorId: monitor.id, name: monitor.name })
 
           if (openIncident) {
-            await dispatchRecoveryAlerts(
-              { ...openIncident, status: 'resolved' as const, resolved_at: now.toISOString() },
-              monitor
-            )
+            const recentIncidents = await countRecentIncidentsForMonitor(monitor.id, FLAP_SUPPRESS_WINDOW_MIN)
+            if (recentIncidents > FLAP_SUPPRESS_THRESHOLD) {
+              logger.warn('Recovery alert suppressed — monitor flapping', { monitorId: monitor.id, name: monitor.name, recentIncidents })
+            } else {
+              await dispatchRecoveryAlerts(
+                { ...openIncident, status: 'resolved' as const, resolved_at: now.toISOString() },
+                monitor
+              )
+            }
           }
         }
 
@@ -152,9 +172,9 @@ export async function GET(request: Request): Promise<NextResponse> {
       })
     )
 
-    // Phase 3: Wait 5 seconds, then confirm DOWN monitors in parallel
+    // Phase 3: Wait (KB-spec 30s), then confirm DOWN monitors in parallel
     if (downResults.length > 0) {
-      await sleep(5000)
+      await sleep(CONFIRMATION_DELAY_MS)
 
       await Promise.allSettled(
         downResults.map(async ({ monitor }) => {
@@ -192,7 +212,14 @@ export async function GET(request: Request): Promise<NextResponse> {
               logger.warn('Monitor confirmed down, incident created', { monitorId: monitor.id, name: monitor.name })
 
               if (newIncident) {
-                await dispatchAlerts(newIncident, monitor)
+                // Flap suppression: record the incident but skip the alert/email
+                // if this monitor is opening incidents too frequently.
+                const recentIncidents = await countRecentIncidentsForMonitor(monitor.id, FLAP_SUPPRESS_WINDOW_MIN)
+                if (recentIncidents > FLAP_SUPPRESS_THRESHOLD) {
+                  logger.warn('Alert suppressed — monitor flapping', { monitorId: monitor.id, name: monitor.name, recentIncidents })
+                } else {
+                  await dispatchAlerts(newIncident, monitor)
+                }
               }
             }
 
