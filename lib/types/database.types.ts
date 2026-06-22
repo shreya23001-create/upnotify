@@ -2910,6 +2910,19 @@ export type Database = {
         Args: { p_month: string; p_count: number }
         Returns: undefined
       }
+      get_uptime_slots: {
+        Args: {
+          p_monitor_id: string
+          p_since: string
+          p_slot_minutes: number
+          p_slot_count: number
+        }
+        Returns: {
+          slot_index: number
+          slot_start: string
+          status: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
