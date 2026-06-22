@@ -133,11 +133,6 @@ export async function getUptimeBarData(monitorId: string, checkIntervalSeconds: 
 }
 
 /**
- * Get recent check results for all monitors in an organisation.
- * Used by the dashboard charts to show uptime and response time trends.
- * IDs are chunked into batches of 50 to avoid PostgREST URL-length limits.
- */
-/**
  * Lightweight projection of CheckResult — only the fields the dashboard
  * stats API actually renders. Excluding metadata (2–5 KB per row of JSONB)
  * cuts the wire payload by ~30× on a 5,000-row response.
@@ -201,11 +196,6 @@ function formatSlotTime(base: Date, slotIndex: number, slotMinutes: number = 15)
   return time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 }
 
-/**
- * Calculate the uptime percentage for a monitor over a given number of days.
- * Returns a value between 0 and 100 (e.g. 99.97).
- * If no check results exist, returns 100.
- */
 export async function getMonitorUptimePercentage(monitorId: string, days: number = 30): Promise<number> {
   const supabase = createAdminClient()
   const since = new Date()
@@ -237,54 +227,30 @@ const rangeConfig: Record<string, { hours: number; slots: number; slotMinutes: n
 }
 
 export async function getUptimeBarDataForRange(monitorId: string, range: string): Promise<UptimeSlot[]> {
-  const config = rangeConfig[range] || rangeConfig['24h']
+  const config = rangeConfig[range] ?? rangeConfig['24h']
   const supabase = createAdminClient()
   const now = new Date()
   const since = new Date(now.getTime() - config.hours * 60 * 60 * 1000)
 
-  // PostgREST silently caps unlimited SELECTs at 1,000 rows; a 1-minute
-  // monitor over 90 days has 129,600 rows. Bumping to 50,000 covers the
-  // common cases (7d/30d at any interval, 90d at 5-min+). Very high-frequency
-  // monitors over the full 90-day range still risk truncation — addressed
-  // later by a pre-aggregation table.
-  const { data, error } = await supabase
-    .from('check_results')
-    .select('status, checked_at')
-    .eq('monitor_id', monitorId)
-    .gte('checked_at', since.toISOString())
-    .order('checked_at', { ascending: true })
-    .limit(50000)
+  const { data, error } = await supabase.rpc('get_uptime_slots', {
+    p_monitor_id:   monitorId,
+    p_since:        since.toISOString(),
+    p_slot_minutes: config.slotMinutes,
+    p_slot_count:   config.slots,
+  })
 
   if (error) {
-    logger.error('Failed to get uptime bar data for range', { error: error.message })
+    logger.error('Failed to get uptime slot data', { error: error.message })
     return Array.from({ length: config.slots }, (_, i) => ({
-      slot: formatSlotTime(since, i, config.slotMinutes),
+      slot:      formatSlotTime(since, i, config.slotMinutes),
       timestamp: new Date(since.getTime() + i * config.slotMinutes * 60 * 1000).toISOString(),
-      status: 'none' as const,
+      status:    'none' as const,
     }))
   }
 
-  const results = data ?? []
-  const slots: UptimeSlot[] = []
-
-  for (let i = 0; i < config.slots; i++) {
-    const slotStart = new Date(since.getTime() + i * config.slotMinutes * 60 * 1000)
-    const slotEnd = new Date(slotStart.getTime() + config.slotMinutes * 60 * 1000)
-
-    const checksInSlot = results.filter(r => {
-      const t = new Date(r.checked_at).getTime()
-      return t >= slotStart.getTime() && t < slotEnd.getTime()
-    })
-
-    let status: UptimeSlot['status'] = 'none'
-    if (checksInSlot.length > 0) {
-      if (checksInSlot.some(c => c.status === 'down')) status = 'down'
-      else if (checksInSlot.some(c => c.status === 'degraded')) status = 'degraded'
-      else status = 'up'
-    }
-
-    slots.push({ slot: formatSlotTime(since, i, config.slotMinutes), timestamp: slotStart.toISOString(), status })
-  }
-
-  return slots
+  return (data ?? []).map((row: { slot_index: number; slot_start: string; status: string }) => ({
+    slot:      formatSlotTime(since, row.slot_index, config.slotMinutes),
+    timestamp: row.slot_start,
+    status:    row.status as UptimeSlot['status'],
+  }))
 }

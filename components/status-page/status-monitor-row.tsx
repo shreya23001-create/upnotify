@@ -77,6 +77,7 @@ export function StatusMonitorRow({ monitor, uptimeSlots, uptimePercent, range }:
             <div className="sp-uptime-bars">
               <TimelineBarGraph
                 data={uptimeSlots.map(s => ({ timestamp: s.timestamp, status: s.status }))}
+                maxBars={uptimeSlots.length}
                 height={20}
                 showFooter={false}
               />

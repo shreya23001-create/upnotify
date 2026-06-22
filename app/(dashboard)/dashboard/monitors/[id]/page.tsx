@@ -162,7 +162,7 @@ export default async function MonitorDetailPage({
         </div>
       </div>
 
-      {/* 90-day uptime bars */}
+      {/* 30-day uptime bars */}
       <MonitorUptimeBars slots={uptimeSlots} uptimePercent={uptimePercent} rangeLabel="30 days" />
 
       {/* Type-specific insight */}

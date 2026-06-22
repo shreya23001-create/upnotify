@@ -12,6 +12,7 @@ interface Props {
 
 export function MonitorUptimeBars({ slots, uptimePercent, rangeLabel = '30 days' }: Props): React.ReactElement {
   const pctColor = uptimePercent >= 99.9 ? '#10b981' : uptimePercent >= 99 ? '#f59e0b' : '#ef4444'
+  const hasData = slots.filter(s => s.status !== 'none').length >= 2
 
   return (
     <div className="uptime-bar-section">
@@ -20,13 +21,20 @@ export function MonitorUptimeBars({ slots, uptimePercent, rangeLabel = '30 days'
         <span className="uptime-bar-pct" style={{ color: pctColor }}>{uptimePercent.toFixed(2)}% uptime</span>
       </div>
 
-      <div style={{ padding: '16px 20px' }}>
-        <TimelineBarGraph
-          data={slots.map(s => ({ timestamp: s.timestamp, status: s.status }))}
-          height={32}
-          showFooter={false}
-        />
-      </div>
+      {!hasData ? (
+        <div className="uptime-bar-collecting">
+          Collecting data — the first check will run shortly.
+        </div>
+      ) : (
+        <div style={{ padding: '16px 20px' }}>
+          <TimelineBarGraph
+            data={slots.map(s => ({ timestamp: s.timestamp, status: s.status }))}
+            maxBars={slots.length}
+            height={32}
+            showFooter={false}
+          />
+        </div>
+      )}
 
       <div className="uptime-bar-footer">
         <span>{rangeLabel} ago</span>
