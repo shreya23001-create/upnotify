@@ -18,7 +18,7 @@
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
-import { verifyRazorpayWebhook } from '@/lib/services/payments-razorpay'
+import { verifyRazorpayWebhook, cancelRazorpaySubscription } from '@/lib/services/payments-razorpay'
 import { getStripe } from '@/lib/services/stripe'
 import { isProduction } from '@/lib/utils/environment'
 import { getServerConfig } from '@/lib/utils/config'
@@ -119,6 +119,19 @@ async function handleSubscriptionActivated(sub: RzpSubscription): Promise<void> 
       } catch (err) {
         logger.warn('Razorpay activation: failed to cancel old Stripe sub', {
           stripeSubId: existingSub.stripe_subscription_id,
+          error: err instanceof Error ? err.message : String(err),
+        })
+      }
+    }
+    // Cancel in Razorpay if this was a Razorpay subscription — must cancel via API
+    // so Razorpay stops billing, not just update the DB.
+    const oldRzpId = existingSub.razorpay_subscription_id as string | undefined
+    if (oldRzpId && oldRzpId !== sub.id) {
+      try {
+        await cancelRazorpaySubscription(oldRzpId, false) // immediate — user has moved to new sub
+      } catch (err) {
+        logger.warn('Razorpay activation: failed to cancel old Razorpay sub via API', {
+          oldRzpSubId: oldRzpId,
           error: err instanceof Error ? err.message : String(err),
         })
       }
@@ -269,7 +282,14 @@ async function handleSubscriptionCharged(sub: RzpSubscription, payment: RzpPayme
   const supabase = createAdminClient()
   const orgId    = sub.notes?.org_id
 
-  if (!orgId || !payment) return
+  if (!orgId || !payment) {
+    logger.warn('Razorpay subscription.charged: missing orgId or payment entity — invoice not recorded', {
+      subId: sub.id,
+      hasOrgId: !!orgId,
+      hasPayment: !!payment,
+    })
+    return
+  }
 
   // Find our subscription record (include status to avoid overwriting cancelling → active)
   const { data: subRecord } = await supabase

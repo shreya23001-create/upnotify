@@ -3,6 +3,7 @@ import { getCurrentUser } from '@/lib/db/users'
 import { getCurrentOrganisation } from '@/lib/db/organisations'
 import { getStripe, ensureStripeCustomer } from '@/lib/services/stripe'
 import { getPlanBySlug } from '@/lib/db/subscriptions'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { getConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
 import { billingCheckoutSchema } from '@/lib/validations/schemas'
@@ -60,6 +61,32 @@ export async function POST(request: Request): Promise<NextResponse> {
         { error: 'The Free plan does not require payment. You are already on this plan.' },
         { status: 400 }
       )
+    }
+
+    // Server-side downgrade prevention (V1 billing rule: upgrades only).
+    // Frontend already blocks this, but direct API calls must also be rejected.
+    const PLAN_TIER: Record<string, number> = { free: 0, lite: 1, builder: 2, scale: 3 }
+    const supabase = createAdminClient()
+    const { data: activeSub } = await supabase
+      .from('subscriptions')
+      .select('plans!inner(slug)')
+      .eq('org_id', org.id)
+      .in('status', ['active', 'cancelling', 'past_due'])
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+
+    if (activeSub) {
+      const currentSlug = (activeSub as unknown as { plans: { slug: string } }).plans?.slug ?? ''
+      const currentTier = PLAN_TIER[currentSlug] ?? 0
+      const requestedTier = PLAN_TIER[plan.slug] ?? 0
+      if (requestedTier < currentTier) {
+        logger.warn('Checkout downgrade attempt blocked', { orgId: org.id, currentSlug, requestedSlug: plan.slug })
+        return NextResponse.json(
+          { error: 'Plan downgrade is not available. Please contact support if you need to change plans.' },
+          { status: 403 }
+        )
+      }
     }
 
     // Use the pre-configured Stripe price IDs from the DB

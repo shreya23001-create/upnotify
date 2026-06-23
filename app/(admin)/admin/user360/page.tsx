@@ -115,7 +115,10 @@ export default async function User360Page({
   const activePlan = activeSub?.plans ?? null
   const monitorUpCount = monitors.filter(m => m.status === 'up').length
   const monitorDownCount = monitors.filter(m => m.status === 'down').length
-  const totalRevenue = invoices.filter(i => i.status === 'paid').reduce((sum, i) => sum + (i.amount_gbp ?? 0), 0)
+  const paidInvoices = invoices.filter(i => i.status === 'paid')
+  const totalRevGbp = paidInvoices.filter(i => i.currency !== 'inr').reduce((sum, i) => sum + (i.amount_gbp ?? 0), 0)
+  const totalRevInr = paidInvoices.filter(i => i.currency === 'inr').reduce((sum, i) => sum + (i.amount_gbp ?? 0), 0)
+  const totalRevDisplay = totalRevInr > 0 ? fmtAmount(totalRevInr, 'inr') : fmtAmount(totalRevGbp)
   const enabledChannelTypes = new Set(alertChannels.filter(c => c.is_enabled).map(c => c.type))
 
   // ── Unit economics ───────────────────────────────────────────────────────
@@ -335,7 +338,7 @@ export default async function User360Page({
               { label: 'Billing', value: activeSub ? activeSub.billing_cycle : '—' },
               { label: 'Monitors', value: String(monitors.length) },
               { label: 'Up / Down', value: `${monitorUpCount} / ${monitorDownCount}` },
-              { label: 'Total Paid', value: fmtAmount(totalRevenue) },
+              { label: 'Total Paid', value: totalRevDisplay },
               { label: 'Invoices', value: String(invoices.length) },
             ].map(s => (
               <div key={s.label} className="card" style={{ padding: '12px 14px' }}>

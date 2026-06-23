@@ -547,7 +547,7 @@ export async function resumeSubscription(
     const { getStripe } = await import('@/lib/services/stripe')
     const stripe = getStripe()
     await stripe.subscriptions.update(stripeSubscriptionId, {
-      pause_collection: '',
+      pause_collection: null,
     } as Record<string, unknown>)
 
     // 2. Fetch paused_at before clearing it — used to identify system-paused resources
