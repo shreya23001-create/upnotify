@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getCurrentUser } from '@/lib/db/users'
-import { acceptTeamInvite } from '@/lib/db/team'
+import { acceptTeamInvite, getInviteByToken } from '@/lib/db/team'
+import { checkTeamMemberLimit } from '@/lib/utils/plan-limits'
 import { writeAuditLog } from '@/lib/db/audit'
 import { logger } from '@/lib/utils/logger'
 
@@ -22,6 +23,24 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       return NextResponse.json(
         { error: 'Invite token is required.' },
         { status: 400 }
+      )
+    }
+
+    // Re-check limit against the TARGET org at accept time (TOCTOU fix).
+    // The invite was created when the org had capacity, but the plan may have
+    // changed or other invites may have been accepted since.
+    const invite = await getInviteByToken(token)
+    if (!invite) {
+      return NextResponse.json(
+        { error: 'Invite not found, expired, or already used.' },
+        { status: 400 }
+      )
+    }
+    const limitCheck = await checkTeamMemberLimit(invite.org_id)
+    if (!limitCheck.allowed) {
+      return NextResponse.json(
+        { error: 'This organisation has reached its team member limit. Ask the owner to upgrade their plan.' },
+        { status: 403 }
       )
     }
 

@@ -17,14 +17,21 @@ vi.mock('@/lib/supabase/admin', () => ({
     from: (_table: string) => {
       // Subscriptions query (used by getPlanLimits):
       //   .select('*, plans(*)').eq('org_id', orgId).in('status', [...]).order(...).limit(1).maybeSingle()
-      // Count queries (monitors, workspaces, users):
-      //   .select('id', { count: 'exact', head: true }).eq(...)
+      // Count queries (monitors, workspaces, users, reports):
+      //   .select('id', { count: 'exact', head: true }).eq(...)[.gte(...)]
       return {
         select: (_cols: string, opts?: { count?: string; head?: boolean }) => {
           if (opts?.count === 'exact') {
-            // Count query — flat terminal
+            // Count query — supports .eq().gte() chain used by checkAiReportLimit (bug #111)
+            const countTerminal = { count: mockCountResult.count }
             return {
-              eq: () => ({ count: mockCountResult.count }),
+              eq: () => ({
+                ...countTerminal,
+                gte: () => countTerminal,
+                lte: () => countTerminal,
+              }),
+              gte: () => countTerminal,
+              lte: () => countTerminal,
             }
           }
           // Subscription query — full fluent chain
@@ -53,6 +60,7 @@ import {
   checkWorkspaceLimit,
   checkFeatureAccess,
   checkTeamMemberLimit,
+  checkAiReportLimit,
 } from '@/lib/utils/plan-limits'
 
 // ---------------------------------------------------------------------------
@@ -80,6 +88,36 @@ const usageBasedPlan = {
   has_status_page_custom_domain: true,
   has_white_label: true,
   has_voice_calls: true,
+  check_interval_seconds: 30,
+}
+
+// Builder plan — used for bug #111 (AI report limit) and bug #113 (white-label)
+const builderPlan = {
+  monitor_limit: 50,
+  client_workspace_limit: 10,
+  max_team_members: 10,
+  has_api_access: true,
+  has_ai_predictive: true,
+  has_status_page_custom_domain: false,
+  has_white_label: false,
+  has_voice_calls: false,
+  check_interval_seconds: 60,
+  ai_report_limit: 5,
+  competitor_limit: 10,
+  has_email_alerts: true,
+  has_slack_teams: true,
+  has_webhooks: true,
+  has_status_pages: true,
+  status_page_limit: 3,
+  wp_monitor_limit: 5,
+}
+
+// Scale plan — unlimited AI reports and white-label
+const scalePlan = {
+  ...builderPlan,
+  monitor_limit: null,
+  ai_report_limit: -1,
+  has_white_label: true,
   check_interval_seconds: 30,
 }
 
@@ -168,6 +206,19 @@ describe('lib/utils/plan-limits', () => {
       expect(limits.monitors).toBeNull()
       expect(limits.workspaces).toBeNull()
       expect(limits.hasWhiteLabel).toBe(true)
+    })
+
+    it('retains plan limits for past_due subscription (bug #104)', async () => {
+      // past_due means payment failed but Stripe is still retrying.
+      // The org paid for this plan — they must NOT be silently downgraded to Free
+      // while Stripe works through its retry schedule.
+      // This test simulates the DB returning a past_due row (because
+      // .in('status', ['active','cancelling','paused','past_due']) now includes 'past_due').
+      mockSubscriptionResult = { data: { plans: starterPlan }, error: null }
+      const limits = await getPlanLimits('org-past-due')
+      expect(limits.monitors).toBe(10)           // NOT Free default of 3
+      expect(limits.maxTeamMembers).toBe(3)       // plan value, not Free 0
+      expect(limits.checkIntervalSeconds).toBe(300) // plan value, not Free 600
     })
   })
 
@@ -275,12 +326,13 @@ describe('lib/utils/plan-limits', () => {
   // ── checkTeamMemberLimit ────────────────────────────────────────────
 
   describe('checkTeamMemberLimit', () => {
-    it('allows solo owner when team member limit is 0 (Free tier)', async () => {
-      // limit=0 means solo only; owner counts as 1 user
+    it('blocks adding member when limit is 0 (Free tier solo plan)', async () => {
+      // limit=0 means solo plan — no additional members can ever be added.
+      // checkTeamMemberLimit answers "can we add another member?" so limit=0 → false.
       mockSubscriptionResult = { data: null, error: null }
       mockCountResult = { count: 1 }
       const result = await checkTeamMemberLimit('org-solo')
-      expect(result.allowed).toBe(true)
+      expect(result.allowed).toBe(false)
       expect(result.limit).toBe(0)
       expect(result.currentCount).toBe(1)
     })
@@ -320,13 +372,14 @@ describe('lib/utils/plan-limits', () => {
       expect(result.limit).toBe(3)
     })
 
-    it('handles null count as 0', async () => {
+    it('handles null count as 0 (Free tier, still blocked)', async () => {
+      // count=null (no users recorded) treated as 0; limit=0 still blocks new members
       mockSubscriptionResult = { data: null, error: null }
       mockCountResult = { count: null }
       const result = await checkTeamMemberLimit('org-null-count')
-      // count=0 with limit=0: 0 <= 1 is true
-      expect(result.allowed).toBe(true)
+      expect(result.allowed).toBe(false)
       expect(result.currentCount).toBe(0)
+      expect(result.limit).toBe(0)
     })
   })
 
@@ -352,6 +405,93 @@ describe('lib/utils/plan-limits', () => {
       expect(await checkFeatureAccess('org-free', 'hasStatusPageCustomDomain')).toBe(false)
       expect(await checkFeatureAccess('org-free', 'hasWhiteLabel')).toBe(false)
       expect(await checkFeatureAccess('org-free', 'hasVoiceCalls')).toBe(false)
+    })
+
+    it('returns true for hasWhiteLabel on Scale plan (bug #113)', async () => {
+      mockSubscriptionResult = { data: { plans: scalePlan }, error: null }
+      const result = await checkFeatureAccess('org-scale', 'hasWhiteLabel')
+      expect(result).toBe(true)
+    })
+
+    it('returns false for hasWhiteLabel on Builder plan (bug #113)', async () => {
+      mockSubscriptionResult = { data: { plans: builderPlan }, error: null }
+      const result = await checkFeatureAccess('org-builder', 'hasWhiteLabel')
+      expect(result).toBe(false)
+    })
+  })
+
+  // ── checkAiReportLimit ──────────────────────────────────────────────
+  // Bug #111: previously always returned allowed=true; now correctly queries DB.
+
+  describe('checkAiReportLimit', () => {
+    it('blocks immediately when plan has aiReportLimit=0 (Free tier)', async () => {
+      mockSubscriptionResult = { data: null, error: null } // Free defaults: aiReportLimit=0
+      const result = await checkAiReportLimit('org-free')
+      expect(result.allowed).toBe(false)
+      expect(result.currentCount).toBe(0)
+      expect(result.limit).toBe(0)
+    })
+
+    it('allows unlimited reports when aiReportLimit=-1 (Scale plan)', async () => {
+      mockSubscriptionResult = { data: { plans: scalePlan }, error: null } // aiReportLimit=-1
+      const result = await checkAiReportLimit('org-scale')
+      expect(result.allowed).toBe(true)
+      expect(result.limit).toBe(-1)
+    })
+
+    it('allows when current month count is under limit', async () => {
+      mockSubscriptionResult = { data: { plans: builderPlan }, error: null } // aiReportLimit=5
+      mockCountResult = { count: 3 }
+      const result = await checkAiReportLimit('org-builder')
+      expect(result.allowed).toBe(true)
+      expect(result.currentCount).toBe(3)
+      expect(result.limit).toBe(5)
+    })
+
+    it('blocks when current month count equals limit', async () => {
+      mockSubscriptionResult = { data: { plans: builderPlan }, error: null } // aiReportLimit=5
+      mockCountResult = { count: 5 }
+      const result = await checkAiReportLimit('org-builder-full')
+      expect(result.allowed).toBe(false)
+      expect(result.currentCount).toBe(5)
+      expect(result.limit).toBe(5)
+    })
+
+    it('blocks when current month count exceeds limit (corruption scenario)', async () => {
+      mockSubscriptionResult = { data: { plans: builderPlan }, error: null } // aiReportLimit=5
+      mockCountResult = { count: 8 }
+      const result = await checkAiReportLimit('org-builder-over')
+      expect(result.allowed).toBe(false)
+      expect(result.currentCount).toBe(8)
+      expect(result.limit).toBe(5)
+    })
+
+    it('handles null DB count as 0 (first report of month)', async () => {
+      mockSubscriptionResult = { data: { plans: builderPlan }, error: null }
+      mockCountResult = { count: null }
+      const result = await checkAiReportLimit('org-builder-first')
+      expect(result.allowed).toBe(true)
+      expect(result.currentCount).toBe(0)
+      expect(result.limit).toBe(5)
+    })
+
+    it('Scale plan gets unlimited (aiReportLimit=-1) — migration 00104 fix (bug #117)', async () => {
+      // Migration 00036 incorrectly set ai_report_limit=0 for Scale.
+      // Migration 00104 fixes it to -1 (unlimited). This test verifies the -1 path.
+      mockSubscriptionResult = { data: { plans: scalePlan }, error: null } // ai_report_limit: -1
+      const result = await checkAiReportLimit('org-scale')
+      expect(result.allowed).toBe(true)
+      expect(result.limit).toBe(-1)
+      // With aiReportLimit=-1, the DB is NOT queried — short-circuits immediately
+    })
+
+    it('aiReportLimit=0 blocks even if DB count is 0 (Free/Lite — not Scale)', async () => {
+      // Ensures 0 means "feature off" (Free/Lite), not "unlimited" (Scale uses -1)
+      mockSubscriptionResult = { data: null, error: null } // Free defaults: aiReportLimit=0
+      mockCountResult = { count: 0 }
+      const result = await checkAiReportLimit('org-free')
+      expect(result.allowed).toBe(false)
+      expect(result.limit).toBe(0)
     })
   })
 })

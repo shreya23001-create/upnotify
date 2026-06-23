@@ -62,6 +62,30 @@ export async function POST(request: Request): Promise<NextResponse> {
       return NextResponse.json({ error: 'Free plan does not require payment.' }, { status: 400 })
     }
 
+    // Server-side downgrade prevention (V1 billing rule: upgrades only).
+    // Frontend already blocks this, but direct API calls must also be rejected.
+    const PLAN_TIER: Record<string, number> = { free: 0, lite: 1, builder: 2, scale: 3 }
+    const { data: activeSub } = await supabase
+      .from('subscriptions')
+      .select('plans!inner(slug)')
+      .eq('org_id', org.id)
+      .in('status', ['active', 'cancelling', 'past_due'])
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+
+    if (activeSub) {
+      const currentSlug = (activeSub as unknown as { plans: { slug: string } }).plans?.slug ?? ''
+      const currentTier = PLAN_TIER[currentSlug] ?? 0
+      const requestedTier = PLAN_TIER[plan.slug] ?? 0
+      if (requestedTier < currentTier) {
+        return NextResponse.json(
+          { error: 'Plan downgrade is not available. Please contact support if you need to change plans.' },
+          { status: 403 }
+        )
+      }
+    }
+
     const razorpayPlanId = billingCycle === 'annual'
       ? (p.razorpay_annual_plan_id as string | null)
       : (p.razorpay_monthly_plan_id as string | null)
@@ -72,7 +96,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     // ── MOCK MODE — no real Razorpay keys configured ──────────────────────────
     // Returns a fake subscription ID so the frontend can show a test modal.
     // Remove this block once real keys are added.
-    if (isMockMode || !razorpayPlanId) {
+    if (isMockMode) {
       const amountPaise = billingCycle === 'annual'
         ? ((plan as unknown as Record<string, number>).price_annual_inr ?? 0)
         : ((plan as unknown as Record<string, number>).price_monthly_inr ?? 0)
@@ -86,6 +110,15 @@ export async function POST(request: Request): Promise<NextResponse> {
         userEmail: user.email,
         orgName: org.name,
       })
+    }
+
+    if (!razorpayPlanId) {
+      logger.error('Razorpay plan ID not configured', { planSlug, billingCycle })
+      return NextResponse.json({
+        error: billingCycle === 'annual'
+          ? 'Annual billing is not yet available for INR. Please select monthly billing.'
+          : 'Payment plan not configured for this tier. Please contact support.',
+      }, { status: 400 })
     }
 
     // Ensure Razorpay customer exists for this org

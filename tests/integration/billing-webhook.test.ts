@@ -265,13 +265,16 @@ describe('Stripe webhook handler', () => {
 
   // ── invoice.payment_failed ─────────────────────────────────────────
 
-  it('marks subscription as past_due on invoice.payment_failed', async () => {
+  it('marks subscription as past_due on second payment failure (attempt_count=2)', async () => {
+    // Bug #110: past_due only set after attempt_count >= 2 (first retry has also failed).
+    // attempt_count=1 is the initial charge — Stripe may auto-recover it.
     const event = {
       type: 'invoice.payment_failed',
       data: {
         object: {
           subscription: 'sub_123',
           customer: 'cus_456',
+          attempt_count: 2,
         },
       },
     }
@@ -285,6 +288,32 @@ describe('Stripe webhook handler', () => {
     const subUpdate = mockUpdateData.find((d) => d.table === 'subscriptions')
     expect(subUpdate).toBeDefined()
     expect(subUpdate?.data).toEqual({ status: 'past_due' })
+  })
+
+  it('does NOT mark past_due on first payment failure (attempt_count=1)', async () => {
+    // Bug #110: first failure is lenient — transient card issues (3DS, daily limits) can
+    // be recovered by Stripe's retry schedule without disrupting the user's access.
+    const event = {
+      type: 'invoice.payment_failed',
+      data: {
+        object: {
+          subscription: 'sub_123',
+          customer: 'cus_456',
+          attempt_count: 1,
+        },
+      },
+    }
+
+    mockConstructEvent.mockReturnValue(event)
+    mockDbOps['subscriptions'] = createMockChain('subscriptions')
+
+    const response = await POST(makeStripeRequest(event))
+    expect(response.status).toBe(200)
+
+    const subUpdate = mockUpdateData.find(
+      (d) => d.table === 'subscriptions' && d.data.status === 'past_due'
+    )
+    expect(subUpdate).toBeUndefined()
   })
 
   // ── customer.subscription.updated ──────────────────────────────────
