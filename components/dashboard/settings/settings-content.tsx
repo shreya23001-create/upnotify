@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useCallback, useEffect } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { DataTable, type Column, type BulkAction } from '@/components/ui/data-table'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import type { Organisation, User, Subscription, Invoice, ApiKey, Plan, UserCredit, CreditRule, Referral } from '@/lib/types'
@@ -66,19 +66,9 @@ export function SettingsContent({
   cmsTheme = null,
 }: SettingsContentProps): React.ReactElement {
   const searchParams = useSearchParams()
-  const router = useRouter()
   const initialTab = searchParams.get('tab') || 'organisation'
   const [tab, setTab] = useState(initialTab)
   const billingResult = searchParams.get('billing') // 'success' | 'canceled' | null
-
-  // After a successful checkout, the webhook may not have fired yet — auto-refresh
-  // after 4s so the billing tab reflects the new plan without manual reload
-  useEffect(() => {
-    if (billingResult !== 'success') return
-    const t = setTimeout(() => router.refresh(), 4000)
-    return () => clearTimeout(t)
-  }, [billingResult, router])
-
   const [revokeIds, setRevokeIds] = useState<string[]>([])
   const [revokeError, setRevokeError] = useState<string | null>(null)
   const [apiKeyList, setApiKeyList] = useState<ApiKey[]>(apiKeys)

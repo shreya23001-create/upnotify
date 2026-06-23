@@ -55,7 +55,7 @@ const REPORT_TYPE_LABELS: Record<string, string> = {
   'response-trend': 'Response Time Trends',
 }
 
-export function ReportViewer({ report, hasWhiteLabel = false }: { report: Report; hasWhiteLabel?: boolean }): React.ReactElement {
+export function ReportViewer({ report }: { report: Report }): React.ReactElement {
   const data = report.data as unknown as ReportData
   const reportType = data.reportType ?? 'uptime'
   const typeLabel = REPORT_TYPE_LABELS[reportType] ?? 'Report'
@@ -80,7 +80,7 @@ export function ReportViewer({ report, hasWhiteLabel = false }: { report: Report
       </div>
 
       {/* Printable A4 content */}
-      <ReportPrintWrapper title={typeLabel} period={period} generatedAt={report.generated_at} hasWhiteLabel={hasWhiteLabel}>
+      <ReportPrintWrapper title={typeLabel} period={period} generatedAt={report.generated_at}>
 
         <ReportStats data={data} />
 

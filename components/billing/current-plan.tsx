@@ -19,7 +19,6 @@ export function CurrentPlan({ plan, subscription }: Props) {
   const isPaused = sub?.status === 'paused'
   const isCancelling = sub?.status === 'cancelling'
   const isTrialing = sub?.status === 'trialing'
-  const isPastDue = sub?.status === 'past_due'
   const pauseUntil = sub?.pause_until as string | null
   const currentPeriodEnd = sub?.current_period_end as string | null
 
@@ -54,8 +53,8 @@ export function CurrentPlan({ plan, subscription }: Props) {
             <div>
               <div className="stat-label">Current Plan</div>
               <div style={{ fontSize: 20, fontWeight: 700, marginBottom: 4 }}>{plan.name}</div>
-              <span className={`badge ${subscription.status === 'active' ? 'badge-success' : isPaused ? 'badge-warning' : isCancelling ? 'badge-warning' : isPastDue ? 'badge-danger' : 'badge-danger'}`}>
-                {isPaused ? 'Paused' : isCancelling ? 'Cancels at period end' : isPastDue ? 'Payment failed' : subscription.status}
+              <span className={`badge ${subscription.status === 'active' ? 'badge-success' : isPaused ? 'badge-warning' : isCancelling ? 'badge-warning' : 'badge-danger'}`}>
+                {isPaused ? 'Paused' : isCancelling ? 'Cancels at period end' : subscription.status}
               </span>
               <span style={{ marginLeft: 8, fontSize: 14, color: '#94a3b8', textTransform: 'capitalize' }}>
                 {subscription.billing_cycle}
@@ -70,12 +69,7 @@ export function CurrentPlan({ plan, subscription }: Props) {
                   Access until {new Date(currentPeriodEnd).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}, then moves to Free plan.
                 </p>
               )}
-              {isPastDue && (
-                <p style={{ fontSize: 13, color: '#ef4444', marginTop: 8, fontWeight: 500 }}>
-                  Your last payment failed. Update your payment method to keep your monitors running.
-                </p>
-              )}
-              {!isPaused && !isCancelling && !isPastDue && subscription.current_period_end && (
+              {!isPaused && !isCancelling && subscription.current_period_end && (
                 <p style={{ fontSize: 13, color: '#94a3b8', marginTop: 8 }}>
                   Next billing: {new Date(subscription.current_period_end).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
                 </p>

@@ -6,13 +6,12 @@ import type { Subscription, Invoice, Plan } from '@/lib/types'
 export async function getSubscription(orgId: string): Promise<Subscription | null> {
   const supabase = await createClient()
 
-  // Active, cancelling, paused, or past_due — all need to surface in the billing UI
-  // past_due: Stripe payment failed; user needs to see their sub to access the portal
+  // Active or cancelling (paid until period end) — show either
   const { data: active, error: activeErr } = await supabase
     .from('subscriptions')
     .select('*')
     .eq('org_id', orgId)
-    .in('status', ['active', 'cancelling', 'paused', 'past_due'])
+    .in('status', ['active', 'cancelling', 'paused'])
     .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle()

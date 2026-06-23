@@ -28,15 +28,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       )
     }
 
-    // Compete is Builder+ only per KB
-    const COMPETE_ELIGIBLE_SLUGS = ['builder', 'scale']
-    if (!COMPETE_ELIGIBLE_SLUGS.includes(baseSub.plan.slug)) {
-      return NextResponse.json(
-        { error: 'Compete is available on the Builder plan and above. Upgrade your base plan first.' },
-        { status: 403 }
-      )
-    }
-
     // Check not already subscribed to Compete
     const existingCompete = await getCompeteSubscription(user.org_id)
     if (existingCompete) {

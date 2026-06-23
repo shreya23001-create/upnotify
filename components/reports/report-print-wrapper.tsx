@@ -4,11 +4,10 @@ interface ReportPrintWrapperProps {
   title: string
   period: string
   generatedAt: string
-  hasWhiteLabel?: boolean
   children: React.ReactNode
 }
 
-export function ReportPrintWrapper({ title, period, generatedAt, hasWhiteLabel = false, children }: ReportPrintWrapperProps): React.ReactElement {
+export function ReportPrintWrapper({ title, period, generatedAt, children }: ReportPrintWrapperProps): React.ReactElement {
   const formatted = new Date(generatedAt).toLocaleDateString('en-GB', {
     day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit',
   })
@@ -45,9 +44,7 @@ export function ReportPrintWrapper({ title, period, generatedAt, hasWhiteLabel =
         {/* Footer */}
         <div className="report-page-footer">
           <span>Generated {formatted}</span>
-          {!hasWhiteLabel && (
-            <span style={{ fontWeight: 500 }}>Powered by Uptrue · uptrue.io</span>
-          )}
+          <span style={{ fontWeight: 500 }}>Powered by Uptrue · uptrue.io</span>
         </div>
       </div>
     </div>

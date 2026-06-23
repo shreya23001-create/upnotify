@@ -74,7 +74,7 @@ export async function GET(req: Request): Promise<NextResponse> {
       supabase.from('alert_channels').select('org_id').eq('is_enabled', true),
       supabase.from('status_pages').select('org_id'),
       supabase.from('subscriptions').select('org_id, status, plans(slug, monitor_limit)').eq('status', 'active'),
-      supabase.from('invoices').select('org_id, amount_gbp, currency').eq('status', 'paid'),
+      supabase.from('invoices').select('org_id, amount_gbp').eq('status', 'paid'),
       supabase.from('audit_log').select('org_id').eq('action', 'monitor.created').gte('created_at', thirtyDaysAgo),
       supabase.from('incidents').select('org_id').is('resolved_at', null),
     ])
@@ -116,14 +116,11 @@ export async function GET(req: Request): Promise<NextResponse> {
       subByOrg.set(s.org_id, s)
     }
 
-    type InvRow = { org_id: string; amount_gbp: number; currency: string }
+    type InvRow = { org_id: string; amount_gbp: number }
     const invoicesByOrg = new Map<string, { totalPence: number; count: number }>()
     for (const inv of (invoicesRaw ?? []) as InvRow[]) {
       const e = invoicesByOrg.get(inv.org_id) ?? { totalPence: 0, count: 0 }
-      // INR invoices store paise — skip them here so the GBP-calibrated financial score isn't inflated
-      if ((inv.currency ?? 'gbp').toLowerCase() !== 'inr') {
-        e.totalPence += inv.amount_gbp ?? 0
-      }
+      e.totalPence += inv.amount_gbp ?? 0
       e.count++
       invoicesByOrg.set(inv.org_id, e)
     }

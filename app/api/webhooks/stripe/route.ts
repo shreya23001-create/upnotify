@@ -298,24 +298,15 @@ async function handleInvoicePaymentFailed(
   const supabase = createAdminClient()
   const invoice = invoiceObj as unknown as Record<string, unknown>
   const subId = (invoice.subscription as string | null) ?? null
-  const attemptCount = (invoice.attempt_count as number | null) ?? 1
 
   if (subId) {
-    // Only mark past_due after the first RETRY has also failed (attempt_count >= 2).
-    // attempt_count === 1 is the initial charge attempt — Stripe will retry automatically.
-    // Downgrading on attempt 1 would punish users for transient card issues (e.g. 3DS,
-    // daily limit) before Stripe has had a chance to recover the payment.
-    if (attemptCount >= 2) {
-      await supabase
-        .from('subscriptions')
-        .update({ status: 'past_due' })
-        .eq('stripe_subscription_id', subId)
-    }
+    await supabase
+      .from('subscriptions')
+      .update({ status: 'past_due' })
+      .eq('stripe_subscription_id', subId)
 
     logger.warn('Subscription payment failed', {
       subscriptionId: subId,
-      attemptCount,
-      markedPastDue: attemptCount >= 2,
     })
 
     // Look up org for the audit log row.
@@ -424,13 +415,6 @@ async function handleSubscriptionUpdated(
           source: 'stripe_webhook',
         },
       })
-
-      // Safety net: enforce Free limits when status transitions to canceled.
-      // subscription.deleted fires separately and also enforces, but if that event
-      // fails to process the org would keep active monitors indefinitely.
-      if (finalStatus === 'canceled') {
-        await enforceDowngradeLimits(subRow.org_id)
-      }
     }
   }
 }

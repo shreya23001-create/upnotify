@@ -3,7 +3,6 @@ import type { Metadata } from 'next'
 import { getStatusPageBySlug, getUptimePercentage } from '@/lib/db/status-pages'
 import { getUptimeBarDataForRange } from '@/lib/db/check-results'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { getPlanLimits } from '@/lib/utils/plan-limits'
 import { StatusOverallBanner } from '@/components/status-page/status-overall-banner'
 import { StatusMonitorRow } from '@/components/status-page/status-monitor-row'
 import { StatusIncidentList } from '@/components/status-page/status-incident-list'
@@ -56,14 +55,13 @@ export default async function PublicStatusPage({
   const supabase = createAdminClient()
 
   let orgLogoUrl: string | null = null
-  let hasWhiteLabel = false
   if (statusPage.org_id) {
-    const [orgResult, planLimits] = await Promise.all([
-      supabase.from('organisations').select('logo_url').eq('id', statusPage.org_id).single(),
-      getPlanLimits(statusPage.org_id),
-    ])
-    orgLogoUrl = orgResult.data?.logo_url ?? null
-    hasWhiteLabel = planLimits.hasWhiteLabel
+    const { data: org } = await supabase
+      .from('organisations')
+      .select('logo_url')
+      .eq('id', statusPage.org_id)
+      .single()
+    orgLogoUrl = org?.logo_url ?? null
   }
 
   const monitorIds = (statusPage.monitor_ids || []) as string[]
@@ -112,11 +110,9 @@ export default async function PublicStatusPage({
           {statusPage.name} — Status
         </div>
         <div className="sp-nav-right">
-          {!hasWhiteLabel && (
-            <a href="https://uptrue.io" target="_blank" rel="noopener noreferrer" className="sp-nav-powered">
-              Powered by <span className="sp-nav-powered-brand">Uptrue</span>
-            </a>
-          )}
+          <a href="https://uptrue.io" target="_blank" rel="noopener noreferrer" className="sp-nav-powered">
+            Powered by <span className="sp-nav-powered-brand">Uptrue</span>
+          </a>
           <div className={`sp-nav-status ${anyDown ? 'down' : openIncidents.length > 0 ? 'warn' : 'up'}`}>
             <div className={`sp-nav-dot${anyDown || openIncidents.length > 0 ? ' pulse' : ''}`} />
             {navStatusText}
@@ -201,15 +197,13 @@ export default async function PublicStatusPage({
         <StatusSubscribeForm statusPageId={statusPage.id} />
 
         {/* Footer */}
-        {!hasWhiteLabel && (
-          <div className="sp-footer">
-            <div className="sp-footer-text">
-              Powered by <span className="sp-footer-brand">Uptrue</span>{' \u00b7 '}
-              <a href="/privacy">Privacy</a>{' \u00b7 '}
-              <a href="https://uptrue.io" target="_blank" rel="noopener noreferrer">uptrue.io</a>
-            </div>
+        <div className="sp-footer">
+          <div className="sp-footer-text">
+            Powered by <span className="sp-footer-brand">Uptrue</span>{' \u00b7 '}
+            <a href="/privacy">Privacy</a>{' \u00b7 '}
+            <a href="https://uptrue.io" target="_blank" rel="noopener noreferrer">uptrue.io</a>
           </div>
-        )}
+        </div>
 
       </div>
     </div>

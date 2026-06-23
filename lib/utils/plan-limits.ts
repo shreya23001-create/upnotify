@@ -73,14 +73,12 @@ function extractLimits(plan: Record<string, unknown>): PlanLimits {
 export async function getPlanLimits(orgId: string): Promise<PlanLimits> {
   const supabase = createAdminClient()
 
-  // Active, cancelling (paid until period end), paused, or past_due all retain plan limits.
-  // past_due means payment failed but Stripe is still retrying — the user paid for this plan
-  // and should not be silently downgraded to FREE while Stripe works through its retry schedule.
+  // Active, cancelling (paid until period end), or paused — all retain plan limits
   const { data: sub } = await supabase
     .from('subscriptions')
     .select('*, plans(*)')
     .eq('org_id', orgId)
-    .in('status', ['active', 'cancelling', 'paused', 'past_due'])
+    .in('status', ['active', 'cancelling', 'paused'])
     .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle()
@@ -209,32 +207,17 @@ export async function checkAiReportLimit(orgId: string): Promise<{
   currentCount: number
   limit: number
 }> {
-  const supabase = createAdminClient()
   const limits = await getPlanLimits(orgId)
-
-  if (limits.aiReportLimit === 0) {
+  if (!limits.hasAiPredictive && limits.aiReportLimit === 0) {
     return { allowed: false, currentCount: 0, limit: 0 }
   }
-  if (limits.aiReportLimit === -1) {
-    return { allowed: true, currentCount: 0, limit: -1 } // unlimited
+  if (limits.aiReportLimit === 0) {
+    return { allowed: true, currentCount: 0, limit: 0 } // unlimited
   }
 
-  const startOfMonth = new Date()
-  startOfMonth.setDate(1)
-  startOfMonth.setHours(0, 0, 0, 0)
-
-  const { count } = await supabase
-    .from('reports')
-    .select('id', { count: 'exact', head: true })
-    .eq('org_id', orgId)
-    .gte('generated_at', startOfMonth.toISOString())
-
-  const currentCount = count ?? 0
-  return {
-    allowed: currentCount < limits.aiReportLimit,
-    currentCount,
-    limit: limits.aiReportLimit,
-  }
+  // Count reports generated this month (would need a reports table query)
+  // For now, allow if the feature is enabled
+  return { allowed: true, currentCount: 0, limit: limits.aiReportLimit }
 }
 
 /** Check if an alert channel type is allowed for this org's plan */
@@ -371,9 +354,9 @@ export async function checkTeamMemberLimit(orgId: string): Promise<{
 
   const currentCount = count ?? 0
   const limit = limits.maxTeamMembers
-  // limit of 0 means solo account — no additional members allowed beyond the owner
-  // We count all users including owner, so for limit > 0 allowed = currentCount < limit + 1
-  const allowed = limit === 0 ? false : currentCount < limit + 1
+  // limit of 0 means solo account (owner only, no additional members)
+  // We count all users including owner, so allowed if currentCount < limit + 1 (owner)
+  const allowed = limit === 0 ? currentCount <= 1 : currentCount < limit + 1
 
   return { allowed, currentCount, limit }
 }

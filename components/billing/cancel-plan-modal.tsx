@@ -9,7 +9,6 @@ interface CancelPlanModalProps {
   pauseUntil?: string | null
   onClose: () => void
   onComplete: () => void
-  cancelProvider?: 'stripe' | 'razorpay'
 }
 
 const REASONS = [
@@ -24,7 +23,7 @@ const REASONS = [
 
 type Step = 'reason' | 'confirm_cancel' | 'processing' | 'done'
 
-export function CancelPlanModal({ planName, isOpen, isPaused, pauseUntil, onClose, onComplete, cancelProvider = 'stripe' }: CancelPlanModalProps): React.ReactElement | null {
+export function CancelPlanModal({ planName, isOpen, isPaused, pauseUntil, onClose, onComplete }: CancelPlanModalProps): React.ReactElement | null {
   const [step, setStep] = useState<Step>('reason')
   const [reason, setReason] = useState('')
   const [detail, setDetail] = useState('')
@@ -64,18 +63,18 @@ export function CancelPlanModal({ planName, isOpen, isPaused, pauseUntil, onClos
     setStep('processing')
     setError(null)
     try {
-      const res = cancelProvider === 'razorpay'
-        ? await fetch('/api/v1/billing/razorpay/cancel', { method: 'POST', headers: { 'Content-Type': 'application/json' } })
-        : await fetch('/api/v1/billing/cancel', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'cancel', reason, reasonDetail: detail || undefined }),
-          })
+      const res = await fetch('/api/v1/billing/cancel', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'cancel', reason, reasonDetail: detail || undefined }),
+      })
       const data = await res.json() as { success?: boolean; error?: string; cancelAt?: string }
       if (data.success) {
+        // Hard redirect — guarantees fresh server-side data on the billing tab
         window.location.href = '/dashboard/settings?tab=billing&billing=cancelled'
       } else {
         const msg = data.error ?? 'Something went wrong. Please try again.'
+        // Surface a friendlier message when no payment provider is linked (e.g. test/mock subscriptions)
         setError(msg.includes('no payment provider')
           ? 'Your subscription cannot be cancelled automatically. Please contact support@uptrue.io.'
           : msg
@@ -120,8 +119,8 @@ export function CancelPlanModal({ planName, isOpen, isPaused, pauseUntil, onClos
           </div>
         )}
 
-        {/* Resume UI for paused subscriptions — Stripe only (Razorpay has no pause concept) */}
-        {step === 'reason' && isPaused && cancelProvider !== 'razorpay' && (
+        {/* Resume UI for paused subscriptions */}
+        {step === 'reason' && isPaused && (
           <div>
             <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>Subscription Paused</h2>
             <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.7, marginBottom: 16 }}>
@@ -139,7 +138,7 @@ export function CancelPlanModal({ planName, isOpen, isPaused, pauseUntil, onClos
         )}
 
         {/* Step 1: Select reason */}
-        {step === 'reason' && (!isPaused || cancelProvider === 'razorpay') && (
+        {step === 'reason' && !isPaused && (
           <div>
             <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>Cancel {planName} Plan</h2>
             <p style={{ fontSize: 14, color: 'var(--text-secondary)', marginBottom: 16 }}>
