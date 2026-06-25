@@ -328,6 +328,20 @@ export function SettingsContent({
 
       {tab === 'api-keys' && (
         <div>
+          {/* Plan gate — API access requires a paid plan */}
+          {!currentPlan?.has_api_access && (
+            <div className="card" style={{ marginBottom: 20 }}>
+              <div className="card-content" style={{ textAlign: 'center', padding: '40px 24px' }}>
+                <div style={{ fontSize: 32, marginBottom: 12 }}>🔒</div>
+                <div className="card-title" style={{ marginBottom: 8 }}>API access requires a paid plan</div>
+                <p style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: 20, maxWidth: 480, margin: '0 auto 20px' }}>
+                  Upgrade to create API keys and integrate Uptrue with your tools and workflows.
+                </p>
+                <a href="/dashboard/settings?tab=billing" className="btn btn-primary btn-sm">Upgrade plan</a>
+              </div>
+            </div>
+          )}
+
           {/* Show-once new key modal */}
           {newKeyResult && (
             <div className="api-key-reveal-overlay">
@@ -367,12 +381,14 @@ export function SettingsContent({
                   Used to authenticate with the Uptrue API and Compete webhooks. Keys are only shown once.
                 </p>
               </div>
-              <button
-                className="btn btn-primary btn-sm"
-                onClick={() => { setShowCreateForm(f => !f); setCreateError(null) }}
-              >
-                {showCreateForm ? 'Cancel' : '+ Create Key'}
-              </button>
+              {currentPlan?.has_api_access && (
+                <button
+                  className="btn btn-primary btn-sm"
+                  onClick={() => { setShowCreateForm(f => !f); setCreateError(null) }}
+                >
+                  {showCreateForm ? 'Cancel' : '+ Create Key'}
+                </button>
+              )}
             </div>
             <div className="card-content">
               {showCreateForm && (

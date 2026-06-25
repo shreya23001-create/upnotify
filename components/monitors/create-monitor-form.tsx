@@ -56,6 +56,7 @@ export function CreateMonitorForm({ minCheckInterval = 600, defaultType = 'http'
   const [target, setTarget] = useState('')
   const [positiveKeywords, setPositiveKeywords] = useState<string[]>([])
   const [negativeKeywords, setNegativeKeywords] = useState<string[]>([])
+  const [ignoreWhitespace, setIgnoreWhitespace] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 
@@ -99,6 +100,9 @@ export function CreateMonitorForm({ minCheckInterval = 600, defaultType = 'http'
     if (type === 'keyword') {
       formData.set('positiveKeywords', JSON.stringify(positiveKeywords))
       formData.set('negativeKeywords', JSON.stringify(negativeKeywords))
+    }
+    if (type === 'competitor') {
+      formData.set('ignoreWhitespace', String(ignoreWhitespace))
     }
     startTransition(async () => {
       const result = await createMonitorAction(formData)
@@ -156,8 +160,8 @@ export function CreateMonitorForm({ minCheckInterval = 600, defaultType = 'http'
               required
               placeholder={
                 type === 'keyword' ? 'https://yoursite.com/checkout'
-                  : type === 'http' || type === 'ssl' || type === 'api' || type === 'competitor' || type === 'ping' ? 'https://example.com'
-                  : type === 'dns' || type === 'domain' ? 'example.com'
+                  : type === 'http' || type === 'ssl' || type === 'api' || type === 'competitor' || type === 'ping' || type === 'robots-txt' || type === 'security-headers' || type === 'response-time' || type === 'sitemap' || type === 'redirect-chain' || type === 'page-size' || type === 'cookie-consent' ? 'https://example.com'
+                  : type === 'dns' || type === 'domain' || type === 'ip-change' || type === 'mx-health' || type === 'whois-change' || type === 'spf-dmarc' || type === 'blacklist' || type === 'nameserver-change' ? 'example.com'
                   : type === 'port' ? 'example.com:3306'
                   : 'my-cron-job'
               }
@@ -280,6 +284,23 @@ export function CreateMonitorForm({ minCheckInterval = 600, defaultType = 'http'
                 <input className="form-input" id="headers" name="headers" placeholder='{"Authorization": "Bearer ..."}' disabled={isPending} />
               </div>
             </>
+          )}
+
+          {type === 'competitor' && (
+            <div className="form-group">
+              <label className="form-label form-label-toggle" htmlFor="ignoreWhitespace">
+                <span>Ignore Whitespace</span>
+                <input
+                  type="checkbox"
+                  id="ignoreWhitespace"
+                  checked={ignoreWhitespace}
+                  onChange={e => setIgnoreWhitespace(e.target.checked)}
+                  disabled={isPending}
+                  className="form-toggle-input"
+                />
+              </label>
+              <span className="form-hint">When ON, changes to spaces, tabs, and line breaks are ignored — only meaningful content changes trigger alerts.</span>
+            </div>
           )}
 
           <div className="form-actions">

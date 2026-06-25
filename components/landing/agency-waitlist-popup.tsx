@@ -47,7 +47,20 @@ export function AgencyWaitlistPopup({ isOpen, onClose }: AgencyWaitlistPopupProp
   const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault()
     if (!name.trim() || !email.trim() || !businessName.trim()) {
-      setResult({ type: 'error', text: 'Please fill in all required fields.' })
+      setResult({ type: 'error', text: 'Please fill in all required fields (Name, Email, Business Name).' })
+      return
+    }
+    if (website.trim()) {
+      try {
+        const parsed = new URL(website.trim().startsWith('http') ? website.trim() : `https://${website.trim()}`)
+        if (!['http:', 'https:'].includes(parsed.protocol)) throw new Error()
+      } catch {
+        setResult({ type: 'error', text: 'Please enter a valid website URL (e.g. https://agency.com).' })
+        return
+      }
+    }
+    if (phoneNumber.trim() && !/^\d[\d\s\-]{5,14}$/.test(phoneNumber.trim())) {
+      setResult({ type: 'error', text: 'Please enter a valid phone number (digits only).' })
       return
     }
 
