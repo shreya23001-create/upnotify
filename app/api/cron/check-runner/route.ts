@@ -209,9 +209,9 @@ export async function GET(request: Request): Promise<NextResponse> {
                 title: incidentTitle,
                 severity: monitor.severity,
               })
-              logger.warn('Monitor confirmed down, incident created', { monitorId: monitor.id, name: monitor.name })
 
               if (newIncident) {
+                logger.warn('Monitor confirmed down, incident created', { monitorId: monitor.id, name: monitor.name })
                 // Flap suppression: record the incident but skip the alert/email
                 // if this monitor is opening incidents too frequently.
                 const recentIncidents = await countRecentIncidentsForMonitor(monitor.id, FLAP_SUPPRESS_WINDOW_MIN)
@@ -220,6 +220,8 @@ export async function GET(request: Request): Promise<NextResponse> {
                 } else {
                   await dispatchAlerts(newIncident, monitor)
                 }
+              } else {
+                logger.error('createIncident returned null — alert not dispatched', { monitorId: monitor.id, name: monitor.name })
               }
             }
 
