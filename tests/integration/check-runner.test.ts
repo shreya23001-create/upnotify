@@ -25,11 +25,13 @@ vi.mock('@/lib/db/check-results', () => ({
 const mockCreateIncident = vi.fn()
 const mockResolveIncident = vi.fn()
 const mockGetOpenIncidentForMonitor = vi.fn()
+const mockCountRecentIncidents = vi.fn()
 
 vi.mock('@/lib/db/incidents', () => ({
   createIncident: (...args: unknown[]) => mockCreateIncident(...args),
   resolveIncident: (...args: unknown[]) => mockResolveIncident(...args),
   getOpenIncidentForMonitor: (...args: unknown[]) => mockGetOpenIncidentForMonitor(...args),
+  countRecentIncidentsForMonitor: (...args: unknown[]) => mockCountRecentIncidents(...args),
 }))
 
 // engineering-app#58 — the check-runner used to call isMonitorInMaintenance
@@ -155,6 +157,7 @@ describe('check-runner cron route', () => {
     mockDispatchAlerts.mockResolvedValue(undefined)
     mockDispatchRecoveryAlerts.mockResolvedValue(undefined)
     mockIncrementFlapCount.mockResolvedValue(undefined)
+    mockCountRecentIncidents.mockResolvedValue(0) // below flap threshold — recovery alerts go out
   })
 
   // ── Auth ───────────────────────────────────────────────────────────
@@ -236,69 +239,87 @@ describe('check-runner cron route', () => {
 
   // ── Two-confirmation flow ─────────────────────────────────────────
 
-  it('confirms down with second check and creates incident', { timeout: 15000 }, async () => {
-    const monitor = makeMonitor()
-    mockGetDueMonitors.mockResolvedValue([monitor])
-    // First check: down. Confirmation check: also down.
-    mockDispatchChecker
-      .mockResolvedValueOnce(downResult())
-      .mockResolvedValueOnce(downResult())
-    const incident = { id: 'inc-001', org_id: 'org-001', title: 'Test Monitor is down', severity: 'high' }
-    mockCreateIncident.mockResolvedValue(incident)
+  it('confirms down with second check and creates incident', async () => {
+    vi.useFakeTimers()
+    try {
+      const monitor = makeMonitor()
+      mockGetDueMonitors.mockResolvedValue([monitor])
+      mockDispatchChecker
+        .mockResolvedValueOnce(downResult())
+        .mockResolvedValueOnce(downResult())
+      const incident = { id: 'inc-001', org_id: 'org-001', title: 'Test Monitor is down', severity: 'high' }
+      mockCreateIncident.mockResolvedValue(incident)
 
-    const response = await GET(makeRequest())
-    const body = await response.json()
+      const responsePromise = GET(makeRequest())
+      await vi.advanceTimersByTimeAsync(31_000) // skip 30s confirmation delay
+      const response = await responsePromise
+      const body = await response.json()
 
-    expect(body.ok).toBe(true)
-    expect(mockDispatchChecker).toHaveBeenCalledTimes(2)
-    expect(mockCreateIncident).toHaveBeenCalledWith(
-      expect.objectContaining({
-        org_id: 'org-001',
-        monitor_id: 'mon-001',
-        title: 'Test Monitor is not responding',
-        severity: 'high',
-      })
-    )
-    expect(mockDispatchAlerts).toHaveBeenCalledWith(incident, expect.anything())
-    expect(mockUpdateMonitorStatus).toHaveBeenCalledWith(
-      'mon-001',
-      expect.objectContaining({ status: 'down' })
-    )
+      expect(body.ok).toBe(true)
+      expect(mockDispatchChecker).toHaveBeenCalledTimes(2)
+      expect(mockCreateIncident).toHaveBeenCalledWith(
+        expect.objectContaining({
+          org_id: 'org-001',
+          monitor_id: 'mon-001',
+          title: 'Test Monitor is not responding',
+          severity: 'high',
+        })
+      )
+      expect(mockDispatchAlerts).toHaveBeenCalledWith(incident, expect.anything())
+      expect(mockUpdateMonitorStatus).toHaveBeenCalledWith(
+        'mon-001',
+        expect.objectContaining({ status: 'down' })
+      )
+    } finally {
+      vi.useRealTimers()
+    }
   })
 
-  it('does not create a duplicate incident if one is already open', { timeout: 15000 }, async () => {
-    const monitor = makeMonitor({ status: 'down' })
-    mockGetDueMonitors.mockResolvedValue([monitor])
-    mockDispatchChecker
-      .mockResolvedValueOnce(downResult())
-      .mockResolvedValueOnce(downResult())
-    // Existing open incident
-    mockGetOpenIncidentForMonitor.mockResolvedValue({ id: 'inc-existing' })
+  it('does not create a duplicate incident if one is already open', async () => {
+    vi.useFakeTimers()
+    try {
+      const monitor = makeMonitor({ status: 'down' })
+      mockGetDueMonitors.mockResolvedValue([monitor])
+      mockDispatchChecker
+        .mockResolvedValueOnce(downResult())
+        .mockResolvedValueOnce(downResult())
+      mockGetOpenIncidentForMonitor.mockResolvedValue({ id: 'inc-existing' })
 
-    await GET(makeRequest())
+      const responsePromise = GET(makeRequest())
+      await vi.advanceTimersByTimeAsync(31_000)
+      await responsePromise
 
-    expect(mockCreateIncident).not.toHaveBeenCalled()
-    expect(mockDispatchAlerts).not.toHaveBeenCalled()
+      expect(mockCreateIncident).not.toHaveBeenCalled()
+      expect(mockDispatchAlerts).not.toHaveBeenCalled()
+    } finally {
+      vi.useRealTimers()
+    }
   })
 
   // ── Flap detection ────────────────────────────────────────────────
 
-  it('detects a flap when first check is down but confirmation is up', { timeout: 15000 }, async () => {
-    const monitor = makeMonitor()
-    mockGetDueMonitors.mockResolvedValue([monitor])
-    // First check: down. Confirmation: back up.
-    mockDispatchChecker
-      .mockResolvedValueOnce(downResult())
-      .mockResolvedValueOnce(upResult())
+  it('detects a flap when first check is down but confirmation is up', async () => {
+    vi.useFakeTimers()
+    try {
+      const monitor = makeMonitor()
+      mockGetDueMonitors.mockResolvedValue([monitor])
+      mockDispatchChecker
+        .mockResolvedValueOnce(downResult())
+        .mockResolvedValueOnce(upResult())
 
-    await GET(makeRequest())
+      const responsePromise = GET(makeRequest())
+      await vi.advanceTimersByTimeAsync(31_000)
+      await responsePromise
 
-    expect(mockIncrementFlapCount).toHaveBeenCalledWith('mon-001')
-    expect(mockCreateIncident).not.toHaveBeenCalled()
-    expect(mockUpdateMonitorStatus).toHaveBeenCalledWith(
-      'mon-001',
-      expect.objectContaining({ status: 'up' })
-    )
+      expect(mockIncrementFlapCount).toHaveBeenCalledWith('mon-001')
+      expect(mockCreateIncident).not.toHaveBeenCalled()
+      expect(mockUpdateMonitorStatus).toHaveBeenCalledWith(
+        'mon-001',
+        expect.objectContaining({ status: 'up' })
+      )
+    } finally {
+      vi.useRealTimers()
+    }
   })
 
   // ── Recovery flow ─────────────────────────────────────────────────
