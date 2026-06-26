@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: {
-    template: '%s | Uptrue Leaderboard',
+    template: '%s',
     default: 'Uptime Leaderboard — Most Reliable Websites | Uptrue',
   },
   description:

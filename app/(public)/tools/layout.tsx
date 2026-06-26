@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: {
-    template: '%s | Uptrue Tools',
+    template: '%s',
     default: 'Free Website Monitoring Tools | Uptrue',
   },
   description:
