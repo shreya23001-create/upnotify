@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: {
-    template: '%s | Uptrue Tracker',
+    template: '%s',
     default: 'Website Status Tracker | Uptrue',
   },
   description: 'Real-time uptime monitoring for popular websites and services. Check if sites are down right now.',

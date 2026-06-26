@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://uptrue.io"),
   title: {
     default: "Uptrue — Uptime Monitoring for Agencies & Teams",
-    template: "%s | Uptrue",
+    template: "%s",
   },
   description:
     "Monitor uptime, performance and infrastructure across all your sites. 10 monitor types, AI-powered reports, public status pages, multi-channel alerts, and agency white-label — all in one platform.",
