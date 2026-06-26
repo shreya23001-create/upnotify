@@ -254,6 +254,7 @@ export async function getAllIncidentsByOrgPaged(
     .select('*, monitors(name)', { count: 'exact' })
     .eq('org_id', orgId)
     .order('started_at', { ascending: false })
+    .order('id', { ascending: false })
     .range(from, to)
 
   if (statusFilter === 'open') query = query.neq('status', 'resolved')

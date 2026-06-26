@@ -15,6 +15,8 @@ export interface SiteInfo {
   users: string
   statusPageUrl: string | null
   alternatives: string[]
+  seoTitle?: string
+  seoDescription?: string
 }
 
 export const SITE_INFO: Record<string, SiteInfo> = {
@@ -838,6 +840,8 @@ export const SITE_INFO: Record<string, SiteInfo> = {
     users: '150,000+ companies',
     statusPageUrl: 'https://status.salesforce.com/',
     alternatives: ['hubspot.com', 'zendesk.com'],
+    seoTitle: 'Is Salesforce (SFDC) Down? Live Status & Uptime | Uptrue',
+    seoDescription: 'Check if Salesforce is down right now. Real-time SFDC status, uptime history, response time and instant alerts. Monitor Salesforce with Uptrue — free.',
   },
   'zendesk.com': {
     name: 'Zendesk',
