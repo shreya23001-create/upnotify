@@ -131,7 +131,7 @@ export default function AiSeoCheckerPage(): React.ReactElement {
             trust signals, and schema. Fix what is blocking your AI search presence. Free, no signup.
           </p>
           <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: 'var(--space-2)' }}>
-            <time dateTime={new Date().toISOString().split('T')[0]}>
+            <time dateTime={new Date().toISOString().split('T')[0]} suppressHydrationWarning>
               Updated {new Date().toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}
             </time>
             {' '}· Published by the{' '}
