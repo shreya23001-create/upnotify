@@ -19,6 +19,11 @@ vi.mock('@/lib/services/webhook', () => ({
   sendWebhookAlert: (...args: unknown[]) => mockSendWebhookAlert(...args),
 }))
 
+const mockSendTelegramAlert = vi.fn()
+vi.mock('@/lib/services/telegram', () => ({
+  sendTelegramAlert: (...args: unknown[]) => mockSendTelegramAlert(...args),
+}))
+
 const mockSupabaseFrom = vi.fn()
 const mockSupabaseSelect = vi.fn()
 const mockSupabaseInsert = vi.fn()
@@ -183,6 +188,30 @@ function makeWebhookChannel(secret?: string): Record<string, unknown> {
       webhookUrl: 'https://hooks.example.com/uptrue',
       ...(secret && { webhookSecret: secret }),
     },
+  }
+}
+
+function makeTelegramChannel(): Record<string, unknown> {
+  return {
+    id: 'ch-telegram',
+    org_id: 'org-001',
+    type: 'telegram',
+    name: 'Telegram Alert',
+    is_enabled: true,
+    severity_filter: ['high', 'critical'],
+    config: { telegramChatId: '6263919448' },
+  }
+}
+
+function makeTeamsChannel(): Record<string, unknown> {
+  return {
+    id: 'ch-teams',
+    org_id: 'org-001',
+    type: 'teams',
+    name: 'Teams Alert',
+    is_enabled: true,
+    severity_filter: ['high', 'critical'],
+    config: { teamsWebhookUrl: 'https://prod-xx.westus.logic.azure.com/workflows/test' },
   }
 }
 
@@ -377,5 +406,189 @@ describe('alert-dispatcher', () => {
     await dispatchAlerts(makeIncident() as never, makeMonitor() as never)
 
     expect(mockSendSlackAlert).toHaveBeenCalledTimes(1)
+  })
+
+  // ── AL05: Alert fires when monitor goes DOWN ───────────────────────
+
+  it('AL05: fires alert when incident status is open (monitor DOWN)', async () => {
+    mockChannelsData = [makeEmailChannel()]
+    mockSendAlertEmail.mockResolvedValue({ success: true })
+
+    const incident = makeIncident({ status: 'open', severity: 'high' })
+    const monitor = makeMonitor({ status: 'down' })
+    await dispatchAlerts(incident as never, monitor as never)
+
+    expect(mockSendAlertEmail).toHaveBeenCalledTimes(1)
+    expect(mockSupabaseInsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        status: 'sent',
+        incident_id: 'inc-001',
+      })
+    )
+  })
+
+  it('AL05: alert is recorded as failed when email send fails on DOWN', async () => {
+    mockChannelsData = [makeEmailChannel()]
+    mockSendAlertEmail.mockResolvedValue({ success: false, error: 'SMTP error' })
+
+    await dispatchAlerts(makeIncident({ status: 'open' }) as never, makeMonitor({ status: 'down' }) as never)
+
+    expect(mockSupabaseInsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        status: 'failed',
+        error_message: 'SMTP error',
+      })
+    )
+  })
+
+  // ── AL06: Recovery alert fires when monitor comes back UP ─────────
+
+  it('AL06: fires recovery alert when incident is resolved (monitor UP)', async () => {
+    mockChannelsData = [makeEmailChannel()]
+    mockSendAlertEmail.mockResolvedValue({ success: true })
+
+    const resolvedIncident = makeIncident({
+      status: 'resolved',
+      severity: 'high',
+      resolved_at: '2026-04-01T10:15:00Z',
+    })
+    const monitor = makeMonitor({ status: 'up' })
+    await dispatchRecoveryAlerts(resolvedIncident as never, monitor as never)
+
+    expect(mockSendAlertEmail).toHaveBeenCalledTimes(1)
+    expect(mockSupabaseInsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        status: 'sent',
+        incident_id: 'inc-001',
+      })
+    )
+  })
+
+  it('AL06: recovery webhook payload has event=incident.resolved', async () => {
+    mockChannelsData = [makeWebhookChannel('secret')]
+    mockSendWebhookAlert.mockResolvedValue({ success: true })
+
+    const resolvedIncident = makeIncident({
+      status: 'resolved',
+      resolved_at: '2026-04-01T10:15:00Z',
+    })
+    await dispatchRecoveryAlerts(resolvedIncident as never, makeMonitor() as never)
+
+    expect(mockSendWebhookAlert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        payload: expect.objectContaining({
+          event: 'incident.resolved',
+          incident: expect.objectContaining({ status: 'resolved' }),
+        }),
+      })
+    )
+  })
+
+  // ── AL07: Webhook HMAC signing ────────────────────────────────────
+
+  it('AL07: webhook payload is sent with HMAC secret when configured', async () => {
+    const secret = 'whsec_hmac_test_secret'
+    mockChannelsData = [makeWebhookChannel(secret)]
+    mockSendWebhookAlert.mockResolvedValue({ success: true })
+
+    await dispatchAlerts(makeIncident() as never, makeMonitor() as never)
+
+    expect(mockSendWebhookAlert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        secret: 'whsec_hmac_test_secret',
+      })
+    )
+  })
+
+  it('AL07: HMAC signature is sha256 format and non-empty', async () => {
+    const crypto = await import('crypto')
+    const secret = 'test_secret'
+    const payload = JSON.stringify({ event: 'incident.created' })
+    const signature = crypto.createHmac('sha256', secret).update(payload).digest('hex')
+
+    expect(signature).toMatch(/^[a-f0-9]{64}$/)
+    expect(`sha256=${signature}`).toMatch(/^sha256=[a-f0-9]{64}$/)
+  })
+
+  it('AL07: webhook sent without HMAC header when no secret configured', async () => {
+    mockChannelsData = [makeWebhookChannel()]
+    mockSendWebhookAlert.mockResolvedValue({ success: true })
+
+    await dispatchAlerts(makeIncident() as never, makeMonitor() as never)
+
+    expect(mockSendWebhookAlert).toHaveBeenCalledWith(
+      expect.objectContaining({ secret: undefined })
+    )
+  })
+
+  // ── Telegram dispatch ─────────────────────────────────────────────
+
+  it('sends Telegram alert with correct chatId and monitor details', async () => {
+    mockChannelsData = [makeTelegramChannel()]
+    mockSendTelegramAlert.mockResolvedValue({ success: true })
+
+    const incident = makeIncident({ status: 'open', severity: 'high' })
+    await dispatchAlerts(incident as never, makeMonitor() as never)
+
+    expect(mockSendTelegramAlert).toHaveBeenCalledTimes(1)
+    expect(mockSendTelegramAlert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        chatId: '6263919448',
+        monitorName: 'API Server',
+        monitorTarget: 'https://api.example.com',
+        isResolved: false,
+        severity: 'high',
+      })
+    )
+    expect(mockSupabaseInsert).toHaveBeenCalledWith(
+      expect.objectContaining({ status: 'sent' })
+    )
+  })
+
+  it('sends Telegram recovery alert with isResolved=true', async () => {
+    mockChannelsData = [makeTelegramChannel()]
+    mockSendTelegramAlert.mockResolvedValue({ success: true })
+
+    const resolvedIncident = makeIncident({ status: 'resolved', resolved_at: '2026-04-01T10:15:00Z' })
+    await dispatchRecoveryAlerts(resolvedIncident as never, makeMonitor() as never)
+
+    expect(mockSendTelegramAlert).toHaveBeenCalledWith(
+      expect.objectContaining({ isResolved: true })
+    )
+  })
+
+  // ── Teams dispatch ────────────────────────────────────────────────
+
+  it('sends Teams alert using Adaptive Card format via webhook', async () => {
+    mockChannelsData = [makeTeamsChannel()]
+    mockSendWebhookAlert.mockResolvedValue({ success: true })
+
+    await dispatchAlerts(makeIncident() as never, makeMonitor() as never)
+
+    expect(mockSendWebhookAlert).toHaveBeenCalledTimes(1)
+    expect(mockSendWebhookAlert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        url: 'https://prod-xx.westus.logic.azure.com/workflows/test',
+        payload: expect.objectContaining({
+          type: 'message',
+          attachments: expect.arrayContaining([
+            expect.objectContaining({
+              contentType: 'application/vnd.microsoft.card.adaptive',
+            }),
+          ]),
+        }),
+      })
+    )
+  })
+
+  it('Teams alert payload does NOT use old MessageCard format', async () => {
+    mockChannelsData = [makeTeamsChannel()]
+    mockSendWebhookAlert.mockResolvedValue({ success: true })
+
+    await dispatchAlerts(makeIncident() as never, makeMonitor() as never)
+
+    const call = mockSendWebhookAlert.mock.calls[0][0]
+    expect(call.payload['@type']).toBeUndefined()
+    expect(call.payload['@context']).toBeUndefined()
   })
 })

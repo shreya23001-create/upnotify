@@ -277,7 +277,7 @@ export function SettingsContent({
       </div> */}
 
       <div className="tabs-list">
-        {(['organisation', 'billing', 'credits', 'referrals', 'company'] as string[]).map((t) => (
+        {(['organisation', 'billing', 'credits', 'referrals', 'company', 'team'] as string[]).map((t) => (
           <button key={t} className={`tab-trigger${tab === t ? ' active' : ''}`} onClick={() => setTab(t)}>
             {t.charAt(0).toUpperCase() + t.slice(1)}
           </button>
@@ -323,6 +323,42 @@ export function SettingsContent({
               <CompanyDetailsForm organisation={organisation} onSave={saveCompanyDetails} />
             </div>
           </div>
+        </div>
+      )}
+
+      {tab === 'team' && (
+        <div className="space-y">
+          <div className="card">
+            <div className="card-header">
+              <div className="card-title">Team Members</div>
+            </div>
+            <div className="card-content">
+              <DataTable
+                columns={memberColumns}
+                data={teamMembers}
+                searchPlaceholder="Search members..."
+                emptyMessage="No team members yet."
+              />
+            </div>
+          </div>
+          {canManageTeam && (
+            <div className="card">
+              <div className="card-header">
+                <div className="card-title">Invite Team Member</div>
+                <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 2 }}>
+                  {canInvite
+                    ? `${teamMemberCount} of ${teamMemberLimit === 0 ? '∞' : teamMemberLimit} seats used`
+                    : 'Team member limit reached. Upgrade your plan to invite more.'}
+                </p>
+              </div>
+              <div className="card-content">
+                {canInvite
+                  ? <TeamInviteForm canInvite={canInvite} onInviteSent={handleInviteSent} />
+                  : <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>Team invites are not available on the Free plan. Upgrade to invite team members.</p>
+                }
+              </div>
+            </div>
+          )}
         </div>
       )}
 
