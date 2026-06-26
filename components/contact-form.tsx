@@ -5,6 +5,13 @@ import { useSearchParams } from 'next/navigation'
 
 type State = 'idle' | 'submitting' | 'sent' | 'error'
 
+interface FieldErrors {
+  name?: string
+  email?: string
+  subject?: string
+  message?: string
+}
+
 const SUBJECTS = [
   'General Enquiry',
   'Agency Enquiry',
@@ -13,10 +20,25 @@ const SUBJECTS = [
   'Feature Request',
 ]
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+function validate(name: string, email: string, subject: string, message: string): FieldErrors {
+  const errors: FieldErrors = {}
+  if (!name.trim()) errors.name = 'Name is required.'
+  else if (name.trim().length < 2) errors.name = 'Name must be at least 2 characters.'
+  if (!email.trim()) errors.email = 'Email address is required.'
+  else if (!EMAIL_REGEX.test(email.trim())) errors.email = 'Please enter a valid email address.'
+  if (!subject) errors.subject = 'Please select a subject.'
+  if (!message.trim()) errors.message = 'Message is required.'
+  else if (message.trim().length < 10) errors.message = 'Message must be at least 10 characters.'
+  return errors
+}
+
 export function ContactForm(): React.ReactElement {
   const searchParams = useSearchParams()
   const [state, setState] = useState<State>('idle')
   const [errorMsg, setErrorMsg] = useState('')
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
   const [verifiedStatus, setVerifiedStatus] = useState<'true' | 'already' | 'expired' | 'invalid' | null>(null)
 
   useEffect(() => {
@@ -28,15 +50,27 @@ export function ContactForm(): React.ReactElement {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    setState('submitting')
     setErrorMsg('')
 
     const form = e.currentTarget
+    const nameVal    = (form.elements.namedItem('name')    as HTMLInputElement).value
+    const emailVal   = (form.elements.namedItem('email')   as HTMLInputElement).value
+    const subjectVal = (form.elements.namedItem('subject') as HTMLSelectElement).value
+    const messageVal = (form.elements.namedItem('message') as HTMLTextAreaElement).value
+
+    const errors = validate(nameVal, emailVal, subjectVal, messageVal)
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors)
+      return
+    }
+    setFieldErrors({})
+    setState('submitting')
+
     const payload = {
-      name:    (form.elements.namedItem('name')    as HTMLInputElement).value,
-      email:   (form.elements.namedItem('email')   as HTMLInputElement).value,
-      subject: (form.elements.namedItem('subject') as HTMLSelectElement).value,
-      message: (form.elements.namedItem('message') as HTMLTextAreaElement).value,
+      name:    nameVal,
+      email:   emailVal,
+      subject: subjectVal,
+      message: messageVal,
     }
 
     try {
@@ -108,26 +142,49 @@ export function ContactForm(): React.ReactElement {
   }
 
   return (
-    <form className="contact-form" onSubmit={handleSubmit}>
+    <form className="contact-form" onSubmit={handleSubmit} noValidate>
       <div className="contact-form-row">
         <label htmlFor="contact-name" className="contact-label">Your Name</label>
-        <input type="text" id="contact-name" name="name" required className="contact-input" placeholder="Jane Smith" />
+        <input
+          type="text" id="contact-name" name="name"
+          className={`contact-input${fieldErrors.name ? ' input-error' : ''}`}
+          placeholder="Jane Smith" minLength={2} maxLength={100}
+          onChange={() => fieldErrors.name && setFieldErrors(p => ({ ...p, name: undefined }))}
+        />
+        {fieldErrors.name && <p className="field-error">{fieldErrors.name}</p>}
       </div>
       <div className="contact-form-row">
         <label htmlFor="contact-email" className="contact-label">Email Address</label>
-        <input type="email" id="contact-email" name="email" required className="contact-input" placeholder="jane@company.com" />
+        <input
+          type="email" id="contact-email" name="email"
+          className={`contact-input${fieldErrors.email ? ' input-error' : ''}`}
+          placeholder="jane@company.com"
+          onChange={() => fieldErrors.email && setFieldErrors(p => ({ ...p, email: undefined }))}
+        />
+        {fieldErrors.email && <p className="field-error">{fieldErrors.email}</p>}
       </div>
       <div className="contact-form-row">
         <label htmlFor="contact-subject" className="contact-label">Subject</label>
-        <select id="contact-subject" name="subject" required className="contact-input" defaultValue="">
+        <select
+          id="contact-subject" name="subject"
+          className={`contact-input${fieldErrors.subject ? ' input-error' : ''}`}
+          defaultValue=""
+          onChange={() => fieldErrors.subject && setFieldErrors(p => ({ ...p, subject: undefined }))}
+        >
           <option value="" disabled>Select a subject</option>
           {SUBJECTS.map(s => <option key={s} value={s}>{s}</option>)}
         </select>
+        {fieldErrors.subject && <p className="field-error">{fieldErrors.subject}</p>}
       </div>
       <div className="contact-form-row">
         <label htmlFor="contact-message" className="contact-label">Message</label>
-        <textarea id="contact-message" name="message" required className="contact-input contact-textarea"
-          placeholder="Tell us how we can help..." rows={6} maxLength={5000} />
+        <textarea
+          id="contact-message" name="message"
+          className={`contact-input contact-textarea${fieldErrors.message ? ' input-error' : ''}`}
+          placeholder="Tell us how we can help..." rows={6} minLength={10} maxLength={5000}
+          onChange={() => fieldErrors.message && setFieldErrors(p => ({ ...p, message: undefined }))}
+        />
+        {fieldErrors.message && <p className="field-error">{fieldErrors.message}</p>}
       </div>
 
       {state === 'error' && (
