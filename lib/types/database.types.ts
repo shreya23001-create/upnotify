@@ -2923,6 +2923,18 @@ export type Database = {
           status: string
         }[]
       }
+      get_leaderboard: {
+        Args: { p_limit?: number }
+        Returns: {
+          id: string
+          domain: string
+          display_name: string
+          category: string
+          last_status: string
+          last_response_time_ms: number | null
+          uptime_pct: number
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
