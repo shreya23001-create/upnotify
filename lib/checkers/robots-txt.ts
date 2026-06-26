@@ -3,6 +3,45 @@ import type { CheckerResult, CheckerConfig } from './types'
 import { isSafeUrl } from './ssrf-guard'
 import * as crypto from 'crypto'
 
+/**
+ * Parse robots.txt blocks and return true if Googlebot (or all crawlers via *)
+ * is blocked from crawling all content (Disallow: /).
+ */
+function isGooglebotBlocked(content: string): boolean {
+  const lines = content.split('\n').map(l => l.replace(/#.*$/, '').trim())
+  let inGooglebotBlock = false
+  let inWildcardBlock = false
+  let wildcardDisallowsAll = false
+
+  for (const line of lines) {
+    const lower = line.toLowerCase()
+    if (lower.startsWith('user-agent:')) {
+      const agent = line.slice('user-agent:'.length).trim().toLowerCase()
+      if (agent === 'googlebot') {
+        // If we find Googlebot block with Disallow: / immediately, return true
+        inGooglebotBlock = true
+        inWildcardBlock = false
+      } else if (agent === '*') {
+        inWildcardBlock = true
+        inGooglebotBlock = false
+      } else {
+        inGooglebotBlock = false
+        inWildcardBlock = false
+      }
+    } else if (lower.startsWith('disallow:')) {
+      const path = line.slice('disallow:'.length).trim()
+      if (path === '/') {
+        if (inGooglebotBlock) return true  // explicit Googlebot block
+        if (inWildcardBlock) wildcardDisallowsAll = true
+      }
+    } else if (line === '') {
+      inGooglebotBlock = false
+      inWildcardBlock = false
+    }
+  }
+  return wildcardDisallowsAll
+}
+
 export async function check(monitor: Monitor): Promise<CheckerResult> {
   const base = monitor.target.startsWith('http') ? monitor.target : `https://${monitor.target}`
   const robotsUrl = new URL('/robots.txt', base).toString()
@@ -30,10 +69,21 @@ export async function check(monitor: Monitor): Promise<CheckerResult> {
     const previousHash = (monitor.config as CheckerConfig)?.lastRobotsHash
     const changed = previousHash !== undefined && previousHash !== hash
 
+    // Critical: Googlebot blocked = DOWN (high-severity alert trigger)
+    if (isGooglebotBlocked(text)) {
+      return {
+        status: 'down',
+        responseTimeMs,
+        metadata: { hash, changed, length: text.length, googlebotBlocked: true },
+        configUpdates: { lastRobotsHash: hash },
+        errorMessage: 'robots.txt is blocking Googlebot (Disallow: /) — SEO critical',
+      }
+    }
+
     return {
       status: changed ? 'degraded' : 'up',
       responseTimeMs,
-      metadata: { hash, changed, length: text.length },
+      metadata: { hash, changed, length: text.length, googlebotBlocked: false },
       configUpdates: { lastRobotsHash: hash },
       ...(changed && { errorMessage: 'robots.txt content has changed' }),
     }
