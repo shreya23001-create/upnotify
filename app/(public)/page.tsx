@@ -47,12 +47,12 @@ import type {
 export const revalidate = 600
 
 export const metadata: Metadata = {
-  title: 'Uptrue — Website Monitoring Suite for Agencies & Teams',
+  title: 'Uptrue — Uptime Monitoring Suite for Agencies & Teams',
   description:
     'Monitor uptime, performance and infrastructure across all your sites. 24 monitor types, AI-powered reports, public status pages, multi-channel alerts, and agency white-label — all in one platform. Free plan available.',
   alternates: { canonical: 'https://uptrue.io' },
   openGraph: {
-    title: 'Uptrue — Website Monitoring Suite for Agencies & Teams',
+    title: 'Uptrue — Uptime Monitoring Suite for Agencies & Teams',
     description:
       'Monitor uptime, performance and infrastructure across all your sites. 24 monitor types, AI-powered reports, public status pages, and multi-channel alerts.',
     url: 'https://uptrue.io',
