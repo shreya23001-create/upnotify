@@ -15,6 +15,8 @@ export interface SiteInfo {
   users: string
   statusPageUrl: string | null
   alternatives: string[]
+  seoTitle?: string
+  seoDescription?: string
 }
 
 export const SITE_INFO: Record<string, SiteInfo> = {
@@ -58,6 +60,8 @@ export const SITE_INFO: Record<string, SiteInfo> = {
     users: '3+ billion monthly active users',
     statusPageUrl: 'https://developers.facebook.com/status/dashboard/',
     alternatives: ['instagram.com', 'twitter.com', 'linkedin.com'],
+    seoTitle: 'Is Facebook Down? Live Status & Uptime | Uptrue',
+    seoDescription: 'Check if Facebook is down right now. Real-time Facebook status, uptime history, response time and instant alerts. Monitor Facebook with Uptrue — free.',
   },
   'instagram.com': {
     name: 'Instagram',
@@ -76,6 +80,8 @@ export const SITE_INFO: Record<string, SiteInfo> = {
     users: '500+ million monthly active users',
     statusPageUrl: 'https://api.twitterstat.us/',
     alternatives: ['facebook.com', 'reddit.com', 'linkedin.com'],
+    seoTitle: 'Is Twitter (X) Down? Live Status & Uptime | Uptrue',
+    seoDescription: 'Check if Twitter (X) is down right now. Real-time Twitter status, uptime history, response time and instant alerts. Monitor Twitter with Uptrue — free.',
   },
   'linkedin.com': {
     name: 'LinkedIn',
@@ -94,6 +100,8 @@ export const SITE_INFO: Record<string, SiteInfo> = {
     users: '1.7+ billion monthly visits',
     statusPageUrl: 'https://www.redditstatus.com/',
     alternatives: ['twitter.com', 'facebook.com'],
+    seoTitle: 'Is Reddit Down? Live Status & Uptime | Uptrue',
+    seoDescription: 'Check if Reddit is down right now. Real-time Reddit status, uptime history, response time and instant alerts. Monitor Reddit with Uptrue — free.',
   },
   'tiktok.com': {
     name: 'TikTok',
@@ -133,6 +141,8 @@ export const SITE_INFO: Record<string, SiteInfo> = {
     users: '260+ million paid subscribers',
     statusPageUrl: 'https://help.netflix.com/en/is-netflix-down',
     alternatives: ['disneyplus.com', 'youtube.com'],
+    seoTitle: 'Is Netflix Down? Live Status & Uptime | Uptrue',
+    seoDescription: 'Check if Netflix is down right now. Real-time Netflix status, uptime history, response time and instant alerts. Monitor Netflix with Uptrue — free.',
   },
   'twitch.tv': {
     name: 'Twitch',
@@ -151,6 +161,8 @@ export const SITE_INFO: Record<string, SiteInfo> = {
     users: '620+ million users',
     statusPageUrl: 'https://downdetector.com/status/spotify/',
     alternatives: ['youtube.com', 'netflix.com'],
+    seoTitle: 'Is Spotify Down? Live Status & Uptime | Uptrue',
+    seoDescription: 'Check if Spotify is down right now. Real-time Spotify status, uptime history, response time and instant alerts. Monitor Spotify with Uptrue — free.',
   },
   'disneyplus.com': {
     name: 'Disney+',
@@ -565,6 +577,8 @@ export const SITE_INFO: Record<string, SiteInfo> = {
     users: '70+ million daily active users',
     statusPageUrl: null,
     alternatives: ['epicgames.com', 'store.steampowered.com'],
+    seoTitle: 'Is Roblox Down? Live Status & Uptime | Uptrue',
+    seoDescription: 'Check if Roblox is down right now. Real-time Roblox status, uptime history, response time and instant alerts. Monitor Roblox with Uptrue — free.',
   },
   'playstation.com': {
     name: 'PlayStation',
@@ -931,6 +945,34 @@ export const SITE_INFO: Record<string, SiteInfo> = {
     users: '33+ million users',
     statusPageUrl: 'https://status.lastpass.com/',
     alternatives: ['1password.com', 'nordvpn.com'],
+  },
+
+  // ── Indian E-commerce ─────────────────────────────────────────
+
+  'zepto.com': {
+    name: 'Zepto',
+    description: 'Zepto is an Indian quick-commerce platform that promises grocery and essentials delivery in 10 minutes. Founded in 2021, it has expanded rapidly across major Indian cities and is one of the fastest-growing startups in India. Zepto competes directly with Blinkit and Swiggy Instamart in the hyper-fast grocery delivery space. Outages prevent customers from placing orders for essentials and disrupt the livelihoods of delivery partners.',
+    founded: '2021',
+    category: 'E-commerce',
+    users: 'Millions of active users across India',
+    statusPageUrl: null,
+    alternatives: ['blinkit.com', 'swiggy.com', 'bigbasket.com'],
+    seoTitle: 'Is Zepto Down? Live Status & Uptime | Uptrue',
+    seoDescription: 'Check if Zepto is down right now. Real-time Zepto status, uptime history, response time and instant alerts. Monitor Zepto with Uptrue — free.',
+  },
+
+  // ── Project Management ────────────────────────────────────────
+
+  'jira.com': {
+    name: 'Jira',
+    description: 'Jira is Atlassian\'s industry-standard issue tracking and project management tool, used by over 65,000 software development teams worldwide. It supports agile methodologies including Scrum and Kanban and integrates deeply with the broader Atlassian ecosystem including Confluence, Bitbucket, and Trello. Jira outages effectively halt engineering work for thousands of teams who depend on it to track tasks, sprints, and bug reports.',
+    founded: '2002',
+    category: 'SaaS',
+    users: '65,000+ companies',
+    statusPageUrl: 'https://jira-software.status.atlassian.com/',
+    alternatives: ['asana.com', 'monday.com', 'trello.com'],
+    seoTitle: 'Is Jira Down? Live Status & Uptime | Uptrue',
+    seoDescription: 'Check if Jira is down right now. Real-time Jira status, uptime history, response time and instant alerts. Monitor Jira with Uptrue — free.',
   },
 }
 
