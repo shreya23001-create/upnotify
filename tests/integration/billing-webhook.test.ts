@@ -311,7 +311,7 @@ describe('Stripe webhook handler', () => {
     expect(response.status).toBe(200)
 
     const subUpdate = mockUpdateData.find(
-      (d) => d.table === 'subscriptions' && d.data.status === 'past_due'
+      (d) => d.table === 'subscriptions' && (d.data as Record<string, unknown>).status === 'past_due'
     )
     expect(subUpdate).toBeUndefined()
   })

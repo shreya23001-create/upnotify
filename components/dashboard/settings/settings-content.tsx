@@ -353,7 +353,7 @@ export function SettingsContent({
               </div>
               <div className="card-content">
                 {canInvite
-                  ? <TeamInviteForm canInvite={canInvite} onInviteSent={handleInviteSent} />
+                  ? <TeamInviteForm canInvite={canInvite} teamMemberLimit={teamMemberLimit} teamMemberCount={teamMemberCount} onInviteSent={handleInviteSent} />
                   : <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>Team invites are not available on the Free plan. Upgrade to invite team members.</p>
                 }
               </div>
