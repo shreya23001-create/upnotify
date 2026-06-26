@@ -56,24 +56,27 @@ export async function generateMetadata({ params }: { params: Promise<{ domain: s
   const siteInfo = SITE_INFO[monitor.domain]
   const siteName = siteInfo?.name ?? monitor.display_name
 
-  const title = `Is ${siteName} Down? Live Status & Uptime | Uptrue`
-  const description = siteInfo
-    ? `Check if ${siteName} is down right now. Live status, response time, uptime history, and incident log for ${siteName} (${monitor.domain}). Get alerts when ${siteName} goes down.`
-    : `Check if ${monitor.display_name} (${monitor.domain}) is down right now. Live status, response time, uptime history, and incident log.`
+  const rawTitle = siteInfo?.seoTitle ?? `Is ${siteName} Down? Live Status & Uptime | Uptrue`
+  const description = siteInfo?.seoDescription
+    ?? (siteInfo
+      ? `Check if ${siteName} is down right now. Live status, response time, uptime history, and incident log for ${siteName} (${monitor.domain}). Get alerts when ${siteName} goes down.`
+      : `Check if ${monitor.display_name} (${monitor.domain}) is down right now. Live status, response time, uptime history, and incident log.`)
+  // seoTitle overrides bypass the layout template (which appends "| Uptrue Tracker")
+  const title = siteInfo?.seoTitle ? { absolute: rawTitle } : rawTitle
 
   return {
     title,
     description,
     alternates: { canonical: `https://uptrue.io/tracker/${monitor.domain}` },
     openGraph: {
-      title,
+      title: rawTitle,
       description,
       url: `https://uptrue.io/tracker/${monitor.domain}`,
       type: 'website',
     },
     twitter: {
       card: 'summary',
-      title,
+      title: rawTitle,
       description,
     },
   }

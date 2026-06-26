@@ -222,6 +222,7 @@ export const TRACKED_SITES: TrackedSiteSeed[] = [
   { domain: 'intercom.com',        display_name: 'Intercom',         category: 'SaaS' },
   { domain: 'freshdesk.com',       display_name: 'Freshdesk',        category: 'SaaS' },
   { domain: 'jira.atlassian.com',  display_name: 'Jira',             category: 'SaaS' },
+  { domain: 'jira.com',            display_name: 'Jira',             category: 'SaaS' },
   { domain: 'confluence.atlassian.com', display_name: 'Confluence',  category: 'SaaS' },
   { domain: 'pipedrive.com',       display_name: 'Pipedrive',        category: 'SaaS' },
   { domain: 'zoho.com',            display_name: 'Zoho',             category: 'SaaS' },
@@ -301,6 +302,7 @@ export const TRACKED_SITES: TrackedSiteSeed[] = [
   // -------------------------------------------------------------------------
   // Food & Delivery
   // -------------------------------------------------------------------------
+  { domain: 'zepto.com',           display_name: 'Zepto',            category: 'Food & Delivery' },
   { domain: 'ubereats.com',        display_name: 'Uber Eats',        category: 'Food & Delivery' },
   { domain: 'deliveroo.com',       display_name: 'Deliveroo',        category: 'Food & Delivery' },
   { domain: 'doordash.com',        display_name: 'DoorDash',         category: 'Food & Delivery' },
