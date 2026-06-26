@@ -503,6 +503,17 @@ export const SITE_INFO: Record<string, SiteInfo> = {
     statusPageUrl: 'https://status.openai.com/',
     alternatives: ['anthropic.com', 'huggingface.co'],
   },
+  'chatgpt.com': {
+    name: 'ChatGPT',
+    description: 'ChatGPT is OpenAI\'s flagship AI assistant, used by over 200 million people weekly for writing, coding, research, analysis, and creative tasks. Launched in November 2022, it became the fastest-growing consumer application in history. ChatGPT is available at chatgpt.com and powers thousands of third-party applications via the OpenAI API. When ChatGPT is down, it disrupts students, developers, and professionals who rely on it as a daily productivity tool.',
+    founded: '2022',
+    category: 'AI',
+    users: '200+ million weekly active users',
+    statusPageUrl: 'https://status.openai.com/',
+    alternatives: ['anthropic.com', 'gemini.google.com', 'perplexity.ai'],
+    seoTitle: 'Is ChatGPT Down? Live Status & Uptime | Uptrue',
+    seoDescription: 'Check if ChatGPT is down right now. Real-time ChatGPT status, uptime history, response time and instant alerts. Monitor ChatGPT with Uptrue — free.',
+  },
   'anthropic.com': {
     name: 'Anthropic',
     description: 'Anthropic is an AI safety company and the creator of Claude, a family of large language models. Claude is used by developers, businesses, and individuals for writing, analysis, coding, and reasoning tasks. Anthropic focuses on building reliable and safe AI systems.',
@@ -852,6 +863,8 @@ export const SITE_INFO: Record<string, SiteInfo> = {
     users: '150,000+ companies',
     statusPageUrl: 'https://status.salesforce.com/',
     alternatives: ['hubspot.com', 'zendesk.com'],
+    seoTitle: 'Is Salesforce (SFDC) Down? Live Status & Uptime | Uptrue',
+    seoDescription: 'Check if Salesforce is down right now. Real-time SFDC status, uptime history, response time and instant alerts. Monitor Salesforce with Uptrue — free.',
   },
   'zendesk.com': {
     name: 'Zendesk',

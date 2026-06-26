@@ -258,6 +258,7 @@ export const TRACKED_SITES: TrackedSiteSeed[] = [
   // AI
   // -------------------------------------------------------------------------
   { domain: 'openai.com',          display_name: 'OpenAI',           category: 'AI' },
+  { domain: 'chatgpt.com',         display_name: 'ChatGPT',          category: 'AI' },
   { domain: 'anthropic.com',       display_name: 'Anthropic',        category: 'AI' },
   { domain: 'huggingface.co',      display_name: 'Hugging Face',     category: 'AI' },
   { domain: 'midjourney.com',      display_name: 'Midjourney',       category: 'AI' },
