@@ -56,9 +56,9 @@ export function MonitorTable({ monitors, uptimeData, initialSearch = '', initial
   useEffect(() => { setSearchInput(initialSearch) }, [initialSearch])
   useEffect(() => {
     if (searchInput === initialSearch) return
-    const t = setTimeout(() => updateParams({ search: searchInput }), 400)
+    const t = setTimeout(() => startTransition(() => updateParams({ search: searchInput })), 400)
     return () => clearTimeout(t)
-  }, [searchInput, initialSearch, updateParams])
+  }, [searchInput, initialSearch, updateParams, startTransition])
 
   function handlePauseResume(id: string, isPaused: boolean): void {
     setPendingConfirm({ type: 'pause', ids: [id], isPaused })
