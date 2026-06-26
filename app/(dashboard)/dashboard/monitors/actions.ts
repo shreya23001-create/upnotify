@@ -14,7 +14,7 @@ import { resolveIncident, getOpenIncidentForMonitor } from '@/lib/db/incidents'
 import { MONITOR_TYPES } from '@/lib/constants/monitor-types'
 
 // Types that require a URL target (need SSRF + protocol validation)
-const URL_TARGET_TYPES = ['http', 'https', 'keyword', 'api', 'ssl', 'domain']
+const URL_TARGET_TYPES = ['http', 'https', 'keyword', 'api', 'ssl', 'domain', 'robots-txt', 'security-headers', 'response-time', 'sitemap', 'redirect-chain', 'page-size', 'cookie-consent']
 
 // Private IP ranges that must never be monitored (SSRF protection)
 const PRIVATE_IP_PATTERNS = [
@@ -131,6 +131,10 @@ export async function createMonitorAction(formData: FormData): Promise<{ error?:
     if (posArr.length === 0 && negArr.length === 0) {
       return { error: 'Please add at least one positive or negative keyword' }
     }
+  }
+
+  if (type === 'competitor') {
+    config.ignoreWhitespace = formData.get('ignoreWhitespace') !== 'false'
   }
 
   if (type === 'port') {

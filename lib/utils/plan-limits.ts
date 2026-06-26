@@ -61,7 +61,7 @@ function extractLimits(plan: Record<string, unknown>): PlanLimits {
     hasApiAccess: (plan.has_api_access as boolean) ?? false,
     hasWhiteLabel: (plan.has_white_label as boolean) ?? false,
     hasVoiceCalls: (plan.has_voice_calls as boolean) ?? false,
-    checkIntervalSeconds: (plan.check_interval_seconds as number) ?? 600,
+    checkIntervalSeconds: Math.max((plan.check_interval_seconds as number) ?? 600, 30),
     wpMonitors: (plan.wp_monitor_limit as number) ?? 0,
   }
 }

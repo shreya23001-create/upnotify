@@ -8,7 +8,7 @@ import { generateReport, type ReportType } from '@/lib/services/reports'
 import { logger } from '@/lib/utils/logger'
 import { impersonationGuard } from '@/lib/auth/impersonation-guard'
 import { getServerConfig } from '@/lib/utils/config'
-import { getPlanLimits } from '@/lib/utils/plan-limits'
+import { getPlanLimits, checkAiReportLimit } from '@/lib/utils/plan-limits'
 
 export async function generateReportAction(formData: FormData): Promise<{ error?: string }> {
   const guard = await impersonationGuard()
@@ -25,6 +25,12 @@ export async function generateReportAction(formData: FormData): Promise<{ error?
   const planLimits = await getPlanLimits(user.org_id)
   if (!planLimits.hasAiPredictive && planLimits.aiReportLimit === 0) {
     return { error: 'Reports are not available on the Free plan. Upgrade to unlock this feature.' }
+  }
+
+  // Enforce monthly limit for plans with a finite aiReportLimit (e.g. Builder: 5/mo)
+  const reportLimit = await checkAiReportLimit(user.org_id)
+  if (!reportLimit.allowed) {
+    return { error: `You have reached your monthly report limit (${reportLimit.currentCount}/${reportLimit.limit}). Your limit resets on the 1st of next month.` }
   }
 
   const type = (formData.get('type') as string) || 'on_demand'
