@@ -107,9 +107,10 @@ export async function sendTelegramAlert(params: MonitorAlertTelegramParams): Pro
     lines.push(`<b>Downtime:</b> ${escapeHtml(params.downtimeDuration)}`)
   }
 
+  const isLocalhostUrl = params.monitorUrl.startsWith('http://localhost') || params.monitorUrl.startsWith('http://127.')
   return sendTelegramMessage(params.chatId, {
     text: lines.join('\n'),
-    inlineKeyboard: [[{ text: '👁 View Monitor', url: params.monitorUrl }]],
+    inlineKeyboard: isLocalhostUrl ? undefined : [[{ text: '👁 View Monitor', url: params.monitorUrl }]],
   }, botToken)
 }
 

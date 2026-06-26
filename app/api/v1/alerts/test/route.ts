@@ -111,12 +111,39 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         result = await sendWebhookAlert({
           url: channelConfig.teamsWebhookUrl || '',
           payload: {
-            '@type': 'MessageCard',
-            '@context': 'http://schema.org/extensions',
-            summary: 'Test Alert from Uptrue',
-            themeColor: '3b82f6',
-            title: 'Test Alert — Uptrue',
-            text: 'This is a test notification. If you received this, your Teams integration is working correctly.',
+            type: 'message',
+            attachments: [{
+              contentType: 'application/vnd.microsoft.card.adaptive',
+              content: {
+                '$schema': 'http://adaptivecards.io/schemas/adaptive-card.json',
+                type: 'AdaptiveCard',
+                version: '1.4',
+                body: [
+                  {
+                    type: 'TextBlock',
+                    text: 'Test Alert — Uptrue',
+                    weight: 'Bolder',
+                    size: 'Medium',
+                    color: 'Accent',
+                    wrap: true,
+                  },
+                  {
+                    type: 'TextBlock',
+                    text: 'This is a test notification. If you received this, your Teams integration is working correctly.',
+                    wrap: true,
+                    spacing: 'Small',
+                  },
+                  {
+                    type: 'FactSet',
+                    spacing: 'Medium',
+                    facts: [
+                      { title: 'Channel', value: channel.name },
+                      { title: 'Time', value: new Date().toISOString() },
+                    ],
+                  },
+                ],
+              },
+            }],
           },
         })
         break

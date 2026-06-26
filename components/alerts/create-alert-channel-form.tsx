@@ -142,15 +142,16 @@ export function CreateAlertChannelForm() {
           <div style={{ padding: '16px', background: '#f0f9ff', border: '1px solid #bae6fd', borderRadius: 8, marginBottom: 16 }}>
             <p style={{ margin: '0 0 10px', fontSize: 13, fontWeight: 700, color: '#0369a1' }}>How to get your Microsoft Teams Webhook URL</p>
             <ol style={{ margin: 0, paddingLeft: 18, fontSize: 13, color: '#374151', lineHeight: 1.8 }}>
-              <li>Open Microsoft Teams and go to the <strong>channel</strong> where you want alerts</li>
+              <li>Open <strong>Microsoft Teams</strong> and go to the channel where you want alerts</li>
               <li>Click the <strong>&hellip; (More options)</strong> menu next to the channel name</li>
-              <li>Select <strong>Connectors</strong> (or <strong>Edit</strong> &rarr; <strong>Connectors</strong>)</li>
-              <li>Search for <strong>Incoming Webhook</strong> and click <strong>Add</strong> then <strong>Configure</strong></li>
-              <li>Give it a name (e.g. &ldquo;Uptrue&rdquo;), optionally upload an icon, then click <strong>Create</strong></li>
+              <li>Select <strong>Workflows</strong></li>
+              <li>Search for <strong>&ldquo;Post to a channel when a webhook request is received&rdquo;</strong> and select it</li>
+              <li>Give the workflow a name (e.g. &ldquo;Uptrue Alerts&rdquo;) and click <strong>Next</strong></li>
+              <li>Select the Team and Channel, then click <strong>Add Workflow</strong></li>
               <li>Copy the <strong>Webhook URL</strong> shown and paste it below</li>
             </ol>
             <p style={{ margin: '10px 0 0', fontSize: 12, color: '#0369a1' }}>
-              <strong>Note:</strong> If you don&apos;t see Connectors, ask your Teams admin to enable the Incoming Webhook connector for your organisation.
+              <strong>Note:</strong> Microsoft retired the old Incoming Webhook connector. You must use the <strong>Workflows</strong> method above. The URL will start with <code>https://prod-*.westus.logic.azure.com/...</code>
             </p>
           </div>
           <label className="form-label">Teams Webhook URL</label>
@@ -158,7 +159,7 @@ export function CreateAlertChannelForm() {
             className="form-input"
             name="teamsWebhookUrl"
             required
-            placeholder="https://outlook.office.com/webhook/..."
+            placeholder="https://prod-xx.westus.logic.azure.com/workflows/..."
             disabled={isPending}
           />
         </div>

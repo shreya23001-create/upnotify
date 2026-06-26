@@ -149,26 +149,48 @@ export async function dispatchAlerts(incident: Incident, monitor: Monitor): Prom
           }
 
           case 'teams': {
+            const teamsColor = isResolved ? 'Good' : (incident.severity === 'P1' ? 'Attention' : 'Warning')
             const result = await sendWebhookAlert({
               url: channelConfig.teamsWebhookUrl || '',
               payload: {
-                '@type': 'MessageCard',
-                '@context': 'http://schema.org/extensions',
-                summary: copy.subject,
-                themeColor: isResolved ? '00FF00' : 'FF0000',
-                title: copy.headline,
-                text: copy.detail,
-                sections: [{
-                  facts: [
-                    { name: 'Severity', value: incident.severity },
-                    { name: 'Target', value: monitor.target },
-                    { name: 'Status', value: incident.status },
-                  ],
-                }],
-                potentialAction: [{
-                  '@type': 'OpenUri',
-                  name: 'View Monitor',
-                  targets: [{ os: 'default', uri: monitorUrl }],
+                type: 'message',
+                attachments: [{
+                  contentType: 'application/vnd.microsoft.card.adaptive',
+                  content: {
+                    '$schema': 'http://adaptivecards.io/schemas/adaptive-card.json',
+                    type: 'AdaptiveCard',
+                    version: '1.4',
+                    body: [
+                      {
+                        type: 'TextBlock',
+                        text: copy.headline,
+                        weight: 'Bolder',
+                        size: 'Medium',
+                        color: teamsColor,
+                        wrap: true,
+                      },
+                      {
+                        type: 'TextBlock',
+                        text: copy.detail,
+                        wrap: true,
+                        spacing: 'Small',
+                      },
+                      {
+                        type: 'FactSet',
+                        spacing: 'Medium',
+                        facts: [
+                          { title: 'Severity', value: incident.severity },
+                          { title: 'Target', value: monitor.target },
+                          { title: 'Status', value: incident.status },
+                        ],
+                      },
+                    ],
+                    actions: [{
+                      type: 'Action.OpenUrl',
+                      title: 'View Monitor',
+                      url: monitorUrl,
+                    }],
+                  },
                 }],
               },
             })
