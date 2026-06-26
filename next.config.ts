@@ -42,6 +42,13 @@ const NON_PROD_NOINDEX_HEADERS: { key: string; value: string }[] = IS_PRODUCTION
   : [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }];
 
 const nextConfig: NextConfig = {
+  redirects: async () => [
+    {
+      source: '/monitors',
+      destination: '/dashboard/monitors',
+      permanent: true,
+    },
+  ],
   headers: async (): Promise<
     { source: string; headers: { key: string; value: string }[] }[]
   > => [
