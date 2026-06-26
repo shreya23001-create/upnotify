@@ -4,7 +4,7 @@ import { useState, useCallback, useRef, useEffect } from 'react'
 import Link from 'next/link'
 
 function fmt(n: number): string {
-  return '£' + Math.round(n).toLocaleString('en-GB')
+  return '£' + Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 }
 
 export function DowntimeCalculator(): React.ReactElement {

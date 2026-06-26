@@ -3722,13 +3722,14 @@ html.dark .landing-cta { background: linear-gradient(135deg, #1a1d27 0%, #242736
 .billing-toggle-btn:hover { color: var(--text-primary); }
 .billing-toggle-active { background: var(--bg-card); color: var(--text-primary); box-shadow: var(--shadow-sm); }
 .billing-toggle-save { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 9999px; background: rgba(5, 150, 105, 0.1); color: #059669; white-space: nowrap; }
+html.dark .billing-toggle-save { color: #34d399; background: rgba(52, 211, 153, 0.1); }
 
 /* ==========================================================================
    Credit Balance Banner
    ========================================================================== */
 
 .credit-balance-banner { text-align: center; padding: 10px 16px; margin-bottom: 16px; background: rgba(5, 150, 105, 0.06); border: 1px solid rgba(5, 150, 105, 0.15); border-radius: 10px; font-size: 14px; color: #059669; }
-html.dark .credit-balance-banner { background: rgba(5, 150, 105, 0.1); border-color: rgba(5, 150, 105, 0.2); }
+html.dark .credit-balance-banner { background: rgba(5, 150, 105, 0.1); border-color: rgba(5, 150, 105, 0.2); color: #34d399; }
 
 /* ==========================================================================
    Credits Section
@@ -3741,6 +3742,7 @@ html.dark .credit-balance-banner { background: rgba(5, 150, 105, 0.1); border-co
 .credit-rule-name { font-size: 14px; font-weight: 600; color: var(--text-primary); }
 .credit-rule-type { font-size: 12px; color: var(--text-muted); }
 .credit-rule-amount { font-size: 15px; font-weight: 700; color: #059669; }
+html.dark .credit-rule-amount { color: #34d399; }
 
 .credit-history-list { display: flex; flex-direction: column; gap: 0; }
 .credit-history-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-light); }
@@ -3880,6 +3882,7 @@ html.dark .credit-balance-banner { background: rgba(5, 150, 105, 0.1); border-co
 .credits-card-header { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 6px; }
 .credits-card-title { font-size: 16px; font-weight: 600; }
 .credits-card-amount { font-size: 14px; font-weight: 700; color: #059669; white-space: nowrap; }
+html.dark .credits-card-amount { color: #34d399; }
 .credits-card-description { font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 8px; }
 .credits-card-frequency { font-size: 12px; color: var(--text-muted); font-weight: 500; }
 
@@ -4799,6 +4802,9 @@ html.dark .compete-success-msg { color: #6ee7b7; }
 .credit-submit-status-pending { background: #fef3c7; color: #92400e; }
 .credit-submit-status-approved { background: #dcfce7; color: #166534; }
 .credit-submit-status-rejected { background: #fef2f2; color: #991b1b; }
+html.dark .credit-submit-status-pending { background: rgba(251, 191, 36, 0.1); color: #fbbf24; }
+html.dark .credit-submit-status-approved { background: rgba(52, 211, 153, 0.1); color: #34d399; }
+html.dark .credit-submit-status-rejected { background: rgba(239, 68, 68, 0.1); color: #f87171; }
 
 /* ========== Compete Pricing ========== */
 .landing-compete-pricing { background: var(--bg-secondary, #f8fafc); }
