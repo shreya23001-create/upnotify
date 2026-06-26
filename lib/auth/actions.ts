@@ -53,23 +53,11 @@ export async function signInWithEmail(
     if (msg.includes('rate') || msg.includes('too many')) {
       return { error: 'Too many attempts. Please wait a minute before trying again.' }
     }
-    if (msg.includes('email') && msg.includes('not confirmed')) {
-      return { error: 'Please check your inbox — a magic link was already sent to this address.' }
-    }
     // Never reveal whether an email is registered or not (account enumeration prevention).
-    // If Supabase rejects the OTP because the user doesn't exist or signups are disabled,
-    // silently succeed — the UI shows "Check your email" and no email is sent.
-    if (
-      msg.includes('user not found') ||
-      msg.includes('signup') ||
-      msg.includes('not found') ||
-      msg.includes('invalid login') ||
-      msg.includes('email not confirmed')
-    ) {
-      await writeAuditLog({ orgId: 'system', userId: null, action: 'auth.magic_link_silent_404', ipAddress: ip, userAgent, metadata: { email } })
-      return {}
-    }
-    return { error: 'Failed to send magic link. Please check your email address and try again.' }
+    // Silently succeed for all other errors — the UI shows "Check your email" and
+    // no email is sent if the address is unregistered or signups are disabled.
+    await writeAuditLog({ orgId: 'system', userId: null, action: 'auth.magic_link_silent_404', ipAddress: ip, userAgent, metadata: { email } })
+    return {}
   }
 
   await writeAuditLog({ orgId: 'system', userId: null, action: 'auth.magic_link_requested', ipAddress: ip, userAgent, metadata: { email } })

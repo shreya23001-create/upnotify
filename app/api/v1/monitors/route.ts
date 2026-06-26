@@ -119,7 +119,7 @@ export async function POST(request: Request): Promise<NextResponse> {
   if (!limitCheck.allowed) {
     return NextResponse.json(
       { error: `Monitor limit reached (${limitCheck.currentCount}/${limitCheck.limit}). Upgrade your plan to add more monitors.` },
-      { status: 429 }
+      { status: 403 }
     )
   }
 
