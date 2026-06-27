@@ -3,7 +3,10 @@ import type { NextConfig } from "next";
 // Domains used by analytics/third-party scripts
 const GTM   = 'https://www.googletagmanager.com';
 const GA    = 'https://www.google-analytics.com https://ssl.google-analytics.com https://analytics.google.com';
-const CLARITY   = 'https://www.clarity.ms https://scripts.clarity.ms https://r.clarity.ms https://c.bing.com';
+// Clarity uploads session data to regional shard hosts (a.clarity.ms … i.clarity.ms …),
+// not just www/scripts. Wildcard covers every current and future shard so the
+// `connect-src` policy stops blocking https://i.clarity.ms/collect (and logging CSP errors).
+const CLARITY   = 'https://*.clarity.ms https://c.bing.com';
 const STRIPE    = 'https://js.stripe.com https://checkout.stripe.com';
 const RAZORPAY  = 'https://checkout.razorpay.com https://cdn.razorpay.com https://api.razorpay.com';
 const SUPABASE = process.env.NEXT_PUBLIC_SUPABASE_URL ?? '';
