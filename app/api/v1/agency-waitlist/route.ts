@@ -39,21 +39,9 @@ export async function POST(request: Request): Promise<NextResponse> {
 
     const supabase = createAdminClient()
 
-    // Check for duplicate email
-    const { data: existing } = await supabase
-      .from('agency_waitlist')
-      .select('id')
-      .eq('email', body.email.toLowerCase().trim())
-      .limit(1)
-      .single()
-
-    if (existing) {
-      return NextResponse.json(
-        { error: 'You are already on the waitlist. We will be in touch soon!' },
-        { status: 400 }
-      )
-    }
-
+    // Insert directly and let the unique index on lower(email) reject duplicates.
+    // A read-then-insert check is a TOCTOU race: two concurrent (or rapid double)
+    // submissions both pass the check and create duplicate rows (#146).
     const { error } = await supabase.from('agency_waitlist').insert({
       name: body.name.trim(),
       email: body.email.toLowerCase().trim(),
@@ -66,6 +54,13 @@ export async function POST(request: Request): Promise<NextResponse> {
     })
 
     if (error) {
+      // 23505 = unique_violation → already on the waitlist (idempotent, not an error to the user).
+      if (error.code === '23505') {
+        return NextResponse.json(
+          { error: 'You are already on the waitlist. We will be in touch soon!' },
+          { status: 409 }
+        )
+      }
       logger.error('Agency waitlist insert failed', { error: error.message })
       return NextResponse.json({ error: 'Failed to join waitlist' }, { status: 500 })
     }
