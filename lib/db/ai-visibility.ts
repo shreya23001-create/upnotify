@@ -105,6 +105,21 @@ export async function canGenerateLlmsTxt(orgId: string, planSlug: string): Promi
   return { allowed: true }
 }
 
+/**
+ * Post-insert overflow check for the race-condition guard. Unlike
+ * canGenerateLlmsTxt() — a PRE-insert check that uses `count >= limit` — this
+ * uses a STRICT `count > limit`. After a legitimate generation the row count
+ * equals the limit (e.g. free plan: count 1 === limit 1); that row is valid and
+ * must NOT be rolled back. Only a genuine concurrent over-insert pushes the
+ * count strictly past the limit. engineering-app#154.
+ */
+export async function isLlmsTxtOverLimit(orgId: string, planSlug: string): Promise<boolean> {
+  const { llmsTxtLimit: limit } = await getAiVisibilityPlanLimits(planSlug)
+  if (limit === -1) return false  // unlimited — never over
+  const count = await getLlmsTxtGenerationCount(orgId)
+  return count > limit
+}
+
 export async function saveLlmsTxtGeneration(
   orgId: string,
   userId: string,

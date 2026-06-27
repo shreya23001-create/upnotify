@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { getCurrentUser } from '@/lib/db/users'
 import { getEnginesByType } from '@/lib/db/ai-engines'
-import { canGenerateLlmsTxt, saveLlmsTxtGeneration, getLlmsTxtGenerationCount } from '@/lib/db/ai-visibility'
+import { canGenerateLlmsTxt, saveLlmsTxtGeneration, isLlmsTxtOverLimit } from '@/lib/db/ai-visibility'
 import { getSubscriptionWithPlan } from '@/lib/db/subscriptions'
 import { logger } from '@/lib/utils/logger'
 import { generateLlmsTxtDashboard } from '@/lib/services/llms-txt'
@@ -53,19 +53,20 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     // Return content anyway — don't block the user if save fails
   }
 
-  // Race-condition guard: re-check count AFTER insert to catch concurrent requests
-  // that both passed the pre-check. Only applies to finite limits.
-  if (saved && limitCheck.allowed) {
-    const sub2 = await getSubscriptionWithPlan(user.org_id)
-    const slug2 = sub2?.plan?.slug ?? 'free'
-    const postCheck = await canGenerateLlmsTxt(user.org_id, slug2)
-    if (!postCheck.allowed) {
-      // Over limit — delete the row we just inserted and return error
+  // Race-condition guard: after insert, roll back ONLY if the count is now
+  // STRICTLY over the plan limit — i.e. a concurrent request also inserted.
+  // The just-saved row legitimately brings the count up to the limit (free
+  // plan: count 1 === limit 1), so it must not be rolled back. Using the
+  // pre-insert check (count >= limit) here failed every first generation.
+  // engineering-app#154.
+  if (saved) {
+    const slug2 = (await getSubscriptionWithPlan(user.org_id))?.plan?.slug ?? 'free'
+    if (await isLlmsTxtOverLimit(user.org_id, slug2)) {
       logger.warn('llms.txt race condition detected — rolling back insert', { orgId: user.org_id, rowId: saved.id })
       // saveLlmsTxtGeneration uses user client; use admin client to delete
       const { createAdminClient } = await import('@/lib/supabase/admin')
       await createAdminClient().from('llms_txt_generations').delete().eq('id', saved.id)
-      return NextResponse.json({ error: postCheck.reason }, { status: 403 })
+      return NextResponse.json({ error: 'You have reached your llms.txt generation limit. Please try again.' }, { status: 403 })
     }
   }
 
