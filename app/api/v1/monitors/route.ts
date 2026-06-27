@@ -92,7 +92,7 @@ export async function GET(request: Request): Promise<NextResponse> {
  *
  * Enforces:
  * - API access plan gate (hasApiAccess) — Free plan: 403
- * - Monitor count limit (checkMonitorLimit) — over limit: 429
+ * - Monitor count limit (checkMonitorLimit) — over limit: 403
  * - SSRF protection on target URL
  */
 export async function POST(request: Request): Promise<NextResponse> {

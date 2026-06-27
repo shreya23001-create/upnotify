@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import { ThemeToggle } from '@/components/ui/theme-toggle'
 import type { NavContent } from '@/lib/types/cms'
 
 interface PublicNavClientProps {
@@ -71,7 +72,7 @@ export function PublicNavClient({ links, ctaPrimary, ctaSecondary }: PublicNavCl
             <text x="10" y="30" fontFamily="system-ui,-apple-system,sans-serif" fontSize="16" fontWeight="800" fill="white" letterSpacing="0.5">
               <tspan dy="0">U</tspan><tspan dy="-5">p</tspan>
             </text>
-            <text x="46" y="34" fontFamily="system-ui,-apple-system,sans-serif" fontSize="28" fontWeight="700" fill="#0f172a" letterSpacing="-0.5">Uptrue</text>
+            <text x="46" y="34" fontFamily="system-ui,-apple-system,sans-serif" fontSize="28" fontWeight="700" fill="currentColor" letterSpacing="-0.5">Uptrue</text>
           </svg>
         </Link>
 
@@ -87,6 +88,7 @@ export function PublicNavClient({ links, ctaPrimary, ctaSecondary }: PublicNavCl
         </ul>
 
         <div className="nav-actions">
+          <ThemeToggle />
           {isLoggedIn ? (
             <Link href="/dashboard" className="btn btn-primary btn-sm">Dashboard</Link>
           ) : (
@@ -128,6 +130,9 @@ export function PublicNavClient({ links, ctaPrimary, ctaSecondary }: PublicNavCl
             ))}
           </ul>
           <div className="nav-mobile-cta">
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 'var(--space-3)' }}>
+              <ThemeToggle />
+            </div>
             {isLoggedIn ? (
               <Link href="/dashboard" className="btn btn-primary" onClick={close} style={{ display: 'block', textAlign: 'center' }}>Dashboard</Link>
             ) : (

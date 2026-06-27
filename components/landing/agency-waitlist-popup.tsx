@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 
 const COUNTRY_CODES = [
   { code: '+44', country: 'UK' },
@@ -41,11 +41,17 @@ export function AgencyWaitlistPopup({ isOpen, onClose }: AgencyWaitlistPopupProp
   const [numClients, setNumClients] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [result, setResult] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+  // Synchronous guard: state updates are async, so `disabled={submitting}` alone
+  // does not stop a second submit fired before the re-render (#146 double submission).
+  const inFlightRef = useRef(false)
 
   if (!isOpen) return null
 
   const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault()
+    if (inFlightRef.current) return
+    // Already on the list — don't let a successful submission be repeated.
+    if (result?.type === 'success') return
     if (!name.trim() || !email.trim() || !businessName.trim()) {
       setResult({ type: 'error', text: 'Please fill in all required fields (Name, Email, Business Name).' })
       return
@@ -64,6 +70,7 @@ export function AgencyWaitlistPopup({ isOpen, onClose }: AgencyWaitlistPopupProp
       return
     }
 
+    inFlightRef.current = true
     setSubmitting(true)
     setResult(null)
 
@@ -94,6 +101,7 @@ export function AgencyWaitlistPopup({ isOpen, onClose }: AgencyWaitlistPopupProp
       setResult({ type: 'error', text: 'Network error. Please try again.' })
     } finally {
       setSubmitting(false)
+      inFlightRef.current = false
     }
   }
 

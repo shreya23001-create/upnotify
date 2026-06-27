@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { Fragment, useState, useEffect, useRef, useCallback } from 'react'
 
 /* ─── Types ─────────────────────────────────────────────────────────────── */
 type Phase = 'normal' | 'degrading' | 'down' | 'recovering'
@@ -821,8 +821,8 @@ export function HeroDashboardMockup(): React.ReactElement {
 
                     {/* User-added monitors */}
                     {userMonitors.map(m => (
-                      <>
-                        <tr key={m.id} className="hm-clickable-row hm-new-row" onClick={() => toggleRow(m.id)}>
+                      <Fragment key={m.id}>
+                        <tr className="hm-clickable-row hm-new-row" onClick={() => toggleRow(m.id)}>
                           <td><input type="checkbox" name={`hm-row-${m.id}`} id={`hm-row-${m.id}`} style={{ accentColor: 'var(--brand-blue)', width: '10px', height: '10px' }} readOnly aria-label={`Select ${m.name}`} /></td>
                           <td><div className="mm-monitor-name">{m.name}</div><div className="mm-monitor-url">{m.url}</div></td>
                           <td><span className="mm-type-tag">{m.type}</span></td>
@@ -836,13 +836,13 @@ export function HeroDashboardMockup(): React.ReactElement {
                           <td style={{ fontSize: '9px', color: 'var(--text-muted)' }}>Just added</td>
                         </tr>
                         {expandedRow === m.id && (
-                          <tr key={`${m.id}-d`} className="hm-row-detail-row"><td colSpan={7}>
+                          <tr className="hm-row-detail-row"><td colSpan={7}>
                             <div className="hm-row-detail">
                               <div className="hm-detail-item"><span className="hm-detail-label">Status</span><span className="hm-detail-val">First check in progress — usually takes 30s</span></div>
                             </div>
                           </td></tr>
                         )}
-                      </>
+                      </Fragment>
                     ))}
 
                   </tbody>
