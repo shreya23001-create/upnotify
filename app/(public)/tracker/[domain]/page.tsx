@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation'
+import { cache } from 'react'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import {
@@ -25,12 +26,18 @@ import {
 } from '@/lib/constants/tracker-site-info'
 
 export const revalidate = 60
+export const maxDuration = 30
+
+// Deduplicate the monitor lookup between generateMetadata and the page component
+// within a single request — both call getPublicMonitorByDomainIncludingInactive
+// for the same domain, so without cache() that's two cold DB round-trips.
+const getMonitorCached = cache(getPublicMonitorByDomainIncludingInactive)
 
 export async function generateMetadata({ params }: { params: Promise<{ domain: string }> }): Promise<Metadata> {
   const { domain } = await params
   const decodedDomain = decodeURIComponent(domain)
   const canonicalDomain = normalisePublicMonitorDomain(decodedDomain)
-  const monitorAny = await getPublicMonitorByDomainIncludingInactive(canonicalDomain)
+  const monitorAny = await getMonitorCached(canonicalDomain)
 
   // Soft 404 — domain not in our tracker. Render with helpful content
   // (related sites + signup CTA) but don't index the URL.
@@ -273,7 +280,7 @@ export default async function TrackerDomainPage({
   //     robots:noindex,nofollow (200)
   //   - no row → render "we don't track this yet" soft page (200)
   // generateMetadata sets the right robots header per branch.
-  const monitorAny = await getPublicMonitorByDomainIncludingInactive(canonicalDomain)
+  const monitorAny = await getMonitorCached(canonicalDomain)
 
   if (!monitorAny) {
     return <TrackerSoftNotFound requestedDomain={canonicalDomain} variant="not-tracked" />
