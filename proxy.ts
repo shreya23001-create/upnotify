@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server'
 import { createProxyClient } from '@/lib/supabase/proxy'
-import { isPublicRoute, isAuthRoute, isAdminRoute } from '@/lib/auth/helpers'
+import { isPublicRoute, isAuthRoute, isAdminRoute, isPrivateRoute } from '@/lib/auth/helpers'
 
 /**
  * Next.js 16 proxy (replaces middleware.ts).
@@ -32,7 +32,11 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
 
   // Protected routes: redirect unauthenticated users to login
   if (!user) {
-    return NextResponse.redirect(new URL('/login', request.url))
+    if (isPrivateRoute(pathname)) {
+      return NextResponse.redirect(new URL('/login', request.url))
+    }
+    // Unknown/unrecognised path — let Next.js render not-found.tsx (custom 404)
+    return response()
   }
 
   // Check if user is deactivated

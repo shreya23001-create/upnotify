@@ -79,6 +79,13 @@ export function isAuthRoute(pathname: string): boolean {
   return pathname === '/login' || pathname === '/signup'
 }
 
+export function isPrivateRoute(pathname: string): boolean {
+  if (pathname.startsWith('/dashboard')) return true
+  if (pathname.startsWith('/admin')) return true
+  if (pathname === '/deactivated') return true
+  return false
+}
+
 export function isAdminRoute(pathname: string): boolean {
   return pathname.startsWith('/admin')
 }
