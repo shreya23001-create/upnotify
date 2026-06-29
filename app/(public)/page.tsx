@@ -47,14 +47,14 @@ import type {
 export const revalidate = 600
 
 export const metadata: Metadata = {
-  title: 'Uptrue — Uptime Monitoring Suite for Agencies & Teams',
+  title: 'Free Uptime Monitoring for Agencies, SaaS & Dev Teams — Uptrue',
   description:
-    'Monitor uptime, performance and infrastructure across all your sites. 24 monitor types, AI-powered reports, public status pages, multi-channel alerts, and agency white-label — all in one platform. Free plan available.',
+    'Monitor uptime, SSL, DNS, APIs & more across all your sites. 1-min checks, 2-region confirm, zero false alarms. Free — no card needed.',
   alternates: { canonical: 'https://uptrue.io' },
   openGraph: {
-    title: 'Uptrue — Uptime Monitoring Suite for Agencies & Teams',
+    title: 'Free Uptime Monitoring for Agencies, SaaS & Dev Teams — Uptrue',
     description:
-      'Monitor uptime, performance and infrastructure across all your sites. 24 monitor types, AI-powered reports, public status pages, and multi-channel alerts.',
+      'Monitor uptime, SSL, DNS, APIs & more across all your sites. 1-min checks, 2-region confirm, zero false alarms. Free — no card needed.',
     url: 'https://uptrue.io',
   },
 }
@@ -213,8 +213,8 @@ export default async function LandingPage(): Promise<React.ReactElement> {
                   </div>
                 </div>
                 <h1 className="hero-headline fade-up delay-1">
-                  {hero?.headline_line1 ?? 'Know when your sites go down.'}<br />
-                  <span className="gradient-text">{hero?.headline_line2 ?? 'Before your customers do.'}</span>
+                  {hero?.headline_line1 ?? 'Free Uptime & Website Monitoring'}<br />
+                  <span className="gradient-text">{hero?.headline_line2 ?? 'for Agencies, SaaS & Dev Teams'}</span>
                 </h1>
                 <p className="hero-sub fade-up delay-2">
                   {hero?.subheadline ?? 'Uptime, performance & infrastructure monitoring for agencies and teams. Multi-channel alerts, public status pages, and AI-powered reports — all in one platform.'}
