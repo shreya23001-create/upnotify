@@ -182,9 +182,13 @@ export async function subscribeWebhookToStatusPage(
 
 export async function unsubscribeFromStatusPage(token: string): Promise<boolean> {
   const supabase = createAdminClient()
-  const { error } = await supabase.from('status_page_subscribers').delete().eq('unsubscribe_token', token)
+  const { data, error } = await supabase
+    .from('status_page_subscribers')
+    .delete()
+    .eq('unsubscribe_token', token)
+    .select()
   if (error) { logger.error('Failed to unsubscribe', { error: error.message }); return false }
-  return true
+  return (data?.length ?? 0) > 0
 }
 
 export async function bulkDeleteStatusPages(ids: string[], orgId: string): Promise<boolean> {

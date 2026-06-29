@@ -48,6 +48,7 @@ export function isPublicRoute(pathname: string): boolean {
   if (pathname.startsWith('/monitoring/')) return true
   if (pathname.startsWith('/tools/')) return true
   if (pathname.startsWith('/integrations/')) return true
+  if (pathname.startsWith('/api/v1/')) return true
   if (pathname.startsWith('/api/cron/')) return true
   if (pathname.startsWith('/api/badge/')) return true
   if (pathname.startsWith('/api/v1/tracker/')) return true
