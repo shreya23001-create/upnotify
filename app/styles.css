@@ -3554,6 +3554,7 @@ html.dark .landing-cta { background: linear-gradient(135deg, #1a1d27 0%, #242736
 .ai-vis-input { width: 100%; padding: 10px 12px; font-size: 14px; border: 1.5px solid var(--border-primary); border-radius: 8px; background: var(--bg-primary); color: var(--text-primary); outline: none; transition: border-color 0.2s; box-sizing: border-box; }
 .ai-vis-input:focus { border-color: var(--accent); }
 .ai-vis-hint { font-size: 12px; color: var(--text-muted); margin-top: 5px; display: block; }
+.ai-vis-hint-inline { font-size: 12px; color: var(--text-muted); font-weight: 400; }
 
 .ai-vis-engine-grid { display: flex; flex-wrap: wrap; gap: 8px; }
 .ai-vis-engine-chip { display: flex; align-items: center; gap: 6px; padding: 7px 12px; border: 1.5px solid var(--border-primary); border-radius: 8px; cursor: pointer; transition: all 0.15s; user-select: none; }
