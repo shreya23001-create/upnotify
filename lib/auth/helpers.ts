@@ -59,6 +59,17 @@ export function isPublicRoute(pathname: string): boolean {
   if (pathname.startsWith('/api/debug/')) return true
   if (pathname.startsWith('/invite/')) return true
   if (pathname.startsWith('/r/')) return true
+  // Public API routes that must be accessible without a session
+  if (pathname === '/api/contact') return true
+  if (pathname === '/api/contact/verify') return true
+  if (pathname === '/api/v1/blog/subscribe') return true
+  if (pathname === '/api/v1/email/unsubscribe') return true
+  if (pathname === '/api/v1/team/invite-details') return true
+  if (pathname === '/api/v1/team/accept') return true
+  if (pathname === '/api/v1/compete/webhook') return true
+  if (pathname === '/api/v1/status-pages/subscribe') return true
+  if (pathname === '/api/v1/status-pages/unsubscribe') return true
+  if (pathname === '/api/v1/outreach/unsubscribe') return true
   return false
 }
 
