@@ -25,7 +25,7 @@ export function AiVisibilityClient({
   planSlug, canGenerateLlms, llmsBlockReason,
   citationRunsThisMonth, citationLimit,
 }: Props): React.ReactElement {
-  const [tab, setTab] = useState<Tab>('llms')
+  const [tab, setTab] = useState<Tab>('citation')
 
   return (
     <div>

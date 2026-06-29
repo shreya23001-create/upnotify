@@ -40,6 +40,7 @@ const PUBLIC_ROUTES: ReadonlyArray<string> = [
 
 export function isPublicRoute(pathname: string): boolean {
   if (PUBLIC_ROUTES.includes(pathname)) return true
+  if (pathname === '/status') return true
   if (pathname.startsWith('/status/')) return true
   if (pathname.startsWith('/score/')) return true
   if (pathname.startsWith('/tracker/')) return true

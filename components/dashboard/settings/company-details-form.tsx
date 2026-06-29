@@ -117,12 +117,12 @@ export function CompanyDetailsForm({ organisation, onSave }: Props): React.React
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
         <div className="form-group">
-          <label className="form-label">Company Name</label>
-          <input className="form-input" name="company_name" defaultValue={getFieldValue(savedOrg, 'company_name')} disabled={isPending} />
+          <label className="form-label">Company Name <span style={{ color: 'var(--error, #ef4444)' }}>*</span></label>
+          <input className="form-input" name="company_name" required minLength={2} maxLength={100} defaultValue={getFieldValue(savedOrg, 'company_name')} disabled={isPending} placeholder="e.g. Acme Ltd" />
         </div>
         <div className="form-group">
           <label className="form-label">Billing Email</label>
-          <input className="form-input" name="billing_email" type="email" defaultValue={getFieldValue(savedOrg, 'billing_email')} disabled={isPending} />
+          <input className="form-input" name="billing_email" type="email" maxLength={254} defaultValue={getFieldValue(savedOrg, 'billing_email')} disabled={isPending} placeholder="e.g. billing@acme.com" />
         </div>
       </div>
 

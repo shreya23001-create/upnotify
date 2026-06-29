@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
 import type { Organisation } from '@/lib/types'
 import { getCurrentUser } from './users'
@@ -58,7 +59,7 @@ export async function updateCompanyDetails(
     logo_url?: string
   }
 ): Promise<Organisation | null> {
-  const supabase = await createClient()
+  const supabase = createAdminClient()
   const { data, error } = await supabase
     .from('organisations')
     .update(details as Record<string, unknown>)
