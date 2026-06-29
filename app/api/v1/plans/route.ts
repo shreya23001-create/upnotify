@@ -13,7 +13,7 @@ export async function GET(): Promise<NextResponse> {
     .order('price_monthly_gbp', { ascending: true })
 
   if (error) {
-    return NextResponse.json({ error: 'Failed to fetch plans' }, { status: 500 })
+    return NextResponse.json({ error: 'Plans temporarily unavailable. Please try again shortly.' }, { status: 503 })
   }
 
   return NextResponse.json({ plans: data ?? [] }, {
