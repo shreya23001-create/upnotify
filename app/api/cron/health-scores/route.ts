@@ -45,7 +45,7 @@ function scoreLabel(score: number): string {
 
 export async function GET(req: Request): Promise<NextResponse> {
   if (!(await isAuthorised(req))) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   const cronStart = Date.now()
