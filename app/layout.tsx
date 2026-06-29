@@ -27,11 +27,11 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL("https://uptrue.io"),
   title: {
-    default: "Uptrue — Uptime Monitoring for Agencies & Teams",
+    default: "Free Uptime Monitoring for Agencies, SaaS & Dev Teams — Uptrue",
     template: "%s",
   },
   description:
-    "Monitor uptime, performance and infrastructure across all your sites. 10 monitor types, AI-powered reports, public status pages, multi-channel alerts, and agency white-label — all in one platform.",
+    "Monitor uptime, SSL, DNS, APIs & more across all your sites. 1-min checks, 2-region confirm, zero false alarms. Free — no card needed.",
   keywords: [
     "uptime monitoring",
     "website monitoring",
@@ -57,23 +57,23 @@ export const metadata: Metadata = {
     locale: "en_GB",
     url: "https://uptrue.io",
     siteName: "Uptrue",
-    title: "Uptrue — Uptime Monitoring for Agencies & Teams",
+    title: "Free Uptime Monitoring for Agencies, SaaS & Dev Teams — Uptrue",
     description:
-      "Monitor uptime, performance and infrastructure across all your sites. 10 monitor types, AI-powered reports, public status pages, and multi-channel alerts.",
+      "Monitor uptime, SSL, DNS, APIs & more across all your sites. 1-min checks, 2-region confirm, zero false alarms. Free — no card needed.",
     images: [
       {
         url: "/opengraph-image",
         width: 1200,
         height: 630,
-        alt: "Uptrue — Uptime Monitoring for Agencies & Teams",
+        alt: "Free Uptime Monitoring for Agencies, SaaS & Dev Teams — Uptrue",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Uptrue — Uptime Monitoring for Agencies & Teams",
+    title: "Free Uptime Monitoring for Agencies, SaaS & Dev Teams — Uptrue",
     description:
-      "Monitor uptime, performance and infrastructure across all your sites. 10 monitor types, AI-powered reports, public status pages, and multi-channel alerts.",
+      "Monitor uptime, SSL, DNS, APIs & more across all your sites. 1-min checks, 2-region confirm, zero false alarms. Free — no card needed.",
     images: ["/opengraph-image"],
   },
   icons: {
