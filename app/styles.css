@@ -5838,6 +5838,8 @@ html.dark .monitor-stat-icon.icon-red { background: rgba(239,68,68,0.15); }
   outline: none; width: 240px; transition: border-color 0.15s, box-shadow 0.15s;
 }
 .blog-newsletter-input:focus { border-color: var(--brand-blue); box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+.blog-newsletter-input.input-error { border-color: #dc2626; }
+.blog-newsletter-input.input-error:focus { box-shadow: 0 0 0 3px rgba(220,38,38,0.12); }
 @media (max-width: 768px) {
   .blog-newsletter { flex-direction: column; }
   .blog-newsletter-form { flex-direction: column; width: 100%; }

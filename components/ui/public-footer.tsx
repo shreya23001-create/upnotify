@@ -58,7 +58,7 @@ const DEFAULT_COLUMNS: FooterColumn[] = [
     title: 'Support',
     links: [
       { label: 'Help Centre',    href: '/help' },
-      { label: 'API Docs',       href: '/docs' },
+      { label: 'API Docs',       href: '/api-docs' },
       { label: 'Status',         href: '/status' },
       { label: 'Security',       href: '/security' },
       { label: 'Sub-processors', href: '/subprocessors' },
