@@ -302,7 +302,7 @@ function CitationTab({ engines, freeEngineIds, runs, planSlug, runsThisMonth, mo
   const [runId, setRunId]              = useState<string | null>(null)
 
   const citationEngines = engines.filter(e => e.type === 'citation' || e.type === 'both')
-  const canRun = planSlug === 'free' || runsThisMonth < monthlyLimit
+  const canRun = runsThisMonth < monthlyLimit
 
   function toggleEngine(id: string) {
     if (planSlug === 'free' && !freeEngineIds.includes(id)) return // block paid engines for free users
@@ -494,7 +494,7 @@ function ProfileTab({ engines, freeEngineIds, runs, planSlug, runsThisMonth, mon
 
   // Profile uses the same engine pool as citation (any engine that can answer)
   const profileEngines = engines.filter(e => e.type === 'citation' || e.type === 'both')
-  const canRun = planSlug === 'free' || runsThisMonth < monthlyLimit
+  const canRun = runsThisMonth < monthlyLimit
 
   function toggleEngine(id: string) {
     if (planSlug === 'free' && !freeEngineIds.includes(id)) return
