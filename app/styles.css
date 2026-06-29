@@ -6093,7 +6093,7 @@ section.hero::before {
    ============================================================ */
 .stats-bar {
   padding: 32px 0; background: var(--bg-muted);
-  border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+  border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); overflow: hidden;
 }
 .stats-bar-inner {
   display: flex; align-items: center; justify-content: center;

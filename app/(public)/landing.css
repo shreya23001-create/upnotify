@@ -463,7 +463,7 @@ html.dark .pub-nav {
    ============================================================ */
 .stats-bar {
   padding: var(--space-8) 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
-  background: var(--bg-card);
+  background: var(--bg-card); overflow: hidden;
 }
 .stats-bar-inner { display: flex; justify-content: center; align-items: center; gap: var(--space-16); flex-wrap: nowrap; max-width: 1160px; margin: 0 auto; padding: 0 var(--space-6); }
 .stats-bar .stat-item { text-align: center; flex-shrink: 0; }
