@@ -79,15 +79,16 @@ export function ContactForm(): React.ReactElement {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       })
-      const data = await res.json() as { success?: boolean; error?: string }
+      let data: { success?: boolean; error?: string } = {}
+      try { data = await res.json() as typeof data } catch { /* non-JSON response (e.g. 504 HTML) */ }
       if (data.success) {
         setState('sent')
       } else {
-        setErrorMsg(data.error ?? 'Something went wrong. Please try again.')
+        setErrorMsg(data.error ?? (res.ok ? 'Something went wrong. Please try again.' : `Server error (${res.status}). Please try again.`))
         setState('error')
       }
     } catch {
-      setErrorMsg('Network error. Please check your connection and try again.')
+      setErrorMsg('Unable to reach the server. Please check your connection and try again.')
       setState('error')
     }
   }

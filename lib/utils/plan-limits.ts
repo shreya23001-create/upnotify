@@ -27,7 +27,7 @@ const FREE_DEFAULTS: PlanLimits = {
   monitors: 3,
   workspaces: 1,
   competitors: 3,
-  maxTeamMembers: 1,
+  maxTeamMembers: 0,
   hasEmailAlerts: true,
   hasSlackTeams: false,
   hasWebhooks: false,

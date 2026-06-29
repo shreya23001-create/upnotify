@@ -29,6 +29,39 @@ interface AgencyWaitlistPopupProps {
   onClose: () => void
 }
 
+interface FieldErrors {
+  name?: string
+  email?: string
+  businessName?: string
+  website?: string
+  phone?: string
+}
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+function validateFields(
+  name: string, email: string, businessName: string,
+  website: string, phoneNumber: string
+): FieldErrors {
+  const errors: FieldErrors = {}
+  if (!name.trim()) errors.name = 'Name is required.'
+  if (!email.trim()) errors.email = 'Email address is required.'
+  else if (!EMAIL_REGEX.test(email.trim())) errors.email = 'Please enter a valid email address.'
+  if (!businessName.trim()) errors.businessName = 'Business name is required.'
+  if (website.trim()) {
+    try {
+      const parsed = new URL(website.trim().startsWith('http') ? website.trim() : `https://${website.trim()}`)
+      if (!['http:', 'https:'].includes(parsed.protocol)) throw new Error()
+    } catch {
+      errors.website = 'Please enter a valid website URL (e.g. https://agency.com).'
+    }
+  }
+  if (phoneNumber.trim() && !/^\d[\d\s\-]{5,14}$/.test(phoneNumber.trim())) {
+    errors.phone = 'Please enter a valid phone number (digits only).'
+  }
+  return errors
+}
+
 export function AgencyWaitlistPopup({ isOpen, onClose }: AgencyWaitlistPopupProps): React.ReactElement | null {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -40,6 +73,7 @@ export function AgencyWaitlistPopup({ isOpen, onClose }: AgencyWaitlistPopupProp
   const [website, setWebsite] = useState('')
   const [numClients, setNumClients] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
   const [result, setResult] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
   // Synchronous guard: state updates are async, so `disabled={submitting}` alone
   // does not stop a second submit fired before the re-render (#146 double submission).
@@ -47,32 +81,21 @@ export function AgencyWaitlistPopup({ isOpen, onClose }: AgencyWaitlistPopupProp
 
   if (!isOpen) return null
 
+  function clearFieldError(field: keyof FieldErrors) {
+    if (fieldErrors[field]) setFieldErrors(p => ({ ...p, [field]: undefined }))
+  }
+
   const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault()
-    if (inFlightRef.current) return
-    // Already on the list — don't let a successful submission be repeated.
-    if (result?.type === 'success') return
-    if (!name.trim() || !email.trim() || !businessName.trim()) {
-      setResult({ type: 'error', text: 'Please fill in all required fields (Name, Email, Business Name).' })
-      return
-    }
-    if (website.trim()) {
-      try {
-        const parsed = new URL(website.trim().startsWith('http') ? website.trim() : `https://${website.trim()}`)
-        if (!['http:', 'https:'].includes(parsed.protocol)) throw new Error()
-      } catch {
-        setResult({ type: 'error', text: 'Please enter a valid website URL (e.g. https://agency.com).' })
-        return
-      }
-    }
-    if (phoneNumber.trim() && !/^\d[\d\s\-]{5,14}$/.test(phoneNumber.trim())) {
-      setResult({ type: 'error', text: 'Please enter a valid phone number (digits only).' })
-      return
-    }
-
-    inFlightRef.current = true
-    setSubmitting(true)
     setResult(null)
+
+    const errors = validateFields(name, email, businessName, website, phoneNumber)
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors)
+      return
+    }
+    setFieldErrors({})
+    setSubmitting(true)
 
     try {
       const res = await fetch('/api/v1/agency-waitlist', {
@@ -128,15 +151,29 @@ export function AgencyWaitlistPopup({ isOpen, onClose }: AgencyWaitlistPopupProp
               and revenue sharing for agencies managing multiple client sites.
             </p>
 
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} noValidate>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 <div className="form-group">
                   <label className="form-label" htmlFor="aw-name">Your Name *</label>
-                  <input id="aw-name" name="aw-name" className="form-input" value={name} onChange={e => setName(e.target.value)} placeholder="John Smith" required disabled={submitting} />
+                  <input
+                    id="aw-name" name="aw-name"
+                    className={`form-input${fieldErrors.name ? ' input-error' : ''}`}
+                    value={name}
+                    onChange={e => { setName(e.target.value); clearFieldError('name') }}
+                    placeholder="John Smith" disabled={submitting}
+                  />
+                  {fieldErrors.name && <p className="field-error">{fieldErrors.name}</p>}
                 </div>
                 <div className="form-group">
                   <label className="form-label" htmlFor="aw-email">Email *</label>
-                  <input id="aw-email" name="aw-email" className="form-input" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="john@agency.com" required disabled={submitting} />
+                  <input
+                    id="aw-email" name="aw-email"
+                    className={`form-input${fieldErrors.email ? ' input-error' : ''}`}
+                    type="email" value={email}
+                    onChange={e => { setEmail(e.target.value); clearFieldError('email') }}
+                    placeholder="john@agency.com" disabled={submitting}
+                  />
+                  {fieldErrors.email && <p className="field-error">{fieldErrors.email}</p>}
                 </div>
                 <div className="form-group">
                   <label className="form-label">Phone Number</label>
@@ -146,16 +183,37 @@ export function AgencyWaitlistPopup({ isOpen, onClose }: AgencyWaitlistPopupProp
                         <option key={c.code} value={c.code}>{c.code} {c.country}</option>
                       ))}
                     </select>
-                    <input id="aw-phone-number" name="aw-phone-number" className="form-input" value={phoneNumber} onChange={e => setPhoneNumber(e.target.value)} placeholder="7911123456" disabled={submitting} />
+                    <input
+                      id="aw-phone-number" name="aw-phone-number"
+                      className={`form-input${fieldErrors.phone ? ' input-error' : ''}`}
+                      value={phoneNumber}
+                      onChange={e => { setPhoneNumber(e.target.value); clearFieldError('phone') }}
+                      placeholder="7911123456" disabled={submitting}
+                    />
                   </div>
+                  {fieldErrors.phone && <p className="field-error">{fieldErrors.phone}</p>}
                 </div>
                 <div className="form-group">
                   <label className="form-label" htmlFor="aw-business-name">Business Name *</label>
-                  <input id="aw-business-name" name="aw-business-name" className="form-input" value={businessName} onChange={e => setBusinessName(e.target.value)} placeholder="Acme Digital Agency" required disabled={submitting} />
+                  <input
+                    id="aw-business-name" name="aw-business-name"
+                    className={`form-input${fieldErrors.businessName ? ' input-error' : ''}`}
+                    value={businessName}
+                    onChange={e => { setBusinessName(e.target.value); clearFieldError('businessName') }}
+                    placeholder="Acme Digital Agency" disabled={submitting}
+                  />
+                  {fieldErrors.businessName && <p className="field-error">{fieldErrors.businessName}</p>}
                 </div>
                 <div className="form-group">
                   <label className="form-label" htmlFor="aw-website">Website</label>
-                  <input id="aw-website" name="aw-website" className="form-input" value={website} onChange={e => setWebsite(e.target.value)} placeholder="https://agency.com" disabled={submitting} />
+                  <input
+                    id="aw-website" name="aw-website"
+                    className={`form-input${fieldErrors.website ? ' input-error' : ''}`}
+                    value={website}
+                    onChange={e => { setWebsite(e.target.value); clearFieldError('website') }}
+                    placeholder="https://agency.com" disabled={submitting}
+                  />
+                  {fieldErrors.website && <p className="field-error">{fieldErrors.website}</p>}
                 </div>
                 <div className="form-group">
                   <label className="form-label" htmlFor="aw-num-clients">Number of Clients</label>

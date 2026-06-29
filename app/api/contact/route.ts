@@ -3,6 +3,8 @@ import { headers } from 'next/headers'
 import crypto from 'crypto'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { sendEmail } from '@/lib/services/email'
+
+export const maxDuration = 30
 import { getServerConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
 import { escapeHtml } from '@/lib/utils/escape-html'

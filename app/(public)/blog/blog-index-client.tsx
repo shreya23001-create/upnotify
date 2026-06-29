@@ -31,10 +31,15 @@ function normCat(cat: string): string {
 }
 
 
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
 function BlogIndexContent({ posts }: { posts: UnifiedPost[] }) {
   const [activeTab, setActiveTab] = useState('All posts')
   const [searchQuery, setSearchQuery] = useState('')
   const [visibleCount, setVisibleCount] = useState(POSTS_PER_PAGE)
+  const [subEmail, setSubEmail] = useState('')
+  const [subStatus, setSubStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+  const [subMsg, setSubMsg] = useState('')
 
   const catFilter = activeTab === 'All posts' ? null : activeTab
 
@@ -57,6 +62,33 @@ function BlogIndexContent({ posts }: { posts: UnifiedPost[] }) {
   function switchTab(tab: string) {
     setActiveTab(tab)
     setVisibleCount(POSTS_PER_PAGE)
+  }
+
+  async function handleSubscribe(e: React.FormEvent) {
+    e.preventDefault()
+    const trimmed = subEmail.trim()
+    if (!trimmed) { setSubStatus('error'); setSubMsg('Email address is required.'); return }
+    if (!EMAIL_RE.test(trimmed)) { setSubStatus('error'); setSubMsg('Please enter a valid email address.'); return }
+    setSubStatus('loading')
+    try {
+      const res = await fetch('/api/v1/blog/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: trimmed, source: 'blog-index' }),
+      })
+      const data = await res.json() as { success?: boolean; error?: string }
+      if (data.success) {
+        setSubStatus('success')
+        setSubMsg("You're subscribed! We'll email you when new articles are published.")
+        setSubEmail('')
+      } else {
+        setSubStatus('error')
+        setSubMsg(data.error ?? 'Something went wrong. Please try again.')
+      }
+    } catch {
+      setSubStatus('error')
+      setSubMsg('Network error. Please try again.')
+    }
   }
 
   return (
@@ -223,10 +255,28 @@ function BlogIndexContent({ posts }: { posts: UnifiedPost[] }) {
             <h3>Get articles in your inbox</h3>
             <p>One email when we publish. No noise. Unsubscribe any time.</p>
           </div>
-          <div className="blog-newsletter-form">
-            <input className="blog-newsletter-input" type="email" placeholder="you@company.com" />
-            <button className="btn btn-primary">Subscribe</button>
-          </div>
+          {subStatus === 'success' ? (
+            <p style={{ fontSize: 14, color: '#16a34a', fontWeight: 500 }}>{subMsg}</p>
+          ) : (
+            <form className="blog-newsletter-form" onSubmit={handleSubscribe} noValidate style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
+              <div style={{ display: 'flex', gap: 'var(--space-2)', width: '100%' }}>
+                <input
+                  className={`blog-newsletter-input${subStatus === 'error' ? ' input-error' : ''}`}
+                  type="email"
+                  placeholder="you@company.com"
+                  value={subEmail}
+                  onChange={e => { setSubEmail(e.target.value); setSubStatus('idle') }}
+                  disabled={subStatus === 'loading'}
+                />
+                <button className="btn btn-primary" type="submit" disabled={subStatus === 'loading'}>
+                  {subStatus === 'loading' ? 'Subscribing…' : 'Subscribe'}
+                </button>
+              </div>
+              {subStatus === 'error' && (
+                <p style={{ fontSize: 12, color: '#dc2626', margin: '4px 0 0' }}>{subMsg}</p>
+              )}
+            </form>
+          )}
         </div>
 
       </div>
