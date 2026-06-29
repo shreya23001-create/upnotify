@@ -94,7 +94,14 @@ export default async function MonitorDetailPage({
             <span className="monitor-type-badge">{monitor.type}</span>
           </div>
           <div className="monitor-target-row">
-            <div className="monitor-header-v2-url">{monitor.target}</div>
+            <a
+              href={/^https?:\/\//i.test(monitor.target) ? monitor.target : `https://${monitor.target}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="monitor-header-v2-url monitor-header-v2-url-link"
+            >
+              {monitor.target}
+            </a>
             <CopyUrlButton url={monitor.target} />
           </div>
         </div>
