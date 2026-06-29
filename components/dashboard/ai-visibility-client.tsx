@@ -293,6 +293,7 @@ function CitationTab({ engines, freeEngineIds, runs, planSlug, runsThisMonth, mo
   monthlyLimit:   number
 }) {
   const [domain, setDomain]            = useState('')
+  const [brand, setBrand]              = useState('')
   const [keywords, setKeywords]        = useState('')
   const [selectedEngines, setSelected] = useState<string[]>(
     planSlug === 'free' ? freeEngineIds : engines.filter(e => e.type === 'citation' || e.type === 'both').map(e => e.id)
@@ -321,6 +322,7 @@ function CitationTab({ engines, freeEngineIds, runs, planSlug, runsThisMonth, mo
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           domain:    domain.trim(),
+          brand:     brand.trim() || undefined,
           keywords:  keywords.split('\n').map(k => k.trim()).filter(Boolean).slice(0, 5),
           engineIds: selectedEngines,
         }),
@@ -379,6 +381,13 @@ function CitationTab({ engines, freeEngineIds, runs, planSlug, runsThisMonth, mo
               <label className="ai-vis-label">Domain to check</label>
               <input className="ai-vis-input" type="text" value={domain}
                 onChange={e => setDomain(e.target.value)} placeholder="e.g. mywebsite.com" required />
+            </div>
+
+            <div className="ai-vis-form-group">
+              <label className="ai-vis-label">Brand / product name <span className="ai-vis-hint-inline">(optional)</span></label>
+              <input className="ai-vis-input" type="text" value={brand}
+                onChange={e => setBrand(e.target.value)} placeholder="e.g. Uptrue" maxLength={100} />
+              <span className="ai-vis-hint">How your brand is known — saved with the run for your records.</span>
             </div>
 
             <div className="ai-vis-form-group">

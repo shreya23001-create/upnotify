@@ -257,11 +257,12 @@ export async function createCitationRun(
   domain: string,
   keywords: string[],
   engineIds: string[],
+  brandName?: string,
 ): Promise<CitationCheckRun | null> {
   const supabase = await createClient() as AnySupabase
   const { data, error } = await supabase
     .from('citation_check_runs')
-    .insert({ org_id: orgId, user_id: userId, domain, keywords, engine_ids: engineIds, status: 'pending' })
+    .insert({ org_id: orgId, user_id: userId, domain, keywords, engine_ids: engineIds, status: 'pending', brand_name: brandName ?? null })
     .select()
     .single()
 

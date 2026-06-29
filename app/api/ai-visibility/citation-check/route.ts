@@ -41,21 +41,22 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     )
   }
 
-  let body: { domain?: string; keywords?: string[]; engineIds?: string[] }
+  let body: { domain?: string; keywords?: string[]; engineIds?: string[]; brand?: string }
   try { body = await request.json() }
   catch { return NextResponse.json({ error: 'Invalid request.' }, { status: 400 }) }
 
-  const { domain, keywords = [], engineIds = [] } = body
+  const { domain, keywords = [], engineIds = [], brand } = body
 
   if (!domain?.trim()) return NextResponse.json({ error: 'Domain is required.' }, { status: 400 })
   if (keywords.length === 0) return NextResponse.json({ error: 'At least one keyword is required.' }, { status: 400 })
   if (keywords.length > 5) return NextResponse.json({ error: 'Maximum 5 keywords per run.' }, { status: 400 })
   if (engineIds.length === 0) return NextResponse.json({ error: 'Select at least one AI engine.' }, { status: 400 })
 
-  // Sanitise both fields before they reach the prompt — strip control chars,
-  // LLM delimiter tokens, cap length. engineering-app#81 + #83.
+  // Sanitise before they reach the prompt — strip control chars, LLM
+  // delimiter tokens, cap length. engineering-app#81 + #83.
   const cleanDomain   = cleanDomainForAi(domain)
   const cleanKeywords = keywords.map(cleanKeywordForAi).filter(Boolean)
+  const cleanBrand    = brand?.trim() ? cleanKeywordForAi(brand.trim()) : undefined
 
   const sub           = await getSubscriptionWithPlan(user.org_id)
   const planSlug      = sub?.plan?.slug ?? 'free'
@@ -66,7 +67,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   const limitCheck = await canRunCitationCheck(user.org_id, planSlug, validEngineIds, freeEngineIds)
   if (!limitCheck.allowed) return NextResponse.json({ error: limitCheck.reason }, { status: 403 })
 
-  const run = await createCitationRun(user.org_id, user.id, cleanDomain, cleanKeywords, validEngineIds)
+  const run = await createCitationRun(user.org_id, user.id, cleanDomain, cleanKeywords, validEngineIds, cleanBrand)
   if (!run) {
     logger.error('createCitationRun failed', { orgId: user.org_id })
     return NextResponse.json({ error: 'Failed to start check. Please try again.' }, { status: 500 })
