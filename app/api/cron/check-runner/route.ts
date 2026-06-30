@@ -196,7 +196,11 @@ export async function GET(request: Request): Promise<NextResponse> {
           if (confirmation.status === 'down') {
             const existingIncident = await getOpenIncidentForMonitor(monitor.id)
             if (!existingIncident) {
-              const alertCopy = getAlertCopy(monitor, { severity: monitor.severity }, {
+              // A checker can escalate severity for a specific failure mode
+              // (e.g. robots.txt blocking Googlebot → P1) above the monitor's
+              // statically-configured severity.
+              const incidentSeverity = confirmation.severityOverride ?? monitor.severity
+              const alertCopy = getAlertCopy(monitor, { severity: incidentSeverity }, {
                 variant: 'alert',
                 metadata: confirmation.metadata as Record<string, unknown> | undefined,
               })
@@ -207,7 +211,7 @@ export async function GET(request: Request): Promise<NextResponse> {
                 workspace_id: monitor.workspace_id,
                 monitor_id: monitor.id,
                 title: incidentTitle,
-                severity: monitor.severity,
+                severity: incidentSeverity,
               })
 
               if (newIncident) {

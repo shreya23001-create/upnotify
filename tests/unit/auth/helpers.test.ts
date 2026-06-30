@@ -44,6 +44,13 @@ describe('isPublicRoute', () => {
       expect(isPublicRoute('/integrations/webhook')).toBe(true)
     })
 
+    // #166 — footer "API Docs" and "Status" links were redirecting to /login
+    // (and API Docs 404'd) because the routes weren't treated as public.
+    it('returns true for /api-docs and /status footer links', () => {
+      expect(isPublicRoute('/api-docs')).toBe(true)
+      expect(isPublicRoute('/status')).toBe(true)
+    })
+
     it('returns true for /free-uptime-monitoring', () => {
       expect(isPublicRoute('/free-uptime-monitoring')).toBe(true)
     })
