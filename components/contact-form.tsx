@@ -158,6 +158,7 @@ export function ContactForm(): React.ReactElement {
         <label htmlFor="contact-email" className="contact-label">Email Address</label>
         <input
           type="email" id="contact-email" name="email"
+          maxLength={254}
           className={`contact-input${fieldErrors.email ? ' input-error' : ''}`}
           placeholder="jane@company.com"
           onChange={() => fieldErrors.email && setFieldErrors(p => ({ ...p, email: undefined }))}

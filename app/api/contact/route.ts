@@ -44,6 +44,9 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     if (!name || !email || !subject || !message) {
       return NextResponse.json({ error: 'All fields are required.' }, { status: 400 })
     }
+    if (email.length > 254) {
+      return NextResponse.json({ error: 'Invalid email address.' }, { status: 400 })
+    }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return NextResponse.json({ error: 'Invalid email address.' }, { status: 400 })
     }

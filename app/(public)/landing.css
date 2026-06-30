@@ -463,7 +463,7 @@ html.dark .pub-nav {
    ============================================================ */
 .stats-bar {
   padding: var(--space-8) 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
-  background: var(--bg-card);
+  background: var(--bg-card); overflow: hidden;
 }
 .stats-bar-inner { display: flex; justify-content: center; align-items: center; gap: var(--space-16); flex-wrap: nowrap; max-width: 1160px; margin: 0 auto; padding: 0 var(--space-6); }
 .stats-bar .stat-item { text-align: center; flex-shrink: 0; }
@@ -1202,7 +1202,7 @@ html.dark .pub-nav {
   font-size: 9px; font-weight: 800; letter-spacing: 0.12em;
   border-right: 1px solid rgba(255,255,255,0.2);
 }
-.ticker-track-wrap { flex: 1; overflow: hidden; position: relative; }
+.ticker-track-wrap { flex: 1; min-width: 0; overflow: hidden; position: relative; }
 .ticker-track-wrap::before, .ticker-track-wrap::after {
   content: ''; position: absolute; top: 0; bottom: 0; width: 40px; z-index: 2; pointer-events: none;
 }

@@ -141,6 +141,7 @@ export function LoginForm({ mode = 'login', next }: { mode?: 'login' | 'signup';
               type="text"
               placeholder="Your name"
               autoComplete="name"
+              maxLength={100}
               required
               disabled={isPending}
             />
@@ -158,6 +159,7 @@ export function LoginForm({ mode = 'login', next }: { mode?: 'login' | 'signup';
             type="email"
             placeholder="you@company.com"
             defaultValue={hintEmail}
+            maxLength={254}
             required
             autoComplete="email"
             disabled={isPending}

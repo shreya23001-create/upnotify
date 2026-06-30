@@ -48,6 +48,7 @@ export function isPublicRoute(pathname: string): boolean {
   if (pathname.startsWith('/monitoring/')) return true
   if (pathname.startsWith('/tools/')) return true
   if (pathname.startsWith('/integrations/')) return true
+  if (pathname.startsWith('/api/v1/')) return true
   if (pathname.startsWith('/api/cron/')) return true
   if (pathname.startsWith('/api/badge/')) return true
   if (pathname.startsWith('/api/v1/tracker/')) return true
@@ -76,6 +77,13 @@ export function isPublicRoute(pathname: string): boolean {
 
 export function isAuthRoute(pathname: string): boolean {
   return pathname === '/login' || pathname === '/signup'
+}
+
+export function isPrivateRoute(pathname: string): boolean {
+  if (pathname.startsWith('/dashboard')) return true
+  if (pathname.startsWith('/admin')) return true
+  if (pathname === '/deactivated') return true
+  return false
 }
 
 export function isAdminRoute(pathname: string): boolean {

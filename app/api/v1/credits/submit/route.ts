@@ -60,6 +60,27 @@ export async function POST(request: Request): Promise<NextResponse> {
 
   const creditAmount = CREDIT_AMOUNTS[body.creditType] ?? 0
 
+  // Enforce £10/month (1000p) cap per org — count pending + approved this calendar month
+  const MONTHLY_CAP_PENCE = 1000
+  const monthStart = new Date()
+  monthStart.setDate(1)
+  monthStart.setHours(0, 0, 0, 0)
+
+  const { data: monthlyRows } = await supabase
+    .from('credit_submissions')
+    .select('credit_amount_pence, status')
+    .eq('org_id', currentUser.org_id)
+    .in('status', ['pending', 'approved'])
+    .gte('created_at', monthStart.toISOString())
+
+  const monthlyTotal = (monthlyRows ?? []).reduce((sum, r) => sum + (r.credit_amount_pence ?? 0), 0)
+  if (monthlyTotal + creditAmount > MONTHLY_CAP_PENCE) {
+    return NextResponse.json(
+      { error: `Monthly credit cap of £${(MONTHLY_CAP_PENCE / 100).toFixed(2)} reached. Unused credits do not roll over.` },
+      { status: 422 }
+    )
+  }
+
   const submission = await createSubmission({
     orgId: currentUser.org_id,
     userId: user.id,

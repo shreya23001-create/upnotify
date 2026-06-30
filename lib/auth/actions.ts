@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/server'
 import { getConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
 import { writeAuditLog } from '@/lib/db/audit'
+import { checkRateLimitByKey, AUTH_RATE_LIMIT } from '@/lib/utils/rate-limiter'
 
 /**
  * Send a magic-link OTP to the given email address.
@@ -25,8 +26,23 @@ export async function signInWithEmail(
     return { error: 'Email is required' }
   }
 
+  if (email.length > 254) {
+    return { error: 'Email address is too long.' }
+  }
+
   if (isSignup && !fullname?.trim()) {
     return { error: 'Full name is required' }
+  }
+
+  if (isSignup && fullname && fullname.trim().length > 100) {
+    return { error: 'Full name must be 100 characters or fewer.' }
+  }
+
+  const hdrsForRateLimit = await headers()
+  const ip = hdrsForRateLimit.get('x-forwarded-for')?.split(',')[0].trim() ?? 'unknown'
+  const rateLimit = checkRateLimitByKey(`magic-link:${ip}`, AUTH_RATE_LIMIT)
+  if (!rateLimit.allowed) {
+    return { error: 'Too many attempts. Please wait a few minutes before trying again.' }
   }
 
   const supabase = await createClient()
@@ -37,9 +53,8 @@ export async function signInWithEmail(
   const queryStr = params.toString()
   const callbackUrl = queryStr ? `${baseUrl}/auth/callback?${queryStr}` : `${baseUrl}/auth/callback`
 
-  const hdrs = await headers()
-  const ip = hdrs.get('x-forwarded-for')?.split(',')[0].trim() ?? undefined
-  const userAgent = hdrs.get('user-agent') ?? undefined
+  const userAgent = hdrsForRateLimit.get('user-agent') ?? undefined
+  const ipForAudit = ip === 'unknown' ? undefined : ip
 
   const { error } = await supabase.auth.signInWithOtp({
     email,
@@ -48,7 +63,7 @@ export async function signInWithEmail(
 
   if (error) {
     logger.error('Magic link sign in failed', { error: error.message })
-    await writeAuditLog({ orgId: 'system', userId: null, action: 'auth.magic_link_failed', ipAddress: ip, userAgent, metadata: { email } })
+    await writeAuditLog({ orgId: 'system', userId: null, action: 'auth.magic_link_failed', ipAddress: ipForAudit, userAgent, metadata: { email } })
     const msg = error.message?.toLowerCase() ?? ''
     if (msg.includes('rate') || msg.includes('too many')) {
       return { error: 'Too many attempts. Please wait a minute before trying again.' }
@@ -56,11 +71,11 @@ export async function signInWithEmail(
     // Never reveal whether an email is registered or not (account enumeration prevention).
     // Silently succeed for all other errors — the UI shows "Check your email" and
     // no email is sent if the address is unregistered or signups are disabled.
-    await writeAuditLog({ orgId: 'system', userId: null, action: 'auth.magic_link_silent_404', ipAddress: ip, userAgent, metadata: { email } })
+    await writeAuditLog({ orgId: 'system', userId: null, action: 'auth.magic_link_silent_404', ipAddress: ipForAudit, userAgent, metadata: { email } })
     return {}
   }
 
-  await writeAuditLog({ orgId: 'system', userId: null, action: 'auth.magic_link_requested', ipAddress: ip, userAgent, metadata: { email } })
+  await writeAuditLog({ orgId: 'system', userId: null, action: 'auth.magic_link_requested', ipAddress: ipForAudit, userAgent, metadata: { email } })
   return {}
 }
 
