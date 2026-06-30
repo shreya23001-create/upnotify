@@ -87,6 +87,27 @@ describe('robots-txt checker — Googlebot detection', () => {
     expect(result.status).toBe('up')
     expect(result.metadata?.googlebotBlocked).toBe(false)
   })
+
+  // #150 — a Googlebot block is always a P1 event, even when the monitor is
+  // configured at a lower severity (default P2 from the create-monitor form).
+  it('escalates severity to P1 when Googlebot is blocked', async () => {
+    mockFetchResponse('User-agent: Googlebot\nDisallow: /')
+    const result = await check(createMonitor()) // monitor.severity = P2
+    expect(result.severityOverride).toBe('P1')
+  })
+
+  it('does NOT set a severity override for a normal (allowed) robots.txt', async () => {
+    mockFetchResponse('User-agent: *\nAllow: /')
+    const result = await check(createMonitor())
+    expect(result.severityOverride).toBeUndefined()
+  })
+
+  it('does NOT set a severity override on a benign content change', async () => {
+    mockFetchResponse('User-agent: *\nAllow: /\nSitemap: https://example.com/sitemap.xml')
+    const result = await check(createMonitor({ lastRobotsHash: 'old-hash' }))
+    expect(result.status).toBe('degraded')
+    expect(result.severityOverride).toBeUndefined()
+  })
 })
 
 // ---------------------------------------------------------------------------

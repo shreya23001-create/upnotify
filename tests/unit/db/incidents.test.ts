@@ -19,7 +19,7 @@ function makeChain(): Record<string, unknown> {
     chain[m] = vi.fn().mockReturnValue(chain)
   }
   // range is the terminal — return a promise
-  ;(chain as unknown as PromiseLike<ChainResult>).then = (
+  ;(chain as Record<string, unknown>).then = (
     onFulfilled: (v: ChainResult) => unknown
   ) => Promise.resolve(resolveWith).then(onFulfilled)
   return chain
@@ -42,7 +42,7 @@ vi.mock('@/lib/supabase/server', () => ({
       chain.range = vi.fn().mockImplementation((...args: unknown[]) => {
         rangeSpy(...args)
         // range is terminal — make chain thenable with resolveWith
-        ;(chain as unknown as PromiseLike<ChainResult>).then = (
+        ;(chain as Record<string, unknown>).then = (
           onFulfilled: (v: ChainResult) => unknown
         ) => Promise.resolve(resolveWith).then(onFulfilled)
         return chain
@@ -76,7 +76,7 @@ describe('getAllIncidentsByOrgPaged — pagination & sort (#97 fix)', () => {
     resolveWith = { data: [], error: null, count: 0 }
     await getAllIncidentsByOrgPaged('org-1', 1, 20)
     const calls = orderSpy.mock.calls
-    const primary = calls.find(([col]: [string]) => col === 'started_at')
+    const primary = calls.find((call: unknown[]) => call[0] === 'started_at')
     expect(primary).toBeDefined()
     expect(primary?.[1]).toEqual({ ascending: false })
   })
@@ -85,7 +85,7 @@ describe('getAllIncidentsByOrgPaged — pagination & sort (#97 fix)', () => {
     resolveWith = { data: [], error: null, count: 0 }
     await getAllIncidentsByOrgPaged('org-1', 1, 20)
     const calls = orderSpy.mock.calls
-    const secondary = calls.find(([col]: [string]) => col === 'id')
+    const secondary = calls.find((call: unknown[]) => call[0] === 'id')
     expect(secondary).toBeDefined()
     expect(secondary?.[1]).toEqual({ ascending: false })
   })
@@ -93,7 +93,7 @@ describe('getAllIncidentsByOrgPaged — pagination & sort (#97 fix)', () => {
   it('secondary sort is applied AFTER primary sort (preserves intent)', async () => {
     resolveWith = { data: [], error: null, count: 0 }
     await getAllIncidentsByOrgPaged('org-1', 1, 20)
-    const cols = orderSpy.mock.calls.map(([col]: [string]) => col)
+    const cols = orderSpy.mock.calls.map((call: unknown[]) => call[0])
     const primaryIdx = cols.indexOf('started_at')
     const secondaryIdx = cols.indexOf('id')
     expect(primaryIdx).toBeGreaterThanOrEqual(0)
@@ -149,7 +149,7 @@ describe('getAllIncidentsByOrgPaged — status filter', () => {
   it('filters open incidents (neq resolved)', async () => {
     resolveWith = { data: [], error: null, count: 0 }
     await getAllIncidentsByOrgPaged('org-1', 1, 20, 'open')
-    const neqArgs = neqSpy.mock.calls.find(([col]: [string]) => col === 'status')
+    const neqArgs = neqSpy.mock.calls.find((call: unknown[]) => call[0] === 'status')
     expect(neqArgs).toBeDefined()
     expect(neqArgs?.[1]).toBe('resolved')
   })
@@ -158,7 +158,7 @@ describe('getAllIncidentsByOrgPaged — status filter', () => {
     resolveWith = { data: [], error: null, count: 0 }
     await getAllIncidentsByOrgPaged('org-1', 1, 20, 'resolved')
     const eqArgs = eqSpy.mock.calls.find(
-      ([col, val]: [string, string]) => col === 'status' && val === 'resolved'
+      (call: unknown[]) => call[0] === 'status' && call[1] === 'resolved'
     )
     expect(eqArgs).toBeDefined()
   })

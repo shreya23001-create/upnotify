@@ -5,6 +5,11 @@ export interface CheckerResult {
   errorMessage?: string
   metadata?: Record<string, unknown>
   configUpdates?: Partial<CheckerConfig>
+  // When set, the check-runner uses this severity for the opened incident
+  // instead of the monitor's statically-configured severity. Lets a checker
+  // escalate a specific, business-critical failure mode (e.g. robots.txt
+  // blocking Googlebot → P1) above the monitor's default severity.
+  severityOverride?: 'P1' | 'P2' | 'P3' | 'P4'
 }
 
 export interface CheckerConfig {

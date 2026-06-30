@@ -69,11 +69,15 @@ export async function check(monitor: Monitor): Promise<CheckerResult> {
     const previousHash = (monitor.config as CheckerConfig)?.lastRobotsHash
     const changed = previousHash !== undefined && previousHash !== hash
 
-    // Critical: Googlebot blocked = DOWN (high-severity alert trigger)
+    // Critical: Googlebot blocked = DOWN, escalated to P1 regardless of the
+    // monitor's configured severity. A "Disallow: /" can wipe a site from
+    // Google within days — it is always a P1 event (KB: product/roadmap +
+    // issue #150 "P1 alert if Googlebot is blocked").
     if (isGooglebotBlocked(text)) {
       return {
         status: 'down',
         responseTimeMs,
+        severityOverride: 'P1',
         metadata: { hash, changed, length: text.length, googlebotBlocked: true },
         configUpdates: { lastRobotsHash: hash },
         errorMessage: 'robots.txt is blocking Googlebot (Disallow: /) — SEO critical',
