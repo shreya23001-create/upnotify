@@ -29,6 +29,20 @@ interface MutationResult {
   error?: string
 }
 
+/**
+ * The team-invite vocabulary ('member' | 'admin') differs from the users.role
+ * CHECK constraint, which only permits 'admin' | 'manager' | 'viewer' | 'client'
+ * (migration 00002_core_tenancy.sql). Writing role='member' straight from an
+ * invite violates that constraint and fails the accept with a 400
+ * ("Failed to join organisation"). Map to a valid users.role:
+ *   - 'admin'  → 'admin'  (full access)
+ *   - 'member' → 'viewer' (matches the auth-trigger default for invited users
+ *                          in 00079; least-privilege read access)
+ */
+export function inviteRoleToUserRole(inviteRole: string): 'admin' | 'viewer' {
+  return inviteRole === 'admin' ? 'admin' : 'viewer'
+}
+
 // ---------------------------------------------------------------------------
 // Create invite
 // ---------------------------------------------------------------------------
@@ -269,12 +283,14 @@ export async function acceptTeamInvite(
     }
   }
 
-  // Update the user's org_id and role
+  // Update the user's org_id and role. Map the invite role to a valid
+  // users.role value — 'member' is not permitted by the users.role CHECK
+  // constraint and would fail the whole accept with a 400.
   const { error: updateError } = await supabase
     .from('users')
     .update({
       org_id: invite.org_id,
-      role: invite.role,
+      role: inviteRoleToUserRole(invite.role),
     })
     .eq('id', userId)
 
