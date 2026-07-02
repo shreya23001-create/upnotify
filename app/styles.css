@@ -4,7 +4,7 @@
 
 /* Reset */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { font-family: var(--font-inter, 'Inter', system-ui, -apple-system, sans-serif); line-height: 1.6; -webkit-text-size-adjust: 100%; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+html { font-family: var(--font-figtree, var(--font-inter, 'Figtree', 'Inter', system-ui, -apple-system, sans-serif)); line-height: 1.6; -webkit-text-size-adjust: 100%; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
 body { min-height: 100vh; color: var(--text-primary); background: var(--bg-primary); font-size: 15px; }
 a { color: inherit; text-decoration: none; }
 button { font: inherit; cursor: pointer; border: none; background: none; }
@@ -17,16 +17,16 @@ img { max-width: 100%; display: block; }
    ========================================================================== */
 
 :root {
-  --bg-primary: #f8f9fc;
-  --bg-card: #fff;
-  --bg-sidebar: #fff;
-  --bg-header: #fff;
-  --bg-input: #fff;
-  --bg-hover: #f1f5f9;
-  --bg-muted: #f8f9fc;
-  --bg-skeleton: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
-  --text-primary: #1a1a2e;
-  --text-secondary: #475569;
+  --bg-primary: #f4f6fd;
+  --bg-card: #ffffff;
+  --bg-sidebar: #ffffff;
+  --bg-header: #ffffff;
+  --bg-input: #ffffff;
+  --bg-hover: #eef1fa;
+  --bg-muted: #f4f6fd;
+  --bg-skeleton: linear-gradient(90deg, #eef1fa 25%, #e2e8f0 50%, #eef1fa 75%);
+  --text-primary: #0f0c29;
+  --text-secondary: #3d4566;
   /* engineering-app#75 — #94a3b8 was 3.47:1 vs --bg-primary, failing WCAG AA.
      Slate-500 #64748b clears 4.5:1 on every light background we paint it on. */
   --text-muted: #64748b;
@@ -48,9 +48,9 @@ img { max-width: 100%; display: block; }
   --brand-cyan: #06b6d4;
   --brand-gradient: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
   --brand-gradient-soft: linear-gradient(135deg, rgba(59,130,246,0.12) 0%, rgba(6,182,212,0.12) 100%);
-  --bg-page: #f5f7fa;
-  --bg-subtle: #f8fafc;
-  --bg-card-hover: #fafbfd;
+  --bg-page: #f4f6fd;
+  --bg-subtle: #f8f9ff;
+  --bg-card-hover: #fafbff;
   --color-up: #10b981; --color-up-bg: #ecfdf5; --color-up-border: #a7f3d0;
   --color-down: #ef4444; --color-down-bg: #fef2f2; --color-down-border: #fecaca;
   --color-warn: #f59e0b; --color-warn-bg: #fffbeb; --color-warn-border: #fde68a;
@@ -64,46 +64,123 @@ img { max-width: 100%; display: block; }
 }
 
 html.dark {
-  --bg-primary: #0f1117;
-  --bg-card: #1a1d27;
-  --bg-sidebar: #141620;
-  --bg-header: #141620;
-  --bg-input: #1a1d27;
-  --bg-hover: #242736;
-  --bg-muted: #1a1d27;
-  --bg-skeleton: linear-gradient(90deg, #1a1d27 25%, #242736 50%, #1a1d27 75%);
-  --text-primary: #e8eaf0;
-  --text-secondary: #a0a8b8;
-  /* engineering-app#75 — #6b7280 was 4.09:1 vs --bg-primary, failing WCAG AA.
-     Gray-400 #9ca3af gives ~6.4:1 on every dark background we paint it on. */
-  --text-muted: #9ca3af;
-  --text-link: #60a5fa;
-  --border-primary: #2a2d3a;
-  --border-input: #2a2d3a;
-  --border-light: #1e2130;
-  --accent: #60a5fa;
-  --accent-hover: #3b82f6;
-  --accent-gradient: linear-gradient(135deg, #3b82f6, #06b6d4);
-  --shadow-sm: 0 1px 4px rgba(0,0,0,0.2);
-  --shadow-md: 0 4px 16px rgba(0,0,0,0.3);
-  --shadow-lg: 0 8px 30px rgba(0,0,0,0.4);
+  --bg-primary: #100d22;
+  --bg-card: #18143a;
+  --bg-sidebar: #130f2c;
+  --bg-header: #130f2c;
+  --bg-input: #18143a;
+  --bg-hover: #211c42;
+  --bg-muted: #18143a;
+  --bg-skeleton: linear-gradient(90deg, #16122a 25%, #1e1a35 50%, #16122a 75%);
+  --text-primary: #ede9ff;
+  --text-secondary: #b4afd4;
+  --text-muted: #8b85a8;
+  --text-link: #a78bfa;
+  --border-primary: #2a2248;
+  --border-input: #2a2248;
+  --border-light: #1e1a35;
+  --accent: #a78bfa;
+  --accent-hover: #8b5cf6;
+  --accent-gradient: linear-gradient(135deg, #7c3aed, #a78bfa);
+  --shadow-sm: 0 1px 4px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.4);
+  --shadow-lg: 0 8px 30px rgba(0,0,0,0.55);
 
   /* Preview-compatible aliases — dark overrides */
-  --border: #242d3d;
-  --border-strong: #2d3748;
-  --brand-blue: #60a5fa;
-  --bg-page: #0d1117;
-  --bg-subtle: #161b27;
-  --bg-card-hover: #1c2333;
+  --border: #2a2248;
+  --border-strong: #362d5e;
+  --brand-blue: #a78bfa;
+  --brand-cyan: #67e8f9;
+  --brand-gradient: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%);
+  --brand-gradient-soft: linear-gradient(135deg, rgba(124,58,237,0.15) 0%, rgba(167,139,250,0.12) 100%);
+  --bg-page: #100d22;
+  --bg-subtle: #130f2c;
+  --bg-card-hover: #1e1944;
   --color-up-bg: #052e16; --color-up-border: #166534;
   --color-down-bg: #1c0a0a; --color-down-border: #991b1b;
   --color-warn-bg: #1c1100; --color-warn-border: #92400e;
-  --color-info-bg: #0c1a3d; --color-info-border: #1e40af;
+  --color-info-bg: #1a0e3d; --color-info-border: #4c1d95;
 }
 
-/* Theme toggle */
-.theme-toggle { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 18px; background: var(--bg-hover); border: 1px solid var(--border-primary); cursor: pointer; transition: all 0.2s; }
-.theme-toggle:hover { background: var(--bg-muted); transform: scale(1.05); }
+/* ─── Theme toggle — neumorphic pill ──────────────────────────────────────── */
+.tt {
+  background: none; border: none; padding: 0; cursor: pointer;
+  display: flex; align-items: center; flex-shrink: 0;
+}
+
+.tt-track {
+  position: relative;
+  width: 72px; height: 36px;
+  border-radius: 99px;
+  display: flex; align-items: center;
+  transition: background 0.35s ease, box-shadow 0.35s ease;
+}
+
+/* light mode track — soft light grey neumorphic */
+.tt--light .tt-track {
+  background: #e8eaf0;
+  box-shadow:
+    4px 4px 8px rgba(163,177,198,0.6),
+    -4px -4px 8px rgba(255,255,255,0.9);
+}
+
+/* dark mode track — deep violet neumorphic */
+.tt--dark .tt-track {
+  background: #1a1535;
+  box-shadow:
+    4px 4px 8px rgba(0,0,0,0.5),
+    -4px -4px 8px rgba(167,139,250,0.06),
+    inset 0 0 0 1px rgba(167,139,250,0.08);
+}
+
+/* ── icon slots — always visible on both sides ── */
+.tt-slot {
+  position: absolute;
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  transition: opacity 0.3s ease, color 0.3s ease;
+  z-index: 1;
+}
+.tt-slot-sun  { left: 0; }
+.tt-slot-moon { right: 0; }
+
+/* light mode: sun is active (full), moon is dim */
+.tt--light .tt-slot-sun  { color: #f59e0b; opacity: 1; }
+.tt--light .tt-slot-moon { color: #94a3b8; opacity: 0.45; }
+
+/* dark mode: moon is active (full), sun is dim */
+.tt--dark .tt-slot-sun  { color: #6b6490; opacity: 0.4; }
+.tt--dark .tt-slot-moon { color: #c4b5fd; opacity: 1; }
+
+/* ── thumb — the sliding raised circle ── */
+.tt-thumb {
+  position: absolute;
+  top: 4px;
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  z-index: 2;
+  transition: left 0.38s cubic-bezier(0.34,1.4,0.64,1), background 0.35s ease, box-shadow 0.35s ease;
+}
+
+.tt--light .tt-thumb {
+  left: 4px;
+  background: linear-gradient(145deg, #ffffff, #dde1ea);
+  box-shadow:
+    3px 3px 6px rgba(163,177,198,0.55),
+    -2px -2px 5px rgba(255,255,255,0.95);
+}
+
+.tt--dark .tt-thumb {
+  left: 40px;
+  background: linear-gradient(145deg, #2e1f5e, #1a1235);
+  box-shadow:
+    3px 3px 6px rgba(0,0,0,0.5),
+    -2px -2px 5px rgba(167,139,250,0.08),
+    0 0 8px rgba(124,58,237,0.3);
+}
+
+.tt--no-anim .tt-thumb { transition: none; }
+.tt:hover .tt-track { filter: brightness(1.03); }
 
 /* ==========================================================================
    Layout
@@ -6125,7 +6202,11 @@ section.hero::before {
   flex-shrink: 0;
 }
 @media (max-width: 768px) {
-  .blog-article-hero { height: 140px; }
+  .blog-article-hero { height: 160px; }
+}
+@media (max-width: 480px) {
+  .blog-article-hero { height: 130px; padding: 16px 16px 14px !important; }
+  .blog-article-hero > div { font-size: 16px !important; }
 }
 
 /* Auth canvas */

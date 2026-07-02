@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
+import { Menu, X } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
 import type { NavContent } from '@/lib/types/cms'
@@ -105,15 +106,7 @@ export function PublicNavClient({ links, ctaPrimary, ctaSecondary }: PublicNavCl
           aria-expanded={mobileOpen}
           onClick={() => setMobileOpen(o => !o)}
         >
-          {mobileOpen ? (
-            <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-            </svg>
-          ) : (
-            <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-              <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
-            </svg>
-          )}
+          {mobileOpen ? <X size={22} strokeWidth={2.5} /> : <Menu size={22} strokeWidth={2.5} />}
         </button>
       </div>
 

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { Check, X } from 'lucide-react'
 import type { SupportedCurrency } from '@/lib/utils/currency'
 import { getPlanFeatures, formatPlanPrice } from '@/lib/utils/plan-display'
 import type { PlanDisplayData } from '@/lib/utils/plan-display'
@@ -31,9 +32,9 @@ export default function PricingTable({ defaultCurrency = 'gbp' }: { defaultCurre
     <section className="section" id="pricing">
       <div className="container">
         <div className="section-header">
-          <div className="section-eyebrow">Simple pricing</div>
-          <h2 className="section-title">Start free, scale as you grow</h2>
-          <p className="section-sub">No hidden fees. No credit card required for free plan. Cancel or pause anytime.</p>
+          <div className="section-eyebrow">No surprises</div>
+          <h2 className="section-title">Start free. Pay when you&apos;re <em>ready.</em></h2>
+          <p className="section-sub">No hidden fees. No credit card for the free plan. Cancel or pause anytime.</p>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 24, flexWrap: 'wrap', marginBottom: 8 }}>
@@ -102,17 +103,21 @@ export default function PricingTable({ defaultCurrency = 'gbp' }: { defaultCurre
                 <div className="plan-name" style={isHighlighted ? { color: 'var(--brand-blue)' } : {}}>
                   {plan.name}
                 </div>
-                <div className="plan-price">
-                  {price.symbol}<span>{price.amount}</span>
+                <div className="plan-price-block">
+                  <div className="plan-price">
+                    {price.symbol}<span>{price.amount}</span>
+                  </div>
+                  <div className="plan-period-line">
+                    <span className="plan-period">{price.period}</span>
+                    {price.note && <><span className="plan-period-sep">·</span><span className="plan-price-note">{price.note}</span></>}
+                  </div>
                 </div>
-                <div className="plan-period">{price.period}</div>
-                {price.note && <div className="plan-price-note">{price.note}</div>}
                 <hr className="plan-divider" />
                 <ul className="plan-features">
                   {features.map((feature, index) => (
                     <li key={index} className="plan-feature">
                       <span className={feature.included ? 'plan-check' : 'plan-x'}>
-                        {feature.included ? '✓' : '✗'}
+                        {feature.included ? <Check size={14} strokeWidth={2.5} /> : <X size={14} strokeWidth={2.5} />}
                       </span>
                       {' '}{feature.text}
                     </li>

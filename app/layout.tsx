@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next"
-import { Inter, JetBrains_Mono } from "next/font/google"
+import { Inter, JetBrains_Mono, Plus_Jakarta_Sans, Figtree } from "next/font/google"
 import { CookieConsent } from "@/components/ui/cookie-consent"
 import { BackToTop } from "@/components/ui/back-to-top"
 import { GoogleTagManager } from "@/components/analytics/google-tag-manager"
@@ -14,6 +14,8 @@ const IS_PRODUCTION_HOST = process.env.VERCEL_ENV === "production"
 
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"], display: "swap" })
 const jetbrainsMono = JetBrains_Mono({ variable: "--font-mono", subsets: ["latin"], display: "swap" })
+const plusJakartaSans = Plus_Jakarta_Sans({ variable: "--font-display", subsets: ["latin"], display: "swap", weight: ["700", "800"] })
+const figtree = Figtree({ variable: "--font-figtree", subsets: ["latin"], display: "swap", weight: ["300", "400", "500", "600", "700", "800", "900"] })
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -112,7 +114,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} ${plusJakartaSans.variable} ${figtree.variable}`} suppressHydrationWarning>
       <body>
         <script dangerouslySetInnerHTML={{ __html: `
           (function() {

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { ChevronDown } from 'lucide-react'
 import { FAQ_ITEMS, type FaqItem } from '@/lib/constants/faq'
 
 interface FaqProps {
@@ -21,9 +22,9 @@ export default function Faq({ items, eyebrow, headline }: FaqProps): React.React
     <section className="section faq-section" id="faq">
       <div className="container">
         <div className="section-header">
-          <div className="section-eyebrow">{eyebrow ?? 'Questions answered'}</div>
-          <h2 className="section-title">{headline ?? 'Frequently asked questions'}</h2>
-          <p className="section-sub">Everything you need to know about Uptrue</p>
+          <div className="section-eyebrow">{eyebrow ?? 'Got questions?'}</div>
+          <h2 className="section-title">{headline ?? <>We&apos;ve got <em>answers.</em></>}</h2>
+          <p className="section-sub">Everything you need to know about Uptrue — no fluff.</p>
         </div>
         <div className="faq-grid">
           {faqItems.map((item, index) => (
@@ -39,9 +40,7 @@ export default function Faq({ items, eyebrow, headline }: FaqProps): React.React
               >
                 {item.question}
                 <div className="faq-chevron">
-                  <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                    <polyline points="6 9 12 15 18 9"/>
-                  </svg>
+                  <ChevronDown size={12} strokeWidth={2.5} />
                 </div>
               </div>
               <div className="faq-a">{item.answer}</div>
