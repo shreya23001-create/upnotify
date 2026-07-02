@@ -1,6 +1,7 @@
 import './landing.css'
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { Zap, Info, Check } from 'lucide-react'
 import { Ticker } from '@/components/landing/ticker'
 import { BlogPreview } from '@/components/landing/blog-preview'
 import PricingTable from '@/components/landing/pricing-table'
@@ -11,6 +12,7 @@ import { DowntimeCalculator } from '@/components/landing/downtime-calculator'
 import Faq from '@/components/landing/faq'
 import { AgencyWaitlistCta } from '@/components/landing/agency-waitlist-cta'
 import { TrustedLogos } from '@/components/landing/trusted-logos'
+import { ScrollReveal } from '@/components/landing/scroll-reveal'
 import { CtaCanvas } from '@/components/landing/cta-canvas'
 import { CustomSection } from '@/components/landing/custom-section'
 import type { CustomContent } from '@/components/landing/custom-section'
@@ -209,30 +211,26 @@ export default async function LandingPage(): Promise<React.ReactElement> {
                 <div className="hero-eyebrow fade-up">
                   <div className="hero-eyebrow-text">
                     <span className="hero-eyebrow-dot" />
-                    {hero?.eyebrow ?? '24 monitor types · 1-minute checks · AI-powered reports'}
+                    24 monitor types · 1-minute checks · AI-powered reports
                   </div>
                 </div>
                 <h1 className="hero-headline fade-up delay-1">
-                  {hero?.headline_line1 ?? 'Free Uptime & Website Monitoring'}<br />
-                  <span className="gradient-text">{hero?.headline_line2 ?? 'for Agencies, SaaS & Dev Teams'}</span>
+                  Know your site is down<br />
+                  <span className="gradient-text">before a customer tweets.</span>
                 </h1>
                 <p className="hero-sub fade-up delay-2">
-                  {hero?.subheadline ?? 'Uptime, performance & infrastructure monitoring for agencies and teams. Multi-channel alerts, public status pages, and AI-powered reports — all in one platform.'}
+                  24 monitor types. 1-minute checks. Instant alerts to Slack, email or webhook. Built for agencies and dev teams.
                 </p>
                 <div className="hero-ctas fade-up delay-3">
                   <Link href={hero?.cta_primary?.href ?? '/signup'} className="btn btn-primary btn-lg">
-                    <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
+                    <Zap size={16} strokeWidth={2} />
                     {hero?.cta_primary?.text ?? 'Start Monitoring Free'}
                   </Link>
                   <Link href={hero?.cta_secondary?.href ?? '/#how-it-works'} className="btn btn-ghost btn-lg">
                     {hero?.cta_secondary?.text ?? 'See How It Works'}
                   </Link>
                   <Link href={hero?.cta_tertiary?.href ?? '/score'} className="btn btn-outline-brand btn-lg">
-                    <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                      <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
-                    </svg>
+                    <Info size={14} strokeWidth={2} />
                     {hero?.cta_tertiary?.text ?? 'Score Your Site Free'}
                   </Link>
                 </div>
@@ -254,7 +252,7 @@ export default async function LandingPage(): Promise<React.ReactElement> {
         return (
           <div key="trusted_logos" className="social-proof-strip">
             <div className="container">
-              <div className="sp-label">{trustedLogos?.label ?? "Tracking uptime for the world's most-used platforms"}</div>
+              <div className="sp-label">{trustedLogos?.label ?? "Trusted by teams monitoring the web's most-used platforms"}</div>
               <TrustedLogos />
             </div>
           </div>
@@ -283,15 +281,15 @@ export default async function LandingPage(): Promise<React.ReactElement> {
         return (
           <section key="features" className="section" id="features">
             <div className="container">
-              <div className="section-header">
-                <div className="section-eyebrow">{features?.eyebrow ?? 'Everything you need'}</div>
-                <h2 className="section-title">{features?.headline ?? 'Website monitoring that actually works'}</h2>
+              <div className="section-header reveal-title">
+                <div className="section-eyebrow">{features?.eyebrow ?? '24 monitor types'}</div>
+                <h2 className="section-title">{features?.headline ?? (<>One platform.<br /><em>Every</em> kind of monitor.</>)}</h2>
                 <p className="section-sub">
                   {features?.subheadline ?? (
                     <>
-                      From <Link href="/monitoring/http-uptime-monitoring">HTTP uptime monitoring</Link>,{' '}
-                      <Link href="/monitoring/ssl-certificate-monitoring">SSL certificate monitoring</Link>, and{' '}
-                      <Link href="/monitoring/dns-monitoring">DNS monitoring</Link> to AI-powered insights — site monitoring built for agencies managing hundreds of sites and teams who need reliable website uptime monitoring.
+                      <Link href="/monitoring/http-uptime-monitoring">HTTP uptime</Link>,{' '}
+                      <Link href="/monitoring/ssl-certificate-monitoring">SSL certificates</Link>,{' '}
+                      <Link href="/monitoring/dns-monitoring">DNS records</Link>, keyword detection, APIs, blacklists, sitemaps, and more. Most tools give you one or two. Uptrue gives you all of them.
                     </>
                   )}
                 </p>
@@ -305,11 +303,11 @@ export default async function LandingPage(): Promise<React.ReactElement> {
         return (
           <section key="how_it_works" className="section hiw-section" id="how-it-works">
             <div className="container">
-              <div className="section-header">
-                <div className="section-eyebrow">{howItWorks?.eyebrow ?? 'Simple by design'}</div>
-                <h2 className="section-title">{howItWorks?.headline ?? 'Up and running in 2 minutes'}</h2>
+              <div className="section-header reveal-title">
+                <div className="section-eyebrow">{howItWorks?.eyebrow ?? 'No setup scripts. No agents.'}</div>
+                <h2 className="section-title">{howItWorks?.headline ?? (<>Up and running<br />in <em>2 minutes</em>.</>)}</h2>
               </div>
-              <div className="hiw-steps">
+              <div className="hiw-steps reveal-stagger">
                 {steps.map((step) => (
                   <div key={step.number} className="hiw-step">
                     <div className="hiw-number">{step.number}</div>
@@ -327,13 +325,13 @@ export default async function LandingPage(): Promise<React.ReactElement> {
           <section key="ai_features" className="ai-section">
             <div className="container">
               <div className="ai-inner">
-                <div className="ai-text">
-                  <div className="section-eyebrow">{aiFeatures?.eyebrow ?? 'AI-Powered Intelligence'}</div>
-                  <h2 className="section-title">{aiFeatures?.headline ?? 'Your monitoring gets smarter over time'}</h2>
+                <div className="ai-text reveal-title">
+                  <div className="section-eyebrow">{aiFeatures?.eyebrow ?? 'Powered by Claude AI'}</div>
+                  <h2 className="section-title">{aiFeatures?.headline ?? (<>Monitoring that actually<br /><em>explains</em> itself.</>)}</h2>
                   <p className="section-sub">
-                    {aiFeatures?.subheadline ?? "Uptrue doesn't just tell you something went down — it tells you why, what it means for your business, and what to do next."}
+                    {aiFeatures?.subheadline ?? "Most tools just tell you something broke. Uptrue tells you why, what it means for your business, and what to fix — in plain English."}
                   </p>
-                  <div className="ai-features-list">
+                  <div className="ai-features-list reveal-stagger">
                     {(aiFeatures?.features ?? [
                       { icon: '🤖', color: 'purple', title: 'Executive AI Reports',             description: 'One click and Claude analyses 90 days of uptime data, incident patterns, and performance trends — generating a polished summary you can send to clients or stakeholders.' },
                       { icon: '🔍', color: 'cyan',   title: 'Outage Pattern Detection',          description: "Uptrue learns your monitor's normal behaviour and flags anomalies before they become incidents. Recurring issues are spotted and surfaced automatically." },
@@ -464,7 +462,7 @@ export default async function LandingPage(): Promise<React.ReactElement> {
                   <h2>{agency?.headline ?? 'Monitor hundreds of client sites under your brand'}</h2>
                   <p>{agency?.description ?? 'The Agency tier gives you full white-label, multi-tenant workspaces, revenue sharing, custom analytics, and AI reports branded with your agency name. Built for agencies managing dozens of clients.'}</p>
                   <div className="agency-badges">
-                    {(agency?.badges ?? ['🏷️ Full white-label', '👥 Multi-tenant workspaces', '💰 Revenue sharing', '🤖 Branded AI reports', '📊 Custom analytics']).map((badge) => (
+                    {(agency?.badges ?? ['Full white-label', 'Multi-tenant workspaces', 'Revenue sharing', 'Branded AI reports', 'Custom analytics']).map((badge) => (
                       <div key={badge} className="agency-badge">{badge}</div>
                     ))}
                   </div>
@@ -490,28 +488,54 @@ export default async function LandingPage(): Promise<React.ReactElement> {
         return (
           <section key="testimonials" className="testimonials-section">
             <div className="container">
-              <div className="section-header">
-                <div className="section-eyebrow">{testimonials?.eyebrow ?? 'Trusted by teams'}</div>
-                <h2 className="section-title">{testimonials?.headline ?? 'What our users say'}</h2>
+              {/* Social proof header — big claim left, stats right */}
+              <div className="testimonials-hero reveal-title">
+                <div className="testimonials-hero-left">
+                  <div className="section-eyebrow">{testimonials?.eyebrow ?? 'What our users say'}</div>
+                  <h2 className="testimonials-big-claim">
+                    Trusted by agencies,<br />
+                    <span className="gradient-text">SaaS teams & developers.</span>
+                  </h2>
+                </div>
+                <div className="testimonials-hero-right">
+                  <div className="testimonials-stat">
+                    <div className="testimonials-stat-value">4.9<span className="testimonials-stat-star">★</span></div>
+                    <div className="testimonials-stat-label">average rating</div>
+                  </div>
+                  <div className="testimonials-stat-divider" />
+                  <div className="testimonials-stat">
+                    <div className="testimonials-stat-value">500<span className="testimonials-stat-plus">+</span></div>
+                    <div className="testimonials-stat-label">teams monitoring</div>
+                  </div>
+                  <div className="testimonials-stat-divider" />
+                  <div className="testimonials-stat">
+                    <div className="testimonials-stat-value">99.9<span className="testimonials-stat-plus">%</span></div>
+                    <div className="testimonials-stat-label">uptime SLA</div>
+                  </div>
+                </div>
               </div>
-              <div className="testimonials-grid">
+
+              {/* Cards */}
+              <div className="testimonials-grid reveal-stagger">
                 {testimonialItems.map((t) => (
                   <div key={t.name} className={`testimonial-card ${t.cardClass}`}>
-                    <div className="testimonial-quote">&ldquo;</div>
-                    <div className="testimonial-stars">
-                      <span className="testimonial-star">★</span>
-                      <span className="testimonial-star">★</span>
-                      <span className="testimonial-star">★</span>
-                      <span className="testimonial-star">★</span>
-                      <span className="testimonial-star">★</span>
+                    {/* Company logo placeholder — initials badge */}
+                    <div className={`testimonial-company-badge ${t.avatarClass}`}>
+                      {t.initials}
                     </div>
-                    <div className="testimonial-text">{t.quote}</div>
+                    <div className="testimonial-text">&ldquo;{t.quote}&rdquo;</div>
                     <div className="testimonial-author">
                       <div className={`testimonial-avatar ${t.avatarClass}`}>{t.initials}</div>
                       <div>
                         <div className="testimonial-name">{t.name}</div>
                         <div className="testimonial-role">{'role' in t && typeof t.role === 'string' ? t.role : `${(t as {role?: string; company?: string}).company ?? ''}`}</div>
                       </div>
+                    </div>
+                    <div className="testimonial-footer">
+                      <div className="testimonial-stars">
+                        {'★★★★★'.split('').map((s, i) => <span key={i} className="testimonial-star">{s}</span>)}
+                      </div>
+                      <span className="testimonial-cta">View case study →</span>
                     </div>
                   </div>
                 ))}
@@ -524,12 +548,12 @@ export default async function LandingPage(): Promise<React.ReactElement> {
         return (
           <section key="comparison_table" className="comparison-section">
             <div className="container">
-              <div className="section-header">
-                <div className="section-eyebrow">{comparison?.eyebrow ?? 'How we compare'}</div>
-                <h2 className="section-title">{comparison?.headline ?? 'Uptrue vs the alternatives'}</h2>
-                <p className="section-sub">{comparison?.subheadline ?? "Not all uptime monitoring is equal. Here's how Uptrue stacks up against the most popular tools."}</p>
+              <div className="section-header reveal-title">
+                <div className="section-eyebrow">{comparison?.eyebrow ?? 'Side by side'}</div>
+                <h2 className="section-title">{comparison?.headline ?? (<>The honest comparison<br />nobody <em>else</em> will show you.</>)}</h2>
+                <p className="section-sub">{comparison?.subheadline ?? "We checked. The others don't offer AI reports, citation monitoring, or 24 monitor types. Uptrue does."}</p>
               </div>
-              <div className="comparison-table-wrap">
+              <div className="comparison-table-wrap reveal">
                 <table className="comparison-table">
                   <thead>
                     <tr>
@@ -595,18 +619,14 @@ export default async function LandingPage(): Promise<React.ReactElement> {
             <div className="container">
               <div className="cta-band-inner">
                 <div className="cta-band-eyebrow">
-                  <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
+                  <Zap size={12} strokeWidth={2.5} />
                   {ctaBand?.eyebrow ?? 'Start in 2 minutes'}
                 </div>
-                <h2>{ctaBand?.headline ?? "Don't find out you're down\nfrom a customer tweet."}</h2>
-                <p>{ctaBand?.subheadline ?? 'Uptrue watches your sites, APIs, and infrastructure 24/7 — and tells you first. Free plan included. No credit card required.'}</p>
+                <h2>{ctaBand?.headline ?? (<>Stop finding out you&apos;re down<br />from a <em>customer tweet.</em></>)}</h2>
+                <p>{ctaBand?.subheadline ?? 'Uptrue watches your sites, APIs, and infrastructure 24/7 — and tells you first. Free plan. No credit card. Up in 2 minutes.'}</p>
                 <div className="cta-band-buttons">
                   <Link href={ctaBand?.cta_primary?.href ?? '/signup'} className="btn-cta-white">
-                    <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
+                    <Zap size={16} strokeWidth={2.5} />
                     {ctaBand?.cta_primary?.text ?? 'Start Monitoring Free'}
                   </Link>
                   <Link href={ctaBand?.cta_secondary?.href ?? '/#features'} className="btn-cta-outline">
@@ -617,9 +637,7 @@ export default async function LandingPage(): Promise<React.ReactElement> {
                   {(ctaBand?.trust_items ?? ['3 monitors free forever', 'No credit card required', 'GDPR compliant · EU data', '1-minute check intervals']).map((item, i, arr) => (
                     <span key={item} style={{ display: 'contents' }}>
                       <span className="cta-band-trust-item">
-                        <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                          <polyline points="20 6 9 17 4 12" />
-                        </svg>
+                        <Check size={13} strokeWidth={2.5} />
                         {item}
                       </span>
                       {i < arr.length - 1 && <span className="cta-band-trust-dot" />}
@@ -646,15 +664,16 @@ export default async function LandingPage(): Promise<React.ReactElement> {
       <SoftwareApplicationJsonLd />
       <WebSiteJsonLd />
       <FaqPageJsonLd items={faqItems} />
+      <ScrollReveal />
 
       {/* NAV — always pinned to top (global section, not reorderable) */}
-      
+
 
       {/* Landing sections rendered in DB sort_order */}
       {renderOrder.map(key => renderSection(key))}
 
       {/* FOOTER — always pinned to bottom (global section, not reorderable) */}
-      
+
 
     </>
   )

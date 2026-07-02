@@ -217,8 +217,8 @@ export function formatPlanPrice(
       return {
         symbol: '£',
         amount: Math.round(perMonthEquiv).toString(),
-        period: 'per month · billed annually',
-        note: `Or £${monthlyGbp % 1 === 0 ? monthlyGbp.toFixed(0) : monthlyGbp.toFixed(2)}/mo billed monthly`,
+        period: 'per month, billed annually',
+        note: `Or £${monthlyGbp % 1 === 0 ? monthlyGbp.toFixed(0) : monthlyGbp.toFixed(2)}/mo monthly`,
       }
     }
     return {
@@ -237,7 +237,7 @@ export function formatPlanPrice(
     note: annualPence && annualPence > 0
       ? `Or £${(annualPence / 100) % 1 === 0
           ? (annualPence / 100).toFixed(0)
-          : (annualPence / 100).toFixed(2)}/yr billed annually`
+          : (annualPence / 100).toFixed(2)}/yr annually`
       : undefined,
   }
 }

@@ -2,11 +2,24 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { BlogCardImage } from '@/components/ui/blog-card-image'
 import { BlogShareSubscribe } from '@/components/blog/blog-share-subscribe'
 import { logger } from '@/lib/utils/logger'
 
 export const revalidate = 300 // ISR: revalidate every 5 minutes
+
+const CATEGORY_GRADIENTS: Record<string, string> = {
+  Guide:             'linear-gradient(135deg,#7c3aed,#3b82f6)',
+  Security:          'linear-gradient(135deg,#dc2626,#b45309)',
+  Performance:       'linear-gradient(135deg,#047857,#0e7490)',
+  Ecommerce:         'linear-gradient(135deg,#b45309,#9d174d)',
+  'Incident Report': 'linear-gradient(135deg,#b91c1c,#5b21b6)',
+  Outage:            'linear-gradient(135deg,#b91c1c,#5b21b6)',
+  Agency:            'linear-gradient(135deg,#1e3a5f,#1d4ed8)',
+  WordPress:         'linear-gradient(135deg,#1d4ed8,#0e7490)',
+  Hosting:           'linear-gradient(135deg,#047857,#1d4ed8)',
+  'AI-VISIBILITY':   'linear-gradient(135deg,#4c1d95,#1d4ed8)',
+  Insights:          'linear-gradient(135deg,#0e7490,#1d4ed8)',
+}
 
 interface BlogContent {
   body?: string
@@ -206,8 +219,23 @@ export default async function DynamicBlogPost({ params }: { params: Promise<{ sl
 
   return (
     <div className="blog-article-wrap">
-      <div className="blog-article-hero">
-        <BlogCardImage category={post.category ?? 'Default'} title={post.title} />
+      <div className="blog-article-hero" style={{
+        background: CATEGORY_GRADIENTS[post.category ?? ''] ?? 'linear-gradient(135deg,#1d4ed8,#0e7490)',
+        display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+        padding: '28px 32px 24px',
+      }}>
+        {post.category && (
+          <span style={{
+            fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em',
+            color: 'rgba(255,255,255,0.65)', alignSelf: 'flex-start',
+            background: 'rgba(0,0,0,0.2)', padding: '3px 11px',
+            borderRadius: 99, border: '1px solid rgba(255,255,255,0.15)',
+          }}>{post.category}</span>
+        )}
+        <div style={{
+          fontSize: 22, fontWeight: 700, color: 'rgba(255,255,255,0.95)',
+          lineHeight: 1.3, letterSpacing: '-0.02em', maxWidth: 640,
+        }}>{post.title}</div>
       </div>
     <article className="blog-article">
       <header className="blog-article-header">
