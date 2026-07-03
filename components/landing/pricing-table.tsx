@@ -33,7 +33,7 @@ export default function PricingTable({ defaultCurrency = 'gbp' }: { defaultCurre
       <div className="container">
         <div className="section-header">
           <div className="section-eyebrow">No surprises</div>
-          <h2 className="section-title">Start free. Pay when you&apos;re <em>ready.</em></h2>
+          <h2 className="section-title pricing-title-gradient">Start free. Pay when you&apos;re <em>ready.</em></h2>
           <p className="section-sub">No hidden fees. No credit card for the free plan. Cancel or pause anytime.</p>
         </div>
 

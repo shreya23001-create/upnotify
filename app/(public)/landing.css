@@ -84,6 +84,16 @@
   box-shadow: 0 4px 12px rgba(59,130,246,0.08);
 }
 
+.pair-monitor-card:hover {
+  border-color: rgba(102,126,234,0.35) !important;
+  box-shadow: 0 8px 24px rgba(102,126,234,0.14) !important;
+  transform: translateY(-2px);
+}
+.pair-monitor-card:hover .pair-monitor-arrow {
+  opacity: 1;
+  transform: translateX(0);
+}
+
 /* ============================================================
    NAV
    ============================================================ */
@@ -564,8 +574,8 @@ body::before {
 }
 .feature-tab-btn:hover { border-color: var(--brand-blue); color: var(--brand-blue); background: var(--color-info-bg); }
 .feature-tab-btn.active {
-  background: var(--brand-gradient); color: white; border-color: transparent;
-  box-shadow: 0 4px 14px rgba(59,130,246,0.35);
+  background: linear-gradient(135deg, #a78bfa 0%, #f472b6 100%); color: white; border-color: transparent;
+  box-shadow: 0 4px 14px rgba(167,139,250,0.35);
 }
 .feature-carousel-wrap { position: relative; }
 .feature-carousel-track-outer {
@@ -911,6 +921,29 @@ body::before {
 .faq-section {
   background: linear-gradient(160deg, #f8f9ff 0%, #f4f0ff 50%, #f8f9ff 100%);
 }
+.wp-monitor-tail-section {
+  background: linear-gradient(160deg, #f8f9ff 0%, #f4f0ff 50%, #f8f9ff 100%);
+}
+html.dark .wp-monitor-tail-section {
+  background: rgba(14,11,30,0.42);
+}
+
+/* WordPress monitor: "How it works" dark grid cells */
+.wp-hiw-cell {
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  border-right: 1px solid rgba(255,255,255,0.08);
+}
+.wp-hiw-cell:nth-child(2n) {
+  border-right: none;
+}
+.wp-hiw-cell:last-child {
+  border-bottom: none;
+  border-right: none;
+}
+.wp-hiw-cell:nth-last-child(2):nth-child(odd) {
+  border-bottom: none;
+}
+
 .faq-grid { max-width: 780px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-3); }
 .faq-item {
   border: 1px solid rgba(99,102,241,0.1); border-radius: var(--radius-lg);
@@ -1326,6 +1359,25 @@ body::before {
 .comparison-table th.col-uptrue {
   background: linear-gradient(135deg, rgba(59,130,246,0.08), rgba(6,182,212,0.05));
   color: var(--brand-blue); border-bottom: 2px solid var(--brand-blue);
+}
+.uptrue-col-name {
+  background: linear-gradient(135deg, #6326ed, #ec4899);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* FAQ headline accent word */
+.section-title em.faq-answers-gradient {
+  background: linear-gradient(135deg, #6326ed, #ec4899);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Monitoring index hero: "your website" gradient */
+.monitoring-hero-gradient {
+  background: linear-gradient(135deg, #6326ed, #ec4899);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 .comparison-table td {
   padding: 13px var(--space-5); text-align: center; border-bottom: 1px solid var(--border);
@@ -1836,6 +1888,52 @@ html.dark .gradient-text {
   -webkit-background-clip: text; -webkit-text-fill-color: transparent;
   background-clip: text;
   font-style: italic; font-weight: 900;
+}
+
+/* Pricing headline: dark gradient text with a light blue accent word */
+.pricing-title-gradient {
+  background: linear-gradient(135deg, #1e3a8a 0%, #4c1d95 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.dark .pricing-title-gradient {
+  background: linear-gradient(135deg, #60a5fa 0%, #c4b5fd 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.pricing-title-gradient em {
+  color: #60a5fa;
+}
+.dark .pricing-title-gradient em {
+  color: #93c5fd;
+}
+
+/* AI features headline: violet gradient */
+.ai-title-gradient {
+  background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Hero headline second line: violet-to-pink gradient */
+.hero-tweets-gradient {
+  background: linear-gradient(135deg, #a78bfa 0%, #f472b6 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* How It Works headline: dark violet-to-light pink gradient */
+.hiw-title-gradient {
+  background: linear-gradient(135deg, #4c1d95 0%, #fbcfe8 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Testimonials headline: violet-to-pink gradient */
+.testimonials-title-gradient {
+  background: linear-gradient(135deg, #6326ed, #ec4899);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 /* Stat values in light mode — brand color accent */

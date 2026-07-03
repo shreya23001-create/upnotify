@@ -2,6 +2,8 @@ import '../landing.css'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { MONITOR_TYPES } from '@/lib/constants/monitor-types'
+import { MonitorTypeIcon, MonitorIconGradientDefs } from './monitor-type-icons'
+import { Sparkles, Plug } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'Website Monitoring Suite — 24 Monitor Types | Uptrue',
@@ -34,7 +36,7 @@ export default function MonitoringIndexPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      
+      <MonitorIconGradientDefs />
 
       {/* Hero */}
       <section style={{
@@ -52,7 +54,7 @@ export default function MonitoringIndexPage() {
           </div>
           <h1 style={{ fontSize: 'clamp(32px, 5vw, 52px)', fontWeight: 900, letterSpacing: '-0.03em', color: 'var(--text-primary)', lineHeight: 1.15, marginBottom: 16 }}>
             24 ways to monitor<br />
-            <span className="gradient-text">your website</span>
+            <span className="gradient-text monitoring-hero-gradient">your website</span>
           </h1>
           <p style={{ fontSize: 18, color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: 36, maxWidth: 560, margin: '0 auto 36px' }}>
             From HTTP uptime to WordPress internals, security headers, SPF/DMARC, blacklists, and cookie consent —
@@ -99,7 +101,8 @@ export default function MonitoringIndexPage() {
         <section style={{ marginBottom: 64 }}>
           <div style={{ marginBottom: 32 }}>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'var(--brand-gradient-soft)', border: '1px solid rgba(59,130,246,0.2)', borderRadius: 'var(--radius-full)', padding: '4px 12px', marginBottom: 12 }}>
-              <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--brand-blue)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>✦ New — Advanced Monitors</span>
+              <Sparkles size={12} color="var(--brand-blue)" />
+              <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--brand-blue)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>New — Advanced Monitors</span>
             </div>
             <h2 style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--text-primary)', marginBottom: 6 }}>Security, compliance & change detection</h2>
             <p style={{ color: 'var(--text-secondary)', fontSize: 15 }}>For teams who need to go beyond basic uptime.</p>
@@ -116,7 +119,8 @@ export default function MonitoringIndexPage() {
           <section style={{ marginBottom: 64 }}>
             <div style={{ marginBottom: 32 }}>
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'linear-gradient(135deg, #667eea18, #764ba212)', border: '1px solid #667eea35', borderRadius: 'var(--radius-full)', padding: '4px 12px', marginBottom: 12 }}>
-                <span style={{ fontSize: 11, fontWeight: 700, color: '#667eea', textTransform: 'uppercase', letterSpacing: '0.05em' }}>🔌 New — Agent-Based Monitors</span>
+                <Plug size={12} color="#667eea" />
+                <span style={{ fontSize: 11, fontWeight: 700, color: '#667eea', textTransform: 'uppercase', letterSpacing: '0.05em' }}>New — Agent-Based Monitors</span>
               </div>
               <h2 style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--text-primary)', marginBottom: 6 }}>Monitor from inside your site</h2>
               <p style={{ color: 'var(--text-secondary)', fontSize: 15 }}>Plugin-based monitors that check what external tools can&apos;t see — file injections, rogue users, and internal compromises.</p>
@@ -131,7 +135,7 @@ export default function MonitoringIndexPage() {
 
         {/* Bottom CTA */}
         <div style={{
-          background: 'var(--brand-gradient)',
+          background: 'linear-gradient(135deg, #6326ed, #ec4899)',
           borderRadius: 16,
           padding: '40px 48px',
           display: 'flex',
@@ -146,7 +150,7 @@ export default function MonitoringIndexPage() {
           </div>
           <Link href="/signup" style={{
             background: '#fff',
-            color: 'var(--brand-blue)',
+            color: '#6326ed',
             padding: '12px 28px',
             borderRadius: 10,
             fontWeight: 700,
@@ -194,9 +198,10 @@ function MonitorCard({ t }: { t: typeof MONITOR_TYPES[number] }) {
         background: t.type === 'wordpress' ? '#21759b' : 'var(--brand-gradient-soft)',
         borderRadius: 10,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: 20, marginBottom: 12,
+        color: t.type === 'wordpress' ? '#fff' : 'var(--brand-blue)',
+        marginBottom: 12,
       }}>
-        {t.type === 'wordpress' ? <WpIcon size={22} /> : t.emoji}
+        {t.type === 'wordpress' ? <WpIcon size={22} /> : <MonitorTypeIcon type={t.type} size={20} />}
       </div>
       <div style={{ fontWeight: 700, fontSize: 15, color: 'var(--text-primary)', marginBottom: 6 }}>{t.name}</div>
       <div style={{ color: 'var(--text-secondary)', fontSize: 13, lineHeight: 1.55 }}>{t.tagline}</div>

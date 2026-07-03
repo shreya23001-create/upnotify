@@ -15,7 +15,7 @@ export default function NotFound(): React.ReactElement {
       alignItems: 'center',
       justifyContent: 'center',
       padding: '32px 24px',
-      fontFamily: 'var(--font-inter, system-ui, sans-serif)',
+      fontFamily: 'var(--font-display, system-ui, sans-serif)',
       background: 'var(--bg-page, #0f172a)',
       color: 'var(--text-primary, #f1f5f9)',
       textAlign: 'center',
