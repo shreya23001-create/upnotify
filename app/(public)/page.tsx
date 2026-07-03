@@ -216,7 +216,7 @@ export default async function LandingPage(): Promise<React.ReactElement> {
                 </div>
                 <h1 className="hero-headline fade-up delay-1">
                   Know your site is down<br />
-                  <span className="gradient-text">before a customer tweets.</span>
+                  <span className="gradient-text hero-tweets-gradient">before a customer tweets.</span>
                 </h1>
                 <p className="hero-sub fade-up delay-2">
                   24 monitor types. 1-minute checks. Instant alerts to Slack, email or webhook. Built for agencies and dev teams.
@@ -269,7 +269,7 @@ export default async function LandingPage(): Promise<React.ReactElement> {
                 { value: '0',     label: 'False alarms (2-region confirm)' },
               ]).map((stat) => (
                 <div key={stat.label} className="stat-item">
-                  <div className="stat-value gradient-text">{stat.value}</div>
+                  <div className="stat-value gradient-text hero-tweets-gradient">{stat.value}</div>
                   <div className="stat-label">{stat.label}</div>
                 </div>
               ))}
@@ -305,7 +305,7 @@ export default async function LandingPage(): Promise<React.ReactElement> {
             <div className="container">
               <div className="section-header reveal-title">
                 <div className="section-eyebrow">{howItWorks?.eyebrow ?? 'No setup scripts. No agents.'}</div>
-                <h2 className="section-title">{howItWorks?.headline ?? (<>Up and running<br />in <em>2 minutes</em>.</>)}</h2>
+                <h2 className="section-title hiw-title-gradient">{howItWorks?.headline ?? (<>Up and running<br />in <em>2 minutes</em>.</>)}</h2>
               </div>
               <div className="hiw-steps reveal-stagger">
                 {steps.map((step) => (
@@ -327,7 +327,7 @@ export default async function LandingPage(): Promise<React.ReactElement> {
               <div className="ai-inner">
                 <div className="ai-text reveal-title">
                   <div className="section-eyebrow">{aiFeatures?.eyebrow ?? 'Powered by Claude AI'}</div>
-                  <h2 className="section-title">{aiFeatures?.headline ?? (<>Monitoring that actually<br /><em>explains</em> itself.</>)}</h2>
+                  <h2 className="section-title ai-title-gradient">{aiFeatures?.headline ?? (<>Monitoring that actually<br /><em>explains</em> itself.</>)}</h2>
                   <p className="section-sub">
                     {aiFeatures?.subheadline ?? "Most tools just tell you something broke. Uptrue tells you why, what it means for your business, and what to fix — in plain English."}
                   </p>
@@ -494,7 +494,7 @@ export default async function LandingPage(): Promise<React.ReactElement> {
                   <div className="section-eyebrow">{testimonials?.eyebrow ?? 'What our users say'}</div>
                   <h2 className="testimonials-big-claim">
                     Trusted by agencies,<br />
-                    <span className="gradient-text">SaaS teams & developers.</span>
+                    <span className="gradient-text testimonials-title-gradient">SaaS teams & developers.</span>
                   </h2>
                 </div>
                 <div className="testimonials-hero-right">
@@ -550,7 +550,19 @@ export default async function LandingPage(): Promise<React.ReactElement> {
             <div className="container">
               <div className="section-header reveal-title">
                 <div className="section-eyebrow">{comparison?.eyebrow ?? 'Side by side'}</div>
-                <h2 className="section-title">{comparison?.headline ?? (<>The honest comparison<br />nobody <em>else</em> will show you.</>)}</h2>
+                <h2 className="section-title">
+                  {(() => {
+                    const headline = comparison?.headline
+                    if (typeof headline === 'string' && headline.startsWith('Uptrue ')) {
+                      return (
+                        <>
+                          <span className="uptrue-col-name">Uptrue</span>{headline.slice('Uptrue'.length)}
+                        </>
+                      )
+                    }
+                    return headline ?? (<>The honest comparison<br />nobody <em>else</em> will show you.</>)
+                  })()}
+                </h2>
                 <p className="section-sub">{comparison?.subheadline ?? "We checked. The others don't offer AI reports, citation monitoring, or 24 monitor types. Uptrue does."}</p>
               </div>
               <div className="comparison-table-wrap reveal">
@@ -562,7 +574,7 @@ export default async function LandingPage(): Promise<React.ReactElement> {
                         <th key={col} className={i === 0 ? 'col-uptrue' : undefined}>
                           {i === 0 ? (
                             <div className="uptrue-col-header">
-                              {col}<span className="uptrue-col-badge">Best value</span>
+                              <span className="uptrue-col-name">{col}</span><span className="uptrue-col-badge">Best value</span>
                             </div>
                           ) : col}
                         </th>

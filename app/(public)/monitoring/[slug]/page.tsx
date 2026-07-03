@@ -3,6 +3,9 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { getAllSlugs } from '@/lib/constants/monitor-types'
+import { MonitorSlugIcon, MonitorIconGradientDefs } from '../monitor-type-icons'
+import { Settings, Check, AlertTriangle, HelpCircle } from 'lucide-react'
+import type { ComponentType } from 'react'
 
 // ---------------------------------------------------------------------------
 // Monitor type definitions
@@ -11,7 +14,6 @@ import { getAllSlugs } from '@/lib/constants/monitor-types'
 interface MonitorTypePage {
   slug: string
   name: string
-  emoji: string
   tagline: string
   description: string
   howItWorks: string
@@ -59,7 +61,6 @@ const pages: MonitorTypePage[] = [
   {
     slug: 'http-uptime-monitoring',
     name: 'HTTP/HTTPS Uptime Monitoring',
-    emoji: '🌐',
     tagline: 'Know the instant your website goes down.',
     description: 'HTTP/HTTPS uptime monitoring checks whether your website is reachable and returning a valid response. Uptrue performs checks from the edge every 30 seconds to 5 minutes, with two-confirmation logic to eliminate false positives.',
     howItWorks: 'Uptrue sends an HTTP GET request to your URL and evaluates the response status code. If the site returns a 5xx error or times out, a second confirmation check runs 5 seconds later. Only if both fail does an incident open and alerts fire.',
@@ -76,7 +77,6 @@ const pages: MonitorTypePage[] = [
   {
     slug: 'ssl-certificate-monitoring',
     name: 'SSL Certificate Monitoring',
-    emoji: '🔒',
     tagline: 'Get alerted before your SSL certificate expires.',
     description: 'SSL certificate monitoring checks your certificate\'s expiry date, chain validity, and issuer. An expired or broken SSL certificate causes browser warnings that drive visitors away instantly.',
     howItWorks: 'Uptrue connects to port 443 and retrieves the TLS certificate. It checks the expiry date, validates the certificate chain, and detects self-signed or incomplete chain configurations.',
@@ -92,7 +92,6 @@ const pages: MonitorTypePage[] = [
   {
     slug: 'dns-monitoring',
     name: 'DNS Record Monitoring',
-    emoji: '📡',
     tagline: 'Detect unexpected DNS changes before they cause outages.',
     description: 'DNS monitoring checks your A, MX, NS, and TXT records and alerts you when anything changes. Unexpected DNS changes can redirect traffic, break email, or indicate a compromise.',
     howItWorks: 'Uptrue resolves all major record types for your domain on each check cycle. If any record differs from the previous snapshot, an alert fires with a diff of what changed.',
@@ -108,7 +107,6 @@ const pages: MonitorTypePage[] = [
   {
     slug: 'keyword-monitoring',
     name: 'Keyword Detection Monitoring',
-    emoji: '🔍',
     tagline: 'Verify critical content is always present on your page.',
     description: 'Keyword monitoring fetches your page and checks for the presence or absence of specific text strings. Use it to confirm checkout flows work, API responses are correct, or compliance text remains on your site.',
     howItWorks: 'Uptrue fetches the full HTML of your target URL and searches for your specified positive and negative keywords. You can require multiple keywords to all be present, or alert when a keyword disappears.',
@@ -124,7 +122,6 @@ const pages: MonitorTypePage[] = [
   {
     slug: 'domain-expiry-monitoring',
     name: 'Domain Expiry Monitoring',
-    emoji: '📅',
     tagline: 'Never let your domain registration lapse.',
     description: 'Domain expiry monitoring tracks when your domain registration expires and alerts you weeks before it lapses. An expired domain goes dark instantly — and may be snapped up by squatters.',
     howItWorks: 'Uptrue performs WHOIS lookups for your domain and extracts the expiry date. Alerts fire at configurable thresholds before the registration expires.',
@@ -140,7 +137,6 @@ const pages: MonitorTypePage[] = [
   {
     slug: 'port-monitoring',
     name: 'Port Check Monitoring',
-    emoji: '🔌',
     tagline: 'Verify TCP ports are open and accepting connections.',
     description: 'Port monitoring attempts a TCP connection to a specified host and port. Essential for monitoring databases, mail servers, FTP, SSH, and any custom TCP service.',
     howItWorks: 'Uptrue opens a TCP socket to your target host and port with a configurable timeout. If the connection is refused or times out, an alert fires.',
@@ -156,7 +152,6 @@ const pages: MonitorTypePage[] = [
   {
     slug: 'ping-monitoring',
     name: 'Ping / Reachability Monitoring',
-    emoji: '📶',
     tagline: 'Basic ICMP reachability for servers and network devices.',
     description: 'Ping monitoring sends ICMP echo requests to verify a host is reachable on the network. The simplest and fastest check — ideal for servers, routers, and IoT devices.',
     howItWorks: 'Uptrue sends ICMP ping packets to your target IP or hostname. If the host fails to respond within the timeout, an alert fires.',
@@ -172,7 +167,6 @@ const pages: MonitorTypePage[] = [
   {
     slug: 'api-endpoint-monitoring',
     name: 'API Endpoint Monitoring',
-    emoji: '⚡',
     tagline: 'Test REST APIs with custom assertions on status, body, and latency.',
     description: 'API endpoint monitoring goes beyond simple uptime. You define assertions on the HTTP status code, response body content, and response time. Catches API regressions before users do.',
     howItWorks: 'Uptrue sends an HTTP request (GET, POST, etc.) to your API endpoint with optional custom headers and body. It evaluates your defined assertions and alerts if any fail.',
@@ -188,7 +182,6 @@ const pages: MonitorTypePage[] = [
   {
     slug: 'heartbeat-monitoring',
     name: 'Heartbeat Monitoring',
-    emoji: '💓',
     tagline: 'Detect silent cron job and background task failures.',
     description: 'Heartbeat monitoring flips the model: instead of Uptrue pinging your service, your service pings Uptrue. If Uptrue doesn\'t hear from your cron job or task within the expected interval, it fires an alert.',
     howItWorks: 'Uptrue gives you a unique ping URL. Your scheduled jobs call this URL on success. If a check-in is missed within your configured window, an incident opens.',
@@ -204,7 +197,6 @@ const pages: MonitorTypePage[] = [
   {
     slug: 'page-change-detection',
     name: 'Page Change Detection',
-    emoji: '👁️',
     tagline: 'Alert when competitor or partner pages change.',
     description: 'Page change detection fetches a target page and alerts you when the content changes. Track competitor pricing, partner terms, regulatory pages, or any web content you need to stay current on.',
     howItWorks: 'Uptrue fetches the full HTML of your target URL and computes a hash. If the hash differs from the previous run, a change alert fires with context about what section changed.',
@@ -220,7 +212,6 @@ const pages: MonitorTypePage[] = [
   {
     slug: 'security-headers-monitoring',
     name: 'Security Headers Monitoring',
-    emoji: '🛡️',
     tagline: 'Ensure your HTTP security headers stay configured.',
     description: 'Security headers monitoring checks that critical HTTP response headers are present and configured. Missing headers are a common source of security vulnerabilities caught in penetration tests and compliance audits.',
     howItWorks: 'Uptrue sends a HEAD request to your URL and checks for the presence of six key security headers: Strict-Transport-Security, Content-Security-Policy, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, and Permissions-Policy.',
@@ -236,7 +227,6 @@ const pages: MonitorTypePage[] = [
   {
     slug: 'response-time-monitoring',
     name: 'Response Time Threshold Monitoring',
-    emoji: '⏱️',
     tagline: 'Alert when your site becomes too slow for users.',
     description: 'Response time threshold monitoring measures how long your site takes to respond and fires alerts when it exceeds your defined thresholds. Slow responses hurt conversions and Core Web Vitals scores.',
     howItWorks: 'Uptrue measures the full round-trip time from request to first byte received. If the response time exceeds your warn threshold, status goes degraded. If it exceeds the critical threshold, an incident opens.',
@@ -252,7 +242,6 @@ const pages: MonitorTypePage[] = [
   {
     slug: 'robots-txt-monitoring',
     name: 'robots.txt Change Monitoring',
-    emoji: '🤖',
     tagline: 'Detect accidental changes that could de-index your site.',
     description: 'robots.txt monitoring fetches your robots.txt file on each check cycle and alerts you when the content changes. An accidental Disallow: / can block all search engines within hours.',
     howItWorks: 'Uptrue fetches /robots.txt from your domain and computes a SHA-256 hash of the content. If the hash differs from the previous run, a change alert fires.',
@@ -268,7 +257,6 @@ const pages: MonitorTypePage[] = [
   {
     slug: 'ip-change-monitoring',
     name: 'IP Address Change Monitoring',
-    emoji: '🗺️',
     tagline: 'Alert when your domain resolves to a different IP address.',
     description: 'IP change monitoring resolves your domain\'s A record on each check and alerts you when the IP changes. Catches unexpected CDN failovers, BGP route changes, DNS misconfigurations, and potential hijacking.',
     howItWorks: 'Uptrue resolves your domain\'s A records using public DNS and compares the primary IP to the stored baseline. If the IP changes, an alert fires with the old and new addresses.',
@@ -284,7 +272,6 @@ const pages: MonitorTypePage[] = [
   {
     slug: 'mx-health-monitoring',
     name: 'MX Health Monitoring',
-    emoji: '📧',
     tagline: 'Verify your mail server is configured and reachable.',
     description: 'MX health monitoring checks that your domain has valid MX records and that the primary mail server resolves successfully. Broken MX configuration means lost email — often silent for days.',
     howItWorks: 'Uptrue resolves MX records for your domain, sorts by priority, and attempts to resolve the highest-priority mail server\'s A record. If MX records are missing or the primary server doesn\'t resolve, an alert fires.',
@@ -300,7 +287,6 @@ const pages: MonitorTypePage[] = [
   {
     slug: 'whois-registrar-monitoring',
     name: 'WHOIS Registrar Change Monitoring',
-    emoji: '📋',
     tagline: 'Detect registrar transfers and WHOIS data changes.',
     description: 'WHOIS registrar change monitoring detects changes to your domain\'s SOA record and nameservers — the signals most likely to indicate a registrar transfer, domain hijacking, or unauthorised account changes.',
     howItWorks: 'Uptrue queries DNS SOA and NS records for your domain on each check cycle. If the hostmaster, primary nameserver, or NS records change from the baseline, an alert fires.',
@@ -315,7 +301,6 @@ const pages: MonitorTypePage[] = [
   {
     slug: 'sitemap-monitoring',
     name: 'Sitemap Validity Monitoring',
-    emoji: '🗺️',
     tagline: 'Ensure your sitemap.xml is always accessible and valid.',
     description: 'Sitemap validity monitoring fetches /sitemap.xml and verifies it is reachable and contains valid XML. A missing or broken sitemap silently stops Google from discovering new pages on your site.',
     howItWorks: 'Uptrue fetches /sitemap.xml from your domain on each check cycle. It verifies the response status, checks the content is valid XML (urlset or sitemapindex), and reports URL counts.',
@@ -331,7 +316,6 @@ const pages: MonitorTypePage[] = [
   {
     slug: 'redirect-chain-monitoring',
     name: 'Redirect Chain Monitoring',
-    emoji: '🔗',
     tagline: 'Detect redirect loops, long chains, and broken final destinations.',
     description: 'Redirect chain monitoring follows your URL\'s redirect hops and alerts when chains are too long, end in errors, or form loops. Excessive redirects hurt Core Web Vitals and can drop pages from Google\'s index.',
     howItWorks: 'Uptrue follows redirects manually (not automatically), recording each hop\'s URL and status code. If the chain exceeds your configured maximum hops, or the final destination returns an error, an alert fires.',
@@ -347,7 +331,6 @@ const pages: MonitorTypePage[] = [
   {
     slug: 'spf-dmarc-monitoring',
     name: 'SPF / DMARC Monitoring',
-    emoji: '✉️',
     tagline: 'Ensure your email authentication records are correctly configured.',
     description: 'SPF/DMARC monitoring checks your domain\'s email authentication DNS records. Missing or misconfigured SPF and DMARC records allow attackers to spoof your domain in phishing emails.',
     howItWorks: 'Uptrue queries TXT records for your domain (SPF) and _dmarc.yourdomain.com (DMARC) on each check cycle. Missing records trigger a critical alert. Weak policies (p=none for DMARC, missing all mechanism for SPF) trigger warnings.',
@@ -363,7 +346,6 @@ const pages: MonitorTypePage[] = [
   {
     slug: 'blacklist-monitoring',
     name: 'Blacklist / DNSBL Monitoring',
-    emoji: '🚫',
     tagline: 'Know if your server IP is listed on spam block lists.',
     description: 'Blacklist monitoring checks your server\'s IP address against major DNS-based block lists (DNSBL). Being listed destroys email deliverability and can cause inbound email to be rejected.',
     howItWorks: 'Uptrue resolves your domain to its IP address and performs reverse DNS lookups against four major block list zones: Spamhaus ZEN, SpamCop, SORBS, and Barracuda. If any returns a positive result, an alert fires.',
@@ -379,7 +361,6 @@ const pages: MonitorTypePage[] = [
   {
     slug: 'page-size-monitoring',
     name: 'Page Size Monitoring',
-    emoji: '📦',
     tagline: 'Alert when your page weight grows beyond acceptable limits.',
     description: 'Page size monitoring measures the raw byte size of your page response and alerts when it exceeds configurable warn and critical thresholds. Page bloat slows load times and increases CDN egress costs.',
     howItWorks: 'Uptrue fetches your URL and measures the response body size in kilobytes. If it exceeds your warn threshold, status goes degraded. If it exceeds the critical threshold, an incident opens.',
@@ -395,7 +376,6 @@ const pages: MonitorTypePage[] = [
   {
     slug: 'cookie-consent-monitoring',
     name: 'Cookie Consent Monitoring',
-    emoji: '🍪',
     tagline: 'Verify your cookie consent banner is always present.',
     description: 'Cookie consent monitoring scans your page for the presence of cookie consent mechanisms. A missing banner can trigger GDPR, CCPA, or ePrivacy Directive compliance violations.',
     howItWorks: 'Uptrue fetches your page HTML and checks for signatures of common cookie consent platforms including CookieYes, OneTrust, TrustArc, CookieBot, Usercentrics, and others. If none is detected, an alert fires.',
@@ -411,7 +391,6 @@ const pages: MonitorTypePage[] = [
   {
     slug: 'nameserver-monitoring',
     name: 'Nameserver Change Monitoring',
-    emoji: '🖥️',
     tagline: 'Alert the instant your authoritative nameservers change.',
     description: 'Nameserver change monitoring resolves your domain\'s NS records on each check cycle and alerts when the authoritative nameservers differ from the stored baseline. Nameserver changes cause global DNS propagation and can cause service outages.',
     howItWorks: 'Uptrue resolves NS records for your domain and sorts them for consistent comparison. If the set of authoritative nameservers changes from the baseline, an alert fires with the old and new nameservers.',
@@ -503,7 +482,7 @@ export default async function MonitoringTypePage({ params }: { params: Promise<{
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      
+      <MonitorIconGradientDefs />
 
       {/* Hero */}
       <section style={{
@@ -525,9 +504,10 @@ export default async function MonitoringTypePage({ params }: { params: Promise<{
             border: '1px solid rgba(59,130,246,0.2)',
             borderRadius: 14,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 28, marginBottom: 20,
+            color: 'var(--brand-blue)',
+            marginBottom: 20,
           }}>
-            {page.emoji}
+            <MonitorSlugIcon slug={page.slug} size={28} />
           </div>
 
           <h1 style={{
@@ -563,12 +543,12 @@ export default async function MonitoringTypePage({ params }: { params: Promise<{
         </p>
 
         {/* How it works */}
-        <Section title="How it works" icon="⚙️">
+        <Section title="How it works" icon={Settings}>
           <p style={{ fontSize: 15, lineHeight: 1.75, color: 'var(--text-secondary)' }}>{page.howItWorks}</p>
         </Section>
 
         {/* What we check */}
-        <Section title="What Uptrue checks" icon="✓">
+        <Section title="What Uptrue checks" icon={Check}>
           <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
             {page.whatWeCheck.map((item, i) => (
               <li key={i} style={{
@@ -589,7 +569,7 @@ export default async function MonitoringTypePage({ params }: { params: Promise<{
         </Section>
 
         {/* Alert conditions */}
-        <Section title="Alert conditions" icon="⚠">
+        <Section title="Alert conditions" icon={AlertTriangle}>
           <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
             {page.alertConditions.map((item, i) => (
               <li key={i} style={{
@@ -624,7 +604,7 @@ export default async function MonitoringTypePage({ params }: { params: Promise<{
 
         {/* CTA inline */}
         <div style={{
-          background: 'var(--brand-gradient)',
+          background: 'linear-gradient(135deg, #6326ed, #ec4899)',
           borderRadius: 14,
           padding: '28px 32px',
           display: 'flex',
@@ -640,7 +620,7 @@ export default async function MonitoringTypePage({ params }: { params: Promise<{
           </div>
           <Link href="/signup" style={{
             background: '#fff',
-            color: 'var(--brand-blue)',
+            color: '#6326ed',
             padding: '10px 22px',
             borderRadius: 8,
             fontWeight: 700,
@@ -654,7 +634,7 @@ export default async function MonitoringTypePage({ params }: { params: Promise<{
         </div>
 
         {/* FAQ */}
-        <Section title="Frequently asked questions" icon="?">
+        <Section title="Frequently asked questions" icon={HelpCircle}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {page.faq.map((item, i) => (
               <div key={i} style={{
@@ -695,8 +675,8 @@ export default async function MonitoringTypePage({ params }: { params: Promise<{
                     background: 'var(--brand-gradient-soft)',
                     borderRadius: 8,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 18, flexShrink: 0,
-                  }}>{r.emoji}</span>
+                    color: 'var(--brand-blue)', flexShrink: 0,
+                  }}><MonitorSlugIcon slug={r.slug} size={18} /></span>
                   <span style={{ fontWeight: 600, fontSize: 13, color: 'var(--text-primary)' }}>{r.name}</span>
                 </Link>
               ))}
@@ -712,7 +692,9 @@ export default async function MonitoringTypePage({ params }: { params: Promise<{
           border: '1px solid var(--border)',
           borderRadius: 16,
         }}>
-          <div style={{ fontSize: 24, marginBottom: 12 }}>{page.emoji}</div>
+          <div style={{ display: 'flex', justifyContent: 'center', color: 'var(--brand-blue)', marginBottom: 12 }}>
+            <MonitorSlugIcon slug={page.slug} size={24} />
+          </div>
           <h2 style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--text-primary)', marginBottom: 8 }}>
             Ready to set up {page.name}?
           </h2>
@@ -743,7 +725,7 @@ export default async function MonitoringTypePage({ params }: { params: Promise<{
   )
 }
 
-function Section({ title, icon, children }: { title: string; icon: string; children: React.ReactNode }) {
+function Section({ title, icon: Icon, children }: { title: string; icon: ComponentType<{ size?: number; strokeWidth?: number }>; children: React.ReactNode }) {
   return (
     <div style={{ marginBottom: 48 }}>
       <h2 style={{
@@ -761,8 +743,8 @@ function Section({ title, icon, children }: { title: string; icon: string; child
           border: '1px solid var(--border)',
           borderRadius: 7,
           display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 13, flexShrink: 0,
-        }}>{icon}</span>
+          color: 'var(--text-secondary)', flexShrink: 0,
+        }}><Icon size={14} strokeWidth={2.25} /></span>
         {title}
       </h2>
       {children}

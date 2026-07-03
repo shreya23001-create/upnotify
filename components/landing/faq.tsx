@@ -23,7 +23,7 @@ export default function Faq({ items, eyebrow, headline }: FaqProps): React.React
       <div className="container">
         <div className="section-header">
           <div className="section-eyebrow">{eyebrow ?? 'Got questions?'}</div>
-          <h2 className="section-title">{headline ?? <>We&apos;ve got <em>answers.</em></>}</h2>
+          <h2 className="section-title">{headline ?? <>We&apos;ve got <em className="faq-answers-gradient">answers.</em></>}</h2>
           <p className="section-sub">Everything you need to know about Uptrue — no fluff.</p>
         </div>
         <div className="faq-grid">
