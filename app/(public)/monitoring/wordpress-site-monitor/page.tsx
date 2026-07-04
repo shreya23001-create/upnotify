@@ -328,8 +328,7 @@ export default function WordPressMonitorPage() {
         {/* Threat categories */}
         <section className="reveal" style={{ marginBottom: 64 }}>
           <LandingSection title="What Uptrue WordPress Monitor detects" icon={Search}>
-            <div style={{
-              background: 'linear-gradient(135deg, #0f1729 0%, #1a1f3a 50%, #0f2040 100%)',
+            <div className="wp-showcase-card" style={{
               borderRadius: 16,
               padding: '16px 40px',
             }}>
@@ -337,13 +336,13 @@ export default function WordPressMonitorPage() {
                 const sev = severityBadge[threat.severity]
                 const reversed = i % 2 === 1
                 return (
-                  <div key={threat.title} style={{
+                  <div key={threat.title} className="wp-showcase-row" style={{
                     display: 'flex',
                     flexDirection: reversed ? 'row-reverse' : 'row',
                     alignItems: 'center',
                     gap: 40,
                     padding: '36px 0',
-                    borderBottom: i < threats.length - 1 ? '1px solid rgba(255,255,255,0.08)' : 'none',
+                    borderBottom: i < threats.length - 1 ? '1px solid var(--wp-showcase-divider)' : 'none',
                     flexWrap: 'wrap',
                   }}>
                     <div style={{ flex: '1 1 320px', minWidth: 260 }}>
@@ -357,10 +356,10 @@ export default function WordPressMonitorPage() {
                       }}>
                         {sev.label}
                       </span>
-                      <div style={{ fontSize: 22, fontWeight: 800, color: '#fff', lineHeight: 1.25, marginBottom: 10, letterSpacing: '-0.01em' }}>
+                      <div className="wp-showcase-title" style={{ fontSize: 22, fontWeight: 800, lineHeight: 1.25, marginBottom: 10, letterSpacing: '-0.01em' }}>
                         {threat.title}
                       </div>
-                      <div style={{ fontSize: 14.5, color: 'rgba(255,255,255,0.6)', lineHeight: 1.7 }}>
+                      <div className="wp-showcase-desc" style={{ fontSize: 14.5, lineHeight: 1.7 }}>
                         {threat.desc}
                       </div>
                     </div>
@@ -393,8 +392,7 @@ export default function WordPressMonitorPage() {
         {/* How it works */}
         <section className="reveal" style={{ marginBottom: 64 }}>
           <LandingSection title="How it works" icon={Settings}>
-            <div style={{
-              background: 'linear-gradient(135deg, #0f1729 0%, #1a1f3a 50%, #0f2040 100%)',
+            <div className="wp-showcase-card" style={{
               borderRadius: 16,
               padding: '8px 36px',
               display: 'grid',
@@ -406,14 +404,14 @@ export default function WordPressMonitorPage() {
                     <span style={{
                       width: 20, height: 20, flexShrink: 0, borderRadius: '50%',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      background: 'rgba(74,222,128,0.12)', color: '#4ade80',
+                      background: 'rgba(22,163,74,0.12)', color: '#16a34a',
                       fontSize: 11, fontWeight: 800,
                     }}>
                       {step.step}
                     </span>
-                    <span style={{ fontSize: 15, fontWeight: 700, color: '#fff' }}>{step.title}</span>
+                    <span className="wp-showcase-title" style={{ fontSize: 15, fontWeight: 700 }}>{step.title}</span>
                   </div>
-                  <div style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.55)', lineHeight: 1.65 }}>{step.desc}</div>
+                  <div className="wp-showcase-desc" style={{ fontSize: 13.5, lineHeight: 1.65 }}>{step.desc}</div>
                 </div>
               ))}
             </div>

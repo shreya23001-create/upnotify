@@ -4,8 +4,9 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { getAllSlugs } from '@/lib/constants/monitor-types'
 import { MonitorSlugIcon, MonitorIconGradientDefs } from '../monitor-type-icons'
-import { Settings, Check, AlertTriangle, HelpCircle } from 'lucide-react'
+import { Settings, Check, AlertTriangle } from 'lucide-react'
 import type { ComponentType } from 'react'
+import Faq from '@/components/landing/faq'
 
 // ---------------------------------------------------------------------------
 // Monitor type definitions
@@ -634,21 +635,10 @@ export default async function MonitoringTypePage({ params }: { params: Promise<{
         </div>
 
         {/* FAQ */}
-        <Section title="Frequently asked questions" icon={HelpCircle}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {page.faq.map((item, i) => (
-              <div key={i} style={{
-                padding: '16px 20px',
-                background: 'var(--bg-card)',
-                border: '1px solid var(--border)',
-                borderRadius: 10,
-              }}>
-                <div style={{ fontWeight: 600, fontSize: 15, color: 'var(--text-primary)', marginBottom: 6 }}>{item.q}</div>
-                <div style={{ fontSize: 14, lineHeight: 1.7, color: 'var(--text-secondary)' }}>{item.a}</div>
-              </div>
-            ))}
-          </div>
-        </Section>
+        <Faq
+          items={page.faq.map(item => ({ question: item.q, answer: item.a }))}
+          headline="Frequently asked questions"
+        />
 
         {/* Related monitors */}
         {relatedPages.length > 0 && (

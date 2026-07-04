@@ -10,7 +10,7 @@ const GRADIENTS: Record<string, [string, string]> = {
   'Incident Report': ['#b91c1c', '#5b21b6'],
   Outage:            ['#b91c1c', '#5b21b6'],
   Agency:            ['#1e3a5f', '#1d4ed8'],
-  WordPress:         ['#1d4ed8', '#0e7490'],
+  WordPress:         ['#6326ed', '#ec4899'],
   Hosting:           ['#047857', '#1d4ed8'],
   Default:           ['#1d4ed8', '#0e7490'],
 }

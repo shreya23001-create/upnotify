@@ -1,6 +1,56 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { JsonLd } from '@/components/seo/json-ld'
+import Faq from '@/components/landing/faq'
+import { ScrollReveal } from '@/components/landing/scroll-reveal'
+
+const STORE_CAUSES = [
+  {
+    question: 'Custom domain DNS failure',
+    answer: (
+      <>
+        <p>Shopify stores with custom domains (rather than .myshopify.com) rely on your domain&apos;s DNS records pointing to Shopify&apos;s servers. If your domain has expired, your registrar has changed DNS settings, or your domain was transferred without properly moving the DNS records, your custom domain becomes unreachable while your .myshopify.com URL continues to work.</p>
+        <p>Check your domain&apos;s DNS settings in your registrar&apos;s control panel. Shopify requires specific CNAME or A record configurations. Go to Shopify admin &gt; Settings &gt; Domains and verify your domain shows as &quot;Connected.&quot; If it shows an error, follow Shopify&apos;s instructions to update your DNS records. DNS changes take up to 48 hours to propagate globally, though most changes are visible within a few hours.</p>
+      </>
+    ),
+  },
+  {
+    question: 'A broken app or app conflict',
+    answer: (
+      <>
+        <p>Shopify apps extend your store&apos;s functionality, but they also add code that runs on every page load. A recently updated app, or a newly installed app that conflicts with an existing one, can break your storefront or checkout in ways that are difficult to spot.</p>
+        <p>To diagnose an app conflict: go to your Shopify admin, navigate to Apps, and disable recently added or updated apps one at a time. After disabling each app, reload your store and test the affected functionality. When the problem disappears, the last app you disabled is the cause. Contact that app&apos;s support team with details of the conflict.</p>
+      </>
+    ),
+  },
+  {
+    question: 'Theme code error',
+    answer: (
+      <>
+        <p>If you or a developer recently edited your theme files — via the Shopify admin Theme Editor or via a code editor — a syntax error in Liquid, JavaScript, or CSS can break your storefront. Even a misplaced comma or bracket in a JavaScript file can prevent the entire script from running, breaking interactive elements like the cart drawer, product image gallery, or checkout buttons.</p>
+        <p>Check your theme&apos;s recent edits in the Shopify admin under Online Store &gt; Themes &gt; Edit Code. Review any files modified in the last few days. If you are unsure what changed, unpublishing your current theme and publishing a backup copy (Shopify automatically creates backups when you duplicate a theme) is the fastest way to restore a working store.</p>
+      </>
+    ),
+  },
+  {
+    question: 'Shopify Payments account issue',
+    answer: (
+      <>
+        <p>If customers can browse your store but cannot complete checkout, and status.shopify.com shows Shopify Payments as operational, the problem may be with your specific Shopify Payments account rather than the platform.</p>
+        <p>Shopify Payments accounts can be placed on hold or require additional verification — particularly for new stores, stores with sudden spikes in sales volume, or after chargebacks. When this happens, Shopify sends an email notification, but it can easily be missed. Check your Shopify admin under Settings &gt; Payments for any notices about your Shopify Payments status.</p>
+      </>
+    ),
+  },
+  {
+    question: 'SSL certificate issue on your custom domain',
+    answer: (
+      <>
+        <p>Shopify automatically provisions and renews SSL certificates for your store&apos;s .myshopify.com subdomain, but for custom domains, the SSL certificate is tied to your domain configuration. If your custom domain&apos;s DNS was recently changed, the SSL certificate may need to be reprovisioned. This can cause browser security warnings that prevent customers from accessing your store.</p>
+        <p>In Shopify admin &gt; Settings &gt; Domains, check whether your domain shows an SSL error. Shopify usually provisions the SSL certificate within a few hours of domain connection, but if your DNS is misconfigured, the certificate cannot be issued.</p>
+      </>
+    ),
+  },
+]
 
 export const metadata: Metadata = {
   title: 'Is Shopify Down? How to Check Shopify Status and Protect Your Store',
@@ -54,6 +104,7 @@ const FAQ_DATA = [
 export default function ShopifyDownPage(): React.ReactElement {
   return (
     <article className="blog-article">
+      <ScrollReveal />
       <JsonLd
         data={{
           '@context': 'https://schema.org',
@@ -79,7 +130,7 @@ export default function ShopifyDownPage(): React.ReactElement {
         }}
       />
 
-      <header className="blog-article-header">
+      <header className="blog-article-header reveal-title">
         <div className="blog-article-meta-top">
           <span className="blog-post-category">Ecommerce</span>
           <span>6 April 2026</span>
@@ -138,58 +189,13 @@ export default function ShopifyDownPage(): React.ReactElement {
           Also try visiting your store&apos;s .myshopify.com subdomain directly (e.g., <code>yourstore.myshopify.com</code>) rather than your custom domain. If your .myshopify.com URL works but your custom domain does not, the problem is with your custom domain&apos;s DNS configuration, not your Shopify store.
         </p>
 
-        <h2>Common causes of store-specific Shopify problems</h2>
+      </div>
 
-        <h3>Custom domain DNS failure</h3>
+      <div className="reveal">
+        <Faq items={STORE_CAUSES} headline="Common causes of store-specific Shopify problems" />
+      </div>
 
-        <p>
-          Shopify stores with custom domains (rather than .myshopify.com) rely on your domain&apos;s DNS records pointing to Shopify&apos;s servers. If your domain has expired, your registrar has changed DNS settings, or your domain was transferred without properly moving the DNS records, your custom domain becomes unreachable while your .myshopify.com URL continues to work.
-        </p>
-
-        <p>
-          Check your domain&apos;s DNS settings in your registrar&apos;s control panel. Shopify requires specific CNAME or A record configurations. Go to Shopify admin &gt; Settings &gt; Domains and verify your domain shows as &quot;Connected.&quot; If it shows an error, follow Shopify&apos;s instructions to update your DNS records. DNS changes take up to 48 hours to propagate globally, though most changes are visible within a few hours.
-        </p>
-
-        <h3>A broken app or app conflict</h3>
-
-        <p>
-          Shopify apps extend your store&apos;s functionality, but they also add code that runs on every page load. A recently updated app, or a newly installed app that conflicts with an existing one, can break your storefront or checkout in ways that are difficult to spot.
-        </p>
-
-        <p>
-          To diagnose an app conflict: go to your Shopify admin, navigate to Apps, and disable recently added or updated apps one at a time. After disabling each app, reload your store and test the affected functionality. When the problem disappears, the last app you disabled is the cause. Contact that app&apos;s support team with details of the conflict.
-        </p>
-
-        <h3>Theme code error</h3>
-
-        <p>
-          If you or a developer recently edited your theme files — via the Shopify admin Theme Editor or via a code editor — a syntax error in Liquid, JavaScript, or CSS can break your storefront. Even a misplaced comma or bracket in a JavaScript file can prevent the entire script from running, breaking interactive elements like the cart drawer, product image gallery, or checkout buttons.
-        </p>
-
-        <p>
-          Check your theme&apos;s recent edits in the Shopify admin under Online Store &gt; Themes &gt; Edit Code. Review any files modified in the last few days. If you are unsure what changed, unpublishing your current theme and publishing a backup copy (Shopify automatically creates backups when you duplicate a theme) is the fastest way to restore a working store.
-        </p>
-
-        <h3>Shopify Payments account issue</h3>
-
-        <p>
-          If customers can browse your store but cannot complete checkout, and status.shopify.com shows Shopify Payments as operational, the problem may be with your specific Shopify Payments account rather than the platform.
-        </p>
-
-        <p>
-          Shopify Payments accounts can be placed on hold or require additional verification — particularly for new stores, stores with sudden spikes in sales volume, or after chargebacks. When this happens, Shopify sends an email notification, but it can easily be missed. Check your Shopify admin under Settings &gt; Payments for any notices about your Shopify Payments status.
-        </p>
-
-        <h3>SSL certificate issue on your custom domain</h3>
-
-        <p>
-          Shopify automatically provisions and renews SSL certificates for your store&apos;s .myshopify.com subdomain, but for custom domains, the SSL certificate is tied to your domain configuration. If your custom domain&apos;s DNS was recently changed, the SSL certificate may need to be reprovisioned. This can cause browser security warnings that prevent customers from accessing your store.
-        </p>
-
-        <p>
-          In Shopify admin &gt; Settings &gt; Domains, check whether your domain shows an SSL error. Shopify usually provisions the SSL certificate within a few hours of domain connection, but if your DNS is misconfigured, the certificate cannot be issued.
-        </p>
-
+      <div className="blog-article-body">
         <h2>What to do during an actual Shopify outage</h2>
 
         <p>
@@ -252,7 +258,7 @@ export default function ShopifyDownPage(): React.ReactElement {
           <li><strong>Keyword monitor</strong> — Check that your homepage contains your store name or a key product phrase — catches cases where a broken app renders an empty page that still returns 200</li>
         </ol>
 
-        <div className="blog-cta-section">
+        <div className="blog-cta-section reveal">
           <h3>Know when your Shopify store is down before your customers do</h3>
           <p>
             Free uptime monitoring for your store URL, checkout, and SSL certificate. Get alerted in 60 seconds when something breaks. No credit card required.
@@ -288,7 +294,7 @@ export default function ShopifyDownPage(): React.ReactElement {
         </div>
       </div>
 
-      <footer className="blog-article-footer">
+      <footer className="blog-article-footer reveal">
         <div className="blog-author">
           <div className="blog-author-info">
             <span className="blog-author-name">Uptrue Team</span>

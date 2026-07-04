@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import Faq from '@/components/landing/faq'
 
 interface IntegrationPage {
   slug: string
@@ -459,24 +460,10 @@ export default async function IntegrationPage({ params }: { params: Promise<{ sl
         </section>
 
         {/* FAQ */}
-        <section style={{ marginBottom: 56 }}>
-          <h2 style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--text-primary)', marginBottom: 20 }}>
-            Frequently asked questions
-          </h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {page.faq.map((item, i) => (
-              <div key={i} style={{
-                padding: '16px 20px',
-                background: 'var(--bg-card)',
-                border: '1px solid var(--border)',
-                borderRadius: 10,
-              }}>
-                <div style={{ fontWeight: 600, fontSize: 15, color: 'var(--text-primary)', marginBottom: 6 }}>{item.q}</div>
-                <div style={{ fontSize: 14, lineHeight: 1.7, color: 'var(--text-secondary)' }}>{item.a}</div>
-              </div>
-            ))}
-          </div>
-        </section>
+        <Faq
+          items={page.faq.map(item => ({ question: item.q, answer: item.a }))}
+          headline="Frequently asked questions"
+        />
 
         {/* Related integrations */}
         {related.length > 0 && (

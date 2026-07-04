@@ -90,7 +90,7 @@ export default function MonitoringIndexPage() {
             <h2 style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--text-primary)', marginBottom: 6 }}>The essentials every site needs</h2>
             <p style={{ color: 'var(--text-secondary)', fontSize: 15 }}>Start with these — they cover uptime, security, and DNS from day one.</p>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 5 }}>
             {coreMonitorTypes.map(t => (
               <MonitorCard key={t.slug} t={t} />
             ))}
@@ -107,7 +107,7 @@ export default function MonitoringIndexPage() {
             <h2 style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--text-primary)', marginBottom: 6 }}>Security, compliance & change detection</h2>
             <p style={{ color: 'var(--text-secondary)', fontSize: 15 }}>For teams who need to go beyond basic uptime.</p>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 5 }}>
             {advancedTypes.map(t => (
               <MonitorCard key={t.slug} t={t} />
             ))}
@@ -125,7 +125,7 @@ export default function MonitoringIndexPage() {
               <h2 style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--text-primary)', marginBottom: 6 }}>Monitor from inside your site</h2>
               <p style={{ color: 'var(--text-secondary)', fontSize: 15 }}>Plugin-based monitors that check what external tools can&apos;t see — file injections, rogue users, and internal compromises.</p>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 5 }}>
               {agentTypes.map(t => (
                 <MonitorCard key={t.slug} t={t} />
               ))}
@@ -164,7 +164,7 @@ export default function MonitoringIndexPage() {
         </div>
 
       </main>
-      
+
     </>
   )
 }

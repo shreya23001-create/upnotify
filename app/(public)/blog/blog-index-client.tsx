@@ -2,8 +2,10 @@
 
 import Link from 'next/link'
 import { Suspense, useState } from 'react'
+import { Search } from 'lucide-react'
 import type { UnifiedPost } from './page'
 import { BlogCardImage } from '@/components/ui/blog-card-image'
+import { ScrollReveal } from '@/components/landing/scroll-reveal'
 
 const POSTS_PER_PAGE = 12
 
@@ -93,11 +95,12 @@ function BlogIndexContent({ posts }: { posts: UnifiedPost[] }) {
 
   return (
     <div className="blog-page">
+      <ScrollReveal />
 
       {/* Hero */}
       <div className="blog-hero">
         <div className="container" style={{ maxWidth: 1080, padding: '0 24px', margin: '0 auto' }}>
-          <div className="blog-hero-inner">
+          <div className="blog-hero-inner reveal-title">
             <div className="blog-hero-eyebrow">Uptrue Blog</div>
             <h1>Uptime, monitoring &amp;<br />reliability insights</h1>
             <p className="blog-hero-sub">
@@ -125,7 +128,7 @@ function BlogIndexContent({ posts }: { posts: UnifiedPost[] }) {
 
         {/* Featured post */}
         {featuredPost && (
-          <div className="blog-featured-wrap">
+          <div className="blog-featured-wrap reveal">
             <div className="blog-featured-label">Featured</div>
             <Link href={`/blog/${featuredPost.slug}`} className="blog-featured-card">
               <div className="blog-featured-img">
@@ -194,13 +197,15 @@ function BlogIndexContent({ posts }: { posts: UnifiedPost[] }) {
         {/* Posts grid */}
         {filtered.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '64px 0', color: 'var(--text-muted)' }}>
-            <div style={{ fontSize: 40, marginBottom: 16 }}>🔍</div>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
+              <Search size={36} strokeWidth={1.5} />
+            </div>
             <p style={{ fontSize: 16 }}>No articles found. Try a different search or category.</p>
           </div>
         ) : (
           <>
             {pagePosts.length > 0 && (
-              <div className="blog-posts-grid">
+              <div className="blog-posts-grid reveal-stagger">
                 {pagePosts.map(post => {
                   const bs = badgeStyle(post.category)
                   return (
@@ -250,7 +255,7 @@ function BlogIndexContent({ posts }: { posts: UnifiedPost[] }) {
         )}
 
         {/* Newsletter */}
-        <div className="blog-newsletter">
+        <div className="blog-newsletter reveal">
           <div className="blog-newsletter-left">
             <h3>Get articles in your inbox</h3>
             <p>One email when we publish. No noise. Unsubscribe any time.</p>

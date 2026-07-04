@@ -6,6 +6,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ScoreForm } from '@/components/score/score-form'
+import Faq from '@/components/landing/faq'
 
 export const metadata: Metadata = {
   title: 'Free Website Health Score Checker — Test Site Health Online | Uptrue',
@@ -105,19 +106,10 @@ export default function ScorePage(): React.ReactElement {
       </section>
 
       {/* FAQ */}
-      <section className="landing-section" style={{ background: 'var(--bg-muted)' }}>
-        <div className="landing-container" style={{ maxWidth: 760 }}>
-          <h2 className="landing-section-title">Frequently asked questions</h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 24 }}>
-            {FAQ.map((item, i) => (
-              <div key={i} style={{ padding: '20px 24px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10 }}>
-                <h3 style={{ margin: '0 0 8px', fontSize: 16, fontWeight: 600, color: 'var(--text-primary)' }}>{item.q}</h3>
-                <p style={{ margin: 0, fontSize: 14, lineHeight: 1.7, color: 'var(--text-secondary)' }}>{item.a}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <Faq
+        items={FAQ.map(item => ({ question: item.q, answer: item.a }))}
+        headline="Frequently asked questions"
+      />
 
       {/* JSON-LD FAQPage schema mirroring the FAQ array above */}
       <script

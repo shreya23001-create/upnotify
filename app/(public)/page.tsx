@@ -238,7 +238,7 @@ export default async function LandingPage(): Promise<React.ReactElement> {
                   {(hero?.trust_items ?? ['No credit card required', '3 monitors free forever', '1-minute check intervals', 'GDPR compliant · EU data']).map((item, i, arr) => (
                     <span key={item} style={{ display: 'contents' }}>
                       <div className="trust-item">{item}</div>
-                      {i < arr.length - 1 && <div className="trust-item">·</div>}
+                      {i < arr.length - 1 && <div className="trust-item trust-item-sep">·</div>}
                     </span>
                   ))}
                 </div>

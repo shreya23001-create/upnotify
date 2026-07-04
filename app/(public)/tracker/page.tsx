@@ -5,6 +5,8 @@ import {
   getPublicMonitorCategories,
 } from '@/lib/db/public-monitors'
 import type { PublicMonitor } from '@/lib/db/public-monitors'
+import Faq from '@/components/landing/faq'
+import { CategoryFilter } from './category-filter'
 
 const PAGE_SIZE = 20
 
@@ -131,23 +133,7 @@ export default async function TrackerDirectoryPage({
       </div>
 
       {/* Category filter */}
-      <div className="tracker-category-filter">
-        <Link
-          href={buildPaginationHref(1, undefined)}
-          className={`tracker-category-pill${!selectedCategory || selectedCategory === 'all' ? ' tracker-category-pill-active' : ''}`}
-        >
-          All
-        </Link>
-        {allCategories.map((cat) => (
-          <Link
-            key={cat}
-            href={buildPaginationHref(1, cat)}
-            className={`tracker-category-pill${selectedCategory === cat ? ' tracker-category-pill-active' : ''}`}
-          >
-            {cat}
-          </Link>
-        ))}
-      </div>
+      <CategoryFilter categories={allCategories} selectedCategory={selectedCategory} />
 
       {downMonitors.length > 0 && (
         <div className="tracker-section tracker-down-section">
@@ -263,20 +249,33 @@ export default async function TrackerDirectoryPage({
 
       {/* Related continuous monitors — each tracker site maps to a continuous monitor type */}
       <section className="landing-section">
-        <div className="landing-container" style={{ maxWidth: 880 }}>
-          <h2 className="landing-section-title">Monitor your own site continuously</h2>
-          <p className="landing-section-subtitle">
-            The tracker shows live status for popular sites. To get the same visibility on
-            your own domain — plus alerts when something breaks — set up the matching
-            monitor type:
-          </p>
-          <ul className="about-list" style={{ marginTop: 24, fontSize: 15, lineHeight: 1.9 }}>
-            <li><Link href="/monitoring/http-uptime-monitoring">HTTP uptime monitoring</Link> — the same up/down check that powers every card on this page.</li>
-            <li><Link href="/monitoring/response-time-monitoring">Response time monitoring</Link> — alert when your TTFB or full response degrades past a threshold.</li>
-            <li><Link href="/monitoring/ssl-certificate-monitoring">SSL certificate monitoring</Link> — get warned 30, 14 and 3 days before your certificate expires.</li>
-            <li><Link href="/monitoring/dns-monitoring">DNS record monitoring</Link> — detect unauthorised record changes within minutes.</li>
-            <li><Link href="/monitoring/keyword-monitoring">Keyword monitoring</Link> — catch silent partial outages where the homepage loads but the cart, login or pricing block is broken.</li>
-          </ul>
+        <div className="landing-container" style={{ maxWidth: 960 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 40, flexWrap: 'wrap', marginBottom: 32 }}>
+            <h2 className="landing-section-title" style={{ margin: 0, textAlign: 'left', maxWidth: 420 }}>Monitor your own site continuously</h2>
+            <p className="landing-section-subtitle" style={{ margin: 0, textAlign: 'left', maxWidth: 380 }}>
+              The tracker shows live status for popular sites. To get the same visibility on
+              your own domain — plus alerts when something breaks — set up the matching
+              monitor type.
+            </p>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
+            {[
+              { href: '/monitoring/http-uptime-monitoring', title: 'HTTP uptime monitoring', desc: 'The same up/down check that powers every card on this page.' },
+              { href: '/monitoring/response-time-monitoring', title: 'Response time monitoring', desc: 'Alert when your TTFB or full response degrades past a threshold.' },
+              { href: '/monitoring/ssl-certificate-monitoring', title: 'SSL certificate monitoring', desc: 'Get warned 30, 14 and 3 days before your certificate expires.' },
+              { href: '/monitoring/dns-monitoring', title: 'DNS record monitoring', desc: 'Detect unauthorised record changes within minutes.' },
+              { href: '/monitoring/keyword-monitoring', title: 'Keyword monitoring', desc: 'Catch silent partial outages where the homepage loads but the cart, login or pricing block is broken.', highlight: true },
+            ].map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`tracker-monitor-tile${item.highlight ? ' tracker-monitor-tile-highlight' : ''}`}
+              >
+                <div className="tracker-monitor-tile-title">{item.title}</div>
+                <div className="tracker-monitor-tile-desc">{item.desc}</div>
+              </Link>
+            ))}
+          </div>
           <p style={{ marginTop: 20, fontSize: 14, color: 'var(--text-muted)' }}>
             Or browse all <Link href="/tools">free website monitoring tools</Link> — SSL,
             DNS, security headers, blacklist and more, no signup required.
@@ -285,19 +284,10 @@ export default async function TrackerDirectoryPage({
       </section>
 
       {/* FAQ */}
-      <section className="landing-section" style={{ background: 'var(--bg-muted)' }}>
-        <div className="landing-container" style={{ maxWidth: 760 }}>
-          <h2 className="landing-section-title">Frequently asked questions</h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 24 }}>
-            {FAQ.map((item, i) => (
-              <div key={i} style={{ padding: '20px 24px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10 }}>
-                <h3 style={{ margin: '0 0 8px', fontSize: 16, fontWeight: 600, color: 'var(--text-primary)' }}>{item.q}</h3>
-                <p style={{ margin: 0, fontSize: 14, lineHeight: 1.7, color: 'var(--text-secondary)' }}>{item.a}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <Faq
+        items={FAQ.map(item => ({ question: item.q, answer: item.a }))}
+        headline="Frequently asked questions"
+      />
 
       {/* JSON-LD FAQPage schema mirroring the FAQ array above */}
       <script

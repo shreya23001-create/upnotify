@@ -24,6 +24,24 @@ import {
   CATEGORY_IMPACT,
   getRelatedSites,
 } from '@/lib/constants/tracker-site-info'
+import {
+  Activity, AlertTriangle, History, Info, ListChecks, HeartPulse, Bell,
+  Network, Cpu, Server, Zap, GitBranch, Scale, Gauge,
+  Radio, UserCheck, Wrench, Shuffle, BellRing,
+} from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
+import Faq from '@/components/landing/faq'
+
+const REASON_ICONS: LucideIcon[] = [Cpu, Server, Zap, GitBranch, Scale, Gauge]
+
+function SectionHeading({ icon: Icon, children, className }: { icon: LucideIcon; children: React.ReactNode; className?: string }) {
+  return (
+    <h2 className={`tracker-section-heading${className ? ` ${className}` : ''}`}>
+      <span className="tracker-section-icon"><Icon size={16} strokeWidth={2.25} /></span>
+      {children}
+    </h2>
+  )
+}
 
 export const revalidate = 60
 export const maxDuration = 30
@@ -334,7 +352,7 @@ export default async function TrackerDomainPage({
   )
 
   return (
-    <div className="tracker-detail">
+    <div className="tracker-detail tracker-load-in">
       {/* FAQ JSON-LD for rich results */}
       <script
         type="application/ld+json"
@@ -350,7 +368,7 @@ export default async function TrackerDomainPage({
       {/* Status banner */}
       <div
         className="tracker-status-banner"
-        style={{ borderColor: getStatusColor(monitor.last_status) }}
+        style={{ '--tracker-status-color': getStatusColor(monitor.last_status) } as React.CSSProperties}
       >
         <div className="tracker-status-banner-left">
           <span
@@ -399,7 +417,7 @@ export default async function TrackerDomainPage({
 
       {/* Uptime bars */}
       <div className="tracker-uptime-section">
-        <h2 className="tracker-section-heading">7-Day Uptime History</h2>
+        <SectionHeading icon={History}>7-Day Uptime History</SectionHeading>
         <TimelineBarGraph
           data={uptimeBars.map(bar => ({
             timestamp: bar.timestamp,
@@ -415,9 +433,9 @@ export default async function TrackerDomainPage({
       {/* Open incidents */}
       {openIncidents.length > 0 && (
         <div className="tracker-incidents-section">
-          <h2 className="tracker-section-heading tracker-down-title">
+          <SectionHeading icon={AlertTriangle} className="tracker-down-title">
             Active Incidents
-          </h2>
+          </SectionHeading>
           {openIncidents.map((incident) => (
             <div
               key={incident.id}
@@ -452,7 +470,7 @@ export default async function TrackerDomainPage({
       {/* Resolved incidents */}
       {resolvedIncidents.length > 0 && (
         <div className="tracker-incidents-section">
-          <h2 className="tracker-section-heading">Recent Incidents</h2>
+          <SectionHeading icon={AlertTriangle}>Recent Incidents</SectionHeading>
           {resolvedIncidents.map((incident) => {
             const duration = incident.resolved_at
               ? Math.round(
@@ -493,7 +511,7 @@ export default async function TrackerDomainPage({
 
       {/* About [Site] */}
       <div className="tracker-about-section">
-        <h2 className="tracker-section-heading">About {siteName}</h2>
+        <SectionHeading icon={Info}>About {siteName}</SectionHeading>
         <p className="tracker-about-description">
           {siteInfo
             ? siteInfo.description
@@ -520,17 +538,23 @@ export default async function TrackerDomainPage({
       {/* Common Reasons [Site] Goes Down */}
       {downtimeReasons.length > 0 && (
         <div className="tracker-reasons-section">
-          <h2 className="tracker-section-heading">
+          <SectionHeading icon={ListChecks}>
             Common Reasons {siteName} Goes Down
-          </h2>
+          </SectionHeading>
           <p className="tracker-reasons-intro">
             Even the most reliable services experience downtime. Here are the most common reasons {siteName} may be unavailable:
           </p>
-          <ul className="tracker-reasons-list">
-            {downtimeReasons.map((reason, i) => (
-              <li key={i} className="tracker-reasons-item">{reason}</li>
-            ))}
-          </ul>
+          <div className="tracker-reasons-grid">
+            {downtimeReasons.map((reason, i) => {
+              const ReasonIcon = REASON_ICONS[i % REASON_ICONS.length]
+              return (
+                <div key={i} className="tracker-reasons-card">
+                  <span className="tracker-reasons-icon"><ReasonIcon size={18} strokeWidth={2} /></span>
+                  <span className="tracker-reasons-text">{reason}</span>
+                </div>
+              )
+            })}
+          </div>
           <p className="tracker-reasons-footer">
             When {siteName} experiences issues, our monitoring detects it within minutes. Subscribe above to get notified instantly.
           </p>
@@ -538,101 +562,89 @@ export default async function TrackerDomainPage({
       )}
 
       {/* What to Do When [Site] Is Down */}
-      <div className="tracker-whatdo-section">
-        <h2 className="tracker-section-heading">
-          What to Do When {siteName} Is Down
-        </h2>
-        <div className="tracker-whatdo-steps">
-          {siteInfo?.statusPageUrl && (
-            <div className="tracker-whatdo-step">
-              <span className="tracker-whatdo-step-num">1</span>
-              <div>
-                <strong>Check the official status page</strong>
-                <p>
-                  Visit{' '}
-                  <a
-                    href={siteInfo.statusPageUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="tracker-link"
-                  >
-                    {siteName}&apos;s status page
-                  </a>{' '}
-                  for official updates from their engineering team.
-                </p>
-              </div>
-            </div>
-          )}
-          <div className="tracker-whatdo-step">
-            <span className="tracker-whatdo-step-num">
-              {siteInfo?.statusPageUrl ? '2' : '1'}
-            </span>
-            <div>
-              <strong>Confirm it is not just you</strong>
-              <p>
-                This page shows real monitoring data. If {siteName} appears operational here but is not working for you, the issue may be local to your network, browser, or ISP.
-              </p>
-            </div>
-          </div>
-          <div className="tracker-whatdo-step">
-            <span className="tracker-whatdo-step-num">
-              {siteInfo?.statusPageUrl ? '3' : '2'}
-            </span>
-            <div>
-              <strong>Try basic troubleshooting</strong>
-              <p>
-                Clear your browser cache, try a different browser, switch between Wi-Fi and mobile data, or use a VPN to bypass potential regional blocks.
-              </p>
-            </div>
-          </div>
-          {siteInfo?.alternatives && siteInfo.alternatives.length > 0 && (
-            <div className="tracker-whatdo-step">
-              <span className="tracker-whatdo-step-num">
-                {siteInfo?.statusPageUrl ? '4' : '3'}
-              </span>
-              <div>
-                <strong>Try alternative services</strong>
-                <p>
-                  While waiting for {siteName} to recover, consider using{' '}
-                  {siteInfo.alternatives.map((alt, i) => {
-                    const altInfo = SITE_INFO[alt]
-                    const altName = altInfo?.name ?? alt
-                    return (
-                      <span key={alt}>
-                        {i > 0 && (i === siteInfo.alternatives.length - 1 ? ', or ' : ', ')}
-                        <Link href={`/tracker/${alt}`} className="tracker-link">
-                          {altName}
-                        </Link>
-                      </span>
-                    )
-                  })}
-                  .
-                </p>
-              </div>
-            </div>
-          )}
-          <div className="tracker-whatdo-step">
-            <span className="tracker-whatdo-step-num">
-              {siteInfo?.statusPageUrl
-                ? String((siteInfo.alternatives?.length ?? 0) > 0 ? 5 : 4)
-                : String((siteInfo?.alternatives?.length ?? 0) > 0 ? 4 : 3)}
-            </span>
-            <div>
-              <strong>Subscribe for recovery alerts</strong>
-              <p>
-                Use the subscribe form above to get an email the moment {siteName} comes back online. No need to keep refreshing this page.
-              </p>
+      {(() => {
+        const whatToDoSteps: { icon: LucideIcon; title: string; content: React.ReactNode }[] = []
+        if (siteInfo?.statusPageUrl) {
+          whatToDoSteps.push({
+            icon: Radio,
+            title: 'Check the official status page',
+            content: (
+              <>
+                Visit{' '}
+                <a href={siteInfo.statusPageUrl} target="_blank" rel="noopener noreferrer" className="tracker-link">
+                  {siteName}&apos;s status page
+                </a>{' '}
+                for official updates from their engineering team.
+              </>
+            ),
+          })
+        }
+        whatToDoSteps.push({
+          icon: UserCheck,
+          title: 'Confirm it is not just you',
+          content: `This page shows real monitoring data. If ${siteName} appears operational here but is not working for you, the issue may be local to your network, browser, or ISP.`,
+        })
+        whatToDoSteps.push({
+          icon: Wrench,
+          title: 'Try basic troubleshooting',
+          content: 'Clear your browser cache, try a different browser, switch between Wi-Fi and mobile data, or use a VPN to bypass potential regional blocks.',
+        })
+        if (siteInfo?.alternatives && siteInfo.alternatives.length > 0) {
+          whatToDoSteps.push({
+            icon: Shuffle,
+            title: 'Try alternative services',
+            content: (
+              <>
+                While waiting for {siteName} to recover, consider using{' '}
+                {siteInfo.alternatives.map((alt, i) => {
+                  const altInfo = SITE_INFO[alt]
+                  const altName = altInfo?.name ?? alt
+                  return (
+                    <span key={alt}>
+                      {i > 0 && (i === siteInfo.alternatives.length - 1 ? ', or ' : ', ')}
+                      <Link href={`/tracker/${alt}`} className="tracker-link">
+                        {altName}
+                      </Link>
+                    </span>
+                  )
+                })}
+                .
+              </>
+            ),
+          })
+        }
+        whatToDoSteps.push({
+          icon: BellRing,
+          title: 'Subscribe for recovery alerts',
+          content: `Use the subscribe form above to get an email the moment ${siteName} comes back online. No need to keep refreshing this page.`,
+        })
+
+        return (
+          <div className="tracker-whatdo-section">
+            <SectionHeading icon={Activity}>
+              What to Do When {siteName} Is Down
+            </SectionHeading>
+            <div className="tracker-whatdo-grid">
+              {whatToDoSteps.map((step, i) => (
+                <div key={i} className="tracker-whatdo-card">
+                  <div className="tracker-whatdo-icon"><step.icon size={26} strokeWidth={1.75} /></div>
+                  <div className="tracker-whatdo-title">
+                    <span className="tracker-whatdo-num">{i + 1}.</span> {step.title}
+                  </div>
+                  <p className="tracker-whatdo-text">{step.content}</p>
+                </div>
+              ))}
             </div>
           </div>
-        </div>
-      </div>
+        )
+      })()}
 
       {/* How [Site] Downtime Affects You */}
       {impactStatements.length > 0 && (
         <div className="tracker-impact-section">
-          <h2 className="tracker-section-heading">
+          <SectionHeading icon={HeartPulse}>
             How {siteName} Downtime Affects You
-          </h2>
+          </SectionHeading>
           <p className="tracker-impact-intro">
             When {siteName} goes offline, the effects ripple across businesses and users who depend on it:
           </p>
@@ -658,7 +670,7 @@ export default async function TrackerDomainPage({
 
       {/* Subscribe */}
       <div className="tracker-subscribe-section">
-        <h2 className="tracker-section-heading">Get Notified</h2>
+        <SectionHeading icon={Bell}>Get Notified</SectionHeading>
         <p className="tracker-subscribe-desc">
           Enter your email to receive alerts when {siteName} goes
           down or recovers.
@@ -667,24 +679,14 @@ export default async function TrackerDomainPage({
       </div>
 
       {/* FAQ section (expanded to 8 questions) */}
-      <div className="tracker-faq-section">
-        <h2 className="tracker-section-heading">
-          Frequently Asked Questions
-        </h2>
-        {faqItems.map((faq, i) => (
-          <div key={i} className="tracker-faq-item">
-            <h3 className="tracker-faq-question">{faq.question}</h3>
-            <p className="tracker-faq-answer">{faq.answer}</p>
-          </div>
-        ))}
-      </div>
+      <Faq items={faqItems} headline="Frequently Asked Questions" />
 
       {/* Related Sites */}
       {relatedSites.length > 0 && (
         <div className="tracker-related-section">
-          <h2 className="tracker-section-heading">
+          <SectionHeading icon={Network}>
             Related {siteCategory} Sites We Monitor
-          </h2>
+          </SectionHeading>
           <div className="tracker-related-grid">
             {relatedSites.map((site) => (
               <Link
