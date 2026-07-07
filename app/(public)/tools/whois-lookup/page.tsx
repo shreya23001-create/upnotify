@@ -1,6 +1,9 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { Landmark, Calendar, Server, Info } from 'lucide-react'
 import { WhoisLookupTool } from '@/components/tools/whois-lookup-tool'
+import Faq from '@/components/landing/faq'
+import { ScrollReveal } from '@/components/landing/scroll-reveal'
 
 export const metadata: Metadata = {
   title: 'Free WHOIS Lookup — Domain Registration Checker | Uptrue',
@@ -84,9 +87,10 @@ export default function WhoisLookupPage(): React.ReactElement {
       />
 
       <div className="tools-page">
+        <ScrollReveal />
         <div className="tools-hero">
-          <h1 className="tools-hero-title">WHOIS Lookup</h1>
-          <p className="tools-hero-subtitle">
+          <h1 className="tools-hero-title reveal-title">WHOIS Lookup</h1>
+          <p className="tools-hero-subtitle reveal-title">
             Check registration data for any domain. See registrar, creation date, expiry date, nameservers, and domain status — free, no signup required.
           </p>
         </div>
@@ -96,43 +100,29 @@ export default function WhoisLookupPage(): React.ReactElement {
 
           <div className="tools-info-section">
             <h2>What does this tool check?</h2>
-            <div className="tools-info-grid">
+            <div className="tools-info-grid reveal-stagger">
               <div className="tools-info-card">
-                <h3>Registrar</h3>
+                <h3><span className="tools-info-icon"><Landmark size={16} /></span>Registrar</h3>
                 <p>The company where the domain was registered (e.g., GoDaddy, Namecheap, Cloudflare).</p>
               </div>
               <div className="tools-info-card">
-                <h3>Registration &amp; Expiry Dates</h3>
+                <h3><span className="tools-info-icon"><Calendar size={16} /></span>Registration &amp; Expiry Dates</h3>
                 <p>When the domain was first registered and when it expires. Domains expiring soon are highlighted with a warning.</p>
               </div>
               <div className="tools-info-card">
-                <h3>Nameservers</h3>
+                <h3><span className="tools-info-icon"><Server size={16} /></span>Nameservers</h3>
                 <p>The DNS servers responsible for the domain. Changing nameservers affects where your site and email are hosted.</p>
               </div>
               <div className="tools-info-card">
-                <h3>Domain Status</h3>
+                <h3><span className="tools-info-icon"><Info size={16} /></span>Domain Status</h3>
                 <p>Status codes indicating the current state of the domain, such as transfer locks and pending actions.</p>
               </div>
             </div>
           </div>
 
-          <div className="tools-info-section">
-            <h2>Frequently Asked Questions</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              {faqItems.map((item, i) => (
-                <div key={i} className="card" style={{ padding: '16px 20px' }}>
-                  <h3 style={{ margin: '0 0 8px', fontSize: 15, fontWeight: 600, color: 'var(--text-primary)' }}>
-                    {item.question}
-                  </h3>
-                  <p style={{ margin: 0, fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                    {item.answer}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
+          <Faq items={faqItems} headline="Frequently Asked Questions" />
 
-          <div className="tools-cta">
+          <div className="tools-cta reveal">
             <h2>Never let your domain expire</h2>
             <p>
               Uptrue&apos;s <Link href="/monitoring/domain-expiry-monitoring">domain expiry monitoring</Link>{' '}

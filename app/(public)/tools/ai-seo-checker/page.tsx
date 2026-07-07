@@ -1,7 +1,10 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { Bot, FileText, ShieldCheck, Braces } from 'lucide-react'
 import { AiSeoCheckerTool } from '@/components/tools/ai-seo-checker-tool'
 import { JsonLd } from '@/components/seo/json-ld'
+import Faq from '@/components/landing/faq'
+import { ScrollReveal } from '@/components/landing/scroll-reveal'
 
 export const metadata: Metadata = {
   title: 'Free AI SEO Checker — GEO, AEO & AI Visibility Score',
@@ -122,10 +125,11 @@ export default function AiSeoCheckerPage(): React.ReactElement {
       <JsonLd data={toolSchema} />
 
       <div className="tools-page">
+        <ScrollReveal />
         <div className="tools-hero">
           <div className="ai-checker-hero-badge">AI Search Optimisation · GEO · AEO · LLMO</div>
-          <h1 className="tools-hero-title">Free AI SEO Checker</h1>
-          <p className="tools-hero-subtitle">
+          <h1 className="tools-hero-title reveal-title">Free AI SEO Checker</h1>
+          <p className="tools-hero-subtitle reveal-title">
             Is your website visible to ChatGPT, Perplexity, Claude, and Gemini?
             Get your AI readiness score in seconds — check crawler access, content structure,
             trust signals, and schema. Fix what is blocking your AI search presence. Free, no signup.
@@ -171,27 +175,27 @@ export default function AiSeoCheckerPage(): React.ReactElement {
 
             {/* 4 pillars */}
             <h3>The 4 pillars of AI readiness</h3>
-            <div className="tools-info-grid" style={{ marginTop: 12 }}>
+            <div className="tools-info-grid reveal-stagger" style={{ marginTop: 12 }}>
               <div className="tools-info-card">
-                <h3>1. AI Crawler Access</h3>
+                <h3><span className="tools-info-icon"><Bot size={16} /></span>1. AI Crawler Access</h3>
                 <p>Each AI engine sends its own bot. GPTBot, ClaudeBot, PerplexityBot,
                 Google-Extended — if your robots.txt blocks them (or doesn&apos;t exist),
                 they cannot index you. This is the single biggest mistake most sites make.</p>
               </div>
               <div className="tools-info-card">
-                <h3>2. Content Structure</h3>
+                <h3><span className="tools-info-icon"><FileText size={16} /></span>2. Content Structure</h3>
                 <p>AI engines extract answers from structured content. Question-style headings,
                 numbered lists, clear definitions, and direct answers improve the chance of
                 being cited verbatim. Thin pages and vague copy are invisible.</p>
               </div>
               <div className="tools-info-card">
-                <h3>3. Trust &amp; E-E-A-T</h3>
+                <h3><span className="tools-info-icon"><ShieldCheck size={16} /></span>3. Trust &amp; E-E-A-T</h3>
                 <p>Experience, Expertise, Authoritativeness, Trustworthiness. Named authors,
                 About and Contact pages, Privacy Policy, external citations — these are how
                 AI engines verify that your <strong>AI brand presence</strong> is legitimate.</p>
               </div>
               <div className="tools-info-card">
-                <h3>4. Schema &amp; Technical</h3>
+                <h3><span className="tools-info-icon"><Braces size={16} /></span>4. Schema &amp; Technical</h3>
                 <p>JSON-LD structured data (Organization, Article, FAQ, HowTo) is how AI engines
                 extract and verify facts about your content. Combined with a well-written
                 llms.txt, it gives AI models an explicit map of your site.</p>
@@ -375,15 +379,7 @@ export default function AiSeoCheckerPage(): React.ReactElement {
             </div>
 
             {/* FAQ */}
-            <h3>Frequently asked questions about AI SEO and GEO</h3>
-            <div className="tools-faq">
-              {FAQ_ITEMS.map((item, i) => (
-                <details key={i} className="tools-faq-item">
-                  <summary>{item.question}</summary>
-                  <p>{item.answer}</p>
-                </details>
-              ))}
-            </div>
+            <Faq items={FAQ_ITEMS} headline="Frequently asked questions about AI SEO and GEO" />
 
             {/* CTA */}
             <div style={{

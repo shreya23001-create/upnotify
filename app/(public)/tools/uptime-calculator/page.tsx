@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { UptimeCalculatorTool } from '@/components/tools/uptime-calculator-tool'
+import Faq from '@/components/landing/faq'
+import { ScrollReveal } from '@/components/landing/scroll-reveal'
 
 export const metadata: Metadata = {
   title: 'Free Uptime & SLA Downtime Calculator | Calculate 99.9% SLA Allowed Downtime | Uptrue',
@@ -37,14 +39,15 @@ const jsonLd = {
 export default function UptimeCalculatorPage(): React.ReactElement {
   return (
     <div className="tools-page">
+      <ScrollReveal />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
       <div className="tools-hero">
-        <h1 className="tools-hero-title">Uptime &amp; SLA Downtime Calculator</h1>
-        <p className="tools-hero-subtitle">
+        <h1 className="tools-hero-title reveal-title">Uptime &amp; SLA Downtime Calculator</h1>
+        <p className="tools-hero-subtitle reveal-title">
           Calculate exactly how much downtime each SLA level allows. Enter an uptime percentage
           or a downtime budget to see the conversion. Used by DevOps teams, SREs, and IT managers
           to plan SLA commitments and estimate downtime costs.
@@ -156,90 +159,54 @@ export default function UptimeCalculatorPage(): React.ReactElement {
 
         {/* FAQ section */}
         <section className="tools-seo-section">
-          <h2>Frequently Asked Questions</h2>
-
-          <div className="tools-faq">
-            <details className="tools-faq-item">
-              <summary>What is an SLA (Service Level Agreement)?</summary>
-              <p>
-                An SLA is a contract between a service provider and a customer that defines the
-                expected level of service, including uptime guarantees, response times, and
-                remedies (such as service credits) if those targets are not met. SLAs are standard
-                in cloud computing, web hosting, and SaaS.
-              </p>
-            </details>
-
-            <details className="tools-faq-item">
-              <summary>What is the difference between uptime and availability?</summary>
-              <p>
-                Uptime measures the total time a system is operational, while availability measures
-                the percentage of time a system is accessible and functioning correctly. In practice,
-                these terms are often used interchangeably, but availability also accounts for
-                planned maintenance windows that may not count as downtime in an SLA.
-              </p>
-            </details>
-
-            <details className="tools-faq-item">
-              <summary>How is uptime percentage calculated?</summary>
-              <p>
-                Uptime percentage is calculated as: <code>(Total time - Downtime) / Total time x 100</code>.
-                For example, if a service was down for 43 minutes in a 30-day month (43,200 minutes),
-                the uptime would be (43,200 - 43) / 43,200 x 100 = 99.9%.
-              </p>
-            </details>
-
-            <details className="tools-faq-item">
-              <summary>What does &ldquo;five nines&rdquo; (99.999%) availability mean?</summary>
-              <p>
-                Five nines availability means a service can only be down for approximately 5 minutes
-                and 16 seconds per year, or about 26 seconds per month. This level of availability
-                is extremely difficult and expensive to achieve, typically requiring redundant
-                infrastructure, automatic failover, and multi-region deployments.
-              </p>
-            </details>
-
-            <details className="tools-faq-item">
-              <summary>How do I monitor my website uptime?</summary>
-              <p>
-                You can monitor website uptime using a service like Uptrue that checks your website
-                at regular intervals (as frequently as every minute) from multiple locations. When
-                your site goes down, you receive instant alerts via email, Slack, SMS, or webhook
-                so you can respond quickly.
-              </p>
-            </details>
-
-            <details className="tools-faq-item">
-              <summary>What is MTTR and MTTD?</summary>
-              <p>
-                <strong>MTTD</strong> (Mean Time to Detect) is the average time it takes to discover
-                a problem. <strong>MTTR</strong> (Mean Time to Recover) is the average time it takes
-                to restore service after a failure is detected. Reducing both metrics is key to
-                maintaining high uptime percentages.
-              </p>
-            </details>
-
-            <details className="tools-faq-item">
-              <summary>Does planned maintenance count against SLA uptime?</summary>
-              <p>
-                This depends on the specific SLA agreement. Many providers exclude scheduled
-                maintenance windows from their uptime calculations, provided they give advance
-                notice (typically 24-72 hours). Always check the fine print of your provider&apos;s SLA.
-              </p>
-            </details>
-
-            <details className="tools-faq-item">
-              <summary>What uptime SLA should I offer my customers?</summary>
-              <p>
-                The right SLA depends on your infrastructure, budget, and customer expectations.
-                Most SaaS platforms start with 99.9% and upgrade to 99.95% or 99.99% as they
-                mature. Offering an SLA you cannot consistently meet will erode trust faster than
-                not having one at all.
-              </p>
-            </details>
-          </div>
+          <Faq
+            headline="Frequently Asked Questions"
+            items={[
+              {
+                question: 'What is an SLA (Service Level Agreement)?',
+                answer:
+                  'An SLA is a contract between a service provider and a customer that defines the expected level of service, including uptime guarantees, response times, and remedies (such as service credits) if those targets are not met. SLAs are standard in cloud computing, web hosting, and SaaS.',
+              },
+              {
+                question: 'What is the difference between uptime and availability?',
+                answer:
+                  'Uptime measures the total time a system is operational, while availability measures the percentage of time a system is accessible and functioning correctly. In practice, these terms are often used interchangeably, but availability also accounts for planned maintenance windows that may not count as downtime in an SLA.',
+              },
+              {
+                question: 'How is uptime percentage calculated?',
+                answer:
+                  'Uptime percentage is calculated as: (Total time - Downtime) / Total time x 100. For example, if a service was down for 43 minutes in a 30-day month (43,200 minutes), the uptime would be (43,200 - 43) / 43,200 x 100 = 99.9%.',
+              },
+              {
+                question: 'What does "five nines" (99.999%) availability mean?',
+                answer:
+                  'Five nines availability means a service can only be down for approximately 5 minutes and 16 seconds per year, or about 26 seconds per month. This level of availability is extremely difficult and expensive to achieve, typically requiring redundant infrastructure, automatic failover, and multi-region deployments.',
+              },
+              {
+                question: 'How do I monitor my website uptime?',
+                answer:
+                  'You can monitor website uptime using a service like Uptrue that checks your website at regular intervals (as frequently as every minute) from multiple locations. When your site goes down, you receive instant alerts via email, Slack, SMS, or webhook so you can respond quickly.',
+              },
+              {
+                question: 'What is MTTR and MTTD?',
+                answer:
+                  'MTTD (Mean Time to Detect) is the average time it takes to discover a problem. MTTR (Mean Time to Recover) is the average time it takes to restore service after a failure is detected. Reducing both metrics is key to maintaining high uptime percentages.',
+              },
+              {
+                question: 'Does planned maintenance count against SLA uptime?',
+                answer:
+                  "This depends on the specific SLA agreement. Many providers exclude scheduled maintenance windows from their uptime calculations, provided they give advance notice (typically 24-72 hours). Always check the fine print of your provider's SLA.",
+              },
+              {
+                question: 'What uptime SLA should I offer my customers?',
+                answer:
+                  'The right SLA depends on your infrastructure, budget, and customer expectations. Most SaaS platforms start with 99.9% and upgrade to 99.95% or 99.99% as they mature. Offering an SLA you cannot consistently meet will erode trust faster than not having one at all.',
+              },
+            ]}
+          />
         </section>
 
-        <div className="tools-cta">
+        <div className="tools-cta reveal">
           <h2>Monitor your uptime automatically</h2>
           <p>
             Stop calculating downtime manually. Uptrue&apos;s{' '}

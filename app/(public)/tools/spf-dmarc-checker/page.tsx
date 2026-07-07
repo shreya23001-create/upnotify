@@ -1,6 +1,9 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { Mail, MailCheck, Gauge, AlertTriangle } from 'lucide-react'
 import { SpfDmarcCheckerTool } from '@/components/tools/spf-dmarc-checker-tool'
+import Faq from '@/components/landing/faq'
+import { ScrollReveal } from '@/components/landing/scroll-reveal'
 
 export const metadata: Metadata = {
   title: 'Free SPF & DMARC Record Checker — Email Security Test | Uptrue',
@@ -84,9 +87,10 @@ export default function SpfDmarcCheckerPage(): React.ReactElement {
       />
 
       <div className="tools-page">
+        <ScrollReveal />
         <div className="tools-hero">
-          <h1 className="tools-hero-title">SPF &amp; DMARC Checker</h1>
-          <p className="tools-hero-subtitle">
+          <h1 className="tools-hero-title reveal-title">SPF &amp; DMARC Checker</h1>
+          <p className="tools-hero-subtitle reveal-title">
             Check your email security records instantly. Validate SPF and DMARC configuration, detect misconfigurations, and get a security grade — free, no signup required.
           </p>
         </div>
@@ -96,43 +100,29 @@ export default function SpfDmarcCheckerPage(): React.ReactElement {
 
           <div className="tools-info-section">
             <h2>What does this tool check?</h2>
-            <div className="tools-info-grid">
+            <div className="tools-info-grid reveal-stagger">
               <div className="tools-info-card">
-                <h3>SPF Record</h3>
+                <h3><span className="tools-info-icon"><Mail size={16} /></span>SPF Record</h3>
                 <p>Validates your SPF record exists, is correctly formed, and uses a restrictive "all" mechanism to block unauthorised senders.</p>
               </div>
               <div className="tools-info-card">
-                <h3>DMARC Record</h3>
+                <h3><span className="tools-info-icon"><MailCheck size={16} /></span>DMARC Record</h3>
                 <p>Checks your DMARC policy, enforcement level (none / quarantine / reject), coverage percentage, and reporting address.</p>
               </div>
               <div className="tools-info-card">
-                <h3>Security Grade</h3>
+                <h3><span className="tools-info-icon"><Gauge size={16} /></span>Security Grade</h3>
                 <p>An overall A–F grade based on how well your domain is protected: A = SPF pass + DMARC reject, F = no SPF record.</p>
               </div>
               <div className="tools-info-card">
-                <h3>Issue Detection</h3>
+                <h3><span className="tools-info-icon"><AlertTriangle size={16} /></span>Issue Detection</h3>
                 <p>Identifies specific misconfigurations like missing records, permissive policies, and incomplete coverage with actionable fixes.</p>
               </div>
             </div>
           </div>
 
-          <div className="tools-info-section">
-            <h2>Frequently Asked Questions</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              {faqItems.map((item, i) => (
-                <div key={i} className="card" style={{ padding: '16px 20px' }}>
-                  <h3 style={{ margin: '0 0 8px', fontSize: 15, fontWeight: 600, color: 'var(--text-primary)' }}>
-                    {item.question}
-                  </h3>
-                  <p style={{ margin: 0, fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                    {item.answer}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
+          <Faq items={faqItems} headline="Frequently Asked Questions" />
 
-          <div className="tools-cta">
+          <div className="tools-cta reveal">
             <h2>Monitor SPF &amp; DMARC changes automatically</h2>
             <p>
               Uptrue&apos;s <Link href="/monitoring/spf-dmarc-monitoring">SPF/DMARC validity monitoring</Link>{' '}

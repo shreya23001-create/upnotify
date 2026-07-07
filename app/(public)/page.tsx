@@ -13,6 +13,7 @@ import { DowntimeCalculator } from '@/components/landing/downtime-calculator'
 import Faq from '@/components/landing/faq'
 import { AgencyWaitlistCta } from '@/components/landing/agency-waitlist-cta'
 import { TrustedLogos } from '@/components/landing/trusted-logos'
+import { TestimonialsShowcase } from './testimonials-showcase'
 import { ScrollReveal } from '@/components/landing/scroll-reveal'
 import { CtaCanvas } from '@/components/landing/cta-canvas'
 import { CustomSection } from '@/components/landing/custom-section'
@@ -119,6 +120,24 @@ const DEFAULT_TESTIMONIALS = [
     cardClass: 't3',
     avatarClass: 'a3',
   },
+  {
+    quote:
+      'We manage uptime for 40+ client sites. Uptrue is the only tool that made that manageable from a single dashboard — the alert grouping alone saved us hours every week.',
+    name: 'Priya Nair',
+    role: 'Ops Manager · Northline Agency',
+    initials: 'PN',
+    cardClass: 't1',
+    avatarClass: 'a4',
+  },
+  {
+    quote:
+      "Simple pricing, no surprise overages, and support that actually responds. We evaluated five tools before this one — it's the only one we didn't have to fight with.",
+    name: 'Marcus Webb',
+    role: 'Founder · Webb & Co',
+    initials: 'MW',
+    cardClass: 't2',
+    avatarClass: 'a5',
+  },
 ]
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -167,7 +186,7 @@ export default async function LandingPage(): Promise<React.ReactElement> {
   const testimonialItems = (testimonials?.items ?? DEFAULT_TESTIMONIALS).map((t, i) => ({
     ...t,
     cardClass: `t${(i % 3) + 1}`,
-    avatarClass: `a${(i % 3) + 1}`,
+    avatarClass: `a${(i % 5) + 1}`,
   }))
 
   // FAQ items: use CMS if present, else fall back to local constants
@@ -228,7 +247,7 @@ export default async function LandingPage(): Promise<React.ReactElement> {
                 <p className="hero-sub fade-up delay-2">
                   24 monitor types. 1-minute checks. Instant alerts to Slack, email or webhook. Built for agencies and dev teams.
                 </p>
-                <div className="hero-ctas fade-up delay-3">
+                <div className="hero-ctas hero-ctas-desktop fade-up delay-3">
                   <Link href={hero?.cta_primary?.href ?? '/signup'} className="btn btn-primary btn-lg">
                     <Zap size={16} strokeWidth={2} />
                     {hero?.cta_primary?.text ?? 'Start Monitoring Free'}
@@ -241,7 +260,7 @@ export default async function LandingPage(): Promise<React.ReactElement> {
                     {hero?.cta_tertiary?.text ?? 'Score Your Site Free'}
                   </Link>
                 </div>
-                <div className="hero-trust fade-up delay-3">
+                <div className="hero-trust hero-trust-desktop fade-up delay-3">
                   {(hero?.trust_items ?? ['No credit card required', '3 monitors free forever', '1-minute check intervals', 'GDPR compliant · EU data']).map((item, i, arr) => (
                     <span key={item} style={{ display: 'contents' }}>
                       <div className="trust-item">{item}</div>
@@ -249,6 +268,30 @@ export default async function LandingPage(): Promise<React.ReactElement> {
                     </span>
                   ))}
                 </div>
+
+                {/* Mobile-only: dark checklist card + neon CTA pill */}
+                <div className="hero-mobile-card fade-up delay-3">
+                  <ul className="hero-mobile-checklist">
+                    {(hero?.trust_items ?? ['3 monitors free forever', '24 monitor types', 'Real-time alerts, email & Slack', 'Public status pages']).map((item) => (
+                      <li key={item}>
+                        <Check size={13} strokeWidth={3} />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                  <Link href={hero?.cta_primary?.href ?? '/signup'} className="hero-mobile-cta">
+                    {hero?.cta_primary?.text ?? 'Start monitoring in 30 seconds'}
+                  </Link>
+                  <div className="hero-mobile-links">
+                    <Link href={hero?.cta_secondary?.href ?? '/#how-it-works'}>
+                      {hero?.cta_secondary?.text ?? 'See How It Works'}
+                    </Link>
+                    <Link href={hero?.cta_tertiary?.href ?? '/score'}>
+                      {hero?.cta_tertiary?.text ?? 'Score Your Site Free'}
+                    </Link>
+                  </div>
+                </div>
+
                 <HeroDashboardMockup />
               </div>
             </div>
@@ -511,29 +554,8 @@ export default async function LandingPage(): Promise<React.ReactElement> {
                 </div>
               </div>
 
-              {/* Cards */}
-              <div className="testimonials-grid reveal-stagger">
-                {testimonialItems.map((t) => (
-                  <div key={t.name} className={`testimonial-card ${t.cardClass}`}>
-                    {/* Company logo placeholder — initials badge */}
-                    <div className={`testimonial-company-badge ${t.avatarClass}`}>
-                      {t.initials}
-                    </div>
-                    <div className="testimonial-text">&ldquo;{t.quote}&rdquo;</div>
-                    <div className="testimonial-author">
-                      <div className={`testimonial-avatar ${t.avatarClass}`}>{t.initials}</div>
-                      <div>
-                        <div className="testimonial-name">{t.name}</div>
-                        <div className="testimonial-role">{'role' in t && typeof t.role === 'string' ? t.role : `${(t as {role?: string; company?: string}).company ?? ''}`}</div>
-                      </div>
-                    </div>
-                    <div className="testimonial-footer">
-                      <div className="testimonial-stars">
-                        {'★★★★★'.split('').map((s, i) => <span key={i} className="testimonial-star">{s}</span>)}
-                      </div>
-                    </div>
-                  </div>
-                ))}
+              <div className="reveal">
+                <TestimonialsShowcase items={testimonialItems} />
               </div>
             </div>
           </section>
@@ -560,6 +582,7 @@ export default async function LandingPage(): Promise<React.ReactElement> {
                 </h2>
                 <p className="section-sub">{comparison?.subheadline ?? "We checked. The others don't offer AI reports, citation monitoring, or 24 monitor types. Uptrue does."}</p>
               </div>
+              <div className="comparison-scroll-hint">Swipe to compare →</div>
               <div className="comparison-table-wrap reveal">
                 <table className="comparison-table">
                   <thead>

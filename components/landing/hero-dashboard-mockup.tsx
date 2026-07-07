@@ -320,7 +320,7 @@ export function HeroDashboardMockup(): React.ReactElement {
             <NotifCard
               visible={notif.recover}
               isRecover
-              iconBg="linear-gradient(135deg,#3b82f6,#06b6d4)"
+              iconBg="linear-gradient(135deg,#7c3aed,#a78bfa)"
               icon={<svg width="10" height="10" fill="none" stroke="white" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>}
               source="Slack · #alerts"
               title="✅ Recovered"
@@ -452,8 +452,8 @@ export function HeroDashboardMockup(): React.ReactElement {
                     />
                     <defs>
                       <linearGradient id="aivG" x1="0" y1="0" x2="1" y2="0">
-                        <stop offset="0%" stopColor="#3b82f6"/>
-                        <stop offset="100%" stopColor="#06b6d4"/>
+                        <stop offset="0%" stopColor="#7c3aed"/>
+                        <stop offset="100%" stopColor="#a78bfa"/>
                       </linearGradient>
                     </defs>
                     <text x="52" y="48" textAnchor="middle" fontSize="22" fontWeight="800" fill="#0f172a">{aivScore}</text>
@@ -514,7 +514,7 @@ export function HeroDashboardMockup(): React.ReactElement {
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                   </svg>
                 </div>
-                Uptrue
+                <span className="ms-label">Uptrue</span>
               </div>
               <div className="ms-org-btn">
                 <div>
@@ -529,26 +529,26 @@ export function HeroDashboardMockup(): React.ReactElement {
               <div className={`ms-item${!aivOpen ? ' active' : ''}`}>
                 <div className="ms-item-left">
                   <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /></svg>
-                  Dashboard
+                  <span className="ms-label">Dashboard</span>
                 </div>
               </div>
               <div className="ms-item">
                 <div className="ms-item-left">
                   <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2" /></svg>
-                  Monitors
+                  <span className="ms-label">Monitors</span>
                 </div>
                 <span className="ms-badge-blue">{total}</span>
               </div>
               <div className="ms-item">
                 <div className="ms-item-left">
                   <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
-                  Alerts
+                  <span className="ms-label">Alerts</span>
                 </div>
               </div>
               <div className="ms-item">
                 <div className="ms-item-left">
                   <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
-                  Incidents
+                  <span className="ms-label">Incidents</span>
                 </div>
                 {pd.stats.down > 0 && <span className="ms-badge">{pd.stats.down}</span>}
               </div>
@@ -556,13 +556,13 @@ export function HeroDashboardMockup(): React.ReactElement {
               <div className="ms-item">
                 <div className="ms-item-left">
                   <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                  Reports
+                  <span className="ms-label">Reports</span>
                 </div>
               </div>
               <div className="ms-item">
                 <div className="ms-item-left">
                   <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064" /></svg>
-                  Status Pages
+                  <span className="ms-label">Status Pages</span>
                 </div>
               </div>
               <div className="ms-section">Intelligence</div>
@@ -575,13 +575,13 @@ export function HeroDashboardMockup(): React.ReactElement {
                     <circle cx="9" cy="11" r="1" fill="currentColor" stroke="none" />
                     <circle cx="15" cy="11" r="1" fill="currentColor" stroke="none" />
                   </svg>
-                  Watchdog
+                  <span className="ms-label">Watchdog</span>
                 </div>
               </div>
               <div className="ms-item">
                 <div className="ms-item-left">
                   <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
-                  Compete
+                  <span className="ms-label">Compete</span>
                 </div>
               </div>
 
@@ -592,10 +592,10 @@ export function HeroDashboardMockup(): React.ReactElement {
                 title="Try AI Visibility"
               >
                 <div className="ms-item-left">
-                  <svg width="13" height="13" fill="none" stroke={aivOpen ? 'currentColor' : '#3b82f6'} strokeWidth="2" viewBox="0 0 24 24">
+                  <svg width="13" height="13" fill="none" stroke={aivOpen ? 'currentColor' : '#7c3aed'} strokeWidth="2" viewBox="0 0 24 24">
                     <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
                   </svg>
-                  <span style={{ color: aivOpen ? undefined : '#3b82f6', fontWeight: 700 }}>AI Visibility</span>
+                  <span className="ms-label" style={{ color: aivOpen ? undefined : '#7c3aed', fontWeight: 700 }}>AI Visibility</span>
                 </div>
                 <span className="hm-aiv-new-badge">NEW</span>
                 {pulseAiv && <span className="hm-aiv-hint">← Try it</span>}

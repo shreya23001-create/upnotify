@@ -33,16 +33,10 @@ export function ThemeToggle(): React.ReactElement {
       suppressHydrationWarning
     >
       <span className="tt-track">
-        {/* sun icon — left slot */}
-        <span className="tt-slot tt-slot-sun">
-          <Sun size={14} strokeWidth={2} />
+        {/* sliding thumb — carries the active icon */}
+        <span className="tt-thumb">
+          {dark ? <Moon size={15} strokeWidth={2} fill="currentColor" /> : <Sun size={16} strokeWidth={2} />}
         </span>
-        {/* moon icon — right slot */}
-        <span className="tt-slot tt-slot-moon">
-          <Moon size={13} strokeWidth={2} />
-        </span>
-        {/* sliding thumb */}
-        <span className="tt-thumb" />
       </span>
     </button>
   )

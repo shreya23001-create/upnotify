@@ -1,6 +1,9 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { ShieldCheck, Frame, FileWarning, Gauge } from 'lucide-react'
 import { SecurityHeadersCheckerTool } from '@/components/tools/security-headers-checker-tool'
+import Faq from '@/components/landing/faq'
+import { ScrollReveal } from '@/components/landing/scroll-reveal'
 
 export const metadata: Metadata = {
   title: 'Free Security Headers Checker — Test HTTP Headers | Uptrue',
@@ -95,9 +98,10 @@ export default function SecurityHeadersCheckerPage(): React.ReactElement {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <div className="tools-page">
+        <ScrollReveal />
         <div className="tools-hero">
-          <h1 className="tools-hero-title">Security Headers Checker</h1>
-          <p className="tools-hero-subtitle">
+          <h1 className="tools-hero-title reveal-title">Security Headers Checker</h1>
+          <p className="tools-hero-subtitle reveal-title">
             Check your website&apos;s HTTP security headers instantly. Get a security grade, see what&apos;s missing, and understand what each header protects against.
           </p>
         </div>
@@ -107,63 +111,58 @@ export default function SecurityHeadersCheckerPage(): React.ReactElement {
 
           <div className="tools-info-section">
             <h2>What does this tool check?</h2>
-            <div className="tools-info-grid">
+            <div className="tools-info-grid reveal-stagger">
               <div className="tools-info-card">
-                <h3>HSTS &amp; CSP</h3>
+                <h3><span className="tools-info-icon"><ShieldCheck size={16} /></span>HSTS &amp; CSP</h3>
                 <p>The two most critical headers: HSTS enforces HTTPS, CSP prevents cross-site scripting attacks.</p>
               </div>
               <div className="tools-info-card">
-                <h3>Clickjacking Protection</h3>
+                <h3><span className="tools-info-icon"><Frame size={16} /></span>Clickjacking Protection</h3>
                 <p>Checks X-Frame-Options to confirm your site cannot be embedded in malicious iframes.</p>
               </div>
               <div className="tools-info-card">
-                <h3>Content Type Sniffing</h3>
+                <h3><span className="tools-info-icon"><FileWarning size={16} /></span>Content Type Sniffing</h3>
                 <p>Verifies X-Content-Type-Options is set to prevent browsers from guessing file types.</p>
               </div>
               <div className="tools-info-card">
-                <h3>Security Grade</h3>
+                <h3><span className="tools-info-icon"><Gauge size={16} /></span>Security Grade</h3>
                 <p>Overall A+ to F grade based on which headers are present, so you know exactly where you stand.</p>
               </div>
             </div>
           </div>
 
-          <section style={{ marginBottom: '3rem' }}>
-            <h2 style={{ marginBottom: '1.5rem' }}>Frequently Asked Questions</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <div className="card" style={{ padding: '1.25rem 1.5rem' }}>
-                <h3 style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>What are HTTP security headers?</h3>
-                <p style={{ margin: 0, color: 'var(--color-text-secondary)', fontSize: '0.9375rem' }}>
-                  HTTP security headers are response headers that your web server sends to browsers to control their behaviour. They instruct the browser to enforce HTTPS, restrict what scripts can run, prevent embedding in iframes, and more — protecting users from attacks like XSS, clickjacking, and protocol downgrade.
-                </p>
-              </div>
-              <div className="card" style={{ padding: '1.25rem 1.5rem' }}>
-                <h3 style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>What is HSTS and why is it important?</h3>
-                <p style={{ margin: 0, color: 'var(--color-text-secondary)', fontSize: '0.9375rem' }}>
-                  HSTS (HTTP Strict Transport Security) tells browsers to only connect to your site over HTTPS, forever. Without it, attackers can strip HTTPS at the network level and intercept traffic. HSTS is the single most important security header for any site that uses HTTPS.
-                </p>
-              </div>
-              <div className="card" style={{ padding: '1.25rem 1.5rem' }}>
-                <h3 style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>How do I add a Content Security Policy?</h3>
-                <p style={{ margin: 0, color: 'var(--color-text-secondary)', fontSize: '0.9375rem' }}>
-                  Add a <code>Content-Security-Policy</code> header in your web server config (Nginx: <code>add_header</code>, Apache: <code>Header always set</code>), your CDN (Cloudflare Transform Rules), or application middleware. Start with report-only mode to see violations before enforcing. A strict CSP is the most powerful defence against XSS attacks.
-                </p>
-              </div>
-              <div className="card" style={{ padding: '1.25rem 1.5rem' }}>
-                <h3 style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>What does X-Frame-Options do?</h3>
-                <p style={{ margin: 0, color: 'var(--color-text-secondary)', fontSize: '0.9375rem' }}>
-                  <code>X-Frame-Options: DENY</code> or <code>SAMEORIGIN</code> prevents your pages from being loaded in iframes on other websites. This blocks clickjacking attacks where attackers overlay a hidden version of your site to trick users into clicking buttons or logging in. The modern CSP <code>frame-ancestors</code> directive provides the same protection with more flexibility.
-                </p>
-              </div>
-              <div className="card" style={{ padding: '1.25rem 1.5rem' }}>
-                <h3 style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>How do I get an A+ security headers grade?</h3>
-                <p style={{ margin: 0, color: 'var(--color-text-secondary)', fontSize: '0.9375rem' }}>
-                  To score A+, you need all eight headers: HSTS, CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy, Cross-Origin-Opener-Policy (COOP), and Cross-Origin-Embedder-Policy (COEP). Start with HSTS and CSP as they carry the most weight, then add the remaining headers one by one. Many hosting platforms and CDNs let you add headers with no code changes.
-                </p>
-              </div>
-            </div>
-          </section>
+          <Faq
+            headline="Frequently Asked Questions"
+            items={[
+              {
+                question: 'What are HTTP security headers?',
+                answer:
+                  'HTTP security headers are response headers that your web server sends to browsers to control their behaviour. They instruct the browser to enforce HTTPS, restrict what scripts can run, prevent embedding in iframes, and more — protecting users from attacks like XSS, clickjacking, and protocol downgrade.',
+              },
+              {
+                question: 'What is HSTS and why is it important?',
+                answer:
+                  'HSTS (HTTP Strict Transport Security) tells browsers to only connect to your site over HTTPS, forever. Without it, attackers can strip HTTPS at the network level and intercept traffic. HSTS is the single most important security header for any site that uses HTTPS.',
+              },
+              {
+                question: 'How do I add a Content Security Policy?',
+                answer:
+                  'Add a Content-Security-Policy header in your web server config (Nginx: add_header, Apache: Header always set), your CDN (Cloudflare Transform Rules), or application middleware. Start with report-only mode to see violations before enforcing. A strict CSP is the most powerful defence against XSS attacks.',
+              },
+              {
+                question: 'What does X-Frame-Options do?',
+                answer:
+                  'X-Frame-Options: DENY or SAMEORIGIN prevents your pages from being loaded in iframes on other websites. This blocks clickjacking attacks where attackers overlay a hidden version of your site to trick users into clicking buttons or logging in. The modern CSP frame-ancestors directive provides the same protection with more flexibility.',
+              },
+              {
+                question: 'How do I get an A+ security headers grade?',
+                answer:
+                  'To score A+, you need all eight headers: HSTS, CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy, Cross-Origin-Opener-Policy (COOP), and Cross-Origin-Embedder-Policy (COEP). Start with HSTS and CSP as they carry the most weight, then add the remaining headers one by one. Many hosting platforms and CDNs let you add headers with no code changes.',
+              },
+            ]}
+          />
 
-          <div className="tools-cta">
+          <div className="tools-cta reveal">
             <h2>Monitor your security headers 24/7</h2>
             <p>
               Security headers go missing in deployments more often than teams realise. Uptrue&apos;s{' '}
