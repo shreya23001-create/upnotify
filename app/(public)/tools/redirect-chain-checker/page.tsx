@@ -1,6 +1,9 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { ArrowRightLeft, Repeat, Lock, AlertTriangle } from 'lucide-react'
 import { RedirectChainCheckerTool } from '@/components/tools/redirect-chain-checker-tool'
+import Faq from '@/components/landing/faq'
+import { ScrollReveal } from '@/components/landing/scroll-reveal'
 
 export const metadata: Metadata = {
   title: 'Free Redirect Chain Checker — Trace URL Redirects | Uptrue',
@@ -95,9 +98,10 @@ export default function RedirectChainCheckerPage(): React.ReactElement {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <div className="tools-page">
+        <ScrollReveal />
         <div className="tools-hero">
-          <h1 className="tools-hero-title">Redirect Chain Checker</h1>
-          <p className="tools-hero-subtitle">
+          <h1 className="tools-hero-title reveal-title">Redirect Chain Checker</h1>
+          <p className="tools-hero-subtitle reveal-title">
             Trace every redirect hop for any URL. Detect loops, count hops, and find redirect chains that are slowing your site and hurting your SEO.
           </p>
         </div>
@@ -107,63 +111,58 @@ export default function RedirectChainCheckerPage(): React.ReactElement {
 
           <div className="tools-info-section">
             <h2>What does this tool check?</h2>
-            <div className="tools-info-grid">
+            <div className="tools-info-grid reveal-stagger">
               <div className="tools-info-card">
-                <h3>Full Redirect Chain</h3>
+                <h3><span className="tools-info-icon"><ArrowRightLeft size={16} /></span>Full Redirect Chain</h3>
                 <p>Every redirect hop is traced and shown visually with its status code, destination URL, and response time.</p>
               </div>
               <div className="tools-info-card">
-                <h3>Loop Detection</h3>
+                <h3><span className="tools-info-icon"><Repeat size={16} /></span>Loop Detection</h3>
                 <p>Automatically detects redirect loops where URLs redirect back to themselves, causing infinite cycles.</p>
               </div>
               <div className="tools-info-card">
-                <h3>HTTP → HTTPS Upgrades</h3>
+                <h3><span className="tools-info-icon"><Lock size={16} /></span>HTTP → HTTPS Upgrades</h3>
                 <p>Highlights which hops perform HTTP-to-HTTPS upgrades or www/non-www changes so you can consolidate them.</p>
               </div>
               <div className="tools-info-card">
-                <h3>SEO Issue Flags</h3>
+                <h3><span className="tools-info-icon"><AlertTriangle size={16} /></span>SEO Issue Flags</h3>
                 <p>Flags issues that hurt SEO: long chains, temporary 302 redirects where 301 is needed, and missing HTTPS upgrades.</p>
               </div>
             </div>
           </div>
 
-          <section style={{ marginBottom: '3rem' }}>
-            <h2 style={{ marginBottom: '1.5rem' }}>Frequently Asked Questions</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <div className="card" style={{ padding: '1.25rem 1.5rem' }}>
-                <h3 style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>What is a redirect chain?</h3>
-                <p style={{ margin: 0, color: 'var(--color-text-secondary)', fontSize: '0.9375rem' }}>
-                  A redirect chain is a sequence of redirects before reaching the final URL. For example: <code>http://example.com</code> → <code>https://example.com</code> → <code>https://www.example.com</code> is a 2-hop chain. Each extra hop adds delay and can reduce how much SEO value passes through the chain.
-                </p>
-              </div>
-              <div className="card" style={{ padding: '1.25rem 1.5rem' }}>
-                <h3 style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>Do redirect chains hurt SEO?</h3>
-                <p style={{ margin: 0, color: 'var(--color-text-secondary)', fontSize: '0.9375rem' }}>
-                  Yes. Long chains slow down page load, search engine crawlers may stop following them after 3-5 hops, and each hop can reduce the link equity passed to the final URL. Consolidate chains to a single direct redirect to the final destination wherever possible.
-                </p>
-              </div>
-              <div className="card" style={{ padding: '1.25rem 1.5rem' }}>
-                <h3 style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>What is the difference between 301 and 302 redirects?</h3>
-                <p style={{ margin: 0, color: 'var(--color-text-secondary)', fontSize: '0.9375rem' }}>
-                  <strong>301 (Permanent)</strong> — search engines transfer link equity to the new URL and update their index. Best for permanent page moves. <strong>302 (Temporary)</strong> — search engines keep the original URL indexed and do not fully transfer ranking signals. Only use 302 when the redirect is genuinely temporary, such as during A/B testing or maintenance.
-                </p>
-              </div>
-              <div className="card" style={{ padding: '1.25rem 1.5rem' }}>
-                <h3 style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>How many redirects are too many?</h3>
-                <p style={{ margin: 0, color: 'var(--color-text-secondary)', fontSize: '0.9375rem' }}>
-                  One redirect hop is ideal. Two is acceptable. Three or more starts to impact SEO and performance. Google follows up to 10 redirects but may reduce crawl budget for pages with long chains. Each hop adds 100–300ms of latency. Aim to direct old URLs straight to the final destination in a single 301.
-                </p>
-              </div>
-              <div className="card" style={{ padding: '1.25rem 1.5rem' }}>
-                <h3 style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>How do I fix a redirect loop?</h3>
-                <p style={{ margin: 0, color: 'var(--color-text-secondary)', fontSize: '0.9375rem' }}>
-                  A redirect loop occurs when URL A redirects to URL B which redirects back to URL A. To fix: check your <code>.htaccess</code> or Nginx config for conflicting rules, check any CMS redirect plugins for duplicates, and review CDN redirect rules (Cloudflare Page Rules). Make sure your HTTP→HTTPS and www→non-www rules do not create a cycle.
-                </p>
-              </div>
-            </div>
-          </section>
+          <Faq
+            headline="Frequently Asked Questions"
+            items={[
+              {
+                question: 'What is a redirect chain?',
+                answer:
+                  'A redirect chain is a sequence of redirects before reaching the final URL. For example: http://example.com → https://example.com → https://www.example.com is a 2-hop chain. Each extra hop adds delay and can reduce how much SEO value passes through the chain.',
+              },
+              {
+                question: 'Do redirect chains hurt SEO?',
+                answer:
+                  'Yes. Long chains slow down page load, search engine crawlers may stop following them after 3-5 hops, and each hop can reduce the link equity passed to the final URL. Consolidate chains to a single direct redirect to the final destination wherever possible.',
+              },
+              {
+                question: 'What is the difference between 301 and 302 redirects?',
+                answer:
+                  '301 (Permanent) — search engines transfer link equity to the new URL and update their index. Best for permanent page moves. 302 (Temporary) — search engines keep the original URL indexed and do not fully transfer ranking signals. Only use 302 when the redirect is genuinely temporary, such as during A/B testing or maintenance.',
+              },
+              {
+                question: 'How many redirects are too many?',
+                answer:
+                  'One redirect hop is ideal. Two is acceptable. Three or more starts to impact SEO and performance. Google follows up to 10 redirects but may reduce crawl budget for pages with long chains. Each hop adds 100–300ms of latency. Aim to direct old URLs straight to the final destination in a single 301.',
+              },
+              {
+                question: 'How do I fix a redirect loop?',
+                answer:
+                  'A redirect loop occurs when URL A redirects to URL B which redirects back to URL A. To fix: check your .htaccess or Nginx config for conflicting rules, check any CMS redirect plugins for duplicates, and review CDN redirect rules (Cloudflare Page Rules). Make sure your HTTP→HTTPS and www→non-www rules do not create a cycle.',
+              },
+            ]}
+          />
 
-          <div className="tools-cta">
+          <div className="tools-cta reveal">
             <h2>Monitor your redirects automatically</h2>
             <p>
               Redirect chains often appear silently after deployments. Uptrue&apos;s{' '}

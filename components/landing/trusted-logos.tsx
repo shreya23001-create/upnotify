@@ -28,14 +28,29 @@ async function fetchLogoNames(): Promise<string[]> {
   }
 }
 
+function LogoRow({ names, direction }: { names: string[]; direction: 'left' | 'right' }): React.ReactElement {
+  const doubled = [...names, ...names]
+  return (
+    <div className="sp-logos-track">
+      <div className={direction === 'left' ? 'sp-logos-scroll-left' : 'sp-logos-scroll-right'}>
+        {doubled.map((name, i) => (
+          <div key={`${name}-${i}`} className="sp-logo-item">{name}</div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export async function TrustedLogos(): Promise<React.ReactElement> {
   const names = await fetchLogoNames()
+  const mid = Math.ceil(names.length / 2)
+  const rowA = names.slice(0, mid)
+  const rowB = names.slice(mid)
 
   return (
     <div className="sp-logos">
-      {names.map((name) => (
-        <div key={name} className="sp-logo-item">{name}</div>
-      ))}
+      <LogoRow names={rowA} direction="left" />
+      <LogoRow names={rowB} direction="right" />
     </div>
   )
 }

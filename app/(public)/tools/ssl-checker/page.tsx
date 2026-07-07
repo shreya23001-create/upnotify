@@ -1,6 +1,9 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { Landmark, Clock, Lock, Link2 } from 'lucide-react'
 import { SslCheckerTool } from '@/components/tools/ssl-checker-tool'
+import Faq from '@/components/landing/faq'
+import { ScrollReveal } from '@/components/landing/scroll-reveal'
 
 export const metadata: Metadata = {
   title: 'Free SSL Certificate Checker — Check Any SSL | Uptrue',
@@ -74,14 +77,15 @@ const faqSchema = {
 export default function SslCheckerPage(): React.ReactElement {
   return (
     <div className="tools-page">
+      <ScrollReveal />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
 
       <div className="tools-hero">
-        <h1 className="tools-hero-title">Free SSL Certificate Checker</h1>
-        <p className="tools-hero-subtitle">
+        <h1 className="tools-hero-title reveal-title">Free SSL Certificate Checker</h1>
+        <p className="tools-hero-subtitle reveal-title">
           Check any SSL certificate instantly. See the issuer, expiry, TLS version, and chain validity — no signup required.
         </p>
       </div>
@@ -91,27 +95,27 @@ export default function SslCheckerPage(): React.ReactElement {
 
         <div className="tools-info-section">
           <h2>What does this tool check?</h2>
-          <div className="tools-info-grid">
+          <div className="tools-info-grid reveal-stagger">
             <div className="tools-info-card">
-              <h3>Certificate Issuer</h3>
+              <h3><span className="tools-info-icon"><Landmark size={16} /></span>Certificate Issuer</h3>
               <p>Who issued the SSL certificate (e.g., Let&apos;s Encrypt, Cloudflare, DigiCert).</p>
             </div>
             <div className="tools-info-card">
-              <h3>Expiry Date</h3>
+              <h3><span className="tools-info-icon"><Clock size={16} /></span>Expiry Date</h3>
               <p>When the certificate expires and how many days remain.</p>
             </div>
             <div className="tools-info-card">
-              <h3>TLS Version</h3>
+              <h3><span className="tools-info-icon"><Lock size={16} /></span>TLS Version</h3>
               <p>The TLS protocol version in use (TLS 1.2, 1.3).</p>
             </div>
             <div className="tools-info-card">
-              <h3>Chain Validity</h3>
+              <h3><span className="tools-info-icon"><Link2 size={16} /></span>Chain Validity</h3>
               <p>Whether the full certificate chain is valid and trusted.</p>
             </div>
           </div>
         </div>
 
-        <div className="tools-cta">
+        <div className="tools-cta reveal">
           <h2>Monitor this SSL certificate 24/7</h2>
           <p>
             Get alerted before your SSL certificate expires. Uptrue&apos;s{' '}
@@ -125,17 +129,10 @@ export default function SslCheckerPage(): React.ReactElement {
           </a>
         </div>
 
-        <div className="tools-info-section">
-          <h2>Frequently asked questions</h2>
-          <div className="tools-info-grid" style={{ gridTemplateColumns: '1fr' }}>
-            {faqSchema.mainEntity.map((faq, i) => (
-              <div key={i} className="tools-info-card">
-                <h3>{faq.name}</h3>
-                <p>{faq.acceptedAnswer.text}</p>
-              </div>
-            ))}
-          </div>
-        </div>
+        <Faq
+          items={faqSchema.mainEntity.map(faq => ({ question: faq.name, answer: faq.acceptedAnswer.text }))}
+          headline="Frequently asked questions"
+        />
       </div>
     </div>
   )

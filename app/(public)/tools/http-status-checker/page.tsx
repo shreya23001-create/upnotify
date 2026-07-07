@@ -1,6 +1,9 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { Hash, ArrowRightLeft, FileText, Clock } from 'lucide-react'
 import { HttpStatusCheckerTool } from '@/components/tools/http-status-checker-tool'
+import Faq from '@/components/landing/faq'
+import { ScrollReveal } from '@/components/landing/scroll-reveal'
 
 export const metadata: Metadata = {
   title: 'Free HTTP Status Checker — Check URL Response Codes | Uptrue',
@@ -95,9 +98,10 @@ export default function HttpStatusCheckerPage(): React.ReactElement {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <div className="tools-page">
+        <ScrollReveal />
         <div className="tools-hero">
-          <h1 className="tools-hero-title">HTTP Status Checker</h1>
-          <p className="tools-hero-subtitle">
+          <h1 className="tools-hero-title reveal-title">HTTP Status Checker</h1>
+          <p className="tools-hero-subtitle reveal-title">
             Enter any URL to check its HTTP status code. See redirects, server headers, and a plain-English explanation of what the response means.
           </p>
         </div>
@@ -107,63 +111,58 @@ export default function HttpStatusCheckerPage(): React.ReactElement {
 
           <div className="tools-info-section">
             <h2>What does this tool check?</h2>
-            <div className="tools-info-grid">
+            <div className="tools-info-grid reveal-stagger">
               <div className="tools-info-card">
-                <h3>HTTP Status Code</h3>
+                <h3><span className="tools-info-icon"><Hash size={16} /></span>HTTP Status Code</h3>
                 <p>The exact response code returned by the server — 200, 301, 404, 503 — with a plain-English explanation.</p>
               </div>
               <div className="tools-info-card">
-                <h3>Redirect Chain</h3>
+                <h3><span className="tools-info-icon"><ArrowRightLeft size={16} /></span>Redirect Chain</h3>
                 <p>Every redirect hop is shown step by step, so you can see exactly where a URL ends up and how many hops it takes.</p>
               </div>
               <div className="tools-info-card">
-                <h3>Response Headers</h3>
+                <h3><span className="tools-info-icon"><FileText size={16} /></span>Response Headers</h3>
                 <p>Key response headers including Content-Type, Server, Cache-Control, and X-Powered-By from the final URL.</p>
               </div>
               <div className="tools-info-card">
-                <h3>Response Time</h3>
+                <h3><span className="tools-info-icon"><Clock size={16} /></span>Response Time</h3>
                 <p>How long the server took to respond in milliseconds — useful for diagnosing slow pages.</p>
               </div>
             </div>
           </div>
 
-          <section style={{ marginBottom: '3rem' }}>
-            <h2 style={{ marginBottom: '1.5rem' }}>Frequently Asked Questions</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <div className="card" style={{ padding: '1.25rem 1.5rem' }}>
-                <h3 style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>What do HTTP status codes mean?</h3>
-                <p style={{ margin: 0, color: 'var(--color-text-secondary)', fontSize: '0.9375rem' }}>
-                  HTTP status codes are three-digit numbers indicating the result of a request. <strong>2xx</strong> = success (200 OK, 201 Created). <strong>3xx</strong> = redirect (301 Permanent, 302 Temporary). <strong>4xx</strong> = client error (403 Forbidden, 404 Not Found). <strong>5xx</strong> = server error (500 Internal Error, 503 Unavailable). This tool shows the exact code and a plain-English explanation.
-                </p>
-              </div>
-              <div className="card" style={{ padding: '1.25rem 1.5rem' }}>
-                <h3 style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>What is the difference between 301 and 302 redirects?</h3>
-                <p style={{ margin: 0, color: 'var(--color-text-secondary)', fontSize: '0.9375rem' }}>
-                  A <strong>301</strong> is a permanent redirect — search engines transfer ranking signals (link equity) to the new URL and update their index. A <strong>302</strong> is temporary — search engines keep the original URL indexed. Always use 301 for permanent page moves. Misusing 302 means your SEO value stays on the old URL and may never transfer.
-                </p>
-              </div>
-              <div className="card" style={{ padding: '1.25rem 1.5rem' }}>
-                <h3 style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>Why is my website returning a 404?</h3>
-                <p style={{ margin: 0, color: 'var(--color-text-secondary)', fontSize: '0.9375rem' }}>
-                  A 404 means the server has nothing at that URL. Common causes: the page was deleted, the URL changed without a redirect, a CMS slug was edited, or the server config changed. Fix it by setting up a 301 redirect from the old URL to the correct page. Every 404 is a lost visitor and lost SEO signal.
-                </p>
-              </div>
-              <div className="card" style={{ padding: '1.25rem 1.5rem' }}>
-                <h3 style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>What does a 503 error mean?</h3>
-                <p style={{ margin: 0, color: 'var(--color-text-secondary)', fontSize: '0.9375rem' }}>
-                  503 Service Unavailable means the server cannot handle the request right now — usually because of overload, maintenance, or resource exhaustion. Unlike a 500 error, 503 implies the condition is temporary. If you see persistent 503s, check server memory and CPU, connection limits, and whether any maintenance mode is active.
-                </p>
-              </div>
-              <div className="card" style={{ padding: '1.25rem 1.5rem' }}>
-                <h3 style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>How do I check if a URL redirects?</h3>
-                <p style={{ margin: 0, color: 'var(--color-text-secondary)', fontSize: '0.9375rem' }}>
-                  Enter the URL in this tool — it will follow all redirects and show you every hop. You can also use <code>curl -I -L https://example.com</code> in a terminal. For SEO, aim for a maximum of one redirect hop. Multiple redirects slow down page load and dilute ranking signals.
-                </p>
-              </div>
-            </div>
-          </section>
+          <Faq
+            headline="Frequently Asked Questions"
+            items={[
+              {
+                question: 'What do HTTP status codes mean?',
+                answer:
+                  'HTTP status codes are three-digit numbers indicating the result of a request. 2xx = success (200 OK, 201 Created). 3xx = redirect (301 Permanent, 302 Temporary). 4xx = client error (403 Forbidden, 404 Not Found). 5xx = server error (500 Internal Error, 503 Unavailable). This tool shows the exact code and a plain-English explanation.',
+              },
+              {
+                question: 'What is the difference between 301 and 302 redirects?',
+                answer:
+                  'A 301 is a permanent redirect — search engines transfer ranking signals (link equity) to the new URL and update their index. A 302 is temporary — search engines keep the original URL indexed. Always use 301 for permanent page moves. Misusing 302 means your SEO value stays on the old URL and may never transfer.',
+              },
+              {
+                question: 'Why is my website returning a 404?',
+                answer:
+                  'A 404 means the server has nothing at that URL. Common causes: the page was deleted, the URL changed without a redirect, a CMS slug was edited, or the server config changed. Fix it by setting up a 301 redirect from the old URL to the correct page. Every 404 is a lost visitor and lost SEO signal.',
+              },
+              {
+                question: 'What does a 503 error mean?',
+                answer:
+                  '503 Service Unavailable means the server cannot handle the request right now — usually because of overload, maintenance, or resource exhaustion. Unlike a 500 error, 503 implies the condition is temporary. If you see persistent 503s, check server memory and CPU, connection limits, and whether any maintenance mode is active.',
+              },
+              {
+                question: 'How do I check if a URL redirects?',
+                answer:
+                  'Enter the URL in this tool — it will follow all redirects and show you every hop. You can also use curl -I -L https://example.com in a terminal. For SEO, aim for a maximum of one redirect hop. Multiple redirects slow down page load and dilute ranking signals.',
+              },
+            ]}
+          />
 
-          <div className="tools-cta">
+          <div className="tools-cta reveal">
             <h2>Monitor your URLs around the clock</h2>
             <p>
               Uptrue&apos;s <Link href="/monitoring/http-uptime-monitoring">HTTP uptime monitoring</Link>{' '}

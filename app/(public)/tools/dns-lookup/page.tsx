@@ -1,6 +1,9 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { Globe, Mail, Server, FileText, Link2, Info } from 'lucide-react'
 import { DnsLookupTool } from '@/components/tools/dns-lookup-tool'
+import Faq from '@/components/landing/faq'
+import { ScrollReveal } from '@/components/landing/scroll-reveal'
 
 export const metadata: Metadata = {
   title: 'Free DNS Lookup Tool — Check DNS Records Online | Uptrue',
@@ -84,9 +87,10 @@ export default function DnsLookupPage(): React.ReactElement {
       />
 
       <div className="tools-page">
+        <ScrollReveal />
         <div className="tools-hero">
-          <h1 className="tools-hero-title">DNS Lookup Tool</h1>
-          <p className="tools-hero-subtitle">
+          <h1 className="tools-hero-title reveal-title">DNS Lookup Tool</h1>
+          <p className="tools-hero-subtitle reveal-title">
             Look up DNS records for any domain instantly. Check A, AAAA, MX, NS, TXT, CNAME, and SOA records — free, no signup required.
           </p>
         </div>
@@ -96,51 +100,37 @@ export default function DnsLookupPage(): React.ReactElement {
 
           <div className="tools-info-section">
             <h2>What DNS record types does this tool check?</h2>
-            <div className="tools-info-grid">
+            <div className="tools-info-grid reveal-stagger">
               <div className="tools-info-card">
-                <h3>A &amp; AAAA Records</h3>
+                <h3><span className="tools-info-icon"><Globe size={16} /></span>A &amp; AAAA Records</h3>
                 <p>Maps your domain to an IPv4 (A) or IPv6 (AAAA) address. Essential for resolving your website.</p>
               </div>
               <div className="tools-info-card">
-                <h3>MX Records</h3>
+                <h3><span className="tools-info-icon"><Mail size={16} /></span>MX Records</h3>
                 <p>Mail Exchange records that tell the internet where to deliver email for your domain, with priority ordering.</p>
               </div>
               <div className="tools-info-card">
-                <h3>NS Records</h3>
+                <h3><span className="tools-info-icon"><Server size={16} /></span>NS Records</h3>
                 <p>Name Server records that identify which DNS servers are authoritative for your domain.</p>
               </div>
               <div className="tools-info-card">
-                <h3>TXT Records</h3>
+                <h3><span className="tools-info-icon"><FileText size={16} /></span>TXT Records</h3>
                 <p>Text records used for domain verification, SPF email authentication, DMARC policies, and more.</p>
               </div>
               <div className="tools-info-card">
-                <h3>CNAME Records</h3>
+                <h3><span className="tools-info-icon"><Link2 size={16} /></span>CNAME Records</h3>
                 <p>Canonical Name records that alias one domain to another — commonly used for subdomains and CDNs.</p>
               </div>
               <div className="tools-info-card">
-                <h3>SOA Record</h3>
+                <h3><span className="tools-info-icon"><Info size={16} /></span>SOA Record</h3>
                 <p>Start of Authority record containing zone metadata: primary nameserver, hostmaster email, and serial number.</p>
               </div>
             </div>
           </div>
 
-          <div className="tools-info-section">
-            <h2>Frequently Asked Questions</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              {faqItems.map((item, i) => (
-                <div key={i} className="card" style={{ padding: '16px 20px' }}>
-                  <h3 style={{ margin: '0 0 8px', fontSize: 15, fontWeight: 600, color: 'var(--text-primary)' }}>
-                    {item.question}
-                  </h3>
-                  <p style={{ margin: 0, fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                    {item.answer}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
+          <Faq items={faqItems} headline="Frequently Asked Questions" />
 
-          <div className="tools-cta">
+          <div className="tools-cta reveal">
             <h2>Monitor DNS changes automatically</h2>
             <p>
               Get alerted the moment a DNS record changes on your domain. Uptrue&apos;s{' '}

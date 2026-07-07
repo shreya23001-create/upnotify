@@ -1,6 +1,9 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { Plug2, Radar, Clock, ShieldCheck } from 'lucide-react'
 import { PortCheckerTool } from '@/components/tools/port-checker-tool'
+import Faq from '@/components/landing/faq'
+import { ScrollReveal } from '@/components/landing/scroll-reveal'
 
 export const metadata: Metadata = {
   title: 'Free Port Checker — Check If a TCP Port Is Open | Uptrue',
@@ -66,14 +69,15 @@ const faqSchema = {
 export default function PortCheckerPage(): React.ReactElement {
   return (
     <div className="tools-page">
+      <ScrollReveal />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
 
       <div className="tools-hero">
-        <h1 className="tools-hero-title">Port Checker</h1>
-        <p className="tools-hero-subtitle">
+        <h1 className="tools-hero-title reveal-title">Port Checker</h1>
+        <p className="tools-hero-subtitle reveal-title">
           Enter a hostname and port to check if the TCP port is open. Test firewall rules,
           verify services are running, and troubleshoot connectivity — instantly.
         </p>
@@ -84,39 +88,32 @@ export default function PortCheckerPage(): React.ReactElement {
 
         <div className="tools-info-section">
           <h2>What does this tool check?</h2>
-          <div className="tools-info-grid">
+          <div className="tools-info-grid reveal-stagger">
             <div className="tools-info-card">
-              <h3>Port Reachability</h3>
+              <h3><span className="tools-info-icon"><Plug2 size={16} /></span>Port Reachability</h3>
               <p>Attempts a real TCP connection to verify whether the port is open and accepting connections from the internet.</p>
             </div>
             <div className="tools-info-card">
-              <h3>Service Detection</h3>
+              <h3><span className="tools-info-icon"><Radar size={16} /></span>Service Detection</h3>
               <p>Identifies the known service running on well-known ports — HTTP, HTTPS, SSH, SMTP, MySQL, PostgreSQL, Redis, and more.</p>
             </div>
             <div className="tools-info-card">
-              <h3>Response Time</h3>
+              <h3><span className="tools-info-icon"><Clock size={16} /></span>Response Time</h3>
               <p>Measures how long the TCP handshake takes, helping you identify latency and connectivity issues.</p>
             </div>
             <div className="tools-info-card">
-              <h3>Firewall Testing</h3>
+              <h3><span className="tools-info-icon"><ShieldCheck size={16} /></span>Firewall Testing</h3>
               <p>Verify your server&apos;s firewall, security group, or cloud networking rules are allowing the right traffic through.</p>
             </div>
           </div>
         </div>
 
-        <div className="tools-info-section">
-          <h2>Frequently Asked Questions</h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {faqSchema.mainEntity.map((faq, i) => (
-              <div key={i} className="tools-info-card">
-                <h3>{faq.name}</h3>
-                <p>{faq.acceptedAnswer.text}</p>
-              </div>
-            ))}
-          </div>
-        </div>
+        <Faq
+          items={faqSchema.mainEntity.map(faq => ({ question: faq.name, answer: faq.acceptedAnswer.text }))}
+          headline="Frequently asked questions"
+        />
 
-        <div className="tools-cta">
+        <div className="tools-cta reveal">
           <h2>Monitor your ports 24/7</h2>
           <p>
             Uptrue&apos;s <Link href="/monitoring/port-monitoring">port check monitoring</Link> watches any TCP

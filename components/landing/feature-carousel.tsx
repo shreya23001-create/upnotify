@@ -156,8 +156,8 @@ export function FeatureCarousel(): React.ReactElement {
 
   return (
     <div>
-      {/* Category tabs */}
-      <div className="feature-tabs">
+      {/* Category tabs — desktop/tablet: wrapping pill row */}
+      <div className="feature-tabs feature-tabs-desktop">
         {TABS.map(tab => (
           <button
             key={tab.cat}
@@ -167,6 +167,26 @@ export function FeatureCarousel(): React.ReactElement {
             {'icon' in tab && tab.icon}
             {tab.label}
           </button>
+        ))}
+      </div>
+
+      {/* Category tabs — mobile: 2-row auto-scrolling marquee */}
+      <div className="feature-tabs-mobile">
+        {[TABS.slice(0, 3), TABS.slice(3)].map((row, i) => (
+          <div key={i} className="feature-tabs-marquee-track">
+            <div className={i === 0 ? 'feature-tabs-marquee-left' : 'feature-tabs-marquee-right'}>
+              {[...row, ...row].map((tab, j) => (
+                <button
+                  key={`${tab.cat}-${j}`}
+                  className={`feature-tab-btn${activeCat === tab.cat ? ' active' : ''}`}
+                  onClick={() => switchTab(tab.cat)}
+                >
+                  {'icon' in tab && tab.icon}
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+          </div>
         ))}
       </div>
 

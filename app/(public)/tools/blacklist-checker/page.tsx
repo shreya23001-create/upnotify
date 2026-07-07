@@ -1,6 +1,9 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { AlertTriangle, Radar, Mail, Zap } from 'lucide-react'
 import { BlacklistCheckerTool } from '@/components/tools/blacklist-checker-tool'
+import Faq from '@/components/landing/faq'
+import { ScrollReveal } from '@/components/landing/scroll-reveal'
 
 export const metadata: Metadata = {
   title: 'Free Domain Blacklist Checker — Is My Domain Blacklisted? | Uptrue',
@@ -66,14 +69,15 @@ const faqSchema = {
 export default function BlacklistCheckerPage(): React.ReactElement {
   return (
     <div className="tools-page">
+      <ScrollReveal />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
 
       <div className="tools-hero">
-        <h1 className="tools-hero-title">Domain Blacklist Checker</h1>
-        <p className="tools-hero-subtitle">
+        <h1 className="tools-hero-title reveal-title">Domain Blacklist Checker</h1>
+        <p className="tools-hero-subtitle reveal-title">
           Check if your domain or IP address is listed on any of 10 major spam blacklists.
           Includes Spamhaus, SpamCop, Barracuda, SORBS, and more. Instant results, no signup required.
         </p>
@@ -84,39 +88,32 @@ export default function BlacklistCheckerPage(): React.ReactElement {
 
         <div className="tools-info-section">
           <h2>What does this tool check?</h2>
-          <div className="tools-info-grid">
+          <div className="tools-info-grid reveal-stagger">
             <div className="tools-info-card">
-              <h3>10 Major Blacklists</h3>
+              <h3><span className="tools-info-icon"><AlertTriangle size={16} /></span>10 Major Blacklists</h3>
               <p>Checks against Spamhaus ZEN, SpamCop, Barracuda, SORBS, UCEPROTECT, Manitu, Mailspike, PSBL, and WPBL simultaneously.</p>
             </div>
             <div className="tools-info-card">
-              <h3>IP Resolution</h3>
+              <h3><span className="tools-info-icon"><Radar size={16} /></span>IP Resolution</h3>
               <p>Automatically resolves your domain to its IP address, then checks the IP against each DNSBL using real DNS lookups.</p>
             </div>
             <div className="tools-info-card">
-              <h3>Deliverability Impact</h3>
+              <h3><span className="tools-info-icon"><Mail size={16} /></span>Deliverability Impact</h3>
               <p>Understand which blacklists your domain is on and what impact that has on email deliverability to Gmail, Outlook, and other providers.</p>
             </div>
             <div className="tools-info-card">
-              <h3>Instant Results</h3>
+              <h3><span className="tools-info-icon"><Zap size={16} /></span>Instant Results</h3>
               <p>All 10 lists are checked in parallel — results arrive in seconds with a clear clean/listed status for each list.</p>
             </div>
           </div>
         </div>
 
-        <div className="tools-info-section">
-          <h2>Frequently Asked Questions</h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {faqSchema.mainEntity.map((faq, i) => (
-              <div key={i} className="tools-info-card">
-                <h3>{faq.name}</h3>
-                <p>{faq.acceptedAnswer.text}</p>
-              </div>
-            ))}
-          </div>
-        </div>
+        <Faq
+          items={faqSchema.mainEntity.map(faq => ({ question: faq.name, answer: faq.acceptedAnswer.text }))}
+          headline="Frequently asked questions"
+        />
 
-        <div className="tools-cta">
+        <div className="tools-cta reveal">
           <h2>Monitor your blacklist status 24/7</h2>
           <p>
             Uptrue&apos;s <Link href="/monitoring/blacklist-monitoring">blacklist monitoring</Link> checks your

@@ -1,6 +1,9 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { Bot, ListChecks, Map, FileText } from 'lucide-react'
 import { RobotsTxtCheckerTool } from '@/components/tools/robots-txt-checker-tool'
+import Faq from '@/components/landing/faq'
+import { ScrollReveal } from '@/components/landing/scroll-reveal'
 
 export const metadata: Metadata = {
   title: 'Free robots.txt Checker & Validator — Test Your robots.txt | Uptrue',
@@ -66,14 +69,15 @@ const faqSchema = {
 export default function RobotsTxtCheckerPage(): React.ReactElement {
   return (
     <div className="tools-page">
+      <ScrollReveal />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
 
       <div className="tools-hero">
-        <h1 className="tools-hero-title">robots.txt Checker</h1>
-        <p className="tools-hero-subtitle">
+        <h1 className="tools-hero-title reveal-title">robots.txt Checker</h1>
+        <p className="tools-hero-subtitle reveal-title">
           Fetch, parse, and validate any website&apos;s robots.txt file. Check if you&apos;re
           blocking Googlebot, find missing sitemaps, and view crawl rules for every user agent.
         </p>
@@ -84,39 +88,35 @@ export default function RobotsTxtCheckerPage(): React.ReactElement {
 
         <div className="tools-info-section">
           <h2>What does this tool check?</h2>
-          <div className="tools-info-grid">
+          <div className="tools-info-grid reveal-stagger">
             <div className="tools-info-card">
-              <h3>Googlebot &amp; Bingbot Access</h3>
+              <h3><span className="tools-info-icon"><Bot size={16} /></span>Googlebot &amp; Bingbot Access</h3>
               <p>Instantly flags if your robots.txt accidentally blocks Google or Bing crawlers, which can remove your site from search results.</p>
             </div>
             <div className="tools-info-card">
-              <h3>Crawl Rules by Agent</h3>
+              <h3><span className="tools-info-icon"><ListChecks size={16} /></span>Crawl Rules by Agent</h3>
               <p>Parses all User-agent blocks and shows every Allow, Disallow, and Crawl-delay directive in a readable format.</p>
             </div>
             <div className="tools-info-card">
-              <h3>Sitemap Detection</h3>
+              <h3><span className="tools-info-icon"><Map size={16} /></span>Sitemap Detection</h3>
               <p>Lists all Sitemap URLs declared in robots.txt so you can verify search engines can find your sitemap.</p>
             </div>
             <div className="tools-info-card">
-              <h3>Raw File View</h3>
+              <h3><span className="tools-info-icon"><FileText size={16} /></span>Raw File View</h3>
               <p>Shows the complete raw robots.txt content so you can spot formatting issues, comments, or unexpected directives.</p>
             </div>
           </div>
         </div>
 
-        <div className="tools-info-section">
-          <h2>Frequently Asked Questions</h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {faqSchema.mainEntity.map((faq, i) => (
-              <div key={i} className="tools-info-card">
-                <h3>{faq.name}</h3>
-                <p style={{ whiteSpace: 'pre-line' }}>{faq.acceptedAnswer.text}</p>
-              </div>
-            ))}
-          </div>
-        </div>
+        <Faq
+          items={faqSchema.mainEntity.map(faq => ({
+            question: faq.name,
+            answer: <span style={{ whiteSpace: 'pre-line' }}>{faq.acceptedAnswer.text}</span>,
+          }))}
+          headline="Frequently asked questions"
+        />
 
-        <div className="tools-cta">
+        <div className="tools-cta reveal">
           <h2>Monitor your robots.txt for changes</h2>
           <p>
             Uptrue&apos;s <Link href="/monitoring/robots-txt-monitoring">robots.txt change monitoring</Link>{' '}

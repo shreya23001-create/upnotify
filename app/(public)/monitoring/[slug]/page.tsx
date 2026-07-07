@@ -7,6 +7,7 @@ import { MonitorSlugIcon, MonitorIconGradientDefs } from '../monitor-type-icons'
 import { Settings, Check, AlertTriangle } from 'lucide-react'
 import type { ComponentType } from 'react'
 import Faq from '@/components/landing/faq'
+import { ScrollReveal } from '@/components/landing/scroll-reveal'
 
 // ---------------------------------------------------------------------------
 // Monitor type definitions
@@ -30,32 +31,32 @@ interface MonitorTypePage {
 // and gives users a "try before you sign up" path). Slugs match
 // app/tools/<slug>/ directories — verified against the live tools index.
 const RELATED_TOOL: Record<string, { slug: string; label: string }> = {
-  'http-uptime-monitoring':       { slug: 'http-status-checker',       label: 'free HTTP status checker' },
-  'ssl-certificate-monitoring':   { slug: 'ssl-checker',               label: 'free SSL certificate checker' },
-  'dns-monitoring':               { slug: 'dns-lookup',                label: 'free DNS lookup tool' },
-  'keyword-monitoring':           { slug: 'http-status-checker',       label: 'free HTTP status checker' },
-  'domain-expiry-monitoring':     { slug: 'whois-lookup',              label: 'free WHOIS lookup' },
-  'port-monitoring':              { slug: 'port-checker',              label: 'free port checker' },
-  'ping-monitoring':              { slug: 'port-checker',              label: 'free port checker' },
-  'api-endpoint-monitoring':      { slug: 'http-status-checker',       label: 'free HTTP status checker' },
-  'heartbeat-monitoring':         { slug: 'http-status-checker',       label: 'free HTTP status checker' },
-  'page-change-detection':        { slug: 'http-status-checker',       label: 'free HTTP status checker' },
-  'security-headers-monitoring':  { slug: 'security-headers-checker',  label: 'free security headers checker' },
-  'response-time-monitoring':     { slug: 'website-speed-test',        label: 'free website speed test' },
-  'robots-txt-monitoring':        { slug: 'robots-txt-checker',        label: 'free robots.txt checker' },
-  'ip-change-monitoring':         { slug: 'dns-lookup',                label: 'free DNS lookup tool' },
-  'mx-health-monitoring':         { slug: 'spf-dmarc-checker',         label: 'free SPF & DMARC checker' },
-  'whois-registrar-monitoring':   { slug: 'whois-lookup',              label: 'free WHOIS lookup' },
-  'sitemap-monitoring':           { slug: 'robots-txt-checker',        label: 'free robots.txt checker' },
-  'redirect-chain-monitoring':    { slug: 'redirect-chain-checker',    label: 'free redirect chain checker' },
-  'spf-dmarc-monitoring':         { slug: 'spf-dmarc-checker',         label: 'free SPF & DMARC checker' },
-  'blacklist-monitoring':         { slug: 'blacklist-checker',         label: 'free domain blacklist checker' },
-  'page-size-monitoring':         { slug: 'website-speed-test',        label: 'free website speed test' },
+  'http-uptime-monitoring': { slug: 'http-status-checker', label: 'free HTTP status checker' },
+  'ssl-certificate-monitoring': { slug: 'ssl-checker', label: 'free SSL certificate checker' },
+  'dns-monitoring': { slug: 'dns-lookup', label: 'free DNS lookup tool' },
+  'keyword-monitoring': { slug: 'http-status-checker', label: 'free HTTP status checker' },
+  'domain-expiry-monitoring': { slug: 'whois-lookup', label: 'free WHOIS lookup' },
+  'port-monitoring': { slug: 'port-checker', label: 'free port checker' },
+  'ping-monitoring': { slug: 'port-checker', label: 'free port checker' },
+  'api-endpoint-monitoring': { slug: 'http-status-checker', label: 'free HTTP status checker' },
+  'heartbeat-monitoring': { slug: 'http-status-checker', label: 'free HTTP status checker' },
+  'page-change-detection': { slug: 'http-status-checker', label: 'free HTTP status checker' },
+  'security-headers-monitoring': { slug: 'security-headers-checker', label: 'free security headers checker' },
+  'response-time-monitoring': { slug: 'website-speed-test', label: 'free website speed test' },
+  'robots-txt-monitoring': { slug: 'robots-txt-checker', label: 'free robots.txt checker' },
+  'ip-change-monitoring': { slug: 'dns-lookup', label: 'free DNS lookup tool' },
+  'mx-health-monitoring': { slug: 'spf-dmarc-checker', label: 'free SPF & DMARC checker' },
+  'whois-registrar-monitoring': { slug: 'whois-lookup', label: 'free WHOIS lookup' },
+  'sitemap-monitoring': { slug: 'robots-txt-checker', label: 'free robots.txt checker' },
+  'redirect-chain-monitoring': { slug: 'redirect-chain-checker', label: 'free redirect chain checker' },
+  'spf-dmarc-monitoring': { slug: 'spf-dmarc-checker', label: 'free SPF & DMARC checker' },
+  'blacklist-monitoring': { slug: 'blacklist-checker', label: 'free domain blacklist checker' },
+  'page-size-monitoring': { slug: 'website-speed-test', label: 'free website speed test' },
   // cookie-consent and heartbeat have no genuinely-related single tool;
   // skip rather than link weakly. The "Try the free tool" CTA simply
   // doesn't render on those two slugs (relatedTool falsy → conditional skip).
-  'nameserver-monitoring':        { slug: 'dns-lookup',                label: 'free DNS lookup tool' },
-  'wordpress-site-monitor':       { slug: 'security-headers-checker',  label: 'free security headers checker' },
+  'nameserver-monitoring': { slug: 'dns-lookup', label: 'free DNS lookup tool' },
+  'wordpress-site-monitor': { slug: 'security-headers-checker', label: 'free security headers checker' },
 }
 
 const pages: MonitorTypePage[] = [
@@ -484,6 +485,7 @@ export default async function MonitoringTypePage({ params }: { params: Promise<{
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <MonitorIconGradientDefs />
+      <ScrollReveal />
 
       {/* Hero */}
       <section style={{
@@ -495,7 +497,7 @@ export default async function MonitoringTypePage({ params }: { params: Promise<{
           {/* Breadcrumb */}
           <nav style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 28, display: 'flex', alignItems: 'center', gap: 6 }}>
             <Link href="/monitoring" style={{ color: 'var(--accent)', fontWeight: 500 }}>All Monitor Types</Link>
-            <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+            <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6" /></svg>
             <span>{page.name}</span>
           </nav>
 
@@ -550,44 +552,30 @@ export default async function MonitoringTypePage({ params }: { params: Promise<{
 
         {/* What we check */}
         <Section title="What Uptrue checks" icon={Check}>
-          <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div className="mtd-check-grid reveal-stagger">
             {page.whatWeCheck.map((item, i) => (
-              <li key={i} style={{
-                display: 'flex', gap: 12, alignItems: 'flex-start',
-                padding: '10px 14px',
-                background: 'var(--color-up-bg)',
-                border: '1px solid var(--color-up-border)',
-                borderRadius: 8,
-                fontSize: 14,
-              }}>
-                <svg width="14" height="14" fill="none" stroke="var(--color-up)" strokeWidth="2.5" viewBox="0 0 24 24" style={{ flexShrink: 0, marginTop: 1 }}>
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-                <span style={{ color: 'var(--text-primary)' }}>{item}</span>
-              </li>
+              <div key={i} className="mtd-check-card">
+                <span className="mtd-check-icon">
+                  <MonitorSlugIcon slug={page.slug} size={20} />
+                </span>
+                <span className="mtd-check-label">{item}</span>
+              </div>
             ))}
-          </ul>
+          </div>
         </Section>
 
         {/* Alert conditions */}
         <Section title="Alert conditions" icon={AlertTriangle}>
-          <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div className="mtd-alert-grid reveal-stagger">
             {page.alertConditions.map((item, i) => (
-              <li key={i} style={{
-                display: 'flex', gap: 12, alignItems: 'flex-start',
-                padding: '10px 14px',
-                background: 'var(--color-down-bg)',
-                border: '1px solid var(--color-down-border)',
-                borderRadius: 8,
-                fontSize: 14,
-              }}>
-                <svg width="14" height="14" fill="none" stroke="var(--color-down)" strokeWidth="2.5" viewBox="0 0 24 24" style={{ flexShrink: 0, marginTop: 1 }}>
-                  <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
-                </svg>
-                <span style={{ color: 'var(--text-primary)' }}>{item}</span>
-              </li>
+              <div key={i} className="mtd-alert-card">
+                <span className="mtd-alert-icon">
+                  <AlertTriangle size={14} strokeWidth={2.5} />
+                </span>
+                <span className="mtd-alert-text">{item}</span>
+              </div>
             ))}
-          </ul>
+          </div>
         </Section>
 
         {/* Why it matters */}
@@ -605,7 +593,7 @@ export default async function MonitoringTypePage({ params }: { params: Promise<{
 
         {/* CTA inline */}
         <div style={{
-          background: 'linear-gradient(135deg, #6326ed, #ec4899)',
+          background: 'linear-gradient(135deg, rgb(139 95 237), rgb(229 150 189))',
           borderRadius: 14,
           padding: '28px 32px',
           display: 'flex',
@@ -710,7 +698,7 @@ export default async function MonitoringTypePage({ params }: { params: Promise<{
         </div>
 
       </main>
-      
+
     </>
   )
 }
