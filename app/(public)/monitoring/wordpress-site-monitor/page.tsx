@@ -274,7 +274,7 @@ export default function WordPressMonitorPage() {
       </section>
 
       {/* Health score preview */}
-      <section style={{ background: '#f8faff', borderBottom: '1px solid #e8edf5', padding: '20px 24px' }}>
+      <section className="wp-monitor-stats-strip" style={{ padding: '20px 24px' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', gap: 32, flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center' }}>
           {[
             { value: '100', label: 'Health Score', color: '#10b981' },
@@ -284,7 +284,7 @@ export default function WordPressMonitorPage() {
           ].map(stat => (
             <div key={stat.label} style={{ textAlign: 'center', padding: '8px 20px' }}>
               <div style={{ fontSize: 28, fontWeight: 900, color: stat.color, lineHeight: 1 }}>{stat.value}</div>
-              <div style={{ fontSize: 12, color: '#6b7280', fontWeight: 600, marginTop: 4 }}>{stat.label}</div>
+              <div className="wp-monitor-stats-label" style={{ fontSize: 12, fontWeight: 600, marginTop: 4 }}>{stat.label}</div>
             </div>
           ))}
         </div>

@@ -126,7 +126,7 @@
 }
 
 .btn-primary {
-  background: var(--brand-gradient);
+  /* background: var(--brand-gradient); */
   color: white;
   box-shadow: 0 2px 8px rgba(59, 130, 246, 0.35);
 }
@@ -155,6 +155,27 @@
 
 .btn-outline-brand:hover {
   background: var(--brand-gradient-soft);
+}
+
+.hero-score-cta {
+  background: rgba(59, 130, 246, 0.06);
+  color: #7c3aed;
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.hero-score-cta:hover {
+  background: rgba(59, 130, 246, 0.1);
+}
+
+html.dark .hero-score-cta {
+  background: rgba(167, 139, 250, 0.08);
+  color: #c4b5fd;
+  border-color: rgba(167, 139, 250, 0.3);
+}
+
+html.dark .hero-score-cta:hover {
+  background: rgba(124, 58, 237, 0.14);
+  color: #c4b5fd;
 }
 
 .btn-sm {
@@ -2107,6 +2128,24 @@ html.dark .wp-monitor-tail-section {
   background: rgba(14, 11, 30, 0.42);
 }
 
+.wp-monitor-stats-strip {
+  background: #f8faff;
+  border-bottom: 1px solid #e8edf5;
+}
+
+.wp-monitor-stats-label {
+  color: #6b7280;
+}
+
+html.dark .wp-monitor-stats-strip {
+  background: rgba(14, 11, 30, 0.55);
+  border-bottom: 1px solid rgba(167, 139, 250, 0.12);
+}
+
+html.dark .wp-monitor-stats-label {
+  color: #9d97c0;
+}
+
 /* WordPress monitor: showcase cards (theme-aware) used by
    "What Uptrue WordPress Monitor detects" and "How it works" */
 .wp-showcase-card {
@@ -2659,21 +2698,25 @@ html.dark .wp-showcase-desc {
 .ai-feature-icon.purple {
   background: rgba(139, 92, 246, 0.1);
   border: 1px solid rgba(139, 92, 246, 0.2);
+  color: #8b5cf6;
 }
 
 .ai-feature-icon.cyan {
   background: rgba(6, 182, 212, 0.08);
   border: 1px solid rgba(6, 182, 212, 0.18);
+  color: #06b6d4;
 }
 
 .ai-feature-icon.pink {
   background: rgba(236, 72, 153, 0.08);
   border: 1px solid rgba(236, 72, 153, 0.18);
+  color: #ec4899;
 }
 
 .ai-feature-icon.blue {
   background: rgba(59, 130, 246, 0.08);
   border: 1px solid rgba(59, 130, 246, 0.18);
+  color: #3b82f6;
 }
 
 .ai-feature-body h4 {
@@ -2834,9 +2877,10 @@ html.dark .wp-showcase-desc {
 }
 
 .ai-insight-icon {
-  font-size: 14px;
+  display: flex;
   flex-shrink: 0;
   margin-top: 1px;
+  color: #facc15;
 }
 
 .ai-insight-text {
