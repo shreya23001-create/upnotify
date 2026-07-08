@@ -1,10 +1,11 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { Bot, FileText, ShieldCheck, Braces } from 'lucide-react'
+import { Bot, FileText, ShieldCheck, Braces, Sparkles, Cpu, ListChecks } from 'lucide-react'
 import { AiSeoCheckerTool } from '@/components/tools/ai-seo-checker-tool'
 import { JsonLd } from '@/components/seo/json-ld'
 import Faq from '@/components/landing/faq'
 import { ScrollReveal } from '@/components/landing/scroll-reveal'
+import { AiSeoStepsMarquee } from './steps-marquee'
 
 export const metadata: Metadata = {
   title: 'Free AI SEO Checker — GEO, AEO & AI Visibility Score',
@@ -147,10 +148,10 @@ export default function AiSeoCheckerPage(): React.ReactElement {
           <AiSeoCheckerTool />
 
           {/* ----------------------------------------------------------------
-              What is AI SEO / GEO
+              What is AI SEO / GEO + 4 pillars
               ---------------------------------------------------------------- */}
-          <div className="tools-seo-section">
-            <h2>What is AI SEO — and why does it matter now?</h2>
+          <section className="tools-seo-section ai-seo-flat-section reveal">
+            <h2><span className="tools-info-icon"><Sparkles size={20} /></span>What is AI SEO — and why does it matter now?</h2>
             <p>
               Search is changing. In 2024, ChatGPT surpassed 100 million daily active users.
               Perplexity grew to over 500 million monthly queries. Google added AI Overviews to
@@ -201,10 +202,14 @@ export default function AiSeoCheckerPage(): React.ReactElement {
                 llms.txt, it gives AI models an explicit map of your site.</p>
               </div>
             </div>
+          </section>
 
-            {/* Which bots to allow */}
-            <h3>Which AI bots should you allow — and what do they power?</h3>
-            <div className="tools-sla-comparison">
+          {/* ----------------------------------------------------------------
+              Which bots to allow
+              ---------------------------------------------------------------- */}
+          <section className="tools-seo-section ai-seo-flat-section reveal">
+            <h2><span className="tools-info-icon"><Cpu size={20} /></span>Which AI bots should you allow — and what do they power?</h2>
+            <div className="tools-sla-comparison ai-seo-table-scoped">
               <table className="tools-sla-table">
                 <thead>
                   <tr>
@@ -215,41 +220,45 @@ export default function AiSeoCheckerPage(): React.ReactElement {
                 </thead>
                 <tbody>
                   <tr>
-                    <td><code>GPTBot</code></td>
-                    <td>ChatGPT (OpenAI)</td>
-                    <td>Trains future ChatGPT models and populates ChatGPT Browse — the largest AI assistant user base</td>
+                    <td data-label="Bot name"><code>GPTBot</code></td>
+                    <td data-label="AI Engine">ChatGPT (OpenAI)</td>
+                    <td data-label="Why allow it">Trains future ChatGPT models and populates ChatGPT Browse — the largest AI assistant user base</td>
                   </tr>
                   <tr>
-                    <td><code>OAI-SearchBot</code></td>
-                    <td>ChatGPT Search</td>
-                    <td>Powers real-time search results in ChatGPT&apos;s search feature</td>
+                    <td data-label="Bot name"><code>OAI-SearchBot</code></td>
+                    <td data-label="AI Engine">ChatGPT Search</td>
+                    <td data-label="Why allow it">Powers real-time search results in ChatGPT&apos;s search feature</td>
                   </tr>
                   <tr>
-                    <td><code>ClaudeBot</code></td>
-                    <td>Claude (Anthropic)</td>
-                    <td>Indexes content for Claude AI answers and document analysis</td>
+                    <td data-label="Bot name"><code>ClaudeBot</code></td>
+                    <td data-label="AI Engine">Claude (Anthropic)</td>
+                    <td data-label="Why allow it">Indexes content for Claude AI answers and document analysis</td>
                   </tr>
                   <tr>
-                    <td><code>PerplexityBot</code></td>
-                    <td>Perplexity AI</td>
-                    <td>Perplexity cites sources with explicit URLs — the highest direct referral traffic potential of any AI engine</td>
+                    <td data-label="Bot name"><code>PerplexityBot</code></td>
+                    <td data-label="AI Engine">Perplexity AI</td>
+                    <td data-label="Why allow it">Perplexity cites sources with explicit URLs — the highest direct referral traffic potential of any AI engine</td>
                   </tr>
                   <tr>
-                    <td><code>Google-Extended</code></td>
-                    <td>Gemini / AI Overviews</td>
-                    <td>Powers Google AI Overviews (shown to billions of users) and Gemini responses</td>
+                    <td data-label="Bot name"><code>Google-Extended</code></td>
+                    <td data-label="AI Engine">Gemini / AI Overviews</td>
+                    <td data-label="Why allow it">Powers Google AI Overviews (shown to billions of users) and Gemini responses</td>
                   </tr>
                   <tr>
-                    <td><code>Bingbot</code></td>
-                    <td>Bing / Copilot</td>
-                    <td>Powers Microsoft Copilot, used across Windows, Edge, and Microsoft 365</td>
+                    <td data-label="Bot name"><code>Bingbot</code></td>
+                    <td data-label="AI Engine">Bing / Copilot</td>
+                    <td data-label="Why allow it">Powers Microsoft Copilot, used across Windows, Edge, and Microsoft 365</td>
                   </tr>
                 </tbody>
               </table>
             </div>
+          </section>
 
-            {/* llms.txt */}
-            <h3>What is llms.txt — and why should you have one?</h3>
+          {/* ----------------------------------------------------------------
+              llms.txt
+              ---------------------------------------------------------------- */}
+          <section className="tools-seo-section ai-seo-flat-section reveal">
+            <h2><span className="tools-info-icon"><FileText size={20} /></span>What is llms.txt — and why should you have one?</h2>
             <p>
               <code>llms.txt</code> is an{' '}
               <a
@@ -280,51 +289,33 @@ export default function AiSeoCheckerPage(): React.ReactElement {
               the specific AI engines you want to target — sign up free to access the generator
               in your dashboard.
             </p>
+          </section>
 
-            {/* How to improve score */}
-            <h3>How to improve your AI readiness score — step by step</h3>
-            <p>
+          {/* ----------------------------------------------------------------
+              How to improve score
+              ---------------------------------------------------------------- */}
+          <section className="ai-seo-steps-marquee-section reveal">
+            <h2 className="ai-seo-steps-marquee-title">
+              <span className="tools-info-icon"><ListChecks size={20} /></span>
+              How to improve your AI readiness score — step by step
+            </h2>
+            <p className="ai-seo-steps-marquee-lede">
               Most sites fail on the same four issues. Fix them in this order and you will
-              capture the majority of your missing points:
+              capture the majority of your missing points.
             </p>
-            <ol style={{ paddingLeft: '1.5rem', lineHeight: 2 }}>
-              <li>
-                <strong>Create or fix your robots.txt.</strong> This is the most common and most
-                costly mistake — a missing or over-restrictive robots.txt blocks all AI crawlers
-                at once. Explicitly allow GPTBot, ClaudeBot, PerplexityBot, and Google-Extended.
-              </li>
-              <li>
-                <strong>Generate and deploy your llms.txt.</strong> Even a simple one-page file
-                improves your AI search presence by giving models a direct description of your site.
-                Use the{' '}
-                <Link href="/signup?next=/dashboard/ai-visibility" style={{ color: 'var(--color-primary)' }}>free Uptrue generator</Link>{' '}
-                to create one tailored to selected AI engines.
-              </li>
-              <li>
-                <strong>Add JSON-LD structured data.</strong> At minimum: Organization and WebSite
-                schema on your homepage. Article or BlogPosting on content pages. FAQPage schema
-                on any page with a FAQ section. This is the primary channel through which AI engines
-                extract verified facts.
-              </li>
-              <li>
-                <strong>Add question-style headings and FAQ sections.</strong> AI engines are built
-                to answer questions. Pages with headings like &quot;What is X?&quot; and &quot;How does Y work?&quot;
-                are far more frequently cited than pages that only describe features or products.
-              </li>
-              <li>
-                <strong>Add authorship and E-E-A-T signals.</strong> A named author, a linked About
-                page, a Privacy Policy, and social profile links all contribute to AI brand presence
-                — the credibility layer that determines whether AI engines trust you as a source.
-              </li>
-            </ol>
+          </section>
+          <AiSeoStepsMarquee />
 
-            {/* The AI search terms */}
-            <h3>How to think about AI search — the terminology explained</h3>
+          {/* ----------------------------------------------------------------
+              The AI search terms
+              ---------------------------------------------------------------- */}
+          <section className="tools-seo-section ai-seo-flat-section reveal">
+            <h2><span className="tools-info-icon"><Braces size={20} /></span>How to think about AI search — the terminology explained</h2>
             <p>
               The field is moving fast and the terminology is still settling. Here is a quick
               reference for the terms you will encounter:
             </p>
-            <div className="tools-sla-comparison">
+            <div className="tools-sla-comparison ai-seo-table-scoped">
               <table className="tools-sla-table">
                 <thead>
                   <tr>
@@ -335,80 +326,69 @@ export default function AiSeoCheckerPage(): React.ReactElement {
                 </thead>
                 <tbody>
                   <tr>
-                    <td><strong>GEO</strong> — Generative Engine Optimization</td>
-                    <td>Academics, early adopters</td>
-                    <td>Most technically precise term; covers all generative AI answer engines</td>
+                    <td data-label="Term"><strong>GEO</strong> — Generative Engine Optimization</td>
+                    <td data-label="Who uses it">Academics, early adopters</td>
+                    <td data-label="What it means">Most technically precise term; covers all generative AI answer engines</td>
                   </tr>
                   <tr>
-                    <td><strong>AI Search Optimization</strong></td>
-                    <td>Marketing teams</td>
-                    <td>Plain English umbrella term; broadly understood across all audiences</td>
+                    <td data-label="Term"><strong>AI Search Optimization</strong></td>
+                    <td data-label="Who uses it">Marketing teams</td>
+                    <td data-label="What it means">Plain English umbrella term; broadly understood across all audiences</td>
                   </tr>
                   <tr>
-                    <td><strong>LLMO</strong> — LLM Optimization</td>
-                    <td>Developers, technical teams</td>
-                    <td>Emphasises the LLM layer; includes RAG pipelines and model training data</td>
+                    <td data-label="Term"><strong>LLMO</strong> — LLM Optimization</td>
+                    <td data-label="Who uses it">Developers, technical teams</td>
+                    <td data-label="What it means">Emphasises the LLM layer; includes RAG pipelines and model training data</td>
                   </tr>
                   <tr>
-                    <td><strong>AEO</strong> — Answer Engine Optimization</td>
-                    <td>SEO industry</td>
-                    <td>Older term covering voice/featured snippets; being repurposed for AI</td>
+                    <td data-label="Term"><strong>AEO</strong> — Answer Engine Optimization</td>
+                    <td data-label="Who uses it">SEO industry</td>
+                    <td data-label="What it means">Older term covering voice/featured snippets; being repurposed for AI</td>
                   </tr>
                   <tr>
-                    <td><strong>AI Visibility</strong></td>
-                    <td>Enterprise SEO platforms</td>
-                    <td>Aggregate measure of how visible a brand is across AI answers</td>
+                    <td data-label="Term"><strong>AI Visibility</strong></td>
+                    <td data-label="Who uses it">Enterprise SEO platforms</td>
+                    <td data-label="What it means">Aggregate measure of how visible a brand is across AI answers</td>
                   </tr>
                   <tr>
-                    <td><strong>AI Brand Presence</strong></td>
-                    <td>PR and brand teams</td>
-                    <td>How a brand appears (correctly, frequently, positively) in AI responses</td>
+                    <td data-label="Term"><strong>AI Brand Presence</strong></td>
+                    <td data-label="Who uses it">PR and brand teams</td>
+                    <td data-label="What it means">How a brand appears (correctly, frequently, positively) in AI responses</td>
                   </tr>
                   <tr>
-                    <td><strong>AI Citation Monitoring</strong></td>
-                    <td>Tools like Uptrue</td>
-                    <td>Actively tracking which AI engines cite your domain, for which queries</td>
+                    <td data-label="Term"><strong>AI Citation Monitoring</strong></td>
+                    <td data-label="Who uses it">Tools like Uptrue</td>
+                    <td data-label="What it means">Actively tracking which AI engines cite your domain, for which queries</td>
                   </tr>
                   <tr>
-                    <td><strong>AI Search Presence</strong></td>
-                    <td>Emerging / mixed</td>
-                    <td>Composite score of technical readiness + actual citation frequency</td>
+                    <td data-label="Term"><strong>AI Search Presence</strong></td>
+                    <td data-label="Who uses it">Emerging / mixed</td>
+                    <td data-label="What it means">Composite score of technical readiness + actual citation frequency</td>
                   </tr>
                 </tbody>
               </table>
             </div>
+          </section>
 
-            {/* FAQ */}
+          {/* FAQ */}
+          <section>
             <Faq items={FAQ_ITEMS} headline="Frequently asked questions about AI SEO and GEO" />
+          </section>
 
-            {/* CTA */}
-            <div style={{
-              marginTop: 'var(--space-10)',
-              padding: 'var(--space-8)',
-              background: 'linear-gradient(135deg, rgba(59,130,246,0.08), rgba(6,182,212,0.08))',
-              borderRadius: 'var(--radius-xl)',
-              border: '1px solid rgba(59,130,246,0.2)',
-              textAlign: 'center',
-            }}>
-              <h3 style={{ margin: '0 0 var(--space-2)' }}>
-                Ready to monitor your AI search presence?
-              </h3>
-              <p style={{ color: 'var(--text-muted)', margin: '0 0 var(--space-6)' }}>
-                This checker gives you a technical readiness score. Uptrue AI Visibility&trade; goes further —
-                generate your llms.txt and track whether Perplexity, ChatGPT, and Gemini are actually
-                citing you for your target keywords. Pair it with{' '}
-                <Link href="/monitoring/robots-txt-monitoring">robots.txt change monitoring</Link> and{' '}
-                <Link href="/monitoring/sitemap-monitoring">sitemap validity monitoring</Link> so an
-                accidental Disallow or broken sitemap never silently blocks AI crawlers.
-              </p>
-              <Link href="/signup?next=/dashboard/ai-visibility" className="btn btn-primary" style={{ marginRight: 'var(--space-3)' }}>
-                Get Started Free
-              </Link>
-              <Link href="/dashboard/ai-visibility" className="btn btn-outline-brand">
-                View AI Visibility Dashboard
-              </Link>
-            </div>
-
+          {/* CTA */}
+          <div className="tools-cta reveal">
+            <h2>Ready to monitor your AI search presence?</h2>
+            <p>
+              This checker gives you a technical readiness score. Uptrue AI Visibility&trade; goes further —
+              generate your llms.txt and track whether Perplexity, ChatGPT, and Gemini are actually
+              citing you for your target keywords. Pair it with{' '}
+              <Link href="/monitoring/robots-txt-monitoring">robots.txt change monitoring</Link> and{' '}
+              <Link href="/monitoring/sitemap-monitoring">sitemap validity monitoring</Link> so an
+              accidental Disallow or broken sitemap never silently blocks AI crawlers.
+            </p>
+            <Link href="/signup?next=/dashboard/ai-visibility" className="btn btn-primary btn-lg">
+              Get Started Free
+            </Link>
           </div>
         </div>
       </div>

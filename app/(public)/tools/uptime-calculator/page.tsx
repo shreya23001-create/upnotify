@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { HelpCircle, Table2, TrendingDown } from 'lucide-react'
 import { UptimeCalculatorTool } from '@/components/tools/uptime-calculator-tool'
 import Faq from '@/components/landing/faq'
 import { ScrollReveal } from '@/components/landing/scroll-reveal'
@@ -55,11 +56,13 @@ export default function UptimeCalculatorPage(): React.ReactElement {
       </div>
 
       <div className="tools-container">
-        <UptimeCalculatorTool />
+        <div className="reveal">
+          <UptimeCalculatorTool />
+        </div>
 
         {/* What does 99.9% uptime mean? */}
-        <section className="tools-seo-section">
-          <h2>What Does 99.9% Uptime Mean?</h2>
+        <section className="tools-seo-section reveal">
+          <h2><span className="tools-info-icon"><HelpCircle size={20} /></span>What Does 99.9% Uptime Mean?</h2>
           <p>
             An uptime SLA (Service Level Agreement) of 99.9% &mdash; often called &ldquo;three nines&rdquo; &mdash; means
             your service is allowed a maximum of <strong>8 hours and 46 minutes of downtime per year</strong>,
@@ -74,13 +77,13 @@ export default function UptimeCalculatorPage(): React.ReactElement {
         </section>
 
         {/* SLA tiers comparison */}
-        <section className="tools-seo-section">
-          <h2>Common SLA Uptime Tiers Compared</h2>
+        <section className="tools-seo-section tools-seo-section-accent-right reveal">
+          <h2><span className="tools-info-icon"><Table2 size={20} /></span>Common SLA Uptime Tiers Compared</h2>
           <p>
             Different industries and service types require different levels of availability. Here is
             what each common SLA tier means in practical terms:
           </p>
-          <div className="tools-sla-comparison">
+          <div className="tools-sla-comparison uptime-sla-hover">
             <table className="tools-sla-table">
               <thead>
                 <tr>
@@ -133,8 +136,8 @@ export default function UptimeCalculatorPage(): React.ReactElement {
         </section>
 
         {/* Downtime cost section */}
-        <section className="tools-seo-section">
-          <h2>How Much Does Downtime Cost?</h2>
+        <section className="tools-seo-section reveal">
+          <h2><span className="tools-info-icon"><TrendingDown size={20} /></span>How Much Does Downtime Cost?</h2>
           <p>
             The cost of downtime varies dramatically by industry and company size. According to
             industry research, the average cost of IT downtime is estimated at <strong>$5,600 per
@@ -158,7 +161,7 @@ export default function UptimeCalculatorPage(): React.ReactElement {
         </section>
 
         {/* FAQ section */}
-        <section className="tools-seo-section">
+        <section>
           <Faq
             headline="Frequently Asked Questions"
             items={[

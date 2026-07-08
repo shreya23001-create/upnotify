@@ -8,6 +8,21 @@
  */
 
 import Link from 'next/link'
+import {
+  Activity,
+  ChevronRight,
+  Gauge,
+  Globe,
+  Lock,
+  Radar,
+  Search,
+  ShieldCheck,
+  Sparkles,
+  Timer,
+  type LucideIcon,
+} from 'lucide-react'
+import { ScrollReveal } from '@/components/landing/scroll-reveal'
+import Faq from '@/components/landing/faq'
 
 export interface PillarTool {
   /** Slug under /tools/<slug>. Must match an existing tool page directory.
@@ -58,9 +73,41 @@ export interface ToolPillarData {
   faq: PillarFaq[]
 }
 
+/** Pick a sensible Lucide icon for a tool/monitor card based on its label.
+ *  Best-effort keyword match — not exhaustive, falls back to a generic icon. */
+function iconForLabel(label: string): LucideIcon {
+  const l = label.toLowerCase()
+  if (l.includes('ssl') || l.includes('cert')) return Lock
+  if (l.includes('dns') || l.includes('sitemap') || l.includes('domain')) return Globe
+  if (l.includes('uptime') || l.includes('http') || l.includes('status')) return Activity
+  if (l.includes('security') || l.includes('header') || l.includes('blacklist')) return ShieldCheck
+  if (l.includes('speed') || l.includes('performance') || l.includes('response time')) return Gauge
+  if (l.includes('ai') || l.includes('llm')) return Sparkles
+  if (l.includes('seo') || l.includes('robots') || l.includes('redirect')) return Search
+  if (l.includes('keyword') || l.includes('page size')) return Radar
+  if (l.includes('sla') || l.includes('calculator')) return Timer
+  return Activity
+}
+
+/** Wrap the last word of a headline in the site's violet gradient span,
+ *  mirroring `.gradient-text`. Falls back to plain text if splitting would
+ *  look awkward (single-word titles). */
+function renderGradientTitle(title: string): React.ReactNode {
+  const words = title.trim().split(' ')
+  if (words.length < 2) return title
+  const lastWord = words.pop()
+  return (
+    <>
+      {words.join(' ')}{' '}
+      <span className="pillar-hero-title-gradient">{lastWord}</span>
+    </>
+  )
+}
+
 export function ToolPillarLanding({ data }: { data: ToolPillarData }): React.ReactElement {
   return (
     <>
+      <ScrollReveal />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -92,134 +139,93 @@ export function ToolPillarLanding({ data }: { data: ToolPillarData }): React.Rea
       />
 
       {/* Hero */}
-      <section style={{
-        background: 'var(--bg-subtle)',
-        borderBottom: '1px solid var(--border)',
-        padding: '56px 24px 52px',
-      }}>
-        <div style={{ maxWidth: 880, margin: '0 auto' }}>
-          <nav style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 28, display: 'flex', alignItems: 'center', gap: 6 }}>
-            <Link href="/tools" style={{ color: 'var(--accent)', fontWeight: 500 }}>All Free Tools</Link>
-            <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+      <section className="pillar-hero">
+        <div className="pillar-hero-inner">
+          <nav className="pillar-breadcrumb reveal-title">
+            <Link href="/tools">All Free Tools</Link>
+            <ChevronRight size={12} strokeWidth={2} />
             <span>{data.heroTitle}</span>
           </nav>
 
-          <div style={{
-            display: 'inline-block',
-            padding: '6px 14px',
-            background: 'var(--brand-gradient-soft)',
-            border: '1px solid rgba(59,130,246,0.2)',
-            borderRadius: 999,
-            fontSize: 12,
-            fontWeight: 700,
-            color: 'var(--accent)',
-            letterSpacing: '0.04em',
-            marginBottom: 18,
-          }}>FREE — NO SIGNUP</div>
+          <div className="pillar-hero-badge reveal-title">FREE — NO SIGNUP</div>
 
-          <h1 style={{
-            fontSize: 'clamp(28px, 4vw, 44px)',
-            fontWeight: 900,
-            letterSpacing: '-0.03em',
-            color: 'var(--text-primary)',
-            lineHeight: 1.15,
-            marginBottom: 14,
-          }}>
-            {data.heroTitle}
+          <h1 className="pillar-hero-title reveal-title">
+            {renderGradientTitle(data.heroTitle)}
           </h1>
-          <p style={{ fontSize: 18, color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: 28, maxWidth: 720 }}>
+          <p className="pillar-hero-subtitle reveal-title">
             {data.heroSubtitle}
           </p>
         </div>
       </section>
 
-      <main style={{ maxWidth: 880, margin: '0 auto', padding: '52px 24px 80px' }}>
+      <main className="pillar-main">
         {/* Why it matters */}
-        <section style={{ marginBottom: 56 }}>
-          <h2 style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--text-primary)', marginBottom: 16 }}>
-            Why this matters
-          </h2>
+        <section className="pillar-section">
+          <h2 className="pillar-section-title reveal-title">Why this matters</h2>
           {data.whyItMatters.map((para, i) => (
-            <p key={i} style={{ fontSize: 16, lineHeight: 1.75, color: 'var(--text-secondary)', marginBottom: 14 }}>
+            <p key={i} className="pillar-why-para reveal">
               {para}
             </p>
           ))}
         </section>
 
         {/* Tools in this pillar */}
-        <section style={{ marginBottom: 56 }}>
-          <h2 style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--text-primary)', marginBottom: 16 }}>
-            Free tools in this category
-          </h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))', gap: 14 }}>
-            {data.tools.map((tool) => (
-              <Link
-                key={tool.slug}
-                href={tool.href ?? `/tools/${tool.slug}`}
-                style={{
-                  padding: '20px 22px',
-                  background: 'var(--bg-card)',
-                  border: '1px solid var(--border)',
-                  borderRadius: 12,
-                  textDecoration: 'none',
-                  color: 'inherit',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 8,
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-                  <span style={{ fontWeight: 700, fontSize: 16, color: 'var(--text-primary)' }}>{tool.label}</span>
-                  {tool.badge && (
-                    <span style={{
-                      fontSize: 11,
-                      fontWeight: 700,
-                      letterSpacing: '0.04em',
-                      color: 'var(--accent)',
-                      textTransform: 'uppercase',
-                      background: 'var(--brand-gradient-soft)',
-                      padding: '2px 8px',
-                      borderRadius: 999,
-                    }}>{tool.badge}</span>
-                  )}
-                </div>
-                <p style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--text-secondary)', margin: 0 }}>{tool.oneLiner}</p>
-                <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--accent)', marginTop: 4 }}>Use this tool →</span>
-              </Link>
-            ))}
+        <section className="pillar-section">
+          <h2 className="pillar-section-title reveal-title">Free tools in this category</h2>
+          <div className="pillar-tools-grid reveal-stagger">
+            {data.tools.map((tool) => {
+              const Icon = iconForLabel(tool.label)
+              return (
+                <Link
+                  key={tool.slug}
+                  href={tool.href ?? `/tools/${tool.slug}`}
+                  className="pillar-tool-card"
+                >
+                  <div className="pillar-tool-card-head">
+                    <span className="pillar-tool-card-title">
+                      <span className="pillar-icon-badge">
+                        <Icon size={16} strokeWidth={2.2} />
+                      </span>
+                      {tool.label}
+                    </span>
+                    {tool.badge && (
+                      <span className="pillar-tool-card-badge">{tool.badge}</span>
+                    )}
+                  </div>
+                  <p className="pillar-tool-card-desc">{tool.oneLiner}</p>
+                  <span className="pillar-tool-card-cta">Use this tool →</span>
+                </Link>
+              )
+            })}
           </div>
         </section>
 
         {/* Continuous monitors */}
-        <section style={{ marginBottom: 56 }}>
-          <h2 style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--text-primary)', marginBottom: 8 }}>
+        <section className="pillar-section">
+          <h2 className="pillar-section-title reveal-title" style={{ marginBottom: 8 }}>
             Want continuous monitoring instead of one-off?
           </h2>
-          <p style={{ fontSize: 15, color: 'var(--text-secondary)', marginBottom: 20 }}>
+          <p className="pillar-section-lede reveal-title">
             Each tool above runs a one-off check. To get alerted whenever something changes,
             set up a continuous monitor:
           </p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {data.monitors.map((m) => (
-              <div key={m.slug} style={{
-                padding: '14px 18px',
-                background: 'var(--bg-card)',
-                border: '1px solid var(--border)',
-                borderRadius: 10,
-              }}>
-                <div style={{ marginBottom: 4 }}>
-                  <Link href={`/monitoring/${m.slug}`} style={{
-                    fontSize: 15, fontWeight: 700, color: 'var(--text-primary)',
-                    textDecoration: 'none',
-                  }}>
-                    {m.label} →
-                  </Link>
+          <div className="pillar-monitor-list reveal-stagger">
+            {data.monitors.map((m) => {
+              const Icon = iconForLabel(m.label)
+              return (
+                <div key={m.slug} className="pillar-monitor-card">
+                  <div className="pillar-monitor-card-head">
+                    <span className="pillar-icon-badge">
+                      <Icon size={16} strokeWidth={2.2} />
+                    </span>
+                    <Link href={`/monitoring/${m.slug}`}>{m.label} →</Link>
+                  </div>
+                  <p className="pillar-monitor-card-why">{m.why}</p>
                 </div>
-                <p style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--text-secondary)', margin: 0 }}>{m.why}</p>
-              </div>
-            ))}
+              )
+            })}
           </div>
-          <p style={{ marginTop: 20, fontSize: 14, color: 'var(--text-muted)' }}>
+          <p className="pillar-monitor-footer">
             Or browse <Link href="/monitoring">all 24 monitor types</Link> · run a one-off{' '}
             <Link href="/score">Website Health Score</Link> · see all{' '}
             <Link href="/tools">free monitoring tools</Link>.
@@ -227,55 +233,21 @@ export function ToolPillarLanding({ data }: { data: ToolPillarData }): React.Rea
         </section>
 
         {/* Inline CTA */}
-        <div style={{
-          background: 'var(--brand-gradient)',
-          borderRadius: 14,
-          padding: '28px 32px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: 20,
-          marginBottom: 56,
-        }}>
+        <div className="pillar-cta reveal">
           <div>
-            <div style={{ fontWeight: 700, fontSize: 16, color: '#fff', marginBottom: 4 }}>Stop running one-off checks. Start monitoring.</div>
-            <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)' }}>Free plan · 3 monitors · No credit card required</div>
+            <div className="pillar-cta-copy-title">Stop running one-off checks. Start monitoring.</div>
+            <div className="pillar-cta-copy-sub">Free plan · 3 monitors · No credit card required</div>
           </div>
-          <Link href="/signup" style={{
-            background: '#fff',
-            color: 'var(--brand-blue)',
-            padding: '10px 22px',
-            borderRadius: 8,
-            fontWeight: 700,
-            fontSize: 14,
-            textDecoration: 'none',
-            whiteSpace: 'nowrap',
-            flexShrink: 0,
-          }}>
+          <Link href="/signup" className="pillar-cta-button">
             Start Free →
           </Link>
         </div>
 
         {/* FAQ */}
-        <section style={{ marginBottom: 24 }}>
-          <h2 style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--text-primary)', marginBottom: 20 }}>
-            Frequently asked questions
-          </h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {data.faq.map((item, i) => (
-              <div key={i} style={{
-                padding: '16px 20px',
-                background: 'var(--bg-card)',
-                border: '1px solid var(--border)',
-                borderRadius: 10,
-              }}>
-                <div style={{ fontWeight: 600, fontSize: 15, color: 'var(--text-primary)', marginBottom: 6 }}>{item.q}</div>
-                <div style={{ fontSize: 14, lineHeight: 1.7, color: 'var(--text-secondary)' }}>{item.a}</div>
-              </div>
-            ))}
-          </div>
-        </section>
+        <Faq
+          items={data.faq.map((item) => ({ question: item.q, answer: item.a }))}
+          headline="Frequently asked questions"
+        />
       </main>
     </>
   )

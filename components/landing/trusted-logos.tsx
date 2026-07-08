@@ -48,9 +48,19 @@ export async function TrustedLogos(): Promise<React.ReactElement> {
   const rowB = names.slice(mid)
 
   return (
-    <div className="sp-logos">
-      <LogoRow names={rowA} direction="left" />
-      <LogoRow names={rowB} direction="right" />
-    </div>
+    <>
+      {/* Desktop/tablet: static wrapping row */}
+      <div className="sp-logos sp-logos-desktop">
+        {names.map((name) => (
+          <div key={name} className="sp-logo-item">{name}</div>
+        ))}
+      </div>
+
+      {/* Mobile: 2-row infinite marquee */}
+      <div className="sp-logos sp-logos-mobile">
+        <LogoRow names={rowA} direction="left" />
+        <LogoRow names={rowB} direction="right" />
+      </div>
+    </>
   )
 }

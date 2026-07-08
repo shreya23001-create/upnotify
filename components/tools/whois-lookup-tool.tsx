@@ -301,7 +301,8 @@ export function WhoisLookupTool(): React.ReactElement {
         .whois-row {
           display: flex;
           align-items: flex-start;
-          gap: 12px;
+          flex-wrap: wrap;
+          gap: 4px 12px;
           padding: 6px 0;
           border-bottom: 1px solid var(--bg-muted);
         }

@@ -196,7 +196,7 @@ export function RedirectChainCheckerTool(): React.ReactElement {
                 return (
                   <div key={idx}>
                     <div
-                      className="card"
+                      className="card redirect-chain-step"
                       style={{
                         padding: '0.875rem 1.25rem',
                         borderLeft: `3px solid ${statusColor(step.status)}`,
@@ -315,6 +315,19 @@ export function RedirectChainCheckerTool(): React.ReactElement {
         </div>
       )}
       {result && <MonitorNudge toolType="redirect-chain" domain={toolDomain(result.originalUrl)} detail={String(result.totalHops)} />}
+
+      <style>{`
+        @media (max-width: 480px) {
+          .redirect-chain-step {
+            grid-template-columns: auto 1fr !important;
+          }
+          .redirect-chain-step > div:last-child {
+            grid-column: 1 / -1;
+            text-align: left !important;
+            padding-left: 3rem;
+          }
+        }
+      `}</style>
     </div>
   )
 }
