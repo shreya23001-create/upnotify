@@ -249,35 +249,37 @@ export function HttpStatusCheckerTool(): React.ReactElement {
                 Response Headers
               </h3>
               <div className="card" style={{ overflow: 'hidden' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8125rem' }}>
-                  <thead>
-                    <tr style={{ borderBottom: '1px solid var(--color-border)' }}>
-                      <th style={{ textAlign: 'left', padding: '0.5rem 1rem', fontWeight: 600, color: 'var(--color-text-secondary)', width: '40%' }}>
-                        Header
-                      </th>
-                      <th style={{ textAlign: 'left', padding: '0.5rem 1rem', fontWeight: 600, color: 'var(--color-text-secondary)' }}>
-                        Value
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {finalHeaderEntries.map(([name, value], idx) => (
-                      <tr
-                        key={name}
-                        style={{
-                          borderBottom: idx < finalHeaderEntries.length - 1 ? '1px solid var(--color-border)' : 'none',
-                        }}
-                      >
-                        <td style={{ padding: '0.5rem 1rem', fontFamily: 'monospace', color: 'var(--color-text-secondary)' }}>
-                          {formatHeaderName(name)}
-                        </td>
-                        <td style={{ padding: '0.5rem 1rem', wordBreak: 'break-all', fontFamily: 'monospace' }}>
-                          {value}
-                        </td>
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', minWidth: '360px', borderCollapse: 'collapse', fontSize: '0.8125rem' }}>
+                    <thead>
+                      <tr style={{ borderBottom: '1px solid var(--color-border)' }}>
+                        <th style={{ textAlign: 'left', padding: '0.5rem 1rem', fontWeight: 600, color: 'var(--color-text-secondary)', width: '40%', whiteSpace: 'nowrap' }}>
+                          Header
+                        </th>
+                        <th style={{ textAlign: 'left', padding: '0.5rem 1rem', fontWeight: 600, color: 'var(--color-text-secondary)' }}>
+                          Value
+                        </th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {finalHeaderEntries.map(([name, value], idx) => (
+                        <tr
+                          key={name}
+                          style={{
+                            borderBottom: idx < finalHeaderEntries.length - 1 ? '1px solid var(--color-border)' : 'none',
+                          }}
+                        >
+                          <td style={{ padding: '0.5rem 1rem', fontFamily: 'monospace', color: 'var(--color-text-secondary)', wordBreak: 'break-word' }}>
+                            {formatHeaderName(name)}
+                          </td>
+                          <td style={{ padding: '0.5rem 1rem', wordBreak: 'break-all', fontFamily: 'monospace' }}>
+                            {value}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           )}

@@ -5,6 +5,7 @@
 
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { Activity, KeyRound, Target, Plug, Clock, Server } from 'lucide-react'
 import { ScoreForm } from '@/components/score/score-form'
 import Faq from '@/components/landing/faq'
 
@@ -14,6 +15,45 @@ export const metadata: Metadata = {
     'Free website health score across 5 categories — uptime, SSL, DNS, security headers, and performance. Instant grade from A+ to F. No signup required. Pairs with continuous uptime monitoring.',
   alternates: { canonical: 'https://uptrue.io/score' },
 }
+
+const CONTINUOUS_MONITORS = [
+  {
+    icon: Activity,
+    href: '/monitoring/http-uptime-monitoring',
+    title: 'HTTP uptime monitoring',
+    desc: 'Be alerted the moment your site stops responding.',
+  },
+  {
+    icon: KeyRound,
+    href: '/monitoring/ssl-certificate-monitoring',
+    title: 'SSL certificate monitoring',
+    desc: 'Get warned 30, 14 and 3 days before expiry.',
+  },
+  {
+    icon: Target,
+    href: '/monitoring/dns-monitoring',
+    title: 'DNS record monitoring',
+    desc: 'Detect unauthorised record changes within minutes.',
+  },
+  {
+    icon: Plug,
+    href: '/monitoring/security-headers-monitoring',
+    title: 'Security headers monitoring',
+    desc: 'Spot when HSTS, CSP or X-Frame-Options drop off.',
+  },
+  {
+    icon: Clock,
+    href: '/monitoring/response-time-monitoring',
+    title: 'Response time monitoring',
+    desc: 'Catch performance degradation before it bites.',
+  },
+  {
+    icon: Server,
+    href: '/tools',
+    title: 'Free website tools',
+    desc: 'SSL, DNS, security headers, blacklist and more — no signup required.',
+  },
+]
 
 const FAQ = [
   {
@@ -84,24 +124,25 @@ export default function ScorePage(): React.ReactElement {
       </div>
 
       {/* Related continuous monitors — each score category maps to a continuous monitor type */}
-      <section className="landing-section">
-        <div className="landing-container" style={{ maxWidth: 880 }}>
+      <section className="score-continuous-section">
+        <div className="landing-container" style={{ maxWidth: 1080 }}>
           <h2 className="landing-section-title">Score is a snapshot — monitor it continuously</h2>
           <p className="landing-section-subtitle">
             A one-off score tells you the state right now. To catch regressions before
             customers do, set up continuous monitoring on the categories that matter to you.
           </p>
-          <ul className="about-list" style={{ marginTop: 24, fontSize: 15, lineHeight: 1.9 }}>
-            <li><Link href="/monitoring/http-uptime-monitoring">HTTP uptime monitoring</Link> — be alerted the moment your site stops responding.</li>
-            <li><Link href="/monitoring/ssl-certificate-monitoring">SSL certificate monitoring</Link> — get warned 30, 14 and 3 days before expiry.</li>
-            <li><Link href="/monitoring/dns-monitoring">DNS record monitoring</Link> — detect unauthorised record changes within minutes.</li>
-            <li><Link href="/monitoring/security-headers-monitoring">Security headers monitoring</Link> — spot when HSTS, CSP or X-Frame-Options drop off.</li>
-            <li><Link href="/monitoring/response-time-monitoring">Response time monitoring</Link> — catch performance degradation before it bites.</li>
-          </ul>
-          <p style={{ marginTop: 20, fontSize: 14, color: 'var(--text-muted)' }}>
-            Or browse all <Link href="/tools">free website monitoring tools</Link> — SSL, DNS,
-            security headers, blacklist and more, no signup required.
-          </p>
+          <div className="score-continuous-grid">
+            {CONTINUOUS_MONITORS.map(({ icon: Icon, href, title, desc }) => (
+              <Link key={href} href={href} className="score-continuous-card">
+                <div className="score-continuous-icon-wrap">
+                  <span className="score-continuous-ping" />
+                  <span className="score-continuous-icon"><Icon size={26} strokeWidth={1.75} /></span>
+                </div>
+                <div className="score-continuous-title">{title}</div>
+                <div className="score-continuous-desc">{desc}</div>
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 

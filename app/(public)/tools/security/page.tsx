@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { ToolPillarLanding, type ToolPillarData } from '@/components/landing/tool-pillar-landing'
+import '../../landing.css'
 
 const data: ToolPillarData = {
   pillarSlug: 'security',

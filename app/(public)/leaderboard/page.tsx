@@ -1,7 +1,10 @@
+import '../landing.css'
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { Activity, Lock, Globe, Gauge, Clock, Trophy } from 'lucide-react'
 import { getLeaderboardEntries } from '@/lib/db/leaderboard'
 import Faq from '@/components/landing/faq'
+import { ScrollReveal } from '@/components/landing/scroll-reveal'
 
 // engineering-app#69 — was force-dynamic; load test showed the page
 // killed sessions at 50+ concurrent users (heavy aggregation query).
@@ -69,6 +72,39 @@ function getRankBadge(rank: number): string {
   return ''
 }
 
+const RELATED_MONITORS = [
+  {
+    icon: Activity,
+    href: '/monitoring/http-uptime-monitoring',
+    title: 'HTTP uptime monitoring',
+    desc: 'The foundational check that drives the leaderboard percentage.',
+  },
+  {
+    icon: Lock,
+    href: '/monitoring/ssl-certificate-monitoring',
+    title: 'SSL certificate monitoring',
+    desc: 'Expired certificates are one of the top causes of uptime drops.',
+  },
+  {
+    icon: Globe,
+    href: '/monitoring/dns-monitoring',
+    title: 'DNS record monitoring',
+    desc: 'DNS misconfiguration takes more sites offline than infrastructure failure.',
+  },
+  {
+    icon: Gauge,
+    href: '/monitoring/response-time-monitoring',
+    title: 'Response time monitoring',
+    desc: 'Slow responses count against availability on most strict SLAs.',
+  },
+  {
+    icon: Clock,
+    href: '/monitoring/domain-expiry-monitoring',
+    title: 'Domain expiry monitoring',
+    desc: 'Expired domains are a common, embarrassing reason sites drop off the leaderboard.',
+  },
+]
+
 function getUptimeColor(pct: number): string {
   if (pct >= 99.99) return 'var(--color-success, #22c55e)'
   if (pct >= 99.9) return 'var(--color-success, #22c55e)'
@@ -81,11 +117,18 @@ export default async function LeaderboardPage(): Promise<React.ReactElement> {
 
   return (
     <div className="leaderboard-page">
+      <ScrollReveal />
+
       <div className="leaderboard-hero">
-        <h1 className="leaderboard-hero-title">Uptime Leaderboard</h1>
-        <p className="leaderboard-hero-subtitle">
-          The most reliable websites ranked by uptime. Updated every 5 minutes
-          from real monitoring data.
+        <div className="leaderboard-hero-badge reveal-title">
+          <Trophy size={14} /> Live rankings, updated every 5 minutes
+        </div>
+        <h1 className="leaderboard-hero-title reveal-title">
+          Uptime <span className="gradient-text leaderboard-title-gradient">Leaderboard</span>
+        </h1>
+        <p className="leaderboard-hero-subtitle reveal">
+          The most reliable websites ranked by uptime — real monitoring data,
+          no self-reported numbers.
         </p>
       </div>
 
@@ -93,7 +136,7 @@ export default async function LeaderboardPage(): Promise<React.ReactElement> {
         {entries.length > 0 && (
           <>
             {/* Top 3 podium */}
-            <div className="leaderboard-podium">
+            <div className="leaderboard-podium reveal-stagger">
               {entries.slice(0, 3).map((entry, idx) => (
                 <div
                   key={entry.id}
@@ -192,7 +235,7 @@ export default async function LeaderboardPage(): Promise<React.ReactElement> {
         )}
 
         {/* Badge section */}
-        <div className="leaderboard-badge-section">
+        <div className="leaderboard-badge-section reveal">
           <h2 className="leaderboard-badge-title">Earn a Leaderboard Badge</h2>
           <p className="leaderboard-badge-text">
             Sites ranked in the top 10 can embed a &quot;Top 10 on Uptrue Leaderboard&quot;
@@ -209,19 +252,23 @@ export default async function LeaderboardPage(): Promise<React.ReactElement> {
         {/* Related continuous monitors */}
         <section className="landing-section">
           <div className="landing-container" style={{ maxWidth: 880 }}>
-            <h2 className="landing-section-title">Hit the leaderboard with your own monitors</h2>
-            <p className="landing-section-subtitle">
+            <h2 className="landing-section-title reveal-title">Hit the leaderboard with your own monitors</h2>
+            <p className="landing-section-subtitle reveal">
               Sites at the top of this leaderboard run more than just an uptime check.
               Match the standard with continuous monitoring across the categories that
               matter:
             </p>
-            <ul className="about-list" style={{ marginTop: 24, fontSize: 15, lineHeight: 1.9 }}>
-              <li><Link href="/monitoring/http-uptime-monitoring">HTTP uptime monitoring</Link> — the foundational check that drives the leaderboard percentage.</li>
-              <li><Link href="/monitoring/ssl-certificate-monitoring">SSL certificate monitoring</Link> — expired certificates are one of the top causes of uptime drops.</li>
-              <li><Link href="/monitoring/dns-monitoring">DNS record monitoring</Link> — DNS misconfiguration takes more sites offline than infrastructure failure.</li>
-              <li><Link href="/monitoring/response-time-monitoring">Response time monitoring</Link> — slow responses count against availability on most strict SLAs.</li>
-              <li><Link href="/monitoring/domain-expiry-monitoring">Domain expiry monitoring</Link> — expired domains are a common, embarrassing reason sites drop off the leaderboard.</li>
-            </ul>
+            <div className="leaderboard-related-grid reveal-stagger">
+              {RELATED_MONITORS.map(({ icon: Icon, href, title, desc }) => (
+                <Link key={href} href={href} className="leaderboard-related-card">
+                  <span className="leaderboard-related-icon">
+                    <Icon size={24} strokeWidth={1.75} />
+                  </span>
+                  <div className="leaderboard-related-title">{title}</div>
+                  <div className="leaderboard-related-desc">{desc}</div>
+                </Link>
+              ))}
+            </div>
             <p style={{ marginTop: 20, fontSize: 14, color: 'var(--text-muted)' }}>
               Or run a one-off <Link href="/score">website health score</Link> to see how
               your site stacks up before you start monitoring.
@@ -252,7 +299,7 @@ export default async function LeaderboardPage(): Promise<React.ReactElement> {
         />
 
         {/* CTA */}
-        <div className="leaderboard-cta">
+        <div className="leaderboard-cta reveal">
           <h2>Want your site on the leaderboard?</h2>
           <p>
             Start monitoring your uptime for free and climb the rankings.{' '}

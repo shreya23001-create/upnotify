@@ -116,25 +116,22 @@ export function UptimeCalculatorTool(): React.ReactElement {
 
           {downtimeResult && (
             <div className="uptime-calc-results">
-              <h3 className="uptime-calc-results-title">
-                Allowed Downtime at {uptimeValue}% Uptime
-              </h3>
+              <div className="uptime-calc-hero">
+                <span className="uptime-calc-hero-label">Allowed downtime per year at {uptimeValue}% uptime</span>
+                <span key={downtimeResult.perYear} className="uptime-calc-hero-value">{downtimeResult.perYear}</span>
+              </div>
               <div className="uptime-calc-results-grid">
-                <div className="card uptime-calc-result-card">
-                  <span className="uptime-calc-result-period">Per Year</span>
-                  <span className="uptime-calc-result-value">{downtimeResult.perYear}</span>
-                </div>
-                <div className="card uptime-calc-result-card">
+                <div className="uptime-calc-result-card">
                   <span className="uptime-calc-result-period">Per Month</span>
-                  <span className="uptime-calc-result-value">{downtimeResult.perMonth}</span>
+                  <span key={downtimeResult.perMonth} className="uptime-calc-result-value">{downtimeResult.perMonth}</span>
                 </div>
-                <div className="card uptime-calc-result-card">
+                <div className="uptime-calc-result-card">
                   <span className="uptime-calc-result-period">Per Week</span>
-                  <span className="uptime-calc-result-value">{downtimeResult.perWeek}</span>
+                  <span key={downtimeResult.perWeek} className="uptime-calc-result-value">{downtimeResult.perWeek}</span>
                 </div>
-                <div className="card uptime-calc-result-card">
+                <div className="uptime-calc-result-card">
                   <span className="uptime-calc-result-period">Per Day</span>
-                  <span className="uptime-calc-result-value">{downtimeResult.perDay}</span>
+                  <span key={downtimeResult.perDay} className="uptime-calc-result-value">{downtimeResult.perDay}</span>
                 </div>
               </div>
             </div>
@@ -162,22 +159,20 @@ export function UptimeCalculatorTool(): React.ReactElement {
 
           {reversePct !== null && isValidDowntime && (
             <div className="uptime-calc-results">
-              <h3 className="uptime-calc-results-title">
-                {downtimeMinutesValue} min/month = {reversePct}% Uptime
-              </h3>
-              <div className="uptime-calc-results-grid">
-                <div className="card uptime-calc-result-card">
-                  <span className="uptime-calc-result-period">Uptime %</span>
-                  <span className="uptime-calc-result-value"
-                    style={{ color: reversePct >= 99.9
-                      ? 'var(--color-success, #22c55e)'
-                      : reversePct >= 99
-                        ? 'var(--color-warning, #f59e0b)'
-                        : 'var(--color-danger, #ef4444)'
-                    }}>
-                    {reversePct}%
-                  </span>
-                </div>
+              <div className="uptime-calc-hero">
+                <span className="uptime-calc-hero-label">{downtimeMinutesValue} min/month allowed downtime equals</span>
+                <span
+                  key={reversePct}
+                  className="uptime-calc-hero-value"
+                  style={{ color: reversePct >= 99.9
+                    ? 'var(--color-success, #22c55e)'
+                    : reversePct >= 99
+                      ? 'var(--color-warning, #f59e0b)'
+                      : 'var(--color-danger, #ef4444)'
+                  }}>
+                  {reversePct}%
+                </span>
+                <span className="uptime-calc-hero-sub">uptime</span>
               </div>
             </div>
           )}
@@ -185,7 +180,7 @@ export function UptimeCalculatorTool(): React.ReactElement {
       )}
 
       {/* SLA comparison table */}
-      <div className="card uptime-calc-sla-table-card">
+      <div className="uptime-calc-sla-table-card">
         <h3 style={{ margin: '0 0 16px' }}>SLA Comparison Table</h3>
         <table className="uptime-calc-sla-table">
           <thead>
