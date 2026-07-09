@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Suspense } from 'react'
+import { Mail, Building2, Handshake } from 'lucide-react'
 import {
   OrganizationJsonLd,
 } from '@/components/seo/json-ld'
@@ -23,19 +24,19 @@ export const metadata: Metadata = {
 
 const CONTACT_CHANNELS = [
   {
-    icon: '\u{1F4E7}',
+    icon: Mail,
     title: 'General Support',
     description: 'Questions about your account, billing, or monitoring setup.',
     email: 'support@uptrue.io',
   },
   {
-    icon: '\u{1F3E2}',
+    icon: Building2,
     title: 'For Agencies',
     description: 'White-label, multi-client workspaces, and revenue sharing enquiries.',
     email: 'agencies@uptrue.io',
   },
   {
-    icon: '\u{1F91D}',
+    icon: Handshake,
     title: 'Partnerships',
     description: 'Integration partnerships, reseller programmes, and collaboration.',
     email: 'partners@uptrue.io',
@@ -64,16 +65,19 @@ export default function ContactPage(): React.ReactElement {
       <section className="landing-section">
         <div className="landing-container">
           <div className="contact-channels">
-            {CONTACT_CHANNELS.map((channel) => (
-              <div key={channel.email} className="contact-channel-card">
-                <div className="feature-icon">{channel.icon}</div>
-                <h3 className="feature-title">{channel.title}</h3>
-                <p className="feature-description">{channel.description}</p>
-                <a href={`mailto:${channel.email}`} className="contact-email-link">
-                  {channel.email}
-                </a>
-              </div>
-            ))}
+            {CONTACT_CHANNELS.map((channel) => {
+              const Icon = channel.icon
+              return (
+                <div key={channel.email} className="contact-channel-card">
+                  <div className="contact-channel-icon"><Icon size={22} /></div>
+                  <h3 className="feature-title">{channel.title}</h3>
+                  <p className="feature-description">{channel.description}</p>
+                  <a href={`mailto:${channel.email}`} className="contact-email-link">
+                    {channel.email}
+                  </a>
+                </div>
+              )
+            })}
           </div>
         </div>
       </section>

@@ -1,4 +1,7 @@
+import '../landing.css'
 import type { Metadata } from 'next'
+import { Rocket, Sparkles, ArrowUpCircle, Wrench, Mail } from 'lucide-react'
+import { ScrollReveal } from '@/components/landing/scroll-reveal'
 
 export const metadata: Metadata = {
   title: 'Changelog — Uptrue',
@@ -17,7 +20,7 @@ const ENTRIES = [
     date: 'April 2026',
     version: 'v1.0',
     badge: 'Launch',
-    badgeColor: '#3b82f6',
+    badgeIcon: Rocket,
     items: [
       { type: 'new',      text: '13 advanced monitor types — security headers, response time threshold, robots.txt change, IP change, MX health, WHOIS change, sitemap validity, redirect chain, SPF/DMARC, blacklist, page size, cookie consent, and nameserver change' },
       { type: 'new',      text: 'AI SEO Checker — free public tool to score any website\'s AI readiness across 4 categories' },
@@ -34,7 +37,7 @@ const ENTRIES = [
     date: 'March 2026',
     version: 'v0.9',
     badge: 'Beta',
-    badgeColor: '#8b5cf6',
+    badgeIcon: Sparkles,
     items: [
       { type: 'new', text: 'Uptrue launched — 10 core monitor types: HTTP/HTTPS uptime, SSL certificate, DNS records, keyword detection, domain expiry, port check, ping, API endpoint, heartbeat, and page change detection' },
       { type: 'new', text: 'Alert channels — email, Slack, Microsoft Teams, Telegram, and HMAC-signed webhooks' },
@@ -45,64 +48,70 @@ const ENTRIES = [
   },
 ]
 
-const TYPE_LABELS: Record<string, { label: string; color: string; bg: string }> = {
-  new:      { label: 'New',      color: '#16a34a', bg: '#dcfce7' },
-  improved: { label: 'Improved', color: '#2563eb', bg: '#dbeafe' },
-  fixed:    { label: 'Fixed',    color: '#d97706', bg: '#fef3c7' },
+const TYPE_LABELS: Record<string, { label: string; icon: typeof Sparkles; className: string }> = {
+  new:      { label: 'New',      icon: Sparkles,      className: 'is-new' },
+  improved: { label: 'Improved', icon: ArrowUpCircle, className: 'is-improved' },
+  fixed:    { label: 'Fixed',    icon: Wrench,         className: 'is-fixed' },
 }
 
 export default function ChangelogPage(): React.ReactElement {
   return (
     <div className="landing">
-      
+      <ScrollReveal />
 
       <section className="changelog-hero">
         <div className="container" style={{ maxWidth: 760, padding: '80px 24px 48px' }}>
-          <h1 className="changelog-title">Changelog</h1>
-          <p className="changelog-subtitle">
+          <h1 className="changelog-title reveal-title">Changelog</h1>
+          <p className="changelog-subtitle reveal-title">
             Every update, improvement, and new feature we ship — newest first.
           </p>
         </div>
       </section>
 
       <section style={{ padding: '0 24px 80px' }}>
-        <div style={{ maxWidth: 760, margin: '0 auto' }}>
-          {ENTRIES.map((entry, ei) => (
-            <div key={ei} className="changelog-entry">
-
-              {/* Entry header */}
-              <div className="changelog-entry-header">
-                <div className="changelog-entry-meta">
-                  <span className="changelog-date">{entry.date}</span>
-                  <span className="changelog-version">{entry.version}</span>
-                  <span className="changelog-badge" style={{ background: entry.badgeColor }}>
-                    {entry.badge}
-                  </span>
+        <div className="changelog-timeline" style={{ maxWidth: 760, margin: '0 auto' }}>
+          {ENTRIES.map((entry, ei) => {
+            const BadgeIcon = entry.badgeIcon
+            return (
+              <div key={ei} className="changelog-entry reveal">
+                <div className="changelog-entry-dot">
+                  <BadgeIcon size={16} strokeWidth={2.25} />
                 </div>
-                <div className="changelog-divider" />
+
+                <div className="changelog-entry-body">
+                  {/* Entry header */}
+                  <div className="changelog-entry-header">
+                    <div className="changelog-entry-meta">
+                      <span className="changelog-date">{entry.date}</span>
+                      <span className="changelog-version">{entry.version}</span>
+                      <span className="changelog-badge">{entry.badge}</span>
+                    </div>
+                  </div>
+
+                  {/* Items */}
+                  <ul className="changelog-items reveal-stagger">
+                    {entry.items.map((item, ii) => {
+                      const t = TYPE_LABELS[item.type] ?? TYPE_LABELS.new
+                      const TypeIcon = t.icon
+                      return (
+                        <li key={ii} className="changelog-item">
+                          <span className={`changelog-type-badge ${t.className}`}>
+                            <TypeIcon size={12} strokeWidth={2.5} />
+                            {t.label}
+                          </span>
+                          <span className="changelog-item-text">{item.text}</span>
+                        </li>
+                      )
+                    })}
+                  </ul>
+                </div>
               </div>
-
-              {/* Items */}
-              <ul className="changelog-items">
-                {entry.items.map((item, ii) => {
-                  const t = TYPE_LABELS[item.type] ?? TYPE_LABELS.new
-                  return (
-                    <li key={ii} className="changelog-item">
-                      <span className="changelog-type-badge" style={{ color: t.color, background: t.bg }}>
-                        {t.label}
-                      </span>
-                      <span className="changelog-item-text">{item.text}</span>
-                    </li>
-                  )
-                })}
-              </ul>
-
-            </div>
-          ))}
+            )
+          })}
 
           {/* Subscribe nudge */}
-          <div className="changelog-subscribe">
-            <div className="changelog-subscribe-icon">📬</div>
+          <div className="changelog-subscribe reveal">
+            <div className="changelog-subscribe-icon"><Mail size={22} /></div>
             <div>
               <div className="changelog-subscribe-title">Stay in the loop</div>
               <div className="changelog-subscribe-desc">
@@ -114,8 +123,6 @@ export default function ChangelogPage(): React.ReactElement {
 
         </div>
       </section>
-
-      
     </div>
   )
 }

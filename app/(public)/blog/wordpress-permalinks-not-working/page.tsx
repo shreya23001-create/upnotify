@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { JsonLd } from '@/components/seo/json-ld'
+import Faq from '@/components/landing/faq'
 
 export const metadata: Metadata = {
   title: 'WordPress Permalink Changes Breaking All URLs: How to Prevent SEO Disaster',
@@ -348,16 +349,10 @@ export default function WordPressPermalinksNotWorkingPage(): React.ReactElement 
           </div>
         </div>
 
-        <h2>Frequently asked questions</h2>
-
-        <div className="blog-faq-list">
-          {FAQ_DATA.map((faq) => (
-            <div key={faq.question} className="blog-faq-item">
-              <h3>{faq.question}</h3>
-              <p>{faq.answer}</p>
-            </div>
-          ))}
         </div>
+
+      <div className="reveal">
+        <Faq items={FAQ_DATA} headline="Frequently asked questions" />
       </div>
 
       <footer className="blog-article-footer">

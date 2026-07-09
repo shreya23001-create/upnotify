@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { Lock, ShieldCheck, Zap, BadgeCheck } from 'lucide-react'
 import { getLandingSection } from '@/lib/db/page-sections'
 import type { FooterContent } from '@/lib/types/cms'
 
@@ -10,10 +11,24 @@ type FooterColumn = { title: string; links: FooterLink[] }
 const DEFAULT_DESCRIPTION = 'Uptime, performance & infrastructure monitoring for agencies and teams.'
 
 const DEFAULT_TRUST_ITEMS = [
-  '🔒 Secure Payments via Stripe',
-  '🛡️ GDPR Compliant · EU Data (Frankfurt)',
-  '⚡ 99.9% SLA',
+  'Secure Payments via Stripe',
+  'GDPR Compliant · EU Data (Frankfurt)',
+  '99.9% SLA',
 ]
+
+// Strips a leading emoji from CMS-sourced strings (older seeded content
+// baked emoji into the text) so we can render a matching Lucide icon instead.
+function stripLeadingEmoji(text: string): string {
+  return text.replace(/^\p{Emoji_Presentation}\p{Extended_Pictographic}?\s*/u, '').trim()
+}
+
+function trustIcon(text: string): React.ReactElement {
+  const lower = text.toLowerCase()
+  if (lower.includes('payment') || lower.includes('stripe')) return <Lock size={13} />
+  if (lower.includes('gdpr') || lower.includes('data')) return <ShieldCheck size={13} />
+  if (lower.includes('sla') || lower.includes('uptime')) return <Zap size={13} />
+  return <BadgeCheck size={13} />
+}
 
 const DEFAULT_COLUMNS: FooterColumn[] = [
   {
@@ -105,9 +120,15 @@ export async function PublicFooter(): Promise<React.ReactElement> {
             </Link>
             <p className="footer-desc">{description}</p>
             <div className="footer-trust">
-              {trustItems.map((item) => (
-                <div key={item} className="footer-trust-item">{item}</div>
-              ))}
+              {trustItems.map((item) => {
+                const label = stripLeadingEmoji(item)
+                return (
+                  <div key={item} className="footer-trust-item">
+                    <span className="footer-trust-icon">{trustIcon(label)}</span>
+                    {label}
+                  </div>
+                )
+              })}
             </div>
           </div>
 

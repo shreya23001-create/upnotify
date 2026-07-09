@@ -232,7 +232,7 @@ html.dark .hero-score-cta:hover {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(255, 255, 255, 0.85);
+  background: linear-gradient(135deg, #f0f5ff 0%, #eaf6fd 30%, #f3eeff 60%, #e8f8fc 85%, #f0f5ff 100%) 0 0 / 400% 400%;
   backdrop-filter: blur(16px) saturate(180%);
   border-bottom: 1px solid var(--border);
   height: 60px;
@@ -2202,7 +2202,7 @@ html.dark .wp-monitor-stats-label {
 
 .mtd-check-card:hover {
   border-color: #10b981;
-  box-shadow: 0 4px 14px rgba(16,185,129,0.12);
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.12);
   transform: translateY(-2px);
 }
 
@@ -2214,7 +2214,7 @@ html.dark .wp-monitor-stats-label {
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: rgba(16,185,129,0.1);
+  background: rgba(16, 185, 129, 0.1);
   color: #10b981;
 }
 
@@ -2250,7 +2250,7 @@ html.dark .wp-monitor-stats-label {
 }
 
 .mtd-alert-card:hover {
-  box-shadow: 0 4px 14px rgba(239,68,68,0.1);
+  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.1);
   transform: translateY(-2px);
 }
 
@@ -2262,7 +2262,7 @@ html.dark .wp-monitor-stats-label {
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: rgba(239,68,68,0.12);
+  background: rgba(239, 68, 68, 0.12);
   color: var(--color-down, #ef4444);
   margin-top: 1px;
 }
@@ -3424,11 +3424,25 @@ html.dark .wp-showcase-desc {
   transition: width 0.3s ease, height 0.3s ease, font-size 0.3s ease, box-shadow 0.3s ease;
 }
 
-.testimonials-showcase-avatar.a1 { background: linear-gradient(135deg, #3b82f6, #06b6d4); }
-.testimonials-showcase-avatar.a2 { background: linear-gradient(135deg, #10b981, #3b82f6); }
-.testimonials-showcase-avatar.a3 { background: linear-gradient(135deg, #8b5cf6, #ec4899); }
-.testimonials-showcase-avatar.a4 { background: linear-gradient(135deg, #f59e0b, #ef4444); }
-.testimonials-showcase-avatar.a5 { background: linear-gradient(135deg, #06b6d4, #6366f1); }
+.testimonials-showcase-avatar.a1 {
+  background: linear-gradient(135deg, #3b82f6, #06b6d4);
+}
+
+.testimonials-showcase-avatar.a2 {
+  background: linear-gradient(135deg, #10b981, #3b82f6);
+}
+
+.testimonials-showcase-avatar.a3 {
+  background: linear-gradient(135deg, #8b5cf6, #ec4899);
+}
+
+.testimonials-showcase-avatar.a4 {
+  background: linear-gradient(135deg, #f59e0b, #ef4444);
+}
+
+.testimonials-showcase-avatar.a5 {
+  background: linear-gradient(135deg, #06b6d4, #6366f1);
+}
 
 .testimonials-showcase-row.is-active .testimonials-showcase-avatar {
   width: 52px;
@@ -3493,8 +3507,15 @@ html.dark .wp-showcase-desc {
 }
 
 @keyframes testimonials-showcase-fade {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .testimonials-showcase-quote-author {
@@ -4291,13 +4312,23 @@ html.dark .wp-showcase-desc {
 }
 
 @keyframes sp-logos-scroll-left {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 @keyframes sp-logos-scroll-right {
-  from { transform: translateX(-50%); }
-  to { transform: translateX(0); }
+  from {
+    transform: translateX(-50%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
 }
 
 .sp-logos-scroll-left {
@@ -4734,6 +4765,7 @@ html.dark .gradient-text {
 }
 
 @media (max-width: 640px) {
+
   section.hero .hero-ctas-desktop,
   section.hero .hero-trust-desktop {
     display: none;
@@ -4773,13 +4805,23 @@ html.dark .gradient-text {
   }
 
   @keyframes feature-tabs-marquee-scroll-left {
-    from { transform: translateX(0); }
-    to { transform: translateX(-50%); }
+    from {
+      transform: translateX(0);
+    }
+
+    to {
+      transform: translateX(-50%);
+    }
   }
 
   @keyframes feature-tabs-marquee-scroll-right {
-    from { transform: translateX(-50%); }
-    to { transform: translateX(0); }
+    from {
+      transform: translateX(-50%);
+    }
+
+    to {
+      transform: translateX(0);
+    }
   }
 
   .feature-tabs-marquee-left {

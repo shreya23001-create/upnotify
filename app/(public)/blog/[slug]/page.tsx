@@ -1,25 +1,12 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import { Clock, Sparkles, TrendingUp, Bell } from 'lucide-react'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { BlogShareSubscribe } from '@/components/blog/blog-share-subscribe'
 import { logger } from '@/lib/utils/logger'
 
 export const revalidate = 300 // ISR: revalidate every 5 minutes
-
-const CATEGORY_GRADIENTS: Record<string, string> = {
-  Guide:             'linear-gradient(135deg,#7c3aed,#3b82f6)',
-  Security:          'linear-gradient(135deg,#dc2626,#b45309)',
-  Performance:       'linear-gradient(135deg,#047857,#0e7490)',
-  Ecommerce:         'linear-gradient(135deg,#b45309,#9d174d)',
-  'Incident Report': 'linear-gradient(135deg,#b91c1c,#5b21b6)',
-  Outage:            'linear-gradient(135deg,#b91c1c,#5b21b6)',
-  Agency:            'linear-gradient(135deg,#1e3a5f,#1d4ed8)',
-  WordPress:         'linear-gradient(135deg,#1d4ed8,#0e7490)',
-  Hosting:           'linear-gradient(135deg,#047857,#1d4ed8)',
-  'AI-VISIBILITY':   'linear-gradient(135deg,#4c1d95,#1d4ed8)',
-  Insights:          'linear-gradient(135deg,#0e7490,#1d4ed8)',
-}
 
 interface BlogContent {
   body?: string
@@ -216,44 +203,47 @@ export default async function DynamicBlogPost({ params }: { params: Promise<{ sl
     : ''
 
   const bodyHtml = rawHtml ? body : markdownToHtml(body)
+  const wordCount = body.split(/\s+/).filter(Boolean).length
+  const readTime = Math.max(1, Math.round(wordCount / 200))
+  const titleWords = post.title.split(' ')
+  const highlightCount = Math.min(2, titleWords.length)
+  const leadWords = titleWords.slice(0, titleWords.length - highlightCount).join(' ')
+  const highlightWords = titleWords.slice(titleWords.length - highlightCount).join(' ')
 
   return (
     <div className="blog-article-wrap">
-      <div className="blog-article-hero" style={{
-        background: CATEGORY_GRADIENTS[post.category ?? ''] ?? 'linear-gradient(135deg,#1d4ed8,#0e7490)',
-        display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
-        padding: '28px 32px 24px',
-      }}>
-        {post.category && (
-          <span style={{
-            fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em',
-            color: 'rgba(255,255,255,0.65)', alignSelf: 'flex-start',
-            background: 'rgba(0,0,0,0.2)', padding: '3px 11px',
-            borderRadius: 99, border: '1px solid rgba(255,255,255,0.15)',
-          }}>{post.category}</span>
-        )}
-        <div style={{
-          fontSize: 22, fontWeight: 700, color: 'rgba(255,255,255,0.95)',
-          lineHeight: 1.3, letterSpacing: '-0.02em', maxWidth: 640,
-        }}>{post.title}</div>
-      </div>
+      <section className="blog-post-hero">
+        <div className="blog-post-hero-inner">
+          <div className="blog-post-hero-copy">
+            {post.category && (
+              <span className="blog-post-hero-badge"><Sparkles size={13} /> {post.category}</span>
+            )}
+            <h1 className="blog-post-hero-title">
+              {leadWords ? `${leadWords} ` : ''}
+              <span className="gradient-text">{highlightWords}</span>
+            </h1>
+            {post.excerpt && (
+              <p className="blog-post-hero-subtitle">{post.excerpt}</p>
+            )}
+            <div className="blog-post-hero-meta">
+              {publishedDate && <span>{publishedDate}</span>}
+              <span className="blog-post-hero-meta-dot">&middot;</span>
+              <span>Uptrue Team</span>
+              <span className="blog-post-hero-meta-dot">&middot;</span>
+              <span className="blog-post-hero-readtime"><Clock size={13} /> {readTime} min read</span>
+            </div>
+          </div>
+
+          <div className="blog-post-hero-visual">
+            <div className="blog-post-hero-ring" aria-hidden="true" />
+            <img src="/blog-detail.png" alt="" className="blog-post-hero-image" />
+            <div className="blog-post-hero-float blog-post-hero-float-1"><TrendingUp size={18} /></div>
+            <div className="blog-post-hero-float blog-post-hero-float-2"><Bell size={18} /></div>
+          </div>
+        </div>
+      </section>
+
     <article className="blog-article">
-      <header className="blog-article-header">
-        <div className="blog-article-meta-top">
-          {post.category && (
-            <span className="blog-post-category">{post.category}</span>
-          )}
-        </div>
-        <h1 className="blog-article-title">{post.title}</h1>
-        {post.excerpt && (
-          <p className="blog-article-subtitle">{post.excerpt}</p>
-        )}
-        <div className="blog-article-meta-top" style={{ marginTop: 12 }}>
-          {publishedDate && <span>{publishedDate}</span>}
-          <span>&middot;</span>
-          <span>Uptrue Team</span>
-        </div>
-      </header>
 
       {Boolean((post as unknown as Record<string, unknown>).auto_generated) && post.category === 'outage' && (
         <div style={{

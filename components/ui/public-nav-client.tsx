@@ -78,14 +78,17 @@ export function PublicNavClient({ links, ctaPrimary, ctaSecondary }: PublicNavCl
         </Link>
 
         <ul className="nav-links">
-          {links.map((link) => (
-            <li key={link.href}>
-              <Link href={link.href}>
-                {link.label}
-                {link.badge && <span className="nav-badge">{link.badge}</span>}
-              </Link>
-            </li>
-          ))}
+          {links.map((link) => {
+            const isActive = link.href === '/' ? pathname === '/' : pathname.startsWith(link.href)
+            return (
+              <li key={link.href}>
+                <Link href={link.href} className={isActive ? 'active' : undefined}>
+                  {link.label}
+                  {link.badge && <span className="nav-badge">{link.badge}</span>}
+                </Link>
+              </li>
+            )
+          })}
         </ul>
 
         <div className="nav-actions">
@@ -123,15 +126,18 @@ export function PublicNavClient({ links, ctaPrimary, ctaSecondary }: PublicNavCl
             ))}
           </ul>
           <div className="nav-mobile-cta">
-            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 'var(--space-3)' }}>
-              <ThemeToggle />
-            </div>
             {isLoggedIn ? (
-              <Link href="/dashboard" className="btn btn-primary" onClick={close} style={{ display: 'block', textAlign: 'center' }}>Dashboard</Link>
+              <div className="nav-mobile-cta-row">
+                <ThemeToggle />
+                <Link href="/dashboard" className="btn btn-primary" onClick={close}>Dashboard</Link>
+              </div>
             ) : (
               <>
+                <div className="nav-mobile-cta-row">
+                  <ThemeToggle />
+                  <Link href={primaryHref} className="btn btn-primary" onClick={close}>{primaryText}</Link>
+                </div>
                 <Link href={secondaryHref} className="btn btn-ghost" onClick={close} style={{ display: 'block', textAlign: 'center' }}>{secondaryText}</Link>
-                <Link href={primaryHref}   className="btn btn-primary" onClick={close} style={{ display: 'block', textAlign: 'center' }}>{primaryText}</Link>
               </>
             )}
           </div>

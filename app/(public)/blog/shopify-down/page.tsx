@@ -282,16 +282,10 @@ export default function ShopifyDownPage(): React.ReactElement {
           The additional sources of downtime that are not Shopify&apos;s fault — DNS failures, app conflicts, theme errors — mean your actual availability is lower than Shopify&apos;s platform availability. Monitoring your store independently gives you the real number: how available is your store to actual customers, accounting for all failure modes.
         </p>
 
-        <h2>Frequently asked questions</h2>
+      </div>
 
-        <div className="blog-faq-list">
-          {FAQ_DATA.map((faq) => (
-            <div key={faq.question} className="blog-faq-item">
-              <h3>{faq.question}</h3>
-              <p>{faq.answer}</p>
-            </div>
-          ))}
-        </div>
+      <div className="reveal">
+        <Faq items={FAQ_DATA} headline="Frequently asked questions" />
       </div>
 
       <footer className="blog-article-footer reveal">
