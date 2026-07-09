@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { JsonLd } from '@/components/seo/json-ld'
+import Faq from '@/components/landing/faq'
 
 export const metadata: Metadata = {
   title: 'Best Uptime Monitoring Tools in 2026: What to Look For',
@@ -352,16 +353,10 @@ export default function UptimeMonitoringToolsPage(): React.ReactElement {
           No single tool is right for every situation. A solo developer managing a personal project has different needs than an agency managing 50 client websites. But the features above are the ones that separate tools that genuinely protect your business from ones that just add a green checkmark to your dashboard.
         </p>
 
-        <h2>Frequently asked questions</h2>
-
-        <div className="blog-faq-list">
-          {FAQ_DATA.map((faq) => (
-            <div key={faq.question} className="blog-faq-item">
-              <h3>{faq.question}</h3>
-              <p>{faq.answer}</p>
-            </div>
-          ))}
         </div>
+
+      <div className="reveal">
+        <Faq items={FAQ_DATA} headline="Frequently asked questions" />
       </div>
 
       <footer className="blog-article-footer">

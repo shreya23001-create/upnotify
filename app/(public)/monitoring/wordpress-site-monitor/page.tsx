@@ -185,20 +185,18 @@ export default function WordPressMonitorPage() {
       <ScrollReveal />
 
       {/* Hero */}
-      <section style={{
-        background: 'linear-gradient(135deg, #0f1729 0%, #1a1f3a 50%, #0f2040 100%)',
+      <section className="wp-monitor-hero" style={{
         padding: '72px 24px 64px',
         position: 'relative',
         overflow: 'hidden',
       }}>
-        <div style={{
-          position: 'absolute', inset: 0, opacity: 0.07,
-          backgroundImage: 'radial-gradient(circle at 30% 50%, #667eea 0%, transparent 60%), radial-gradient(circle at 70% 30%, #764ba2 0%, transparent 60%)',
+        <div className="wp-monitor-hero-glow" style={{
+          position: 'absolute', inset: 0,
           pointerEvents: 'none',
         }} />
         <div style={{ maxWidth: 1100, margin: '0 auto', position: 'relative' }}>
-          <nav style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', marginBottom: 28, display: 'flex', alignItems: 'center', gap: 6 }}>
-            <Link href="/monitoring" style={{ color: 'rgba(255,255,255,0.6)', fontWeight: 500 }}>All Monitor Types</Link>
+          <nav className="wp-monitor-hero-breadcrumb" style={{ fontSize: 13, marginBottom: 28, display: 'flex', alignItems: 'center', gap: 6 }}>
+            <Link href="/monitoring" className="wp-monitor-hero-breadcrumb-link" style={{ fontWeight: 500 }}>All Monitor Types</Link>
             <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6" /></svg>
             <span>WordPress Site Monitor</span>
           </nav>
@@ -212,28 +210,26 @@ export default function WordPressMonitorPage() {
             </span>
           </div>
 
-          <h1 style={{
+          <h1 className="wp-monitor-hero-title" style={{
             fontSize: 'clamp(30px, 5vw, 52px)',
             fontWeight: 900,
             letterSpacing: '-0.03em',
-            color: '#fff',
             lineHeight: 1.1,
             marginBottom: 18,
           }}>
-            <span style={{
+            <span className="wp-monitor-hero-icon" style={{
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               width: 44, height: 44, marginBottom: 14,
-              background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)',
-              borderRadius: 12, color: '#a78bfa',
+              borderRadius: 12,
             }}>
               <Plug size={22} strokeWidth={2} />
             </span>
             Uptrue WordPress Monitor
           </h1>
-          <p style={{ fontSize: 19, color: 'rgba(255,255,255,0.75)', lineHeight: 1.65, marginBottom: 10, maxWidth: 640 }}>
+          <p className="wp-monitor-hero-sub" style={{ fontSize: 19, lineHeight: 1.65, marginBottom: 10, maxWidth: 640 }}>
             External uptime tools only see your homepage. This plugin monitors from inside your WordPress site — detecting file injections, rogue users, and silent compromises before your visitors do.
           </p>
-          <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.45)', marginBottom: 36 }}>
+          <p className="wp-monitor-hero-meta" style={{ fontSize: 14, marginBottom: 36 }}>
             Free 2-minute install · No inbound ports · Works on shared hosting
           </p>
 
@@ -253,10 +249,7 @@ export default function WordPressMonitorPage() {
               <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
               Add WordPress Monitor Free
             </Link>
-            <a href="/downloads/uptrue-monitor.zip" style={{
-              background: 'rgba(255,255,255,0.08)',
-              color: 'rgba(255,255,255,0.85)',
-              border: '1px solid rgba(255,255,255,0.15)',
+            <a href="/downloads/uptrue-monitor.zip" className="wp-monitor-hero-secondary-btn" style={{
               padding: '13px 24px',
               borderRadius: 10,
               fontWeight: 600,

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { JsonLd } from '@/components/seo/json-ld'
+import Faq from '@/components/landing/faq'
 
 export const metadata: Metadata = {
   title: 'WooCommerce Down? How to Diagnose and Fix a Broken WooCommerce Store',
@@ -339,16 +340,10 @@ define( 'WP_DEBUG_DISPLAY', false );`}</code></pre>
           More importantly: set up monitoring so the next time something breaks, you find out before your customers do. A WooCommerce store with 100 visitors per day and a 2% conversion rate loses roughly 2 potential customers for every hour of downtime. At an average order value of £50, that is £100 per hour in lost revenue — not counting the customers who tried once, could not complete their purchase, and never came back.
         </p>
 
-        <h2>Frequently asked questions</h2>
-
-        <div className="blog-faq-list">
-          {FAQ_DATA.map((faq) => (
-            <div key={faq.question} className="blog-faq-item">
-              <h3>{faq.question}</h3>
-              <p>{faq.answer}</p>
-            </div>
-          ))}
         </div>
+
+      <div className="reveal">
+        <Faq items={FAQ_DATA} headline="Frequently asked questions" />
       </div>
 
       <footer className="blog-article-footer">

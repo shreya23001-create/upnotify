@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { JsonLd } from '@/components/seo/json-ld'
+import Faq from '@/components/landing/faq'
 
 export const metadata: Metadata = {
   title: 'SSL Certificate Expired: What It Means and How to Fix It in 10 Minutes',
@@ -346,16 +347,10 @@ sudo cat /var/log/letsencrypt/letsencrypt.log | tail -50`}</code></pre>
           <li><strong>Outdated TLS version</strong> — Some browsers warn about sites using TLS 1.0 or 1.1, which are deprecated. Ensure your server is configured to use TLS 1.2 minimum, with TLS 1.3 preferred.</li>
         </ul>
 
-        <h2>Frequently asked questions</h2>
-
-        <div className="blog-faq-list">
-          {FAQ_DATA.map((faq) => (
-            <div key={faq.question} className="blog-faq-item">
-              <h3>{faq.question}</h3>
-              <p>{faq.answer}</p>
-            </div>
-          ))}
         </div>
+
+      <div className="reveal">
+        <Faq items={FAQ_DATA} headline="Frequently asked questions" />
       </div>
 
       <footer className="blog-article-footer">

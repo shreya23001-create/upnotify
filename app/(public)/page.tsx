@@ -1,7 +1,7 @@
 import './landing.css'
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { Zap, Info, Check, Bot, Search, Newspaper, Lightbulb } from 'lucide-react'
+import { Zap, Info, Check, Bot, Search, Newspaper, Lightbulb, Tag, Users, Coins, FileBarChart, BarChart3 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { Ticker } from '@/components/landing/ticker'
 import { BlogPreview } from '@/components/landing/blog-preview'
@@ -70,6 +70,13 @@ export const metadata: Metadata = {
 // icons existed) but React components can't be stored in JSON, so we ignore
 // that field entirely rather than trying to keep it in sync.
 const AI_FEATURE_ICONS: LucideIcon[] = [Bot, Search, Newspaper, Lightbulb]
+const AGENCY_BADGE_ICONS: LucideIcon[] = [Tag, Users, Coins, FileBarChart, BarChart3]
+
+// CMS-seeded badge strings have emoji baked in (see migration 00068) —
+// strip it so we can render a matching Lucide icon instead.
+function stripLeadingEmoji(text: string): string {
+  return text.replace(/^\p{Emoji_Presentation}\p{Extended_Pictographic}?\s*/u, '').trim()
+}
 
 const DEFAULT_STEPS = [
   {
@@ -517,9 +524,15 @@ export default async function LandingPage(): Promise<React.ReactElement> {
                   <h2>{agency?.headline ?? 'Monitor hundreds of client sites under your brand'}</h2>
                   <p>{agency?.description ?? 'The Agency tier gives you full white-label, multi-tenant workspaces, revenue sharing, custom analytics, and AI reports branded with your agency name. Built for agencies managing dozens of clients.'}</p>
                   <div className="agency-badges">
-                    {(agency?.badges ?? ['Full white-label', 'Multi-tenant workspaces', 'Revenue sharing', 'Branded AI reports', 'Custom analytics']).map((badge) => (
-                      <div key={badge} className="agency-badge">{badge}</div>
-                    ))}
+                    {(agency?.badges ?? ['Full white-label', 'Multi-tenant workspaces', 'Revenue sharing', 'Branded AI reports', 'Custom analytics']).map((badge, i) => {
+                      const BadgeIcon = AGENCY_BADGE_ICONS[i % AGENCY_BADGE_ICONS.length]
+                      return (
+                        <div key={badge} className="agency-badge">
+                          <BadgeIcon size={13} />
+                          {stripLeadingEmoji(badge)}
+                        </div>
+                      )
+                    })}
                   </div>
                 </div>
                 <div style={{ flexShrink: 0 }}>
