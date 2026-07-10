@@ -28888,6 +28888,211 @@ html.dark .wp-monitor-hero-secondary-btn:hover {
   background: var(--bg-card);
 }
 
+/* 404 page */
+.notfound-page {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  overflow: hidden;
+  background: var(--bg-page);
+  text-align: center;
+}
+
+.notfound-glow {
+  position: absolute;
+  top: -20%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(900px, 140vw);
+  height: 620px;
+  background: radial-gradient(ellipse at center, rgba(124, 58, 237, 0.16) 0%, rgba(236, 72, 153, 0.08) 40%, transparent 72%);
+  pointer-events: none;
+}
+
+html.dark .notfound-glow {
+  background: radial-gradient(ellipse at center, rgba(167, 139, 250, 0.18) 0%, rgba(236, 72, 153, 0.1) 40%, transparent 72%);
+}
+
+.notfound-logo {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 40px;
+  text-decoration: none;
+  color: var(--text-primary);
+}
+
+.notfound-card {
+  position: relative;
+  width: 100%;
+  max-width: 460px;
+  border-radius: 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.12);
+  overflow: hidden;
+  text-align: left;
+  margin-bottom: 32px;
+}
+
+html.dark .notfound-card {
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+}
+
+.notfound-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 18px;
+  background: rgba(239, 68, 68, 0.08);
+  border-bottom: 1px solid var(--border-primary);
+}
+
+.notfound-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ef4444;
+  box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6);
+  animation: notfoundPulse 1.8s ease-out infinite;
+  flex-shrink: 0;
+}
+
+@keyframes notfoundPulse {
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.55); }
+  70% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .notfound-status-dot {
+    animation: none;
+  }
+}
+
+.notfound-status-label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #ef4444;
+  flex-shrink: 0;
+}
+
+.notfound-card-url {
+  font-size: 12px;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.notfound-card-body {
+  padding: 24px 22px 22px;
+}
+
+.notfound-eyebrow {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #7c3aed;
+  margin-bottom: 10px;
+}
+
+html.dark .notfound-eyebrow {
+  color: #a78bfa;
+}
+
+.notfound-title {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.25;
+  letter-spacing: -0.3px;
+  margin-bottom: 12px;
+}
+
+.notfound-desc {
+  font-size: 14.5px;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+}
+
+.notfound-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-primary);
+}
+
+.notfound-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.notfound-metric-label {
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.notfound-metric-value {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.notfound-metric-error {
+  color: #ef4444;
+}
+
+.notfound-actions {
+  position: relative;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.notfound-footnote {
+  position: relative;
+  font-size: 13.5px;
+  color: var(--text-muted);
+}
+
+.notfound-footnote a {
+  color: #7c3aed;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+html.dark .notfound-footnote a {
+  color: #a78bfa;
+}
+
+@media (max-width: 480px) {
+  .notfound-card-url {
+    display: none;
+  }
+
+  .notfound-metrics {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 .wp-monitor-stats-label {
   color: var(--text-muted);
 }
+
