@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, useMemo, useRef } from 'react'
-import { TimelineBarGraph } from '@/components/ui/timeline-bar-graph'
+import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import { useWorkspace } from '@/components/providers/workspace-provider'
 import type { Monitor, Incident } from '@/lib/types'
@@ -59,8 +59,8 @@ function buildResponseChart(checkResults: CheckResult[]): { label: string; date:
 function StatCards({ stats }: { stats: MonitorStats }) {
   const healthPct = stats.total > 0 ? ((stats.up / stats.total) * 100).toFixed(1) : '0'
   return (
-    <div className="db-stats">
-      <div className="db-stat-card all">
+    <div className="db-stats db-stats-strip">
+      <div className="db-stat-card db-stat-grad-violet all">
         <div className="db-stat-icon all">
           <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
         </div>
@@ -68,28 +68,28 @@ function StatCards({ stats }: { stats: MonitorStats }) {
         <div className="db-stat-value">{stats.total}</div>
         <div className="db-stat-delta">{stats.paused > 0 ? `${stats.paused} paused` : 'All active'}</div>
       </div>
-      <div className="db-stat-card up">
+      <div className="db-stat-card db-stat-grad-blue up">
         <div className="db-stat-icon up">
           <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
         </div>
         <div className="db-stat-label">Healthy</div>
-        <div className="db-stat-value" style={{ color: 'var(--color-up)' }}>{stats.up}</div>
+        <div className="db-stat-value">{stats.up}</div>
         <div className="db-stat-delta">{healthPct}% of monitors</div>
       </div>
-      <div className="db-stat-card down">
+      <div className="db-stat-card db-stat-grad-pink down">
         <div className="db-stat-icon down">
           <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
         </div>
         <div className="db-stat-label">Down</div>
-        <div className="db-stat-value" style={{ color: 'var(--color-down)' }}>{stats.down}</div>
+        <div className="db-stat-value">{stats.down}</div>
         <div className="db-stat-delta">{stats.down === 0 ? 'All systems clear' : 'Needs attention'}</div>
       </div>
-      <div className="db-stat-card warn">
+      <div className="db-stat-card db-stat-grad-amber warn">
         <div className="db-stat-icon warn">
           <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
         </div>
         <div className="db-stat-label">Degraded</div>
-        <div className="db-stat-value" style={{ color: 'var(--color-warn)' }}>{stats.degraded}</div>
+        <div className="db-stat-value">{stats.degraded}</div>
         <div className="db-stat-delta">{stats.degraded === 0 ? 'Performance normal' : 'Slow responses'}</div>
       </div>
     </div>
@@ -98,15 +98,28 @@ function StatCards({ stats }: { stats: MonitorStats }) {
 
 function AddBtn({ hasMonitors }: { hasMonitors: boolean }): React.ReactElement {
   const [open, setOpen] = useState(false)
+  const [menuPos, setMenuPos] = useState<{ top: number; right: number } | null>(null)
   const ref = useRef<HTMLDivElement>(null)
+  const menuRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     function handler(e: MouseEvent): void {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+      const target = e.target as Node
+      if (ref.current?.contains(target)) return
+      if (menuRef.current?.contains(target)) return
+      setOpen(false)
     }
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
   }, [])
+
+  function toggleOpen(): void {
+    if (!open && ref.current) {
+      const rect = ref.current.getBoundingClientRect()
+      setMenuPos({ top: rect.bottom + 6, right: window.innerWidth - rect.right })
+    }
+    setOpen(o => !o)
+  }
 
   if (!hasMonitors) {
     return (
@@ -119,13 +132,13 @@ function AddBtn({ hasMonitors }: { hasMonitors: boolean }): React.ReactElement {
 
   return (
     <div ref={ref} style={{ position: 'relative', display: 'inline-block' }}>
-      <button className="btn btn-primary btn-sm" onClick={() => setOpen(o => !o)}>
+      <button className="btn btn-primary btn-sm" onClick={toggleOpen}>
         <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         Add Monitor
         <svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" style={{ marginLeft: 4 }}><polyline points="6 9 12 15 18 9"/></svg>
       </button>
-      {open && (
-        <div style={{ position: 'absolute', top: 'calc(100% + 6px)', right: 0, background: 'var(--bg-card)', border: '1px solid var(--border-primary)', borderRadius: 10, boxShadow: '0 8px 28px rgba(0,0,0,0.14)', zIndex: 100, minWidth: 210, overflow: 'hidden' }}>
+      {open && menuPos && typeof document !== 'undefined' && createPortal(
+        <div ref={menuRef} style={{ position: 'fixed', top: menuPos.top, right: menuPos.right, background: 'var(--bg-card)', border: '1px solid var(--border-primary)', borderRadius: 10, boxShadow: '0 8px 28px rgba(0,0,0,0.14)', zIndex: 1000, minWidth: 210, overflow: 'hidden' }}>
           <Link href="/dashboard/monitors/scan" onClick={() => setOpen(false)} style={{ display: 'block', padding: '11px 14px', textDecoration: 'none', borderBottom: '1px solid var(--border-primary)' }}>
             <div style={{ fontWeight: 600, fontSize: 13, color: 'var(--text-primary)', marginBottom: 2 }}>🔭 Scan a domain</div>
             <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Auto-detect what needs monitoring</div>
@@ -134,7 +147,8 @@ function AddBtn({ hasMonitors }: { hasMonitors: boolean }): React.ReactElement {
             <div style={{ fontWeight: 600, fontSize: 13, color: 'var(--text-primary)', marginBottom: 2 }}>✏️ Add a specific monitor</div>
             <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Choose a type and configure manually</div>
           </Link>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   )
@@ -220,7 +234,7 @@ function DomainCards({ monitors }: { monitors: Monitor[] }) {
   }
 
   return (
-    <div className="db-card" style={{ marginBottom: 20 }}>
+    <div className="db-card">
       <div className="db-card-header">
         <div className="db-card-title">Domains</div>
         <div className="db-card-actions">
@@ -230,12 +244,12 @@ function DomainCards({ monitors }: { monitors: Monitor[] }) {
       </div>
 
       {groups.length === 0 ? (
-        <div style={{ padding: '32px 20px', textAlign: 'center' }}>
+        <div className="db-home-domains-fill" style={{ padding: '32px 20px', textAlign: 'center' }}>
           <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 12 }}>No monitors yet. Add your first one to start tracking uptime.</p>
           <Link href="/dashboard/monitors/scan" className="btn btn-primary btn-sm">+ Add Your First Monitor</Link>
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 12, padding: '16px 20px 20px' }}>
+        <div className="db-home-domains-fill" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 12, padding: '16px 20px 20px' }}>
           {groups.map(g => (
             <Link
               key={g.domain}
@@ -248,10 +262,10 @@ function DomainCards({ monitors }: { monitors: Monitor[] }) {
                 padding: '14px 16px',
                 background: g.status === 'down' ? 'rgba(239,68,68,0.04)' : g.status === 'degraded' ? 'rgba(245,158,11,0.04)' : 'var(--bg-card)',
                 cursor: 'pointer',
-                transition: 'box-shadow 0.15s, border-color 0.15s',
+                transition: 'box-shadow 0.2s cubic-bezier(0.16,1,0.3,1), transform 0.2s cubic-bezier(0.16,1,0.3,1)',
               }}
-              onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.boxShadow = '0 4px 16px rgba(0,0,0,0.1)' }}
-              onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.boxShadow = 'none' }}
+              onMouseEnter={e => { const el = e.currentTarget as HTMLDivElement; el.style.boxShadow = '0 8px 20px rgba(0,0,0,0.1)'; el.style.transform = 'translateY(-3px)' }}
+              onMouseLeave={e => { const el = e.currentTarget as HTMLDivElement; el.style.boxShadow = 'none'; el.style.transform = 'translateY(0)' }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
                   <DomainStatusDot status={g.status} />
@@ -339,6 +353,21 @@ function IncidentsPanel({ incidents }: { incidents: Incident[] }) {
   )
 }
 
+function ResponseBarChart({ days, maxAvg, barColor }: { days: { label: string; date: Date; avg: number }[]; maxAvg: number; barColor: (avg: number) => string }) {
+  return (
+    <div className="db-bar-chart">
+      {days.map((d, i) => {
+        const pct = maxAvg > 0 ? Math.max(8, Math.round((d.avg / maxAvg) * 100)) : 8
+        return (
+          <div key={i} className="db-bar-chart-col" title={`${d.label}: ${d.avg}ms`}>
+            <div className="db-bar-chart-bar" style={{ height: `${pct}%`, background: barColor(d.avg) }} />
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
 function ResponseChart({ checkResults }: { checkResults: CheckResult[] }) {
   const days = buildResponseChart(checkResults)
   const maxAvg = days.length > 0 ? Math.max(...days.map(d => d.avg)) : 0
@@ -371,20 +400,7 @@ function ResponseChart({ checkResults }: { checkResults: CheckResult[] }) {
             </div>
             <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Avg response · latest day</div>
           </div>
-          <div style={{ padding: '8px 20px 4px' }}>
-            <TimelineBarGraph
-              data={days.map(d => ({
-                timestamp: d.date.toISOString(),
-                value: maxAvg > 0 ? Math.max(6, Math.round((d.avg / maxAvg) * 100)) : 6,
-                status: d.avg < 500 ? 'up' : d.avg < 1500 ? 'degraded' : 'down',
-                tooltipLabel: `${d.avg}ms`,
-              }))}
-              intervalSeconds={86400}
-              height={80}
-              scaleByValue
-              showFooter={false}
-            />
-          </div>
+          <ResponseBarChart days={days} maxAvg={maxAvg} barColor={barColor} />
           <div className="chart-x-labels">
             {days.map((d, i) => <span key={i}>{d.label}</span>)}
           </div>
@@ -399,20 +415,23 @@ function ResponseChart({ checkResults }: { checkResults: CheckResult[] }) {
 function Skeleton() {
   return (
     <>
-      <div className="db-stats">
+      <div className="db-stats db-stats-strip">
         {[1,2,3,4].map(i => (
           <div key={i} className="db-stat-card all" style={{ opacity: 0.4 }}>
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: 'var(--border-primary)', marginBottom: 12 }} />
-            <div style={{ height: 10, background: 'var(--border-primary)', borderRadius: 4, width: '55%', marginBottom: 8 }} />
-            <div style={{ height: 26, background: 'var(--border-primary)', borderRadius: 4, width: '35%', marginBottom: 4 }} />
-            <div style={{ height: 8,  background: 'var(--border-primary)', borderRadius: 4, width: '65%' }} />
+            <div style={{ width: 34, height: 34, borderRadius: 10, background: 'var(--border-primary)', flexShrink: 0 }} />
+            <div style={{ flex: 1 }}>
+              <div style={{ height: 9, background: 'var(--border-primary)', borderRadius: 4, width: '55%', marginBottom: 8 }} />
+              <div style={{ height: 20, background: 'var(--border-primary)', borderRadius: 4, width: '40%' }} />
+            </div>
           </div>
         ))}
       </div>
-      <div className="db-card" style={{ marginBottom: 20, height: 200, opacity: 0.4 }} />
-      <div className="db-two-col">
-        <div className="db-card" style={{ height: 180, opacity: 0.4 }} />
-        <div className="db-card" style={{ height: 180, opacity: 0.4 }} />
+      <div className="db-home-split">
+        <div className="db-card" style={{ height: 260, opacity: 0.4 }} />
+        <div className="db-home-side">
+          <div className="db-card" style={{ height: 180, opacity: 0.4 }} />
+          <div className="db-card" style={{ height: 180, opacity: 0.4 }} />
+        </div>
       </div>
     </>
   )
@@ -457,10 +476,12 @@ export function WorkspaceDashboard(): React.ReactElement {
   return (
     <>
       <StatCards stats={stats} />
-      <DomainCards monitors={monitors} />
-      <div className="db-two-col">
-        <IncidentsPanel incidents={incidents} />
-        <ResponseChart checkResults={checkResults} />
+      <div className="db-home-split">
+        <div className="db-home-side">
+          <IncidentsPanel incidents={incidents} />
+          <ResponseChart checkResults={checkResults} />
+        </div>
+        <DomainCards monitors={monitors} />
       </div>
     </>
   )
