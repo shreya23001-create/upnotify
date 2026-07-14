@@ -29096,3 +29096,353 @@ html.dark .notfound-footnote a {
   color: var(--text-muted);
 }
 
+/* -------------------------------------------------------
+   Dashboard home page refresh — scoped to .db-home only,
+   does not affect other dashboard pages reusing .db-card /
+   .db-stat-card / .db-card-header elsewhere.
+   ------------------------------------------------------- */
+.db-home .db-page-title {
+  font-size: 26px;
+  letter-spacing: -0.03em;
+}
+
+.db-home .db-stats {
+  gap: 16px;
+}
+
+.db-home .db-stat-card,
+.db-home .db-card {
+  position: relative;
+  border-radius: 14px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.db-home .db-stats {
+  animation: dbFadeSlideIn 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.db-home .db-stats .db-stat-card:nth-child(1) { animation: dbFadeSlideIn 420ms cubic-bezier(0.16, 1, 0.3, 1) both 40ms; }
+.db-home .db-stats .db-stat-card:nth-child(2) { animation: dbFadeSlideIn 420ms cubic-bezier(0.16, 1, 0.3, 1) both 110ms; }
+.db-home .db-stats .db-stat-card:nth-child(3) { animation: dbFadeSlideIn 420ms cubic-bezier(0.16, 1, 0.3, 1) both 180ms; }
+.db-home .db-stats .db-stat-card:nth-child(4) { animation: dbFadeSlideIn 420ms cubic-bezier(0.16, 1, 0.3, 1) both 250ms; }
+
+@keyframes dbFadeSlideIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .db-home .db-stats,
+  .db-home .db-stats .db-stat-card {
+    animation: none;
+  }
+}
+
+.db-home .db-stat-card {
+  padding: 20px 20px 22px;
+  transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.db-home .db-stat-card:hover {
+  transform: translateY(-4px) scale(1.015);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.1);
+}
+
+html.dark .db-home .db-stat-card:hover {
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4);
+}
+
+.db-home .db-stat-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  transition: transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.db-home .db-stat-card:hover .db-stat-icon {
+  transform: scale(1.12) rotate(-4deg);
+}
+
+.db-home .db-stat-value {
+  font-size: 32px;
+}
+
+.db-home .db-card {
+  transition: box-shadow 220ms ease, border-color 220ms ease;
+}
+
+/* Compact horizontal stat strip (replaces the 4 large tiles with a slim row) */
+.db-home .db-stats-strip {
+  display: flex;
+  gap: 12px;
+}
+
+.db-home .db-stats-strip .db-stat-card {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  min-width: 0;
+}
+
+.db-home .db-stats-strip .db-stat-icon {
+  width: 34px;
+  height: 34px;
+  margin-bottom: 0;
+  flex-shrink: 0;
+}
+
+.db-home .db-stats-strip .db-stat-label {
+  font-size: 10px;
+  margin-bottom: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.db-home .db-stats-strip .db-stat-value {
+  font-size: 22px;
+}
+
+.db-home .db-stats-strip .db-stat-delta {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .db-home .db-stats-strip {
+    flex-wrap: wrap;
+  }
+
+  .db-home .db-stats-strip .db-stat-card {
+    flex: 1 1 calc(50% - 6px);
+  }
+}
+
+/* Sidebar summary + main content split */
+.db-home-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 380px);
+  gap: 20px;
+  align-items: stretch;
+  margin-top: 20px;
+}
+
+.db-home-split > .db-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.db-home-domains-fill {
+  display: flex;
+  flex-direction: column;
+}
+
+.db-home-side {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Domains card sits in the narrow sidebar column — its header (title +
+   Add Monitor button + View all link) doesn't fit in one row at that
+   width, so stack it instead of letting it overlap. */
+.db-home-split > .db-card:last-child > .db-card-header {
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.db-home-split > .db-card:last-child > .db-card-header > .db-card-actions {
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.db-home-split > .db-card:last-child > .db-card-header > .db-card-actions > a:last-child {
+  font-size: 11px;
+}
+
+@media (max-width: 1100px) {
+  .db-home-split {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 320px);
+  }
+}
+
+@media (max-width: 900px) {
+  .db-home-split {
+    grid-template-columns: 1fr;
+  }
+}
+
+.db-home .db-card:hover {
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.07);
+}
+
+html.dark .db-home .db-card:hover {
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+}
+
+.db-home .db-card-title {
+  font-size: 14.5px;
+  font-weight: 800;
+  letter-spacing: -0.1px;
+}
+
+.db-home .incident-item {
+  position: relative;
+  transition: background 180ms ease, padding-left 180ms ease;
+}
+
+.db-home .incident-item:hover {
+  background: var(--bg-muted);
+  padding-left: 24px;
+}
+
+.db-home .incident-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--accent);
+  transform: scaleY(0);
+  transition: transform 180ms ease;
+}
+
+.db-home .incident-item:hover::before {
+  transform: scaleY(1);
+}
+
+.db-home .incident-icon {
+  border-radius: 10px;
+  transition: transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.db-home .incident-item:hover .incident-icon {
+  transform: scale(1.1);
+}
+
+.db-home .db-two-col {
+  gap: 16px;
+}
+
+@media (max-width: 900px) {
+  .db-home .db-stats {
+    gap: 12px;
+  }
+}
+
+/* Colorful gradient stat tiles */
+.db-home .db-stat-grad-violet {
+  background: linear-gradient(135deg, #4338ca 0%, #7c3aed 100%);
+  border: none;
+}
+
+.db-home .db-stat-grad-blue {
+  background: linear-gradient(135deg, #0284c7 0%, #38bdf8 100%);
+  border: none;
+}
+
+.db-home .db-stat-grad-pink {
+  background: linear-gradient(135deg, #7c3aed 0%, #c026d3 100%);
+  border: none;
+}
+
+.db-home .db-stat-grad-amber {
+  background: linear-gradient(135deg, #c026d3 0%, #ec4899 100%);
+  border: none;
+}
+
+.db-home .db-stat-grad-violet::after,
+.db-home .db-stat-grad-blue::after,
+.db-home .db-stat-grad-pink::after,
+.db-home .db-stat-grad-amber::after {
+  display: none;
+}
+
+.db-home .db-stat-grad-violet .db-stat-label,
+.db-home .db-stat-grad-blue .db-stat-label,
+.db-home .db-stat-grad-pink .db-stat-label,
+.db-home .db-stat-grad-amber .db-stat-label {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.db-home .db-stat-grad-violet .db-stat-value,
+.db-home .db-stat-grad-blue .db-stat-value,
+.db-home .db-stat-grad-pink .db-stat-value,
+.db-home .db-stat-grad-amber .db-stat-value {
+  color: #fff;
+}
+
+.db-home .db-stat-grad-violet .db-stat-delta,
+.db-home .db-stat-grad-blue .db-stat-delta,
+.db-home .db-stat-grad-pink .db-stat-delta,
+.db-home .db-stat-grad-amber .db-stat-delta {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.db-home .db-stat-grad-violet .db-stat-icon,
+.db-home .db-stat-grad-blue .db-stat-icon,
+.db-home .db-stat-grad-pink .db-stat-icon,
+.db-home .db-stat-grad-amber .db-stat-icon {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+
+.db-home .db-stat-grad-violet.db-stat-card:hover,
+.db-home .db-stat-grad-blue.db-stat-card:hover,
+.db-home .db-stat-grad-pink.db-stat-card:hover,
+.db-home .db-stat-grad-amber.db-stat-card:hover {
+  box-shadow: 0 10px 24px rgba(124, 58, 237, 0.28);
+}
+
+/* Response time bar chart */
+.db-bar-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  height: 90px;
+  padding: 8px 20px 4px;
+}
+
+.db-bar-chart-col {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+}
+
+.db-bar-chart-bar {
+  width: 100%;
+  min-height: 6px;
+  border-radius: 5px 5px 0 0;
+  transition: opacity 150ms, transform 150ms;
+  transform-origin: bottom;
+  animation: dbBarGrow 500ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.db-bar-chart-col:nth-child(1) .db-bar-chart-bar { animation-delay: 30ms; }
+.db-bar-chart-col:nth-child(2) .db-bar-chart-bar { animation-delay: 70ms; }
+.db-bar-chart-col:nth-child(3) .db-bar-chart-bar { animation-delay: 110ms; }
+.db-bar-chart-col:nth-child(4) .db-bar-chart-bar { animation-delay: 150ms; }
+.db-bar-chart-col:nth-child(5) .db-bar-chart-bar { animation-delay: 190ms; }
+.db-bar-chart-col:nth-child(6) .db-bar-chart-bar { animation-delay: 230ms; }
+.db-bar-chart-col:nth-child(7) .db-bar-chart-bar { animation-delay: 270ms; }
+
+@keyframes dbBarGrow {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .db-bar-chart-bar {
+    animation: none;
+  }
+}
+
+.db-bar-chart-col:hover .db-bar-chart-bar {
+  opacity: 0.85;
+  transform: scaleY(1.03);
+}
+

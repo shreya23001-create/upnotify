@@ -11,7 +11,7 @@ export default async function DashboardPage(): Promise<React.ReactElement> {
   if (!user) redirect('/login')
 
   return (
-    <div className="db-content">
+    <div className="db-content db-home">
       <div className="db-page-header">
         <div>
           <div className="db-page-title">Dashboard</div>
