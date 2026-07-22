@@ -183,12 +183,12 @@ export function Sidebar({ currency = 'gbp' }: SidebarProps): React.ReactElement 
         {user && (
           <>
             <span className="sidebar-user-avatar">
-              {(user.display_name || user.email || '?').charAt(0).toUpperCase()}
+              {(user.full_name || user.email || '?').charAt(0).toUpperCase()}
             </span>
             {!collapsed && (
               <div className="sidebar-user-info">
-                <div className="sidebar-user-name">{user.display_name || user.email}</div>
-                {user.display_name && <div className="sidebar-user-role">{user.email}</div>}
+                <div className="sidebar-user-name">{user.full_name || user.email}</div>
+                {user.full_name && <div className="sidebar-user-role">{user.email}</div>}
               </div>
             )}
           </>
