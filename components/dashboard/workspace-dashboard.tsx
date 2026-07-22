@@ -223,8 +223,15 @@ function DomainStatusDot({ status }: { status: AggStatus }) {
   )
 }
 
+const DOMAINS_PER_PAGE = 6
+
 function DomainCards({ monitors }: { monitors: Monitor[] }) {
   const groups = useMemo(() => groupByDomain(monitors), [monitors])
+  const [page, setPage] = useState(0)
+
+  const pageCount = Math.max(1, Math.ceil(groups.length / DOMAINS_PER_PAGE))
+  const currentPage = Math.min(page, pageCount - 1)
+  const pagedGroups = groups.slice(currentPage * DOMAINS_PER_PAGE, currentPage * DOMAINS_PER_PAGE + DOMAINS_PER_PAGE)
 
   const statusLabel: Record<AggStatus, string> = {
     down: 'Down', degraded: 'Degraded', paused: 'Paused', up: 'All Up', unknown: 'Unknown',
@@ -250,7 +257,7 @@ function DomainCards({ monitors }: { monitors: Monitor[] }) {
         </div>
       ) : (
         <div className="db-home-domains-fill" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 12, padding: '16px 20px 20px' }}>
-          {groups.map(g => (
+          {pagedGroups.map(g => (
             <Link
               key={g.domain}
               href={`/dashboard/monitors?search=${encodeURIComponent(g.domain)}`}
@@ -294,6 +301,30 @@ function DomainCards({ monitors }: { monitors: Monitor[] }) {
               </div>
             </Link>
           ))}
+        </div>
+      )}
+
+      {groups.length > DOMAINS_PER_PAGE && (
+        <div className="db-table-footer">
+          <span>
+            {currentPage * DOMAINS_PER_PAGE + 1}–{Math.min(groups.length, (currentPage + 1) * DOMAINS_PER_PAGE)} of {groups.length} domains
+          </span>
+          <div style={{ display: 'flex', gap: 6 }}>
+            <button
+              className="btn btn-ghost btn-sm"
+              disabled={currentPage === 0}
+              onClick={() => setPage(p => Math.max(0, p - 1))}
+            >
+              ← Prev
+            </button>
+            <button
+              className="btn btn-ghost btn-sm"
+              disabled={currentPage >= pageCount - 1}
+              onClick={() => setPage(p => Math.min(pageCount - 1, p + 1))}
+            >
+              Next →
+            </button>
+          </div>
         </div>
       )}
     </div>
