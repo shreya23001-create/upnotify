@@ -119,7 +119,12 @@ export async function getOrgsReadyToFlush(): Promise<Array<{
     .select('org_id, created_at')
     .is('digested_at', null)
 
-  if (pendingErr || !pending) return []
+  if (pendingErr || !pending) {
+    logger.error('alert-buffer: fallback pending-events query failed — no orgs will be flushed this tick', {
+      error: pendingErr?.message,
+    })
+    return []
+  }
 
   const grouped = new Map<string, { oldest: string; count: number }>()
   for (const row of pending as Array<{ org_id: string; created_at: string }>) {
