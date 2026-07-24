@@ -289,7 +289,7 @@ export default function WordPressMonitorPage() {
         <section className="reveal" style={{ marginBottom: 64 }}>
           <LandingSection title="Why external monitoring isn't enough" icon={AlertTriangle}>
             <p style={{ fontSize: 15, lineHeight: 1.75, color: 'var(--text-secondary)', marginBottom: 24 }}>
-              Standard uptime monitors check whether your website responds to an HTTP request. That tells you if your site is reachable — but nothing about what's happening inside. Most WordPress compromises are invisible to external tools:
+              Standard uptime monitors check whether your website responds to an HTTP request. That tells you if your site is reachable — but nothing about whats happening inside. Most WordPress compromises are invisible to external tools:
             </p>
             <div className="reveal-stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 16 }}>
               {whyInternal.map(item => (

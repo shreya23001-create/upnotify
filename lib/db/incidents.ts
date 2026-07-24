@@ -145,14 +145,29 @@ export async function createIncident(data: {
 
   // Guard: if an open incident already exists for this monitor, return it
   // rather than creating a duplicate. This handles monitor flapping.
-  const { data: existing } = await supabase
+  //
+  // Uses .maybeSingle() — NOT .single() — because "no open incident" (zero
+  // rows) is the normal, common case here, not an error condition. .single()
+  // treats zero rows as a PostgREST error (PGRST116), which was previously
+  // indistinguishable from a real transient DB error and got silently
+  // swallowed either way. That made incident creation intermittently no-op
+  // on any transient read hiccup, with nothing logged to explain why.
+  const { data: existing, error: lookupError } = await supabase
     .from('incidents')
     .select('*')
     .eq('monitor_id', data.monitor_id)
     .neq('status', 'resolved')
     .order('started_at', { ascending: false })
     .limit(1)
-    .single()
+    .maybeSingle()
+
+  if (lookupError) {
+    logger.error('createIncident: failed to check for existing open incident — aborting to avoid a possible duplicate', {
+      monitorId: data.monitor_id,
+      error: lookupError.message,
+    })
+    return null
+  }
 
   if (existing) {
     logger.info('Open incident already exists for monitor — skipping duplicate creation', {
@@ -173,38 +188,66 @@ export async function createIncident(data: {
     .single()
 
   if (error) {
-    logger.error('Failed to create incident', { error: error.message })
+    logger.error('Failed to create incident', { error: error.message, monitorId: data.monitor_id })
     return null
   }
   return incident
 }
 
-export async function resolveIncident(monitorId: string): Promise<void> {
+/**
+ * Resolves the monitor's open incident (if any) and returns it with the
+ * resolved fields applied, so callers who need to alert on the recovery
+ * don't have to run their own separate lookup — a second independent query
+ * for "the same" incident was the previous pattern, and if that second
+ * query hit a transient error it silently skipped the recovery alert even
+ * though the incident itself had already been resolved successfully.
+ */
+export async function resolveIncident(monitorId: string): Promise<Incident | null> {
   const supabase = createAdminClient()
   const now = new Date()
 
-  const { data: incident } = await supabase
+  const { data: incident, error: lookupError } = await supabase
     .from('incidents')
     .select('*')
     .eq('monitor_id', monitorId)
     .neq('status', 'resolved')
     .order('started_at', { ascending: false })
     .limit(1)
-    .single()
+    .maybeSingle()
 
-  if (incident) {
-    const startedAt = new Date(incident.started_at)
-    const durationSeconds = Math.floor((now.getTime() - startedAt.getTime()) / 1000)
-
-    await supabase
-      .from('incidents')
-      .update({
-        status: 'resolved',
-        resolved_at: now.toISOString(),
-        duration_seconds: durationSeconds,
-      })
-      .eq('id', incident.id)
+  if (lookupError) {
+    logger.error('resolveIncident: failed to look up open incident — recovery not recorded', {
+      monitorId,
+      error: lookupError.message,
+    })
+    return null
   }
+
+  if (!incident) return null
+
+  const startedAt = new Date(incident.started_at)
+  const durationSeconds = Math.floor((now.getTime() - startedAt.getTime()) / 1000)
+  const resolvedAt = now.toISOString()
+
+  const { error: updateError } = await supabase
+    .from('incidents')
+    .update({
+      status: 'resolved',
+      resolved_at: resolvedAt,
+      duration_seconds: durationSeconds,
+    })
+    .eq('id', incident.id)
+
+  if (updateError) {
+    logger.error('resolveIncident: failed to mark incident resolved', {
+      monitorId,
+      incidentId: incident.id,
+      error: updateError.message,
+    })
+    return null
+  }
+
+  return { ...incident, status: 'resolved', resolved_at: resolvedAt, duration_seconds: durationSeconds } as Incident
 }
 
 export async function getOpenIncidentForMonitor(monitorId: string): Promise<Incident | null> {
@@ -216,9 +259,12 @@ export async function getOpenIncidentForMonitor(monitorId: string): Promise<Inci
     .neq('status', 'resolved')
     .order('started_at', { ascending: false })
     .limit(1)
-    .single()
+    .maybeSingle()
 
-  if (error) return null
+  if (error) {
+    logger.error('getOpenIncidentForMonitor: query failed', { monitorId, error: error.message })
+    return null
+  }
   return data
 }
 

@@ -69,6 +69,10 @@ export async function GET(request: Request): Promise<NextResponse> {
   scheduleBase.setSeconds(0, 0)
   const runId = await startCronRun('/api/cron/check-runner', getTriggeredBy(request))
 
+  // Set once the lock is released early (before the confirmation wait) so
+  // the `finally` block below doesn't try to release it a second time.
+  let lockReleased = false
+
   try {
     const { searchParams } = new URL(request.url)
     const force = searchParams.get('force') === 'true'
@@ -147,19 +151,21 @@ export async function GET(request: Request): Promise<NextResponse> {
         const nextCheck = new Date(scheduleBase.getTime() + monitor.check_interval_seconds * 1000)
 
         if (monitor.status === 'down') {
-          const openIncident = await getOpenIncidentForMonitor(monitor.id)
-          await resolveIncident(monitor.id)
+          // resolveIncident does its own lookup internally and returns the
+          // resolved incident directly — previously this was two separate
+          // queries (one here, one inside resolveIncident) for what should
+          // be the same row; if the first one hit a transient error it
+          // silently skipped the recovery alert even when the incident had
+          // actually just been resolved successfully.
+          const resolvedIncident = await resolveIncident(monitor.id)
           logger.info('Monitor recovered', { monitorId: monitor.id, name: monitor.name })
 
-          if (openIncident) {
+          if (resolvedIncident) {
             const recentIncidents = await countRecentIncidentsForMonitor(monitor.id, FLAP_SUPPRESS_WINDOW_MIN)
             if (recentIncidents > FLAP_SUPPRESS_THRESHOLD) {
               logger.warn('Recovery alert suppressed — monitor flapping', { monitorId: monitor.id, name: monitor.name, recentIncidents })
             } else {
-              await dispatchRecoveryAlerts(
-                { ...openIncident, status: 'resolved' as const, resolved_at: now.toISOString() },
-                monitor
-              )
+              await dispatchRecoveryAlerts(resolvedIncident, monitor)
             }
           }
         }
@@ -171,6 +177,38 @@ export async function GET(request: Request): Promise<NextResponse> {
         })
       })
     )
+
+    // Push down monitors' next_check_at past the confirmation window RIGHT
+    // NOW, before the 30s wait — otherwise they're still "due" the whole
+    // time they're awaiting confirmation, and get re-selected (and
+    // re-confirmed concurrently) by the very next cron tick once the lock
+    // below is released early.
+    if (downResults.length > 0) {
+      const provisionalNextCheck = new Date(cronStart + CONFIRMATION_DELAY_MS + 5_000)
+      await Promise.allSettled(
+        downResults.map(({ monitor }) =>
+          updateMonitorStatus(monitor.id, {
+            status: monitor.status,
+            last_checked_at: new Date(cronStart).toISOString(),
+            next_check_at: provisionalNextCheck.toISOString(),
+          })
+        )
+      )
+    }
+
+    // engineering-app: release the overlap lock here, BEFORE the 30s
+    // confirmation wait — not in `finally`. The lock exists to stop two
+    // Phase-1 sweeps racing each other; it was never meant to stall the
+    // *next* tick's entire due-monitor sweep behind one batch's 30s
+    // confirmation wait. Holding it for the full run meant any tick with
+    // down monitors (30s+ wait, often 60s+ with checker latency) could
+    // make the NEXT scheduled tick skip outright ("lock_held"), and the
+    // more monitors were down at once, the more ticks got skipped — down
+    // detection got slower exactly when it mattered most. Down monitors
+    // are already excluded from getDueMonitors() by the next_check_at bump
+    // above, so it's safe for a new tick's Phase 1 to start immediately.
+    await releaseCronLock(CRON_LOCK_NAME)
+    lockReleased = true
 
     // Phase 3: Wait (KB-spec 30s), then confirm DOWN monitors in parallel
     if (downResults.length > 0) {
@@ -262,7 +300,11 @@ export async function GET(request: Request): Promise<NextResponse> {
   } finally {
     // engineering-app#77 — release on every exit path (success, throw,
     // explicit return). TTL would reclaim it eventually, but releasing
-    // explicitly lets the next cron tick start without waiting.
-    await releaseCronLock(CRON_LOCK_NAME)
+    // explicitly lets the next cron tick start without waiting. Guarded by
+    // lockReleased since the success path now releases early, before the
+    // confirmation wait — this only fires for the throw/early-error paths.
+    if (!lockReleased) {
+      await releaseCronLock(CRON_LOCK_NAME)
+    }
   }
 }
