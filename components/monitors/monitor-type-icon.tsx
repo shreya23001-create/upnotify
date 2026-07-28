@@ -65,11 +65,11 @@ const displayNames: Record<string, string> = {
   wordpress: 'WordPress',
 }
 
-export function MonitorTypeIcon({ type, iconOnly = false }: { type: string; iconOnly?: boolean }) {
+export function MonitorTypeIcon({ type, iconOnly = false, iconSize = 14 }: { type: string; iconOnly?: boolean; iconSize?: number }) {
   const Icon = iconMap[type]
   const label = displayNames[type] ?? type
   if (iconOnly) {
-    return Icon ? <Icon size={14} /> : <span style={{ fontSize: 10 }}>{label.slice(0, 2)}</span>
+    return Icon ? <Icon size={iconSize} /> : <span style={{ fontSize: iconSize * 0.7 }}>{label.slice(0, 2)}</span>
   }
   return (
     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>

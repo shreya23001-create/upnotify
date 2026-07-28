@@ -26,7 +26,7 @@ export function MonitorUptimeBars({ slots, uptimePercent, rangeLabel = '30 days'
           Collecting data — the first check will run shortly.
         </div>
       ) : (
-        <div style={{ padding: '16px 20px' }}>
+        <div className="uptime-bar-graph-wrap">
           <TimelineBarGraph
             data={slots.map(s => ({ timestamp: s.timestamp, status: s.status }))}
             maxBars={slots.length}

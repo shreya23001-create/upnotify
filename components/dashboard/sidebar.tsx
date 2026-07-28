@@ -52,13 +52,15 @@ const secondaryNavItems: NavItem[] = [
 
 interface SidebarProps {
   currency?: SupportedCurrency
+  forceExpanded?: boolean
 }
 
-export function Sidebar({ currency = 'gbp' }: SidebarProps): React.ReactElement {
+export function Sidebar({ currency = 'gbp', forceExpanded = false }: SidebarProps): React.ReactElement {
   const pathname = usePathname()
   const { isAgency } = useWorkspace()
   const { user } = useAuth()
   const [collapsed, setCollapsed] = useState(false)
+  const effectiveCollapsed = forceExpanded ? false : collapsed
   const [openIncidentCount, setOpenIncidentCount] = useState(0)
   const [monitorCount, setMonitorCount] = useState(0)
 
@@ -122,13 +124,13 @@ export function Sidebar({ currency = 'gbp' }: SidebarProps): React.ReactElement 
   sections.push({ title: 'SUPPORT', items: secondaryNavItems })
 
   return (
-    <aside className={collapsed ? 'sidebar sidebar-collapsed' : 'sidebar'}>
+    <aside className={effectiveCollapsed ? 'sidebar sidebar-collapsed' : 'sidebar'}>
       <div className="sidebar-logo">
         <Link href="/dashboard" className="sidebar-logo-link">
-          {collapsed ? (
+          {effectiveCollapsed ? (
             <span className="sidebar-logo-mark">U</span>
           ) : (
-            <UptrueLogo variant="light" />
+            <UptrueLogo variant="dark" />
           )}
         </Link>
       </div>
@@ -136,11 +138,11 @@ export function Sidebar({ currency = 'gbp' }: SidebarProps): React.ReactElement 
       <nav className="sidebar-nav">
         {sections.map((section, sIdx) => (
           <div key={section.title} className="sidebar-section">
-            {!collapsed && sIdx > 0 && <div className="sidebar-divider" />}
-            {!collapsed && (
+            {!effectiveCollapsed && sIdx > 0 && <div className="sidebar-divider" />}
+            {!effectiveCollapsed && (
               <div className="sidebar-section-title">{section.title}</div>
             )}
-            {collapsed && sIdx > 0 && <div className="sidebar-divider" />}
+            {effectiveCollapsed && sIdx > 0 && <div className="sidebar-divider" />}
             {section.items.map((item) => (
               <SidebarLink
                 key={item.href}
@@ -148,7 +150,7 @@ export function Sidebar({ currency = 'gbp' }: SidebarProps): React.ReactElement 
                 label={item.label}
                 icon={item.icon}
                 isActive={isActive(item.href)}
-                collapsed={collapsed}
+                collapsed={effectiveCollapsed}
                 badge={item.badge}
                 badgeVariant={item.badgeVariant}
               />
@@ -158,9 +160,8 @@ export function Sidebar({ currency = 'gbp' }: SidebarProps): React.ReactElement 
 
         {user?.is_super_admin && (
           <>
-            {!collapsed && <div className="sidebar-divider" />}
-            {collapsed && <div className="sidebar-divider" />}
-            {!collapsed && (
+            <div className="sidebar-divider" />
+            {!effectiveCollapsed && (
               <div className="sidebar-section-title">ADMIN</div>
             )}
             <SidebarLink
@@ -168,14 +169,14 @@ export function Sidebar({ currency = 'gbp' }: SidebarProps): React.ReactElement 
               label="Admin"
               icon={IconShield}
               isActive={pathname.startsWith('/admin')}
-              collapsed={collapsed}
+              collapsed={effectiveCollapsed}
             />
           </>
         )}
       </nav>
 
       {/* Credits promo — collapsible, only for non-admin users */}
-      {!collapsed && !user?.is_super_admin && (
+      {!effectiveCollapsed && !user?.is_super_admin && (
         <CreditsPromo currency={currency} />
       )}
 
@@ -185,7 +186,7 @@ export function Sidebar({ currency = 'gbp' }: SidebarProps): React.ReactElement 
             <span className="sidebar-user-avatar">
               {(user.full_name || user.email || '?').charAt(0).toUpperCase()}
             </span>
-            {!collapsed && (
+            {!effectiveCollapsed && (
               <div className="sidebar-user-info">
                 <div className="sidebar-user-name">{user.full_name || user.email}</div>
                 {user.full_name && <div className="sidebar-user-role">{user.email}</div>}
@@ -193,13 +194,15 @@ export function Sidebar({ currency = 'gbp' }: SidebarProps): React.ReactElement 
             )}
           </>
         )}
-        <button
-          className="sidebar-collapse-btn"
-          onClick={() => setCollapsed(!collapsed)}
-          title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-        >
-          {collapsed ? <IconChevronRight size={16} /> : <IconChevronLeft size={16} />}
-        </button>
+        {!forceExpanded && (
+          <button
+            className="sidebar-collapse-btn"
+            onClick={() => setCollapsed(!collapsed)}
+            title={effectiveCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          >
+            {effectiveCollapsed ? <IconChevronRight size={16} /> : <IconChevronLeft size={16} />}
+          </button>
+        )}
       </div>
     </aside>
   )
@@ -212,7 +215,7 @@ function CreditsPromo({ currency = 'gbp' }: { currency?: SupportedCurrency }): R
   return (
     <div className="sidebar-credits-promo">
       <div className="sidebar-credits-promo-header" onClick={() => setOpen(!open)}>
-        <span className="sidebar-credits-promo-icon">✨</span>
+        <span className="sidebar-credits-promo-icon"><IconSparkles size={16} /></span>
         <span className="sidebar-credits-promo-title">Earn Credits</span>
         <span className="sidebar-credits-promo-toggle" style={{ transform: open ? 'rotate(0deg)' : 'rotate(-90deg)', transition: 'transform 0.2s' }}>
           <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>

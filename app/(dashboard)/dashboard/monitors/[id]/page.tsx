@@ -85,33 +85,45 @@ export default async function MonitorDetailPage({
 
   return (
     <div>
-      {/* Redesigned monitor header */}
-      <div className="monitor-header-v2">
-        <div className="monitor-header-v2-left">
-          <div className="monitor-header-v2-title-row">
-            <h1 className="monitor-header-v2-name">{monitor.name}</h1>
-            <MonitorStatusBadge status={monitor.status} monitorType={monitor.type} />
-            <span className="monitor-type-badge">{monitor.type}</span>
+      {/* Back link */}
+      <a href="/dashboard/monitors" className="mon-detail-back">
+        <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        All Monitors
+      </a>
+
+      {/* Hero header */}
+      <div className="mon-detail-hero">
+        <div className="mon-detail-hero-left">
+          <div className="mon-detail-type-icon">
+            <MonitorTypeIcon type={monitor.type} iconOnly iconSize={22} />
           </div>
-          <div className="monitor-target-row">
-            <a
-              href={/^https?:\/\//i.test(monitor.target) ? monitor.target : `https://${monitor.target}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="monitor-header-v2-url monitor-header-v2-url-link"
-            >
-              {monitor.target}
-            </a>
-            <CopyUrlButton url={monitor.target} />
+          <div className="mon-detail-hero-info">
+            <div className="mon-detail-hero-top">
+              <h1 className="mon-detail-title">{monitor.name}</h1>
+              <MonitorStatusBadge status={monitor.status} monitorType={monitor.type} />
+              <span className="mon-detail-type-badge">{monitor.type.replace(/-/g, ' ')}</span>
+            </div>
+            <div className="mon-detail-url-row">
+              <a
+                href={/^https?:\/\//i.test(monitor.target) ? monitor.target : `https://${monitor.target}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mon-detail-url"
+              >
+                {monitor.target}
+              </a>
+              <CopyUrlButton url={monitor.target} />
+            </div>
           </div>
         </div>
-        <div className="monitor-header-v2-right">
-          <span className="monitor-interval-chip">
+        <div className="mon-detail-hero-right">
+          <span className="mon-detail-interval-chip">
             <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
             </svg>
             {formatInterval(monitor.check_interval_seconds)}
           </span>
+          <a href={`/dashboard/monitors/${monitor.id}/edit`} className="btn btn-secondary btn-sm">Edit</a>
           <MonitorActions monitorId={monitor.id} isPaused={monitor.is_paused} />
         </div>
       </div>

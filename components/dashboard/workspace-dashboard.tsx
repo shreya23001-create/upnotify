@@ -3,6 +3,7 @@
 import { useEffect, useState, useMemo, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import Link from 'next/link'
+import { Telescope, Pencil } from 'lucide-react'
 import { useWorkspace } from '@/components/providers/workspace-provider'
 import type { Monitor, Incident } from '@/lib/types'
 
@@ -140,11 +141,11 @@ function AddBtn({ hasMonitors }: { hasMonitors: boolean }): React.ReactElement {
       {open && menuPos && typeof document !== 'undefined' && createPortal(
         <div ref={menuRef} style={{ position: 'fixed', top: menuPos.top, right: menuPos.right, background: 'var(--bg-card)', border: '1px solid var(--border-primary)', borderRadius: 10, boxShadow: '0 8px 28px rgba(0,0,0,0.14)', zIndex: 1000, minWidth: 210, overflow: 'hidden' }}>
           <Link href="/dashboard/monitors/scan" onClick={() => setOpen(false)} style={{ display: 'block', padding: '11px 14px', textDecoration: 'none', borderBottom: '1px solid var(--border-primary)' }}>
-            <div style={{ fontWeight: 600, fontSize: 13, color: 'var(--text-primary)', marginBottom: 2 }}>🔭 Scan a domain</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontWeight: 600, fontSize: 13, color: 'var(--text-primary)', marginBottom: 2 }}><Telescope size={14} /> Scan a domain</div>
             <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Auto-detect what needs monitoring</div>
           </Link>
           <Link href="/dashboard/monitors/new/manual" onClick={() => setOpen(false)} style={{ display: 'block', padding: '11px 14px', textDecoration: 'none' }}>
-            <div style={{ fontWeight: 600, fontSize: 13, color: 'var(--text-primary)', marginBottom: 2 }}>✏️ Add a specific monitor</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontWeight: 600, fontSize: 13, color: 'var(--text-primary)', marginBottom: 2 }}><Pencil size={14} /> Add a specific monitor</div>
             <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Choose a type and configure manually</div>
           </Link>
         </div>,
@@ -223,15 +224,8 @@ function DomainStatusDot({ status }: { status: AggStatus }) {
   )
 }
 
-const DOMAINS_PER_PAGE = 6
-
 function DomainCards({ monitors }: { monitors: Monitor[] }) {
   const groups = useMemo(() => groupByDomain(monitors), [monitors])
-  const [page, setPage] = useState(0)
-
-  const pageCount = Math.max(1, Math.ceil(groups.length / DOMAINS_PER_PAGE))
-  const currentPage = Math.min(page, pageCount - 1)
-  const pagedGroups = groups.slice(currentPage * DOMAINS_PER_PAGE, currentPage * DOMAINS_PER_PAGE + DOMAINS_PER_PAGE)
 
   const statusLabel: Record<AggStatus, string> = {
     down: 'Down', degraded: 'Degraded', paused: 'Paused', up: 'All Up', unknown: 'Unknown',
@@ -241,7 +235,7 @@ function DomainCards({ monitors }: { monitors: Monitor[] }) {
   }
 
   return (
-    <div className="db-card">
+    <div className="db-card" style={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}>
       <div className="db-card-header">
         <div className="db-card-title">Domains</div>
         <div className="db-card-actions">
@@ -256,23 +250,17 @@ function DomainCards({ monitors }: { monitors: Monitor[] }) {
           <Link href="/dashboard/monitors/scan" className="btn btn-primary btn-sm">+ Add Your First Monitor</Link>
         </div>
       ) : (
-        <div className="db-home-domains-fill" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 12, padding: '16px 20px 20px' }}>
-          {pagedGroups.map(g => (
+        <div className="db-domains-scroll">
+          {groups.map(g => (
             <Link
               key={g.domain}
               href={`/dashboard/monitors?search=${encodeURIComponent(g.domain)}`}
-              style={{ textDecoration: 'none', display: 'block' }}
+              className="db-domain-item"
             >
-              <div style={{
-                border: `1px solid ${g.status === 'down' ? 'rgba(239,68,68,0.3)' : g.status === 'degraded' ? 'rgba(245,158,11,0.3)' : 'var(--border-primary)'}`,
-                borderRadius: 10,
-                padding: '14px 16px',
-                background: g.status === 'down' ? 'rgba(239,68,68,0.04)' : g.status === 'degraded' ? 'rgba(245,158,11,0.04)' : 'var(--bg-card)',
-                cursor: 'pointer',
-                transition: 'box-shadow 0.2s cubic-bezier(0.16,1,0.3,1), transform 0.2s cubic-bezier(0.16,1,0.3,1)',
-              }}
-              onMouseEnter={e => { const el = e.currentTarget as HTMLDivElement; el.style.boxShadow = '0 8px 20px rgba(0,0,0,0.1)'; el.style.transform = 'translateY(-3px)' }}
-              onMouseLeave={e => { const el = e.currentTarget as HTMLDivElement; el.style.boxShadow = 'none'; el.style.transform = 'translateY(0)' }}
+              <div
+                className={`db-domain-inner${g.status === 'down' ? ' db-domain-inner--down' : g.status === 'degraded' ? ' db-domain-inner--warn' : ''}`}
+                onMouseEnter={e => { const el = e.currentTarget as HTMLDivElement; el.style.boxShadow = '0 8px 20px rgba(0,0,0,0.1)'; el.style.transform = 'translateY(-2px)' }}
+                onMouseLeave={e => { const el = e.currentTarget as HTMLDivElement; el.style.boxShadow = 'none'; el.style.transform = 'translateY(0)' }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
                   <DomainStatusDot status={g.status} />
@@ -301,30 +289,6 @@ function DomainCards({ monitors }: { monitors: Monitor[] }) {
               </div>
             </Link>
           ))}
-        </div>
-      )}
-
-      {groups.length > DOMAINS_PER_PAGE && (
-        <div className="db-table-footer">
-          <span>
-            {currentPage * DOMAINS_PER_PAGE + 1}–{Math.min(groups.length, (currentPage + 1) * DOMAINS_PER_PAGE)} of {groups.length} domains
-          </span>
-          <div style={{ display: 'flex', gap: 6 }}>
-            <button
-              className="btn btn-ghost btn-sm"
-              disabled={currentPage === 0}
-              onClick={() => setPage(p => Math.max(0, p - 1))}
-            >
-              ← Prev
-            </button>
-            <button
-              className="btn btn-ghost btn-sm"
-              disabled={currentPage >= pageCount - 1}
-              onClick={() => setPage(p => Math.min(pageCount - 1, p + 1))}
-            >
-              Next →
-            </button>
-          </div>
         </div>
       )}
     </div>

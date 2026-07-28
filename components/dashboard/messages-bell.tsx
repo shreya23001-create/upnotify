@@ -42,7 +42,9 @@ export function MessagesBell(): React.ReactElement {
   const [open, setOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([])
   const [unreadCount, setUnreadCount] = useState(0)
+  const [dropdownTop, setDropdownTop] = useState(0)
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const btnRef = useRef<HTMLButtonElement>(null)
 
   const fetchMessages = useCallback(async (): Promise<void> => {
     try {
@@ -97,8 +99,15 @@ export function MessagesBell(): React.ReactElement {
   return (
     <div className="messages-bell-wrapper" ref={dropdownRef}>
       <button
+        ref={btnRef}
         className="messages-bell-btn"
-        onClick={() => setOpen(!open)}
+        onClick={() => {
+          if (!open && btnRef.current) {
+            const rect = btnRef.current.getBoundingClientRect()
+            setDropdownTop(rect.bottom + 8)
+          }
+          setOpen(!open)
+        }}
         title="Messages"
         aria-label={`Messages${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`}
       >
@@ -111,7 +120,7 @@ export function MessagesBell(): React.ReactElement {
       </button>
 
       {open && (
-        <div className="messages-dropdown">
+        <div className="messages-dropdown" style={{ top: dropdownTop }}>
           <div className="messages-dropdown-header">
             <span className="messages-dropdown-title">Messages</span>
             {unreadCount > 0 && (

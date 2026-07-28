@@ -1,21 +1,22 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import { Mail, Hash, Users, Webhook, Phone, MessageSquare, Send, AlertTriangle, Info } from 'lucide-react'
 import { createAlertChannelAction } from '@/app/(dashboard)/dashboard/alerts/actions'
 
-const channelTypes = [
-  { value: 'email', label: '\u{1F4E7} Email', description: 'Send alerts to an email address' },
-  { value: 'slack', label: '\u{1F4AC} Slack', description: 'Send alerts to a Slack channel via webhook' },
-  { value: 'teams', label: '\u{1F465} Microsoft Teams', description: 'Send alerts to a Teams channel' },
-  { value: 'webhook', label: '\u{1F517} Webhook', description: 'Send alerts to a custom URL with HMAC signing' },
-  { value: 'telegram', label: '\u{1F4F1} Telegram', description: 'Instant alerts via Telegram — free on all plans' },
+const CHANNEL_TYPES = [
+  { value: 'email',    label: 'Email',           desc: 'Send alerts to an email address',           icon: <Mail size={18} />,          color: '#6366f1', bg: 'rgba(99,102,241,0.12)' },
+  { value: 'slack',    label: 'Slack',            desc: 'Post to a Slack channel via webhook',        icon: <Hash size={18} />,          color: '#f59e0b', bg: 'rgba(245,158,11,0.12)' },
+  { value: 'teams',    label: 'Microsoft Teams',  desc: 'Send alerts to a Teams channel',             icon: <Users size={18} />,         color: '#3b82f6', bg: 'rgba(59,130,246,0.12)' },
+  { value: 'webhook',  label: 'Webhook',          desc: 'POST to any URL with HMAC signing',          icon: <Webhook size={18} />,       color: '#8b5cf6', bg: 'rgba(139,92,246,0.12)' },
+  { value: 'telegram', label: 'Telegram',         desc: 'Instant alerts via Telegram — all plans',   icon: <Send size={18} />,          color: '#06b6d4', bg: 'rgba(6,182,212,0.12)' },
 ]
 
-const severities = [
-  { value: 'P1', label: 'P1 \u2014 Critical' },
-  { value: 'P2', label: 'P2 \u2014 High' },
-  { value: 'P3', label: 'P3 \u2014 Medium' },
-  { value: 'P4', label: 'P4 \u2014 Low' },
+const SEVERITIES = [
+  { value: 'P1', label: 'P1', desc: 'Critical', color: '#ef4444', bg: 'rgba(239,68,68,0.1)' },
+  { value: 'P2', label: 'P2', desc: 'High',     color: '#f97316', bg: 'rgba(249,115,22,0.1)' },
+  { value: 'P3', label: 'P3', desc: 'Medium',   color: '#f59e0b', bg: 'rgba(245,158,11,0.1)' },
+  { value: 'P4', label: 'P4', desc: 'Low',      color: '#6b7280', bg: 'rgba(107,114,128,0.1)' },
 ]
 
 export function CreateAlertChannelForm() {
@@ -40,11 +41,17 @@ export function CreateAlertChannelForm() {
   }
 
   return (
-    <form action={handleSubmit}>
-      {error && <div className="form-error">{error}</div>}
+    <form className="ac-form" action={handleSubmit}>
+      {error && (
+        <div className="ac-form-error">
+          <AlertTriangle size={15} />
+          {error}
+        </div>
+      )}
 
-      <div className="form-group">
-        <label className="form-label">Channel Name</label>
+      {/* Channel Name */}
+      <div className="ac-form-section">
+        <label className="ac-form-label">Channel Name</label>
         <input
           className="form-input"
           name="name"
@@ -54,22 +61,15 @@ export function CreateAlertChannelForm() {
         />
       </div>
 
-      <div className="form-group">
-        <label className="form-label">Channel Type</label>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 10 }}>
-          {channelTypes.map(ct => (
+      {/* Channel Type picker */}
+      <div className="ac-form-section">
+        <label className="ac-form-label">Channel Type</label>
+        <div className="ac-type-grid">
+          {CHANNEL_TYPES.map(ct => (
             <label
               key={ct.value}
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                padding: '14px 16px',
-                border: type === ct.value ? '2px solid #667eea' : '1.5px solid var(--border-input)',
-                borderRadius: 10,
-                cursor: 'pointer',
-                transition: 'all 0.15s',
-                background: type === ct.value ? 'var(--bg-hover)' : 'var(--bg-card)',
-              }}
+              className={`ac-type-card${type === ct.value ? ' ac-type-card--active' : ''}`}
+              style={type === ct.value ? { borderColor: ct.color, background: ct.bg + '60' } : {}}
             >
               <input
                 type="radio"
@@ -79,16 +79,32 @@ export function CreateAlertChannelForm() {
                 onChange={() => setType(ct.value)}
                 style={{ display: 'none' }}
               />
-              <span style={{ fontSize: 15, fontWeight: 600 }}>{ct.label}</span>
-              <span style={{ fontSize: 12, color: '#94a3b8', marginTop: 2 }}>{ct.description}</span>
+              <div
+                className="ac-type-card-icon"
+                style={{ background: ct.bg, color: ct.color }}
+              >
+                {ct.icon}
+              </div>
+              <div className="ac-type-card-info">
+                <span className="ac-type-card-label">{ct.label}</span>
+                <span className="ac-type-card-desc">{ct.desc}</span>
+              </div>
+              {type === ct.value && (
+                <div className="ac-type-card-check" style={{ background: ct.color }}>
+                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                    <path d="M2 5l2.5 2.5L8 3" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </div>
+              )}
             </label>
           ))}
         </div>
       </div>
 
+      {/* Email */}
       {type === 'email' && (
-        <div className="form-group">
-          <label className="form-label">Email Address</label>
+        <div className="ac-form-section">
+          <label className="ac-form-label">Email Address</label>
           <input
             className="form-input"
             name="email"
@@ -100,20 +116,22 @@ export function CreateAlertChannelForm() {
         </div>
       )}
 
+      {/* Slack */}
       {type === 'slack' && (
         <>
-          <div className="form-group">
-            <div style={{ padding: '16px', background: '#f0f9ff', border: '1px solid #bae6fd', borderRadius: 8, marginBottom: 16 }}>
-              <p style={{ margin: '0 0 10px', fontSize: 13, fontWeight: 700, color: '#0369a1' }}>How to get your Slack Webhook URL</p>
-              <ol style={{ margin: 0, paddingLeft: 18, fontSize: 13, color: '#374151', lineHeight: 1.8 }}>
-                <li>Go to <strong>api.slack.com/apps</strong> and click <strong>Create New App</strong></li>
-                <li>Choose <strong>From scratch</strong>, name it (e.g. &ldquo;Uptrue Alerts&rdquo;), select your workspace</li>
-                <li>In the left menu, click <strong>Incoming Webhooks</strong> and toggle it <strong>On</strong></li>
-                <li>Click <strong>Add New Webhook to Workspace</strong> and choose the channel to post to</li>
-                <li>Copy the <strong>Webhook URL</strong> (starts with <code>https://hooks.slack.com/services/</code>) and paste it below</li>
-              </ol>
+          <div className="ac-form-section">
+            <div className="ac-form-info-box">
+              <Info size={14} />
+              <div>
+                <strong>How to get your Slack Webhook URL</strong>
+                <ol>
+                  <li>Go to <strong>api.slack.com/apps</strong> → Create New App → From scratch</li>
+                  <li>Enable <strong>Incoming Webhooks</strong> and add a webhook to your workspace</li>
+                  <li>Copy the URL starting with <code>https://hooks.slack.com/services/</code></li>
+                </ol>
+              </div>
             </div>
-            <label className="form-label">Slack Webhook URL</label>
+            <label className="ac-form-label">Slack Webhook URL</label>
             <input
               className="form-input"
               name="slackWebhookUrl"
@@ -122,39 +140,35 @@ export function CreateAlertChannelForm() {
               disabled={isPending}
             />
           </div>
-          <div className="form-group">
-            <label className="form-label">Channel (optional)</label>
+          <div className="ac-form-section">
+            <label className="ac-form-label">Channel <span className="ac-form-optional">optional</span></label>
             <input
               className="form-input"
               name="slackChannel"
               placeholder="#alerts"
               disabled={isPending}
             />
-            <p style={{ fontSize: 12, color: '#94a3b8', marginTop: 6 }}>
-              Override the default channel. Leave blank to use the channel you selected when creating the webhook.
-            </p>
+            <p className="ac-form-hint">Leave blank to use the default channel set in the webhook.</p>
           </div>
         </>
       )}
 
+      {/* Teams */}
       {type === 'teams' && (
-        <div className="form-group">
-          <div style={{ padding: '16px', background: '#f0f9ff', border: '1px solid #bae6fd', borderRadius: 8, marginBottom: 16 }}>
-            <p style={{ margin: '0 0 10px', fontSize: 13, fontWeight: 700, color: '#0369a1' }}>How to get your Microsoft Teams Webhook URL</p>
-            <ol style={{ margin: 0, paddingLeft: 18, fontSize: 13, color: '#374151', lineHeight: 1.8 }}>
-              <li>Open <strong>Microsoft Teams</strong> and go to the channel where you want alerts</li>
-              <li>Click the <strong>&hellip; (More options)</strong> menu next to the channel name</li>
-              <li>Select <strong>Workflows</strong></li>
-              <li>Search for <strong>&ldquo;Post to a channel when a webhook request is received&rdquo;</strong> and select it</li>
-              <li>Give the workflow a name (e.g. &ldquo;Uptrue Alerts&rdquo;) and click <strong>Next</strong></li>
-              <li>Select the Team and Channel, then click <strong>Add Workflow</strong></li>
-              <li>Copy the <strong>Webhook URL</strong> shown and paste it below</li>
-            </ol>
-            <p style={{ margin: '10px 0 0', fontSize: 12, color: '#0369a1' }}>
-              <strong>Note:</strong> Microsoft retired the old Incoming Webhook connector. You must use the <strong>Workflows</strong> method above. The URL will start with <code>https://prod-*.westus.logic.azure.com/...</code>
-            </p>
+        <div className="ac-form-section">
+          <div className="ac-form-info-box">
+            <Info size={14} />
+            <div>
+              <strong>How to get your Teams Webhook URL</strong>
+              <ol>
+                <li>Open the Teams channel → <strong>… More options</strong> → <strong>Workflows</strong></li>
+                <li>Search for <em>"Post to a channel when a webhook request is received"</em></li>
+                <li>Complete the setup and copy the generated URL</li>
+              </ol>
+              <p className="ac-form-note">URL starts with <code>https://prod-*.westus.logic.azure.com/...</code></p>
+            </div>
           </div>
-          <label className="form-label">Teams Webhook URL</label>
+          <label className="ac-form-label">Teams Webhook URL</label>
           <input
             className="form-input"
             name="teamsWebhookUrl"
@@ -165,19 +179,21 @@ export function CreateAlertChannelForm() {
         </div>
       )}
 
+      {/* Telegram */}
       {type === 'telegram' && (
-        <div className="form-group">
-          <div style={{ padding: '16px', background: '#f0f9ff', border: '1px solid #bae6fd', borderRadius: 8, marginBottom: 16 }}>
-            <p style={{ margin: '0 0 10px', fontSize: 13, fontWeight: 700, color: '#0369a1' }}>How to set up Telegram alerts</p>
-            <ol style={{ margin: 0, paddingLeft: 18, fontSize: 13, color: '#374151', lineHeight: 1.8 }}>
-              <li>Open Telegram and search for <strong>@uptrue_alerts_bot</strong></li>
-              <li>Send it any message (e.g. <em>&quot;hello&quot;</em>) to start the chat</li>
-              <li>Open <strong>@userinfobot</strong> in Telegram and send <strong>/start</strong></li>
-              <li>It will reply with your <strong>Chat ID</strong> (a number like <code>123456789</code>)</li>
-              <li>Paste your Chat ID below and save</li>
-            </ol>
+        <div className="ac-form-section">
+          <div className="ac-form-info-box">
+            <Info size={14} />
+            <div>
+              <strong>How to set up Telegram alerts</strong>
+              <ol>
+                <li>Search for <strong>@uptrue_alerts_bot</strong> on Telegram and send any message</li>
+                <li>Open <strong>@userinfobot</strong> and send <strong>/start</strong> to get your Chat ID</li>
+                <li>Paste your Chat ID below</li>
+              </ol>
+            </div>
           </div>
-          <label className="form-label">Your Telegram Chat ID</label>
+          <label className="ac-form-label">Telegram Chat ID</label>
           <input
             className="form-input"
             name="telegramChatId"
@@ -185,16 +201,15 @@ export function CreateAlertChannelForm() {
             placeholder="e.g. 123456789"
             disabled={isPending}
           />
-          <p style={{ fontSize: 12, color: '#94a3b8', marginTop: 6 }}>
-            This is your personal Chat ID — not your username. Get it from @userinfobot.
-          </p>
+          <p className="ac-form-hint">This is your numeric Chat ID, not your username.</p>
         </div>
       )}
 
+      {/* Webhook */}
       {type === 'webhook' && (
         <>
-          <div className="form-group">
-            <label className="form-label">Webhook URL</label>
+          <div className="ac-form-section">
+            <label className="ac-form-label">Webhook URL</label>
             <input
               className="form-input"
               name="webhookUrl"
@@ -203,57 +218,51 @@ export function CreateAlertChannelForm() {
               disabled={isPending}
             />
           </div>
-          <div className="form-group">
-            <label className="form-label">Secret (for HMAC signing, optional)</label>
+          <div className="ac-form-section">
+            <label className="ac-form-label">Signing Secret <span className="ac-form-optional">optional</span></label>
             <input
               className="form-input"
               name="webhookSecret"
               placeholder="your-secret-key"
               disabled={isPending}
             />
+            <p className="ac-form-hint">Used for HMAC-SHA256 signature verification on your endpoint.</p>
           </div>
         </>
       )}
 
-      <div className="form-group">
-        <label className="form-label">Severity Filter</label>
-        <p style={{ fontSize: 13, color: '#94a3b8', marginBottom: 10 }}>
-          Select which severities trigger this channel
-        </p>
-        <div style={{ display: 'flex', gap: 8 }}>
-          {severities.map(sev => (
-            <button
-              key={sev.value}
-              type="button"
-              onClick={() => toggleSeverity(sev.value)}
-              style={{
-                padding: '6px 14px',
-                borderRadius: 8,
-                fontSize: 13,
-                fontWeight: 600,
-                border: selectedSeverities.includes(sev.value)
-                  ? '2px solid #667eea'
-                  : '1.5px solid #e2e8f0',
-                background: selectedSeverities.includes(sev.value) ? '#f0f4ff' : '#fff',
-                color: selectedSeverities.includes(sev.value) ? '#667eea' : '#94a3b8',
-                cursor: 'pointer',
-                transition: 'all 0.15s',
-              }}
-            >
-              {sev.label}
-            </button>
-          ))}
+      {/* Severity filter */}
+      <div className="ac-form-section">
+        <label className="ac-form-label">Severity Filter</label>
+        <p className="ac-form-sublabel">Select which alert severities trigger this channel</p>
+        <div className="ac-sev-grid">
+          {SEVERITIES.map(sev => {
+            const active = selectedSeverities.includes(sev.value)
+            return (
+              <button
+                key={sev.value}
+                type="button"
+                onClick={() => toggleSeverity(sev.value)}
+                className={`ac-sev-btn${active ? ' ac-sev-btn--active' : ''}`}
+                style={active ? { borderColor: sev.color, background: sev.bg, color: sev.color } : {}}
+              >
+                <span className="ac-sev-badge" style={{ background: active ? sev.color : 'var(--border-primary)', color: '#fff' }}>
+                  {sev.label}
+                </span>
+                <span className="ac-sev-desc">{sev.desc}</span>
+              </button>
+            )
+          })}
         </div>
       </div>
 
-      <button
-        type="submit"
-        className="btn btn-primary"
-        disabled={isPending}
-        style={{ marginTop: 8 }}
-      >
-        {isPending ? 'Creating...' : 'Create Channel'}
-      </button>
+      {/* Actions */}
+      <div className="ac-form-actions">
+        <button type="submit" className="btn btn-primary" disabled={isPending}>
+          {isPending ? 'Creating…' : 'Create Channel'}
+        </button>
+        <a href="/dashboard/alerts" className="btn btn-secondary">Cancel</a>
+      </div>
     </form>
   )
 }

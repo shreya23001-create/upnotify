@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { ClipboardList, Lightbulb, FileText, Search, Eye } from 'lucide-react'
 import type { AiEngine } from '@/lib/db/ai-engines'
 import type { LlmsTxtGeneration, CitationCheckRun } from '@/lib/db/ai-visibility'
 import type { ProfileRun } from '@/lib/db/ai-profile'
@@ -233,7 +234,7 @@ function LlmsTxtTab({ engines, generations, planSlug, canGenerate, blockReason }
               {generated && (
                 <details className="ai-vis-next-steps" style={{ marginTop: 20 }}>
                   <summary style={{ cursor: 'pointer', fontWeight: 600, fontSize: 14, padding: '10px 0', listStyle: 'none', display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span>📋</span> What to do next with your llms.txt
+                    <ClipboardList size={16} /> What to do next with your llms.txt
                   </summary>
                   <div style={{ paddingTop: 12 }}>
                     <ol style={{ paddingLeft: '1.4rem', lineHeight: 2.2, fontSize: 13, color: 'var(--text-secondary)' }}>
@@ -244,8 +245,8 @@ function LlmsTxtTab({ engines, generations, planSlug, canGenerate, blockReason }
                       <li><strong>Monitor your citations</strong> — switch to the <strong>AI Citation Monitor</strong> tab above to track which AI engines are actually citing your domain for your target keywords. Runs complete asynchronously and you&apos;ll receive an email when done.</li>
                       <li><strong>Keep it updated</strong> — regenerate your llms.txt whenever you add major new sections or pages to your site. AI engines re-crawl llms.txt regularly.</li>
                     </ol>
-                    <div style={{ marginTop: 12, padding: '10px 14px', background: 'rgba(59,130,246,0.06)', borderRadius: 8, fontSize: 12, color: 'var(--text-muted)' }}>
-                      💡 <strong>Tip:</strong> Customise the generated file before uploading — fill in the <code>[placeholder]</code> sections with your real site description, key pages, and author details. The more specific, the better your AI citations will be.
+                    <div style={{ marginTop: 12, padding: '10px 14px', background: 'rgba(59,130,246,0.06)', borderRadius: 8, fontSize: 12, color: 'var(--text-muted)', display: 'flex', alignItems: 'flex-start', gap: 6 }}>
+                      <Lightbulb size={14} style={{ flexShrink: 0, marginTop: 1 }} /> <span><strong>Tip:</strong> Customise the generated file before uploading — fill in the <code>[placeholder]</code> sections with your real site description, key pages, and author details. The more specific, the better your AI citations will be.</span>
                     </div>
                   </div>
                 </details>
@@ -253,7 +254,7 @@ function LlmsTxtTab({ engines, generations, planSlug, canGenerate, blockReason }
             </>
           ) : (
             <div className="ai-vis-empty">
-              <div className="ai-vis-empty-icon">📄</div>
+              <div className="ai-vis-empty-icon"><FileText size={28} /></div>
               <p>Your generated llms.txt will appear here. Fill in the form and click Generate.</p>
             </div>
           )}
@@ -448,7 +449,7 @@ function CitationTab({ engines, freeEngineIds, runs, planSlug, runsThisMonth, mo
           <h2 className="ai-vis-panel-title">Recent checks</h2>
           {runs.length === 0 ? (
             <div className="ai-vis-empty">
-              <div className="ai-vis-empty-icon">🔍</div>
+              <div className="ai-vis-empty-icon"><Search size={28} /></div>
               <p>No citation checks yet. Run your first check to see how visible your site is in AI search.</p>
             </div>
           ) : (
@@ -635,7 +636,7 @@ function ProfileTab({ engines, freeEngineIds, runs, planSlug, runsThisMonth, mon
           <h2 className="ai-vis-panel-title">Recent profiles</h2>
           {runs.length === 0 ? (
             <div className="ai-vis-empty">
-              <div className="ai-vis-empty-icon">🪞</div>
+              <div className="ai-vis-empty-icon"><Eye size={28} /></div>
               <p>No AI Profile runs yet. Run your first to see how AI engines describe your site.</p>
             </div>
           ) : (
