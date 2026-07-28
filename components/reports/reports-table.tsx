@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react'
 import Link from 'next/link'
 import { DataTable, type Column, type BulkAction } from '@/components/ui/data-table'
+import { FileText } from 'lucide-react'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { deleteReportAction } from '@/app/(dashboard)/dashboard/reports/actions'
 import { Pagination } from '@/components/ui/pagination'
@@ -74,7 +75,7 @@ export function ReportsTable({ reports, pagination }: { reports: Report[]; pagin
         searchPlaceholder="Search reports..."
         filters={filters}
         bulkActions={bulkActions}
-        emptyIcon="📄"
+        emptyIcon={<FileText size={32} strokeWidth={1.5} />}
         emptyMessage="No reports generated yet. Generate an AI-powered executive summary for your clients."
         emptyAction={{ label: '+ Generate Report', href: '/dashboard/reports/new' }}
       />

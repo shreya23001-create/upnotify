@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
+import { Lock, KeyRound } from 'lucide-react'
 import { DataTable, type Column, type BulkAction } from '@/components/ui/data-table'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import type { Organisation, User, Subscription, Invoice, ApiKey, Plan, UserCredit, CreditRule, Referral } from '@/lib/types'
@@ -368,7 +369,7 @@ export function SettingsContent({
           {!currentPlan?.has_api_access && (
             <div className="card" style={{ marginBottom: 20 }}>
               <div className="card-content" style={{ textAlign: 'center', padding: '40px 24px' }}>
-                <div style={{ fontSize: 32, marginBottom: 12 }}>🔒</div>
+                <div style={{ display: 'flex', justifyContent: 'center', color: 'var(--text-muted)', marginBottom: 12 }}><Lock size={32} /></div>
                 <div className="card-title" style={{ marginBottom: 8 }}>API access requires a paid plan</div>
                 <p style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: 20, maxWidth: 480, margin: '0 auto 20px' }}>
                   Upgrade to create API keys and integrate Uptrue with your tools and workflows.
@@ -382,7 +383,7 @@ export function SettingsContent({
           {newKeyResult && (
             <div className="api-key-reveal-overlay">
               <div className="api-key-reveal-card">
-                <div className="api-key-reveal-icon">🔑</div>
+                <div className="api-key-reveal-icon"><KeyRound size={28} /></div>
                 <h3 className="api-key-reveal-title">Your new API key — copy it now</h3>
                 <p className="api-key-reveal-sub">
                   This is the <strong>only time</strong> you will see the full key. Store it somewhere safe.

@@ -197,9 +197,14 @@ export function EditMonitorForm({ monitor, minCheckInterval = 600 }: { monitor: 
         </>
       )}
 
-      <button type="submit" className="btn btn-primary" disabled={isPending} style={{ marginTop: 8 }}>
-        {isPending ? 'Saving...' : 'Save Changes'}
-      </button>
+      <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
+        <button type="submit" className="btn btn-primary" disabled={isPending}>
+          {isPending ? 'Saving...' : 'Save Changes'}
+        </button>
+        <a href="/dashboard/monitors" className="btn btn-secondary">
+          Cancel
+        </a>
+      </div>
     </form>
   )
 }

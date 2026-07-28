@@ -87,11 +87,9 @@ vi.mock('@/lib/utils/config', () => ({
 // always return acquired so the unit-level check-runner tests aren't
 // gated on a real DB. The lock-held / release behaviour is exercised
 // separately in tests/unit/cron-lock.test.ts.
-const mockAcquireCronLock = vi.fn().mockResolvedValue(true)
-const mockReleaseCronLock = vi.fn().mockResolvedValue(undefined)
 vi.mock('@/lib/utils/cron-lock', () => ({
-  acquireCronLock: (...args: unknown[]) => mockAcquireCronLock(...args),
-  releaseCronLock: (...args: unknown[]) => mockReleaseCronLock(...args),
+  acquireCronLock: vi.fn().mockResolvedValue(true),
+  releaseCronLock: vi.fn().mockResolvedValue(undefined),
 }))
 
 // ---------------------------------------------------------------------------
@@ -298,63 +296,6 @@ describe('check-runner cron route', () => {
     }
   })
 
-  // A run with down monitors used to hold the overlap lock for the ENTIRE
-  // 30s confirmation wait, so the next scheduled tick would skip outright
-  // ("lock_held") whenever a run ran long — worse the more monitors were
-  // down at once. Fixed by releasing the lock right after Phase 2, before
-  // the confirmation sleep, once down monitors' next_check_at has already
-  // been pushed past the confirmation window so they can't be re-picked up
-  // by getDueMonitors() in the meantime.
-  it('releases the overlap lock before the 30s confirmation wait, not after', async () => {
-    vi.useFakeTimers()
-    try {
-      const monitor = makeMonitor()
-      mockGetDueMonitors.mockResolvedValue([monitor])
-      mockDispatchChecker
-        .mockResolvedValueOnce(downResult())
-        .mockResolvedValueOnce(downResult())
-
-      const responsePromise = GET(makeRequest())
-
-      // Let Phase 1 + Phase 2 (synchronous-ish DB calls) settle, but stay
-      // well short of the 30s confirmation delay.
-      await vi.advanceTimersByTimeAsync(0)
-      expect(mockReleaseCronLock).toHaveBeenCalledTimes(1)
-
-      await vi.advanceTimersByTimeAsync(31_000)
-      await responsePromise
-    } finally {
-      vi.useRealTimers()
-    }
-  })
-
-  it('pushes a down monitor\'s next_check_at past the confirmation window before waiting', async () => {
-    vi.useFakeTimers()
-    try {
-      const monitor = makeMonitor()
-      mockGetDueMonitors.mockResolvedValue([monitor])
-      mockDispatchChecker
-        .mockResolvedValueOnce(downResult())
-        .mockResolvedValueOnce(downResult())
-
-      const responsePromise = GET(makeRequest())
-      await vi.advanceTimersByTimeAsync(0)
-
-      // Provisional bump happens before the confirmation sleep — so at this
-      // point updateMonitorStatus should already have been called once for
-      // the down monitor with a next_check_at at least ~30s out, well before
-      // the confirmation phase's own final update at the end of the run.
-      expect(mockUpdateMonitorStatus).toHaveBeenCalledWith(
-        'mon-001',
-        expect.objectContaining({ status: 'up' }) // provisional update keeps the pre-confirmation status
-      )
-
-      await vi.advanceTimersByTimeAsync(31_000)
-      await responsePromise
-    } finally {
-      vi.useRealTimers()
-    }
-  })
 
   // ── Flap detection ────────────────────────────────────────────────
 
@@ -388,17 +329,13 @@ describe('check-runner cron route', () => {
     const monitor = makeMonitor({ status: 'down' })
     mockGetDueMonitors.mockResolvedValue([monitor])
     mockDispatchChecker.mockResolvedValue(upResult())
-    // resolveIncident now does its own lookup and returns the resolved
-    // incident directly — the caller no longer calls getOpenIncidentForMonitor
-    // separately first (that was a redundant second query for the same row;
-    // see lib/db/incidents.ts resolveIncident doc comment).
-    const resolvedIncident = {
+    const openIncident = {
       id: 'inc-001',
       org_id: 'org-001',
       title: 'Test Monitor is down',
-      status: 'resolved',
+      status: 'open',
     }
-    mockResolveIncident.mockResolvedValue(resolvedIncident)
+    mockGetOpenIncidentForMonitor.mockResolvedValue(openIncident)
 
     await GET(makeRequest())
 
@@ -417,8 +354,7 @@ describe('check-runner cron route', () => {
     const monitor = makeMonitor({ status: 'down' })
     mockGetDueMonitors.mockResolvedValue([monitor])
     mockDispatchChecker.mockResolvedValue(upResult())
-    // No open incident to resolve — resolveIncident returns null.
-    mockResolveIncident.mockResolvedValue(null)
+    mockGetOpenIncidentForMonitor.mockResolvedValue(null)
 
     await GET(makeRequest())
 

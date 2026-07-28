@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import Link from 'next/link'
-import { DataTable, type Column, type BulkAction } from '@/components/ui/data-table'
+import { BellOff, Mail, Hash, Webhook, Phone, MessageSquare, Users, Edit2, Trash2, Power, PowerOff, Send } from 'lucide-react'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { deleteAlertChannelAction, toggleAlertChannelAction, bulkDeleteAlertChannelsAction, bulkEnableAlertChannelsAction, bulkDisableAlertChannelsAction } from '@/app/(dashboard)/dashboard/alerts/actions'
 import { useToast } from '@/components/ui/toast'
@@ -10,14 +10,16 @@ import { Pagination } from '@/components/ui/pagination'
 import type { PaginationMeta } from '@/lib/utils/pagination'
 import type { AlertChannel } from '@/lib/types'
 
-const typeLabels: Record<string, string> = {
-  email: '📧 Email',
-  slack: '💬 Slack',
-  teams: '👥 Teams',
-  whatsapp: '📱 WhatsApp',
-  voice: '📞 Voice',
-  webhook: '🔗 Webhook',
+const TYPE_META: Record<string, { label: string; icon: React.ReactNode; color: string; bg: string }> = {
+  email: { label: 'Email', icon: <Mail size={16} />, color: '#6366f1', bg: 'rgba(99,102,241,0.12)' },
+  slack: { label: 'Slack', icon: <Hash size={16} />, color: '#f59e0b', bg: 'rgba(245,158,11,0.12)' },
+  teams: { label: 'Teams', icon: <Users size={16} />, color: '#3b82f6', bg: 'rgba(59,130,246,0.12)' },
+  whatsapp: { label: 'WhatsApp', icon: <MessageSquare size={16} />, color: '#22c55e', bg: 'rgba(34,197,94,0.12)' },
+  voice: { label: 'Voice', icon: <Phone size={16} />, color: '#ec4899', bg: 'rgba(236,72,153,0.12)' },
+  webhook: { label: 'Webhook', icon: <Webhook size={16} />, color: '#8b5cf6', bg: 'rgba(139,92,246,0.12)' },
 }
+
+const DEFAULT_META = { label: 'Channel', icon: <BellOff size={16} />, color: '#6b7280', bg: 'rgba(107,114,128,0.12)' }
 
 interface ChannelConfig {
   email?: string
@@ -31,9 +33,9 @@ function getDestination(channel: AlertChannel): string {
   const config = channel.config as ChannelConfig
   switch (channel.type) {
     case 'email': return config.email || '—'
-    case 'slack': return config.slackChannel || config.slackWebhookUrl?.slice(0, 40) + '...' || '—'
-    case 'teams': return config.teamsWebhookUrl?.slice(0, 40) + '...' || '—'
-    case 'webhook': return config.webhookUrl?.slice(0, 40) + '...' || '—'
+    case 'slack': return config.slackChannel || (config.slackWebhookUrl ? config.slackWebhookUrl.slice(0, 36) + '…' : '—')
+    case 'teams': return config.teamsWebhookUrl ? config.teamsWebhookUrl.slice(0, 36) + '…' : '—'
+    case 'webhook': return config.webhookUrl ? config.webhookUrl.slice(0, 36) + '…' : '—'
     default: return '—'
   }
 }
@@ -47,6 +49,7 @@ export function AlertChannelsTable({ channels, pagination }: { channels: AlertCh
   const [isPending, startTransition] = useTransition()
   const [pendingConfirm, setPendingConfirm] = useState<PendingConfirm | null>(null)
   const [testingChannelId, setTestingChannelId] = useState<string | null>(null)
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const toast = useToast()
 
   async function handleTestAlert(channelId: string): Promise<void> {
@@ -58,11 +61,8 @@ export function AlertChannelsTable({ channels, pagination }: { channels: AlertCh
         body: JSON.stringify({ channelId }),
       })
       const data: { success?: boolean; error?: string; message?: string } = await res.json()
-      if (res.ok && data.success) {
-        toast.addToast(data.message || 'Test alert sent successfully.', 'success')
-      } else {
-        toast.addToast(data.error || 'Failed to send test alert.', 'error')
-      }
+      if (res.ok && data.success) toast.addToast(data.message || 'Test alert sent.', 'success')
+      else toast.addToast(data.error || 'Failed to send test alert.', 'error')
     } catch {
       toast.addToast('Failed to send test alert. Check your connection.', 'error')
     } finally {
@@ -71,20 +71,14 @@ export function AlertChannelsTable({ channels, pagination }: { channels: AlertCh
   }
 
   function handleToggle(id: string, currentlyEnabled: boolean): void {
-    startTransition(async () => {
-      await toggleAlertChannelAction(id, !currentlyEnabled)
-    })
-  }
-
-  function handleDelete(id: string): void {
-    setPendingConfirm({ type: 'delete', ids: [id] })
+    startTransition(async () => { await toggleAlertChannelAction(id, !currentlyEnabled) })
   }
 
   function executeConfirm(): void {
     if (!pendingConfirm) return
     const { type, ids } = pendingConfirm
     setPendingConfirm(null)
-
+    setSelectedIds(new Set())
     startTransition(async () => {
       switch (type) {
         case 'delete': {
@@ -95,15 +89,15 @@ export function AlertChannelsTable({ channels, pagination }: { channels: AlertCh
         }
         case 'bulk-delete':
           await bulkDeleteAlertChannelsAction(ids)
-          toast.addToast(`${ids.length} alert channel(s) deleted.`, 'success')
+          toast.addToast(`${ids.length} channel(s) deleted.`, 'success')
           break
         case 'bulk-enable':
           await bulkEnableAlertChannelsAction(ids)
-          toast.addToast(`${ids.length} alert channel(s) enabled.`, 'success')
+          toast.addToast(`${ids.length} channel(s) enabled.`, 'success')
           break
         case 'bulk-disable':
           await bulkDisableAlertChannelsAction(ids)
-          toast.addToast(`${ids.length} alert channel(s) disabled.`, 'success')
+          toast.addToast(`${ids.length} channel(s) disabled.`, 'success')
           break
       }
     })
@@ -112,158 +106,207 @@ export function AlertChannelsTable({ channels, pagination }: { channels: AlertCh
   function getConfirmProps(): { title: string; message: string; confirmText: string; variant: 'danger' | 'warning' } {
     if (!pendingConfirm) return { title: '', message: '', confirmText: '', variant: 'danger' }
     switch (pendingConfirm.type) {
-      case 'delete':
-        return { title: 'Delete Alert Channel', message: 'This alert channel will be permanently deleted. You will no longer receive notifications through it. This action cannot be undone.', confirmText: 'Delete', variant: 'danger' }
-      case 'bulk-delete':
-        return { title: `Delete ${pendingConfirm.ids.length} Alert Channel(s)`, message: `${pendingConfirm.ids.length} alert channel(s) will be permanently deleted. This action cannot be undone.`, confirmText: 'Delete All', variant: 'danger' }
-      case 'bulk-enable':
-        return { title: `Enable ${pendingConfirm.ids.length} Alert Channel(s)`, message: `${pendingConfirm.ids.length} alert channel(s) will be enabled and start sending notifications.`, confirmText: 'Enable All', variant: 'warning' }
-      case 'bulk-disable':
-        return { title: `Disable ${pendingConfirm.ids.length} Alert Channel(s)`, message: `${pendingConfirm.ids.length} alert channel(s) will be disabled. You will stop receiving notifications through them.`, confirmText: 'Disable All', variant: 'warning' }
+      case 'delete': return { title: 'Delete Channel', message: 'This alert channel will be permanently deleted.', confirmText: 'Delete', variant: 'danger' }
+      case 'bulk-delete': return { title: `Delete ${pendingConfirm.ids.length} Channel(s)`, message: `${pendingConfirm.ids.length} channel(s) will be permanently deleted.`, confirmText: 'Delete All', variant: 'danger' }
+      case 'bulk-enable': return { title: `Enable ${pendingConfirm.ids.length} Channel(s)`, message: `${pendingConfirm.ids.length} channel(s) will be enabled.`, confirmText: 'Enable All', variant: 'warning' }
+      case 'bulk-disable': return { title: `Disable ${pendingConfirm.ids.length} Channel(s)`, message: `${pendingConfirm.ids.length} channel(s) will be disabled.`, confirmText: 'Disable All', variant: 'warning' }
     }
   }
 
-  const columns: Column<AlertChannel>[] = [
-    {
-      key: 'type',
-      label: 'Type',
-      render: (ch) => <span style={{ fontWeight: 500 }}>{typeLabels[ch.type] || ch.type}</span>,
-    },
-    {
-      key: 'name',
-      label: 'Name',
-      render: (ch) => <span style={{ fontWeight: 600 }}>{ch.name}</span>,
-    },
-    {
-      key: 'destination',
-      label: 'Destination',
-      sortable: false,
-      searchable: false,
-      render: (ch) => (
-        <span className="table-muted" style={{ fontFamily: 'monospace', fontSize: 12 }}>
-          {getDestination(ch)}
-        </span>
-      ),
-    },
-    {
-      key: 'severity_filter',
-      label: 'Severities',
-      sortable: false,
-      searchable: false,
-      render: (ch) => {
-        const filters = (ch.severity_filter || []) as string[]
-        return (
-          <span style={{ display: 'flex', gap: 4 }}>
-            {filters.map((s) => (
-              <span
-                key={s}
-                className={`badge ${s === 'P1' || s === 'P2' ? 'badge-danger' : 'badge-muted'}`}
-                style={{ fontSize: 11 }}
-              >
-                {s}
-              </span>
-            ))}
-          </span>
-        )
-      },
-    },
-    {
-      key: 'is_enabled',
-      label: 'Status',
-      render: (ch) => (
-        <span className={`badge ${ch.is_enabled ? 'badge-success' : 'badge-outline'}`}>
-          <span
-            className={`status-dot ${ch.is_enabled ? 'status-dot-up' : 'status-dot-paused'}`}
-            style={{ marginRight: 6 }}
-          />
-          {ch.is_enabled ? 'Enabled' : 'Disabled'}
-        </span>
-      ),
-    },
-    {
-      key: 'actions',
-      label: '',
-      sortable: false,
-      searchable: false,
-      render: (ch) => (
-        <span style={{ display: 'flex', gap: 8 }}>
-          <button
-            className="btn btn-sm btn-secondary"
-            onClick={() => handleTestAlert(ch.id)}
-            disabled={testingChannelId === ch.id}
-          >
-            {testingChannelId === ch.id ? 'Sending...' : 'Test'}
-          </button>
-          <Link href={`/dashboard/alerts/${ch.id}`} className="btn btn-sm btn-secondary">
-            Edit
-          </Link>
-          <button
-            className="btn btn-sm btn-secondary"
-            onClick={() => handleToggle(ch.id, ch.is_enabled)}
-            disabled={isPending}
-          >
-            {ch.is_enabled ? 'Disable' : 'Enable'}
-          </button>
-          <button
-            className="btn btn-sm btn-ghost"
-            style={{ color: '#dc2626' }}
-            onClick={() => handleDelete(ch.id)}
-            disabled={isPending}
-          >
-            Delete
-          </button>
-        </span>
-      ),
-    },
-  ]
-
-  const filters = [
-    {
-      key: 'type',
-      label: 'All Types',
-      options: [
-        { label: 'Email', value: 'email' },
-        { label: 'Slack', value: 'slack' },
-        { label: 'Teams', value: 'teams' },
-        { label: 'Webhook', value: 'webhook' },
-        { label: 'WhatsApp', value: 'whatsapp' },
-        { label: 'Voice', value: 'voice' },
-      ],
-    },
-  ]
-
-  function handleBulkDelete(selectedIds: string[]): void {
-    setPendingConfirm({ type: 'bulk-delete', ids: selectedIds })
+  function toggleSelect(id: string) {
+    setSelectedIds(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n })
   }
 
-  function handleBulkEnable(selectedIds: string[]): void {
-    setPendingConfirm({ type: 'bulk-enable', ids: selectedIds })
+  function toggleSelectAll() {
+    setSelectedIds(prev => prev.size === channels.length ? new Set() : new Set(channels.map(c => c.id)))
   }
-
-  function handleBulkDisable(selectedIds: string[]): void {
-    setPendingConfirm({ type: 'bulk-disable', ids: selectedIds })
-  }
-
-  const bulkActions: BulkAction[] = [
-    { label: 'Enable', onClick: handleBulkEnable },
-    { label: 'Disable', onClick: handleBulkDisable },
-    { label: 'Delete', onClick: handleBulkDelete, variant: 'danger' },
-  ]
 
   const confirmProps = getConfirmProps()
+  const someSelected = selectedIds.size > 0
+  const allSelected = channels.length > 0 && selectedIds.size === channels.length
+
+  if (channels.length === 0) {
+    return (
+      <div className="empty-state">
+        <div className="empty-state-icon"><BellOff size={32} strokeWidth={1.5} /></div>
+        <h3>No alert channels yet</h3>
+        <p>Add a channel to receive downtime notifications.</p>
+        <Link href="/dashboard/alerts/new" className="btn btn-primary" style={{ marginTop: 16 }}>+ Add Channel</Link>
+      </div>
+    )
+  }
 
   return (
-    <>
-      <DataTable
-        columns={columns}
-        data={channels}
-        searchPlaceholder="Search alert channels..."
-        filters={filters}
-        bulkActions={bulkActions}
-        emptyIcon="🔔"
-        emptyMessage="No alert channels configured. Add a channel to receive downtime notifications."
-        emptyAction={{ label: '+ Add Channel', href: '/dashboard/alerts/new' }}
-      />
+    <div className="ac-wrap">
+      {/* Bulk bar */}
+      {someSelected && (
+        <div className="ac-bulk-bar">
+          <span className="ac-bulk-count">{selectedIds.size} selected</span>
+          <div className="ac-bulk-actions">
+            <button className="btn btn-sm" onClick={() => setPendingConfirm({ type: 'bulk-enable', ids: Array.from(selectedIds) })}>Enable</button>
+            <button className="btn btn-sm" onClick={() => setPendingConfirm({ type: 'bulk-disable', ids: Array.from(selectedIds) })}>Disable</button>
+            <button className="btn btn-sm" style={{ color: '#ef4444' }} onClick={() => setPendingConfirm({ type: 'bulk-delete', ids: Array.from(selectedIds) })}>Delete</button>
+            <button className="btn btn-sm" onClick={() => setSelectedIds(new Set())}>Clear</button>
+          </div>
+        </div>
+      )}
+
+      {/* Header */}
+      <div className="ac-header">
+        <div className="ac-col-check">
+          <input type="checkbox" className="mon-checkbox" checked={allSelected} onChange={toggleSelectAll} aria-label="Select all" />
+        </div>
+        <div className="ac-col-channel">Channel</div>
+        <div className="ac-col-dest">Destination</div>
+        <div className="ac-col-severity">Severities</div>
+        <div className="ac-col-status">Status</div>
+        <div className="ac-col-status">Actions</div>
+      </div>
+
+      {/* Rows */}
+      <div className="ac-list">
+        {channels.map(ch => {
+          const meta = TYPE_META[ch.type] ?? DEFAULT_META
+          const severities = (ch.severity_filter || []) as string[]
+          const isSelected = selectedIds.has(ch.id)
+
+          return (
+            <div key={ch.id} className={`ac-row${isSelected ? ' ac-row--selected' : ''}${!ch.is_enabled ? ' ac-row--disabled' : ''}`}>
+              {/* Checkbox — always col 1 */}
+              <div className="ac-col-check">
+                <input type="checkbox" className="mon-checkbox" checked={isSelected} onChange={() => toggleSelect(ch.id)} aria-label={`Select ${ch.name}`} />
+              </div>
+
+              {/* Desktop: individual grid columns. Mobile: .ac-mobile-body wraps everything */}
+              <div className="ac-col-channel">
+                <div className="ac-type-icon" style={{ background: meta.bg, color: meta.color }}>
+                  {meta.icon}
+                </div>
+                <div className="ac-channel-info">
+                  <span className="ac-channel-name">{ch.name}</span>
+                  <span className="ac-channel-type">{meta.label}{!ch.is_enabled ? ' · Disabled' : ''}</span>
+                </div>
+              </div>
+
+              <div className="ac-col-dest">
+                <span className="ac-dest">{getDestination(ch)}</span>
+              </div>
+
+              <div className="ac-col-severity">
+                <div className="ac-severity-chips">
+                  {severities.length === 0
+                    ? <span className="ac-severity-all">All</span>
+                    : severities.map(s => (
+                      <span key={s} className={`ac-severity-chip${s === 'P1' || s === 'P2' ? ' ac-severity-chip--high' : ''}`}>{s}</span>
+                    ))
+                  }
+                </div>
+              </div>
+
+              <div className="ac-col-status">
+                <span className={`ac-status-badge${ch.is_enabled ? ' ac-status-badge--on' : ' ac-status-badge--off'}`}>
+                  <span className="ac-status-dot" />
+                  {ch.is_enabled ? 'Enabled' : 'Disabled'}
+                </span>
+              </div>
+
+              <div className="ac-col-actions">
+                <button
+                  className="mon-action-btn"
+                  title={testingChannelId === ch.id ? 'Sending…' : 'Send test alert'}
+                  onClick={() => handleTestAlert(ch.id)}
+                  disabled={testingChannelId === ch.id}
+                >
+                  <Send size={13} />
+                </button>
+                <Link href={`/dashboard/alerts/${ch.id}`} className="mon-action-btn" title="Edit">
+                  <Edit2 size={13} />
+                </Link>
+                <button
+                  className="mon-action-btn"
+                  title={ch.is_enabled ? 'Disable' : 'Enable'}
+                  onClick={() => handleToggle(ch.id, ch.is_enabled)}
+                  disabled={isPending}
+                >
+                  {ch.is_enabled ? <PowerOff size={13} /> : <Power size={13} />}
+                </button>
+                <button
+                  className="mon-action-btn mon-action-btn--danger"
+                  title="Delete"
+                  onClick={() => setPendingConfirm({ type: 'delete', ids: [ch.id] })}
+                  disabled={isPending}
+                >
+                  <Trash2 size={13} />
+                </button>
+              </div>
+
+              {/* Mobile-only card body — shown instead of desktop columns */}
+              <div className="ac-mobile-body">
+                <div className="ac-mobile-row1">
+                  <div className="ac-type-icon ac-mobile-icon" style={{ background: meta.bg, color: meta.color }}>
+                    {meta.icon}
+                  </div>
+                  <div className="ac-mobile-name-wrap">
+                    <span className="ac-channel-name">{ch.name}</span>
+                    <span className="ac-channel-type">{meta.label}{!ch.is_enabled ? ' · Disabled' : ''}</span>
+                  </div>
+                  <span className={`ac-status-badge${ch.is_enabled ? ' ac-status-badge--on' : ' ac-status-badge--off'}`}>
+                    <span className="ac-status-dot" />
+                    {ch.is_enabled ? 'On' : 'Off'}
+                  </span>
+                </div>
+
+                <div className="ac-mobile-dest">
+                  <span className="ac-dest">{getDestination(ch)}</span>
+                </div>
+
+                <div className="ac-mobile-row3">
+                  <div className="ac-severity-chips">
+                    {severities.length === 0
+                      ? <span className="ac-severity-all">All severities</span>
+                      : severities.map(s => (
+                        <span key={s} className={`ac-severity-chip${s === 'P1' || s === 'P2' ? ' ac-severity-chip--high' : ''}`}>{s}</span>
+                      ))
+                    }
+                  </div>
+                  <div className="ac-mobile-actions">
+                    <button
+                      className="mon-action-btn"
+                      title={testingChannelId === ch.id ? 'Sending…' : 'Send test'}
+                      onClick={() => handleTestAlert(ch.id)}
+                      disabled={testingChannelId === ch.id}
+                    >
+                      <Send size={13} />
+                    </button>
+                    <Link href={`/dashboard/alerts/${ch.id}`} className="mon-action-btn" title="Edit">
+                      <Edit2 size={13} />
+                    </Link>
+                    <button
+                      className="mon-action-btn"
+                      title={ch.is_enabled ? 'Disable' : 'Enable'}
+                      onClick={() => handleToggle(ch.id, ch.is_enabled)}
+                      disabled={isPending}
+                    >
+                      {ch.is_enabled ? <PowerOff size={13} /> : <Power size={13} />}
+                    </button>
+                    <button
+                      className="mon-action-btn mon-action-btn--danger"
+                      title="Delete"
+                      onClick={() => setPendingConfirm({ type: 'delete', ids: [ch.id] })}
+                      disabled={isPending}
+                    >
+                      <Trash2 size={13} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      {pagination && <Pagination {...pagination} />}
+
       <ConfirmDialog
         isOpen={pendingConfirm !== null}
         onConfirm={executeConfirm}
@@ -273,7 +316,6 @@ export function AlertChannelsTable({ channels, pagination }: { channels: AlertCh
         confirmText={confirmProps.confirmText}
         variant={confirmProps.variant}
       />
-      {pagination && <Pagination {...pagination} />}
-    </>
+    </div>
   )
 }

@@ -3,7 +3,7 @@
 import { useState, useTransition, useCallback, useEffect } from 'react'
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { DataTable, type Column, type BulkAction } from '@/components/ui/data-table'
+import { Radio, Pause, Play, Trash2, Edit2 } from 'lucide-react'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { MonitorStatusBadge } from './monitor-status-badge'
 import { TimelineBarGraph } from '@/components/ui/timeline-bar-graph'
@@ -30,16 +30,50 @@ interface PendingConfirm {
   isPaused?: boolean
 }
 
+function timeAgo(dateStr: string): string {
+  const seconds = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000)
+  if (seconds < 60) return 'Just now'
+  if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`
+  if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`
+  return `${Math.floor(seconds / 86400)}d ago`
+}
+
+const STATUS_ORDER = ['', 'up', 'down', 'degraded', 'paused', 'unknown']
+const TYPE_OPTIONS = [
+  { label: 'HTTP', value: 'http' },
+  { label: 'SSL', value: 'ssl' },
+  { label: 'DNS', value: 'dns' },
+  { label: 'Keyword', value: 'keyword' },
+  { label: 'Domain', value: 'domain' },
+  { label: 'Port', value: 'port' },
+  { label: 'Ping', value: 'ping' },
+  { label: 'API', value: 'api' },
+  { label: 'Heartbeat', value: 'heartbeat' },
+  { label: 'Competitor', value: 'competitor' },
+  { label: 'Security Headers', value: 'security-headers' },
+  { label: 'Response Time', value: 'response-time' },
+  { label: 'robots.txt', value: 'robots-txt' },
+  { label: 'IP Change', value: 'ip-change' },
+  { label: 'MX Health', value: 'mx-health' },
+  { label: 'WHOIS Change', value: 'whois-change' },
+  { label: 'Sitemap', value: 'sitemap' },
+  { label: 'Redirect Chain', value: 'redirect-chain' },
+  { label: 'SPF / DMARC', value: 'spf-dmarc' },
+  { label: 'Blacklist', value: 'blacklist' },
+  { label: 'Page Size', value: 'page-size' },
+  { label: 'Cookie Consent', value: 'cookie-consent' },
+  { label: 'Nameservers', value: 'nameserver-change' },
+]
+
 export function MonitorTable({ monitors, uptimeData, initialSearch = '', initialStatus = '', initialType = '', pagination }: MonitorTableProps) {
   const [isPending, startTransition] = useTransition()
   const [pendingConfirm, setPendingConfirm] = useState<PendingConfirm | null>(null)
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
 
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
-  // Push search/filter changes into the URL so the server query (the single
-  // source of truth for pagination) re-runs. Always reset to page 1.
   const updateParams = useCallback((updates: Record<string, string>) => {
     const params = new URLSearchParams(searchParams.toString())
     for (const [key, value] of Object.entries(updates)) {
@@ -51,7 +85,6 @@ export function MonitorTable({ monitors, uptimeData, initialSearch = '', initial
     router.push(qs ? `${pathname}?${qs}` : pathname)
   }, [pathname, router, searchParams])
 
-  // Local search box value for snappy typing; pushed to the URL (debounced).
   const [searchInput, setSearchInput] = useState(initialSearch)
   useEffect(() => { setSearchInput(initialSearch) }, [initialSearch])
   useEffect(() => {
@@ -60,40 +93,34 @@ export function MonitorTable({ monitors, uptimeData, initialSearch = '', initial
     return () => clearTimeout(t)
   }, [searchInput, initialSearch, updateParams, startTransition])
 
-  function handlePauseResume(id: string, isPaused: boolean): void {
-    setPendingConfirm({ type: 'pause', ids: [id], isPaused })
+  function toggleSelect(id: string) {
+    setSelectedIds(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id); else next.add(id)
+      return next
+    })
   }
 
-  function handleDelete(id: string): void {
-    setPendingConfirm({ type: 'delete', ids: [id] })
+  function toggleSelectAll() {
+    if (selectedIds.size === monitors.length) setSelectedIds(new Set())
+    else setSelectedIds(new Set(monitors.map(m => m.id)))
   }
 
-  function executeConfirm(): void {
+  function executeConfirm() {
     if (!pendingConfirm) return
     const { type, ids, isPaused } = pendingConfirm
     setPendingConfirm(null)
-
+    setSelectedIds(new Set())
     startTransition(async () => {
       switch (type) {
-        case 'delete':
-          await deleteMonitorAction(ids[0])
-          break
-        case 'bulk-delete':
-          await bulkDeleteMonitorsAction(ids)
-          break
+        case 'delete': await deleteMonitorAction(ids[0]); break
+        case 'bulk-delete': await bulkDeleteMonitorsAction(ids); break
         case 'pause':
-          if (isPaused) {
-            await resumeMonitorAction(ids[0])
-          } else {
-            await pauseMonitorAction(ids[0])
-          }
+          if (isPaused) await resumeMonitorAction(ids[0])
+          else await pauseMonitorAction(ids[0])
           break
-        case 'bulk-pause':
-          await bulkPauseMonitorsAction(ids)
-          break
-        case 'bulk-resume':
-          await bulkResumeMonitorsAction(ids)
-          break
+        case 'bulk-pause': await bulkPauseMonitorsAction(ids); break
+        case 'bulk-resume': await bulkResumeMonitorsAction(ids); break
       }
     })
   }
@@ -101,152 +128,181 @@ export function MonitorTable({ monitors, uptimeData, initialSearch = '', initial
   function getConfirmProps(): { title: string; message: string; confirmText: string; variant: 'danger' | 'warning' } {
     if (!pendingConfirm) return { title: '', message: '', confirmText: '', variant: 'danger' }
     switch (pendingConfirm.type) {
-      case 'delete':
-        return { title: 'Delete Monitor', message: 'This monitor and all its check history will be permanently deleted. This action cannot be undone.', confirmText: 'Delete', variant: 'danger' }
-      case 'bulk-delete':
-        return { title: `Delete ${pendingConfirm.ids.length} Monitor(s)`, message: `${pendingConfirm.ids.length} monitor(s) and all their check history will be permanently deleted. This action cannot be undone.`, confirmText: 'Delete All', variant: 'danger' }
-      case 'pause':
-        return { title: pendingConfirm.isPaused ? 'Resume Monitor' : 'Pause Monitor', message: pendingConfirm.isPaused ? 'This monitor will start checking again.' : 'This monitor will stop checking until resumed.', confirmText: pendingConfirm.isPaused ? 'Resume' : 'Pause', variant: 'warning' }
-      case 'bulk-pause':
-        return { title: `Pause ${pendingConfirm.ids.length} Monitor(s)`, message: `${pendingConfirm.ids.length} monitor(s) will stop checking until resumed.`, confirmText: 'Pause All', variant: 'warning' }
-      case 'bulk-resume':
-        return { title: `Resume ${pendingConfirm.ids.length} Monitor(s)`, message: `${pendingConfirm.ids.length} monitor(s) will start checking again.`, confirmText: 'Resume All', variant: 'warning' }
+      case 'delete': return { title: 'Delete Monitor', message: 'This monitor and all its check history will be permanently deleted.', confirmText: 'Delete', variant: 'danger' }
+      case 'bulk-delete': return { title: `Delete ${pendingConfirm.ids.length} Monitor(s)`, message: `${pendingConfirm.ids.length} monitors and all their history will be permanently deleted.`, confirmText: 'Delete All', variant: 'danger' }
+      case 'pause': return { title: pendingConfirm.isPaused ? 'Resume Monitor' : 'Pause Monitor', message: pendingConfirm.isPaused ? 'This monitor will start checking again.' : 'This monitor will stop checking until resumed.', confirmText: pendingConfirm.isPaused ? 'Resume' : 'Pause', variant: 'warning' }
+      case 'bulk-pause': return { title: `Pause ${pendingConfirm.ids.length} Monitor(s)`, message: `${pendingConfirm.ids.length} monitors will stop checking until resumed.`, confirmText: 'Pause All', variant: 'warning' }
+      case 'bulk-resume': return { title: `Resume ${pendingConfirm.ids.length} Monitor(s)`, message: `${pendingConfirm.ids.length} monitors will start checking again.`, confirmText: 'Resume All', variant: 'warning' }
     }
   }
 
-  const columns: Column<Monitor>[] = [
-    { key: 'type', label: 'Type', render: (m) => <MonitorTypeIcon type={m.type} /> },
-    { key: 'name', label: 'Name', render: (m) => <Link href={m.type === 'wordpress' ? `/dashboard/monitors/${m.id}/wordpress` : `/dashboard/monitors/${m.id}`} className="table-link">{m.name}</Link> },
-    { key: 'target', label: 'URL', render: (m) => {
-      const href = /^https?:\/\//i.test(m.target) ? m.target : `https://${m.target}`
-      return (
-        <a
-          href={href}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="table-link"
-          title={m.target}
-          style={{ display: 'inline-block', maxWidth: 280, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', verticalAlign: 'middle' }}
-        >
-          {m.target.replace(/^https?:\/\//, '').replace(/\/$/, '')}
-        </a>
-      )
-    } },
-    { key: 'uptime', label: 'Uptime (24h)', sortable: false, searchable: false, render: (m) => {
-      const slotSeconds = Math.max(m.check_interval_seconds, Math.ceil(86400 / 288))
-      const numSlots    = Math.floor(86400 / slotSeconds)
-      return (
-        <TimelineBarGraph
-          data={(uptimeData[m.id] || []).map(s => ({ timestamp: s.timestamp, status: s.status }))}
-          intervalSeconds={slotSeconds}
-          maxBars={numSlots}
-          height={24}
-          showFooter={false}
-        />
-      )
-    }},
-    { key: 'status', label: 'Status', render: (m) => <MonitorStatusBadge status={m.status} monitorType={m.type} /> },
-    { key: 'last_checked_at', label: 'Last Checked', render: (m) => <span className="table-muted">{m.last_checked_at ? timeAgo(m.last_checked_at) : 'Never'}</span> },
-    {
-      key: 'actions',
-      label: '',
-      sortable: false,
-      searchable: false,
-      render: (m) => (
-        <span style={{ display: 'flex', gap: 8 }}>
-          <Link href={`/dashboard/monitors/${m.id}/edit`} className="btn btn-sm btn-secondary">Edit</Link>
-          <button
-            className="btn btn-sm btn-secondary"
-            onClick={() => handlePauseResume(m.id, m.is_paused)}
-            disabled={isPending}
-          >
-            {m.is_paused ? 'Resume' : 'Pause'}
-          </button>
-          <button
-            className="btn btn-sm btn-ghost"
-            style={{ color: '#dc2626' }}
-            onClick={() => handleDelete(m.id)}
-            disabled={isPending}
-          >
-            Delete
-          </button>
-        </span>
-      ),
-    },
-  ]
-
-  const filters = [
-    { key: 'status', label: 'All Statuses', options: [
-      { label: 'Up', value: 'up' },
-      { label: 'Down', value: 'down' },
-      { label: 'Degraded', value: 'degraded' },
-      { label: 'Paused', value: 'paused' },
-      { label: 'Unknown', value: 'unknown' },
-    ]},
-    { key: 'type', label: 'All Types', options: [
-      { label: 'HTTP', value: 'http' },
-      { label: 'SSL', value: 'ssl' },
-      { label: 'DNS', value: 'dns' },
-      { label: 'Keyword', value: 'keyword' },
-      { label: 'Domain', value: 'domain' },
-      { label: 'Port', value: 'port' },
-      { label: 'Ping', value: 'ping' },
-      { label: 'API', value: 'api' },
-      { label: 'Heartbeat', value: 'heartbeat' },
-      { label: 'Competitor', value: 'competitor' },
-      { label: 'Security Headers', value: 'security-headers' },
-      { label: 'Response Time', value: 'response-time' },
-      { label: 'robots.txt', value: 'robots-txt' },
-      { label: 'IP Change', value: 'ip-change' },
-      { label: 'MX Health', value: 'mx-health' },
-      { label: 'WHOIS Change', value: 'whois-change' },
-      { label: 'Sitemap', value: 'sitemap' },
-      { label: 'Redirect Chain', value: 'redirect-chain' },
-      { label: 'SPF / DMARC', value: 'spf-dmarc' },
-      { label: 'Blacklist', value: 'blacklist' },
-      { label: 'Page Size', value: 'page-size' },
-      { label: 'Cookie Consent', value: 'cookie-consent' },
-      { label: 'Nameserver Change', value: 'nameserver-change' },
-    ]},
-  ]
-
-  function handleBulkPause(selectedIds: string[]): void {
-    setPendingConfirm({ type: 'bulk-pause', ids: selectedIds })
-  }
-
-  function handleBulkResume(selectedIds: string[]): void {
-    setPendingConfirm({ type: 'bulk-resume', ids: selectedIds })
-  }
-
-  function handleBulkDelete(selectedIds: string[]): void {
-    setPendingConfirm({ type: 'bulk-delete', ids: selectedIds })
-  }
-
-  const bulkActions: BulkAction[] = [
-    { label: 'Pause', onClick: handleBulkPause },
-    { label: 'Resume', onClick: handleBulkResume },
-    { label: 'Delete', onClick: handleBulkDelete, variant: 'danger' },
-  ]
-
   const confirmProps = getConfirmProps()
+  const allSelected = monitors.length > 0 && selectedIds.size === monitors.length
+  const someSelected = selectedIds.size > 0
+
+  if (monitors.length === 0 && !initialSearch && !initialStatus && !initialType) {
+    return (
+      <div className="empty-state">
+        <div className="empty-state-icon"><Radio size={32} strokeWidth={1.5} /></div>
+        <h3>No monitors yet</h3>
+        <p>Create your first monitor to get started.</p>
+        <Link href="/dashboard/monitors/scan" className="btn btn-primary" style={{ marginTop: 16 }}>
+          + Add Your First Monitor
+        </Link>
+      </div>
+    )
+  }
 
   return (
-    <>
-      <DataTable
-        columns={columns}
-        data={monitors}
-        searchPlaceholder="Search monitors..."
-        serverMode
-        searchValue={searchInput}
-        onSearchChange={setSearchInput}
-        controlledFilterValues={{ status: initialStatus, type: initialType }}
-        onFilterChange={(key, value) => updateParams({ [key]: value })}
-        filters={filters}
-        bulkActions={bulkActions}
-        emptyIcon="📡"
-        emptyMessage="No monitors yet. Create your first monitor to get started."
-        emptyAction={{ label: '+ Add Your First Monitor', href: '/dashboard/monitors/scan' }}
-      />
+    <div className="mon-list-wrap">
+      {/* Toolbar */}
+      <div className="mon-toolbar">
+        <div className="mon-toolbar-left">
+          <input
+            className="mon-search"
+            type="text"
+            placeholder="Search monitors…"
+            value={searchInput}
+            onChange={e => setSearchInput(e.target.value)}
+          />
+          <div className="mon-filter-row">
+            <select
+              className="mon-filter-select"
+              value={initialStatus}
+              onChange={e => updateParams({ status: e.target.value })}
+            >
+              <option value="">All Statuses</option>
+              {STATUS_ORDER.slice(1).map(s => (
+                <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>
+              ))}
+            </select>
+            <select
+              className="mon-filter-select"
+              value={initialType}
+              onChange={e => updateParams({ type: e.target.value })}
+            >
+              <option value="">All Types</option>
+              {TYPE_OPTIONS.map(o => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+        {someSelected && (
+          <div className="mon-bulk-bar">
+            <span className="mon-bulk-count">{selectedIds.size} selected</span>
+            <div className="mon-bulk-actions">
+              <button className="btn btn-sm btn-secondary" onClick={() => setPendingConfirm({ type: 'bulk-pause', ids: Array.from(selectedIds) })}>Pause</button>
+              <button className="btn btn-sm btn-secondary" onClick={() => setPendingConfirm({ type: 'bulk-resume', ids: Array.from(selectedIds) })}>Resume</button>
+              <button className="btn btn-sm btn-ghost" style={{ color: '#dc2626' }} onClick={() => setPendingConfirm({ type: 'bulk-delete', ids: Array.from(selectedIds) })}>Delete</button>
+              <button className="btn btn-sm btn-ghost" onClick={() => setSelectedIds(new Set())}>Clear</button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Header row */}
+      <div className="mon-list-header">
+        <div className="mon-col-check">
+          <input type="checkbox" className="mon-checkbox" checked={allSelected} onChange={toggleSelectAll} aria-label="Select all" />
+        </div>
+        <div className="mon-col-name">Monitor</div>
+        <div className="mon-col-type">Type</div>
+        <div className="mon-col-status">Status</div>
+        <div className="mon-col-uptime">Uptime (24h)</div>
+        <div className="mon-col-checked">Last Checked</div>
+        <div className="mon-col-checked">Actions</div>
+      </div>
+
+      {/* Monitor rows */}
+      <div className="mon-list">
+        {monitors.length === 0 ? (
+          <div className="mon-empty-filtered">No monitors match your filters.</div>
+        ) : monitors.map(m => {
+          const isSelected = selectedIds.has(m.id)
+          const slotSeconds = Math.max(m.check_interval_seconds, Math.ceil(86400 / 288))
+          const numSlots = Math.floor(86400 / slotSeconds)
+          const detailHref = m.type === 'wordpress' ? `/dashboard/monitors/${m.id}/wordpress` : `/dashboard/monitors/${m.id}`
+          const statusClass = m.status === 'down' ? 'mon-row--down' : m.status === 'degraded' ? 'mon-row--degraded' : m.status === 'paused' ? 'mon-row--paused' : 'mon-row--up'
+
+          return (
+            <div key={m.id} className={`mon-row ${statusClass}${isSelected ? ' mon-row--selected' : ''}`}>
+              <div className="mon-col-check">
+                <input type="checkbox" className="mon-checkbox" checked={isSelected} onChange={() => toggleSelect(m.id)} aria-label={`Select ${m.name}`} />
+              </div>
+
+              <div className="mon-col-name">
+                <Link href={detailHref} className="mon-name">{m.name}</Link>
+                <a
+                  href={/^https?:\/\//i.test(m.target) ? m.target : `https://${m.target}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mon-url"
+                >
+                  {m.target.replace(/^https?:\/\//, '').replace(/\/$/, '')}
+                </a>
+                {/* Mobile-only: status + type below name */}
+                <div className="mon-mobile-meta">
+                  <MonitorStatusBadge status={m.status} monitorType={m.type} />
+                  <span className="mon-type-chip"><MonitorTypeIcon type={m.type} /></span>
+                </div>
+              </div>
+
+              {/* Desktop-only columns */}
+              <div className="mon-col-type">
+                <span className="mon-type-chip">
+                  <MonitorTypeIcon type={m.type} />
+                </span>
+              </div>
+
+              <div className="mon-col-status">
+                <MonitorStatusBadge status={m.status} monitorType={m.type} />
+              </div>
+
+              <div className="mon-col-uptime">
+                <TimelineBarGraph
+                  data={(uptimeData[m.id] || []).map(s => ({ timestamp: s.timestamp, status: s.status }))}
+                  intervalSeconds={slotSeconds}
+                  maxBars={numSlots}
+                  height={24}
+                  showFooter={false}
+                />
+              </div>
+
+              <div className="mon-col-checked">
+                <span className="mon-last-checked">
+                  {m.last_checked_at ? timeAgo(m.last_checked_at) : '—'}
+                </span>
+              </div>
+
+              <div className="mon-col-actions">
+                <Link href={`/dashboard/monitors/${m.id}/edit`} className="mon-action-btn" title="Edit">
+                  <Edit2 size={14} />
+                </Link>
+                <button
+                  className="mon-action-btn"
+                  title={m.is_paused ? 'Resume' : 'Pause'}
+                  onClick={() => setPendingConfirm({ type: 'pause', ids: [m.id], isPaused: m.is_paused })}
+                  disabled={isPending}
+                >
+                  {m.is_paused ? <Play size={14} /> : <Pause size={14} />}
+                </button>
+                <button
+                  className="mon-action-btn mon-action-btn--danger"
+                  title="Delete"
+                  onClick={() => setPendingConfirm({ type: 'delete', ids: [m.id] })}
+                  disabled={isPending}
+                >
+                  <Trash2 size={14} />
+                </button>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      {pagination && <Pagination {...pagination} />}
+
       <ConfirmDialog
         isOpen={pendingConfirm !== null}
         onConfirm={executeConfirm}
@@ -256,15 +312,6 @@ export function MonitorTable({ monitors, uptimeData, initialSearch = '', initial
         confirmText={confirmProps.confirmText}
         variant={confirmProps.variant}
       />
-      {pagination && <Pagination {...pagination} />}
-    </>
+    </div>
   )
-}
-
-function timeAgo(dateStr: string): string {
-  const seconds = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000)
-  if (seconds < 60) return 'Just now'
-  if (seconds < 3600) return `${Math.floor(seconds / 60)} min ago`
-  if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`
-  return `${Math.floor(seconds / 86400)}d ago`
 }

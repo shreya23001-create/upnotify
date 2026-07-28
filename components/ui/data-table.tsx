@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useCallback } from 'react'
 import Link from 'next/link'
+import { BarChart2 } from 'lucide-react'
 
 export interface Column<T> {
   key: string
@@ -32,7 +33,7 @@ interface DataTableProps<T extends { id: string }> {
   pageSize?: number
   emptyMessage?: string
   emptyAction?: { label: string; href: string }
-  emptyIcon?: string
+  emptyIcon?: React.ReactNode
   /**
    * When true the table is a passive view of `data`: search, filtering and
    * pagination are owned by the parent (typically via the URL / server query)
@@ -56,7 +57,7 @@ export function DataTable<T extends { id: string }>({
   pageSize: initialPageSize = 10,
   emptyMessage = 'No data found.',
   emptyAction,
-  emptyIcon = '📊',
+  emptyIcon = <BarChart2 size={32} strokeWidth={1.5} />,
   serverMode = false,
   searchValue,
   onSearchChange,

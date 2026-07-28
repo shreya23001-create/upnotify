@@ -93,7 +93,7 @@ function EmptyChartState({ title, message, cta, href }: {
 }): React.ReactElement {
   return (
     <div className="chart-empty-state">
-      <div className="chart-empty-icon">📊</div>
+      <div className="chart-empty-icon"><IconBarChart size={28} /></div>
       <h4 className="chart-empty-title">{title}</h4>
       <p className="chart-empty-message">{message}</p>
       <Link href={href} className="btn btn-primary btn-sm">{cta}</Link>

@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react'
 import Link from 'next/link'
 import { DataTable, type Column, type BulkAction } from '@/components/ui/data-table'
+import { Globe } from 'lucide-react'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { deleteStatusPageAction, bulkDeleteStatusPagesAction, bulkPublishStatusPagesAction, bulkUnpublishStatusPagesAction } from '@/app/(dashboard)/dashboard/status-pages/actions'
 import type { StatusPage } from '@/lib/types'
@@ -111,7 +112,7 @@ export function StatusPagesTable({ pages, pagination }: { pages: StatusPage[]; p
         data={pages}
         searchPlaceholder="Search status pages..."
         bulkActions={bulkActions}
-        emptyIcon="🌐"
+        emptyIcon={<Globe size={32} strokeWidth={1.5} />}
         emptyMessage="No status pages yet. Create one to share your uptime status publicly."
         emptyAction={{ label: '+ Create Status Page', href: '/dashboard/status-pages/new' }}
       />
