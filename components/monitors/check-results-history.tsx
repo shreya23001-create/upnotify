@@ -6,7 +6,7 @@ import type { CheckResult } from '@/lib/types'
 
 export function CheckResultsHistory({ results }: { results: CheckResult[] }) {
   const columns: Column<CheckResult>[] = [
-    { key: 'checked_at', label: 'Time', render: (r) => <span className="table-muted">{new Date(r.checked_at).toLocaleString()}</span> },
+    { key: 'checked_at', label: 'Time', render: (r) => <span className="table-muted" suppressHydrationWarning>{new Date(r.checked_at).toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false })}</span> },
     { key: 'status', label: 'Status', render: (r) => (
       <span className={`badge ${r.status === 'up' ? 'badge-success' : r.status === 'down' ? 'badge-danger' : 'badge-warning'}`}>
         {r.status}

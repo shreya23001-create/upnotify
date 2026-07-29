@@ -1,3 +1,4 @@
+import { AlertTriangle } from 'lucide-react'
 import { SvgGauge } from './charts/svg-gauge'
 
 interface SecurityMonitorResult {
@@ -100,7 +101,7 @@ export function ReportSecurityAudit({ data }: { data: SecurityAuditData }): Reac
                   <td style={{ padding: '10px 12px' }}>
                     <div style={{ fontWeight: 500, color: '#1e293b' }}>{typeInfo?.label ?? m.name}</div>
                     {m.status !== 'up' && typeInfo && (
-                      <div style={{ fontSize: 11, color: '#ef4444', marginTop: 2 }}>⚠ {typeInfo.riskIfFailing}</div>
+                      <div style={{ fontSize: 11, color: '#ef4444', marginTop: 2, display: 'flex', alignItems: 'center', gap: 4 }}><AlertTriangle size={11} /> {typeInfo.riskIfFailing}</div>
                     )}
                   </td>
                   <td style={{ padding: '10px 12px', color: '#64748b', fontSize: 12 }}>{m.target}</td>
