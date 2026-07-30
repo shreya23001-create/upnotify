@@ -31850,11 +31850,12 @@ html.dark .db-home .db-stat-card:hover {
 /* ── Domains scrollable list — shows 5 items, scrolls for more ──────────── */
 .db-domains-scroll {
   overflow-y: auto;
+  overflow-x: hidden;
   max-height: calc(5 * 68px + 4 * 8px);
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 10px 12px;
+  padding: 10px 14px 10px 14px;
   scrollbar-width: thin;
   scrollbar-color: var(--border-primary) transparent;
 }
@@ -31880,6 +31881,9 @@ html.dark .db-home .db-stat-card:hover {
   text-decoration: none;
   display: block;
   flex-shrink: 0;
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .db-domain-inner {
@@ -31889,6 +31893,9 @@ html.dark .db-home .db-stat-card:hover {
   background: var(--bg-card);
   cursor: pointer;
   transition: box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .db-domain-inner--down {

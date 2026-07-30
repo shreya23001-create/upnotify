@@ -262,22 +262,22 @@ function DomainCards({ monitors }: { monitors: Monitor[] }) {
                 onMouseEnter={e => { const el = e.currentTarget as HTMLDivElement; el.style.boxShadow = '0 8px 20px rgba(0,0,0,0.1)'; el.style.transform = 'translateY(-2px)' }}
                 onMouseLeave={e => { const el = e.currentTarget as HTMLDivElement; el.style.boxShadow = 'none'; el.style.transform = 'translateY(0)' }}
               >
-                {/* Row 1: dot + domain name + status badge */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6, minWidth: 0 }}>
+                {/* Row 1: dot + domain name (truncated) + status badge pinned right */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6, width: '100%', boxSizing: 'border-box' }}>
                   <DomainStatusDot status={g.status} />
-                  <span style={{ fontWeight: 600, fontSize: 12, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>
+                  <span style={{ fontWeight: 600, fontSize: 12, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: '1 1 0', minWidth: 0 }}>
                     {g.domain}
                   </span>
-                  <span className={`db-badge ${statusBadgeClass[g.status]}`} style={{ fontSize: 10, flexShrink: 0, marginLeft: 4 }}>
+                  <span className={`db-badge ${statusBadgeClass[g.status]}`} style={{ fontSize: 10, flexShrink: 0, flex: '0 0 auto' }}>
                     {statusLabel[g.status]}
                   </span>
                 </div>
-                {/* Row 2: monitor count + type tags (clipped, no overflow) */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0, overflow: 'hidden' }}>
+                {/* Row 2: monitor count + type tags */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, width: '100%', boxSizing: 'border-box', overflow: 'hidden' }}>
                   <span style={{ fontSize: 11, color: 'var(--text-muted)', flexShrink: 0 }}>
-                    {g.monitors.length}
+                    {g.monitors.length} monitors
                   </span>
-                  <div style={{ display: 'flex', gap: 3, overflow: 'hidden', minWidth: 0 }}>
+                  <div style={{ display: 'flex', gap: 3, overflow: 'hidden', minWidth: 0, flex: 1 }}>
                     {[...new Set(g.monitors.map(m => m.type))].slice(0, 3).map(t => (
                       <span key={t} style={{ fontSize: 10, background: 'var(--bg-subtle)', color: 'var(--text-muted)', borderRadius: 4, padding: '1px 5px', flexShrink: 0, whiteSpace: 'nowrap' }}>
                         {t}
