@@ -329,7 +329,7 @@ function IncidentsPanel({ incidents }: { incidents: Incident[] }) {
           return (
             <div key={inc.id} className="incident-item" style={inc.status === 'resolved' ? { opacity: 0.6 } : undefined}>
               <div className={`incident-icon ${v}`}>{icons[v]}</div>
-              <div style={{ flex: 1 }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
                 <div className="incident-name">{inc.title}</div>
                 <div className="incident-detail">{inc.root_cause ?? inc.severity}</div>
                 <div style={{ marginTop: 4 }}>

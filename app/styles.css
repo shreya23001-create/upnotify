@@ -3324,20 +3324,26 @@ html.dark .stat-icon-yellow {
   font-size: 13px;
   font-weight: 600;
   color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .incident-detail {
   font-size: 11px;
   color: var(--text-muted);
   margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .incident-time {
   font-size: 11px;
   color: var(--text-muted);
-  margin-left: auto;
   white-space: nowrap;
-  padding-left: 12px;
+  flex-shrink: 0;
+  padding-left: 8px;
 }
 
 /* Response time bar chart */
