@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { Plus, X, Globe, TrendingUp, Clock, Shield, ChevronRight, ScanSearch } from 'lucide-react'
 import type { CompetitorMonitor } from '@/lib/db/competitor-monitors'
 
 interface CompetitorDashboardProps {
@@ -11,27 +12,34 @@ interface CompetitorDashboardProps {
 }
 
 function getStatusColor(status: string): string {
-  if (status === 'up') return 'var(--color-success, #22c55e)'
-  if (status === 'down') return 'var(--color-danger, #ef4444)'
-  if (status === 'degraded') return 'var(--color-warning, #f59e0b)'
-  return 'var(--text-muted, #94a3b8)'
+  if (status === 'up') return '#22c55e'
+  if (status === 'down') return '#ef4444'
+  if (status === 'degraded') return '#f59e0b'
+  return '#94a3b8'
+}
+
+function getStatusBg(status: string): string {
+  if (status === 'up') return 'rgba(34,197,94,0.1)'
+  if (status === 'down') return 'rgba(239,68,68,0.1)'
+  if (status === 'degraded') return 'rgba(245,158,11,0.1)'
+  return 'rgba(148,163,184,0.1)'
 }
 
 function getStatusLabel(status: string): string {
   if (status === 'up') return 'Up'
   if (status === 'down') return 'Down'
   if (status === 'degraded') return 'Degraded'
-  return 'Checking...'
+  return 'Checking…'
 }
 
 function formatResponseTime(ms: number | null): string {
-  if (ms === null || ms === undefined) return '--'
+  if (ms === null || ms === undefined) return '—'
   if (ms < 1000) return `${ms}ms`
   return `${(ms / 1000).toFixed(1)}s`
 }
 
 function formatUptime(pct: number | null): string {
-  if (pct === null || pct === undefined) return '--'
+  if (pct === null || pct === undefined) return '—'
   return `${pct.toFixed(2)}%`
 }
 
@@ -59,14 +67,9 @@ export function CompetitorDashboard({
   const [items, setItems] = useState<CompetitorMonitor[]>(competitors)
 
   async function handleAdd(): Promise<void> {
-    if (!domain.trim()) {
-      setError('Domain is required')
-      return
-    }
-
+    if (!domain.trim()) { setError('Domain is required'); return }
     setLoading(true)
     setError('')
-
     try {
       const res = await fetch('/api/v1/competitors', {
         method: 'POST',
@@ -77,13 +80,8 @@ export function CompetitorDashboard({
           display_name: displayName.trim() || domain.trim(),
         }),
       })
-
       const data = await res.json()
-      if (!res.ok) {
-        setError(data.error || 'Failed to add competitor')
-        return
-      }
-
+      if (!res.ok) { setError(data.error || 'Failed to add competitor'); return }
       setItems(prev => [data.competitor, ...prev])
       setDomain('')
       setDisplayName('')
@@ -95,155 +93,185 @@ export function CompetitorDashboard({
     }
   }
 
-  async function handleDelete(id: string, displayName: string): Promise<void> {
-    if (!confirm(`Remove "${displayName}" from competitor monitoring? This will delete all check history for this competitor.`)) return
+  async function handleDelete(id: string, name: string): Promise<void> {
+    if (!confirm(`Remove "${name}" from competitor monitoring? This will delete all check history for this competitor.`)) return
     try {
-      const res = await fetch(`/api/v1/competitors?id=${id}&org_id=${orgId}`, {
-        method: 'DELETE',
-      })
-      if (res.ok) {
-        setItems(prev => prev.filter(c => c.id !== id))
-      }
-    } catch {
-      /* silent — will show stale data until refresh */
-    }
+      const res = await fetch(`/api/v1/competitors?id=${id}&org_id=${orgId}`, { method: 'DELETE' })
+      if (res.ok) setItems(prev => prev.filter(c => c.id !== id))
+    } catch { /* silent */ }
   }
 
   return (
-    <div className="competitors-section">
-      <div className="competitors-header">
-        <span className="competitors-count">
-          {limitInfo.currentCount} / {limitInfo.limit} competitors
-        </span>
-        {limitInfo.allowed && (
-          <button
-            className="btn btn-primary"
-            onClick={() => setShowForm(!showForm)}
-          >
-            + Add Competitor
-          </button>
-        )}
-        {!limitInfo.allowed && (
-          <span className="competitors-limit-msg">
-            Competitor limit reached. Upgrade your plan for more.
-          </span>
-        )}
+    <div className="wd-wrap">
+
+      {/* Toolbar */}
+      <div className="wd-toolbar">
+        <div className="wd-count-pill">
+          <Shield size={13} />
+          {limitInfo.currentCount} / {limitInfo.limit} tracked
+        </div>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          {!limitInfo.allowed && (
+            <span className="wd-limit-msg">Plan limit reached</span>
+          )}
+          {limitInfo.allowed && (
+            <button className="btn btn-primary" onClick={() => setShowForm(s => !s)}>
+              <Plus size={14} /> Add Competitor
+            </button>
+          )}
+        </div>
       </div>
 
+      {/* Add form */}
       {showForm && (
-        <div className="card competitor-form-card">
-          <h3 style={{ marginBottom: 16 }}>Add Competitor Domain</h3>
-          <div className="competitor-form">
+        <div className="card wd-add-card">
+          <div className="wd-add-header">
+            <span className="wd-add-title">Track a competitor domain</span>
+            <button className="btn-icon-sm" onClick={() => setShowForm(false)}><X size={14} /></button>
+          </div>
+          <div className="wd-add-body">
             <div className="form-group">
-              <label className="form-label">Domain</label>
+              <label className="form-label">Domain *</label>
               <input
-                type="text"
                 className="form-input"
-                placeholder="e.g. competitor.com"
+                type="text"
+                placeholder="competitor.com"
                 value={domain}
-                onChange={(e) => setDomain(e.target.value)}
+                onChange={e => setDomain(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleAdd()}
+                autoFocus
               />
             </div>
             <div className="form-group">
-              <label className="form-label">Display Name (optional)</label>
+              <label className="form-label">Display Name <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>(optional)</span></label>
               <input
-                type="text"
                 className="form-input"
-                placeholder="e.g. Competitor Inc"
+                type="text"
+                placeholder="Competitor Inc"
                 value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
+                onChange={e => setDisplayName(e.target.value)}
               />
             </div>
-            {error && <p className="form-error">{error}</p>}
-            <div className="competitor-form-actions">
-              <button
-                className="btn btn-primary"
-                onClick={handleAdd}
-                disabled={loading}
-              >
-                {loading ? 'Adding...' : 'Add Competitor'}
-              </button>
-              <button
-                className="btn btn-ghost"
-                onClick={() => setShowForm(false)}
-              >
-                Cancel
-              </button>
-            </div>
+          </div>
+          {error && <p className="form-error" style={{ margin: '0 20px 12px' }}>{error}</p>}
+          <div className="wd-add-footer">
+            <button className="btn btn-primary" onClick={handleAdd} disabled={loading}>
+              {loading ? 'Adding…' : 'Start Monitoring'}
+            </button>
+            <button className="btn btn-ghost" onClick={() => setShowForm(false)}>Cancel</button>
           </div>
         </div>
       )}
 
+      {/* Empty state */}
       {items.length === 0 && !showForm && (
-        <div className="card" style={{ padding: 48, textAlign: 'center' }}>
-          <p style={{ fontSize: 16, color: 'var(--text-secondary)', marginBottom: 8 }}>
-            No competitors tracked yet.
-          </p>
-          <p style={{ fontSize: 14, color: 'var(--text-muted)' }}>
-            Add competitor domains to compare their uptime and performance against your own sites.
-          </p>
+        <div className="wd-empty">
+          <div className="wd-empty-icon"><ScanSearch size={26} strokeWidth={1.5} /></div>
+          <div className="wd-empty-title">No competitors tracked yet</div>
+          <div className="wd-empty-sub">Add competitor domains to compare their uptime and response time against your own sites.</div>
+          {limitInfo.allowed && (
+            <button className="btn btn-primary" style={{ marginTop: 16 }} onClick={() => setShowForm(true)}>
+              <Plus size={14} /> Add Your First Competitor
+            </button>
+          )}
         </div>
       )}
 
+      {/* List */}
       {items.length > 0 && (
-        <div className="competitor-grid">
-          {items.map((comp) => (
-            <div key={comp.id} className="card competitor-card">
-              <div className="competitor-card-header">
-                <Link href={`/dashboard/watchdog/${comp.id}`} className="competitor-card-status" style={{ textDecoration: 'none', flex: 1 }}>
-                  <span
-                    className="status-dot"
-                    style={{ background: getStatusColor(comp.last_status) }}
-                  />
-                  <span className="competitor-card-name">{comp.display_name}</span>
-                </Link>
-                <button
-                  className="btn-icon-sm"
-                  onClick={() => handleDelete(comp.id, comp.display_name)}
-                  title="Remove competitor"
-                  aria-label={`Remove ${comp.display_name}`}
-                >
-                  &times;
-                </button>
-              </div>
-              <div className="competitor-card-domain">{comp.domain}</div>
-              <div className="competitor-card-stats">
-                <div className="competitor-stat">
-                  <span className="competitor-stat-label">Status</span>
-                  <span
-                    className="competitor-stat-value"
-                    style={{ color: getStatusColor(comp.last_status) }}
-                  >
-                    {getStatusLabel(comp.last_status)}
+        <div className="wd-list">
+          {/* Header row — desktop */}
+          <div className="wd-header">
+            <div className="wd-col-name">Competitor</div>
+            <div className="wd-col-status">Status</div>
+            <div className="wd-col-response">Response</div>
+            <div className="wd-col-uptime">Uptime (30d)</div>
+            <div className="wd-col-checked">Last Check</div>
+            <div className="wd-col-actions"></div>
+          </div>
+
+          {items.map(comp => {
+            const color = getStatusColor(comp.last_status)
+            const bg = getStatusBg(comp.last_status)
+            const label = getStatusLabel(comp.last_status)
+            return (
+              <div key={comp.id} className="wd-row">
+                {/* Name + domain */}
+                <div className="wd-col-name">
+                  <div className="wd-row-icon">
+                    <Globe size={14} color="var(--text-muted)" />
+                  </div>
+                  <div className="wd-row-name-wrap">
+                    <Link href={`/dashboard/watchdog/${comp.id}`} className="wd-row-name">
+                      {comp.display_name}
+                    </Link>
+                    <span className="wd-row-domain">{comp.domain}</span>
+                  </div>
+                </div>
+
+                {/* Status */}
+                <div className="wd-col-status">
+                  <span className="wd-status-chip" style={{ color, background: bg }}>
+                    <span className="wd-status-dot" style={{ background: color }} />
+                    {label}
                   </span>
                 </div>
-                <div className="competitor-stat">
-                  <span className="competitor-stat-label">Response</span>
-                  <span className="competitor-stat-value">
-                    {formatResponseTime(comp.last_response_time_ms)}
-                  </span>
+
+                {/* Response */}
+                <div className="wd-col-response wd-muted">
+                  {formatResponseTime(comp.last_response_time_ms)}
                 </div>
-                <div className="competitor-stat">
-                  <span className="competitor-stat-label">Uptime (30d)</span>
-                  <span className="competitor-stat-value">
+
+                {/* Uptime */}
+                <div className="wd-col-uptime">
+                  <span style={{
+                    color: comp.uptime_30d !== null && comp.uptime_30d < 99 ? '#f59e0b' : '#22c55e',
+                    fontWeight: 600,
+                    fontSize: 13,
+                  }}>
                     {formatUptime(comp.uptime_30d)}
                   </span>
                 </div>
-                <div className="competitor-stat">
-                  <span className="competitor-stat-label">Last Check</span>
-                  <span className="competitor-stat-value">
-                    {timeAgo(comp.last_checked_at)}
+
+                {/* Last check */}
+                <div className="wd-col-checked wd-muted" suppressHydrationWarning>
+                  <Clock size={11} style={{ flexShrink: 0 }} />
+                  {timeAgo(comp.last_checked_at)}
+                </div>
+
+                {/* Actions */}
+                <div className="wd-col-actions">
+                  <Link href={`/dashboard/watchdog/${comp.id}`} className="btn btn-sm btn-secondary wd-view-btn">
+                    <TrendingUp size={12} /> View
+                  </Link>
+                  <button
+                    className="btn-icon-sm wd-delete-btn"
+                    onClick={() => handleDelete(comp.id, comp.display_name)}
+                    title={`Remove ${comp.display_name}`}
+                  >
+                    <X size={13} />
+                  </button>
+                </div>
+
+                {/* Mobile-only extra info */}
+                <div className="wd-mobile-meta">
+                  <span className="wd-status-chip" style={{ color, background: bg }}>
+                    <span className="wd-status-dot" style={{ background: color }} />
+                    {label}
+                  </span>
+                  <span className="wd-muted" style={{ fontSize: 12, display: 'flex', gap: 4, alignItems: 'center' }}>
+                    <TrendingUp size={11} />
+                    {formatUptime(comp.uptime_30d)}
+                  </span>
+                  <span className="wd-muted" style={{ fontSize: 12, display: 'flex', gap: 4, alignItems: 'center' }}>
+                    <Clock size={11} />
+                    <span suppressHydrationWarning>{timeAgo(comp.last_checked_at)}</span>
                   </span>
                 </div>
+
               </div>
-              <Link
-                href={`/dashboard/watchdog/${comp.id}`}
-                className="competitor-card-view-link"
-              >
-                View charts &amp; history →
-              </Link>
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
     </div>

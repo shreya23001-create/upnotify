@@ -13726,95 +13726,131 @@ html.dark .contact-channel-icon {
    Competitor Monitoring
    ========================================================================== */
 
-.competitors-section {
+/* ==========================================================================
+   Watchdog — List Page
+   ========================================================================== */
+
+.wd-wrap {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
 }
 
-.competitors-header {
+.wd-toolbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 12px;
   flex-wrap: wrap;
 }
 
-.competitors-count {
-  font-size: 14px;
+.wd-count-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--text-secondary);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 5px 12px;
 }
 
-.competitors-limit-msg {
-  font-size: 13px;
-  color: var(--color-warning, #f59e0b);
+.wd-limit-msg {
+  font-size: 12px;
+  color: #f59e0b;
   font-weight: 500;
 }
 
-.competitor-form-card {
-  padding: 24px;
+/* Add form */
+.wd-add-card {
+  padding: 0;
+  overflow: hidden;
 }
 
-.competitor-form {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.competitor-form-actions {
-  display: flex;
-  gap: 12px;
-}
-
-.competitor-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 16px;
-}
-
-.competitor-card {
-  padding: 20px;
-}
-
-.competitor-card-header {
+.wd-add-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 4px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
 }
 
-.competitor-card-status {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.competitor-card-name {
-  font-size: 16px;
-  font-weight: 700;
+.wd-add-title {
+  font-size: 14px;
+  font-weight: 600;
   color: var(--text-primary);
 }
 
-.competitor-card-domain {
-  font-size: 13px;
+.wd-add-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  padding: 20px;
+}
+
+.wd-add-footer {
+  display: flex;
+  gap: 10px;
+  padding: 14px 20px;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+}
+
+/* Empty state */
+.wd-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 64px 24px;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background: var(--bg-secondary);
+}
+
+.wd-empty-icon {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
   color: var(--text-muted);
   margin-bottom: 16px;
 }
 
-.competitor-card-stats {
+.wd-empty-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+
+.wd-empty-sub {
+  font-size: 13px;
+  color: var(--text-muted);
+  max-width: 380px;
+  line-height: 1.5;
+}
+
+/* List */
+.wd-list {
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.wd-header {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-.competitor-stat {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.competitor-stat-label {
+  grid-template-columns: 1fr 110px 100px 110px 120px 120px;
+  gap: 0;
+  padding: 10px 16px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
@@ -13822,12 +13858,326 @@ html.dark .contact-channel-icon {
   color: var(--text-muted);
 }
 
-.competitor-stat-value {
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--text-primary);
+.wd-row {
+  display: grid;
+  grid-template-columns: 1fr 110px 100px 110px 120px 120px;
+  gap: 0;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-color);
+  transition: background 0.15s;
 }
 
+.wd-row:last-child {
+  border-bottom: none;
+}
+
+.wd-row:hover {
+  background: var(--bg-hover);
+}
+
+.wd-col-name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.wd-col-status,
+.wd-col-response,
+.wd-col-uptime,
+.wd-col-checked,
+.wd-col-actions {
+  display: flex;
+  align-items: center;
+}
+
+.wd-col-actions {
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.wd-row-icon {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+
+.wd-row-name-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.wd-row-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.15s;
+}
+
+.wd-row-name:hover {
+  color: var(--color-primary, #3b82f6);
+}
+
+.wd-row-domain {
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.wd-status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 20px;
+}
+
+.wd-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.wd-muted {
+  font-size: 13px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.wd-view-btn {
+  font-size: 12px;
+  padding: 4px 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.wd-delete-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.wd-delete-btn:hover {
+  background: rgba(239,68,68,0.1);
+  color: #ef4444;
+}
+
+.wd-mobile-meta {
+  display: none;
+}
+
+/* ==========================================================================
+   Watchdog — Detail Page
+   ========================================================================== */
+
+.wd-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Stat strip */
+.wd-stat-strip {
+  display: flex;
+  align-items: center;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 0 4px;
+  overflow: hidden;
+  flex-wrap: wrap;
+}
+
+.wd-stat-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 20px;
+  flex: 1;
+  min-width: 130px;
+}
+
+.wd-stat-divider {
+  width: 1px;
+  height: 36px;
+  background: var(--border-color);
+  flex-shrink: 0;
+}
+
+.wd-stat-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.wd-stat-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+
+.wd-stat-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+/* Period pills */
+.wd-period-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.wd-period-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-right: 4px;
+}
+
+.wd-period-btn {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.wd-period-btn:hover {
+  border-color: var(--color-primary, #3b82f6);
+  color: var(--color-primary, #3b82f6);
+}
+
+.wd-period-btn--active {
+  background: var(--color-primary, #3b82f6);
+  border-color: var(--color-primary, #3b82f6);
+  color: #fff;
+}
+
+/* Charts */
+.wd-chart-card {
+  margin-bottom: 0;
+}
+
+.wd-chart-wrap {
+  padding: 4px 0;
+}
+
+.wd-chart-empty {
+  padding: 32px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.wd-bar-wrap {
+  padding: 4px 0;
+}
+
+.wd-bar-legend {
+  display: flex;
+  gap: 16px;
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--text-muted);
+  flex-wrap: wrap;
+}
+
+.wd-legend-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+
+/* Compare + AI grid */
+.wd-bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.wd-compare-table {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.wd-compare-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 13px;
+  gap: 8px;
+}
+
+.wd-compare-row:last-child {
+  border-bottom: none;
+}
+
+.wd-compare-head {
+  background: var(--bg-secondary);
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* Spin animation for AI refresh icon */
+@keyframes wd-spin {
+  to { transform: rotate(360deg); }
+}
+
+.wd-spin {
+  animation: wd-spin 1s linear infinite;
+}
+
+/* btn-icon-sm — shared util */
 .btn-icon-sm {
   width: 28px;
   height: 28px;
@@ -13835,9 +14185,8 @@ html.dark .contact-channel-icon {
   align-items: center;
   justify-content: center;
   border-radius: 6px;
-  font-size: 18px;
   color: var(--text-muted);
-  transition: all 0.2s;
+  transition: all 0.15s;
   background: transparent;
   border: none;
   cursor: pointer;
@@ -13846,22 +14195,6 @@ html.dark .contact-channel-icon {
 .btn-icon-sm:hover {
   background: var(--bg-hover);
   color: var(--color-danger, #ef4444);
-}
-
-.competitor-card-view-link {
-  display: block;
-  margin-top: 14px;
-  padding-top: 12px;
-  border-top: 1px solid var(--border-color);
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--color-primary, #3b82f6);
-  text-decoration: none;
-  transition: color 0.15s;
-}
-
-.competitor-card-view-link:hover {
-  color: var(--color-primary-dark, #2563eb);
 }
 
 .status-dot {
@@ -13878,134 +14211,72 @@ html.dark .contact-channel-icon {
   margin-top: 4px;
 }
 
-@media (max-width: 640px) {
-  .competitor-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
 /* ==========================================================================
-   Competitor Detail Page
+   Watchdog responsive
    ========================================================================== */
-.comp-detail {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
-
-.comp-stat-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.comp-stat-card {
-  padding: 16px;
-}
-
-.comp-stat-card-label {
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--text-muted);
-  margin-bottom: 6px;
-}
-
-.comp-stat-card-value {
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-.comp-period-filter {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 16px;
-}
-
-.comp-chart-wrap {
-  padding: 4px 0;
-}
-
-.comp-chart-empty {
-  padding: 24px;
-  text-align: center;
-  color: var(--text-muted);
-  font-size: 13px;
-}
-
-.comp-chart-legend {
-  display: flex;
-  gap: 16px;
-  margin-top: 8px;
-  font-size: 12px;
-  color: var(--text-muted);
-}
-
-.comp-legend-dot {
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  border-radius: 2px;
-  margin-right: 4px;
-  vertical-align: middle;
-}
-
-.comp-bottom-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin-bottom: 0;
-}
-
-.comp-compare-table {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.comp-compare-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 0;
-  padding: 10px 14px;
-  border-bottom: 1px solid var(--border-color);
-  font-size: 13px;
-}
-
-.comp-compare-row:last-child {
-  border-bottom: none;
-}
-
-.comp-compare-header {
-  background: var(--bg-secondary);
-  font-weight: 600;
-  font-size: 12px;
-  color: var(--text-secondary);
-}
 
 @media (max-width: 900px) {
-  .comp-bottom-grid {
+  .wd-header {
+    display: none;
+  }
+
+  .wd-row {
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+    gap: 8px;
+    padding: 14px 16px;
+  }
+
+  .wd-col-name { grid-column: 1; grid-row: 1; }
+  .wd-col-actions { grid-column: 2; grid-row: 1; align-self: start; }
+  .wd-mobile-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .wd-col-status,
+  .wd-col-response,
+  .wd-col-uptime,
+  .wd-col-checked { display: none; }
+
+  .wd-bottom-grid {
     grid-template-columns: 1fr;
+  }
+
+  .wd-stat-strip {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0;
+  }
+
+  .wd-stat-divider {
+    display: none;
+  }
+
+  .wd-stat-item {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .wd-stat-item:last-child {
+    border-bottom: none;
   }
 }
 
 @media (max-width: 640px) {
-  .comp-stat-cards {
-    grid-template-columns: repeat(2, 1fr);
+  .wd-add-body {
+    grid-template-columns: 1fr;
   }
 
-  .comp-compare-row {
+  .wd-compare-row {
     grid-template-columns: 1fr 1fr;
   }
 
-  .comp-compare-row>div:last-child {
+  .wd-compare-row > div:last-child {
     display: none;
   }
 }

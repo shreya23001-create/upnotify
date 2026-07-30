@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next"
 import { Inter, JetBrains_Mono, Plus_Jakarta_Sans } from "next/font/google"
 import { CookieConsent } from "@/components/ui/cookie-consent"
+import { ThemeScript } from "@/components/ui/theme-script"
 import { BackToTop } from "@/components/ui/back-to-top"
 import { GoogleTagManager } from "@/components/analytics/google-tag-manager"
 import { MicrosoftClarity } from "@/components/analytics/microsoft-clarity"
@@ -115,7 +116,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} ${plusJakartaSans.variable}`} suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: `(function(){var s=localStorage.getItem('uptrue_theme');if(s!=='light')document.documentElement.classList.add('dark');})();` }} />
+        <ThemeScript />
       </head>
       <body>
         <GoogleTagManager />

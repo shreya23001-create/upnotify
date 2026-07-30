@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { Activity, Zap, Clock, AlertTriangle, CheckCircle, BarChart2, Sparkles, RefreshCw, ArrowUpDown } from 'lucide-react'
 import type { CompetitorMonitor, CompetitorCheckResult } from '@/lib/db/competitor-monitors'
 
 interface DailyStat {
@@ -41,8 +42,6 @@ interface Props {
   orgMonitors: OrgMonitor[]
 }
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
-
 function getStatusColor(status: string): string {
   if (status === 'up') return '#22c55e'
   if (status === 'down') return '#ef4444'
@@ -50,11 +49,23 @@ function getStatusColor(status: string): string {
   return '#94a3b8'
 }
 
+function getStatusBg(status: string): string {
+  if (status === 'up') return 'rgba(34,197,94,0.1)'
+  if (status === 'down') return 'rgba(239,68,68,0.1)'
+  if (status === 'degraded') return 'rgba(245,158,11,0.1)'
+  return 'rgba(148,163,184,0.1)'
+}
+
 function getStatusLabel(status: string): string {
   if (status === 'up') return 'Up'
   if (status === 'down') return 'Down'
   if (status === 'degraded') return 'Degraded'
   return 'Unknown'
+}
+
+function fmtMs(ms: number | null | undefined): string {
+  if (ms === null || ms === undefined) return '—'
+  return ms >= 1000 ? `${(ms / 1000).toFixed(1)}s` : `${ms}ms`
 }
 
 function timeAgo(dateStr: string | null): string {
@@ -74,21 +85,18 @@ function fmtTime(dateStr: string): string {
   })
 }
 
-// ── SVG Uptime Bar Chart (90 days) ───────────────────────────────────────────
+// ── Uptime Bar Chart ──────────────────────────────────────────────────────────
 
 function UptimeBarChart({ dailyStats }: { dailyStats: DailyStat[] }): React.ReactElement {
-  const W = 780
-  const H = 48
   const BAR_COUNT = 90
   const BAR_W = 6
   const GAP = 2
+  const H = 48
   const TOTAL_W = BAR_COUNT * (BAR_W + GAP) - GAP
 
-  // Build a map of date → stat
   const byDate: Record<string, DailyStat> = {}
   for (const d of dailyStats) byDate[d.date] = d
 
-  // Generate last 90 days
   const days: string[] = []
   for (let i = BAR_COUNT - 1; i >= 0; i--) {
     const d = new Date(Date.now() - i * 86400000)
@@ -96,39 +104,38 @@ function UptimeBarChart({ dailyStats }: { dailyStats: DailyStat[] }): React.Reac
   }
 
   return (
-    <div className="comp-chart-wrap">
+    <div className="wd-bar-wrap">
       <svg width="100%" viewBox={`0 0 ${TOTAL_W} ${H}`} preserveAspectRatio="none" style={{ display: 'block' }}>
         {days.map((date, i) => {
           const stat = byDate[date]
-          let fill = '#e2e8f0' // no data
+          let fill = 'var(--border-color, #e2e8f0)'
           if (stat && stat.total > 0) {
             if (stat.down > 0) fill = '#ef4444'
             else if (stat.degraded > 0) fill = '#f59e0b'
             else fill = '#22c55e'
           }
-          const x = i * (BAR_W + GAP)
           return (
-            <rect key={date} x={x} y={0} width={BAR_W} height={H} rx={1} fill={fill}>
-              <title>{date}{stat ? `: ${stat.up}↑ ${stat.down}↓ ${stat.degraded}⚠` : ': no data'}</title>
+            <rect key={date} x={i * (BAR_W + GAP)} y={0} width={BAR_W} height={H} rx={1} fill={fill}>
+              <title>{date}{stat ? `: ${stat.up}↑ ${stat.down}↓ ${stat.degraded} degraded` : ': no data'}</title>
             </rect>
           )
         })}
       </svg>
-      <div className="comp-chart-legend">
-        <span><span style={{ background: '#22c55e' }} className="comp-legend-dot" /> Up</span>
-        <span><span style={{ background: '#f59e0b' }} className="comp-legend-dot" /> Degraded</span>
-        <span><span style={{ background: '#ef4444' }} className="comp-legend-dot" /> Down</span>
-        <span><span style={{ background: '#e2e8f0' }} className="comp-legend-dot" /> No data</span>
+      <div className="wd-bar-legend">
+        <span><span className="wd-legend-dot" style={{ background: '#22c55e' }} /> Up</span>
+        <span><span className="wd-legend-dot" style={{ background: '#f59e0b' }} /> Degraded</span>
+        <span><span className="wd-legend-dot" style={{ background: '#ef4444' }} /> Down</span>
+        <span><span className="wd-legend-dot" style={{ background: 'var(--border-color)' }} /> No data</span>
       </div>
     </div>
   )
 }
 
-// ── SVG Response Time Line Chart ──────────────────────────────────────────────
+// ── Response Time Chart ───────────────────────────────────────────────────────
 
 function ResponseTimeChart({ series }: { series: ResponsePoint[] }): React.ReactElement {
   if (series.length < 2) {
-    return <div className="comp-chart-empty">Not enough data yet</div>
+    return <div className="wd-chart-empty">Not enough data yet — checks will appear here once data is collected.</div>
   }
 
   const W = 780
@@ -141,33 +148,29 @@ function ResponseTimeChart({ series }: { series: ResponsePoint[] }): React.React
   const values = series.map(p => p.ms)
   const minT = Math.min(...times)
   const maxT = Math.max(...times)
-  const minV = 0
   const maxV = Math.max(...values, 1000)
 
   const toX = (t: number) => PAD.l + ((t - minT) / (maxT - minT || 1)) * innerW
-  const toY = (v: number) => PAD.t + innerH - ((v - minV) / (maxV - minV)) * innerH
+  const toY = (v: number) => PAD.t + innerH - (v / maxV) * innerH
 
   const points = series.map(p => `${toX(new Date(p.t).getTime())},${toY(p.ms)}`).join(' ')
-
-  // Y-axis labels
   const yLabels = [0, Math.round(maxV / 2), maxV]
 
   return (
-    <div className="comp-chart-wrap">
+    <div className="wd-chart-wrap">
       <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display: 'block' }}>
-        {/* Grid lines */}
         {yLabels.map(v => (
           <g key={v}>
-            <line
-              x1={PAD.l} y1={toY(v)} x2={W - PAD.r} y2={toY(v)}
-              stroke="var(--border-color)" strokeWidth={0.5} strokeDasharray="3 3"
-            />
+            <line x1={PAD.l} y1={toY(v)} x2={W - PAD.r} y2={toY(v)} stroke="var(--border-color)" strokeWidth={0.5} strokeDasharray="3 3" />
             <text x={PAD.l - 4} y={toY(v) + 4} textAnchor="end" fontSize={9} fill="var(--text-muted)">
               {v >= 1000 ? `${(v / 1000).toFixed(1)}s` : `${v}ms`}
             </text>
           </g>
         ))}
-        {/* Line */}
+        <polygon
+          points={`${PAD.l},${PAD.t + innerH} ${points} ${W - PAD.r},${PAD.t + innerH}`}
+          fill="rgba(59,130,246,0.08)"
+        />
         <polyline
           points={points}
           fill="none"
@@ -176,23 +179,18 @@ function ResponseTimeChart({ series }: { series: ResponsePoint[] }): React.React
           strokeLinejoin="round"
           strokeLinecap="round"
         />
-        {/* Area fill */}
-        <polygon
-          points={`${PAD.l},${PAD.t + innerH} ${points} ${W - PAD.r},${PAD.t + innerH}`}
-          fill="#3b82f620"
-        />
       </svg>
     </div>
   )
 }
 
-// ── Main Component ────────────────────────────────────────────────────────────
+// ── Main ──────────────────────────────────────────────────────────────────────
 
 export function CompetitorDetail({ competitor, orgMonitors }: Props): React.ReactElement {
   const [period, setPeriod] = useState(30)
   const [data, setData] = useState<DetailData | null>(null)
   const [loading, setLoading] = useState(true)
-  const [compareMonitorId, setCompareMonitorId] = useState<string>('')
+  const [compareMonitorId, setCompareMonitorId] = useState('')
   const [compareMonitor, setCompareMonitor] = useState<OrgMonitor | null>(null)
   const [compareStats, setCompareStats] = useState<{ uptimePct: number; avgResponseMs: number | null; status: string } | null>(null)
   const [compareLoading, setCompareLoading] = useState(false)
@@ -205,10 +203,7 @@ export function CompetitorDetail({ competitor, orgMonitors }: Props): React.Reac
     setLoading(true)
     try {
       const res = await fetch(`/api/v1/competitors/${competitor.id}?period=${p}`)
-      if (res.ok) {
-        const json = await res.json() as DetailData
-        setData(json)
-      }
+      if (res.ok) setData(await res.json() as DetailData)
     } finally {
       setLoading(false)
     }
@@ -217,26 +212,21 @@ export function CompetitorDetail({ competitor, orgMonitors }: Props): React.Reac
   useEffect(() => { fetchData(period) }, [period, fetchData])
 
   useEffect(() => {
-    if (compareMonitorId) {
-      const monitor = orgMonitors.find(m => m.id === compareMonitorId) ?? null
-      setCompareMonitor(monitor)
-      if (monitor) {
-        setCompareLoading(true)
-        setCompareStats(null)
-        fetch(`/api/v1/monitors/${compareMonitorId}/stats?days=${period}`)
-          .then(r => r.json())
-          .then((json: { success?: boolean; monitor?: { status: string }; stats?: { uptimePct: number; avgResponseMs: number | null } }) => {
-            if (json.success && json.stats && json.monitor) {
-              setCompareStats({ ...json.stats, status: json.monitor.status })
-            }
-          })
-          .catch(() => null)
-          .finally(() => setCompareLoading(false))
-      }
-    } else {
-      setCompareMonitor(null)
-      setCompareStats(null)
-    }
+    if (!compareMonitorId) { setCompareMonitor(null); setCompareStats(null); return }
+    const monitor = orgMonitors.find(m => m.id === compareMonitorId) ?? null
+    setCompareMonitor(monitor)
+    if (!monitor) return
+    setCompareLoading(true)
+    setCompareStats(null)
+    fetch(`/api/v1/monitors/${compareMonitorId}/stats?days=${period}`)
+      .then(r => r.json())
+      .then((json: { success?: boolean; monitor?: { status: string }; stats?: { uptimePct: number; avgResponseMs: number | null } }) => {
+        if (json.success && json.stats && json.monitor) {
+          setCompareStats({ ...json.stats, status: json.monitor.status })
+        }
+      })
+      .catch(() => null)
+      .finally(() => setCompareLoading(false))
   }, [compareMonitorId, orgMonitors, period])
 
   const canRefreshAi = !aiSummaryAt ||
@@ -262,59 +252,82 @@ export function CompetitorDetail({ competitor, orgMonitors }: Props): React.Reac
   }
 
   const stats = data?.stats
-  const responseSeries = data?.responseSeries ?? []
-  const filteredSeries = responseSeries.filter(p => {
-    const age = (Date.now() - new Date(p.t).getTime()) / 86400000
-    return age <= period
-  })
+  const filteredSeries = (data?.responseSeries ?? []).filter(p =>
+    (Date.now() - new Date(p.t).getTime()) / 86400000 <= period
+  )
+
+  const statusColor = getStatusColor(competitor.last_status)
+  const statusBg = getStatusBg(competitor.last_status)
 
   return (
-    <div className="comp-detail">
+    <div className="wd-detail">
 
-      {/* Stat Cards */}
-      <div className="comp-stat-cards">
-        <div className="card comp-stat-card">
-          <div className="comp-stat-card-label">Uptime ({period}d)</div>
-          <div className="comp-stat-card-value" style={{ color: stats?.uptimePct !== null && stats?.uptimePct !== undefined && stats.uptimePct < 99 ? '#f59e0b' : '#22c55e' }}>
-            {stats?.uptimePct !== null && stats?.uptimePct !== undefined ? `${stats.uptimePct}%` : '--'}
+      {/* Stat strip */}
+      <div className="wd-stat-strip">
+        <div className="wd-stat-item">
+          <div className="wd-stat-icon" style={{ background: statusBg, color: statusColor }}>
+            <Activity size={15} />
+          </div>
+          <div>
+            <div className="wd-stat-label">Current Status</div>
+            <div className="wd-stat-value" style={{ color: statusColor }}>
+              {getStatusLabel(competitor.last_status)}
+            </div>
           </div>
         </div>
-        <div className="card comp-stat-card">
-          <div className="comp-stat-card-label">Avg Response ({period}d)</div>
-          <div className="comp-stat-card-value">
-            {stats?.avgResponseMs !== null && stats?.avgResponseMs !== undefined
-              ? stats.avgResponseMs >= 1000
-                ? `${(stats.avgResponseMs / 1000).toFixed(1)}s`
-                : `${stats.avgResponseMs}ms`
-              : '--'}
+        <div className="wd-stat-divider" />
+        <div className="wd-stat-item">
+          <div className="wd-stat-icon" style={{ background: 'rgba(34,197,94,0.1)', color: '#22c55e' }}>
+            <BarChart2 size={15} />
+          </div>
+          <div>
+            <div className="wd-stat-label">Uptime ({period}d)</div>
+            <div className="wd-stat-value" style={{ color: stats?.uptimePct !== null && stats?.uptimePct !== undefined && stats.uptimePct < 99 ? '#f59e0b' : '#22c55e' }}>
+              {stats?.uptimePct !== null && stats?.uptimePct !== undefined ? `${stats.uptimePct}%` : '—'}
+            </div>
           </div>
         </div>
-        <div className="card comp-stat-card">
-          <div className="comp-stat-card-label">Downtime (est. 90d)</div>
-          <div className="comp-stat-card-value" style={{ color: (stats?.downHoursApprox ?? 0) > 1 ? '#ef4444' : undefined }}>
-            {stats !== undefined ? `${stats.downHoursApprox}h` : '--'}
+        <div className="wd-stat-divider" />
+        <div className="wd-stat-item">
+          <div className="wd-stat-icon" style={{ background: 'rgba(59,130,246,0.1)', color: '#3b82f6' }}>
+            <Zap size={15} />
+          </div>
+          <div>
+            <div className="wd-stat-label">Avg Response ({period}d)</div>
+            <div className="wd-stat-value">{fmtMs(stats?.avgResponseMs)}</div>
           </div>
         </div>
-        <div className="card comp-stat-card">
-          <div className="comp-stat-card-label">Checks ({period}d)</div>
-          <div className="comp-stat-card-value">{stats?.totalChecks.toLocaleString() ?? '--'}</div>
+        <div className="wd-stat-divider" />
+        <div className="wd-stat-item">
+          <div className="wd-stat-icon" style={{ background: 'rgba(239,68,68,0.1)', color: '#ef4444' }}>
+            <AlertTriangle size={15} />
+          </div>
+          <div>
+            <div className="wd-stat-label">Down (est. 90d)</div>
+            <div className="wd-stat-value" style={{ color: (stats?.downHoursApprox ?? 0) > 1 ? '#ef4444' : undefined }}>
+              {stats !== undefined ? `${stats.downHoursApprox}h` : '—'}
+            </div>
+          </div>
         </div>
-        <div className="card comp-stat-card">
-          <div className="comp-stat-card-label">Current Status</div>
-          <div className="comp-stat-card-value" style={{ color: getStatusColor(competitor.last_status) }}>
-            {getStatusLabel(competitor.last_status)}
+        <div className="wd-stat-divider" />
+        <div className="wd-stat-item">
+          <div className="wd-stat-icon" style={{ background: 'rgba(107,114,128,0.1)', color: '#6b7280' }}>
+            <CheckCircle size={15} />
+          </div>
+          <div>
+            <div className="wd-stat-label">Checks ({period}d)</div>
+            <div className="wd-stat-value">{stats?.totalChecks.toLocaleString() ?? '—'}</div>
           </div>
         </div>
       </div>
 
-      {/* Period Filter */}
-      <div className="comp-period-filter">
-        <span style={{ fontSize: 13, color: 'var(--text-muted)', marginRight: 8 }}>Period:</span>
+      {/* Period pills */}
+      <div className="wd-period-bar">
+        <span className="wd-period-label">Period:</span>
         {[7, 30, 90].map(p => (
           <button
             key={p}
-            className={`btn ${period === p ? 'btn-primary' : 'btn-secondary'}`}
-            style={{ fontSize: 12, padding: '4px 12px' }}
+            className={`wd-period-btn${period === p ? ' wd-period-btn--active' : ''}`}
             onClick={() => setPeriod(p)}
           >
             {p}d
@@ -322,41 +335,46 @@ export function CompetitorDetail({ competitor, orgMonitors }: Props): React.Reac
         ))}
       </div>
 
-      {/* Uptime Bar Chart */}
-      <div className="card" style={{ marginBottom: 16 }}>
+      {/* Uptime bars */}
+      <div className="card wd-chart-card">
         <div className="card-header">
           <div className="card-title">Uptime — Last 90 Days</div>
-          <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>1 bar per day</div>
+          <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>1 bar per day</span>
         </div>
         <div className="card-content">
-          {data ? <UptimeBarChart dailyStats={data.dailyStats} /> : <div className="comp-chart-empty">Loading...</div>}
+          {data ? <UptimeBarChart dailyStats={data.dailyStats} /> : <div className="wd-chart-empty">Loading…</div>}
         </div>
       </div>
 
-      {/* Response Time Chart */}
-      <div className="card" style={{ marginBottom: 16 }}>
+      {/* Response time chart */}
+      <div className="card wd-chart-card">
         <div className="card-header">
           <div className="card-title">Response Time — {period}d</div>
-          <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>Successful checks only</div>
+          <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Successful checks only</span>
         </div>
         <div className="card-content">
           {loading
-            ? <div className="comp-chart-empty">Loading...</div>
+            ? <div className="wd-chart-empty">Loading…</div>
             : <ResponseTimeChart series={filteredSeries} />
           }
         </div>
       </div>
 
-      {/* Compare + AI — side by side on wide screens */}
-      <div className="comp-bottom-grid">
+      {/* Compare + AI side by side */}
+      <div className="wd-bottom-grid">
 
-        {/* Compare against my site */}
+        {/* Compare */}
         {orgMonitors.length > 0 && (
-          <div className="card" style={{ marginBottom: 16 }}>
-            <div className="card-header"><div className="card-title">Compare Against My Site</div></div>
+          <div className="card">
+            <div className="card-header">
+              <div className="card-title">
+                <ArrowUpDown size={14} style={{ marginRight: 6 }} />
+                Compare Against My Site
+              </div>
+            </div>
             <div className="card-content">
               <select
-                className="input"
+                className="form-input"
                 value={compareMonitorId}
                 onChange={e => setCompareMonitorId(e.target.value)}
                 style={{ marginBottom: 16 }}
@@ -366,53 +384,43 @@ export function CompetitorDetail({ competitor, orgMonitors }: Props): React.Reac
                   <option key={m.id} value={m.id}>{m.name} ({m.target})</option>
                 ))}
               </select>
-              {compareMonitor && stats && (
-                <div className="comp-compare-table">
-                  <div className="comp-compare-row comp-compare-header">
+
+              {compareMonitor && stats ? (
+                <div className="wd-compare-table">
+                  <div className="wd-compare-row wd-compare-head">
                     <div />
                     <div>{competitor.display_name}</div>
                     <div>{compareMonitor.name}</div>
                   </div>
-                  <div className="comp-compare-row">
+                  <div className="wd-compare-row">
                     <div>Uptime ({period}d)</div>
-                    <div style={{ color: stats.uptimePct !== null && stats.uptimePct < 99 ? '#f59e0b' : '#22c55e' }}>
-                      {stats.uptimePct !== null ? `${stats.uptimePct}%` : '--'}
+                    <div style={{ color: stats.uptimePct !== null && stats.uptimePct < 99 ? '#f59e0b' : '#22c55e', fontWeight: 600 }}>
+                      {stats.uptimePct !== null ? `${stats.uptimePct}%` : '—'}
                     </div>
-                    <div style={{ color: compareLoading ? 'var(--text-muted)' : compareStats && compareStats.uptimePct < 99 ? '#f59e0b' : '#22c55e' }}>
-                      {compareLoading ? 'Loading...' : compareStats ? `${compareStats.uptimePct}%` : '--'}
+                    <div style={{ color: compareLoading ? 'var(--text-muted)' : compareStats && compareStats.uptimePct < 99 ? '#f59e0b' : '#22c55e', fontWeight: 600 }}>
+                      {compareLoading ? '…' : compareStats ? `${compareStats.uptimePct}%` : '—'}
                     </div>
                   </div>
-                  <div className="comp-compare-row">
+                  <div className="wd-compare-row">
                     <div>Avg Response ({period}d)</div>
-                    <div>
-                      {stats.avgResponseMs !== null
-                        ? stats.avgResponseMs >= 1000
-                          ? `${(stats.avgResponseMs / 1000).toFixed(1)}s`
-                          : `${stats.avgResponseMs}ms`
-                        : '--'}
-                    </div>
-                    <div style={{ color: 'var(--text-muted)' }}>
-                      {compareLoading ? 'Loading...' : compareStats?.avgResponseMs !== null && compareStats?.avgResponseMs !== undefined
-                        ? compareStats.avgResponseMs >= 1000
-                          ? `${(compareStats.avgResponseMs / 1000).toFixed(1)}s`
-                          : `${compareStats.avgResponseMs}ms`
-                        : '--'}
+                    <div>{fmtMs(stats.avgResponseMs)}</div>
+                    <div style={{ color: 'var(--text-secondary)' }}>
+                      {compareLoading ? '…' : fmtMs(compareStats?.avgResponseMs)}
                     </div>
                   </div>
-                  <div className="comp-compare-row">
+                  <div className="wd-compare-row">
                     <div>Status now</div>
-                    <div style={{ color: getStatusColor(competitor.last_status) }}>
+                    <div style={{ color: getStatusColor(competitor.last_status), fontWeight: 600 }}>
                       {getStatusLabel(competitor.last_status)}
                     </div>
-                    <div style={{ color: compareLoading ? 'var(--text-muted)' : getStatusColor(compareStats?.status ?? 'unknown') }}>
-                      {compareLoading ? 'Loading...' : compareStats ? getStatusLabel(compareStats.status) : '--'}
+                    <div style={{ color: compareLoading ? 'var(--text-muted)' : getStatusColor(compareStats?.status ?? 'unknown'), fontWeight: 600 }}>
+                      {compareLoading ? '…' : compareStats ? getStatusLabel(compareStats.status) : '—'}
                     </div>
                   </div>
                 </div>
-              )}
-              {!compareMonitor && (
+              ) : (
                 <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>
-                  Select one of your monitors above to compare side by side.
+                  Select one of your monitors above to see a side-by-side comparison.
                 </p>
               )}
             </div>
@@ -420,50 +428,61 @@ export function CompetitorDetail({ competitor, orgMonitors }: Props): React.Reac
         )}
 
         {/* AI Summary */}
-        <div className="card" style={{ marginBottom: 16 }}>
+        <div className="card">
           <div className="card-header">
-            <div className="card-title">AI Reliability Summary</div>
+            <div className="card-title">
+              <Sparkles size={14} style={{ marginRight: 6, color: '#8b5cf6' }} />
+              AI Reliability Summary
+            </div>
             <button
               className="btn btn-secondary"
-              style={{ fontSize: 12, padding: '4px 12px' }}
+              style={{ fontSize: 12, padding: '4px 12px', display: 'flex', gap: 6, alignItems: 'center' }}
               disabled={!canRefreshAi || aiLoading}
               onClick={handleGenerateAi}
               title={!canRefreshAi ? 'Can only refresh once every 24 hours' : 'Generate AI summary'}
             >
-              {aiLoading ? 'Generating...' : canRefreshAi ? 'Generate' : `Refresh in ${Math.ceil((24 * 3600000 - (Date.now() - new Date(aiSummaryAt!).getTime())) / 3600000)}h`}
+              <RefreshCw size={12} className={aiLoading ? 'wd-spin' : ''} />
+              {aiLoading
+                ? 'Generating…'
+                : canRefreshAi
+                  ? 'Generate'
+                  : `Refresh in ${Math.ceil((24 * 3600000 - (Date.now() - new Date(aiSummaryAt!).getTime())) / 3600000)}h`
+              }
             </button>
           </div>
           <div className="card-content">
-            {aiError && (
-              <p style={{ fontSize: 13, color: '#ef4444', marginBottom: 12 }}>{aiError}</p>
-            )}
+            {aiError && <p style={{ fontSize: 13, color: '#ef4444', marginBottom: 12 }}>{aiError}</p>}
             {aiSummary ? (
               <>
-                <p style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--text-primary)', marginBottom: 12 }}>
+                <p style={{ fontSize: 14, lineHeight: 1.65, color: 'var(--text-primary)', marginBottom: 12 }}>
                   {aiSummary}
                 </p>
                 <p style={{ fontSize: 11, color: 'var(--text-muted)', fontStyle: 'italic' }}>
-                  Based on Uptrue&apos;s automated monitoring data only. Does not represent the overall quality or reliability of this service. Generated {aiSummaryAt ? timeAgo(aiSummaryAt) : ''}.
+                  Based on Uptrue&apos;s automated monitoring data only. Does not represent the overall quality or reliability of this service.
+                  {aiSummaryAt && ` Generated ${timeAgo(aiSummaryAt)}.`}
                 </p>
               </>
             ) : (
               <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>
-                No summary yet. Click Generate to create an AI reliability summary based on monitoring data.
+                No summary yet. Click Generate to create an AI reliability analysis based on uptime and response data.
               </p>
             )}
           </div>
         </div>
       </div>
 
-      {/* Status Log */}
-      <div className="card" style={{ marginBottom: 16 }}>
+      {/* Check log */}
+      <div className="card">
         <div className="card-header">
-          <div className="card-title">Check Log</div>
-          <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>Last 50 checks</div>
+          <div className="card-title">
+            <Clock size={14} style={{ marginRight: 6 }} />
+            Check Log
+          </div>
+          <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Last 50 checks</span>
         </div>
         <div className="card-content" style={{ padding: 0 }}>
           {loading ? (
-            <div style={{ padding: 24, color: 'var(--text-muted)', fontSize: 13 }}>Loading...</div>
+            <div style={{ padding: 24, color: 'var(--text-muted)', fontSize: 13 }}>Loading…</div>
           ) : !data?.statusLog.length ? (
             <div style={{ padding: 24, color: 'var(--text-muted)', fontSize: 13 }}>No check results yet.</div>
           ) : (
@@ -481,25 +500,17 @@ export function CompetitorDetail({ competitor, orgMonitors }: Props): React.Reac
                 <tbody>
                   {data.statusLog.map(r => (
                     <tr key={r.id}>
-                      <td style={{ fontSize: 12, color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
+                      <td style={{ fontSize: 12, color: 'var(--text-muted)', whiteSpace: 'nowrap' }} suppressHydrationWarning>
                         {fmtTime(r.checked_at)}
                       </td>
                       <td>
                         <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                          <span style={{ width: 8, height: 8, borderRadius: '50%', background: getStatusColor(r.status), flexShrink: 0 }} />
-                          <span style={{ fontSize: 13, fontWeight: 500 }}>{getStatusLabel(r.status)}</span>
+                          <span style={{ width: 7, height: 7, borderRadius: '50%', background: getStatusColor(r.status), flexShrink: 0 }} />
+                          <span style={{ fontSize: 13, fontWeight: 500, color: getStatusColor(r.status) }}>{getStatusLabel(r.status)}</span>
                         </span>
                       </td>
-                      <td style={{ fontSize: 13 }}>
-                        {r.response_time_ms !== null
-                          ? r.response_time_ms >= 1000
-                            ? `${(r.response_time_ms / 1000).toFixed(1)}s`
-                            : `${r.response_time_ms}ms`
-                          : '--'}
-                      </td>
-                      <td style={{ fontSize: 13, color: 'var(--text-muted)' }}>
-                        {r.status_code ?? '--'}
-                      </td>
+                      <td style={{ fontSize: 13 }}>{fmtMs(r.response_time_ms)}</td>
+                      <td style={{ fontSize: 13, color: 'var(--text-muted)' }}>{r.status_code ?? '—'}</td>
                       <td style={{ fontSize: 12, color: 'var(--text-muted)', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {r.keyword_matched
                           ? `${r.keyword_category === 'maintenance' ? 'Maintenance' : 'Error'}: "${r.keyword_matched}"`
