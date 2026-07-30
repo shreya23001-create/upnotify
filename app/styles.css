@@ -31840,7 +31840,6 @@ html.dark .db-home .db-stat-card:hover {
 .db-home-split>.db-card {
   display: flex;
   flex-direction: column;
-  align-self: start;
 }
 
 .db-home-domains-fill {

@@ -235,7 +235,7 @@ function DomainCards({ monitors }: { monitors: Monitor[] }) {
   }
 
   return (
-    <div className="db-card" style={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+    <div className="db-card" style={{ display: 'flex', flexDirection: 'column', alignSelf: 'start' }}>
       <div className="db-card-header">
         <div className="db-card-title">Domains</div>
         <div className="db-card-actions">
