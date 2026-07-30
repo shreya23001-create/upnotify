@@ -1,31 +1,32 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import { Zap, Calendar, Edit2, BarChart2, Activity, AlertTriangle, CheckCircle, Heart, Shield, CalendarDays, Search, TrendingUp, Monitor, Mail, Webhook, Loader2, FileText } from 'lucide-react'
 import { generateReportAction } from '@/app/(dashboard)/dashboard/reports/actions'
 import { CustomSelect } from '@/components/ui/custom-select'
 
 const SCHEDULE_OPTIONS = [
-  { value: 'on_demand', label: 'On Demand', icon: '⚡' },
-  { value: 'monthly',   label: 'Monthly',   icon: '📅' },
-  { value: 'custom',    label: 'Custom',     icon: '✏️' },
+  { value: 'on_demand', label: 'On Demand', icon: <Zap size={15} /> },
+  { value: 'monthly',   label: 'Monthly',   icon: <Calendar size={15} /> },
+  { value: 'custom',    label: 'Custom',     icon: <Edit2 size={15} /> },
 ]
 
 const REPORT_TYPE_OPTIONS = [
-  { value: 'uptime',                label: 'Uptime Report',           icon: '📊', group: 'Monitoring Reports' },
-  { value: 'performance',           label: 'Performance Report',      icon: '⚡', group: 'Monitoring Reports' },
-  { value: 'incident',              label: 'Incident Report',         icon: '🚨', group: 'Monitoring Reports' },
-  { value: 'sla',                   label: 'SLA Compliance Report',   icon: '✅', group: 'Monitoring Reports' },
-  { value: 'site-health',           label: 'Site Health Report',      icon: '🏥', group: 'Advanced Reports' },
-  { value: 'security-audit',        label: 'Security Audit Report',   icon: '🛡️', group: 'Advanced Reports' },
-  { value: 'availability-summary',  label: 'Availability Summary',    icon: '🗓️', group: 'Advanced Reports' },
-  { value: 'change-digest',         label: 'Change Detection Digest', icon: '🔍', group: 'Advanced Reports' },
-  { value: 'response-trend',        label: 'Response Time Trends',    icon: '📈', group: 'Advanced Reports' },
+  { value: 'uptime',               label: 'Uptime Report',           icon: <BarChart2 size={15} />,    group: 'Monitoring Reports' },
+  { value: 'performance',          label: 'Performance Report',      icon: <Activity size={15} />,     group: 'Monitoring Reports' },
+  { value: 'incident',             label: 'Incident Report',         icon: <AlertTriangle size={15} />,group: 'Monitoring Reports' },
+  { value: 'sla',                  label: 'SLA Compliance Report',   icon: <CheckCircle size={15} />,  group: 'Monitoring Reports' },
+  { value: 'site-health',          label: 'Site Health Report',      icon: <Heart size={15} />,        group: 'Advanced Reports' },
+  { value: 'security-audit',       label: 'Security Audit Report',   icon: <Shield size={15} />,       group: 'Advanced Reports' },
+  { value: 'availability-summary', label: 'Availability Summary',    icon: <CalendarDays size={15} />, group: 'Advanced Reports' },
+  { value: 'change-digest',        label: 'Change Detection Digest', icon: <Search size={15} />,       group: 'Advanced Reports' },
+  { value: 'response-trend',       label: 'Response Time Trends',    icon: <TrendingUp size={15} />,   group: 'Advanced Reports' },
 ]
 
 const DELIVERY_OPTIONS = [
-  { value: 'dashboard', label: 'View in dashboard only', icon: '🖥️' },
-  { value: 'email',     label: 'Send to email',           icon: '📧' },
-  { value: 'webhook',   label: 'Send via webhook',        icon: '🔗' },
+  { value: 'dashboard', label: 'View in dashboard only', icon: <Monitor size={15} /> },
+  { value: 'email',     label: 'Send to email',           icon: <Mail size={15} /> },
+  { value: 'webhook',   label: 'Send via webhook',        icon: <Webhook size={15} /> },
 ]
 
 export function GenerateReportForm(): React.ReactElement {
@@ -61,7 +62,7 @@ export function GenerateReportForm(): React.ReactElement {
 
       {isPending && (
         <div className="report-generating-banner">
-          <span className="report-generating-icon">✨</span>
+          <Loader2 size={15} className="report-generating-icon" />
           Generating report with AI summary… This may take 15–30 seconds.
         </div>
       )}
@@ -154,7 +155,11 @@ export function GenerateReportForm(): React.ReactElement {
 
       <div className="form-actions">
         <button type="submit" className="btn btn-primary" disabled={isPending}>
-          {isPending ? 'Generating Report…' : 'Generate Report'}
+          {isPending ? (
+            <><Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} /> Generating…</>
+          ) : (
+            <><FileText size={14} /> Generate Report</>
+          )}
         </button>
       </div>
     </form>

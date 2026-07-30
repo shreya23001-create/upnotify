@@ -31,6 +31,7 @@ export default async function IncidentsPage({
     <div className="db-content">
       <div className="db-page-header">
         <div className="db-page-title">Incidents</div>
+        <div className="db-page-subtitle">Track and resolve downtime events across your monitors</div>
       </div>
       <IncidentsTable
         incidents={incidents}

@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next"
-import Script from "next/script"
 import { Inter, JetBrains_Mono, Plus_Jakarta_Sans } from "next/font/google"
 import { CookieConsent } from "@/components/ui/cookie-consent"
+import { ThemeScript } from "@/components/ui/theme-script"
 import { BackToTop } from "@/components/ui/back-to-top"
 import { GoogleTagManager } from "@/components/analytics/google-tag-manager"
 import { MicrosoftClarity } from "@/components/analytics/microsoft-clarity"
@@ -115,18 +115,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} ${plusJakartaSans.variable}`} suppressHydrationWarning>
+      <head>
+        <ThemeScript />
+      </head>
       <body>
-        <Script
-          id="theme-init"
-          strategy="beforeInteractive"
-          dangerouslySetInnerHTML={{ __html: `
-          (function() {
-            var saved = localStorage.getItem('uptrue_theme');
-            if (saved !== 'light') {
-              document.documentElement.classList.add('dark');
-            }
-          })();
-        ` }} />
         <GoogleTagManager />
         <MicrosoftClarity />
         {children}
