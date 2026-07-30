@@ -3499,11 +3499,17 @@ html.dark .stat-icon-yellow {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  flex: 1 1 0;
+  min-width: 0;
+  margin-right: 10px;
 }
 
 .incident-row-title {
   font-size: 14px;
   font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .incident-row-time {
@@ -24054,6 +24060,25 @@ html.dark .mon-detail-hero {
   .mon-detail-back {
     margin-bottom: 12px;
     font-size: 12px;
+  }
+
+  /* Check history: hide Status Code and Error columns on small screens */
+  .table th:nth-child(5),
+  .table td:nth-child(5),
+  .table th:nth-child(6),
+  .table td:nth-child(6) {
+    display: none;
+  }
+
+  /* Pagination: stack on small screens */
+  .data-table-pagination {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .data-table-pagination-buttons {
+    flex-wrap: wrap;
   }
 }
 

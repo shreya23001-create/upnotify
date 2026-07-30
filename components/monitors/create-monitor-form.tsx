@@ -8,12 +8,47 @@ import { getKeywordSuggestions } from '@/lib/utils/keyword-suggestions'
 import { MonitorTypeHelp } from './monitor-type-help'
 import { MONITOR_TYPES } from '@/lib/constants/monitor-types'
 import { CustomSelect } from '@/components/ui/custom-select'
-import { IconWordpress } from '@/components/icons'
+import { MonitorTypeIcon } from './monitor-type-icon'
+import {
+  IconHttp, IconSsl, IconDns, IconKeyword, IconDomain,
+  IconPort, IconPing, IconApi, IconHeartbeat, IconCompetitor,
+  IconSecurityHeaders, IconResponseTime, IconRobotsTxt, IconIpChange,
+  IconMxHealth, IconWhoisChange, IconSitemap, IconRedirectChain,
+  IconSpfDmarc, IconBlacklist, IconPageSize, IconCookieConsent, IconNameserverChange,
+  IconWordpress,
+} from '@/components/icons'
+
+const typeIconMap: Record<string, React.ReactElement> = {
+  http:               <IconHttp size={16} />,
+  ssl:                <IconSsl size={16} />,
+  dns:                <IconDns size={16} />,
+  keyword:            <IconKeyword size={16} />,
+  domain:             <IconDomain size={16} />,
+  port:               <IconPort size={16} />,
+  ping:               <IconPing size={16} />,
+  api:                <IconApi size={16} />,
+  heartbeat:          <IconHeartbeat size={16} />,
+  competitor:         <IconCompetitor size={16} />,
+  'security-headers': <IconSecurityHeaders size={16} />,
+  'response-time':    <IconResponseTime size={16} />,
+  'robots-txt':       <IconRobotsTxt size={16} />,
+  'ip-change':        <IconIpChange size={16} />,
+  'mx-health':        <IconMxHealth size={16} />,
+  'whois-change':     <IconWhoisChange size={16} />,
+  sitemap:            <IconSitemap size={16} />,
+  'redirect-chain':   <IconRedirectChain size={16} />,
+  'spf-dmarc':        <IconSpfDmarc size={16} />,
+  blacklist:          <IconBlacklist size={16} />,
+  'page-size':        <IconPageSize size={16} />,
+  'cookie-consent':   <IconCookieConsent size={16} />,
+  'nameserver-change':<IconNameserverChange size={16} />,
+  wordpress:          <IconWordpress size={16} />,
+}
 
 const monitorTypes = MONITOR_TYPES.map(t => ({
   value: t.type,
   label: t.name,
-  icon: t.emoji === '__wp__' ? <IconWordpress size={18} /> : t.emoji,
+  icon: typeIconMap[t.type] ?? <MonitorTypeIcon type={t.type} iconOnly iconSize={16} />,
 }))
 
 const ALL_INTERVALS = [
@@ -29,10 +64,10 @@ const ALL_INTERVALS = [
 ]
 
 const SEVERITY_OPTIONS = [
-  { value: 'P1', label: 'P1 — Critical', icon: '🔴' },
-  { value: 'P2', label: 'P2 — High', icon: '🟠' },
-  { value: 'P3', label: 'P3 — Medium', icon: '🟡' },
-  { value: 'P4', label: 'P4 — Low', icon: '🔵' },
+  { value: 'P1', label: 'P1 — Critical', icon: <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#ef4444', display: 'inline-block', flexShrink: 0 }} /> },
+  { value: 'P2', label: 'P2 — High',     icon: <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#f97316', display: 'inline-block', flexShrink: 0 }} /> },
+  { value: 'P3', label: 'P3 — Medium',   icon: <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#eab308', display: 'inline-block', flexShrink: 0 }} /> },
+  { value: 'P4', label: 'P4 — Low',      icon: <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#3b82f6', display: 'inline-block', flexShrink: 0 }} /> },
 ]
 
 const HTTP_METHOD_OPTIONS = [
@@ -117,7 +152,7 @@ export function CreateMonitorForm({ minCheckInterval = 600, defaultType = 'http'
         <form action={handleSubmit}>
           {error && (
             <div className="form-error">
-              {error.includes('Monitor limit reached') && <span style={{ marginRight: 6 }}>⚠️</span>}
+              {error.includes('Monitor limit reached') && <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" style={{ marginRight: 6, flexShrink: 0 }}><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>}
               {error}
               {error.includes('Monitor limit reached') && (
                 <>{' '}<Link href="/dashboard/settings?tab=billing" className="form-error-link">Upgrade your plan</Link></>
