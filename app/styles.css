@@ -31850,6 +31850,7 @@ html.dark .db-home .db-stat-card:hover {
 /* ── Domains scrollable list — shows 4 items, scrolls for more ──────────── */
 .db-domains-scroll {
   overflow-y: auto;
+  max-height: calc(5 * 68px + 4 * 8px);
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -31933,6 +31934,53 @@ html.dark .db-home .db-stat-card:hover {
 @media (max-width: 900px) {
   .db-home-split {
     grid-template-columns: 1fr;
+  }
+
+  /* Stack incidents + response time above domains on mobile */
+  .db-home-split {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Domains: remove scroll cap on mobile so it shows all inline */
+  .db-domains-scroll {
+    max-height: none;
+    overflow-y: visible;
+  }
+
+  /* Domain tags: don't overflow, truncate row */
+  .db-domain-inner > div:last-child {
+    overflow: hidden;
+  }
+
+  .db-domain-inner > div:last-child > div {
+    flex-wrap: nowrap;
+    overflow: hidden;
+  }
+
+  /* Incidents: keep time always visible */
+  .incident-item {
+    gap: 8px;
+    padding: 12px 14px;
+  }
+
+  /* Response time text wrapping fix */
+  .db-card-header {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  /* Stat strip: 2 per row, no label truncation */
+  .db-home .db-stats-strip .db-stat-label {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    font-size: 10px;
+  }
+
+  .db-home .db-stats-strip .db-stat-card {
+    flex: 1 1 calc(50% - 6px);
+    min-width: 0;
   }
 }
 

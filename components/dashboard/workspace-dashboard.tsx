@@ -271,18 +271,18 @@ function DomainCards({ monitors }: { monitors: Monitor[] }) {
                     {statusLabel[g.status]}
                   </span>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+                  <span style={{ fontSize: 11, color: 'var(--text-muted)', flexShrink: 0 }}>
                     {g.monitors.length} monitor{g.monitors.length !== 1 ? 's' : ''}
                   </span>
-                  <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-                    {[...new Set(g.monitors.map(m => m.type))].slice(0, 5).map(t => (
-                      <span key={t} style={{ fontSize: 10, background: 'var(--bg-subtle)', color: 'var(--text-muted)', borderRadius: 4, padding: '1px 5px' }}>
+                  <div style={{ display: 'flex', gap: 4, overflow: 'hidden', flex: 1, minWidth: 0 }}>
+                    {[...new Set(g.monitors.map(m => m.type))].slice(0, 4).map(t => (
+                      <span key={t} style={{ fontSize: 10, background: 'var(--bg-subtle)', color: 'var(--text-muted)', borderRadius: 4, padding: '1px 5px', flexShrink: 0 }}>
                         {t}
                       </span>
                     ))}
-                    {new Set(g.monitors.map(m => m.type)).size > 5 && (
-                      <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>+{new Set(g.monitors.map(m => m.type)).size - 5}</span>
+                    {new Set(g.monitors.map(m => m.type)).size > 4 && (
+                      <span style={{ fontSize: 10, color: 'var(--text-muted)', flexShrink: 0 }}>+{new Set(g.monitors.map(m => m.type)).size - 4}</span>
                     )}
                   </div>
                 </div>
