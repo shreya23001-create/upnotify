@@ -5717,7 +5717,7 @@ html.dark .status-pill-paused {
 
 .esp-layout {
   display: grid;
-  grid-template-columns: 340px 1fr;
+  grid-template-columns: minmax(0, 320px) minmax(0, 1fr);
   gap: 24px;
   align-items: start;
 }
@@ -5729,7 +5729,8 @@ html.dark .status-pill-paused {
   border-radius: 14px;
   padding: 22px;
   min-width: 0;
-  overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .esp-section-title {
@@ -5838,7 +5839,6 @@ html.dark .status-pill-paused {
   transition: background 0.12s;
   width: 100%;
   box-sizing: border-box;
-  overflow: hidden;
 }
 .esp-added-row:hover { background: var(--bg-hover); }
 
@@ -5937,6 +5937,9 @@ html.dark .status-pill-paused {
   gap: 5px;
   max-height: 320px;
   overflow-y: auto;
+  overflow-x: hidden;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .esp-available-empty {
@@ -5957,7 +5960,6 @@ html.dark .status-pill-paused {
   cursor: default;
   width: 100%;
   box-sizing: border-box;
-  overflow: hidden;
 }
 .esp-avail-row:hover {
   background: var(--bg-hover);
