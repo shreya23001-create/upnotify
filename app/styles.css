@@ -19028,13 +19028,18 @@ html.dark .crd-highlight { color: #22c55e; }
   .crd-title { font-size: 17px; }
 
   .crd-stat-strip {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     padding: 14px 16px;
-    row-gap: 10px;
+    gap: 16px 0;
   }
 
-  .crd-stat { padding-right: 16px; }
-  .crd-stat-val { font-size: 20px; }
-  .crd-stat-divider { margin-right: 16px; height: 24px; }
+  .crd-stat-divider { display: none; }
+  .crd-stat { padding-right: 0; border-right: none; }
+  .crd-stat-val { font-size: 22px; }
+
+  .crd-stat:nth-child(odd) { border-right: 1px solid var(--border-subtle, rgba(0,0,0,0.07)); }
+  html.dark .crd-stat:nth-child(odd) { border-right-color: rgba(255,255,255,0.07); }
 
   .crd-kw-row {
     grid-template-columns: minmax(0, 1fr) auto;
