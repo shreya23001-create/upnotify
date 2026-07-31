@@ -5645,8 +5645,9 @@ html.dark .status-pill-paused {
 
 .spt-delete-btn { color: #dc2626 !important; }
 
-/* mobile-only badge hidden by default (desktop shows spt-col-status instead) */
-.spt-status-mobile { display: none; }
+/* mobile-only elements hidden by default */
+.spt-status-mobile  { display: none; }
+.spt-monitors-inline { display: none; }
 
 /* ── MOBILE  ≤ 640px ── */
 @media (max-width: 640px) {
@@ -5687,11 +5688,20 @@ html.dark .status-pill-paused {
   /* hide the standalone status column on mobile */
   .spt-col-status { display: none; }
 
-  /* hide monitors count on mobile (saves vertical space) */
+  /* hide standalone monitors column — shown inline instead */
   .spt-col-monitors { display: none; }
 
-  /* indent url under the name (past icon) */
-  .spt-col-url { padding-left: 36px; }
+  /* show inline monitors chip inside the URL row */
+  .spt-monitors-inline { display: inline-block; }
+
+  /* URL row: link + monitors chip side by side */
+  .spt-col-url {
+    padding-left: 36px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
 
   .spt-col-actions {
     display: flex;

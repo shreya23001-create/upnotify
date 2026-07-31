@@ -84,7 +84,7 @@ export function StatusPagesTable({ pages, pagination }: { pages: StatusPage[]; p
                   </span>
                 </div>
 
-                {/* Public URL */}
+                {/* Public URL + monitors chip (chip shows inline on mobile) */}
                 <div className="spt-col-url">
                   <a
                     href={`/status/${p.slug}`}
@@ -95,9 +95,10 @@ export function StatusPagesTable({ pages, pagination }: { pages: StatusPage[]; p
                     /status/{p.slug}
                     <ExternalLink size={11} />
                   </a>
+                  <span className="spt-monitors-chip spt-monitors-inline">{monitorCount} monitor{monitorCount !== 1 ? 's' : ''}</span>
                 </div>
 
-                {/* Monitors */}
+                {/* Monitors — desktop only standalone column */}
                 <div className="spt-col-monitors">
                   <span className="spt-monitors-chip">{monitorCount} monitor{monitorCount !== 1 ? 's' : ''}</span>
                 </div>
