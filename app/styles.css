@@ -5711,6 +5711,307 @@ html.dark .status-pill-paused {
   }
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   EDIT STATUS PAGE FORM  (esp-*)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.esp-layout {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.esp-settings,
+.esp-picker {
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  border-radius: 14px;
+  padding: 22px;
+}
+
+.esp-section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-primary);
+}
+
+.esp-count-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 9999px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* slug field */
+.esp-slug-wrap {
+  display: flex;
+  align-items: stretch;
+  border: 1.5px solid var(--border-input);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--bg-input);
+}
+.esp-slug-prefix {
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  font-size: 13px;
+  color: var(--text-muted);
+  background: var(--bg-subtle);
+  border-right: 1px solid var(--border-input);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.esp-slug-input {
+  border: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  flex: 1;
+  min-width: 0;
+}
+.esp-slug-input:focus { outline: none; box-shadow: none; }
+
+/* preview link */
+.esp-preview-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+  margin-top: -4px;
+}
+.esp-preview-link a {
+  color: var(--accent);
+  text-decoration: none;
+}
+.esp-preview-link a:hover { text-decoration: underline; }
+
+.esp-save-btn { width: 100%; justify-content: center; }
+
+/* ── added monitors ── */
+.esp-added {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 60px;
+  margin-bottom: 16px;
+}
+
+.esp-added-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 20px;
+  color: var(--text-muted);
+  font-size: 13px;
+  background: var(--bg-subtle);
+  border-radius: 10px;
+  border: 1.5px dashed var(--border-primary);
+}
+
+.esp-added-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 10px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-primary);
+  border-radius: 10px;
+  transition: background 0.12s;
+}
+.esp-added-row:hover { background: var(--bg-hover); }
+
+.esp-added-icon {
+  width: 26px; height: 26px;
+  border-radius: 7px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.esp-added-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.esp-added-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.esp-remove-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 24px; height: 24px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.12s, color 0.12s;
+}
+.esp-remove-btn:hover { background: #fef2f2; color: #dc2626; }
+
+/* ── divider ── */
+.esp-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+.esp-divider::before,
+.esp-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border-primary);
+}
+
+/* ── search ── */
+.esp-search-wrap {
+  position: relative;
+  margin-bottom: 10px;
+}
+.esp-search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+.esp-search {
+  width: 100%;
+  height: 36px;
+  padding: 0 12px 0 32px;
+  border: 1.5px solid var(--border-input);
+  border-radius: 9px;
+  font-size: 13px;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  outline: none;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+.esp-search:focus { border-color: var(--accent); }
+
+/* ── available list ── */
+.esp-available {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.esp-available-empty {
+  padding: 20px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.esp-avail-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 9px;
+  border: 1px solid transparent;
+  transition: background 0.12s, border-color 0.12s;
+  cursor: default;
+}
+.esp-avail-row:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-primary);
+}
+
+.esp-avail-icon {
+  width: 26px; height: 26px;
+  border-radius: 7px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-primary);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.esp-avail-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.esp-avail-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.esp-avail-type {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: capitalize;
+}
+
+.esp-add-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px;
+  border-radius: 7px;
+  border: 1.5px solid var(--border-input);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+.esp-add-btn:hover {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+/* ── mobile ── */
+@media (max-width: 860px) {
+  .esp-layout {
+    grid-template-columns: 1fr;
+  }
+  .esp-available { max-height: 240px; }
+}
+
 /* Report AI card highlight */
 .report-ai-card .card {
   border-left: 4px solid var(--accent);
