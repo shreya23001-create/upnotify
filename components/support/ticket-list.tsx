@@ -138,81 +138,95 @@ export function TicketList({ tickets }: TicketListProps): React.ReactElement {
       </div>
 
       {showForm && (
-        <div className="card support-form-card">
-          <h3 className="support-form-title">Raise a Support Ticket</h3>
-          <div className="support-form-grid">
-            <div className="form-group support-form-full">
-              <label className="form-label">
-                Subject <span className="form-required">*</span>
-              </label>
-              <input
-                type="text"
-                className={`form-input${subjectError ? ' form-input-error' : ''}`}
-                placeholder="Brief summary of your issue"
-                value={subject}
-                onChange={e => { setSubject(e.target.value); if (subjectError) setSubjectError('') }}
-                required
-              />
-              {subjectError && <p className="form-field-error">{subjectError}</p>}
+        <div className="stf-wrap">
+          <div className="stf-accent" />
+          <div className="stf-body">
+
+            <div className="stf-header">
+              <div className="stf-header-icon">
+                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              </div>
+              <div>
+                <div className="stf-header-title">New Support Ticket</div>
+                <div className="stf-header-sub">We typically reply within a few hours.</div>
+              </div>
+              <button className="stf-close" aria-label="Close" onClick={() => { setShowForm(false); setError(''); setSubjectError(''); setFiles([]) }}>
+                <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
             </div>
 
-            <div className="form-group">
-              <label className="form-label">Category</label>
-              <CustomSelect
-                options={CATEGORY_OPTIONS}
-                value={category}
-                onChange={v => setCategory(v as TicketCategory)}
-                disabled={submitting}
-              />
-            </div>
+            <div className="stf-section">
+              <div className="stf-field stf-field-full">
+                <label className="stf-label">Subject <span className="stf-required">*</span></label>
+                <input
+                  type="text"
+                  className={`form-input${subjectError ? ' form-input-error' : ''}`}
+                  placeholder="Brief summary of your issue"
+                  value={subject}
+                  onChange={e => { setSubject(e.target.value); if (subjectError) setSubjectError('') }}
+                />
+                {subjectError && <p className="stf-field-error">{subjectError}</p>}
+              </div>
 
-            <div className="form-group">
-              <label className="form-label">Priority</label>
-              <CustomSelect
-                options={PRIORITY_OPTIONS}
-                value={priority}
-                onChange={v => setPriority(v as TicketPriority)}
-                disabled={submitting}
-              />
-            </div>
-
-            <div className="form-group support-form-full">
-              <label className="form-label">Message</label>
-              <textarea
-                className="form-input support-textarea"
-                placeholder="Describe your issue in detail..."
-                value={message}
-                onChange={e => setMessage(e.target.value)}
-                rows={5}
-              />
-            </div>
-
-            <div className="form-group support-form-full">
-              <label className="form-label">
-                Attachments <span className="form-label-optional">(optional — max 5MB each)</span>
-              </label>
-              <input
-                type="file" multiple accept="image/*,.pdf,.txt,.log,.csv,.zip"
-                className="form-input support-file-input"
-                onChange={e => setFiles(Array.from(e.target.files ?? []))}
-              />
-              {files.length > 0 && (
-                <div className="support-file-names">
-                  {files.map(f => f.name).join(', ')}
+              <div className="stf-row">
+                <div className="stf-field">
+                  <label className="stf-label">Category</label>
+                  <CustomSelect options={CATEGORY_OPTIONS} value={category} onChange={v => setCategory(v as TicketCategory)} disabled={submitting} />
                 </div>
-              )}
+                <div className="stf-field">
+                  <label className="stf-label">Priority</label>
+                  <CustomSelect options={PRIORITY_OPTIONS} value={priority} onChange={v => setPriority(v as TicketPriority)} disabled={submitting} />
+                </div>
+              </div>
+
+              <div className="stf-field stf-field-full">
+                <label className="stf-label">Message <span className="stf-required">*</span></label>
+                <textarea
+                  className="form-input stf-textarea"
+                  placeholder="Describe your issue in detail. Include steps to reproduce if it's a bug."
+                  value={message}
+                  onChange={e => setMessage(e.target.value)}
+                  rows={6}
+                />
+              </div>
+
+              <div className="stf-field stf-field-full">
+                <label className="stf-label">
+                  Attachments
+                  <span className="stf-label-hint">optional · max 5 MB each · images, PDF, logs, CSV, ZIP</span>
+                </label>
+                <label className="stf-dropzone">
+                  <input
+                    type="file" multiple accept="image/*,.pdf,.txt,.log,.csv,.zip"
+                    className="stf-file-hidden"
+                    onChange={e => setFiles(Array.from(e.target.files ?? []))}
+                  />
+                  <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                  {files.length === 0
+                    ? <span>Click to upload or drag files here</span>
+                    : <span className="stf-file-list">{files.map(f => f.name).join(' · ')}</span>
+                  }
+                </label>
+              </div>
             </div>
-          </div>
 
-          {error && <p className="form-error">{error}</p>}
+            {error && <p className="stf-error">{error}</p>}
 
-          <div className="support-form-actions">
-            <button className="btn btn-primary" onClick={handleSubmit} disabled={submitting}>
-              {submitting ? 'Submitting…' : 'Submit Ticket'}
-            </button>
-            <button className="btn btn-ghost" onClick={() => { setShowForm(false); setError(''); setSubjectError(''); setFiles([]) }}>
-              Cancel
-            </button>
+            <div className="stf-actions">
+              <button className="btn btn-primary stf-submit" onClick={handleSubmit} disabled={submitting}>
+                {submitting
+                  ? <><span className="stf-spinner" /> Submitting…</>
+                  : <>
+                      <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                      Submit Ticket
+                    </>
+                }
+              </button>
+              <button className="btn btn-ghost" onClick={() => { setShowForm(false); setError(''); setSubjectError(''); setFiles([]) }}>
+                Cancel
+              </button>
+            </div>
+
           </div>
         </div>
       )}
