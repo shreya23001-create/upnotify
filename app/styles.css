@@ -5975,11 +5975,12 @@ html.dark .status-pill-paused {
 }
 
 .esp-avail-info {
-  flex: 1;
+  flex: 1 1 0;
   min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 1px;
+  overflow: hidden;
 }
 .esp-avail-name {
   font-size: 13px;
@@ -5988,11 +5989,16 @@ html.dark .status-pill-paused {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  display: block;
 }
 .esp-avail-type {
   font-size: 11px;
   color: var(--text-muted);
   text-transform: capitalize;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
 }
 
 .esp-add-btn {
