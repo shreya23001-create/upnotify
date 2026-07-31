@@ -30,19 +30,26 @@ export default async function CitationRunPage({
 
   return (
     <div className="db-content">
-      <div className="db-page-header">
-        <div>
-          <a href="/dashboard/ai-visibility" className="db-breadcrumb-back">← AI Visibility</a>
-          <div className="db-page-title" style={{ marginTop: 6 }}>
-            Citation Check — {run.domain}
+      {/* ── Hero header ── */}
+      <div className="crd-hero">
+        <div className="crd-hero-accent" />
+        <div className="crd-hero-body">
+          <div className="crd-hero-left">
+            <a href="/dashboard/ai-visibility" className="crd-back">
+              <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+              AI Visibility
+            </a>
+            <h1 className="crd-title">Citation Check — <span className="crd-domain">{run.domain}</span></h1>
+            <div className="crd-meta">
+              {run.keywords.length} keyword{run.keywords.length !== 1 ? 's' : ''}
+              <span className="crd-meta-sep">·</span>
+              {run.engine_ids.length} engine{run.engine_ids.length !== 1 ? 's' : ''}
+              <span className="crd-meta-sep">·</span>
+              {new Date(run.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+            </div>
           </div>
-          <div className="db-page-sub">
-            {run.keywords.length} keyword{run.keywords.length !== 1 ? 's' : ''} ·{' '}
-            {run.engine_ids.length} engine{run.engine_ids.length !== 1 ? 's' : ''} ·{' '}
-            {new Date(run.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
-          </div>
+          <RunStatusBadge status={run.status} />
         </div>
-        <RunStatusBadge status={run.status} />
       </div>
 
       {run.status === 'pending' || run.status === 'running' ? (
@@ -60,54 +67,49 @@ export default async function CitationRunPage({
 // Status badge
 // ---------------------------------------------------------------------------
 function RunStatusBadge({ status }: { status: CitationCheckRun['status'] }): React.ReactElement {
-  const colors: Record<string, string> = {
-    pending:  '#f59e0b',
-    running:  '#3b82f6',
-    complete: '#22c55e',
-    failed:   '#ef4444',
+  const map: Record<string, { color: string; label: string }> = {
+    pending:  { color: '#f59e0b', label: 'Pending' },
+    running:  { color: '#3b82f6', label: 'Running' },
+    complete: { color: '#22c55e', label: 'Complete' },
+    failed:   { color: '#ef4444', label: 'Failed'  },
   }
+  const { color, label } = map[status] ?? { color: '#94a3b8', label: status }
   return (
-    <span style={{
-      display: 'inline-flex', alignItems: 'center', gap: 6,
-      padding: '4px 12px', borderRadius: 20, fontSize: 13, fontWeight: 600,
-      background: `${colors[status]}20`, color: colors[status],
-      border: `1px solid ${colors[status]}40`,
+    <span className="crd-status-badge" style={{
+      background: `${color}18`,
+      color,
+      border: `1px solid ${color}35`,
     }}>
-      <span style={{ width: 7, height: 7, borderRadius: '50%', background: colors[status] }} />
-      {status.charAt(0).toUpperCase() + status.slice(1)}
+      <span className="crd-status-dot" style={{ background: color }} />
+      {label}
     </span>
   )
 }
 
 // ---------------------------------------------------------------------------
-// Pending state
+// Pending / Failed states
 // ---------------------------------------------------------------------------
 function PendingState({ run }: { run: CitationCheckRun }): React.ReactElement {
   return (
-    <div className="ai-vis-panel" style={{ maxWidth: 560, margin: '40px auto', textAlign: 'center', padding: 40 }}>
-      <div style={{ fontSize: 48, marginBottom: 16 }}>⏳</div>
-      <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 8 }}>
-        {run.status === 'pending' ? 'Check queued' : 'Check in progress'}
+    <div className="crd-state-card">
+      <div className="crd-state-icon crd-state-icon-pending">
+        <svg width="28" height="28" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
       </div>
-      <div style={{ color: 'var(--text-secondary)', fontSize: 14, marginBottom: 24 }}>
-        We&apos;re querying each AI engine with your keywords. This usually takes a few seconds.
-      </div>
-      <a href={`/dashboard/ai-visibility/runs/${run.id}`} className="btn btn-secondary btn-sm">Refresh</a>
+      <div className="crd-state-title">{run.status === 'pending' ? 'Check queued' : 'Check in progress'}</div>
+      <div className="crd-state-desc">We&apos;re querying each AI engine with your keywords. This usually takes a few seconds.</div>
+      <a href={`/dashboard/ai-visibility/runs/${run.id}`} className="btn btn-secondary btn-sm">Refresh page</a>
     </div>
   )
 }
 
-// ---------------------------------------------------------------------------
-// Failed state
-// ---------------------------------------------------------------------------
 function FailedState({ run }: { run: CitationCheckRun }): React.ReactElement {
   return (
-    <div className="ai-vis-panel" style={{ maxWidth: 560, margin: '40px auto', textAlign: 'center', padding: 40 }}>
-      <div style={{ fontSize: 48, marginBottom: 16 }}>⚠️</div>
-      <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 8 }}>Check failed</div>
-      <div style={{ color: 'var(--text-secondary)', fontSize: 14, marginBottom: 24 }}>
-        {run.error_message ?? 'An unexpected error occurred. Please try again.'}
+    <div className="crd-state-card">
+      <div className="crd-state-icon crd-state-icon-failed">
+        <svg width="28" height="28" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
       </div>
+      <div className="crd-state-title">Check failed</div>
+      <div className="crd-state-desc">{run.error_message ?? 'An unexpected error occurred. Please try again.'}</div>
       <a href="/dashboard/ai-visibility" className="btn btn-primary btn-sm">Run a new check</a>
     </div>
   )
@@ -123,86 +125,101 @@ function CompletedState({ run, results, engineMap }: {
 }): React.ReactElement {
   const summary = run.summary
 
-  // Group results by keyword
   const byKeyword: Record<string, CitationCheckResult[]> = {}
   for (const r of results) {
     if (!byKeyword[r.keyword]) byKeyword[r.keyword] = []
     byKeyword[r.keyword].push(r)
   }
 
-  // Per-keyword visibility table at the top — Q1 surfaced as keyword-level, not just one global score
-  const perKeyword = perKeywordVisibility(results, engineMap)
-
-  // Per-keyword competitor leaderboard — Q2 deep view, replaces the one-line CTA
+  const perKeyword         = perKeywordVisibility(results, engineMap)
   const competitorLeaderboard = aggregateCompetitorsByKeyword(results, run.domain)
+  const remediations       = buildRemediations(run, results, engineMap)
 
-  // Build remediation tips based on results (Q3/Q4 deferred to Phase 1.75)
-  const remediations = buildRemediations(run, results, engineMap)
+  const score = summary?.score ?? 0
+  const scoreColor = score >= 60 ? '#22c55e' : score >= 30 ? '#f59e0b' : '#ef4444'
 
   return (
-    <div>
-      {/* Summary cards */}
+    <div className="crd-content">
+
+      {/* ── Summary stat strip ── */}
       {summary && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 16, marginBottom: 28 }}>
-          <SummaryCard label="Visibility score" value={`${summary.score}/100`} accent="#3b82f6" />
-          <SummaryCard label="Cited by" value={`${summary.cited_by.length} engine${summary.cited_by.length !== 1 ? 's' : ''}`} accent="#22c55e" />
-          <SummaryCard label="Not cited by" value={`${summary.not_cited_by.length} engine${summary.not_cited_by.length !== 1 ? 's' : ''}`} accent="#ef4444" />
-          <SummaryCard label="Total checks" value={String(summary.total_checks)} accent="#6366f1" />
+        <div className="crd-stat-strip">
+          <div className="crd-stat">
+            <span className="crd-stat-val" style={{ color: scoreColor }}>{summary.score}<span className="crd-stat-unit">/100</span></span>
+            <span className="crd-stat-label">Visibility score</span>
+          </div>
+          <div className="crd-stat-divider" />
+          <div className="crd-stat">
+            <span className="crd-stat-val" style={{ color: '#22c55e' }}>{summary.cited_by.length}</span>
+            <span className="crd-stat-label">Cited by</span>
+          </div>
+          <div className="crd-stat-divider" />
+          <div className="crd-stat">
+            <span className="crd-stat-val" style={{ color: '#ef4444' }}>{summary.not_cited_by.length}</span>
+            <span className="crd-stat-label">Not cited by</span>
+          </div>
+          <div className="crd-stat-divider" />
+          <div className="crd-stat">
+            <span className="crd-stat-val">{summary.total_checks}</span>
+            <span className="crd-stat-label">Total checks</span>
+          </div>
         </div>
       )}
 
-      {/* Per-keyword visibility table — surfaces Q1 at keyword granularity */}
+      {/* ── Visibility by keyword ── */}
       {perKeyword.length > 0 && (
-        <div className="ai-vis-panel" style={{ marginBottom: 24 }}>
-          <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 14 }}>Visibility by keyword</h3>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
-            <thead>
-              <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                <th style={{ textAlign: 'left',  padding: '8px 6px', fontWeight: 600, color: 'var(--text-muted)' }}>Keyword</th>
-                <th style={{ textAlign: 'right', padding: '8px 6px', fontWeight: 600, color: 'var(--text-muted)', width: 110 }}>Visibility</th>
-                <th style={{ textAlign: 'left',  padding: '8px 6px', fontWeight: 600, color: 'var(--text-muted)' }}>Cited by</th>
-              </tr>
-            </thead>
-            <tbody>
-              {perKeyword.map(row => (
-                <tr key={row.keyword} style={{ borderBottom: '1px solid var(--border)' }}>
-                  <td style={{ padding: '10px 6px', fontWeight: 600 }}>&ldquo;{row.keyword}&rdquo;</td>
-                  <td style={{ padding: '10px 6px', textAlign: 'right' }}>
-                    <span style={{
-                      fontWeight: 700,
-                      color: row.scorePct >= 50 ? '#16a34a' : row.scorePct > 0 ? '#f59e0b' : '#dc2626',
-                    }}>
-                      {row.scorePct}% ({row.citedEngines.length}/{row.totalEngines})
-                    </span>
-                  </td>
-                  <td style={{ padding: '10px 6px', color: 'var(--text-secondary)' }}>
-                    {row.citedEngines.length > 0 ? row.citedEngines.join(', ') : <span style={{ color: 'var(--text-muted)' }}>None</span>}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="crd-card">
+          <div className="crd-card-header">
+            <div className="crd-card-icon">
+              <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </div>
+            <div className="crd-card-title">Visibility by keyword</div>
+          </div>
+          <div className="crd-kw-table">
+            <div className="crd-kw-row crd-kw-head">
+              <span>Keyword</span>
+              <span>Visibility</span>
+              <span>Cited by</span>
+            </div>
+            {perKeyword.map(row => (
+              <div key={row.keyword} className="crd-kw-row">
+                <span className="crd-kw-term">&ldquo;{row.keyword}&rdquo;</span>
+                <span className="crd-kw-score" style={{
+                  color: row.scorePct >= 50 ? '#16a34a' : row.scorePct > 0 ? '#d97706' : '#dc2626',
+                }}>
+                  {row.scorePct}% ({row.citedEngines.length}/{row.totalEngines})
+                </span>
+                <span className="crd-kw-engines">
+                  {row.citedEngines.length > 0 ? row.citedEngines.join(', ') : <span className="crd-kw-none">None</span>}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
-      {/* Engine breakdown — overall pills */}
+      {/* ── Engine breakdown ── */}
       {summary && (summary.cited_by.length > 0 || summary.not_cited_by.length > 0) && (
-        <div className="ai-vis-panel" style={{ marginBottom: 24 }}>
-          <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 14 }}>Engine breakdown (any keyword)</h3>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+        <div className="crd-card">
+          <div className="crd-card-header">
+            <div className="crd-card-icon">
+              <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            </div>
+            <div className="crd-card-title">Engine breakdown <span className="crd-card-subtitle">any keyword</span></div>
+          </div>
+          <div className="crd-engine-chips">
             {run.engine_ids.map(engId => {
               const engine = engineMap[engId]
               const cited  = summary.cited_by.includes(engine?.slug ?? engId)
               return (
-                <div key={engId} style={{
-                  display: 'flex', alignItems: 'center', gap: 8,
-                  padding: '6px 14px', borderRadius: 20, fontSize: 13,
-                  background: cited ? 'rgba(34,197,94,0.08)' : 'rgba(239,68,68,0.08)',
-                  border: `1px solid ${cited ? 'rgba(34,197,94,0.25)' : 'rgba(239,68,68,0.25)'}`,
-                  color: cited ? '#16a34a' : '#dc2626',
-                }}>
-                  <span style={{ fontWeight: 600 }}>{engine?.name ?? '[deactivated engine]'}</span>
-                  <span>{cited ? '✓ Cited' : '✗ Not cited'}</span>
+                <div key={engId} className={`crd-engine-chip ${cited ? 'cited' : 'not-cited'}`}>
+                  <span className="crd-engine-name">{engine?.name ?? '[deactivated]'}</span>
+                  <span className="crd-engine-result">
+                    {cited
+                      ? <><svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Cited</>
+                      : <><svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Not cited</>
+                    }
+                  </span>
                 </div>
               )
             })}
@@ -210,206 +227,176 @@ function CompletedState({ run, results, engineMap }: {
         </div>
       )}
 
-      {/* Per-keyword competitor leaderboard — answers Q2 properly */}
+      {/* ── Competitor leaderboard ── */}
       {Object.keys(competitorLeaderboard).length > 0 && (
-        <div className="ai-vis-panel" style={{ marginBottom: 24 }}>
-          <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 6 }}>Who&apos;s winning instead of you</h3>
-          <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 18 }}>
-            For each keyword, the domains AI engines surfaced as sources, ranked by how many engines cited each.
-            <strong style={{ color: 'var(--text-primary)' }}> Bold</strong> rows are you.
-          </p>
-          {Object.entries(competitorLeaderboard).map(([keyword, entries]) => {
-            const maxCount = Math.max(...entries.map(e => e.engineCount), 1)
-            return (
-              <div key={keyword} style={{ marginBottom: 20 }}>
-                <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-secondary)' }}>
-                  &ldquo;{keyword}&rdquo;
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <div className="crd-card">
+          <div className="crd-card-header">
+            <div className="crd-card-icon">
+              <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+            </div>
+            <div>
+              <div className="crd-card-title">Who&apos;s winning instead of you</div>
+              <div className="crd-card-desc">Domains AI engines surfaced as sources, ranked by how many engines cited each. <strong>Bold</strong> rows are you.</div>
+            </div>
+          </div>
+          <div className="crd-leaderboard">
+            {Object.entries(competitorLeaderboard).map(([keyword, entries]) => {
+              const maxCount = Math.max(...entries.map(e => e.engineCount), 1)
+              return (
+                <div key={keyword} className="crd-lb-section">
+                  <div className="crd-lb-keyword">&ldquo;{keyword}&rdquo;</div>
                   {entries.slice(0, 8).map(entry => {
                     const widthPct = (entry.engineCount / maxCount) * 100
                     const barColor = entry.isUser
                       ? (entry.engineCount > 0 ? '#22c55e' : '#94a3b8')
                       : '#6366f1'
                     return (
-                      <div key={entry.domain} style={{
-                        display: 'grid',
-                        gridTemplateColumns: '240px 1fr 60px',
-                        gap: 12, alignItems: 'center', fontSize: 13,
-                      }}>
-                        <span style={{
-                          fontWeight: entry.isUser ? 700 : 500,
-                          color: entry.isUser ? 'var(--text-primary)' : 'var(--text-secondary)',
-                          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                        }}>
-                          {entry.domain}{entry.isUser ? '  ← you' : ''}
+                      <div key={entry.domain} className={`crd-lb-row${entry.isUser ? ' is-you' : ''}`}>
+                        <span className="crd-lb-domain">
+                          {entry.domain}{entry.isUser ? <span className="crd-lb-you-tag">you</span> : ''}
                         </span>
-                        <div style={{
-                          height: 12, background: 'var(--surface-sunken)',
-                          borderRadius: 4, overflow: 'hidden',
-                        }}>
-                          <div style={{
-                            height: '100%', width: `${widthPct}%`,
-                            background: barColor, transition: 'width 0.3s ease',
-                          }} />
+                        <div className="crd-lb-bar-wrap">
+                          <div className="crd-lb-bar" style={{ width: `${widthPct}%`, background: barColor }} />
                         </div>
-                        <span style={{ fontVariantNumeric: 'tabular-nums', color: 'var(--text-muted)' }}>
-                          {entry.engineCount} engine{entry.engineCount !== 1 ? 's' : ''}
-                        </span>
+                        <span className="crd-lb-count">{entry.engineCount}</span>
                       </div>
                     )
                   })}
                 </div>
-              </div>
-            )
-          })}
-          <a href="/dashboard/watchdog" style={{
-            fontSize: 12, color: 'var(--text-muted)', textDecoration: 'none',
-          }}>
-            Track these competitors in Watchdog →
-          </a>
+              )
+            })}
+          </div>
+          <a href="/dashboard/watchdog" className="crd-watchdog-link">Track these competitors in Watchdog →</a>
         </div>
       )}
 
-      {/* Per-keyword results */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 28 }}>
-        {run.keywords.map(keyword => {
-          const keyResults = byKeyword[keyword] ?? []
-          return (
-            <div key={keyword} className="ai-vis-panel">
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-                <h3 style={{ fontSize: 15, fontWeight: 600, margin: 0 }}>&ldquo;{keyword}&rdquo;</h3>
-                <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>
-                  {keyResults.filter(r => r.cited).length}/{keyResults.length} engines cited you
-                </span>
+      {/* ── Per-keyword results ── */}
+      {run.keywords.map(keyword => {
+        const keyResults = byKeyword[keyword] ?? []
+        const citedCount = keyResults.filter(r => r.cited).length
+        return (
+          <div key={keyword} className="crd-card">
+            <div className="crd-card-header">
+              <div className="crd-card-icon">
+                <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
               </div>
-              {keyResults.length === 0 ? (
-                <div style={{ color: 'var(--text-secondary)', fontSize: 13 }}>No results recorded for this keyword.</div>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                  {keyResults.map(result => {
-                    const engine = engineMap[result.engine_id]
-                    return (
-                      <ResultRow
-                        key={result.id}
-                        result={result}
-                        engineName={engine?.name ?? '[deactivated engine]'}
-                        userDomain={run.domain}
-                      />
-                    )
-                  })}
-                </div>
-              )}
+              <div className="crd-card-title">&ldquo;{keyword}&rdquo;</div>
+              <span className="crd-kw-count-badge">{citedCount}/{keyResults.length} cited</span>
             </div>
-          )
-        })}
-      </div>
+            {keyResults.length === 0 ? (
+              <div className="crd-no-results">No results recorded for this keyword.</div>
+            ) : (
+              <div className="crd-results-list">
+                {keyResults.map(result => {
+                  const engine = engineMap[result.engine_id]
+                  return (
+                    <ResultRow
+                      key={result.id}
+                      result={result}
+                      engineName={engine?.name ?? '[deactivated engine]'}
+                      userDomain={run.domain}
+                    />
+                  )
+                })}
+              </div>
+            )}
+          </div>
+        )
+      })}
 
-      {/* Remediation section */}
+      {/* ── Remediation tips ── */}
       {remediations.length > 0 && (
-        <div className="ai-vis-panel" style={{ borderTop: '3px solid #3b82f6' }}>
-          <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 4 }}>How to improve your AI visibility</h3>
-          <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 20 }}>
-            Based on your results, here are the highest-impact actions you can take.
-          </p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+        <div className="crd-card crd-card-remediation">
+          <div className="crd-card-header">
+            <div className="crd-card-icon crd-card-icon-accent">
+              <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <div>
+              <div className="crd-card-title">How to improve your AI visibility</div>
+              <div className="crd-card-desc">Based on your results, here are the highest-impact actions you can take.</div>
+            </div>
+          </div>
+          <div className="crd-tips">
             {remediations.map((tip, i) => (
               <RemediationTip key={i} priority={tip.priority} title={tip.title} body={tip.body} link={tip.link} linkLabel={tip.linkLabel} />
             ))}
           </div>
         </div>
       )}
+
     </div>
   )
 }
 
 // ---------------------------------------------------------------------------
-// Result row — shows all source URLs (no slice) and highlights the user's
-// domain in any matching response text or URL so it's obvious WHY a result
-// was marked Cited.
+// Result row
 // ---------------------------------------------------------------------------
 function ResultRow({ result, engineName, userDomain }: {
   result: CitationCheckResult; engineName: string; userDomain: string
 }): React.ReactElement {
-  const citedColor  = result.cited === true ? '#22c55e' : result.cited === false ? '#ef4444' : '#94a3b8'
-  const citedLabel  = result.cited === true ? '✓ Cited' : result.cited === false ? '✗ Not cited' : '— Unknown'
+  const cited       = result.cited === true
+  const notCited    = result.cited === false
   const confLabels: Record<string, string> = { high: 'High confidence', medium: 'Medium confidence', indicative: 'Indicative' }
 
   return (
-    <div style={{ border: '1px solid var(--border)', borderRadius: 10, padding: 16, background: 'var(--surface)' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: result.response_text ? 12 : 0 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ fontWeight: 600, fontSize: 14 }}>{engineName}</span>
-          {result.confidence && (
-            <span style={{ fontSize: 11, color: 'var(--text-muted)', background: 'var(--surface-raised)', padding: '2px 8px', borderRadius: 10 }}>
-              {confLabels[result.confidence] ?? result.confidence}
-            </span>
-          )}
+    <div className={`crd-result-row ${cited ? 'cited' : notCited ? 'not-cited' : 'unknown'}`}>
+      <div className="crd-result-bar" />
+      <div className="crd-result-body">
+        <div className="crd-result-top">
+          <div className="crd-result-engine-row">
+            <span className="crd-result-engine">{engineName}</span>
+            {result.confidence && (
+              <span className="crd-result-conf">{confLabels[result.confidence] ?? result.confidence}</span>
+            )}
+          </div>
+          <span className={`crd-result-verdict ${cited ? 'cited' : notCited ? 'not-cited' : 'unknown'}`}>
+            {cited
+              ? <><svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Cited</>
+              : notCited
+              ? <><svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Not cited</>
+              : '— Unknown'
+            }
+          </span>
         </div>
-        <span style={{ fontWeight: 600, fontSize: 13, color: citedColor }}>{citedLabel}</span>
+
+        {result.response_text && (
+          <div className="crd-result-text">
+            <DomainHighlightedText text={result.response_text} domain={userDomain} />
+          </div>
+        )}
+
+        {result.source_urls.length > 0 && (
+          <div className="crd-result-urls">
+            {result.source_urls.map((url, i) => {
+              const isUser = url.toLowerCase().includes(userDomain.toLowerCase())
+              return (
+                <a key={i} href={url} target="_blank" rel="noopener noreferrer"
+                  className={`crd-url-chip${isUser ? ' is-user' : ''}`}>
+                  {url}
+                </a>
+              )
+            })}
+          </div>
+        )}
       </div>
-
-      {result.response_text && (
-        <div style={{
-          fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6,
-          background: 'var(--surface-sunken)', borderRadius: 8, padding: '10px 14px',
-          maxHeight: 240, overflowY: 'auto',
-        }}>
-          <DomainHighlightedText text={result.response_text} domain={userDomain} />
-        </div>
-      )}
-
-      {result.source_urls.length > 0 && (
-        <div style={{ marginTop: 10, display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-          {result.source_urls.map((url, i) => {
-            const containsDomain = url.toLowerCase().includes(userDomain.toLowerCase())
-            return (
-              <a key={i} href={url} target="_blank" rel="noopener noreferrer" style={{
-                fontSize: 11,
-                color: containsDomain ? '#15803d' : 'var(--color-primary)',
-                textDecoration: 'none',
-                background: containsDomain ? 'rgba(34,197,94,0.12)' : 'rgba(59,130,246,0.08)',
-                padding: '2px 8px', borderRadius: 8,
-                border: `1px solid ${containsDomain ? 'rgba(34,197,94,0.35)' : 'rgba(59,130,246,0.2)'}`,
-                fontWeight: containsDomain ? 700 : 400,
-                maxWidth: 320, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-              }}>
-                {url}
-              </a>
-            )
-          })}
-        </div>
-      )}
     </div>
   )
 }
 
-// Highlight occurrences of the user's domain in response text. Server-rendered
-// (no JS needed) — splits the text on the domain substring (case-insensitive)
-// and wraps matches in a <mark>.
 function DomainHighlightedText({ text, domain }: { text: string; domain: string }): React.ReactElement {
   if (!domain) return <>{text}</>
-  const lower = text.toLowerCase()
+  const lower  = text.toLowerCase()
   const needle = domain.toLowerCase()
   const parts: React.ReactNode[] = []
   let cursor = 0
   while (cursor < text.length) {
     const idx = lower.indexOf(needle, cursor)
-    if (idx === -1) {
-      parts.push(text.slice(cursor))
-      break
-    }
+    if (idx === -1) { parts.push(text.slice(cursor)); break }
     if (idx > cursor) parts.push(text.slice(cursor, idx))
     parts.push(
-      <mark
-        key={idx}
-        style={{
-          background: 'rgba(34,197,94,0.25)', color: '#15803d',
-          padding: '1px 4px', borderRadius: 4, fontWeight: 600,
-        }}
-      >
+      <mark key={idx} className="crd-highlight">
         {text.slice(idx, idx + needle.length)}
-      </mark>,
+      </mark>
     )
     cursor = idx + needle.length
   }
@@ -417,148 +404,81 @@ function DomainHighlightedText({ text, domain }: { text: string; domain: string 
 }
 
 // ---------------------------------------------------------------------------
-// Summary card
-// ---------------------------------------------------------------------------
-function SummaryCard({ label, value, accent }: { label: string; value: string; accent: string }): React.ReactElement {
-  return (
-    <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: '18px 20px', borderTop: `3px solid ${accent}` }}>
-      <div style={{ fontSize: 24, fontWeight: 700, color: accent }}>{value}</div>
-      <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 4 }}>{label}</div>
-    </div>
-  )
-}
-
-// ---------------------------------------------------------------------------
 // Remediation tip
 // ---------------------------------------------------------------------------
 function RemediationTip({ priority, title, body, link, linkLabel }: {
-  priority:  'high' | 'medium' | 'low'
-  title:     string
-  body:      string
-  link?:     string
+  priority:   'high' | 'medium' | 'low'
+  title:      string
+  body:       string
+  link?:      string
   linkLabel?: string
 }): React.ReactElement {
-  const colors = { high: '#ef4444', medium: '#f59e0b', low: '#3b82f6' }
-  const labels = { high: 'High impact', medium: 'Medium impact', low: 'Quick win' }
+  const cfg = {
+    high:   { color: '#ef4444', label: 'High impact' },
+    medium: { color: '#f59e0b', label: 'Medium impact' },
+    low:    { color: '#3b82f6', label: 'Quick win' },
+  }
+  const { color, label } = cfg[priority]
   return (
-    <div style={{ display: 'flex', gap: 14, padding: '14px 16px', background: 'var(--surface-raised)', borderRadius: 10, border: '1px solid var(--border)' }}>
-      <div style={{ flexShrink: 0, marginTop: 2 }}>
-        <span style={{
-          display: 'inline-block', padding: '2px 8px', borderRadius: 10, fontSize: 11, fontWeight: 700,
-          background: `${colors[priority]}15`, color: colors[priority], border: `1px solid ${colors[priority]}30`,
-        }}>
-          {labels[priority]}
-        </span>
-      </div>
-      <div style={{ flex: 1 }}>
-        <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 4 }}>{title}</div>
-        <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6 }}>{body}</div>
-        {link && (
-          <a href={link} target={link.startsWith('http') ? '_blank' : undefined} rel="noopener noreferrer"
-            style={{ display: 'inline-block', marginTop: 8, fontSize: 13, fontWeight: 600, color: 'var(--color-primary)', textDecoration: 'none' }}>
-            {linkLabel ?? 'Learn more'} →
-          </a>
-        )}
-      </div>
+    <div className="crd-tip">
+      <span className="crd-tip-badge" style={{ background: `${color}15`, color, border: `1px solid ${color}30` }}>
+        {label}
+      </span>
+      <div className="crd-tip-title">{title}</div>
+      <div className="crd-tip-body">{body}</div>
+      {link && (
+        <a href={link} target={link.startsWith('http') ? '_blank' : undefined} rel="noopener noreferrer" className="crd-tip-link">
+          {linkLabel ?? 'Learn more'} →
+        </a>
+      )}
     </div>
   )
 }
 
-// detectCompetitors / extractDomain helpers removed — replaced by
-// aggregateCompetitorsByKeyword in lib/utils/citation-aggregations.ts which
-// powers the per-keyword leaderboard above.
-
+// ---------------------------------------------------------------------------
+// buildRemediations (unchanged logic)
+// ---------------------------------------------------------------------------
 interface RemediationItem {
-  priority:  'high' | 'medium' | 'low'
-  title:     string
-  body:      string
-  link?:     string
+  priority:   'high' | 'medium' | 'low'
+  title:      string
+  body:       string
+  link?:      string
   linkLabel?: string
 }
 
 function buildRemediations(
-  run: CitationCheckRun,
-  results: CitationCheckResult[],
+  run:       CitationCheckRun,
+  results:   CitationCheckResult[],
   engineMap: Record<string, AiEngine>,
 ): RemediationItem[] {
   const tips: RemediationItem[] = []
   const summary = run.summary
   if (!summary) return tips
-
   const score = summary.score
 
-  // Not cited by anything
   if (score === 0) {
-    tips.push({
-      priority: 'high',
-      title: 'Add an llms.txt file to your site',
-      body: 'You have no AI citations yet. The single most impactful first step is adding an llms.txt file — it tells AI engines exactly what your site is about and who it helps. Generate one now.',
-      link: '/dashboard/ai-visibility',
-      linkLabel: 'Generate llms.txt',
-    })
-    tips.push({
-      priority: 'high',
-      title: 'Publish authoritative, long-form content for these keywords',
-      body: `AI engines like Exa and Perplexity cite content that directly and clearly answers the query. Create a dedicated page or article that thoroughly covers "${run.keywords[0]}" and similar terms. Include your domain name, company name, and key differentiators prominently.`,
-    })
-    tips.push({
-      priority: 'medium',
-      title: 'Add structured data (JSON-LD) to your site',
-      body: 'JSON-LD schema markup (Organization, WebSite, FAQPage) makes your content significantly easier for AI engines to parse and attribute. Add it to your homepage and key landing pages.',
-      link: 'https://schema.org/docs/gs.html',
-      linkLabel: 'Schema.org guide',
-    })
+    tips.push({ priority: 'high', title: 'Add an llms.txt file to your site', body: 'You have no AI citations yet. The single most impactful first step is adding an llms.txt file — it tells AI engines exactly what your site is about and who it helps. Generate one now.', link: '/dashboard/ai-visibility', linkLabel: 'Generate llms.txt' })
+    tips.push({ priority: 'high', title: 'Publish authoritative, long-form content for these keywords', body: `AI engines like Exa and Perplexity cite content that directly and clearly answers the query. Create a dedicated page or article that thoroughly covers "${run.keywords[0]}" and similar terms. Include your domain name, company name, and key differentiators prominently.` })
+    tips.push({ priority: 'medium', title: 'Add structured data (JSON-LD) to your site', body: 'JSON-LD schema markup (Organization, WebSite, FAQPage) makes your content significantly easier for AI engines to parse and attribute. Add it to your homepage and key landing pages.', link: 'https://schema.org/docs/gs.html', linkLabel: 'Schema.org guide' })
   }
 
-  // Partially cited
   if (score > 0 && score < 100) {
     const notCitedEngineNames = (summary.not_cited_by ?? [])
       .map(slug => Object.values(engineMap).find(e => e.slug === slug)?.name ?? slug)
-
     if (notCitedEngineNames.length > 0) {
-      tips.push({
-        priority: 'high',
-        title: `Improve visibility on ${notCitedEngineNames.slice(0, 2).join(' and ')}`,
-        body: `You're already cited by some engines but not by ${notCitedEngineNames.join(', ')}. Each engine has different signals: Perplexity and Exa prioritise pages with clear structured URLs and direct answers. ChatGPT and Claude weight training data and web grounding — publishing regular, well-structured content helps. Check your robots.txt allows AI crawlers (GPTBot, ClaudeBot, PerplexityBot).`,
-      })
+      tips.push({ priority: 'high', title: `Improve visibility on ${notCitedEngineNames.slice(0, 2).join(' and ')}`, body: `You're already cited by some engines but not by ${notCitedEngineNames.join(', ')}. Each engine has different signals: Perplexity and Exa prioritise pages with clear structured URLs and direct answers. ChatGPT and Claude weight training data and web grounding — publishing regular, well-structured content helps. Check your robots.txt allows AI crawlers (GPTBot, ClaudeBot, PerplexityBot).` })
     }
-
-    tips.push({
-      priority: 'medium',
-      title: 'Expand your content around these exact keywords',
-      body: `Create FAQ sections, comparison pages, and how-to guides specifically targeting: ${run.keywords.map(k => `"${k}"`).join(', ')}. AI engines prefer pages that directly answer a question in full rather than pages that mention the keyword in passing.`,
-    })
+    tips.push({ priority: 'medium', title: 'Expand your content around these exact keywords', body: `Create FAQ sections, comparison pages, and how-to guides specifically targeting: ${run.keywords.map(k => `"${k}"`).join(', ')}. AI engines prefer pages that directly answer a question in full rather than pages that mention the keyword in passing.` })
   }
 
-  // Has some citations — improvement tips
   if (score > 0) {
-    tips.push({
-      priority: 'medium',
-      title: 'Check your robots.txt allows AI crawlers',
-      body: 'Make sure your robots.txt does not block GPTBot (ChatGPT), ClaudeBot (Claude), PerplexityBot, or Google-Extended (Gemini). Blocking these means the engine cannot index your latest content and will stop citing you over time.',
-      link: '/tools/ai-seo-checker',
-      linkLabel: 'Run free AI SEO check',
-    })
-
-    tips.push({
-      priority: 'low',
-      title: 'Keep your llms.txt up to date',
-      body: 'AI engines re-crawl llms.txt regularly. Regenerate yours whenever you add major new sections, products, or pages. The more specific and accurate it is, the more precisely you will be cited.',
-      link: '/dashboard/ai-visibility',
-      linkLabel: 'Regenerate llms.txt',
-    })
+    tips.push({ priority: 'medium', title: 'Check your robots.txt allows AI crawlers', body: 'Make sure your robots.txt does not block GPTBot (ChatGPT), ClaudeBot (Claude), PerplexityBot, or Google-Extended (Gemini). Blocking these means the engine cannot index your latest content and will stop citing you over time.', link: '/tools/ai-seo-checker', linkLabel: 'Run free AI SEO check' })
+    tips.push({ priority: 'low', title: 'Keep your llms.txt up to date', body: 'AI engines re-crawl llms.txt regularly. Regenerate yours whenever you add major new sections, products, or pages. The more specific and accurate it is, the more precisely you will be cited.', link: '/dashboard/ai-visibility', linkLabel: 'Regenerate llms.txt' })
   }
 
-  // Check if any result has errors suggesting a crawl block
   const hasErrors = results.some(r => r.response_text?.startsWith('Error:'))
   if (hasErrors) {
-    tips.push({
-      priority: 'low',
-      title: 'Some engine queries returned errors',
-      body: 'One or more engines returned errors during this check. This may be temporary API rate limiting. Re-run the check to get fresh results.',
-      link: '/dashboard/ai-visibility',
-      linkLabel: 'Run again',
-    })
+    tips.push({ priority: 'low', title: 'Some engine queries returned errors', body: 'One or more engines returned errors during this check. This may be temporary API rate limiting. Re-run the check to get fresh results.', link: '/dashboard/ai-visibility', linkLabel: 'Run again' })
   }
 
   return tips
