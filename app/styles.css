@@ -5504,6 +5504,203 @@ html.dark .status-pill-paused {
   .sp-hero-stat-num { font-size: 18px; }
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   STATUS PAGES LIST  — dashboard (spt-*)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.spt-toolbar {
+  margin-bottom: 16px;
+}
+
+.spt-header {
+  display: flex;
+  align-items: center;
+  padding: 0 16px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-primary);
+  gap: 12px;
+}
+
+.spt-list {
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.spt-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border-light, rgba(0,0,0,0.05));
+  transition: background 0.12s;
+}
+.spt-row:last-child { border-bottom: none; }
+.spt-row:hover { background: var(--bg-hover); }
+
+.spt-empty {
+  padding: 32px 16px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+/* Column widths — desktop */
+.spt-col-name     { display: flex; align-items: center; gap: 8px; flex: 0 0 180px; min-width: 0; }
+.spt-col-url      { flex: 1; min-width: 0; overflow: hidden; }
+.spt-col-monitors { flex: 0 0 100px; }
+.spt-col-status   { flex: 0 0 100px; }
+.spt-col-actions  { flex: 0 0 100px; display: flex; align-items: center; justify-content: flex-end; gap: 6px; }
+
+/* header uses same columns */
+.spt-header .spt-col-name     { flex: 0 0 180px; }
+.spt-header .spt-col-url      { flex: 1; }
+.spt-header .spt-col-monitors { flex: 0 0 100px; }
+.spt-header .spt-col-status   { flex: 0 0 100px; }
+.spt-header .spt-col-actions  { flex: 0 0 100px; }
+
+.spt-name-icon {
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-primary);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.spt-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.spt-url-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+  color: var(--accent);
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+.spt-url-link:hover { text-decoration: underline; }
+
+.spt-monitors-chip {
+  display: inline-block;
+  font-size: 12px;
+  color: var(--text-muted);
+  background: var(--bg-subtle);
+  border-radius: 6px;
+  padding: 3px 8px;
+  white-space: nowrap;
+}
+
+.spt-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  white-space: nowrap;
+}
+.spt-status-badge.published {
+  background: var(--color-up-bg, #ecfdf5);
+  color: var(--color-up, #059669);
+  border: 1px solid rgba(5,150,105,0.2);
+}
+.spt-status-badge.draft {
+  background: var(--bg-subtle);
+  color: var(--text-muted);
+  border: 1px solid var(--border-primary);
+}
+
+.spt-status-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+.spt-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.spt-delete-btn { color: #dc2626 !important; }
+
+/* mobile-only badge hidden by default (desktop shows spt-col-status instead) */
+.spt-status-mobile { display: none; }
+
+/* ── MOBILE  ≤ 640px ── */
+@media (max-width: 640px) {
+  /* hide desktop header row */
+  .spt-header { display: none; }
+
+  .spt-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding: 14px;
+  }
+
+  /* all columns full-width */
+  .spt-col-name,
+  .spt-col-url,
+  .spt-col-monitors,
+  .spt-col-status,
+  .spt-col-actions {
+    flex: unset;
+    width: 100%;
+    min-width: 0;
+  }
+
+  /* row 1: icon + name + inline status badge */
+  .spt-col-name {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* name shrinks, badge pushes to end */
+  .spt-name { flex: 1; min-width: 0; }
+
+  /* show inline badge on mobile */
+  .spt-status-mobile { display: inline-flex; }
+
+  /* hide the standalone status column on mobile */
+  .spt-col-status { display: none; }
+
+  /* hide monitors count on mobile (saves vertical space) */
+  .spt-col-monitors { display: none; }
+
+  /* indent url under the name (past icon) */
+  .spt-col-url { padding-left: 36px; }
+
+  .spt-col-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 4px;
+    border-top: 1px solid var(--border-light, rgba(0,0,0,0.05));
+  }
+}
+
 /* Report AI card highlight */
 .report-ai-card .card {
   border-left: 4px solid var(--accent);
