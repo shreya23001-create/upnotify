@@ -39,16 +39,6 @@ export default async function AiVisibilityPage(): Promise<React.ReactElement> {
 
   return (
     <div className="db-content">
-      <div className="db-page-header">
-        <div>
-          <div className="db-page-title">AI Visibility</div>
-          <div className="db-page-sub">Generate your llms.txt, monitor citations, and discover what AI engines say about your site.</div>
-        </div>
-        <a href="/tools/ai-seo-checker" target="_blank" className="btn btn-secondary btn-sm">
-          Free AI SEO Checker ↗
-        </a>
-      </div>
-
       <AiVisibilityClient
         engines={engines}
         freeEngineIds={freeEngineIds}

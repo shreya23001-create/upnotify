@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { ClipboardList, Lightbulb, FileText, Search, Eye } from 'lucide-react'
+import { ClipboardList, Lightbulb, FileText, Search, Eye, Zap, Bot, Globe } from 'lucide-react'
 import type { AiEngine } from '@/lib/db/ai-engines'
 import type { LlmsTxtGeneration, CitationCheckRun } from '@/lib/db/ai-visibility'
 import type { ProfileRun } from '@/lib/db/ai-profile'
@@ -15,7 +15,7 @@ interface Props {
   planSlug:               string
   canGenerateLlms:        boolean
   llmsBlockReason?:       string
-  citationRunsThisMonth:  number   // combined citation + profile count (shared quota)
+  citationRunsThisMonth:  number
   citationLimit:          number
 }
 
@@ -28,27 +28,74 @@ export function AiVisibilityClient({
 }: Props): React.ReactElement {
   const [tab, setTab] = useState<Tab>('citation')
 
+  const usedPct = citationLimit > 0 ? Math.min((citationRunsThisMonth / citationLimit) * 100, 100) : 0
+
   return (
-    <div>
-      {/* Tab switcher */}
-      <div className="db-tabs db-tabs-spaced">
-        <button className={`db-tab${tab === 'llms' ? ' db-tab-active' : ''}`} onClick={() => setTab('llms')}>
-          llms.txt Generator
-        </button>
-        <button className={`db-tab${tab === 'citation' ? ' db-tab-active' : ''}`} onClick={() => setTab('citation')}>
+    <div className="aiv-root">
+
+      {/* ── Hero banner ── */}
+      <div className="aiv-hero">
+        <div className="aiv-hero-accent" />
+        <div className="aiv-hero-body">
+          <div className="aiv-hero-left">
+            <div className="aiv-hero-icon">
+              <Bot size={22} />
+            </div>
+            <div>
+              <div className="aiv-hero-title">AI Visibility Suite</div>
+              <div className="aiv-hero-sub">Generate your llms.txt, monitor citations, and discover what AI engines say about your site.</div>
+            </div>
+          </div>
+          <a href="/tools/ai-seo-checker" target="_blank" className="btn btn-secondary btn-sm aiv-hero-cta">
+            <Globe size={13} />
+            Free AI SEO Checker ↗
+          </a>
+        </div>
+
+        {/* Usage strip */}
+        {citationLimit > 0 && (
+          <div className="aiv-usage-strip">
+            <span className="aiv-usage-label">
+              <Zap size={12} />
+              {citationRunsThisMonth} / {citationLimit} runs used this month
+            </span>
+            <div className="aiv-usage-track">
+              <div className="aiv-usage-fill" style={{ width: `${usedPct}%` }} />
+            </div>
+            <span className="aiv-usage-pct">{Math.round(usedPct)}%</span>
+          </div>
+        )}
+      </div>
+
+      {/* ── Tab bar ── */}
+      <div className="aiv-tabs">
+        <button
+          className={`aiv-tab${tab === 'citation' ? ' aiv-tab-active' : ''}`}
+          onClick={() => setTab('citation')}
+        >
+          <Search size={14} />
           AI Citation Monitor
           {citationLimit > 0 && (
-            <span className="db-tab-badge">{citationRunsThisMonth}/{citationLimit} used</span>
+            <span className="aiv-tab-pill">{citationRunsThisMonth}/{citationLimit}</span>
           )}
         </button>
-        <button className={`db-tab${tab === 'profile' ? ' db-tab-active' : ''}`} onClick={() => setTab('profile')}>
+        <button
+          className={`aiv-tab${tab === 'profile' ? ' aiv-tab-active' : ''}`}
+          onClick={() => setTab('profile')}
+        >
+          <Eye size={14} />
           AI Profile
-          {citationLimit > 0 && (
-            <span className="db-tab-badge">{citationRunsThisMonth}/{citationLimit} used</span>
-          )}
+        </button>
+        <button
+          className={`aiv-tab${tab === 'llms' ? ' aiv-tab-active' : ''}`}
+          onClick={() => setTab('llms')}
+        >
+          <FileText size={14} />
+          llms.txt Generator
         </button>
       </div>
 
+      {/* ── Tab content ── */}
       {tab === 'llms' && (
         <LlmsTxtTab
           engines={engines}
@@ -83,6 +130,140 @@ export function AiVisibilityClient({
 }
 
 // ---------------------------------------------------------------------------
+// Shared sub-components
+// ---------------------------------------------------------------------------
+
+function EngineGrid({ engines, selected, onToggle, freeEngineIds, planSlug }: {
+  engines: AiEngine[]
+  selected: string[]
+  onToggle: (id: string) => void
+  freeEngineIds?: string[]
+  planSlug?: string
+}) {
+  return (
+    <div className="aiv-engine-grid">
+      {engines.map(engine => {
+        const isFree = freeEngineIds?.includes(engine.id) ?? true
+        const locked = planSlug === 'free' && !isFree
+        const on = selected.includes(engine.id)
+        return (
+          <label
+            key={engine.id}
+            className={`aiv-engine-chip${on ? ' on' : ''}${locked ? ' locked' : ''}`}
+            title={locked ? 'Upgrade to access this engine' : undefined}
+          >
+            <input
+              type="checkbox"
+              checked={on}
+              onChange={() => onToggle(engine.id)}
+              disabled={locked}
+              style={{ display: 'none' }}
+            />
+            <span className="aiv-engine-name">{engine.name}</span>
+            {locked
+              ? <span className="aiv-signal aiv-signal-locked">Upgrade</span>
+              : <span className={`aiv-signal aiv-signal-${engine.signal_quality}`}>{engine.signal_quality}</span>
+            }
+          </label>
+        )
+      })}
+    </div>
+  )
+}
+
+function RunStartedBanner({ runId, profileMode }: { runId: string; profileMode?: boolean }) {
+  return (
+    <div className="aiv-run-started">
+      <div className="aiv-run-started-icon">
+        <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div className="aiv-run-started-body">
+        <div className="aiv-run-started-title">{profileMode ? 'AI Profile complete' : 'Check started'}</div>
+        <div className="aiv-run-started-desc">
+          {profileMode
+            ? "We've gathered responses from each engine."
+            : "We'll email you when results are ready — usually within 2–5 minutes."}
+        </div>
+        <a
+          href={profileMode ? `/dashboard/ai-visibility/profile/${runId}` : `/dashboard/ai-visibility/runs/${runId}`}
+          className="aiv-run-started-link"
+        >
+          View {profileMode ? 'profile' : 'run'} →
+        </a>
+      </div>
+    </div>
+  )
+}
+
+function RunsList({ runs, type }: {
+  runs: (CitationCheckRun | ProfileRun)[]
+  type: 'citation' | 'profile'
+}) {
+  if (runs.length === 0) {
+    return (
+      <div className="aiv-empty">
+        <div className="aiv-empty-icon">
+          {type === 'citation' ? <Search size={32} strokeWidth={1.5} /> : <Eye size={32} strokeWidth={1.5} />}
+        </div>
+        <div className="aiv-empty-title">No {type === 'citation' ? 'citation checks' : 'profiles'} yet</div>
+        <div className="aiv-empty-desc">
+          {type === 'citation'
+            ? 'Run your first check to see how visible your site is in AI search.'
+            : 'Run your first AI Profile to see how AI engines describe your site.'}
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="aiv-runs-list">
+      {runs.map(run => {
+        const isComplete = run.status === 'complete'
+        const isFailed = run.status === 'failed'
+        const statusClass = isComplete ? 'complete' : isFailed ? 'failed' : 'pending'
+        const href = type === 'citation'
+          ? `/dashboard/ai-visibility/runs/${run.id}`
+          : `/dashboard/ai-visibility/profile/${run.id}`
+
+        const score = type === 'citation'
+          ? (run as CitationCheckRun).summary?.score
+          : null
+        const recognisedCt = type === 'profile'
+          ? ((run as ProfileRun).summary?.recognised_by.length ?? null)
+          : null
+        const totalEngines = run.engine_ids.length
+
+        return (
+          <a key={run.id} href={href} className="aiv-run-card">
+            <div className={`aiv-run-card-bar ${statusClass}`} />
+            <div className="aiv-run-card-body">
+              <div className="aiv-run-card-top">
+                <span className="aiv-run-card-domain">{run.domain}</span>
+                <span className={`aiv-run-card-status ${statusClass}`}>{run.status}</span>
+              </div>
+              <div className="aiv-run-card-meta">
+                {totalEngines} engine{totalEngines !== 1 ? 's' : ''} ·{' '}
+                {type === 'citation'
+                  ? `${(run as CitationCheckRun).keywords.length} keyword${(run as CitationCheckRun).keywords.length !== 1 ? 's' : ''}`
+                  : `${(run as ProfileRun).prompt_ids.length} prompt${(run as ProfileRun).prompt_ids.length !== 1 ? 's' : ''}`
+                } ·{' '}
+                {new Date(run.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+              </div>
+            </div>
+            {isComplete && (
+              <div className="aiv-run-card-score">
+                {score != null && <span className="aiv-run-card-score-val">{score}<span className="aiv-run-card-score-unit">/100</span></span>}
+                {recognisedCt != null && <span className="aiv-run-card-score-val">{recognisedCt}<span className="aiv-run-card-score-unit">/{totalEngines}</span></span>}
+              </div>
+            )}
+          </a>
+        )
+      })}
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
 // llms.txt Generator Tab
 // ---------------------------------------------------------------------------
 function LlmsTxtTab({ engines, generations, planSlug, canGenerate, blockReason }: {
@@ -108,38 +289,19 @@ function LlmsTxtTab({ engines, generations, planSlug, canGenerate, blockReason }
   async function handleGenerate(e: React.FormEvent) {
     e.preventDefault()
     if (!canGenerate) return
-
-    // Client-side validation. The HTML5 `required` attribute on the input
-    // only checks empty-string and lets whitespace-only values through, so
-    // an explicit trim check is needed before any network call. The server
-    // also rejects empty domains with a 400 — this is the friendly belt to
-    // that suspenders.
     const trimmedDomain = domain.trim()
-    if (!trimmedDomain) {
-      setError('Please enter a valid domain (e.g. mywebsite.com).')
-      return
-    }
-    if (selectedEngines.length === 0) {
-      setError('Select at least one AI engine.')
-      return
-    }
+    if (!trimmedDomain) { setError('Please enter a valid domain (e.g. mywebsite.com).'); return }
+    if (selectedEngines.length === 0) { setError('Select at least one AI engine.'); return }
 
-    setLoading(true)
-    setError('')
-    setGenerated(null)
+    setLoading(true); setError(''); setGenerated(null)
     try {
       const res = await fetch('/api/ai-visibility/generate-llms', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ domain: trimmedDomain, engineIds: selectedEngines }),
       })
-
-      // Defend against non-JSON 5xx and the rare empty-body case — both used
-      // to surface as `Cannot read properties of undefined` on data.error and
-      // crash the dashboard to a white screen.
       let data: { error?: string; content?: string } = {}
       try { data = await res.json() } catch { /* keep data empty */ }
-
       if (!res.ok) { setError(data.error ?? 'Generation failed. Please try again.'); return }
       if (!data.content) { setError('No content returned. Please try again.'); return }
       setGenerated(data.content)
@@ -167,116 +329,104 @@ function LlmsTxtTab({ engines, generations, planSlug, canGenerate, blockReason }
   }
 
   return (
-    <div>
-      <div className="ai-vis-grid">
-        {/* Generator panel */}
-        <div className="ai-vis-panel">
-          <h2 className="ai-vis-panel-title">Generate llms.txt</h2>
-          <p className="ai-vis-panel-desc">
-            A llms.txt file tells AI engines what your site is about. Place it at <code>yourdomain.com/llms.txt</code>.
-          </p>
-
-          {!canGenerate && blockReason && (
-            <div className="ai-vis-limit-notice">
-              <div className="ai-vis-limit-text">{blockReason}</div>
-              <a href="/dashboard/settings?tab=billing" className="ai-vis-upgrade-link">Upgrade plan →</a>
+    <div className="aiv-layout">
+      {/* Form panel */}
+      <div className="aiv-form-panel">
+        <div className="aiv-panel-header">
+          <div className="aiv-panel-icon"><FileText size={16} /></div>
+          <div>
+            <div className="aiv-panel-title">Generate llms.txt</div>
+            <div className="aiv-panel-desc">
+              A llms.txt file tells AI engines what your site is about. Place it at <code>yourdomain.com/llms.txt</code>.
             </div>
-          )}
-
-          <form onSubmit={handleGenerate} style={{ opacity: canGenerate ? 1 : 0.5, pointerEvents: canGenerate ? 'auto' : 'none' }}>
-            <div className="ai-vis-form-group">
-              <label className="ai-vis-label">Your domain</label>
-              <input className="ai-vis-input" type="text" value={domain}
-                onChange={e => setDomain(e.target.value)}
-                placeholder="e.g. mywebsite.com" required />
-            </div>
-
-            <div className="ai-vis-form-group">
-              <label className="ai-vis-label">Optimise for these AI engines</label>
-              <div className="ai-vis-engine-grid">
-                {llmsEngines.map(engine => (
-                  <label key={engine.id} className={`ai-vis-engine-chip ${selectedEngines.includes(engine.id) ? 'ai-vis-engine-chip-on' : ''}`}>
-                    <input type="checkbox" checked={selectedEngines.includes(engine.id)}
-                      onChange={() => toggleEngine(engine.id)} style={{ display: 'none' }} />
-                    <span className="ai-vis-engine-name">{engine.name}</span>
-                    <span className={`ai-vis-signal ai-vis-signal-${engine.signal_quality}`}>{engine.signal_quality}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            {error && <div className="ai-vis-error">{error}</div>}
-
-            <button type="submit" className="btn btn-primary btn-block" disabled={loading || selectedEngines.length === 0}>
-              {loading ? 'Generating...' : 'Generate llms.txt'}
-            </button>
-
-            {planSlug === 'free' && (
-              <p className="ai-vis-plan-note">Free plan: 1 generation. <a href="/dashboard/settings?tab=billing">Upgrade</a> for unlimited.</p>
-            )}
-          </form>
+          </div>
         </div>
 
-        {/* Generated output */}
-        <div className="ai-vis-panel">
-          <h2 className="ai-vis-panel-title">Your llms.txt</h2>
-          {generated ? (
-            <>
-              <div className="ai-vis-output-header">
-                <button className="btn btn-secondary btn-sm" onClick={copy}>{copied ? '✓ Copied' : 'Copy'}</button>
-                <button className="btn btn-primary btn-sm" onClick={download}>Download</button>
-              </div>
-              <pre className="ai-vis-output">{generated}</pre>
-              <p className="ai-vis-output-hint">
-                Upload this file to your web root as <code>llms.txt</code>, then re-run the{' '}
-                <a href="/tools/ai-seo-checker" target="_blank">AI SEO Checker</a> to confirm it&apos;s detected.
-              </p>
-              {generated && (
-                <details className="ai-vis-next-steps" style={{ marginTop: 20 }}>
-                  <summary style={{ cursor: 'pointer', fontWeight: 600, fontSize: 14, padding: '10px 0', listStyle: 'none', display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <ClipboardList size={16} /> What to do next with your llms.txt
-                  </summary>
-                  <div style={{ paddingTop: 12 }}>
-                    <ol style={{ paddingLeft: '1.4rem', lineHeight: 2.2, fontSize: 13, color: 'var(--text-secondary)' }}>
-                      <li><strong>Save the file</strong> — click Download above to get <code>llms.txt</code></li>
-                      <li><strong>Upload to your web root</strong> — place it at <code>https://yourdomain.com/llms.txt</code> (same level as robots.txt). For WordPress: upload via FTP or File Manager to the root folder. For Webflow/Squarespace: upload as a static file in Settings → Custom Code. For Vercel/Netlify: place the file in your <code>public/</code> folder.</li>
-                      <li><strong>Check your robots.txt</strong> — make sure it allows GPTBot, ClaudeBot, PerplexityBot, and Google-Extended. If it&apos;s missing or blocking them, use the <a href="/tools/ai-seo-checker" target="_blank">free AI SEO Checker</a> to see exactly what to fix.</li>
-                      <li><strong>Verify it&apos;s live</strong> — visit <code>https://yourdomain.com/llms.txt</code> in your browser to confirm it&apos;s accessible. Then run the <a href="/tools/ai-seo-checker" target="_blank">AI SEO Checker</a> on your domain — the llms.txt check should now pass.</li>
-                      <li><strong>Monitor your citations</strong> — switch to the <strong>AI Citation Monitor</strong> tab above to track which AI engines are actually citing your domain for your target keywords. Runs complete asynchronously and you&apos;ll receive an email when done.</li>
-                      <li><strong>Keep it updated</strong> — regenerate your llms.txt whenever you add major new sections or pages to your site. AI engines re-crawl llms.txt regularly.</li>
-                    </ol>
-                    <div style={{ marginTop: 12, padding: '10px 14px', background: 'rgba(59,130,246,0.06)', borderRadius: 8, fontSize: 12, color: 'var(--text-muted)', display: 'flex', alignItems: 'flex-start', gap: 6 }}>
-                      <Lightbulb size={14} style={{ flexShrink: 0, marginTop: 1 }} /> <span><strong>Tip:</strong> Customise the generated file before uploading — fill in the <code>[placeholder]</code> sections with your real site description, key pages, and author details. The more specific, the better your AI citations will be.</span>
-                    </div>
-                  </div>
-                </details>
-              )}
-            </>
-          ) : (
-            <div className="ai-vis-empty">
-              <div className="ai-vis-empty-icon"><FileText size={28} /></div>
-              <p>Your generated llms.txt will appear here. Fill in the form and click Generate.</p>
-            </div>
-          )}
+        {!canGenerate && blockReason && (
+          <div className="aiv-notice aiv-notice-warn">
+            <span>{blockReason}</span>
+            <a href="/dashboard/settings?tab=billing" className="aiv-notice-link">Upgrade →</a>
+          </div>
+        )}
 
-          {/* Previous generations */}
-          {generations.length > 0 && (
-            <div style={{ marginTop: 24 }}>
-              <h3 className="ai-vis-history-title">Previous generations</h3>
-              <div className="ai-vis-history-list">
-                {generations.slice(0, 5).map(g => (
-                  <div key={g.id} className="ai-vis-history-item"
-                    onClick={() => setGenerated(g.content)} style={{ cursor: 'pointer' }}>
-                    <span className="ai-vis-history-domain">{g.domain}</span>
-                    <span className="ai-vis-history-date">
-                      {new Date(g.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
+        <form onSubmit={handleGenerate} style={{ opacity: canGenerate ? 1 : 0.5, pointerEvents: canGenerate ? 'auto' : 'none' }}>
+          <div className="aiv-field">
+            <label className="aiv-label">Your domain</label>
+            <input className="form-input" type="text" value={domain}
+              onChange={e => setDomain(e.target.value)} placeholder="e.g. mywebsite.com" required />
+          </div>
+
+          <div className="aiv-field">
+            <label className="aiv-label">Optimise for these AI engines</label>
+            <EngineGrid engines={llmsEngines} selected={selectedEngines} onToggle={toggleEngine} />
+          </div>
+
+          {error && <div className="aiv-error">{error}</div>}
+
+          <button type="submit" className="btn btn-primary btn-block" disabled={loading || selectedEngines.length === 0}>
+            {loading ? 'Generating…' : 'Generate llms.txt'}
+          </button>
+
+          {planSlug === 'free' && (
+            <p className="aiv-plan-note">Free plan: 1 generation. <a href="/dashboard/settings?tab=billing">Upgrade</a> for unlimited.</p>
           )}
+        </form>
+      </div>
+
+      {/* Output panel */}
+      <div className="aiv-result-panel">
+        <div className="aiv-panel-header">
+          <div className="aiv-panel-icon"><ClipboardList size={16} /></div>
+          <div className="aiv-panel-title">Your llms.txt</div>
         </div>
+
+        {generated ? (
+          <>
+            <div className="aiv-output-actions">
+              <button className="btn btn-secondary btn-sm" onClick={copy}>{copied ? '✓ Copied' : 'Copy'}</button>
+              <button className="btn btn-primary btn-sm" onClick={download}>Download</button>
+            </div>
+            <pre className="aiv-output">{generated}</pre>
+            <p className="aiv-output-hint">
+              Upload this file to your web root as <code>llms.txt</code>, then re-run the{' '}
+              <a href="/tools/ai-seo-checker" target="_blank">AI SEO Checker</a> to confirm it&apos;s detected.
+            </p>
+            <details className="aiv-next-steps">
+              <summary>
+                <Lightbulb size={14} />
+                What to do next with your llms.txt
+              </summary>
+              <ol>
+                <li><strong>Save the file</strong> — click Download above to get <code>llms.txt</code></li>
+                <li><strong>Upload to your web root</strong> — place it at <code>https://yourdomain.com/llms.txt</code> (same level as robots.txt).</li>
+                <li><strong>Check your robots.txt</strong> — make sure it allows GPTBot, ClaudeBot, PerplexityBot, and Google-Extended.</li>
+                <li><strong>Verify it&apos;s live</strong> — visit <code>https://yourdomain.com/llms.txt</code> in your browser, then run the <a href="/tools/ai-seo-checker" target="_blank">AI SEO Checker</a>.</li>
+                <li><strong>Monitor your citations</strong> — switch to the AI Citation Monitor tab to track which engines cite your domain.</li>
+                <li><strong>Keep it updated</strong> — regenerate whenever you add major new sections or pages.</li>
+              </ol>
+            </details>
+          </>
+        ) : (
+          <div className="aiv-empty">
+            <div className="aiv-empty-icon"><FileText size={36} strokeWidth={1.2} /></div>
+            <div className="aiv-empty-title">Your llms.txt will appear here</div>
+            <div className="aiv-empty-desc">Fill in the form and click Generate to create your file.</div>
+          </div>
+        )}
+
+        {generations.length > 0 && (
+          <div className="aiv-history">
+            <div className="aiv-history-title">Previous generations</div>
+            {generations.slice(0, 5).map(g => (
+              <div key={g.id} className="aiv-history-row" onClick={() => setGenerated(g.content)}>
+                <span className="aiv-history-domain">{g.domain}</span>
+                <span className="aiv-history-date">
+                  {new Date(g.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )
@@ -305,18 +455,17 @@ function CitationTab({ engines, freeEngineIds, runs, planSlug, runsThisMonth, mo
 
   const citationEngines = engines.filter(e => e.type === 'citation' || e.type === 'both')
   const canRun = runsThisMonth < monthlyLimit
+  const remainingRuns = Math.max(0, monthlyLimit - runsThisMonth)
 
   function toggleEngine(id: string) {
-    if (planSlug === 'free' && !freeEngineIds.includes(id)) return // block paid engines for free users
+    if (planSlug === 'free' && !freeEngineIds.includes(id)) return
     setSelected(s => s.includes(id) ? s.filter(x => x !== id) : [...s, id])
   }
 
   async function handleRun(e: React.FormEvent) {
     e.preventDefault()
     if (!canRun) return
-    setLoading(true)
-    setError('')
-    setRunId(null)
+    setLoading(true); setError(''); setRunId(null)
     try {
       const res = await fetch('/api/ai-visibility/citation-check', {
         method: 'POST',
@@ -338,153 +487,88 @@ function CitationTab({ engines, freeEngineIds, runs, planSlug, runsThisMonth, mo
     }
   }
 
-  const remainingRuns = Math.max(0, monthlyLimit - runsThisMonth)
-
   return (
-    <div>
-      {planSlug === 'free' && (
-        <div className="ai-vis-free-notice">
-          <strong>Free plan:</strong> You can check free-tier engines only (Copilot, Exa).{' '}
-          <a href="/dashboard/settings?tab=billing">Upgrade to Lite</a> to access all engines and get 2 checks/month.
-        </div>
-      )}
-
-      {planSlug !== 'free' && (
-        <div className="ai-vis-usage-bar">
-          <span className="ai-vis-usage-text">
-            {runsThisMonth} / {monthlyLimit} checks used this month
-            {remainingRuns > 0 ? ` · ${remainingRuns} remaining` : ' · Resets on the 1st'}
-          </span>
-          <div className="ai-vis-usage-track">
-            <div className="ai-vis-usage-fill"
-              style={{ width: `${Math.min((runsThisMonth / monthlyLimit) * 100, 100)}%` }} />
+    <div className="aiv-layout">
+      <div className="aiv-form-panel">
+        <div className="aiv-panel-header">
+          <div className="aiv-panel-icon"><Search size={16} /></div>
+          <div>
+            <div className="aiv-panel-title">Run AI Citation Check</div>
+            <div className="aiv-panel-desc">
+              We query each AI engine with your keywords and check whether your domain appears as a cited source.
+            </div>
           </div>
         </div>
-      )}
 
-      <div className="ai-vis-grid">
-        {/* Run panel */}
-        <div className="ai-vis-panel">
-          <h2 className="ai-vis-panel-title">Run AI Citation Check</h2>
-          <p className="ai-vis-panel-desc">
-            We query each AI engine with your keywords and check whether your domain appears as a cited source.
-          </p>
+        {planSlug === 'free' && (
+          <div className="aiv-notice aiv-notice-info">
+            <span><strong>Free plan:</strong> Free-tier engines only (Copilot, Exa).</span>
+            <a href="/dashboard/settings?tab=billing" className="aiv-notice-link">Upgrade →</a>
+          </div>
+        )}
 
-          {!canRun && (
-            <div className="ai-vis-limit-notice">
-              <div className="ai-vis-limit-text">You&apos;ve used all {monthlyLimit} checks for this month. Resets on the 1st.</div>
-              <a href="/dashboard/settings?tab=billing" className="ai-vis-upgrade-link">Upgrade for more →</a>
-            </div>
-          )}
+        {!canRun && planSlug !== 'free' && (
+          <div className="aiv-notice aiv-notice-warn">
+            <span>You&apos;ve used all {monthlyLimit} checks this month. Resets on the 1st.</span>
+            <a href="/dashboard/settings?tab=billing" className="aiv-notice-link">Upgrade →</a>
+          </div>
+        )}
 
-          <form onSubmit={handleRun} style={{ opacity: canRun ? 1 : 0.5, pointerEvents: canRun ? 'auto' : 'none' }}>
-            <div className="ai-vis-form-group">
-              <label className="ai-vis-label">Domain to check</label>
-              <input className="ai-vis-input" type="text" value={domain}
-                onChange={e => setDomain(e.target.value)} placeholder="e.g. mywebsite.com" required />
-            </div>
+        {canRun && planSlug !== 'free' && (
+          <div className="aiv-quota-row">
+            <span>{remainingRuns} run{remainingRuns !== 1 ? 's' : ''} remaining this month</span>
+          </div>
+        )}
 
-            <div className="ai-vis-form-group">
-              <label className="ai-vis-label">Brand / product name <span className="ai-vis-hint-inline">(optional)</span></label>
-              <input className="ai-vis-input" type="text" value={brand}
-                onChange={e => setBrand(e.target.value)} placeholder="e.g. Uptrue" maxLength={100} />
-              <span className="ai-vis-hint">How your brand is known — saved with the run for your records.</span>
-            </div>
+        <form onSubmit={handleRun} style={{ opacity: canRun ? 1 : 0.5, pointerEvents: canRun ? 'auto' : 'none' }}>
+          <div className="aiv-field">
+            <label className="aiv-label">Domain to check</label>
+            <input className="form-input" type="text" value={domain}
+              onChange={e => setDomain(e.target.value)} placeholder="e.g. mywebsite.com" required />
+          </div>
 
-            <div className="ai-vis-form-group">
-              <label className="ai-vis-label">Target keywords (one per line, max 5)</label>
-              <textarea className="ai-vis-input" rows={4} value={keywords}
-                onChange={e => setKeywords(e.target.value)}
-                placeholder={"best project management tools\nhow to improve website speed\nwhat is uptime monitoring"} required />
-              <span className="ai-vis-hint">These are the queries we send to each AI engine to see if your site is cited.</span>
-            </div>
+          <div className="aiv-field">
+            <label className="aiv-label">Brand / product name <span className="aiv-label-hint">(optional)</span></label>
+            <input className="form-input" type="text" value={brand}
+              onChange={e => setBrand(e.target.value)} placeholder="e.g. Uptrue" maxLength={100} />
+          </div>
 
-            <div className="ai-vis-form-group">
-              <label className="ai-vis-label">AI engines to check</label>
-              <div className="ai-vis-engine-grid">
-                {citationEngines.map(engine => {
-                  const isFreeEngine = freeEngineIds.includes(engine.id)
-                  const locked = planSlug === 'free' && !isFreeEngine
-                  return (
-                    <label key={engine.id}
-                      className={`ai-vis-engine-chip ${selectedEngines.includes(engine.id) ? 'ai-vis-engine-chip-on' : ''} ${locked ? 'ai-vis-engine-chip-locked' : ''}`}
-                      title={locked ? 'Upgrade to access this engine' : undefined}>
-                      <input type="checkbox" checked={selectedEngines.includes(engine.id)}
-                        onChange={() => toggleEngine(engine.id)} disabled={locked} style={{ display: 'none' }} />
-                      <span className="ai-vis-engine-name">{engine.name}</span>
-                      {locked
-                        ? <span className="ai-vis-signal ai-vis-signal-locked">Upgrade</span>
-                        : <span className={`ai-vis-signal ai-vis-signal-${engine.signal_quality}`}>{engine.signal_quality}</span>
-                      }
-                    </label>
-                  )
-                })}
-              </div>
-            </div>
+          <div className="aiv-field">
+            <label className="aiv-label">Target keywords <span className="aiv-label-hint">(one per line, max 5)</span></label>
+            <textarea className="form-input" rows={4} value={keywords}
+              onChange={e => setKeywords(e.target.value)}
+              placeholder={"best project management tools\nhow to improve website speed\nwhat is uptime monitoring"} required />
+            <span className="aiv-hint">These queries are sent to each AI engine to see if your site is cited.</span>
+          </div>
 
-            {error && <div className="ai-vis-error">{error}</div>}
+          <div className="aiv-field">
+            <label className="aiv-label">AI engines to check</label>
+            <EngineGrid engines={citationEngines} selected={selectedEngines} onToggle={toggleEngine} freeEngineIds={freeEngineIds} planSlug={planSlug} />
+          </div>
 
-            <button type="submit" className="btn btn-primary btn-block" disabled={loading || selectedEngines.length === 0}>
-              {loading ? 'Starting check...' : 'Run Citation Check'}
-            </button>
-          </form>
+          {error && <div className="aiv-error">{error}</div>}
 
-          {runId && (
-            <div className="ai-vis-run-started">
-              <div className="ai-vis-run-icon">✓</div>
-              <div>
-                <div className="ai-vis-run-title">Check started</div>
-                <div className="ai-vis-run-desc">
-                  We&apos;ll email you when results are ready — usually within 2–5 minutes.
-                  You can also refresh this page to check status.
-                </div>
-                <a href={`/dashboard/ai-visibility/runs/${runId}`} className="ai-vis-run-link">View run →</a>
-              </div>
-            </div>
-          )}
+          <button type="submit" className="btn btn-primary btn-block" disabled={loading || selectedEngines.length === 0}>
+            {loading ? 'Starting check…' : 'Run Citation Check'}
+          </button>
+        </form>
+
+        {runId && <RunStartedBanner runId={runId} />}
+      </div>
+
+      <div className="aiv-result-panel">
+        <div className="aiv-panel-header">
+          <div className="aiv-panel-icon"><ClipboardList size={16} /></div>
+          <div className="aiv-panel-title">Recent checks</div>
         </div>
-
-        {/* Recent runs */}
-        <div className="ai-vis-panel">
-          <h2 className="ai-vis-panel-title">Recent checks</h2>
-          {runs.length === 0 ? (
-            <div className="ai-vis-empty">
-              <div className="ai-vis-empty-icon"><Search size={28} /></div>
-              <p>No citation checks yet. Run your first check to see how visible your site is in AI search.</p>
-            </div>
-          ) : (
-            <div className="ai-vis-runs-list">
-              {runs.map(run => {
-                const statusColor = run.status === 'complete' ? '#22c55e' : run.status === 'failed' ? '#ef4444' : '#f59e0b'
-                return (
-                  <a key={run.id} href={`/dashboard/ai-visibility/runs/${run.id}`} className="ai-vis-run-item">
-                    <div className="ai-vis-run-item-left">
-                      <div className="ai-vis-run-domain">{run.domain}</div>
-                      <div className="ai-vis-run-meta">
-                        {run.engine_ids.length} engine{run.engine_ids.length !== 1 ? 's' : ''} ·{' '}
-                        {run.keywords.length} keyword{run.keywords.length !== 1 ? 's' : ''} ·{' '}
-                        {new Date(run.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
-                      </div>
-                    </div>
-                    <div className="ai-vis-run-right">
-                      {run.summary && (
-                        <div className="ai-vis-run-score">{run.summary.score}/100</div>
-                      )}
-                      <span className="ai-vis-run-status" style={{ color: statusColor }}>{run.status}</span>
-                    </div>
-                  </a>
-                )
-              })}
-            </div>
-          )}
-        </div>
+        <RunsList runs={runs} type="citation" />
       </div>
     </div>
   )
 }
 
 // ---------------------------------------------------------------------------
-// AI Profile Tab — introspection: "what does AI think my site is?"
+// AI Profile Tab
 // ---------------------------------------------------------------------------
 function ProfileTab({ engines, freeEngineIds, runs, planSlug, runsThisMonth, monthlyLimit }: {
   engines:        AiEngine[]
@@ -502,9 +586,9 @@ function ProfileTab({ engines, freeEngineIds, runs, planSlug, runsThisMonth, mon
   const [error, setError]              = useState('')
   const [runId, setRunId]              = useState<string | null>(null)
 
-  // Profile uses the same engine pool as citation (any engine that can answer)
   const profileEngines = engines.filter(e => e.type === 'citation' || e.type === 'both')
   const canRun = runsThisMonth < monthlyLimit
+  const remainingRuns = Math.max(0, monthlyLimit - runsThisMonth)
 
   function toggleEngine(id: string) {
     if (planSlug === 'free' && !freeEngineIds.includes(id)) return
@@ -514,9 +598,7 @@ function ProfileTab({ engines, freeEngineIds, runs, planSlug, runsThisMonth, mon
   async function handleRun(e: React.FormEvent) {
     e.preventDefault()
     if (!canRun) return
-    setLoading(true)
-    setError('')
-    setRunId(null)
+    setLoading(true); setError(''); setRunId(null)
     try {
       const res = await fetch('/api/ai-visibility/profile-check', {
         method: 'POST',
@@ -533,140 +615,70 @@ function ProfileTab({ engines, freeEngineIds, runs, planSlug, runsThisMonth, mon
     }
   }
 
-  const remainingRuns = Math.max(0, monthlyLimit - runsThisMonth)
-
   return (
-    <div>
-      {planSlug === 'free' && (
-        <div className="ai-vis-free-notice">
-          <strong>Free plan:</strong> AI Profile is available with free-tier engines (Copilot, Exa).{' '}
-          <a href="/dashboard/settings?tab=billing">Upgrade to Lite</a> to use all engines.
-        </div>
-      )}
-
-      {planSlug !== 'free' && (
-        <div className="ai-vis-usage-bar">
-          <span className="ai-vis-usage-text">
-            {runsThisMonth} / {monthlyLimit} AI Visibility runs used this month (citations + profile combined)
-            {remainingRuns > 0 ? ` · ${remainingRuns} remaining` : ' · Resets on the 1st'}
-          </span>
-          <div className="ai-vis-usage-track">
-            <div className="ai-vis-usage-fill"
-              style={{ width: `${Math.min((runsThisMonth / monthlyLimit) * 100, 100)}%` }} />
+    <div className="aiv-layout">
+      <div className="aiv-form-panel">
+        <div className="aiv-panel-header">
+          <div className="aiv-panel-icon"><Eye size={16} /></div>
+          <div>
+            <div className="aiv-panel-title">Run AI Profile</div>
+            <div className="aiv-panel-desc">
+              Discover what AI engines actually think about your site. We ask each engine introspection questions
+              about your domain and capture their responses.
+            </div>
           </div>
         </div>
-      )}
 
-      <div className="ai-vis-grid">
-        {/* Run panel */}
-        <div className="ai-vis-panel">
-          <h2 className="ai-vis-panel-title">Run AI Profile</h2>
-          <p className="ai-vis-panel-desc">
-            Discover what AI engines actually think about your site. We ask each engine a set of introspection
-            questions about your domain and capture their responses — useful for spotting miscategorisations,
-            knowledge gaps, and unrecognised brand opportunities.
-          </p>
+        {planSlug === 'free' && (
+          <div className="aiv-notice aiv-notice-info">
+            <span><strong>Free plan:</strong> Free-tier engines only (Copilot, Exa).</span>
+            <a href="/dashboard/settings?tab=billing" className="aiv-notice-link">Upgrade →</a>
+          </div>
+        )}
 
-          {!canRun && (
-            <div className="ai-vis-limit-notice">
-              <div className="ai-vis-limit-text">
-                You&apos;ve used all {monthlyLimit} AI Visibility runs for this month. Resets on the 1st.
-              </div>
-              <a href="/dashboard/settings?tab=billing" className="ai-vis-upgrade-link">Upgrade for more →</a>
-            </div>
-          )}
+        {!canRun && planSlug !== 'free' && (
+          <div className="aiv-notice aiv-notice-warn">
+            <span>You&apos;ve used all {monthlyLimit} AI Visibility runs this month. Resets on the 1st.</span>
+            <a href="/dashboard/settings?tab=billing" className="aiv-notice-link">Upgrade →</a>
+          </div>
+        )}
 
-          <form onSubmit={handleRun} style={{ opacity: canRun ? 1 : 0.5, pointerEvents: canRun ? 'auto' : 'none' }}>
-            <div className="ai-vis-form-group">
-              <label className="ai-vis-label">Your domain</label>
-              <input className="ai-vis-input" type="text" value={domain}
-                onChange={e => setDomain(e.target.value)} placeholder="e.g. mywebsite.com" required />
-              <span className="ai-vis-hint">
-                We&apos;ll ask each AI engine a set of questions about this domain. Prompts are managed by your admin.
-              </span>
-            </div>
+        {canRun && planSlug !== 'free' && (
+          <div className="aiv-quota-row">
+            <span>{remainingRuns} run{remainingRuns !== 1 ? 's' : ''} remaining (shared with citation checks)</span>
+          </div>
+        )}
 
-            <div className="ai-vis-form-group">
-              <label className="ai-vis-label">AI engines to ask</label>
-              <div className="ai-vis-engine-grid">
-                {profileEngines.map(engine => {
-                  const isFreeEngine = freeEngineIds.includes(engine.id)
-                  const locked = planSlug === 'free' && !isFreeEngine
-                  return (
-                    <label key={engine.id}
-                      className={`ai-vis-engine-chip ${selectedEngines.includes(engine.id) ? 'ai-vis-engine-chip-on' : ''} ${locked ? 'ai-vis-engine-chip-locked' : ''}`}
-                      title={locked ? 'Upgrade to access this engine' : undefined}>
-                      <input type="checkbox" checked={selectedEngines.includes(engine.id)}
-                        onChange={() => toggleEngine(engine.id)} disabled={locked} style={{ display: 'none' }} />
-                      <span className="ai-vis-engine-name">{engine.name}</span>
-                      {locked
-                        ? <span className="ai-vis-signal ai-vis-signal-locked">Upgrade</span>
-                        : <span className={`ai-vis-signal ai-vis-signal-${engine.signal_quality}`}>{engine.signal_quality}</span>
-                      }
-                    </label>
-                  )
-                })}
-              </div>
-            </div>
+        <form onSubmit={handleRun} style={{ opacity: canRun ? 1 : 0.5, pointerEvents: canRun ? 'auto' : 'none' }}>
+          <div className="aiv-field">
+            <label className="aiv-label">Your domain</label>
+            <input className="form-input" type="text" value={domain}
+              onChange={e => setDomain(e.target.value)} placeholder="e.g. mywebsite.com" required />
+            <span className="aiv-hint">We&apos;ll ask each AI engine a set of questions about this domain.</span>
+          </div>
 
-            {error && <div className="ai-vis-error">{error}</div>}
+          <div className="aiv-field">
+            <label className="aiv-label">AI engines to ask</label>
+            <EngineGrid engines={profileEngines} selected={selectedEngines} onToggle={toggleEngine} freeEngineIds={freeEngineIds} planSlug={planSlug} />
+          </div>
 
-            <button type="submit" className="btn btn-primary btn-block" disabled={loading || selectedEngines.length === 0}>
-              {loading ? 'Running AI Profile…' : 'Run AI Profile'}
-            </button>
-            <p className="ai-vis-plan-note">Each run uses one AI Visibility credit (shared with citation checks).</p>
-          </form>
+          {error && <div className="aiv-error">{error}</div>}
 
-          {runId && (
-            <div className="ai-vis-run-started">
-              <div className="ai-vis-run-icon">✓</div>
-              <div>
-                <div className="ai-vis-run-title">AI Profile complete</div>
-                <div className="ai-vis-run-desc">
-                  We&apos;ve gathered responses from each engine. Click below to see what they said.
-                </div>
-                <a href={`/dashboard/ai-visibility/profile/${runId}`} className="ai-vis-run-link">View profile →</a>
-              </div>
-            </div>
-          )}
+          <button type="submit" className="btn btn-primary btn-block" disabled={loading || selectedEngines.length === 0}>
+            {loading ? 'Running AI Profile…' : 'Run AI Profile'}
+          </button>
+          <p className="aiv-plan-note">Each run uses one AI Visibility credit (shared with citation checks).</p>
+        </form>
+
+        {runId && <RunStartedBanner runId={runId} profileMode />}
+      </div>
+
+      <div className="aiv-result-panel">
+        <div className="aiv-panel-header">
+          <div className="aiv-panel-icon"><Eye size={16} /></div>
+          <div className="aiv-panel-title">Recent profiles</div>
         </div>
-
-        {/* Recent profile runs */}
-        <div className="ai-vis-panel">
-          <h2 className="ai-vis-panel-title">Recent profiles</h2>
-          {runs.length === 0 ? (
-            <div className="ai-vis-empty">
-              <div className="ai-vis-empty-icon"><Eye size={28} /></div>
-              <p>No AI Profile runs yet. Run your first to see how AI engines describe your site.</p>
-            </div>
-          ) : (
-            <div className="ai-vis-runs-list">
-              {runs.map(run => {
-                const statusColor = run.status === 'complete' ? '#22c55e' : run.status === 'failed' ? '#ef4444' : '#f59e0b'
-                const recognisedCt = run.summary?.recognised_by.length ?? 0
-                const totalEngines = run.engine_ids.length
-                return (
-                  <a key={run.id} href={`/dashboard/ai-visibility/profile/${run.id}`} className="ai-vis-run-item">
-                    <div className="ai-vis-run-item-left">
-                      <div className="ai-vis-run-domain">{run.domain}</div>
-                      <div className="ai-vis-run-meta">
-                        {totalEngines} engine{totalEngines !== 1 ? 's' : ''} ·{' '}
-                        {run.prompt_ids.length} prompt{run.prompt_ids.length !== 1 ? 's' : ''} ·{' '}
-                        {new Date(run.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
-                      </div>
-                    </div>
-                    <div className="ai-vis-run-right">
-                      {run.status === 'complete' && (
-                        <div className="ai-vis-run-score">{recognisedCt}/{totalEngines} recognise</div>
-                      )}
-                      <span className="ai-vis-run-status" style={{ color: statusColor }}>{run.status}</span>
-                    </div>
-                  </a>
-                )
-              })}
-            </div>
-          )}
-        </div>
+        <RunsList runs={runs} type="profile" />
       </div>
     </div>
   )

@@ -39,7 +39,6 @@ export default async function MonitorDetailPage({
   const monitor = await getMonitorById(id)
   if (!monitor) notFound()
 
-  // WordPress monitors have their own dedicated report page
   if (monitor.type === 'wordpress') redirect(`/dashboard/monitors/${id}/wordpress`)
 
   const [incidents, checkResults, uptimeSlots, uptimePercent] = await Promise.all([
@@ -70,7 +69,6 @@ export default async function MonitorDetailPage({
   const latestResult = checkResults.length > 0 ? checkResults[0] : undefined
   const latestMetadata = latestResult?.metadata as Record<string, unknown> | undefined
 
-  // Compute avg + p95 response time from recent results
   const responseTimes = checkResults
     .filter(r => r.response_time_ms != null && r.response_time_ms > 0)
     .map(r => r.response_time_ms as number)
@@ -80,115 +78,105 @@ export default async function MonitorDetailPage({
   const p95ResponseTime = responseTimes.length > 0
     ? Math.round(responseTimes.sort((a, b) => a - b)[Math.floor(responseTimes.length * 0.95)] ?? 0)
     : null
-  const totalChecks30d = checkResults.length
+  const totalChecks = checkResults.length
+  const failedChecks = checkResults.filter(r => r.status === 'down').length
   const openIncidentCount = incidents.filter(i => i.status !== 'resolved').length
 
+  const uptimeColor = uptimePercent >= 99.9 ? '#10b981' : uptimePercent >= 99 ? '#f59e0b' : '#ef4444'
+
   return (
-    <div>
-      {/* Back link */}
+    <div className="mdd-root">
+
+      {/* ── Back link ── */}
       <a href="/dashboard/monitors" className="mon-detail-back">
         <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
         All Monitors
       </a>
 
-      {/* Hero header */}
-      <div className="mon-detail-hero">
-        <div className="mon-detail-hero-left">
-          <div className="mon-detail-type-icon">
-            <MonitorTypeIcon type={monitor.type} iconOnly iconSize={22} />
-          </div>
-          <div className="mon-detail-hero-info">
-            <div className="mon-detail-hero-top">
-              <h1 className="mon-detail-title">{monitor.name}</h1>
-              <MonitorStatusBadge status={monitor.status} monitorType={monitor.type} />
-              <span className="mon-detail-type-badge">{monitor.type.replace(/-/g, ' ')}</span>
+      {/* ── Hero ── */}
+      <div className="mdd-hero">
+        <div className="mdd-hero-accent" />
+
+        <div className="mdd-hero-body">
+          {/* Left: icon + info */}
+          <div className="mdd-hero-left">
+            <div className="mdd-hero-icon">
+              <MonitorTypeIcon type={monitor.type} iconOnly iconSize={24} />
             </div>
-            <div className="mon-detail-url-row">
-              <a
-                href={/^https?:\/\//i.test(monitor.target) ? monitor.target : `https://${monitor.target}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mon-detail-url"
-              >
-                {monitor.target}
-              </a>
-              <CopyUrlButton url={monitor.target} />
+            <div className="mdd-hero-info">
+              <div className="mdd-hero-name-row">
+                <h1 className="mdd-hero-name">{monitor.name}</h1>
+                <MonitorStatusBadge status={monitor.status} monitorType={monitor.type} />
+              </div>
+              <div className="mdd-hero-meta">
+                <span className="mdd-type-chip">{monitor.type.replace(/-/g, ' ')}</span>
+                <span className="mdd-hero-sep">·</span>
+                <a
+                  href={/^https?:\/\//i.test(monitor.target) ? monitor.target : `https://${monitor.target}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mdd-hero-url"
+                >
+                  {monitor.target}
+                </a>
+                <CopyUrlButton url={monitor.target} />
+              </div>
             </div>
           </div>
-        </div>
-        <div className="mon-detail-hero-right">
-          <span className="mon-detail-interval-chip">
-            <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-            </svg>
-            {formatInterval(monitor.check_interval_seconds)}
-          </span>
-          <a href={`/dashboard/monitors/${monitor.id}/edit`} className="btn btn-secondary btn-sm">Edit</a>
-          <MonitorActions monitorId={monitor.id} isPaused={monitor.is_paused} />
-        </div>
-      </div>
 
-      {/* Stat cards */}
-      <div className="monitor-stat-grid">
-        <div className="monitor-stat-card card-up">
-          <div className="monitor-stat-icon icon-up">
-            <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-          </div>
-          <div className="monitor-stat-label">Uptime · 30 days</div>
-          <div className="monitor-stat-value">
-            {uptimePercent.toFixed(2)}<span className="monitor-stat-unit">%</span>
-          </div>
-          <div className="monitor-stat-sub">
-            {uptimeSlots.filter(s => s.status === 'down').length === 0
-              ? 'No downtime recorded'
-              : `${uptimeSlots.filter(s => s.status === 'down').length} slot(s) with issues`}
+          {/* Right: interval + actions */}
+          <div className="mdd-hero-right">
+            <span className="mon-detail-interval-chip">
+              <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+              </svg>
+              {formatInterval(monitor.check_interval_seconds)}
+            </span>
+            <a href={`/dashboard/monitors/${monitor.id}/edit`} className="btn btn-secondary btn-sm">Edit</a>
+            <MonitorActions monitorId={monitor.id} isPaused={monitor.is_paused} />
           </div>
         </div>
 
-        <div className="monitor-stat-card card-blue">
-          <div className="monitor-stat-icon icon-blue">
-            <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        {/* Stats strip inside hero */}
+        <div className="mdd-hero-stats">
+          <div className="mdd-hstat">
+            <span className="mdd-hstat-val" style={{ color: uptimeColor }}>
+              {uptimePercent.toFixed(2)}<span className="mdd-hstat-unit">%</span>
+            </span>
+            <span className="mdd-hstat-label">Uptime · 30d</span>
           </div>
-          <div className="monitor-stat-label">Avg Response · 50 checks</div>
-          <div className="monitor-stat-value">
-            {avgResponseTime != null ? <>{avgResponseTime}<span className="monitor-stat-unit">ms</span></> : '—'}
+          <div className="mdd-hstat-divider" />
+          <div className="mdd-hstat">
+            <span className="mdd-hstat-val">
+              {avgResponseTime != null ? <>{avgResponseTime}<span className="mdd-hstat-unit">ms</span></> : '—'}
+            </span>
+            <span className="mdd-hstat-label">Avg response</span>
           </div>
-          <div className="monitor-stat-sub">
-            {p95ResponseTime != null ? `P95: ${p95ResponseTime}ms` : 'No response data'}
+          <div className="mdd-hstat-divider" />
+          <div className="mdd-hstat">
+            <span className="mdd-hstat-val">{totalChecks}</span>
+            <span className="mdd-hstat-label">Checks · {failedChecks} failed</span>
           </div>
-        </div>
-
-        <div className="monitor-stat-card card-up">
-          <div className="monitor-stat-icon icon-up">
-            <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-          </div>
-          <div className="monitor-stat-label">Checks · Recent</div>
-          <div className="monitor-stat-value">{totalChecks30d}</div>
-          <div className="monitor-stat-sub">
-            {checkResults.filter(r => r.status === 'down').length} failed
-          </div>
-        </div>
-
-        <div className={`monitor-stat-card ${openIncidentCount > 0 ? 'card-warn' : 'card-up'}`}>
-          <div className={`monitor-stat-icon ${openIncidentCount > 0 ? 'icon-warn' : 'icon-up'}`}>
-            <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-          </div>
-          <div className="monitor-stat-label">Open Incidents</div>
-          <div className="monitor-stat-value">{openIncidentCount}</div>
-          <div className="monitor-stat-sub">
-            {incidents.length} total in view
+          <div className="mdd-hstat-divider" />
+          <div className="mdd-hstat">
+            <span className="mdd-hstat-val" style={{ color: openIncidentCount > 0 ? '#f59e0b' : 'var(--text-primary)' }}>
+              {openIncidentCount}
+            </span>
+            <span className="mdd-hstat-label">Open incidents</span>
           </div>
         </div>
       </div>
 
-      {/* 30-day uptime bars */}
+      {/* ── Uptime bars — exactly as before ── */}
       <MonitorUptimeBars slots={uptimeSlots} uptimePercent={uptimePercent} rangeLabel="30 days" />
 
-      {/* Type-specific insight */}
+      {/* ── Type-specific insight ── */}
       <MonitorTypeInsight monitor={monitor} latestMetadata={latestMetadata as Record<string, unknown> | undefined} />
 
-      {/* Config + incidents */}
-      <div className="grid-2" style={{ marginBottom: 24 }}>
+      {/* ── Two-col: settings + incidents ── */}
+      <div className="mdd-two-col">
+
+        {/* Settings card */}
         <div className="card">
           <div className="card-header">
             <div className="card-title">Monitor Settings</div>
@@ -210,6 +198,7 @@ export default async function MonitorDetailPage({
               <div className="mon-config-item-sub" style={{ textTransform: 'capitalize' }}>{monitor.severity} severity</div>
             </div>
           </div>
+
           {isKeywordMonitor && (displayPositive.length > 0 || displayNegative.length > 0) && (
             <div className="alert-channels-row">
               {displayPositive.length > 0 && (
@@ -234,6 +223,7 @@ export default async function MonitorDetailPage({
               )}
             </div>
           )}
+
           <div className="alert-channels-row">
             <div className="alert-channels-label">Alert Channels</div>
             <div>
@@ -253,6 +243,7 @@ export default async function MonitorDetailPage({
           </div>
         </div>
 
+        {/* Incidents / keyword results card */}
         <div className="card">
           <div className="card-header">
             <div className="card-title">{isKeywordMonitor ? 'Last Keyword Check' : 'Recent Incidents'}</div>
@@ -265,35 +256,33 @@ export default async function MonitorDetailPage({
                 <p style={{ fontSize: 14, color: '#71717a' }}>No keyword check results yet. The first check will run shortly.</p>
               )
             ) : (
-              <>
-                {incidents.length === 0 ? (
-                  <p style={{ fontSize: 14, color: '#71717a' }}>No incidents recorded.</p>
-                ) : (
-                  <div className="space-y-sm">
-                    {incidents.map((inc) => (
-                      <div key={inc.id} className="incident-row">
-                        <div className="incident-row-info">
-                          <span className="incident-row-title">{inc.title}</span>
-                          <span className="incident-row-time">
-                            {new Date(inc.started_at).toLocaleString('en-GB', { dateStyle: 'short', timeStyle: 'short' })}
-                          </span>
-                        </div>
-                        <span className={`badge ${inc.status === 'resolved' ? 'badge-outline' : 'badge-danger'}`}>
-                          {inc.status}
+              incidents.length === 0 ? (
+                <p style={{ fontSize: 14, color: '#71717a' }}>No incidents recorded.</p>
+              ) : (
+                <div className="space-y-sm">
+                  {incidents.map((inc) => (
+                    <div key={inc.id} className="incident-row">
+                      <div className="incident-row-info">
+                        <span className="incident-row-title">{inc.title}</span>
+                        <span className="incident-row-time">
+                          {new Date(inc.started_at).toLocaleString('en-GB', { dateStyle: 'short', timeStyle: 'short' })}
                         </span>
                       </div>
-                    ))}
-                  </div>
-                )}
-              </>
+                      <span className={`badge ${inc.status === 'resolved' ? 'badge-outline' : 'badge-danger'}`}>
+                        {inc.status}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )
             )}
           </div>
         </div>
       </div>
 
-      {/* Keyword incidents below keyword results */}
+      {/* Keyword incidents (only for keyword monitors with incidents) */}
       {isKeywordMonitor && incidents.length > 0 && (
-        <div style={{ marginBottom: 24 }}>
+        <div className="mdd-section">
           <div className="card">
             <div className="card-header"><div className="card-title">Recent Incidents</div></div>
             <div className="card-content">
@@ -317,15 +306,16 @@ export default async function MonitorDetailPage({
         </div>
       )}
 
-      {/* Full check history */}
-      <div style={{ marginBottom: 24 }}>
+      {/* Check history */}
+      <div className="mdd-section">
         <CheckResultsHistory results={checkResults} />
       </div>
 
       {/* Badge embed */}
-      <div style={{ marginBottom: 24 }}>
+      <div className="mdd-section">
         <BadgeEmbed monitorId={monitor.id} />
       </div>
+
     </div>
   )
 }

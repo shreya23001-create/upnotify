@@ -22,11 +22,7 @@ export default async function EditStatusPagePage({ params }: { params: Promise<{
       <div className="db-page-header">
         <div className="db-page-title">Edit Status Page</div>
       </div>
-      <div className="card">
-        <div className="card-content">
-          <EditStatusPageForm statusPage={statusPage} monitors={monitors} />
-        </div>
-      </div>
+      <EditStatusPageForm statusPage={statusPage} monitors={monitors} />
     </div>
   )
 }
