@@ -33,18 +33,18 @@ const PRIORITY_CLASS: Record<string, string> = {
 }
 
 const CATEGORY_OPTIONS = [
-  { value: 'general',         label: 'General',         icon: '💬' },
-  { value: 'billing',         label: 'Billing',         icon: '💳' },
-  { value: 'technical',       label: 'Technical',       icon: '🔧' },
-  { value: 'feature_request', label: 'Feature Request', icon: '✨' },
-  { value: 'bug',             label: 'Bug Report',      icon: '🐛' },
+  { value: 'general',         label: 'General',         icon: <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> },
+  { value: 'billing',         label: 'Billing',         icon: <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> },
+  { value: 'technical',       label: 'Technical',       icon: <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg> },
+  { value: 'feature_request', label: 'Feature Request', icon: <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> },
+  { value: 'bug',             label: 'Bug Report',      icon: <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M8 2l1.5 1.5"/><path d="M14.5 3.5L16 2"/><path d="M9 7a4 4 0 0 1 6 0v1a6 6 0 0 1-6 0V7z"/><path d="M3 13h2m14 0h2"/><path d="M5 9l1.5 1.5M17.5 10.5 19 9"/><path d="M5 19l1.5-1.5M17.5 17.5 19 19"/><path d="M9 21a6 6 0 0 1 0-12h6a6 6 0 0 1 0 12H9z"/></svg> },
 ]
 
 const PRIORITY_OPTIONS = [
-  { value: 'low',    label: 'Low',    icon: '🔵' },
-  { value: 'normal', label: 'Normal', icon: '🟡' },
-  { value: 'high',   label: 'High',   icon: '🟠' },
-  { value: 'urgent', label: 'Urgent', icon: '🔴' },
+  { value: 'low',    label: 'Low',    icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="#94a3b8"><circle cx="12" cy="12" r="6"/></svg> },
+  { value: 'normal', label: 'Normal', icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="#3b82f6"><circle cx="12" cy="12" r="6"/></svg> },
+  { value: 'high',   label: 'High',   icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="#f97316"><circle cx="12" cy="12" r="6"/></svg> },
+  { value: 'urgent', label: 'Urgent', icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="#ef4444"><circle cx="12" cy="12" r="6"/></svg> },
 ]
 
 function ticketNumber(id: string): string {
