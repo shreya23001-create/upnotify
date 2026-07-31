@@ -236,35 +236,30 @@ function CompletedState({ run, results, engineMap }: {
             </div>
             <div>
               <div className="crd-card-title">Who&apos;s winning instead of you</div>
-              <div className="crd-card-desc">Domains AI engines surfaced as sources, ranked by how many engines cited each. <strong>Bold</strong> rows are you.</div>
+              <div className="crd-card-desc">Domains AI engines surfaced as sources for each keyword, ranked by citation count.</div>
             </div>
           </div>
           <div className="crd-leaderboard">
-            {Object.entries(competitorLeaderboard).map(([keyword, entries]) => {
-              const maxCount = Math.max(...entries.map(e => e.engineCount), 1)
-              return (
-                <div key={keyword} className="crd-lb-section">
-                  <div className="crd-lb-keyword">&ldquo;{keyword}&rdquo;</div>
-                  {entries.slice(0, 8).map(entry => {
-                    const widthPct = (entry.engineCount / maxCount) * 100
-                    const barColor = entry.isUser
-                      ? (entry.engineCount > 0 ? '#22c55e' : '#94a3b8')
-                      : '#6366f1'
-                    return (
-                      <div key={entry.domain} className={`crd-lb-row${entry.isUser ? ' is-you' : ''}`}>
-                        <span className="crd-lb-domain">
-                          {entry.domain}{entry.isUser ? <span className="crd-lb-you-tag">you</span> : ''}
-                        </span>
-                        <div className="crd-lb-bar-wrap">
-                          <div className="crd-lb-bar" style={{ width: `${widthPct}%`, background: barColor }} />
-                        </div>
-                        <span className="crd-lb-count">{entry.engineCount}</span>
-                      </div>
-                    )
-                  })}
+            {Object.entries(competitorLeaderboard).map(([keyword, entries]) => (
+              <div key={keyword} className="crd-lb-section">
+                <div className="crd-lb-keyword-label">&ldquo;{keyword}&rdquo;</div>
+                <div className="crd-lb-list">
+                  {entries.slice(0, 8).map((entry, idx) => (
+                    <div key={entry.domain} className={`crd-lb-item${entry.isUser ? ' is-you' : ''}`}>
+                      <span className="crd-lb-rank">#{idx + 1}</span>
+                      <span className="crd-lb-favicon">
+                        {entry.domain.charAt(0).toUpperCase()}
+                      </span>
+                      <span className="crd-lb-domain">{entry.domain}</span>
+                      {entry.isUser && <span className="crd-lb-you-tag">you</span>}
+                      <span className="crd-lb-engines-badge">
+                        {entry.engineCount} {entry.engineCount === 1 ? 'engine' : 'engines'}
+                      </span>
+                    </div>
+                  ))}
                 </div>
-              )
-            })}
+              </div>
+            ))}
           </div>
           <a href="/dashboard/watchdog" className="crd-watchdog-link">Track these competitors in Watchdog →</a>
         </div>
