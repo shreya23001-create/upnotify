@@ -244,233 +244,307 @@ export function SettingsContent({
     return {}
   }
 
+  type NavItem = { id: string; label: string; icon: React.ReactElement; adminOnly?: boolean }
+  const navItems: NavItem[] = [
+    { id: 'organisation', label: 'Organisation', icon: <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> },
+    { id: 'company',      label: 'Company',      icon: <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg> },
+    { id: 'team',         label: 'Team',         icon: <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> },
+    { id: 'billing',      label: 'Billing',      icon: <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> },
+    { id: 'credits',      label: 'Credits',      icon: <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> },
+    { id: 'referrals',    label: 'Referrals',    icon: <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> },
+    { id: 'api-keys',     label: 'API Keys',     icon: <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg> },
+    { id: 'landing',      label: 'CMS',          icon: <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>, adminOnly: true },
+  ]
+
+  const visibleNav = navItems.filter(n => !n.adminOnly || isSuperAdmin)
+
   return (
     <>
-    <div>
-      {/* Billing return banner */}
-      {billingResult === 'success' && (
-        <div className="alert alert-success" style={{ marginBottom: 16 }}>
-          <strong>Plan activated.</strong> Your subscription is now live. It may take a moment to reflect across all features.
-        </div>
-      )}
-      {billingResult === 'canceled' && (
-        <div className="alert alert-warning" style={{ marginBottom: 16 }}>
-          <strong>Payment canceled.</strong> No charge was made. Your current plan remains unchanged.
-        </div>
-      )}
-      {billingResult === 'cancelled' && (
-        <div className="alert alert-warning" style={{ marginBottom: 16 }}>
-          <strong>Subscription cancelled.</strong> You keep full access until the end of your billing period. After that, your account moves to the Free plan.
-        </div>
-      )}
-      {billingResult === 'portal_return' && (
-        <div className="alert alert-success" style={{ marginBottom: 16 }}>
-          <strong>Changes saved.</strong> Your subscription changes are being processed by Stripe. This page may take a moment to reflect the latest status.
-        </div>
-      )}
+      <div className="stt-root">
 
-      {/* <div className="tabs-list">
-        {(['organisation', 'billing', 'credits', 'referrals', 'company', 'api-keys'] as string[]).map((t) => (
-          <button key={t} className={`tab-trigger${tab === t ? ' active' : ''}`} onClick={() => setTab(t)}>
-            {t === 'api-keys' ? 'API Keys' : t.charAt(0).toUpperCase() + t.slice(1)}
-          </button>
-        ))}
-      </div> */}
-
-      <div className="tabs-list">
-        {(['organisation', 'billing', 'credits', 'referrals', 'company', 'team'] as string[]).map((t) => (
-          <button key={t} className={`tab-trigger${tab === t ? ' active' : ''}`} onClick={() => setTab(t)}>
-            {t.charAt(0).toUpperCase() + t.slice(1)}
-          </button>
-        ))}
-      </div>
-
-      {tab === 'organisation' && (
-        <OrgSettingsForm organisation={organisation} />
-      )}
-
-      {tab === 'billing' && (
-        <div className="space-y">
-          <CurrentPlan plan={currentPlan} subscription={subscription} />
-          <PricingTable plans={plans} currentPlanSlug={currentPlan?.slug} subscription={subscription} creditBalancePence={creditBalance} defaultCurrency={defaultCurrency} />
-
-          <InvoiceList invoices={invoices} />
-        </div>
-      )}
-
-      {tab === 'credits' && (
-        <CreditsSection credits={credits} creditRules={creditRules} balancePence={creditBalance} currency={defaultCurrency} />
-      )}
-
-      {tab === 'referrals' && (
-        <ReferralSection referralCode={referralCode} referrals={referrals} />
-      )}
-
-      {tab === 'company' && (
-        <div className="space-y">
-          <div className="card">
-            <div className="card-header"><div className="card-title">Organisation Logo</div></div>
-            <div className="card-content">
-              <LogoUpload
-                currentLogoUrl={organisation.logo_url}
-                orgName={organisation.name}
-                onUpload={uploadLogo}
-              />
-            </div>
+        {/* ── Sidebar ── */}
+        <nav className="stt-sidebar">
+          <div className="stt-nav-group">
+            {visibleNav.map(n => (
+              <button
+                key={n.id}
+                className={`stt-nav-item${tab === n.id ? ' stt-nav-active' : ''}`}
+                onClick={() => setTab(n.id)}
+              >
+                <span className="stt-nav-icon">{n.icon}</span>
+                {n.label}
+              </button>
+            ))}
           </div>
-          <div className="card">
-            <div className="card-header"><div className="card-title">Company Details</div></div>
-            <div className="card-content">
-              <CompanyDetailsForm organisation={organisation} onSave={saveCompanyDetails} />
-            </div>
-          </div>
-        </div>
-      )}
+        </nav>
 
-      {tab === 'team' && (
-        <div className="space-y">
-          <div className="card">
-            <div className="card-header">
-              <div className="card-title">Team Members</div>
-            </div>
-            <div className="card-content">
-              <DataTable
-                columns={memberColumns}
-                data={teamMembers}
-                searchPlaceholder="Search members..."
-                emptyMessage="No team members yet."
-              />
-            </div>
-          </div>
-          {canManageTeam && (
-            <div className="card">
-              <div className="card-header">
-                <div className="card-title">Invite Team Member</div>
-                <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 2 }}>
-                  {canInvite
-                    ? `${teamMemberCount} of ${teamMemberLimit === 0 ? '∞' : teamMemberLimit} seats used`
-                    : 'Team member limit reached. Upgrade your plan to invite more.'}
-                </p>
-              </div>
-              <div className="card-content">
-                {canInvite
-                  ? <TeamInviteForm canInvite={canInvite} teamMemberLimit={teamMemberLimit} teamMemberCount={teamMemberCount} onInviteSent={handleInviteSent} />
-                  : <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>Team invites are not available on the Free plan. Upgrade to invite team members.</p>
-                }
-              </div>
+        {/* ── Main panel ── */}
+        <div className="stt-panel">
+
+          {/* Billing return banners */}
+          {billingResult === 'success' && (
+            <div className="alert alert-success stt-banner">
+              <strong>Plan activated.</strong> Your subscription is now live. It may take a moment to reflect across all features.
             </div>
           )}
-        </div>
-      )}
-
-      {tab === 'api-keys' && (
-        <div>
-          {/* Plan gate — API access requires a paid plan */}
-          {!currentPlan?.has_api_access && (
-            <div className="card" style={{ marginBottom: 20 }}>
-              <div className="card-content" style={{ textAlign: 'center', padding: '40px 24px' }}>
-                <div style={{ display: 'flex', justifyContent: 'center', color: 'var(--text-muted)', marginBottom: 12 }}><Lock size={32} /></div>
-                <div className="card-title" style={{ marginBottom: 8 }}>API access requires a paid plan</div>
-                <p style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: 20, maxWidth: 480, margin: '0 auto 20px' }}>
-                  Upgrade to create API keys and integrate Uptrue with your tools and workflows.
-                </p>
-                <a href="/dashboard/settings?tab=billing" className="btn btn-primary btn-sm">Upgrade plan</a>
-              </div>
+          {billingResult === 'canceled' && (
+            <div className="alert alert-warning stt-banner">
+              <strong>Payment canceled.</strong> No charge was made. Your current plan remains unchanged.
+            </div>
+          )}
+          {billingResult === 'cancelled' && (
+            <div className="alert alert-warning stt-banner">
+              <strong>Subscription cancelled.</strong> You keep full access until the end of your billing period. After that, your account moves to the Free plan.
+            </div>
+          )}
+          {billingResult === 'portal_return' && (
+            <div className="alert alert-success stt-banner">
+              <strong>Changes saved.</strong> Your subscription changes are being processed by Stripe. This page may take a moment to reflect the latest status.
             </div>
           )}
 
-          {/* Show-once new key modal */}
-          {newKeyResult && (
-            <div className="api-key-reveal-overlay">
-              <div className="api-key-reveal-card">
-                <div className="api-key-reveal-icon"><KeyRound size={28} /></div>
-                <h3 className="api-key-reveal-title">Your new API key — copy it now</h3>
-                <p className="api-key-reveal-sub">
-                  This is the <strong>only time</strong> you will see the full key. Store it somewhere safe.
-                </p>
-                <div className="api-key-reveal-name">Key name: <strong>{newKeyResult.name}</strong></div>
-                <div className="api-key-raw-row">
-                  <code className="api-key-raw">{newKeyResult.rawKey}</code>
-                  <button
-                    className={`btn btn-sm ${copiedKey ? 'btn-success' : 'btn-secondary'}`}
-                    onClick={handleCopyKey}
-                    style={{ flexShrink: 0 }}
-                  >
-                    {copiedKey ? '✓ Copied' : 'Copy'}
-                  </button>
+          {/* Mobile tab bar */}
+          <div className="stt-mobile-tabs">
+            {visibleNav.map(n => (
+              <button
+                key={n.id}
+                className={`stt-mobile-tab${tab === n.id ? ' stt-mobile-tab-active' : ''}`}
+                onClick={() => setTab(n.id)}
+              >
+                {n.icon}
+                <span>{n.label}</span>
+              </button>
+            ))}
+          </div>
+
+          {/* ── Tab: Organisation ── */}
+          {tab === 'organisation' && (
+            <div className="stt-section">
+              <div className="stt-section-header">
+                <div className="stt-section-icon">
+                  <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
                 </div>
-                <button
-                  className="btn btn-primary btn-sm"
-                  style={{ marginTop: 16 }}
-                  onClick={() => { setNewKeyResult(null); setCopiedKey(false) }}
-                >
-                  I&apos;ve saved it — close
-                </button>
+                <div>
+                  <div className="stt-section-title">Organisation</div>
+                  <div className="stt-section-sub">Your workspace name and primary settings.</div>
+                </div>
+              </div>
+              <OrgSettingsForm organisation={organisation} />
+            </div>
+          )}
+
+          {/* ── Tab: Company ── */}
+          {tab === 'company' && (
+            <div className="stt-section">
+              <div className="stt-section-header">
+                <div className="stt-section-icon">
+                  <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                </div>
+                <div>
+                  <div className="stt-section-title">Company</div>
+                  <div className="stt-section-sub">Logo and billing address for invoices.</div>
+                </div>
+              </div>
+              <div className="space-y">
+                <div className="card">
+                  <div className="card-header"><div className="card-title">Organisation Logo</div></div>
+                  <div className="card-content">
+                    <LogoUpload currentLogoUrl={organisation.logo_url} orgName={organisation.name} onUpload={uploadLogo} />
+                  </div>
+                </div>
+                <div className="card">
+                  <div className="card-header"><div className="card-title">Company Details</div></div>
+                  <div className="card-content">
+                    <CompanyDetailsForm organisation={organisation} onSave={saveCompanyDetails} />
+                  </div>
+                </div>
               </div>
             </div>
           )}
 
-          <div className="card">
-            <div className="card-header card-header-row">
-              <div>
-                <div className="card-title">API Keys</div>
-                <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 2 }}>
-                  Used to authenticate with the Uptrue API and Compete webhooks. Keys are only shown once.
-                </p>
+          {/* ── Tab: Team ── */}
+          {tab === 'team' && (
+            <div className="stt-section">
+              <div className="stt-section-header">
+                <div className="stt-section-icon">
+                  <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+                <div>
+                  <div className="stt-section-title">Team</div>
+                  <div className="stt-section-sub">Manage members and send invites.</div>
+                </div>
               </div>
-              {currentPlan?.has_api_access && (
-                <button
-                  className="btn btn-primary btn-sm"
-                  onClick={() => { setShowCreateForm(f => !f); setCreateError(null) }}
-                >
-                  {showCreateForm ? 'Cancel' : '+ Create Key'}
-                </button>
-              )}
+              <div className="space-y">
+                <div className="card">
+                  <div className="card-header"><div className="card-title">Team Members</div></div>
+                  <div className="card-content">
+                    <DataTable columns={memberColumns} data={teamMembers} searchPlaceholder="Search members..." emptyMessage="No team members yet." />
+                  </div>
+                </div>
+                {canManageTeam && (
+                  <div className="card">
+                    <div className="card-header">
+                      <div className="card-title">Invite Team Member</div>
+                      <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 2 }}>
+                        {canInvite
+                          ? `${teamMemberCount} of ${teamMemberLimit === 0 ? '∞' : teamMemberLimit} seats used`
+                          : 'Team member limit reached. Upgrade your plan to invite more.'}
+                      </p>
+                    </div>
+                    <div className="card-content">
+                      {canInvite
+                        ? <TeamInviteForm canInvite={canInvite} teamMemberLimit={teamMemberLimit} teamMemberCount={teamMemberCount} onInviteSent={handleInviteSent} />
+                        : <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>Team invites are not available on the Free plan. Upgrade to invite team members.</p>
+                      }
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
-            <div className="card-content">
-              {showCreateForm && (
-                <div className="api-key-create-form">
-                  <input
-                    className="form-input"
-                    placeholder="Key name (e.g. WooCommerce store, Zapier)"
-                    value={newKeyName}
-                    onChange={e => setNewKeyName(e.target.value)}
-                    maxLength={64}
-                    disabled={creatingKey}
-                    onKeyDown={e => { if (e.key === 'Enter') void handleCreateKey() }}
-                    autoFocus
-                  />
-                  <button
-                    className="btn btn-primary"
-                    onClick={() => void handleCreateKey()}
-                    disabled={creatingKey || !newKeyName.trim()}
-                  >
-                    {creatingKey ? 'Creating...' : 'Create Key'}
-                  </button>
-                  {createError && (
-                    <div className="alert alert-error" style={{ marginTop: 8 }}>{createError}</div>
+          )}
+
+          {/* ── Tab: Billing ── */}
+          {tab === 'billing' && (
+            <div className="stt-section">
+              <div className="stt-section-header">
+                <div className="stt-section-icon">
+                  <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                </div>
+                <div>
+                  <div className="stt-section-title">Billing</div>
+                  <div className="stt-section-sub">Your plan, invoices and payment details.</div>
+                </div>
+              </div>
+              <div className="space-y">
+                <CurrentPlan plan={currentPlan} subscription={subscription} />
+                <PricingTable plans={plans} currentPlanSlug={currentPlan?.slug} subscription={subscription} creditBalancePence={creditBalance} defaultCurrency={defaultCurrency} />
+                <InvoiceList invoices={invoices} />
+              </div>
+            </div>
+          )}
+
+          {/* ── Tab: Credits ── */}
+          {tab === 'credits' && (
+            <div className="stt-section">
+              <div className="stt-section-header">
+                <div className="stt-section-icon">
+                  <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                </div>
+                <div>
+                  <div className="stt-section-title">Credits</div>
+                  <div className="stt-section-sub">Earn and spend credits across Uptrue features.</div>
+                </div>
+              </div>
+              <CreditsSection credits={credits} creditRules={creditRules} balancePence={creditBalance} currency={defaultCurrency} />
+            </div>
+          )}
+
+          {/* ── Tab: Referrals ── */}
+          {tab === 'referrals' && (
+            <div className="stt-section">
+              <div className="stt-section-header">
+                <div className="stt-section-icon">
+                  <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                </div>
+                <div>
+                  <div className="stt-section-title">Referrals</div>
+                  <div className="stt-section-sub">Share your link and earn credits for every sign-up.</div>
+                </div>
+              </div>
+              <ReferralSection referralCode={referralCode} referrals={referrals} />
+            </div>
+          )}
+
+          {/* ── Tab: API Keys ── */}
+          {tab === 'api-keys' && (
+            <div className="stt-section">
+              <div className="stt-section-header">
+                <div className="stt-section-icon">
+                  <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+                </div>
+                <div>
+                  <div className="stt-section-title">API Keys</div>
+                  <div className="stt-section-sub">Authenticate with the Uptrue API. Keys are shown once.</div>
+                </div>
+              </div>
+
+              {!currentPlan?.has_api_access && (
+                <div className="card stt-upgrade-gate">
+                  <div className="stt-gate-icon"><Lock size={32} /></div>
+                  <div className="stt-gate-title">API access requires a paid plan</div>
+                  <p className="stt-gate-sub">Upgrade to create API keys and integrate Uptrue with your tools and workflows.</p>
+                  <a href="/dashboard/settings?tab=billing" className="btn btn-primary btn-sm">Upgrade plan</a>
+                </div>
+              )}
+
+              {newKeyResult && (
+                <div className="api-key-reveal-overlay">
+                  <div className="api-key-reveal-card">
+                    <div className="api-key-reveal-icon"><KeyRound size={28} /></div>
+                    <h3 className="api-key-reveal-title">Your new API key — copy it now</h3>
+                    <p className="api-key-reveal-sub">This is the <strong>only time</strong> you will see the full key. Store it somewhere safe.</p>
+                    <div className="api-key-reveal-name">Key name: <strong>{newKeyResult.name}</strong></div>
+                    <div className="api-key-raw-row">
+                      <code className="api-key-raw">{newKeyResult.rawKey}</code>
+                      <button className={`btn btn-sm ${copiedKey ? 'btn-success' : 'btn-secondary'}`} onClick={handleCopyKey} style={{ flexShrink: 0 }}>
+                        {copiedKey ? '✓ Copied' : 'Copy'}
+                      </button>
+                    </div>
+                    <button className="btn btn-primary btn-sm" style={{ marginTop: 16 }} onClick={() => { setNewKeyResult(null); setCopiedKey(false) }}>
+                      I&apos;ve saved it — close
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <div className="card">
+                <div className="card-header card-header-row">
+                  <div>
+                    <div className="card-title">API Keys</div>
+                    <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 2 }}>Used to authenticate with the Uptrue API and Compete webhooks.</p>
+                  </div>
+                  {currentPlan?.has_api_access && (
+                    <button className="btn btn-primary btn-sm" onClick={() => { setShowCreateForm(f => !f); setCreateError(null) }}>
+                      {showCreateForm ? 'Cancel' : '+ Create Key'}
+                    </button>
                   )}
                 </div>
-              )}
-              {revokeError && (
-                <div className="alert alert-error" style={{ marginBottom: 16 }}>{revokeError}</div>
-              )}
-              <DataTable
-                columns={apiKeyColumns}
-                data={apiKeyList}
-                searchPlaceholder="Search API keys..."
-                bulkActions={apiKeyBulkActions}
-                emptyMessage="No API keys yet. Create one above to get started."
-              />
+                <div className="card-content">
+                  {showCreateForm && (
+                    <div className="api-key-create-form">
+                      <input className="form-input" placeholder="Key name (e.g. WooCommerce store, Zapier)" value={newKeyName} onChange={e => setNewKeyName(e.target.value)} maxLength={64} disabled={creatingKey} onKeyDown={e => { if (e.key === 'Enter') void handleCreateKey() }} autoFocus />
+                      <button className="btn btn-primary" onClick={() => void handleCreateKey()} disabled={creatingKey || !newKeyName.trim()}>
+                        {creatingKey ? 'Creating...' : 'Create Key'}
+                      </button>
+                      {createError && <div className="alert alert-error" style={{ marginTop: 8 }}>{createError}</div>}
+                    </div>
+                  )}
+                  {revokeError && <div className="alert alert-error" style={{ marginBottom: 16 }}>{revokeError}</div>}
+                  <DataTable columns={apiKeyColumns} data={apiKeyList} searchPlaceholder="Search API keys..." bulkActions={apiKeyBulkActions} emptyMessage="No API keys yet. Create one above to get started." />
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      )}
+          )}
 
-      {tab === 'landing' && isSuperAdmin && (
-        <CmsManager initialSections={cmsSections} initialTheme={cmsTheme} />
-      )}
-    </div>
+          {/* ── Tab: CMS (super-admin) ── */}
+          {tab === 'landing' && isSuperAdmin && (
+            <div className="stt-section">
+              <div className="stt-section-header">
+                <div className="stt-section-icon">
+                  <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                </div>
+                <div>
+                  <div className="stt-section-title">CMS</div>
+                  <div className="stt-section-sub">Manage landing page content and theme.</div>
+                </div>
+              </div>
+              <CmsManager initialSections={cmsSections} initialTheme={cmsTheme} />
+            </div>
+          )}
+
+        </div>{/* end stt-panel */}
+      </div>{/* end stt-root */}
+
       <ConfirmDialog
         isOpen={revokeIds.length > 0}
         onConfirm={() => { void executeRevoke() }}

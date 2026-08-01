@@ -58,9 +58,6 @@ export default async function SettingsPage(): Promise<React.ReactElement> {
 
   return (
     <div className="db-content">
-      <div className="db-page-header">
-        <div className="db-page-title">Settings</div>
-      </div>
       <SettingsContent
         organisation={organisation}
         members={members}
