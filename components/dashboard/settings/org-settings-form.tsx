@@ -80,35 +80,37 @@ export function OrgSettingsForm({ organisation }: { organisation: Organisation }
         {success && <div style={{ padding: 12, borderRadius: 8, background: '#ecfdf5', color: '#059669', fontSize: 14, marginBottom: 16 }}>Organisation updated!</div>}
 
         <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label className="form-label" htmlFor="org-name">Organisation Name</label>
-            <input className="form-input" id="org-name" name="name" defaultValue={organisation.name} required disabled={isPending} />
+          <div className="osf-row">
+            <div className="form-group">
+              <label className="form-label" htmlFor="org-name">Organisation Name</label>
+              <input className="form-input" id="org-name" name="name" defaultValue={organisation.name} required disabled={isPending} />
+            </div>
+            <div className="form-group">
+              <label className="form-label" htmlFor="org-slug">Slug (URL identifier)</label>
+              <input className="form-input" id="org-slug" name="slug" defaultValue={organisation.slug} required disabled={isPending} style={{ fontFamily: 'monospace' }} />
+              <p className="osf-hint">Lowercase letters, numbers and hyphens only.</p>
+            </div>
           </div>
 
-          <div className="form-group">
-            <label className="form-label" htmlFor="org-slug">Slug (URL identifier)</label>
-            <input className="form-input" id="org-slug" name="slug" defaultValue={organisation.slug} required disabled={isPending} style={{ fontFamily: 'monospace' }} />
-            <p style={{ fontSize: 12, color: '#94a3b8', marginTop: 4 }}>Used in URLs. Lowercase letters, numbers, and hyphens only.</p>
-          </div>
-
-          <div className="form-group">
-            <label className="form-label" htmlFor="org-type">Account Type</label>
-            <input className="form-input" id="org-type" defaultValue={organisation.type} disabled style={{ textTransform: 'capitalize', background: 'var(--bg-muted)' }} />
-            <p style={{ fontSize: 12, color: '#94a3b8', marginTop: 4 }}>Contact support to change account type.</p>
-          </div>
-
-          <div className="form-group">
-            <label className="form-label" htmlFor="org-timezone">Timezone</label>
-            <select className="form-select" id="org-timezone" name="timezone" defaultValue={organisation.timezone} disabled={isPending}>
-              {timezones.map(tz => (
-                <option key={tz.value} value={tz.value}>{tz.label}</option>
-              ))}
-            </select>
-            <p style={{ fontSize: 12, color: '#94a3b8', marginTop: 4 }}>All timestamps and reports will use this timezone.</p>
+          <div className="osf-row">
+            <div className="form-group">
+              <label className="form-label" htmlFor="org-type">Account Type</label>
+              <input className="form-input" id="org-type" defaultValue={organisation.type} disabled style={{ textTransform: 'capitalize', background: 'var(--bg-muted)' }} />
+              <p className="osf-hint">Contact support to change account type.</p>
+            </div>
+            <div className="form-group">
+              <label className="form-label" htmlFor="org-timezone">Timezone</label>
+              <select className="form-select" id="org-timezone" name="timezone" defaultValue={organisation.timezone} disabled={isPending}>
+                {timezones.map(tz => (
+                  <option key={tz.value} value={tz.value}>{tz.label}</option>
+                ))}
+              </select>
+              <p className="osf-hint">Used for all timestamps and reports.</p>
+            </div>
           </div>
 
           <button type="submit" className="btn btn-primary" disabled={isPending} style={{ marginTop: 8 }}>
-            {isPending ? 'Saving...' : 'Save Changes'}
+            {isPending ? 'Saving…' : 'Save Changes'}
           </button>
         </form>
       </div>
