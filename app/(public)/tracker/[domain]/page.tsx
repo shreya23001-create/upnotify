@@ -82,7 +82,7 @@ export async function generateMetadata({ params }: { params: Promise<{ domain: s
   const siteName = siteInfo?.name ?? monitor.display_name
 
   // Per-domain SEO override takes precedence when present (e.g. salesforce → "sfdc status" keyword)
-  const rawTitle = siteInfo?.seoTitle ?? `Is ${siteName} Down? Live Status & Uptime | Uptrue`
+  const rawTitle = siteInfo?.seoTitle ?? `Is ${siteName} Down? Live Status & Uptime Tracker | Uptrue`
   const title = siteInfo?.seoTitle ? { absolute: siteInfo.seoTitle } : rawTitle
   const description = siteInfo?.seoDescription ?? (siteInfo
     ? `Check if ${siteName} is down right now. Live status, response time, uptime history, and incident log for ${siteName} (${monitor.domain}). Get alerts when ${siteName} goes down.`
@@ -415,6 +415,17 @@ export default async function TrackerDomainPage({
         </div>
       </div>
 
+      {/* ── CTA banner — between stats and uptime history ── */}
+      <div className="tracker-promo-banner">
+        <div className="tracker-promo-banner-text">
+          <strong>Want this for your own website?</strong>
+          {' '}Get instant alerts the moment your site goes down — free to start.
+        </div>
+        <Link href="/pricing" className="tracker-promo-banner-btn">
+          Monitor My Site Free →
+        </Link>
+      </div>
+
       {/* Uptime bars */}
       <div className="tracker-uptime-section">
         <SectionHeading icon={History}>7-Day Uptime History</SectionHeading>
@@ -516,6 +527,11 @@ export default async function TrackerDomainPage({
           {siteInfo
             ? siteInfo.description
             : `${monitor.display_name} is a website that Uptrue monitors for uptime and performance. We check ${monitor.domain} every 5 minutes from multiple locations to detect downtime, slow responses, and SSL issues.`}
+          {' '}
+          <Link href="/pricing" className="tracker-link">
+            Monitor your own website with Uptrue
+          </Link>
+          {' '}and get instant alerts when anything goes wrong.
         </p>
         {siteInfo && (
           <div className="tracker-about-meta">
@@ -555,9 +571,14 @@ export default async function TrackerDomainPage({
               )
             })}
           </div>
-          <p className="tracker-reasons-footer">
-            When {siteName} experiences issues, our monitoring detects it within minutes. Subscribe above to get notified instantly.
-          </p>
+          <div className="tracker-reasons-cta">
+            <p className="tracker-reasons-footer">
+              Don&apos;t just track {siteName} — protect your own uptime. Uptrue monitors your website 24/7 and alerts you via email, SMS, or Slack.
+            </p>
+            <Link href="/pricing" className="tracker-reasons-cta-btn">
+              Start Free Monitoring →
+            </Link>
+          </div>
         </div>
       )}
 
