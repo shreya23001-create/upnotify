@@ -14358,12 +14358,24 @@ html.dark .contact-channel-icon {
     gap: 20px;
   }
 
+  /* Email takes full width; Role + button share the next row */
   .team-invite-form {
-    flex-direction: column;
+    flex-wrap: wrap;
   }
 
-  .team-invite-field {
+  .team-invite-form .team-invite-field:first-child {
+    flex: 0 0 100%;
     min-width: 100%;
+  }
+
+  .team-invite-form .team-invite-field:nth-child(2) {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .team-invite-form > .btn {
+    flex-shrink: 0;
+    align-self: flex-end;
   }
 }
 
