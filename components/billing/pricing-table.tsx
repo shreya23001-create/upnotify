@@ -410,7 +410,10 @@ export function PricingTable({ plans, currentPlanSlug, subscription, creditBalan
                     className={`pricing-feature${!feature.included ? ' pricing-feature-disabled' : ''}`}
                   >
                     <span className="pricing-feature-icon">
-                      {feature.included ? '\u2713' : '\u2014'}
+                      {feature.included
+                        ? <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        : <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                      }
                     </span>
                     {feature.text}
                   </li>
@@ -419,7 +422,10 @@ export function PricingTable({ plans, currentPlanSlug, subscription, creditBalan
 
               {isCurrent ? (
                 <div>
-                  <div className="pricing-card-current-label">{'\u2713'} You&apos;re on this plan</div>
+                  <div className="pricing-card-current-label">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    You&apos;re on this plan
+                  </div>
                   {!isFree && (
                     <div style={{ marginTop: 8 }}>
                       {!isCancelling && (
