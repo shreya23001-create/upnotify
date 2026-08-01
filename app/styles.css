@@ -19374,23 +19374,29 @@ html.dark .stt-nav-active { background: rgba(99,102,241,0.15) !important; }
   .stt-sidebar { display: none; }
 
   .stt-mobile-tabs {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: auto auto;
     gap: 4px;
-    overflow-x: auto;
-    scrollbar-width: none;
-    padding-bottom: 4px;
     margin-bottom: 4px;
-    -webkit-overflow-scrolling: touch;
   }
 
-  .stt-mobile-tabs::-webkit-scrollbar { display: none; }
+  /* 5th tab onward wraps to second row, spanning to fill */
+  .stt-mobile-tab:nth-child(n+5) { grid-column: span 1; }
+
+  /* Second row: 3 items → span so they fill the 4-col grid evenly */
+  .stt-mobile-tab:nth-child(5) { grid-column: 1 / 2; }
+  .stt-mobile-tab:nth-child(6) { grid-column: 2 / 3; }
+  .stt-mobile-tab:nth-child(7) { grid-column: 3 / 4; }
+  .stt-mobile-tab:nth-child(8) { grid-column: 4 / 5; }
 
   .stt-mobile-tab {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     gap: 3px;
-    padding: 7px 10px;
+    padding: 7px 4px;
     border-radius: 10px;
     font-size: 10px;
     font-weight: 600;
@@ -19398,10 +19404,9 @@ html.dark .stt-nav-active { background: rgba(99,102,241,0.15) !important; }
     background: var(--bg-card);
     border: 1px solid var(--border-primary);
     cursor: pointer;
-    white-space: nowrap;
-    flex-shrink: 0;
     transition: background 0.15s, color 0.15s;
     min-width: 0;
+    width: 100%;
   }
 
   .stt-mobile-tab svg { flex-shrink: 0; }
@@ -19414,6 +19419,10 @@ html.dark .stt-nav-active { background: rgba(99,102,241,0.15) !important; }
 
   html.dark .stt-mobile-tab { background: var(--bg-card); }
   html.dark .stt-mobile-tab-active { background: rgba(99,102,241,0.15); }
+
+  /* Team table: hide Email on narrow mobile so Role isn't squashed */
+  .stt-panel .table th:nth-child(2),
+  .stt-panel .table td:nth-child(2) { display: none; }
 }
 
 /* ==========================================================================
