@@ -18,12 +18,14 @@ export default function WordPressHelpPage(): React.ReactElement {
         </nav>
 
         <article className="help-article">
-          <h1 className="help-article-title">WordPress Site Monitor Plugin</h1>
-          <p className="help-article-intro">
-            The Uptrue WordPress plugin monitors your site from the inside — detecting file injections,
-            rogue admin users, security misconfigurations, and foreign-language spam content. It runs
-            on WordPress Cron and pushes findings to Uptrue via HTTPS. No inbound ports required.
-          </p>
+          <div className="help-article-hero">
+            <h1 className="help-article-title">WordPress Site Monitor Plugin</h1>
+            <p className="help-article-intro">
+              The Uptrue WordPress plugin monitors your site from the inside — detecting file injections,
+              rogue admin users, security misconfigurations, and foreign-language spam content. It runs
+              on WordPress Cron and pushes findings to Uptrue via HTTPS. No inbound ports required.
+            </p>
+          </div>
 
           <section className="help-section">
             <h2 className="help-section-title">Installation (2 minutes)</h2>

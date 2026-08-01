@@ -54,11 +54,13 @@ export default function BillingPage(): React.ReactElement {
         </nav>
 
         <article className="help-article">
-          <h1 className="help-article-title">Plans &amp; Billing</h1>
-          <p className="help-article-intro">
-            Uptrue is designed so you can start for free and only pay when you genuinely need
-            more. No surprise charges, no hidden fees, no &ldquo;contact sales&rdquo; runaround.
-          </p>
+          <div className="help-article-hero">
+            <h1 className="help-article-title">Plans &amp; Billing</h1>
+            <p className="help-article-intro">
+              Uptrue is designed so you can start for free and only pay when you genuinely need
+              more. No surprise charges, no hidden fees, no &ldquo;contact sales&rdquo; runaround.
+            </p>
+          </div>
 
           <section className="help-section">
             <h2 className="help-section-title">The four plans</h2>

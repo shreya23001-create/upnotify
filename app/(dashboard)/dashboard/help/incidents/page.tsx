@@ -11,8 +11,10 @@ export default function HelpIncidentsPage(): React.ReactElement {
       <HelpSidebar currentPath={pathname} />
       <div className="help-main">
         <article className="help-article">
-          <h1 className="help-article-title">Incidents</h1>
-          <p className="help-article-intro">Incidents are created automatically when a monitor confirms downtime. They track the lifecycle of an outage from detection to resolution.</p>
+          <div className="help-article-hero">
+            <h1 className="help-article-title">Incidents</h1>
+            <p className="help-article-intro">Incidents are created automatically when a monitor confirms downtime. They track the lifecycle of an outage from detection to resolution.</p>
+          </div>
 
           <section className="help-section">
             <h2 className="help-section-title">How Incidents Work</h2>

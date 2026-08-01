@@ -54,13 +54,15 @@ export default function WatchdogHelpPage(): React.ReactElement {
         </nav>
 
         <article className="help-article">
-          <h1 className="help-article-title">Watchdog — Competitor Tracking</h1>
-          <p className="help-article-intro">
-            Knowing your own uptime is good. Knowing how it compares to the
-            competition is better. Watchdog lets you monitor any website —
-            a direct competitor, an industry leader, or anyone you want to
-            benchmark against — right inside your Uptrue dashboard.
-          </p>
+          <div className="help-article-hero">
+            <h1 className="help-article-title">Watchdog — Competitor Tracking</h1>
+            <p className="help-article-intro">
+              Knowing your own uptime is good. Knowing how it compares to the
+              competition is better. Watchdog lets you monitor any website —
+              a direct competitor, an industry leader, or anyone you want to
+              benchmark against — right inside your Uptrue dashboard.
+            </p>
+          </div>
 
           <section className="help-section">
             <h2 className="help-section-title">What Watchdog does</h2>

@@ -54,12 +54,14 @@ export default function CreditsHelpPage(): React.ReactElement {
         </nav>
 
         <article className="help-article">
-          <h1 className="help-article-title">Community Credits</h1>
-          <p className="help-article-intro">
-            We believe the people who help Uptrue grow should benefit too. Community
-            credits let you earn real money off your bill just by being part of the
-            community.
-          </p>
+          <div className="help-article-hero">
+            <h1 className="help-article-title">Community Credits</h1>
+            <p className="help-article-intro">
+              We believe the people who help Uptrue grow should benefit too. Community
+              credits let you earn real money off your bill just by being part of the
+              community.
+            </p>
+          </div>
 
           <section className="help-section">
             <h2 className="help-section-title">How credits work</h2>

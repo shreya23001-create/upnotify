@@ -11,8 +11,10 @@ export default function HelpTeamPage(): React.ReactElement {
       <HelpSidebar currentPath={pathname} />
       <div className="help-main">
         <article className="help-article">
-          <h1 className="help-article-title">Team &amp; Invites</h1>
-          <p className="help-article-intro">Invite team members to your organisation so they can view monitors, manage alerts, and collaborate on incident response.</p>
+          <div className="help-article-hero">
+            <h1 className="help-article-title">Team &amp; Invites</h1>
+            <p className="help-article-intro">Invite team members to your organisation so they can view monitors, manage alerts, and collaborate on incident response.</p>
+          </div>
 
           <section className="help-section">
             <h2 className="help-section-title">Inviting Team Members</h2>

@@ -54,11 +54,13 @@ export default function AlertsPage(): React.ReactElement {
         </nav>
 
         <article className="help-article">
-          <h1 className="help-article-title">Setting Up Alerts</h1>
-          <p className="help-article-intro">
-            Monitoring without alerts is like a smoke detector without a siren. Alerts make sure
-            the right people know the moment something breaks, wherever they are.
-          </p>
+          <div className="help-article-hero">
+            <h1 className="help-article-title">Setting Up Alerts</h1>
+            <p className="help-article-intro">
+              Monitoring without alerts is like a smoke detector without a siren. Alerts make sure
+              the right people know the moment something breaks, wherever they are.
+            </p>
+          </div>
 
           <section className="help-section">
             <h2 className="help-section-title">Alert channels</h2>

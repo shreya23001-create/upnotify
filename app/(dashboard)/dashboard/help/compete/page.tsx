@@ -14,8 +14,10 @@ export default function HelpCompetePage(): React.ReactElement {
       <HelpSidebar currentPath={pathname} />
       <div className="help-main">
         <article className="help-article">
-          <h1 className="help-article-title">Uptrue Compete</h1>
-          <p className="help-article-intro">Track competitor prices, detect stock changes, and get alerts when competitors adjust their pricing. Compete is a separate add-on available with any paid monitoring plan.</p>
+          <div className="help-article-hero">
+            <h1 className="help-article-title">Uptrue Compete</h1>
+            <p className="help-article-intro">Track competitor prices, detect stock changes, and get alerts when competitors adjust their pricing. Compete is a separate add-on available with any paid monitoring plan.</p>
+          </div>
 
           <section className="help-section">
             <h2 className="help-section-title">What is Compete?</h2>

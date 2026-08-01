@@ -62,12 +62,14 @@ export default function AiVisibilityHelpPage(): React.ReactElement {
         </nav>
 
         <article className="help-article">
-          <h1 className="help-article-title">AI Visibility — llms.txt &amp; Citation Monitor</h1>
-          <p className="help-article-intro">
-            Search is changing. ChatGPT, Perplexity, Gemini, and Claude are answering questions
-            directly — and the sites they cite get the traffic. AI Visibility helps you control
-            how AI engines understand and reference your website.
-          </p>
+          <div className="help-article-hero">
+            <h1 className="help-article-title">AI Visibility — llms.txt &amp; Citation Monitor</h1>
+            <p className="help-article-intro">
+              Search is changing. ChatGPT, Perplexity, Gemini, and Claude are answering questions
+              directly — and the sites they cite get the traffic. AI Visibility helps you control
+              how AI engines understand and reference your website.
+            </p>
+          </div>
 
           <section className="help-section">
             <h2 className="help-section-title">What AI Visibility does</h2>

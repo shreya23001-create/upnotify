@@ -17,8 +17,10 @@ export default function HelpCancelPausePage(): React.ReactElement {
         </nav>
 
         <article className="help-article">
-          <h1 className="help-article-title">Cancel or Pause Your Subscription</h1>
-          <p className="help-article-intro">You can cancel or pause your subscription at any time from your billing settings. We offer a pause option so you can take a break without losing your setup.</p>
+          <div className="help-article-hero">
+            <h1 className="help-article-title">Cancel or Pause Your Subscription</h1>
+            <p className="help-article-intro">You can cancel or pause your subscription at any time from your billing settings. We offer a pause option so you can take a break without losing your setup.</p>
+          </div>
 
           <section className="help-section">
             <h2 className="help-section-title">How to Cancel or Pause</h2>

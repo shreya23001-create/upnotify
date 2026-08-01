@@ -54,12 +54,14 @@ export default function ReferralsHelpPage(): React.ReactElement {
         </nav>
 
         <article className="help-article">
-          <h1 className="help-article-title">Referral Program</h1>
-          <p className="help-article-intro">
-            Good tools spread by word of mouth. If you like Uptrue enough to
-            recommend it, we want to say thanks -- with free monitoring for you
-            and the person you refer.
-          </p>
+          <div className="help-article-hero">
+            <h1 className="help-article-title">Referral Program</h1>
+            <p className="help-article-intro">
+              Good tools spread by word of mouth. If you like Uptrue enough to
+              recommend it, we want to say thanks -- with free monitoring for you
+              and the person you refer.
+            </p>
+          </div>
 
           <section className="help-section">
             <h2 className="help-section-title">How it works</h2>

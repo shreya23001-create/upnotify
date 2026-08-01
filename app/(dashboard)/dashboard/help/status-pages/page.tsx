@@ -54,12 +54,14 @@ export default function StatusPagesPage(): React.ReactElement {
         </nav>
 
         <article className="help-article">
-          <h1 className="help-article-title">Public Status Pages</h1>
-          <p className="help-article-intro">
-            When your site has a wobble, your inbox fills up with &ldquo;Is it down for everyone
-            or just me?&rdquo; emails. A status page answers that question for you, automatically,
-            24/7.
-          </p>
+          <div className="help-article-hero">
+            <h1 className="help-article-title">Public Status Pages</h1>
+            <p className="help-article-intro">
+              When your site has a wobble, your inbox fills up with &ldquo;Is it down for everyone
+              or just me?&rdquo; emails. A status page answers that question for you, automatically,
+              24/7.
+            </p>
+          </div>
 
           <section className="help-section">
             <h2 className="help-section-title">What is a status page?</h2>

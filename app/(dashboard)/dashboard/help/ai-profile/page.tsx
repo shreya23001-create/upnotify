@@ -77,12 +77,14 @@ export default function AiProfileHelpPage(): React.ReactElement {
           <span>AI Profile</span>
         </nav>
 
-        <h1 className="help-page-title">AI Profile — what AI thinks of you</h1>
-        <p className="help-page-intro">
-          AI Profile is the inbound counterpart to Citation Monitoring. Instead of testing whether
-          AIs cite you for the keywords <em>you</em> care about, it reveals what AI engines
-          <em> already think</em> your site is — in their own words.
-        </p>
+        <div className="help-article-hero">
+          <h1 className="help-article-title">AI Profile — what AI thinks of you</h1>
+          <p className="help-article-intro">
+            AI Profile is the inbound counterpart to Citation Monitoring. Instead of testing whether
+            AIs cite you for the keywords <em>you</em> care about, it reveals what AI engines
+            <em> already think</em> your site is — in their own words.
+          </p>
+        </div>
 
         {/* Why this matters — per the Boss decision to lead with macro context */}
         <section className="help-section">

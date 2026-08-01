@@ -54,11 +54,13 @@ export default function MonitorsPage(): React.ReactElement {
         </nav>
 
         <article className="help-article">
-          <h1 className="help-article-title">Understanding Monitors</h1>
-          <p className="help-article-intro">
-            A monitor keeps an eye on something important so you do not have to. You tell it what
-            to watch, how often to check, and what counts as a problem. Uptrue handles the rest.
-          </p>
+          <div className="help-article-hero">
+            <h1 className="help-article-title">Understanding Monitors</h1>
+            <p className="help-article-intro">
+              A monitor keeps an eye on something important so you do not have to. You tell it what
+              to watch, how often to check, and what counts as a problem. Uptrue handles the rest.
+            </p>
+          </div>
 
           <section className="help-section">
             <h2 className="help-section-title">The 24 monitor types</h2>

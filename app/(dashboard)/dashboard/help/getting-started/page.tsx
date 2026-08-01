@@ -54,11 +54,13 @@ export default function GettingStartedPage(): React.ReactElement {
         </nav>
 
         <article className="help-article">
-          <h1 className="help-article-title">Getting Started with Uptrue</h1>
-          <p className="help-article-intro">
-            You signed up because you never want to be the last person to know your site is down.
-            Good call. Let us get you set up in under five minutes.
-          </p>
+          <div className="help-article-hero">
+            <h1 className="help-article-title">Getting Started with Uptrue</h1>
+            <p className="help-article-intro">
+              You signed up because you never want to be the last person to know your site is down.
+              Good call. Let us get you set up in under five minutes.
+            </p>
+          </div>
 
           <section className="help-section">
             <h2 className="help-section-title">1. Create your first monitor</h2>

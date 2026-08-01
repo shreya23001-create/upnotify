@@ -54,12 +54,14 @@ export default function ToolsHelpPage(): React.ReactElement {
         </nav>
 
         <article className="help-article">
-          <h1 className="help-article-title">Free Tools</h1>
-          <p className="help-article-intro">
-            Sometimes you just need a quick answer -- is my SSL valid, how much
-            downtime does 99.9% actually mean, is my site healthy? Our free tools
-            give you instant results without signing up or paying a penny.
-          </p>
+          <div className="help-article-hero">
+            <h1 className="help-article-title">Free Tools</h1>
+            <p className="help-article-intro">
+              Sometimes you just need a quick answer -- is my SSL valid, how much
+              downtime does 99.9% actually mean, is my site healthy? Our free tools
+              give you instant results without signing up or paying a penny.
+            </p>
+          </div>
 
           <section className="help-section">
             <h2 className="help-section-title">SSL Checker</h2>
