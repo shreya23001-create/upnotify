@@ -64,22 +64,6 @@
       "schedule": "*/30 * * * *"
     },
     {
-      "path": "/api/cron/autoblog/feed-fetcher",
-      "schedule": "0 */6 * * *"
-    },
-    {
-      "path": "/api/cron/autoblog/llm-detector",
-      "schedule": "0 7 * * *"
-    },
-    {
-      "path": "/api/cron/autoblog/topic-runner",
-      "schedule": "0 */2 * * *"
-    },
-    {
-      "path": "/api/cron/autoblog/post-generator",
-      "schedule": "*/10 * * * *"
-    },
-    {
       "path": "/api/cron/pmb/daily-publisher",
       "schedule": "*/5 * * * *"
     },
