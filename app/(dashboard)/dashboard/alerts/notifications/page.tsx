@@ -52,7 +52,7 @@ export default async function NotificationsSettingsPage() {
         {/* Form card */}
         <div className="card">
           <div className="card-content">
-            <form action={saveNotificationSettingsAction} method="post" className="notif-form">
+            <form action={saveNotificationSettingsAction} className="notif-form">
 
               {/* Mode */}
               <div className="notif-section">
@@ -61,7 +61,7 @@ export default async function NotificationsSettingsPage() {
                   <span className="notif-section-desc">Choose how alert emails are batched and sent</span>
                 </div>
                 <div className="notif-mode-grid">
-                  <label className={`notif-mode-card${settings.mode === 'off' ? ' notif-mode-card--active' : ''}`}>
+                  <label className="notif-mode-card">
                     <input type="radio" name="mode" value="off" defaultChecked={settings.mode === 'off'} className="notif-radio" />
                     <div className="notif-mode-icon notif-mode-icon--off">
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -79,7 +79,7 @@ export default async function NotificationsSettingsPage() {
                     </div>
                   </label>
 
-                  <label className={`notif-mode-card${settings.mode !== 'off' ? ' notif-mode-card--active' : ''}`}>
+                  <label className="notif-mode-card">
                     <input type="radio" name="mode" value="smart" defaultChecked={settings.mode !== 'off'} className="notif-radio" />
                     <div className="notif-mode-icon notif-mode-icon--smart">
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

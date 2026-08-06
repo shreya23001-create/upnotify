@@ -24464,7 +24464,8 @@ html.dark .ac-row--selected {
   background: var(--bg-muted);
 }
 
-.notif-mode-card--active {
+.notif-mode-card--active,
+.notif-mode-card:has(.notif-radio:checked) {
   border-color: #6366f1;
   background: rgba(99, 102, 241, 0.04);
 }
@@ -24493,11 +24494,13 @@ html.dark .ac-row--selected {
   color: #6366f1;
 }
 
-.notif-mode-card--active .notif-mode-icon--off {
+.notif-mode-card--active .notif-mode-icon--off,
+.notif-mode-card:has(.notif-radio:checked) .notif-mode-icon--off {
   background: rgba(107, 114, 128, 0.18);
 }
 
-.notif-mode-card--active .notif-mode-icon--smart {
+.notif-mode-card--active .notif-mode-icon--smart,
+.notif-mode-card:has(.notif-radio:checked) .notif-mode-icon--smart {
   background: rgba(99, 102, 241, 0.18);
 }
 
@@ -24548,7 +24551,8 @@ html.dark .ac-row--selected {
   transition: all 0.15s;
 }
 
-.notif-mode-card--active .notif-mode-check {
+.notif-mode-card--active .notif-mode-check,
+.notif-mode-card:has(.notif-radio:checked) .notif-mode-check {
   background: #6366f1;
   border-color: #6366f1;
   color: #fff;
