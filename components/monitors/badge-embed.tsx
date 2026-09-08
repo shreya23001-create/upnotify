@@ -10,9 +10,9 @@ interface BadgeEmbedProps {
 }
 
 const BADGE_STYLES: { value: BadgeStyle; label: string; description: string }[] = [
-  { value: 'standard', label: 'Standard', description: 'Monitored by Uptrue' },
-  { value: 'uptime', label: 'Uptime', description: '99.97% Uptime — Uptrue' },
-  { value: 'shield', label: 'Shield', description: 'Uptrue ✓ Verified' },
+  { value: 'standard', label: 'Standard', description: 'Monitored by Upnotify' },
+  { value: 'uptime', label: 'Uptime', description: '99.97% Uptime — Upnotify' },
+  { value: 'shield', label: 'Shield', description: 'Upnotify ✓ Verified' },
 ]
 
 export function BadgeEmbed({ monitorId }: BadgeEmbedProps): React.ReactNode {
@@ -24,7 +24,7 @@ export function BadgeEmbed({ monitorId }: BadgeEmbedProps): React.ReactNode {
   const badgeUrl = `${appUrl}/api/badge/monitor/${monitorId}?style=${selectedStyle}`
   const statusUrl = `${appUrl}/status`
 
-  const embedCode = `<a href="${statusUrl}" target="_blank" rel="noopener noreferrer">\n  <img src="${badgeUrl}" alt="Uptime monitored by Uptrue" width="160" height="32" />\n</a>`
+  const embedCode = `<a href="${statusUrl}" target="_blank" rel="noopener noreferrer">\n  <img src="${badgeUrl}" alt="Uptime monitored by Upnotify" width="160" height="32" />\n</a>`
 
   async function handleCopy(): Promise<void> {
     try {
@@ -79,7 +79,7 @@ export function BadgeEmbed({ monitorId }: BadgeEmbedProps): React.ReactNode {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={badgeUrl}
-              alt="Uptime monitored by Uptrue"
+              alt="Uptime monitored by Upnotify"
               width={160}
               height={32}
               key={selectedStyle}

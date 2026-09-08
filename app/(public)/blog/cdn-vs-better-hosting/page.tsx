@@ -63,7 +63,7 @@ const FAQ_DATA = [
   {
     question: 'How do I test whether a CDN or hosting upgrade will help my site more?',
     answer:
-      'Measure your origin TTFB by bypassing the CDN — either by hitting your server IP directly or using development mode in Cloudflare. If origin TTFB is under 500 milliseconds, a CDN will help most by reducing latency for distant visitors. If origin TTFB is over 1 second, hosting is your bottleneck. Use Uptrue HTTP monitoring to track response times from outside your network over several days. The response time data reveals whether your performance problem is origin speed (hosting) or delivery speed (CDN territory).',
+      'Measure your origin TTFB by bypassing the CDN — either by hitting your server IP directly or using development mode in Cloudflare. If origin TTFB is under 500 milliseconds, a CDN will help most by reducing latency for distant visitors. If origin TTFB is over 1 second, hosting is your bottleneck. Use Upnotify HTTP monitoring to track response times from outside your network over several days. The response time data reveals whether your performance problem is origin speed (hosting) or delivery speed (CDN territory).',
   },
 ]
 
@@ -87,7 +87,7 @@ export default function CdnVsBetterHostingPage(): React.ReactElement {
           '@type': 'Article',
           headline: 'CDN vs Better Hosting: What Actually Makes Your Site Faster?',
           description: 'When a CDN helps vs when you need better hosting. Origin server TTFB, edge caching layers, and what actually makes your website faster.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-04-02',
           dateModified: '2026-04-02',
@@ -204,7 +204,7 @@ export default function CdnVsBetterHostingPage(): React.ReactElement {
 
         <h3>Test 3: Monitor over time</h3>
         <p>
-          One-off speed tests give you a snapshot. <Link href="/signup">Uptrue&apos;s HTTP monitoring</Link> gives you the full picture — response times measured every 60 seconds, 24 hours a day. This reveals patterns that single tests miss:
+          One-off speed tests give you a snapshot. <Link href="/signup">Upnotify&apos;s HTTP monitoring</Link> gives you the full picture — response times measured every 60 seconds, 24 hours a day. This reveals patterns that single tests miss:
         </p>
 
         <ul>
@@ -301,7 +301,7 @@ export default function CdnVsBetterHostingPage(): React.ReactElement {
 
         <h3>Before any change</h3>
         <p>
-          Set up <Link href="/signup">Uptrue HTTP monitoring</Link> and collect at least 7 days of response time data. This is your baseline. Record average response time, peak response time, and the pattern of spikes.
+          Set up <Link href="/signup">Upnotify HTTP monitoring</Link> and collect at least 7 days of response time data. This is your baseline. Record average response time, peak response time, and the pattern of spikes.
         </p>
 
         <h3>After adding a CDN</h3>
@@ -361,7 +361,7 @@ export default function CdnVsBetterHostingPage(): React.ReactElement {
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

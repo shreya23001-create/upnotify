@@ -166,20 +166,20 @@ export function DowntimeCalculator(): React.ReactElement {
               <Link
                 href="/signup"
                 className="btn btn-lg"
-                style={{ width: '100%', justifyContent: 'center', background: 'linear-gradient(135deg,#ef4444,#f97316)', color: '#fff', border: 'none', display: 'flex', alignItems: 'center', gap: 8 }}
+                style={{ width: '88%', justifyContent: 'center', background: 'linear-gradient(135deg,#ef4444,#f97316)', color: '#fff', border: 'none', display: 'flex', alignItems: 'center', gap: 8, marginTop: '48px' }}
               >
-                <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                 Start Protecting Revenue Free
               </Link>
               <p className="calc-note">
-                One prevented outage = <strong>{payback}</strong> months of Uptrue Pro covered.
+                One prevented outage = <strong>{payback}</strong> months of Upnotify Pro covered.
               </p>
             </div>
           </div>
 
           {/* Disclaimer */}
           <div className="calc-disclaimer">
-            <strong>Disclaimer:</strong> Figures are indicative estimates based on published industry research, including Forrester Research, Gartner, and PwC studies on the economic impact of downtime. Customer churn assumes a 5% churn rate among affected users and an average £200 customer lifetime value. Reputation damage is estimated at 60% of direct revenue loss. Results vary by industry, business model, and circumstances. Uptrue accepts no liability for decisions made based on these estimates. Not for use in financial planning, insurance, or legal claims.
+            <strong>Disclaimer:</strong> Figures are indicative estimates based on published industry research, including Forrester Research, Gartner, and PwC studies on the economic impact of downtime. Customer churn assumes a 5% churn rate among affected users and an average £200 customer lifetime value. Reputation damage is estimated at 60% of direct revenue loss. Results vary by industry, business model, and circumstances. Upnotify accepts no liability for decisions made based on these estimates. Not for use in financial planning, insurance, or legal claims.
           </div>
         </div>
       </div>

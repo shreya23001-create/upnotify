@@ -6,12 +6,12 @@ import Faq from '@/components/landing/faq'
 import { ScrollReveal } from '@/components/landing/scroll-reveal'
 
 export const metadata: Metadata = {
-  title: 'Free DNS Lookup Tool — Check DNS Records Online | Uptrue',
+  title: 'Free DNS Lookup Tool — Check DNS Records Online | Upnotify',
   description:
     'Look up DNS records for any domain instantly. Check A, AAAA, MX, NS, TXT, CNAME, and SOA records. Free DNS checker, no signup required.',
   alternates: { canonical: 'https://uptrue.io/tools/dns-lookup' },
   openGraph: {
-    title: 'Free DNS Lookup Tool — Check DNS Records Online | Uptrue',
+    title: 'Free DNS Lookup Tool — Check DNS Records Online | Upnotify',
     description:
       'Look up DNS records for any domain instantly. Check A, AAAA, MX, NS, TXT, CNAME, and SOA records. Free, no signup.',
     url: 'https://uptrue.io/tools/dns-lookup',
@@ -133,7 +133,7 @@ export default function DnsLookupPage(): React.ReactElement {
           <div className="tools-cta reveal">
             <h2>Monitor DNS changes automatically</h2>
             <p>
-              Get alerted the moment a DNS record changes on your domain. Uptrue&apos;s{' '}
+              Get alerted the moment a DNS record changes on your domain. Upnotify&apos;s{' '}
               <Link href="/monitoring/dns-monitoring">DNS monitoring</Link> watches your records every six hours
               and pairs naturally with{' '}
               <Link href="/monitoring/nameserver-monitoring">nameserver change monitoring</Link> so a registrar

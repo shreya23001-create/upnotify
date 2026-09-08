@@ -17,7 +17,7 @@ export function OrganizationJsonLd(): React.ReactElement {
   const data = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'Uptrue',
+    name: 'Upnotify',
     legalName: 'Vision Software Solutions Limited',
     url: 'https://uptrue.io',
     logo: 'https://uptrue.io/logo.svg',
@@ -49,7 +49,7 @@ export function SoftwareApplicationJsonLd(): React.ReactElement {
   const data = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
-    name: 'Uptrue',
+    name: 'Upnotify',
     applicationCategory: 'BusinessApplication',
     operatingSystem: 'Web',
     url: 'https://uptrue.io',
@@ -128,7 +128,7 @@ export function WebSiteJsonLd(): React.ReactElement {
   const data = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: 'Uptrue',
+    name: 'Upnotify',
     url: 'https://uptrue.io',
     description:
       'Uptime, performance and infrastructure monitoring for agencies and teams.',

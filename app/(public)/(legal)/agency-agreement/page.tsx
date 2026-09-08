@@ -4,7 +4,7 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = {
   title: 'Agency Partner Agreement',
   description:
-    'Uptrue Agency Partner Agreement. Terms for agencies using white-label monitoring, revenue sharing, and Stripe Connect.',
+    'Upnotify Agency Partner Agreement. Terms for agencies using white-label monitoring, revenue sharing, and Stripe Connect.',
   alternates: { canonical: 'https://uptrue.io/agency-agreement' },
 }
 
@@ -18,10 +18,10 @@ export default function AgencyPartnerAgreementPage(): React.ReactElement {
         This Agency Partner Agreement (&quot;Agreement&quot;) is entered into between Vision Software Solutions Limited, a company
         registered in England and Wales with its registered office at C/O Benison Solvers Limited, 1000 Great West Road, Brentford, United Kingdom, TW8 9DW
         (&quot;Uptrue&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;), and the Agency (&quot;you&quot;, &quot;your&quot;, or &quot;Agency&quot;) that
-        registers for an Agency plan on the Uptrue platform.
+        registers for an Agency plan on the Upnotify platform.
       </p>
       <p>
-        This Agreement supplements the Uptrue <a href="/terms">Terms of Service</a>,
+        This Agreement supplements the Upnotify <a href="/terms">Terms of Service</a>,
         <a href="/privacy"> Privacy Policy</a>, and <a href="/acceptable-use"> Acceptable Use Policy</a>,
         all of which are incorporated by reference. In the event of a conflict between this Agreement
         and the Terms of Service, this Agreement shall prevail with respect to Agency-specific matters.
@@ -35,21 +35,21 @@ export default function AgencyPartnerAgreementPage(): React.ReactElement {
       <h2>1. Agency Relationship</h2>
       <h3>1.1 Nature of Relationship</h3>
       <p>
-        The relationship between Uptrue and the Agency is that of independent service providers. Nothing
+        The relationship between Upnotify and the Agency is that of independent service providers. Nothing
         in this Agreement creates a partnership, joint venture, employment, or franchise relationship.
-        The Agency is not an agent, representative, or employee of Uptrue and has no authority to bind
-        Uptrue or make commitments on our behalf.
+        The Agency is not an agent, representative, or employee of Upnotify and has no authority to bind
+        Upnotify or make commitments on our behalf.
       </p>
       <h3>1.2 Agency Services</h3>
       <p>
-        Under this Agreement, the Agency is authorised to use the Uptrue platform to provide website
+        Under this Agreement, the Agency is authorised to use the Upnotify platform to provide website
         and infrastructure monitoring services to the Agency&apos;s own clients (&quot;End Clients&quot;). The
         Agency may manage monitors, configure alerts, create status pages, and generate reports on
         behalf of its End Clients.
       </p>
       <h3>1.3 End Client Relationship</h3>
       <p>
-        The Agency maintains the direct commercial relationship with its End Clients. Uptrue has no
+        The Agency maintains the direct commercial relationship with its End Clients. Upnotify has no
         direct contractual relationship with End Clients. The Agency is solely responsible for its
         agreements, pricing, support, and obligations to its End Clients.
       </p>
@@ -65,7 +65,7 @@ export default function AgencyPartnerAgreementPage(): React.ReactElement {
       <p>
         The Agency may charge its End Clients for monitoring services at prices determined by the
         Agency at its sole discretion. For each payment received from an End Client through the
-        Uptrue billing system, the revenue shall be split as follows:
+        Upnotify billing system, the revenue shall be split as follows:
       </p>
       <table>
         <thead>
@@ -77,7 +77,7 @@ export default function AgencyPartnerAgreementPage(): React.ReactElement {
         </thead>
         <tbody>
           <tr>
-            <td>Uptrue (Platform Fee)</td>
+            <td>Upnotify (Platform Fee)</td>
             <td>75%</td>
             <td>Platform infrastructure, monitoring engine, maintenance, support, and development</td>
           </tr>
@@ -105,21 +105,21 @@ export default function AgencyPartnerAgreementPage(): React.ReactElement {
         <li>Maintaining compliance with Stripe&apos;s terms of service</li>
       </ul>
       <p>
-        Uptrue does not store, process, or have access to the Agency&apos;s bank account details. All
+        Upnotify does not store, process, or have access to the Agency&apos;s bank account details. All
         financial data is handled directly by Stripe.
       </p>
       <h3>2.4 Payouts</h3>
       <p>
         Agency payouts are processed weekly via Stripe Connect on the default Stripe payout schedule.
         Payouts are subject to Stripe&apos;s standard holding periods and processing times. The Agency
-        may view payout history and pending balances within the Uptrue dashboard and their Stripe
+        may view payout history and pending balances within the Upnotify dashboard and their Stripe
         Express dashboard.
       </p>
       <h3>2.5 Taxes</h3>
       <p>
         Each party is responsible for its own tax obligations. The Agency is responsible for collecting
         and remitting any applicable taxes (including VAT, GST, or sales tax) on amounts charged to
-        its End Clients. Uptrue will provide the Agency with necessary documentation for tax reporting
+        its End Clients. Upnotify will provide the Agency with necessary documentation for tax reporting
         purposes.
       </p>
 
@@ -131,11 +131,11 @@ export default function AgencyPartnerAgreementPage(): React.ReactElement {
           of monitors, alerts, and status pages.
         </li>
         <li>
-          Provide first-line technical support to its End Clients. Uptrue provides platform-level
+          Provide first-line technical support to its End Clients. Upnotify provides platform-level
           support to the Agency, not directly to End Clients.
         </li>
         <li>
-          Ensure that all End Clients are aware that monitoring services are powered by the Uptrue
+          Ensure that all End Clients are aware that monitoring services are powered by the Upnotify
           platform (unless operating under white-label terms as described in Section 5).
         </li>
         <li>
@@ -143,7 +143,7 @@ export default function AgencyPartnerAgreementPage(): React.ReactElement {
           data protection and consumer protection legislation.
         </li>
         <li>
-          Not make any representations, warranties, or guarantees to End Clients on behalf of Uptrue
+          Not make any representations, warranties, or guarantees to End Clients on behalf of Upnotify
           without our prior written consent.
         </li>
         <li>
@@ -151,13 +151,13 @@ export default function AgencyPartnerAgreementPage(): React.ReactElement {
           applicable consumer protection laws.
         </li>
         <li>
-          Promptly notify Uptrue of any material disputes, complaints, or legal proceedings involving
+          Promptly notify Upnotify of any material disputes, complaints, or legal proceedings involving
           End Clients that relate to the Service.
         </li>
       </ul>
 
-      <h2>4. Uptrue Responsibilities</h2>
-      <p>Uptrue agrees to:</p>
+      <h2>4. Upnotify Responsibilities</h2>
+      <p>Upnotify agrees to:</p>
       <ul>
         <li>
           Provide and maintain the monitoring platform, including all core features (monitoring checks,
@@ -206,18 +206,18 @@ export default function AgencyPartnerAgreementPage(): React.ReactElement {
           constitutes passing off.
         </li>
         <li>
-          Remove or obscure Uptrue branding from areas where it is required (e.g., the Uptrue dashboard
+          Remove or obscure Upnotify branding from areas where it is required (e.g., the Upnotify dashboard
           itself, API responses, or webhook payloads).
         </li>
         <li>
-          Use Uptrue&apos;s trademarks, logos, or brand assets except as expressly permitted in this
+          Use Upnotify&apos;s trademarks, logos, or brand assets except as expressly permitted in this
           Agreement or in writing.
         </li>
       </ul>
       <h3>5.3 Agency Analytics</h3>
       <p>
         The Agency may configure its own Google Tag Manager container, Google Analytics property, or
-        other analytics tools on its white-labelled pages. Uptrue&apos;s own analytics are never injected
+        other analytics tools on its white-labelled pages. Upnotify&apos;s own analytics are never injected
         on Agency white-label pages. The Agency is responsible for complying with applicable cookie
         consent and privacy laws in relation to any analytics it configures.
       </p>
@@ -226,7 +226,7 @@ export default function AgencyPartnerAgreementPage(): React.ReactElement {
       <h3>6.1 Data Processing</h3>
       <p>
         In relation to End Client data processed through the Service, the Agency acts as the data
-        controller and Uptrue acts as the data processor. The terms of data processing are set out
+        controller and Upnotify acts as the data processor. The terms of data processing are set out
         in the <a href="/dpa">Data Processing Agreement</a>, which forms part of this Agreement.
       </p>
       <h3>6.2 Data Isolation</h3>
@@ -259,9 +259,9 @@ export default function AgencyPartnerAgreementPage(): React.ReactElement {
           The one-time setup fee is non-refundable.
         </li>
       </ul>
-      <h3>7.2 Termination by Uptrue</h3>
+      <h3>7.2 Termination by Upnotify</h3>
       <p>
-        Uptrue may terminate this Agreement:
+        Upnotify may terminate this Agreement:
       </p>
       <ul>
         <li>
@@ -275,13 +275,13 @@ export default function AgencyPartnerAgreementPage(): React.ReactElement {
         </li>
         <li>
           Immediately if the Agency engages in fraud, illegal activity, or conduct that poses a
-          material risk to Uptrue, other users, or third parties.
+          material risk to Upnotify, other users, or third parties.
         </li>
       </ul>
       <h3>7.3 End Client Migration</h3>
       <p>
         Upon termination, the Agency is responsible for notifying its End Clients and facilitating the
-        transition of monitoring services. Uptrue will:
+        transition of monitoring services. Upnotify will:
       </p>
       <ul>
         <li>
@@ -289,7 +289,7 @@ export default function AgencyPartnerAgreementPage(): React.ReactElement {
         </li>
         <li>
           At the Agency&apos;s request and with End Client consent, assist in transferring End Client
-          accounts to direct Uptrue plans (at Uptrue&apos;s standard pricing) or to another provider.
+          accounts to direct Upnotify plans (at Upnotify&apos;s standard pricing) or to another provider.
         </li>
         <li>
           Delete all Agency and End Client data 30 days after termination, in accordance with our
@@ -307,7 +307,7 @@ export default function AgencyPartnerAgreementPage(): React.ReactElement {
           the threshold are carried forward to the next payout period.
         </li>
         <li>
-          Uptrue reserves the right to withhold payouts if there is a dispute, chargeback, or suspected
+          Upnotify reserves the right to withhold payouts if there is a dispute, chargeback, or suspected
           fraudulent activity, pending resolution.
         </li>
         <li>
@@ -322,13 +322,13 @@ export default function AgencyPartnerAgreementPage(): React.ReactElement {
       </p>
       <ul>
         <li>
-          The Agency agrees not to directly solicit or recruit Uptrue employees or contractors with
+          The Agency agrees not to directly solicit or recruit Upnotify employees or contractors with
           whom the Agency has had material contact during the term.
         </li>
         <li>
-          Uptrue agrees not to directly solicit or approach the Agency&apos;s End Clients to convert them
-          to direct Uptrue accounts, except where the Agency has been terminated for breach or where
-          the End Client independently contacts Uptrue.
+          Upnotify agrees not to directly solicit or approach the Agency&apos;s End Clients to convert them
+          to direct Upnotify accounts, except where the Agency has been terminated for breach or where
+          the End Client independently contacts Upnotify.
         </li>
       </ul>
       <p>
@@ -343,18 +343,18 @@ export default function AgencyPartnerAgreementPage(): React.ReactElement {
       </p>
       <ul>
         <li>
-          Uptrue is not liable for any losses incurred by the Agency as a result of the Agency&apos;s
+          Upnotify is not liable for any losses incurred by the Agency as a result of the Agency&apos;s
           dealings with its End Clients, including disputes over pricing, service quality, or
           contractual obligations between the Agency and its End Clients.
         </li>
         <li>
-          The Agency shall indemnify and hold Uptrue harmless from any claims brought by End Clients
+          The Agency shall indemnify and hold Upnotify harmless from any claims brought by End Clients
           arising from the Agency&apos;s actions, omissions, representations, or breaches of its
           obligations to End Clients.
         </li>
         <li>
-          Uptrue&apos;s total liability to the Agency under this Agreement shall not exceed the total
-          amount paid by the Agency to Uptrue in the three (3) months preceding the claim, or &pound;50,
+          Upnotify&apos;s total liability to the Agency under this Agreement shall not exceed the total
+          amount paid by the Agency to Upnotify in the three (3) months preceding the claim, or &pound;50,
           whichever is less.
         </li>
       </ul>
@@ -398,7 +398,7 @@ export default function AgencyPartnerAgreementPage(): React.ReactElement {
       </p>
       <h3>13.2 Amendment</h3>
       <p>
-        Uptrue may amend this Agreement with 30 days&apos; written notice. If the Agency does not agree
+        Upnotify may amend this Agreement with 30 days&apos; written notice. If the Agency does not agree
         to the amended terms, it may terminate this Agreement in accordance with Section 7.1.
       </p>
       <h3>13.3 Severability</h3>
@@ -414,7 +414,7 @@ export default function AgencyPartnerAgreementPage(): React.ReactElement {
       <h3>13.5 Assignment</h3>
       <p>
         The Agency may not assign or transfer its rights or obligations under this Agreement without
-        Uptrue&apos;s prior written consent. Uptrue may assign its rights and obligations without restriction.
+        Upnotify&apos;s prior written consent. Upnotify may assign its rights and obligations without restriction.
       </p>
 
       <h2>14. Contact</h2>

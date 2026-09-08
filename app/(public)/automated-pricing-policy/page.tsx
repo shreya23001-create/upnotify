@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Automated Pricing Policy | Uptrue',
-  description: 'Uptrue Compete automated pricing rules disclaimer. Understand the risks, limitations, and your responsibilities when using automatic price updates.',
+  title: 'Automated Pricing Policy | Upnotify',
+  description: 'Upnotify Compete automated pricing rules disclaimer. Understand the risks, limitations, and your responsibilities when using automatic price updates.',
   alternates: { canonical: 'https://uptrue.io/automated-pricing-policy' },
 }
 
@@ -19,7 +19,7 @@ export default function AutomatedPricingPolicyPage(): React.ReactElement {
             <section>
               <h2>1. Overview</h2>
               <p>
-                Uptrue Compete (&quot;the Service&quot;) includes an optional automated pricing feature that allows
+                Upnotify Compete (&quot;the Service&quot;) includes an optional automated pricing feature that allows
                 users to set rules that automatically adjust product prices on their connected ecommerce stores
                 based on competitor price changes. This policy explains how automated pricing works, its limitations,
                 and your responsibilities as a user.
@@ -28,28 +28,28 @@ export default function AutomatedPricingPolicyPage(): React.ReactElement {
 
             <section>
               <h2>2. How Automated Pricing Works</h2>
-              <p>When you enable automated pricing rules in Uptrue Compete:</p>
+              <p>When you enable automated pricing rules in Upnotify Compete:</p>
               <ul>
-                <li>Uptrue monitors competitor product prices at regular intervals using web scraping techniques.</li>
+                <li>Upnotify monitors competitor product prices at regular intervals using web scraping techniques.</li>
                 <li>When a competitor price change matches your rule conditions (e.g., price drops by more than 5%), the rule is triggered.</li>
                 <li>If the rule is set to &quot;Alert Only&quot; (default), you receive a notification via your chosen channels.</li>
-                <li>If you have enabled &quot;Auto-Update&quot;, Uptrue sends a webhook to your ecommerce store with the calculated new price. Your store must have a compatible webhook receiver to process the update.</li>
+                <li>If you have enabled &quot;Auto-Update&quot;, Upnotify sends a webhook to your ecommerce store with the calculated new price. Your store must have a compatible webhook receiver to process the update.</li>
               </ul>
             </section>
 
             <section>
               <h2>3. Disclaimer of Responsibility</h2>
               <p><strong>
-                Uptrue does not accept any responsibility, liability, or obligation for pricing decisions made
+                Upnotify does not accept any responsibility, liability, or obligation for pricing decisions made
                 by automated rules, whether those decisions result in financial loss, reduced margins, pricing
                 errors, competitive harm, legal issues, or any other consequence.
               </strong></p>
-              <p>Specifically, Uptrue is not responsible for:</p>
+              <p>Specifically, Upnotify is not responsible for:</p>
               <ul>
                 <li><strong>Incorrect competitor prices:</strong> Web scraping may occasionally extract incorrect prices due to page structure changes, dynamic pricing, regional pricing variations, or temporary promotional prices.</li>
                 <li><strong>Price cascading:</strong> If multiple competitors use similar automated pricing tools, prices may spiral downward (a &quot;race to the bottom&quot;) or upward in ways that are economically harmful.</li>
                 <li><strong>Webhook failures:</strong> Your ecommerce store may not correctly process the price update webhook, resulting in prices not being changed or being changed incorrectly.</li>
-                <li><strong>Timing issues:</strong> There is always a delay between a competitor&apos;s price change, Uptrue detecting it, and the webhook reaching your store. During this window, prices may be out of sync.</li>
+                <li><strong>Timing issues:</strong> There is always a delay between a competitor&apos;s price change, Upnotify detecting it, and the webhook reaching your store. During this window, prices may be out of sync.</li>
                 <li><strong>Legal compliance:</strong> Automated pricing may violate laws in certain jurisdictions (e.g., predatory pricing, price-fixing implications, or minimum advertised price policies). You are solely responsible for ensuring your pricing practices comply with all applicable laws.</li>
                 <li><strong>Margin erosion:</strong> Rules that undercut competitors without adequate safety limits may cause you to sell products below cost.</li>
               </ul>
@@ -57,7 +57,7 @@ export default function AutomatedPricingPolicyPage(): React.ReactElement {
 
             <section>
               <h2>4. Safety Limits</h2>
-              <p>Uptrue provides safety mechanisms to reduce risk:</p>
+              <p>Upnotify provides safety mechanisms to reduce risk:</p>
               <ul>
                 <li><strong>Minimum price:</strong> Set a floor price below which automated updates will not go.</li>
                 <li><strong>Maximum price:</strong> Set a ceiling price above which automated updates will not go.</li>
@@ -67,7 +67,7 @@ export default function AutomatedPricingPolicyPage(): React.ReactElement {
               </ul>
               <p>
                 <strong>These safety limits reduce but do not eliminate risk.</strong> It is your responsibility
-                to configure appropriate safety limits for your business. Uptrue does not validate whether your
+                to configure appropriate safety limits for your business. Upnotify does not validate whether your
                 safety limits are commercially sensible.
               </p>
             </section>
@@ -90,7 +90,7 @@ export default function AutomatedPricingPolicyPage(): React.ReactElement {
             <section>
               <h2>6. Data Accuracy</h2>
               <p>
-                Uptrue extracts competitor prices using automated web scraping. While we use multiple extraction
+                Upnotify extracts competitor prices using automated web scraping. While we use multiple extraction
                 methods (JSON-LD, Open Graph, Microdata, CSS selectors) and confidence scoring, we cannot guarantee
                 100% accuracy. Prices displayed on competitor websites may be:
               </p>
@@ -118,7 +118,7 @@ export default function AutomatedPricingPolicyPage(): React.ReactElement {
             <section>
               <h2>8. Limitation of Liability</h2>
               <p>
-                To the maximum extent permitted by law, Uptrue (Vision Software Solutions Limited) shall not
+                To the maximum extent permitted by law, Upnotify (Vision Software Solutions Limited) shall not
                 be liable for any direct, indirect, incidental, special, consequential, or exemplary damages
                 arising from or related to your use of automated pricing rules, including but not limited to
                 loss of revenue, loss of profit, loss of customers, or damage to business reputation.

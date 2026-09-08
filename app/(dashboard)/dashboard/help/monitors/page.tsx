@@ -10,10 +10,10 @@ const FAQ_SCHEMA = {
   mainEntity: [
     {
       '@type': 'Question',
-      name: 'What types of monitors does Uptrue support?',
+      name: 'What types of monitors does Upnotify support?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Uptrue supports 24 monitor types across two tiers. Core monitors: HTTP/HTTPS Uptime, SSL Certificate, DNS Records, Keyword Detection, Domain Expiry, Port Check, Ping/Reachability, API Endpoint, Heartbeat, and Page Change Detection. Advanced monitors: Security Headers, Response Time Threshold, robots.txt Change, IP Address Change, MX Health, WHOIS Registrar Change, Sitemap Validity, Redirect Chain, SPF/DMARC Validity, Blacklist Check, Page Size, Cookie Consent Presence, and Nameserver Change.',
+        text: 'Upnotify supports 24 monitor types across two tiers. Core monitors: HTTP/HTTPS Uptime, SSL Certificate, DNS Records, Keyword Detection, Domain Expiry, Port Check, Ping/Reachability, API Endpoint, Heartbeat, and Page Change Detection. Advanced monitors: Security Headers, Response Time Threshold, robots.txt Change, IP Address Change, MX Health, WHOIS Registrar Change, Sitemap Validity, Redirect Chain, SPF/DMARC Validity, Blacklist Check, Page Size, Cookie Consent Presence, and Nameserver Change.',
       },
     },
     {
@@ -21,12 +21,12 @@ const FAQ_SCHEMA = {
       name: 'What is two-confirmation detection?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'When a check fails, Uptrue waits 30 seconds and runs a second check from a different region. Only if both checks fail does it open an incident and alert you. This prevents false alarms from momentary network hiccups.',
+        text: 'When a check fails, Upnotify waits 30 seconds and runs a second check from a different region. Only if both checks fail does it open an incident and alert you. This prevents false alarms from momentary network hiccups.',
       },
     },
     {
       '@type': 'Question',
-      name: 'How often does Uptrue check my website?',
+      name: 'How often does Upnotify check my website?',
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'Check intervals depend on your plan. Free plans check every 10 minutes. Lite, Builder, and Scale plans check every 1 minute.',
@@ -58,14 +58,14 @@ export default function MonitorsPage(): React.ReactElement {
             <h1 className="help-article-title">Understanding Monitors</h1>
             <p className="help-article-intro">
               A monitor keeps an eye on something important so you do not have to. You tell it what
-              to watch, how often to check, and what counts as a problem. Uptrue handles the rest.
+              to watch, how often to check, and what counts as a problem. Upnotify handles the rest.
             </p>
           </div>
 
           <section className="help-section">
             <h2 className="help-section-title">The 24 monitor types</h2>
             <p>
-              Different things can go wrong with a website, so Uptrue gives you different tools
+              Different things can go wrong with a website, so Upnotify gives you different tools
               to catch them. Monitors are grouped into two tiers: core monitors that every site
               needs, and advanced monitors for security, compliance, and change detection.
             </p>
@@ -107,7 +107,7 @@ export default function MonitorsPage(): React.ReactElement {
                 method, and validates the response status or body. Great for keeping your backend healthy.
               </li>
               <li>
-                <strong>💓 Heartbeat</strong> — Works in reverse: your server pings Uptrue at regular
+                <strong>💓 Heartbeat</strong> — Works in reverse: your server pings Upnotify at regular
                 intervals. If the heartbeat stops, you get alerted. Perfect for cron jobs and
                 background tasks.
               </li>
@@ -184,7 +184,7 @@ export default function MonitorsPage(): React.ReactElement {
           <section className="help-section">
             <h2 className="help-section-title">Check intervals explained</h2>
             <p>
-              The check interval is how often Uptrue visits your site. Shorter intervals mean
+              The check interval is how often Upnotify visits your site. Shorter intervals mean
               faster detection, but they use more of your plan&rsquo;s allowance.
             </p>
             <ul className="help-list">
@@ -202,14 +202,14 @@ export default function MonitorsPage(): React.ReactElement {
           <section className="help-section">
             <h2 className="help-section-title">Two-confirmation detection</h2>
             <p>
-              Nobody likes false alarms. That is why Uptrue uses a two-step process before
+              Nobody likes false alarms. That is why Upnotify uses a two-step process before
               declaring a site down:
             </p>
             <ol className="help-steps">
               <li>The first check fails -- maybe your site returned an error or timed out.</li>
-              <li>Uptrue waits 30 seconds, then runs a second check from a different region.</li>
-              <li>If the second check also fails, Uptrue opens an incident and sends your alerts.</li>
-              <li>If the second check succeeds, Uptrue logs it as a &ldquo;flap&rdquo; (a brief hiccup) and moves on.</li>
+              <li>Upnotify waits 30 seconds, then runs a second check from a different region.</li>
+              <li>If the second check also fails, Upnotify opens an incident and sends your alerts.</li>
+              <li>If the second check succeeds, Upnotify logs it as a &ldquo;flap&rdquo; (a brief hiccup) and moves on.</li>
             </ol>
             <p>
               This means you only get woken up when there is a real problem, not because of a
@@ -233,7 +233,7 @@ export default function MonitorsPage(): React.ReactElement {
           <section className="help-section">
             <h2 className="help-section-title">Keyword monitoring in depth</h2>
             <p>
-              The keyword monitor is one of the most powerful tools in Uptrue. Instead of just
+              The keyword monitor is one of the most powerful tools in Upnotify. Instead of just
               checking if a page loads, it checks <em>what</em> is on the page. Here is how to
               set it up properly.
             </p>
@@ -241,7 +241,7 @@ export default function MonitorsPage(): React.ReactElement {
             <h3 style={{ fontSize: 16, fontWeight: 700, marginTop: 20, marginBottom: 8 }}>Positive keywords (must exist)</h3>
             <p>
               These are words or phrases that should always be on the page. If any of them
-              disappear, Uptrue treats it as a failure and alerts you.
+              disappear, Upnotify treats it as a failure and alerts you.
             </p>
             <ul className="help-list">
               <li><strong>Checkout page:</strong> &quot;Place Order&quot;, &quot;Secure Payment&quot;, &quot;Add to Cart&quot;</li>
@@ -262,7 +262,7 @@ export default function MonitorsPage(): React.ReactElement {
 
             <h3 style={{ fontSize: 16, fontWeight: 700, marginTop: 20, marginBottom: 8 }}>Smart suggestions</h3>
             <p>
-              When you enter a URL, Uptrue automatically suggests relevant keywords based on
+              When you enter a URL, Upnotify automatically suggests relevant keywords based on
               the page type. For example, a checkout page will suggest &quot;Place Order&quot; as a
               positive keyword and &quot;error&quot; as a negative keyword. Click any suggestion to add
               it, or type your own.
@@ -283,7 +283,7 @@ export default function MonitorsPage(): React.ReactElement {
               <li>Add positive keywords: &quot;Place Order&quot;, &quot;Checkout&quot;, &quot;Secure Payment&quot;</li>
               <li>Add negative keywords: &quot;error&quot;, &quot;failed&quot;, &quot;out of stock&quot;</li>
               <li>Set check interval to 1 minute and severity to P1 (Critical)</li>
-              <li>Uptrue will alert you immediately if the checkout breaks or shows errors</li>
+              <li>Upnotify will alert you immediately if the checkout breaks or shows errors</li>
             </ol>
           </section>
 

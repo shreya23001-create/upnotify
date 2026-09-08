@@ -29,7 +29,7 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL("https://uptrue.io"),
   title: {
-    default: "Free Uptime Monitoring for Agencies, SaaS & Dev Teams — Uptrue",
+    default: "Free Uptime Monitoring for Agencies, SaaS & Dev Teams — Upnotify",
     template: "%s",
   },
   description:
@@ -51,15 +51,15 @@ export const metadata: Metadata = {
     "uptime checker",
   ],
   authors: [{ name: "Vision Software Solutions Limited" }],
-  creator: "Uptrue",
+  creator: "Upnotify",
   publisher: "Vision Software Solutions Limited",
 
   openGraph: {
     type: "website",
     locale: "en_GB",
     url: "https://uptrue.io",
-    siteName: "Uptrue",
-    title: "Free Uptime Monitoring for Agencies, SaaS & Dev Teams — Uptrue",
+    siteName: "Upnotify",
+    title: "Free Uptime Monitoring for Agencies, SaaS & Dev Teams — Upnotify",
     description:
       "Monitor uptime, SSL, DNS, APIs & more across all your sites. 1-min checks, 2-region confirm, zero false alarms. Free — no card needed.",
     images: [
@@ -67,13 +67,13 @@ export const metadata: Metadata = {
         url: "/opengraph-image",
         width: 1200,
         height: 630,
-        alt: "Free Uptime Monitoring for Agencies, SaaS & Dev Teams — Uptrue",
+        alt: "Free Uptime Monitoring for Agencies, SaaS & Dev Teams — Upnotify",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Free Uptime Monitoring for Agencies, SaaS & Dev Teams — Uptrue",
+    title: "Free Uptime Monitoring for Agencies, SaaS & Dev Teams — Upnotify",
     description:
       "Monitor uptime, SSL, DNS, APIs & more across all your sites. 1-min checks, 2-region confirm, zero false alarms. Free — no card needed.",
     images: ["/opengraph-image"],

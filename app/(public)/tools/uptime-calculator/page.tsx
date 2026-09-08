@@ -6,12 +6,12 @@ import Faq from '@/components/landing/faq'
 import { ScrollReveal } from '@/components/landing/scroll-reveal'
 
 export const metadata: Metadata = {
-  title: 'Free Uptime & SLA Downtime Calculator | Calculate 99.9% SLA Allowed Downtime | Uptrue',
+  title: 'Free Uptime & SLA Downtime Calculator | Calculate 99.9% SLA Allowed Downtime | Upnotify',
   description:
     'Free uptime calculator and SLA downtime tool. Calculate how much downtime 99%, 99.9%, 99.95%, 99.99%, and 99.999% SLA levels allow per year, month, week, and day. Estimate downtime costs and compare SLA tiers instantly.',
   alternates: { canonical: 'https://uptrue.io/tools/uptime-calculator' },
   openGraph: {
-    title: 'Free Uptime & SLA Downtime Calculator | Uptrue',
+    title: 'Free Uptime & SLA Downtime Calculator | Upnotify',
     description:
       'Calculate allowed downtime for any uptime SLA percentage. Compare SLA tiers, estimate downtime costs, and understand what 99.9% uptime really means.',
     url: 'https://uptrue.io/tools/uptime-calculator',
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebApplication',
-  name: 'Uptrue Uptime & SLA Calculator',
+  name: 'Upnotify Uptime & SLA Calculator',
   url: 'https://uptrue.io/tools/uptime-calculator',
   description: 'Free uptime and SLA downtime calculator. Calculate allowed downtime for any SLA percentage.',
   applicationCategory: 'UtilityApplication',
@@ -188,7 +188,7 @@ export default function UptimeCalculatorPage(): React.ReactElement {
               {
                 question: 'How do I monitor my website uptime?',
                 answer:
-                  'You can monitor website uptime using a service like Uptrue that checks your website at regular intervals (as frequently as every minute) from multiple locations. When your site goes down, you receive instant alerts via email, Slack, SMS, or webhook so you can respond quickly.',
+                  'You can monitor website uptime using a service like Upnotify that checks your website at regular intervals (as frequently as every minute) from multiple locations. When your site goes down, you receive instant alerts via email, Slack, SMS, or webhook so you can respond quickly.',
               },
               {
                 question: 'What is MTTR and MTTD?',
@@ -212,7 +212,7 @@ export default function UptimeCalculatorPage(): React.ReactElement {
         <div className="tools-cta reveal">
           <h2>Monitor your uptime automatically</h2>
           <p>
-            Stop calculating downtime manually. Uptrue&apos;s{' '}
+            Stop calculating downtime manually. Upnotify&apos;s{' '}
             <Link href="/monitoring/http-uptime-monitoring">HTTP uptime monitoring</Link> tracks your sites every
             minute with two-region confirmation and pairs with{' '}
             <Link href="/monitoring/heartbeat-monitoring">heartbeat monitoring</Link> for cron jobs and background

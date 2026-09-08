@@ -13,25 +13,25 @@ import { AlertConditionsAccordion } from './alert-conditions-accordion'
 import { ChecksMarquee } from './checks-marquee'
 
 export const metadata: Metadata = {
-  title: 'WordPress Site Monitor — Plugin-Based Security & Health Monitoring | Uptrue',
-  description: 'Uptrue\'s WordPress Monitor plugin checks your site from the inside — detecting file injections, rogue admin users, outdated plugins, suspicious pages, and more. Get alerted before hackers cause damage.',
+  title: 'WordPress Site Monitor — Plugin-Based Security & Health Monitoring | Upnotify',
+  description: 'Upnotify\'s WordPress Monitor plugin checks your site from the inside — detecting file injections, rogue admin users, outdated plugins, suspicious pages, and more. Get alerted before hackers cause damage.',
   alternates: { canonical: 'https://uptrue.io/monitoring/wordpress-site-monitor' },
   openGraph: {
-    title: 'WordPress Site Monitor — Plugin-Based Security & Health Monitoring | Uptrue',
-    description: 'Detect file injections, rogue admin users, outdated plugins, and suspicious content — from inside your WordPress site. Free Uptrue plugin.',
+    title: 'WordPress Site Monitor — Plugin-Based Security & Health Monitoring | Upnotify',
+    description: 'Detect file injections, rogue admin users, outdated plugins, and suspicious content — from inside your WordPress site. Free Upnotify plugin.',
   },
 }
 
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'SoftwareApplication',
-  name: 'Uptrue WordPress Monitor',
+  name: 'Upnotify WordPress Monitor',
   description: 'A lightweight WordPress plugin that monitors your site from the inside — detecting file injections, rogue admin users, outdated plugins, and suspicious pages.',
   url: 'https://uptrue.io/monitoring/wordpress-site-monitor',
   applicationCategory: 'SecurityApplication',
   operatingSystem: 'WordPress',
   offers: { '@type': 'Offer', price: '0', priceCurrency: 'GBP', description: 'Free plan available' },
-  publisher: { '@type': 'Organization', name: 'Uptrue', url: 'https://uptrue.io' },
+  publisher: { '@type': 'Organization', name: 'Upnotify', url: 'https://uptrue.io' },
 }
 
 const threats: { icon: LucideIcon; title: string; desc: string; severity: string }[] = [
@@ -50,13 +50,13 @@ const threats: { icon: LucideIcon; title: string; desc: string; severity: string
   {
     icon: Plug,
     title: 'Outdated Plugins & Themes',
-    desc: 'Over 90% of hacked WordPress sites were running outdated plugins with known vulnerabilities. Uptrue alerts you the moment an update is available — before attackers exploit the gap.',
+    desc: 'Over 90% of hacked WordPress sites were running outdated plugins with known vulnerabilities. Upnotify alerts you the moment an update is available — before attackers exploit the gap.',
     severity: 'high',
   },
   {
     icon: FileWarning,
     title: 'Foreign-Language Content Injection',
-    desc: 'SEO spam attacks inject hidden pages with Chinese, Russian, Korean, Arabic, and 6 other scripts to hijack your search rankings. Uptrue scans every published page — title, slug, and body — on each push.',
+    desc: 'SEO spam attacks inject hidden pages with Chinese, Russian, Korean, Arabic, and 6 other scripts to hijack your search rankings. Upnotify scans every published page — title, slug, and body — on each push.',
     severity: 'high',
   },
   {
@@ -68,13 +68,13 @@ const threats: { icon: LucideIcon; title: string; desc: string; severity: string
   {
     icon: KeyRound,
     title: 'Security Configuration Weaknesses',
-    desc: 'XML-RPC enabled, REST API user enumeration exposed, no 2FA, no backup plugin, world-writable directories, disabled auto-updates — Uptrue checks all of these on every push and scores your configuration.',
+    desc: 'XML-RPC enabled, REST API user enumeration exposed, no 2FA, no backup plugin, world-writable directories, disabled auto-updates — Upnotify checks all of these on every push and scores your configuration.',
     severity: 'high',
   },
   {
     icon: ShieldAlert,
     title: 'Brute Force Login Attacks',
-    desc: 'Uptrue counts failed login attempts every 24 hours. A spike in failures means your wp-login.php is under attack — alerting you before an account is compromised.',
+    desc: 'Upnotify counts failed login attempts every 24 hours. A spike in failures means your wp-login.php is under attack — alerting you before an account is compromised.',
     severity: 'high',
   },
   {
@@ -93,8 +93,8 @@ const howItWorks = [
   },
   {
     step: '2',
-    title: 'Connect to Uptrue',
-    desc: 'Add your WordPress Monitor in Uptrue. You\'ll get a secure API token — paste it into Uptrue → Settings in your WordPress Admin.',
+    title: 'Connect to Upnotify',
+    desc: 'Add your WordPress Monitor in Upnotify. You\'ll get a secure API token — paste it into Upnotify → Settings in your WordPress Admin.',
   },
   {
     step: '3',
@@ -103,13 +103,13 @@ const howItWorks = [
   },
   {
     step: '4',
-    title: 'Findings pushed to Uptrue',
-    desc: 'The plugin pushes scan results to Uptrue via encrypted HTTPS. It works behind Cloudflare, CDNs, and firewalls — no inbound ports needed.',
+    title: 'Findings pushed to Upnotify',
+    desc: 'The plugin pushes scan results to Upnotify via encrypted HTTPS. It works behind Cloudflare, CDNs, and firewalls — no inbound ports needed.',
   },
   {
     step: '5',
     title: 'Alerts fire on new threats',
-    desc: 'Uptrue compares each snapshot to the previous one. New threats trigger alerts. Resolved threats are automatically closed. No noise, just signal.',
+    desc: 'Upnotify compares each snapshot to the previous one. New threats trigger alerts. Resolved threats are automatically closed. No noise, just signal.',
   },
 ]
 
@@ -139,11 +139,11 @@ const whyInternal: { icon: LucideIcon; title: string; desc: string }[] = [
 const faq = [
   {
     q: 'Does this replace my security plugin (Wordfence, Sucuri, etc.)?',
-    a: 'It complements them. Security plugins focus on blocking attacks in real time. Uptrue WordPress Monitor is about continuous visibility and alerting — knowing when something changed, getting notified, and having a dashboard that shows your site\'s health score over time. Many Uptrue users run both.',
+    a: 'It complements them. Security plugins focus on blocking attacks in real time. Upnotify WordPress Monitor is about continuous visibility and alerting — knowing when something changed, getting notified, and having a dashboard that shows your site\'s health score over time. Many Upnotify users run both.',
   },
   {
     q: 'What happens if my WordPress site goes down?',
-    a: 'Uptrue already monitors your site\'s HTTP uptime separately. If the site goes down, your standard uptime alerts fire. If the WP plugin stops pushing data, Uptrue will alert you after a configurable silence window — so you know the connection is broken.',
+    a: 'Upnotify already monitors your site\'s HTTP uptime separately. If the site goes down, your standard uptime alerts fire. If the WP plugin stops pushing data, Upnotify will alert you after a configurable silence window — so you know the connection is broken.',
   },
   {
     q: 'Will the plugin slow down my WordPress site?',
@@ -154,8 +154,8 @@ const faq = [
     a: 'PHP 7.4 or higher. The plugin also checks your PHP version and alerts you if you\'re running an end-of-life version that no longer receives security patches.',
   },
   {
-    q: 'I don\'t have an Uptrue account. Can I still use the plugin?',
-    a: 'Yes. The plugin is useful even without Uptrue — it generates a monthly security report emailed to your WordPress admin email address. Connect to Uptrue for real-time alerts, a health score dashboard, and AI-powered fix instructions.',
+    q: 'I don\'t have an Upnotify account. Can I still use the plugin?',
+    a: 'Yes. The plugin is useful even without Upnotify — it generates a monthly security report emailed to your WordPress admin email address. Connect to Upnotify for real-time alerts, a health score dashboard, and AI-powered fix instructions.',
   },
   {
     q: 'How many WordPress sites can I monitor?',
@@ -202,7 +202,7 @@ export default function WordPressMonitorPage() {
           </nav>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20, flexWrap: 'wrap' }}>
-            <span style={{ fontSize: 11, fontWeight: 700, color: '#a78bfa', background: 'rgba(167,139,250,0.15)', border: '1px solid rgba(167,139,250,0.3)', padding: '3px 10px', borderRadius: 20, textTransform: 'uppercase', letterSpacing: 1 }}>
+            <span style={{ fontSize: 11, fontWeight: 700, color: 'rgb(26 181 78)', background: 'rgba(77,255,136,0.15)', border: '1px solid rgba(77,255,136,0.3)', padding: '3px 10px', borderRadius: 20, textTransform: 'uppercase', letterSpacing: 1 }}>
               Plugin-Based · Agent Monitor
             </span>
             <span style={{ fontSize: 11, fontWeight: 700, color: '#4ade80', background: 'rgba(74,222,128,0.1)', border: '1px solid rgba(74,222,128,0.25)', padding: '3px 10px', borderRadius: 20, display: 'inline-flex', alignItems: 'center', gap: 5 }}>
@@ -224,7 +224,7 @@ export default function WordPressMonitorPage() {
             }}>
               <Plug size={22} strokeWidth={2} />
             </span>
-            Uptrue WordPress Monitor
+            Upnotify WordPress Monitor
           </h1>
           <p className="wp-monitor-hero-sub" style={{ fontSize: 19, lineHeight: 1.65, marginBottom: 10, maxWidth: 640 }}>
             External uptime tools only see your homepage. This plugin monitors from inside your WordPress site — detecting file injections, rogue users, and silent compromises before your visitors do.
@@ -235,7 +235,7 @@ export default function WordPressMonitorPage() {
 
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
             <Link href="/signup" style={{
-              background: 'linear-gradient(135deg, #667eea, #764ba2)',
+              background: 'linear-gradient(135deg, #00c94a, #00a83d)',
               color: '#fff',
               padding: '13px 28px',
               borderRadius: 10,
@@ -271,7 +271,7 @@ export default function WordPressMonitorPage() {
         <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', gap: 32, flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center' }}>
           {[
             { value: '100', label: 'Health Score', color: '#10b981' },
-            { value: '8', label: 'Threat Categories', color: '#667eea' },
+            { value: '8', label: 'Threat Categories', color: '#00c94a' },
             { value: '25+', label: 'Checks Per Scan', color: '#f59e0b' },
             { value: '2 min', label: 'Setup Time', color: '#06b6d4' },
           ].map(stat => (
@@ -305,8 +305,8 @@ export default function WordPressMonitorPage() {
                   <div style={{
                     width: 40, height: 40, flexShrink: 0,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    background: 'linear-gradient(135deg, #667eea18, #764ba212)',
-                    borderRadius: 10, color: '#667eea',
+                    background: 'linear-gradient(135deg, #00c94a18, #00a83d12)',
+                    borderRadius: 10, color: '#00c94a',
                   }}><item.icon size={19} strokeWidth={2} /></div>
                   <div>
                     <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 5 }}>{item.title}</div>
@@ -320,7 +320,7 @@ export default function WordPressMonitorPage() {
 
         {/* Threat categories */}
         <section className="reveal" style={{ marginBottom: 64 }}>
-          <LandingSection title="What Uptrue WordPress Monitor detects" icon={Search}>
+          <LandingSection title="What Upnotify WordPress Monitor detects" icon={Search}>
             <div className="wp-showcase-card" style={{
               borderRadius: 16,
               padding: '16px 40px',
@@ -377,7 +377,7 @@ export default function WordPressMonitorPage() {
 
         {/* Full checks list */}
         <section className="reveal" style={{ marginBottom: 64 }}>
-          <LandingSection title="Every check Uptrue runs" icon={Check}>
+          <LandingSection title="Every check Upnotify runs" icon={Check}>
             <ChecksMarquee />
           </LandingSection>
         </section>
@@ -415,8 +415,8 @@ export default function WordPressMonitorPage() {
         <div className="reveal" style={{
           marginBottom: 64,
           padding: '28px 32px',
-          background: 'linear-gradient(135deg, #667eea12, #764ba210)',
-          border: '1px solid #667eea30',
+          background: 'linear-gradient(135deg, #00c94a12, #00a83d10)',
+          border: '1px solid #00c94a30',
           borderRadius: 14,
           display: 'grid',
           gridTemplateColumns: '80px 1fr',
@@ -451,27 +451,27 @@ export default function WordPressMonitorPage() {
           background: 'var(--bg-card, #fff)',
           border: '1px solid var(--border, #e5e7eb)',
           borderRadius: 12,
-          borderLeft: '3px solid #667eea',
+          borderLeft: '3px solid #00c94a',
           boxShadow: '0 1px 3px rgba(15,23,42,0.04)',
           display: 'flex', gap: 14, alignItems: 'flex-start',
         }}>
           <div style={{
             width: 36, height: 36, flexShrink: 0,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: 'linear-gradient(135deg, #667eea18, #764ba212)',
-            borderRadius: 9, color: '#667eea', marginTop: 2,
+            background: 'linear-gradient(135deg, #00c94a18, #00a83d12)',
+            borderRadius: 9, color: '#00c94a', marginTop: 2,
           }}><Bot size={18} strokeWidth={2} /></div>
           <div>
             <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 8 }}>AI Security Report</div>
             <p style={{ fontSize: 14, lineHeight: 1.7, color: 'var(--text-secondary)', margin: 0 }}>
-              On demand, Uptrue generates a plain-English AI security report for your WordPress site — explaining every open issue, ranking them by severity, and providing numbered step-by-step fix instructions. Written for business owners, not developers. Powered by Claude AI.
+              On demand, Upnotify generates a plain-English AI security report for your WordPress site — explaining every open issue, ranking them by severity, and providing numbered step-by-step fix instructions. Written for business owners, not developers. Powered by Claude AI.
             </p>
           </div>
         </div>
 
         {/* Alert conditions */}
         <section className="reveal" style={{ marginBottom: 64 }}>
-          <LandingSection title="When Uptrue alerts you" icon={Bell}>
+          <LandingSection title="When Upnotify alerts you" icon={Bell}>
             <AlertConditionsAccordion
               severityBadge={severityBadge}
               groups={[
@@ -553,11 +553,11 @@ export default function WordPressMonitorPage() {
                       <span style={{
                         width: 38, height: 38, flexShrink: 0,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        background: 'linear-gradient(135deg, #667eea18, #764ba212)',
-                        borderRadius: 10, color: '#667eea',
+                        background: 'linear-gradient(135deg, #00c94a18, #00a83d12)',
+                        borderRadius: 10, color: '#00c94a',
                       }}><rel.icon size={18} strokeWidth={2} /></span>
                       <span className="pair-monitor-arrow" style={{
-                        color: '#667eea', opacity: 0, transform: 'translateX(-4px)',
+                        color: '#00c94a', opacity: 0, transform: 'translateX(-4px)',
                         transition: 'opacity 0.2s, transform 0.2s',
                         display: 'flex',
                       }}>
@@ -573,7 +573,7 @@ export default function WordPressMonitorPage() {
 
           {/* Bottom CTA */}
           <div className="reveal" style={{
-            background: 'linear-gradient(135deg, #0f1729 0%, #2a2560 50%, #1a1440 100%)',
+            background: 'linear-gradient(135deg, #071a10 0%, #0a2016 50%, #0d2818 100%)',
             borderRadius: 20,
             padding: '52px 40px',
             textAlign: 'center',
@@ -582,14 +582,14 @@ export default function WordPressMonitorPage() {
           }}>
             <div style={{
               position: 'absolute', inset: 0, opacity: 0.5,
-              backgroundImage: 'radial-gradient(circle at 25% 30%, #667eea 0%, transparent 55%), radial-gradient(circle at 75% 70%, #764ba2 0%, transparent 55%)',
+              backgroundImage: 'radial-gradient(circle at 25% 30%, #00c94a 0%, transparent 55%), radial-gradient(circle at 75% 70%, #00a83d 0%, transparent 55%)',
               pointerEvents: 'none',
             }} />
             <div style={{ position: 'relative' }}>
               <span style={{
                 display: 'inline-flex', alignItems: 'center', gap: 6,
-                fontSize: 11, fontWeight: 700, color: '#a78bfa',
-                background: 'rgba(167,139,250,0.15)', border: '1px solid rgba(167,139,250,0.3)',
+                fontSize: 11, fontWeight: 700, color: '#4dff88',
+                background: 'rgba(77,255,136,0.15)', border: '1px solid rgba(77,255,136,0.3)',
                 padding: '4px 12px', borderRadius: 20, textTransform: 'uppercase', letterSpacing: 1,
                 marginBottom: 18,
               }}>
@@ -603,7 +603,7 @@ export default function WordPressMonitorPage() {
               </div>
               <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
                 <Link href="/signup" style={{
-                  background: 'linear-gradient(135deg, #667eea, #764ba2)',
+                  background: 'linear-gradient(135deg, #00c94a, #00a83d)',
                   color: '#fff',
                   padding: '14px 30px',
                   borderRadius: 10,
@@ -611,7 +611,7 @@ export default function WordPressMonitorPage() {
                   fontSize: 15,
                   textDecoration: 'none',
                   display: 'inline-flex', alignItems: 'center', gap: 8,
-                  boxShadow: '0 4px 16px rgba(102,126,234,0.4)',
+                  boxShadow: '0 4px 16px rgba(0,201,74,0.4)',
                 }}>
                   <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                   Create Free Account
@@ -648,9 +648,9 @@ function LandingSection({ title, icon: Icon, children }: { title: string; icon: 
         <span style={{
           width: 40, height: 40, flexShrink: 0,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          background: 'linear-gradient(135deg, #667eea18, #764ba212)',
-          border: '1px solid #667eea30',
-          borderRadius: 10, color: '#667eea',
+          background: 'linear-gradient(135deg, #00c94a18, #00a83d12)',
+          border: '1px solid #00c94a30',
+          borderRadius: 10, color: '#00c94a',
         }}><Icon size={20} strokeWidth={2.25} /></span>
         <h2 style={{ fontSize: 24, fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--text-primary)', opacity: 1, margin: 0 }}>{title}</h2>
       </div>

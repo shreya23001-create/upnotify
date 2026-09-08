@@ -25,7 +25,7 @@ export default function HelpTeamPage(): React.ReactElement {
               <li>The person receives an email with an accept link</li>
               <li>Once accepted, they join your organisation and can access the dashboard</li>
             </ol>
-            <p>If the person already has an Uptrue account, they also get an in-app notification.</p>
+            <p>If the person already has an Upnotify account, they also get an in-app notification.</p>
           </section>
 
           <section className="help-section">

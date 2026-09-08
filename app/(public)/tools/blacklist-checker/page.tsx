@@ -6,12 +6,12 @@ import Faq from '@/components/landing/faq'
 import { ScrollReveal } from '@/components/landing/scroll-reveal'
 
 export const metadata: Metadata = {
-  title: 'Free Domain Blacklist Checker — Is My Domain Blacklisted? | Uptrue',
+  title: 'Free Domain Blacklist Checker — Is My Domain Blacklisted? | Upnotify',
   description:
     'Check if your domain or IP is listed on spam blacklists. Test against Spamhaus, SpamCop, Barracuda, SORBS, and 6 more. Free blacklist checker, instant results.',
   alternates: { canonical: 'https://uptrue.io/tools/blacklist-checker' },
   openGraph: {
-    title: 'Free Domain Blacklist Checker — Is My Domain Blacklisted? | Uptrue',
+    title: 'Free Domain Blacklist Checker — Is My Domain Blacklisted? | Upnotify',
     description:
       'Check if your domain or IP is on spam blacklists. Test against Spamhaus, SpamCop, Barracuda, SORBS, and more.',
     url: 'https://uptrue.io/tools/blacklist-checker',
@@ -116,7 +116,7 @@ export default function BlacklistCheckerPage(): React.ReactElement {
         <div className="tools-cta reveal">
           <h2>Monitor your blacklist status 24/7</h2>
           <p>
-            Uptrue&apos;s <Link href="/monitoring/blacklist-monitoring">blacklist monitoring</Link> checks your
+            Upnotify&apos;s <Link href="/monitoring/blacklist-monitoring">blacklist monitoring</Link> checks your
             domain against spam blacklists daily and alerts you the moment you get listed. Pair it with{' '}
             <Link href="/monitoring/mx-health-monitoring">MX health monitoring</Link> so a deliverability hit
             never goes unnoticed.

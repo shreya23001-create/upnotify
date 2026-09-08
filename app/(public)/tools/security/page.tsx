@@ -4,7 +4,7 @@ import '../../landing.css'
 
 const data: ToolPillarData = {
   pillarSlug: 'security',
-  seoTitle: 'Free Website Security Tools — SSL, Headers, Blacklist, Port Checker | Uptrue',
+  seoTitle: 'Free Website Security Tools — SSL, Headers, Blacklist, Port Checker | Upnotify',
   seoDescription:
     'Free website security tools: SSL certificate checker with chain validation, security headers checker (HSTS, CSP, X-Frame-Options), DNSBL blacklist checker, and TCP port checker. No signup required.',
   heroTitle: 'Free Website Security Tools',

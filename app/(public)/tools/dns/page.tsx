@@ -4,7 +4,7 @@ import '../../landing.css'
 
 const data: ToolPillarData = {
   pillarSlug: 'dns',
-  seoTitle: 'Free DNS & Email Tools — DNS Lookup, WHOIS, SPF, DMARC | Uptrue',
+  seoTitle: 'Free DNS & Email Tools — DNS Lookup, WHOIS, SPF, DMARC | Upnotify',
   seoDescription:
     'Free DNS and email-authentication tools: DNS record lookup (A, AAAA, MX, NS, TXT, CNAME, SOA), WHOIS domain expiry lookup, and SPF/DMARC email authentication checker. No signup required.',
   heroTitle: 'Free DNS & Email Tools',

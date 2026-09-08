@@ -6,7 +6,7 @@ import Faq from '@/components/landing/faq'
 import { ScrollReveal } from '@/components/landing/scroll-reveal'
 
 export const metadata: Metadata = {
-  title: 'Free Redirect Chain Checker — Trace URL Redirects | Uptrue',
+  title: 'Free Redirect Chain Checker — Trace URL Redirects | Upnotify',
   description:
     'Trace the full redirect chain for any URL. See every 301, 302, 307 redirect, detect redirect loops, and find SEO-damaging redirect chains. Free tool, no signup.',
   alternates: { canonical: 'https://uptrue.io/tools/redirect-chain-checker' },
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     'seo redirect checker',
   ],
   openGraph: {
-    title: 'Free Redirect Chain Checker — Trace URL Redirects | Uptrue',
+    title: 'Free Redirect Chain Checker — Trace URL Redirects | Upnotify',
     description:
       'Trace the full redirect chain for any URL. Detect loops, count hops, and find SEO-damaging redirect chains instantly.',
     url: 'https://uptrue.io/tools/redirect-chain-checker',
@@ -165,7 +165,7 @@ export default function RedirectChainCheckerPage(): React.ReactElement {
           <div className="tools-cta reveal">
             <h2>Monitor your redirects automatically</h2>
             <p>
-              Redirect chains often appear silently after deployments. Uptrue&apos;s{' '}
+              Redirect chains often appear silently after deployments. Upnotify&apos;s{' '}
               <Link href="/monitoring/redirect-chain-monitoring">redirect chain monitoring</Link> watches your URLs
               continuously and alerts you when a chain changes or a loop appears. Pair it with{' '}
               <Link href="/monitoring/http-uptime-monitoring">HTTP uptime monitoring</Link> for end-to-end coverage.

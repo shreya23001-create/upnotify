@@ -18,7 +18,7 @@ export default function HelpIncidentsPage(): React.ReactElement {
 
           <section className="help-section">
             <h2 className="help-section-title">How Incidents Work</h2>
-            <p>When a monitor check fails, Uptrue runs a second confirmation check 30 seconds later. If both checks fail, an incident is created automatically with status &quot;investigating.&quot; Alert channels fire immediately.</p>
+            <p>When a monitor check fails, Upnotify runs a second confirmation check 30 seconds later. If both checks fail, an incident is created automatically with status &quot;investigating.&quot; Alert channels fire immediately.</p>
             <p>When the monitor recovers, the incident is automatically resolved and recovery alerts are sent.</p>
           </section>
 

@@ -6,7 +6,7 @@ import Faq from '@/components/landing/faq'
 export const metadata: Metadata = {
   title: 'WordPress Permalink Changes Breaking All URLs: How to Prevent SEO Disaster',
   description:
-    'Changing your WordPress permalink structure breaks every URL on your site. Every indexed page returns 404. Every backlink leads nowhere. Every bookmark fails. Learn what causes permalink failures, how to fix them, and how Uptrue HTTP monitoring on multiple pages catches widespread 404 errors before your rankings collapse.',
+    'Changing your WordPress permalink structure breaks every URL on your site. Every indexed page returns 404. Every backlink leads nowhere. Every bookmark fails. Learn what causes permalink failures, how to fix them, and how Upnotify HTTP monitoring on multiple pages catches widespread 404 errors before your rankings collapse.',
   alternates: { canonical: 'https://uptrue.io/blog/wordpress-permalinks-not-working' },
   openGraph: {
     title: 'WordPress Permalink Changes Breaking All URLs: How to Prevent SEO Disaster',
@@ -43,7 +43,7 @@ const FAQ_DATA = [
   {
     question: 'Can monitoring detect when WordPress permalinks break?',
     answer:
-      'Yes, but only if you monitor more than just your homepage. A permalink change does not break the homepage — it breaks every inner page. If your monitoring only checks the homepage, you will not know anything is wrong. Uptrue lets you monitor multiple URLs across your site. Set up HTTP monitors on your most important pages — your top blog posts, your service pages, your product pages. If the permalink structure changes and those pages start returning 404, Uptrue alerts you immediately. One monitor on your homepage is not enough when the problem affects hundreds of inner pages.',
+      'Yes, but only if you monitor more than just your homepage. A permalink change does not break the homepage — it breaks every inner page. If your monitoring only checks the homepage, you will not know anything is wrong. Upnotify lets you monitor multiple URLs across your site. Set up HTTP monitors on your most important pages — your top blog posts, your service pages, your product pages. If the permalink structure changes and those pages start returning 404, Upnotify alerts you immediately. One monitor on your homepage is not enough when the problem affects hundreds of inner pages.',
   },
 ]
 
@@ -67,7 +67,7 @@ export default function WordPressPermalinksNotWorkingPage(): React.ReactElement 
           '@type': 'Article',
           headline: 'WordPress Permalink Changes Breaking All URLs: How to Prevent SEO Disaster',
           description: 'Why permalink changes break every URL on your WordPress site, how to fix them, and how monitoring multiple pages catches widespread 404 errors.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-03-29',
           dateModified: '2026-03-29',
@@ -189,14 +189,14 @@ export default function WordPressPermalinksNotWorkingPage(): React.ReactElement 
           {' '}has the reference configuration for Nginx permalink support.
         </p>
 
-        <h2>How Uptrue catches permalink failures across your entire site</h2>
+        <h2>How Upnotify catches permalink failures across your entire site</h2>
 
         <p>
           Here is the problem with monitoring just your homepage: a permalink failure does not break the homepage. The homepage loads perfectly. It is every other page that returns 404. If your monitoring tool only checks <code>yourdomain.com</code>, you will not know that 200 inner pages are all returning 404.
         </p>
 
         <p>
-          <Link href="/signup">Uptrue</Link> lets you monitor multiple URLs across your site. By setting up HTTP monitors on your most important inner pages, you catch permalink failures, .htaccess corruption, and mod_rewrite issues that only affect inner pages. Here is how to set it up.
+          <Link href="/signup">Upnotify</Link> lets you monitor multiple URLs across your site. By setting up HTTP monitors on your most important inner pages, you catch permalink failures, .htaccess corruption, and mod_rewrite issues that only affect inner pages. Here is how to set it up.
         </p>
 
         <h3>Step 1: Identify your most important pages</h3>
@@ -227,7 +227,7 @@ export default function WordPressPermalinksNotWorkingPage(): React.ReactElement 
         </ol>
 
         <p>
-          Now if the permalink structure changes, .htaccess is corrupted, or mod_rewrite is disabled, Uptrue detects that these pages are returning 404 instead of 200 and alerts you immediately. You do not find out from a Google Search Console report days later — you know within minutes.
+          Now if the permalink structure changes, .htaccess is corrupted, or mod_rewrite is disabled, Upnotify detects that these pages are returning 404 instead of 200 and alerts you immediately. You do not find out from a Google Search Console report days later — you know within minutes.
         </p>
 
         <h3>Step 3: Add keyword monitoring for content verification</h3>
@@ -290,7 +290,7 @@ export default function WordPressPermalinksNotWorkingPage(): React.ReactElement 
           <li>Export a list of all current URLs. Use a crawler like Screaming Frog or your sitemap to get every URL on the site.</li>
           <li>Take a full backup of your database and files.</li>
           <li>Install a redirect plugin like Redirection or Safe Redirect Manager.</li>
-          <li>Set up Uptrue monitors on your top 10 pages before making the change, so you have baseline monitoring in place.</li>
+          <li>Set up Upnotify monitors on your top 10 pages before making the change, so you have baseline monitoring in place.</li>
         </ol>
 
         <h3>Make the change</h3>
@@ -306,7 +306,7 @@ export default function WordPressPermalinksNotWorkingPage(): React.ReactElement 
         <ol>
           <li>Test a sample of old URLs in your browser. They should redirect to the new URLs with a 301 status code.</li>
           <li>Submit your updated sitemap to Google Search Console.</li>
-          <li>Check your Uptrue dashboard — all monitors should be green. If any page returns 404, the redirect for that URL pattern is missing or incorrect.</li>
+          <li>Check your Upnotify dashboard — all monitors should be green. If any page returns 404, the redirect for that URL pattern is missing or incorrect.</li>
           <li>Monitor Google Search Console over the next two weeks for crawl errors. Fix any 404s that appear by adding individual redirects for URLs that the pattern-based redirect missed.</li>
         </ol>
 
@@ -331,7 +331,7 @@ export default function WordPressPermalinksNotWorkingPage(): React.ReactElement 
         </p>
 
         <p>
-          Uptrue HTTP monitoring on multiple pages across your site ensures you know the moment any of those promises break. Not when Google notices days later. Not when a customer emails you. Not when your organic traffic has already dropped 40%. Within minutes.
+          Upnotify HTTP monitoring on multiple pages across your site ensures you know the moment any of those promises break. Not when Google notices days later. Not when a customer emails you. Not when your organic traffic has already dropped 40%. Within minutes.
         </p>
 
         <div className="blog-cta-section">
@@ -358,7 +358,7 @@ export default function WordPressPermalinksNotWorkingPage(): React.ReactElement 
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

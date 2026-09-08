@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = {
   title: {
     template: '%s',
-    default: 'Free Website Monitoring Tools | Uptrue',
+    default: 'Free Website Monitoring Tools | Upnotify',
   },
   description:
     'Free tools for website owners: SSL certificate checker, uptime calculator, and more. No signup required.',

@@ -37,14 +37,19 @@ export async function dispatchAlerts(incident: Incident, monitor: Monitor): Prom
     return
   }
 
-  // Filter channels by severity
+  // Filter channels by severity, then by monitor scope (empty/null monitor_ids = all monitors)
   const matchingChannels = channels.filter((ch: AlertChannel) => {
     const severityFilter = ch.severity_filter as string[]
-    return severityFilter.includes(incident.severity)
+    if (!severityFilter.includes(incident.severity)) return false
+
+    const monitorIds = ch.monitor_ids as string[] | null
+    if (monitorIds && monitorIds.length > 0 && !monitorIds.includes(monitor.id)) return false
+
+    return true
   })
 
   if (matchingChannels.length === 0) {
-    logger.info('No matching alert channels for severity', { severity: incident.severity, orgId: incident.org_id })
+    logger.info('No matching alert channels for severity/monitor scope', { severity: incident.severity, monitorId: monitor.id, orgId: incident.org_id })
     return
   }
 

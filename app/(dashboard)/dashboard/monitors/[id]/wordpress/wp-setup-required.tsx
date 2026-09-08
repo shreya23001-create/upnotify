@@ -103,7 +103,7 @@ export function WpSetupRequired({ monitor, token }: WpSetupRequiredProps): React
           <div className="create-monitor-grid">
             {/* Left — main steps */}
             <div className="create-monitor-form-card">
-              <div className="wp-card-title">Install the Uptrue plugin on {monitor.target}</div>
+              <div className="wp-card-title">Install the Upnotify plugin on {monitor.target}</div>
               <p className="wp-card-sub">Follow the 3 steps below, then come back here to verify the connection.</p>
 
               <div className="wp-install-steps">
@@ -132,9 +132,9 @@ export function WpSetupRequired({ monitor, token }: WpSetupRequiredProps): React
                 <div className="wp-install-step">
                   <div className="wp-install-step-num">2</div>
                   <div className="wp-install-step-body">
-                    <div className="wp-install-step-title">Activate the plugin, then go to Uptrue → Settings</div>
+                    <div className="wp-install-step-title">Activate the plugin, then go to Upnotify → Settings</div>
                     <p className="wp-install-step-desc">
-                      In your WordPress Admin, go to <strong>Uptrue → Settings</strong> and paste your API token:
+                      In your WordPress Admin, go to <strong>Upnotify → Settings</strong> and paste your API token:
                     </p>
                     <div className="wp-token-row">
                       <code className="wp-token">{token}</code>
@@ -154,7 +154,7 @@ export function WpSetupRequired({ monitor, token }: WpSetupRequiredProps): React
                   <div className="wp-install-step-body">
                     <div className="wp-install-step-title">Save the settings in the plugin</div>
                     <p className="wp-install-step-desc">
-                      Click <strong>Save Settings</strong> — the plugin will immediately send the first data push to Uptrue.
+                      Click <strong>Save Settings</strong> — the plugin will immediately send the first data push to Upnotify.
                     </p>
                   </div>
                 </div>
@@ -184,7 +184,7 @@ export function WpSetupRequired({ monitor, token }: WpSetupRequiredProps): React
                 </div>
                 <div className="monitor-help-body">
                   <p className="monitor-help-desc">
-                    A lightweight plugin installed on your WordPress site that monitors security threats, software health, content changes, and performance — then sends findings to Uptrue for real-time alerts.
+                    A lightweight plugin installed on your WordPress site that monitors security threats, software health, content changes, and performance — then sends findings to Upnotify for real-time alerts.
                   </p>
                   <div className="monitor-help-faqs-label">What it catches</div>
                   <ul className="help-list" style={{ marginTop: 8 }}>
@@ -196,7 +196,7 @@ export function WpSetupRequired({ monitor, token }: WpSetupRequiredProps): React
                   </ul>
                   <div className="monitor-help-faqs-label" style={{ marginTop: 16 }}>Having trouble?</div>
                   <p className="monitor-help-desc" style={{ marginBottom: 0, marginTop: 6 }}>
-                    Check <strong>Uptrue → Cron Status</strong> in your WP Admin, or{' '}
+                    Check <strong>Upnotify → Cron Status</strong> in your WP Admin, or{' '}
                     <a href="/dashboard/support" style={{ color: 'var(--accent)', fontWeight: 600 }}>open a support ticket</a>.
                   </p>
                 </div>
@@ -228,7 +228,7 @@ export function WpSetupRequired({ monitor, token }: WpSetupRequiredProps): React
                   <button type="button" onClick={() => setStep(2)} className="wp-waiting-back">
                     Go back
                   </button>
-                  {' '}or check <strong>Uptrue → Cron Status</strong> in your WordPress admin.
+                  {' '}or check <strong>Upnotify → Cron Status</strong> in your WordPress admin.
                 </p>
               </>
             ) : (
@@ -236,7 +236,7 @@ export function WpSetupRequired({ monitor, token }: WpSetupRequiredProps): React
                 <div className="wp-waiting-icon">✅</div>
                 <div className="wp-waiting-title">Connected!</div>
                 <p className="wp-waiting-desc">
-                  Your WordPress site is now connected to Uptrue. Loading your monitor report…
+                  Your WordPress site is now connected to Upnotify. Loading your monitor report…
                 </p>
               </>
             )}

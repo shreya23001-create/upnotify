@@ -11,19 +11,19 @@ const FILTER_TABS = ['All posts', 'Guide', 'Security', 'Performance', 'Ecommerce
 
 // Gradient for each category (matches preview)
 const CARD_GRADIENTS: Record<string, string> = {
-  Guide: 'linear-gradient(90deg,#8b5cf6,#3b82f6)',
+  Guide: 'linear-gradient(90deg,#2ee06b,#3b82f6)',
   Security: 'linear-gradient(90deg,#ef4444,#f59e0b)',
   Performance: 'linear-gradient(90deg,#10b981,#06b6d4)',
   Ecommerce: 'linear-gradient(90deg,#f59e0b,#ec4899)',
-  'Incident Report': 'linear-gradient(90deg,#ef4444,#7c3aed)',
+  'Incident Report': 'linear-gradient(90deg,#ef4444,#00c94a)',
   Agency: 'linear-gradient(90deg,#0c1322,#3b82f6)',
   WordPress: 'linear-gradient(90deg,#3b82f6,#06b6d4)',
   Hosting: 'linear-gradient(90deg,#10b981,#3b82f6)',
-  Outage: 'linear-gradient(90deg,#ef4444,#7c3aed)',
+  Outage: 'linear-gradient(90deg,#ef4444,#00c94a)',
 }
 
 const BADGE_STYLES: Record<string, { bg: string; color: string; border: string }> = {
-  Guide: { bg: 'rgba(139,92,246,0.1)', color: '#8b5cf6', border: 'rgba(139,92,246,0.2)' },
+  Guide: { bg: 'rgba(46,224,107,0.1)', color: '#2ee06b', border: 'rgba(46,224,107,0.2)' },
   Security: { bg: 'rgba(239,68,68,0.1)', color: '#ef4444', border: 'rgba(239,68,68,0.2)' },
   Performance: { bg: 'rgba(16,185,129,0.1)', color: '#10b981', border: 'rgba(16,185,129,0.2)' },
   Ecommerce: { bg: 'rgba(245,158,11,0.1)', color: '#f59e0b', border: 'rgba(245,158,11,0.2)' },

@@ -288,7 +288,7 @@ export function PricingTable({ plans, currentPlanSlug, subscription, creditBalan
       const rzp = new window.Razorpay({
         key:              data.keyId,
         subscription_id:  data.subscriptionId,
-        name:             'Uptrue',
+        name:             'Upnotify',
         description:      isTestKey
           ? `${data.planName ?? planSlug} · TEST MODE — Use card: 5267 3181 8797 5449 (Razorpay test Mastercard)`
           : `${data.planName ?? planSlug} · ${billingCycle === 'annual' ? 'Annual' : 'Monthly'} (incl. 18% GST)`,

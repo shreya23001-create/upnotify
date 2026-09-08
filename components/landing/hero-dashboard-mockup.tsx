@@ -320,7 +320,7 @@ export function HeroDashboardMockup(): React.ReactElement {
             <NotifCard
               visible={notif.recover}
               isRecover
-              iconBg="linear-gradient(135deg,#7c3aed,#a78bfa)"
+              iconBg="linear-gradient(135deg,#00c94a,#4dff88)"
               icon={<svg width="10" height="10" fill="none" stroke="white" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>}
               source="Slack · #alerts"
               title="✅ Recovered"
@@ -452,8 +452,8 @@ export function HeroDashboardMockup(): React.ReactElement {
                     />
                     <defs>
                       <linearGradient id="aivG" x1="0" y1="0" x2="1" y2="0">
-                        <stop offset="0%" stopColor="#7c3aed"/>
-                        <stop offset="100%" stopColor="#a78bfa"/>
+                        <stop offset="0%" stopColor="#00c94a"/>
+                        <stop offset="100%" stopColor="#4dff88"/>
                       </linearGradient>
                     </defs>
                     <text x="52" y="48" textAnchor="middle" fontSize="22" fontWeight="800" fill="#0f172a">{aivScore}</text>
@@ -514,7 +514,7 @@ export function HeroDashboardMockup(): React.ReactElement {
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                   </svg>
                 </div>
-                <span className="ms-label">Uptrue</span>
+                <span className="ms-label">Upnotify</span>
               </div>
               <div className="ms-org-btn">
                 <div>
@@ -592,10 +592,10 @@ export function HeroDashboardMockup(): React.ReactElement {
                 title="Try AI Visibility"
               >
                 <div className="ms-item-left">
-                  <svg width="13" height="13" fill="none" stroke={aivOpen ? 'currentColor' : '#7c3aed'} strokeWidth="2" viewBox="0 0 24 24">
+                  <svg width="13" height="13" fill="none" stroke={aivOpen ? 'currentColor' : '#00c94a'} strokeWidth="2" viewBox="0 0 24 24">
                     <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
                   </svg>
-                  <span className="ms-label" style={{ color: aivOpen ? undefined : '#7c3aed', fontWeight: 700 }}>AI Visibility</span>
+                  <span className="ms-label" style={{ color: aivOpen ? undefined : '#00c94a', fontWeight: 700 }}>AI Visibility</span>
                 </div>
                 <span className="hm-aiv-new-badge">NEW</span>
                 {pulseAiv && <span className="hm-aiv-hint">← Try it</span>}

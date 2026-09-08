@@ -85,7 +85,7 @@ export function ConnectInstructions({
               <li>
                 <strong>Create a new webhook</strong> with these settings:
                 <ul className="compete-substeps">
-                  <li>Name: <code>Uptrue Price Sync</code></li>
+                  <li>Name: <code>Upnotify Price Sync</code></li>
                   <li>Status: <code>Active</code></li>
                   <li>Topic: <code>Product updated</code></li>
                   <li>Delivery URL: <code>{webhookUrlWithKey}</code></li>

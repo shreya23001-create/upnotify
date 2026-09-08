@@ -126,7 +126,7 @@ export default function PricingTable({ defaultCurrency = 'gbp' }: { defaultCurre
                 <a
                   href="/signup"
                   className={`btn${isHighlighted ? ' btn-primary' : ' btn-ghost'}`}
-                  style={{ width: '100%', justifyContent: 'center' }}
+                  style={{ width: '83%', justifyContent: 'center' }}
                 >
                   {isFree ? 'Start Free' : `Get ${plan.name}`}
                 </a>

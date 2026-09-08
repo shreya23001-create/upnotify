@@ -48,7 +48,7 @@ const FAQ_DATA = [
   {
     question: 'How often should DNS records be monitored?',
     answer:
-      'DNS records should be checked at least every hour. Changes to DNS records propagate across the internet over 24 to 48 hours, so catching a change early gives you time to revert it before the incorrect records spread to all DNS resolvers worldwide. Uptrue checks DNS records on a regular schedule and alerts on any change.',
+      'DNS records should be checked at least every hour. Changes to DNS records propagate across the internet over 24 to 48 hours, so catching a change early gives you time to revert it before the incorrect records spread to all DNS resolvers worldwide. Upnotify checks DNS records on a regular schedule and alerts on any change.',
   },
   {
     question: 'What is DNS propagation and why does it make DNS problems worse?',
@@ -63,7 +63,7 @@ const FAQ_DATA = [
   {
     question: 'Is DNS monitoring included in standard uptime monitoring?',
     answer:
-      'Not always. Many uptime monitoring tools only check HTTP status codes and do not monitor DNS records separately. Uptrue includes DNS monitoring as a dedicated monitor type, checking your records independently from HTTP monitoring. This catches DNS-level failures that HTTP monitoring alone would attribute to a generic "site down" event.',
+      'Not always. Many uptime monitoring tools only check HTTP status codes and do not monitor DNS records separately. Upnotify includes DNS monitoring as a dedicated monitor type, checking your records independently from HTTP monitoring. This catches DNS-level failures that HTTP monitoring alone would attribute to a generic "site down" event.',
   },
 ]
 
@@ -87,7 +87,7 @@ export default function DnsMonitoringExplainedPage(): React.ReactElement {
           '@type': 'Article',
           headline: 'DNS Monitoring Explained: Why Your Domain Records Matter More Than You Think',
           description: 'DNS records control where your website and email point. Learn what DNS monitoring catches and why it matters.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-03-30',
           dateModified: '2026-03-30',
@@ -252,7 +252,7 @@ export default function DnsMonitoringExplainedPage(): React.ReactElement {
         </p>
 
         <p>
-          With <Link href="/signup">Uptrue</Link>, you set up a DNS monitor by entering your domain and selecting which record types to track. The monitor checks your records on a regular schedule and alerts you via your chosen channel — email, Slack, or Teams — when any record changes.
+          With <Link href="/signup">Upnotify</Link>, you set up a DNS monitor by entering your domain and selecting which record types to track. The monitor checks your records on a regular schedule and alerts you via your chosen channel — email, Slack, or Teams — when any record changes.
         </p>
 
         <p>
@@ -354,7 +354,7 @@ export default function DnsMonitoringExplainedPage(): React.ReactElement {
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

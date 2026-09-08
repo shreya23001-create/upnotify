@@ -122,7 +122,7 @@ export default function ShopifyDownPage(): React.ReactElement {
           '@type': 'Article',
           headline: 'Is Shopify Down? How to Check Shopify Status and Protect Your Store',
           description: 'How to check if Shopify is down, tell a platform outage from a store problem, and protect your store with uptime monitoring.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-04-06',
           dateModified: '2026-04-06',
@@ -247,7 +247,7 @@ export default function ShopifyDownPage(): React.ReactElement {
         <h3>Set up monitoring for your Shopify store</h3>
 
         <p>
-          In <Link href="https://uptrue.io/signup">Uptrue</Link>, set up the following monitors for your Shopify store:
+          In <Link href="https://uptrue.io/signup">Upnotify</Link>, set up the following monitors for your Shopify store:
         </p>
 
         <ol>
@@ -291,7 +291,7 @@ export default function ShopifyDownPage(): React.ReactElement {
       <footer className="blog-article-footer reveal">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

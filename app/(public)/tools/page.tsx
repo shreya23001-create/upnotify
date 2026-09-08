@@ -11,12 +11,12 @@ import { ScrollReveal } from '@/components/landing/scroll-reveal'
 import Faq from '@/components/landing/faq'
 
 export const metadata: Metadata = {
-  title: 'Free Website Monitoring Tools — DNS, SSL, Speed, Security Headers | Uptrue',
+  title: 'Free Website Monitoring Tools — DNS, SSL, Speed, Security Headers | Upnotify',
   description:
-    'Free website monitoring tools: SSL checker, DNS lookup, WHOIS, security headers, HTTP status checker, redirect chain tracer, SPF/DMARC, blacklist checker, speed test, robots.txt, port checker, uptime calculator, and the Uptrue WordPress plugin. No signup required.',
+    'Free website monitoring tools: SSL checker, DNS lookup, WHOIS, security headers, HTTP status checker, redirect chain tracer, SPF/DMARC, blacklist checker, speed test, robots.txt, port checker, uptime calculator, and the Upnotify WordPress plugin. No signup required.',
   alternates: { canonical: 'https://uptrue.io/tools' },
   openGraph: {
-    title: 'Free Website Monitoring Tools | Uptrue',
+    title: 'Free Website Monitoring Tools | Upnotify',
     description:
       'DNS lookup, SSL checker, security headers, WHOIS, SPF/DMARC, speed test, and more — all free.',
     url: 'https://uptrue.io/tools',
@@ -31,7 +31,7 @@ const FAQ = [
   },
   {
     q: 'How are these tools different from continuous monitoring?',
-    a: 'Each tool gives you a snapshot — the state of your site, certificate, or DNS records at the moment you click "check". Continuous monitoring runs the same checks every minute (or every 5 minutes) and alerts you the moment something changes. The Free Uptrue plan includes 3 continuous monitors with email alerts.',
+    a: 'Each tool gives you a snapshot — the state of your site, certificate, or DNS records at the moment you click "check". Continuous monitoring runs the same checks every minute (or every 5 minutes) and alerts you the moment something changes. The Free Upnotify plan includes 3 continuous monitors with email alerts.',
   },
   {
     q: 'Which tool should I run first?',
@@ -47,7 +47,7 @@ const FAQ = [
   },
   {
     q: 'How do these tools relate to the WordPress plugin?',
-    a: 'The browser tools check externally — what the public internet sees. The Uptrue WordPress plugin checks from inside your site, with privileged access to detect things external tools cannot: file injections, rogue admin users, plugin CVEs, brute force attacks, and security misconfigurations. The two are complementary.',
+    a: 'The browser tools check externally — what the public internet sees. The Upnotify WordPress plugin checks from inside your site, with privileged access to detect things external tools cannot: file injections, rogue admin users, plugin CVEs, brute force attacks, and security misconfigurations. The two are complementary.',
   },
 ]
 
@@ -60,7 +60,7 @@ const TOOLS: { slug: string; title: string; description: string; tag: string; hr
       'Free multi-check grade across 5 categories — uptime, SSL, DNS, security headers, and performance. Enter any URL and get an instant A+ to F score with actionable recommendations. No signup required.',
     tag: 'Featured',
     icon: Gauge,
-    accent: '#6326ed',
+    accent: '#00c94a',
   },
   {
     slug: 'wordpress-monitor',
@@ -70,7 +70,7 @@ const TOOLS: { slug: string; title: string; description: string; tag: string; hr
       'Free plugin that monitors your WordPress site from the inside — detecting file injections, rogue admin users, foreign-language content, brute force attacks, security misconfigurations, and more. No inbound ports. Works behind Cloudflare.',
     tag: 'Free Plugin',
     icon: Plug,
-    accent: '#667eea',
+    accent: '#00a83d',
   },
   {
     slug: 'ai-seo-checker',
@@ -106,7 +106,7 @@ const TOOLS: { slug: string; title: string; description: string; tag: string; hr
       'Look up domain registration details, expiry date, registrar, nameservers, and RDAP data for any domain.',
     tag: '',
     icon: Landmark,
-    accent: '#8b5cf6',
+    accent: '#2ee06b',
   },
   {
     slug: 'security-headers-checker',
@@ -151,7 +151,7 @@ const TOOLS: { slug: string; title: string; description: string; tag: string; hr
       'Check if any TCP port is open on any host. Test SSH, HTTP, HTTPS, SMTP, MySQL, PostgreSQL, Redis, and custom ports.',
     tag: '',
     icon: Plug2,
-    accent: '#667eea',
+    accent: '#00873a',
   },
   {
     slug: 'robots-txt-checker',

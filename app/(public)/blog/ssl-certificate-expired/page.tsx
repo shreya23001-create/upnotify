@@ -72,7 +72,7 @@ export default function SslCertificateExpiredPage(): React.ReactElement {
           '@type': 'Article',
           headline: 'SSL Certificate Expired: What It Means and How to Fix It in 10 Minutes',
           description: 'What a browser SSL warning means, why certificates expire despite auto-renew, how to renew a certificate for free, and how to prevent future expiry.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-04-06',
           dateModified: '2026-04-06',
@@ -274,7 +274,7 @@ sudo systemctl reload apache2`}</code></pre>
         </p>
 
         <p>
-          <Link href="https://uptrue.io/signup">Uptrue</Link> monitors your SSL certificate daily, checks certificate chain validity and domain matching, and sends configurable alerts before expiry. Set it up once and never be caught off guard by an expired certificate again.
+          <Link href="https://uptrue.io/signup">Upnotify</Link> monitors your SSL certificate daily, checks certificate chain validity and domain matching, and sends configurable alerts before expiry. Set it up once and never be caught off guard by an expired certificate again.
         </p>
 
         <h3>Monitor all your domains, not just the main one</h3>
@@ -309,7 +309,7 @@ sudo cat /var/log/letsencrypt/letsencrypt.log | tail -50`}</code></pre>
         <div className="blog-cta-section">
           <h3>Get SSL expiry alerts before visitors see warnings</h3>
           <p>
-            Uptrue monitors your SSL certificate daily and alerts you 30, 14, 7, and 1 day before expiry. Free plan available — set it up in under two minutes.
+            Upnotify monitors your SSL certificate daily and alerts you 30, 14, 7, and 1 day before expiry. Free plan available — set it up in under two minutes.
           </p>
           <Link href="https://uptrue.io/signup" className="btn btn-primary btn-lg">
             Get SSL Alerts Free
@@ -356,7 +356,7 @@ sudo cat /var/log/letsencrypt/letsencrypt.log | tail -50`}</code></pre>
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

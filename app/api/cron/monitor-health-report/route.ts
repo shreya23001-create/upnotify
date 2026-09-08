@@ -178,7 +178,7 @@ function buildEmailHtml(data: MonitorTypeHealth[], date: string, appUrl: string)
       <!-- Footer -->
       <tr>
         <td style="padding:16px 32px;background:#f8fafc;border-top:1px solid #e2e8f0;text-align:center;">
-          <div style="font-size:12px;color:#94a3b8;">Uptrue Super Admin · Monitor Health Report · Sent daily at 8:00 AM</div>
+          <div style="font-size:12px;color:#94a3b8;">Upnotify Super Admin · Monitor Health Report · Sent daily at 8:00 AM</div>
           <div style="font-size:12px;color:#94a3b8;margin-top:2px;">uptrue.io</div>
         </td>
       </tr>
@@ -212,10 +212,10 @@ export async function GET(req: Request): Promise<NextResponse> {
     })
 
     const subject = critical.length > 0
-      ? `🔴 Uptrue Monitor Health — ${critical.length} type${critical.length !== 1 ? 's' : ''} critical — ${date}`
+      ? `🔴 Upnotify Monitor Health — ${critical.length} type${critical.length !== 1 ? 's' : ''} critical — ${date}`
       : warning.length > 0
-      ? `🟡 Uptrue Monitor Health — ${warning.length} warning${warning.length !== 1 ? 's' : ''} — ${date}`
-      : `🟢 Uptrue Monitor Health — All healthy — ${date}`
+      ? `🟡 Upnotify Monitor Health — ${warning.length} warning${warning.length !== 1 ? 's' : ''} — ${date}`
+      : `🟢 Upnotify Monitor Health — All healthy — ${date}`
 
     const html = buildEmailHtml(data, date, appUrl)
 

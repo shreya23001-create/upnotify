@@ -4,12 +4,13 @@ import { useState, useTransition } from 'react'
 import { Mail, Hash, Users, Webhook, Phone, MessageSquare, Send, AlertTriangle, Info } from 'lucide-react'
 import { updateAlertChannelAction } from '@/app/(dashboard)/dashboard/alerts/actions'
 import type { AlertChannel } from '@/lib/types'
+import { MonitorScopeSelect, type MonitorOption } from './monitor-scope-select'
 
 const TYPE_META: Record<string, { label: string; icon: React.ReactNode; color: string; bg: string }> = {
   email:    { label: 'Email',             icon: <Mail size={18} />,          color: '#6366f1', bg: 'rgba(99,102,241,0.12)' },
   slack:    { label: 'Slack',             icon: <Hash size={18} />,          color: '#f59e0b', bg: 'rgba(245,158,11,0.12)' },
   teams:    { label: 'Microsoft Teams',   icon: <Users size={18} />,         color: '#3b82f6', bg: 'rgba(59,130,246,0.12)' },
-  webhook:  { label: 'Webhook',           icon: <Webhook size={18} />,       color: '#8b5cf6', bg: 'rgba(139,92,246,0.12)' },
+  webhook:  { label: 'Webhook',           icon: <Webhook size={18} />,       color: '#2ee06b', bg: 'rgba(46,224,107,0.12)' },
   telegram: { label: 'Telegram',          icon: <Send size={18} />,          color: '#06b6d4', bg: 'rgba(6,182,212,0.12)' },
   whatsapp: { label: 'WhatsApp',          icon: <MessageSquare size={18} />, color: '#22c55e', bg: 'rgba(34,197,94,0.12)' },
   voice:    { label: 'Voice',             icon: <Phone size={18} />,         color: '#ec4899', bg: 'rgba(236,72,153,0.12)' },
@@ -34,11 +35,14 @@ interface ChannelConfig {
   telegramChatId?: string
 }
 
-export function EditAlertChannelForm({ channel }: { channel: AlertChannel }) {
+export function EditAlertChannelForm({ channel, monitors = [] }: { channel: AlertChannel; monitors?: MonitorOption[] }) {
   const config = channel.config as ChannelConfig
   const meta = TYPE_META[channel.type] ?? DEFAULT_META
   const [selectedSeverities, setSelectedSeverities] = useState<string[]>(
     (channel.severity_filter as string[]) || ['P1', 'P2', 'P3', 'P4']
+  )
+  const [selectedMonitorIds, setSelectedMonitorIds] = useState<string[]>(
+    (channel.monitor_ids as string[] | null) || []
   )
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
@@ -49,10 +53,12 @@ export function EditAlertChannelForm({ channel }: { channel: AlertChannel }) {
     )
   }
 
+
   function handleSubmit(formData: FormData): void {
     setError(null)
     formData.set('type', channel.type)
     formData.set('severity_filter', selectedSeverities.join(','))
+    formData.set('monitor_ids', selectedMonitorIds.join(','))
     startTransition(async () => {
       const result = await updateAlertChannelAction(channel.id, formData)
       if (result?.error) setError(result.error)
@@ -181,7 +187,7 @@ export function EditAlertChannelForm({ channel }: { channel: AlertChannel }) {
             <div>
               <strong>How to set up Telegram alerts</strong>
               <ol>
-                <li>Search for <strong>@uptrue_alerts_bot</strong> on Telegram and send any message</li>
+                <li>Search for <strong>@upnotify_alerts_bot</strong> on Telegram and send any message</li>
                 <li>Open <strong>@userinfobot</strong> and send <strong>/start</strong> to get your Chat ID</li>
                 <li>Paste your Chat ID below</li>
               </ol>
@@ -226,6 +232,18 @@ export function EditAlertChannelForm({ channel }: { channel: AlertChannel }) {
           </div>
         </>
       )}
+
+      {/* Monitor scope */}
+      <div className="ac-form-section">
+        <label className="ac-form-label">Monitor <span className="ac-form-optional">optional</span></label>
+        <p className="ac-form-sublabel">Choose which monitor sends alerts to this channel. Leave as &quot;All monitors&quot; to apply to everything.</p>
+        <MonitorScopeSelect
+          monitors={monitors}
+          selected={selectedMonitorIds}
+          onChange={setSelectedMonitorIds}
+          disabled={isPending}
+        />
+      </div>
 
       {/* Severity filter */}
       <div className="ac-form-section">

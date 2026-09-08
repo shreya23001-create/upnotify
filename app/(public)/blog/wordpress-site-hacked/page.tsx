@@ -67,7 +67,7 @@ export default function WordPressSiteHackedPage(): React.ReactElement {
           '@type': 'Article',
           headline: 'WordPress Site Defaced: How Hackers Replace Your Homepage and How to Detect It Instantly',
           description: 'How WordPress defacement attacks work, how to recover, and how keyword monitoring catches the attack before your customers see a hacker\'s message.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-03-31',
           dateModified: '2026-03-31',
@@ -184,10 +184,10 @@ export default function WordPressSiteHackedPage(): React.ReactElement {
           Your uptime monitor did not alert you because the site was technically up. The server returned a 200 status code. The page loaded in a normal amount of time. The SSL certificate was valid. By every metric that standard monitoring checks, your site was healthy. It just was not yours anymore.
         </p>
 
-        <h2>How Uptrue keyword monitoring detects defacement in minutes</h2>
+        <h2>How Upnotify keyword monitoring detects defacement in minutes</h2>
 
         <p>
-          The logic is simple: if your brand name disappears from your homepage, something is very wrong. <Link href="/signup">Uptrue&apos;s keyword monitoring</Link> checks whether a specific word or phrase exists on your page. If a hacker replaces your homepage content, your brand name, your headline, your product names — they all disappear. Uptrue detects the missing keyword and alerts you immediately.
+          The logic is simple: if your brand name disappears from your homepage, something is very wrong. <Link href="/signup">Upnotify&apos;s keyword monitoring</Link> checks whether a specific word or phrase exists on your page. If a hacker replaces your homepage content, your brand name, your headline, your product names — they all disappear. Upnotify detects the missing keyword and alerts you immediately.
         </p>
 
         <h3>Step 1: Set up a keyword monitor for your brand name</h3>
@@ -204,7 +204,7 @@ export default function WordPressSiteHackedPage(): React.ReactElement {
         </ol>
 
         <p>
-          If a hacker replaces your homepage with their own message, your brand name disappears from the page. Uptrue detects this within 60 seconds and alerts you. Instead of discovering the defacement from a customer 8 hours later, you know about it within a minute.
+          If a hacker replaces your homepage with their own message, your brand name disappears from the page. Upnotify detects this within 60 seconds and alerts you. Instead of discovering the defacement from a customer 8 hours later, you know about it within a minute.
         </p>
 
         <h3>Step 2: Add a negative keyword monitor for hacker signatures</h3>
@@ -331,10 +331,10 @@ export default function WordPressSiteHackedPage(): React.ReactElement {
         <h3>Verification — before going live</h3>
 
         <ol>
-          <li>Set up Uptrue keyword monitoring <strong>before</strong> bringing the site back online.</li>
+          <li>Set up Upnotify keyword monitoring <strong>before</strong> bringing the site back online.</li>
           <li>Bring the site online and verify the homepage shows correct content.</li>
           <li>Check 5 to 10 inner pages to confirm they are clean.</li>
-          <li>Monitor Uptrue for the next 48 hours — attackers often have backdoors and may re-deface the site after you clean it.</li>
+          <li>Monitor Upnotify for the next 48 hours — attackers often have backdoors and may re-deface the site after you clean it.</li>
         </ol>
 
         <h2>The reputation damage you cannot undo</h2>
@@ -344,7 +344,7 @@ export default function WordPressSiteHackedPage(): React.ReactElement {
         </p>
 
         <p>
-          The difference between a defacement lasting 60 seconds and 12 hours is the difference between a minor security incident and a brand crisis. Uptrue keyword monitoring gives you that 60-second detection window. Your brand name disappears from your homepage, and you know about it before the first customer screenshot hits Twitter.
+          The difference between a defacement lasting 60 seconds and 12 hours is the difference between a minor security incident and a brand crisis. Upnotify keyword monitoring gives you that 60-second detection window. Your brand name disappears from your homepage, and you know about it before the first customer screenshot hits Twitter.
         </p>
 
         <div className="blog-cta-section">
@@ -371,7 +371,7 @@ export default function WordPressSiteHackedPage(): React.ReactElement {
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

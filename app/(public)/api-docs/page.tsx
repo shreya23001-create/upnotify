@@ -2,16 +2,16 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: 'API Documentation — Uptrue',
+  title: 'API Documentation — Upnotify',
   description:
-    'The Uptrue public REST API and SDKs are launching with our developer platform. Until then, integrate with Uptrue today via webhooks, Slack, Teams, and Zapier-style automations.',
+    'The Upnotify public REST API and SDKs are launching with our developer platform. Until then, integrate with Upnotify today via webhooks, Slack, Teams, and Zapier-style automations.',
   alternates: {
     canonical: 'https://uptrue.io/api-docs',
   },
   openGraph: {
-    title: 'API Documentation — Uptrue',
+    title: 'API Documentation — Upnotify',
     description:
-      'The Uptrue public REST API is launching with our developer platform. Integrate today via webhooks and integrations.',
+      'The Upnotify public REST API is launching with our developer platform. Integrate today via webhooks and integrations.',
     url: 'https://uptrue.io/api-docs',
     type: 'website',
   },
@@ -24,8 +24,8 @@ export default function ApiDocsPage(): React.ReactElement {
         <div className="landing-container">
           <h1 className="about-hero-title">API Documentation</h1>
           <p className="about-hero-subtitle">
-            The Uptrue public REST API and official SDKs ship with our developer platform launch.
-            Until then, here&rsquo;s how teams integrate with Uptrue today.
+            The Upnotify public REST API and official SDKs ship with our developer platform launch.
+            Until then, here&rsquo;s how teams integrate with Upnotify today.
           </p>
         </div>
       </section>

@@ -98,11 +98,11 @@ export function HeroCanvas(): React.ReactElement {
       const cardW = (panW - 12) / 2, cardH = 52
       const cy = ly + 44
       const cards = [
-        { label:'MONITORS', val:'24',                   color:'#3b82f6' },
+        { label:'MONITORS', val:'24',                   color:'#00c94a' },
         { label:'HEALTHY',  val:String(healthyCount),  color:'#10b981' },
         { label:'DOWN',     val:String(downCount),      color:'#ef4444' },
         { label:'AVG RESP', val:(respTime > 999 ? (respTime/1000).toFixed(1)+'s' : respTime+'ms'),
-          color: respTime > 2000 ? '#ef4444' : '#3b82f6' },
+          color: respTime > 2000 ? '#ef4444' : '#00c94a' },
       ]
       cards.forEach((c, i) => {
         const cx2 = lx + 64 + (i % 2) * (cardW + 4)
@@ -164,7 +164,7 @@ export function HeroCanvas(): React.ReactElement {
       rr(rx, chartY, rpW, H*0.22, 8, '#ffffff', '#e2e8f0', a*0.7)
       txt('Response Time', rx+12, chartY+16, 9, '#0f172a', a*1.1, '600')
       txt((respTime>999 ? (respTime/1000).toFixed(1)+'s' : respTime+'ms'),
-          rx+rpW-70, chartY+16, 9, respTime > 2000 ? '#ef4444' : '#3b82f6', a*1.4, '800')
+          rx+rpW-70, chartY+16, 9, respTime > 2000 ? '#ef4444' : '#00c94a', a*1.4, '800')
 
       const barData = [60,72,68,80,74,70,65,200,180,160,350,respTime*0.012].map(v => Math.min(v, 400))
       const maxBar = Math.max(...barData)
@@ -174,7 +174,7 @@ export function HeroCanvas(): React.ReactElement {
         const bh = (v / maxBar) * bH
         const isSpike = i >= barData.length - 3
         ctx.globalAlpha = a * 0.9
-        ctx.fillStyle = isSpike && isDown ? '#ef4444' : '#3b82f6'
+        ctx.fillStyle = isSpike && isDown ? '#ef4444' : '#00c94a'
         ctx.beginPath()
         ctx.roundRect(bx, bYb+bH-bh, (rpW-24)/barData.length - 2, bh, 2)
         ctx.fill()
@@ -189,7 +189,7 @@ export function HeroCanvas(): React.ReactElement {
         ctx.fillStyle = '#ef4444'
         ctx.fillText(isDeg
           ? '⚠  checkout.shop.io — Response time degraded · Confirming…'
-          : '🔴  INCIDENT · checkout.shop.io is DOWN · Uptrue is alerting your team',
+          : '🔴  INCIDENT · checkout.shop.io is DOWN · Upnotify is alerting your team',
           W*0.06 + 16, H*0.72 + 19)
         ctx.globalAlpha = 1
       }

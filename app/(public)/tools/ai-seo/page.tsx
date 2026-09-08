@@ -4,7 +4,7 @@ import '../../landing.css'
 
 const data: ToolPillarData = {
   pillarSlug: 'ai-seo',
-  seoTitle: 'Free AI & SEO Tools — AI SEO Checker, Redirect Chain, robots.txt | Uptrue',
+  seoTitle: 'Free AI & SEO Tools — AI SEO Checker, Redirect Chain, robots.txt | Upnotify',
   seoDescription:
     'Free AI and SEO tools: AI SEO Checker for ChatGPT/Perplexity/Claude/Gemini visibility, redirect chain tracer for SEO loops and excessive hops, and robots.txt analyser. No signup required.',
   heroTitle: 'Free AI & SEO Tools',
@@ -56,8 +56,8 @@ const data: ToolPillarData = {
   ],
   faq: [
     {
-      q: 'Is the AI SEO Checker the same as Uptrue AI Visibility?',
-      a: 'No. The AI SEO Checker is a one-off snapshot — does your site appear AI-ready right now (crawler access, metadata, structure, llms.txt). Uptrue AI Visibility (separate product at aivisibility.uptrue.io) is the continuous tracking layer — does ChatGPT actually cite you for the keywords you target, week after week. The Checker is the doorstep diagnostic; AI Visibility is the rolling vital signs.',
+      q: 'Is the AI SEO Checker the same as Upnotify AI Visibility?',
+      a: 'No. The AI SEO Checker is a one-off snapshot — does your site appear AI-ready right now (crawler access, metadata, structure, llms.txt). Upnotify AI Visibility (separate product at aivisibility.uptrue.io) is the continuous tracking layer — does ChatGPT actually cite you for the keywords you target, week after week. The Checker is the doorstep diagnostic; AI Visibility is the rolling vital signs.',
     },
     {
       q: 'How many redirect hops is too many?',
@@ -69,7 +69,7 @@ const data: ToolPillarData = {
     },
     {
       q: 'My pages aren\'t in AI search results — is the AI SEO Checker enough?',
-      a: 'It diagnoses the technical layer (can crawlers reach you, is structure machine-readable, is llms.txt set up). It does NOT measure whether AI engines cite you for specific queries — for that, use Uptrue AI Visibility. Many sites fix the technical layer and still aren\'t cited because their content quality / authority isn\'t there yet. Both are needed.',
+      a: 'It diagnoses the technical layer (can crawlers reach you, is structure machine-readable, is llms.txt set up). It does NOT measure whether AI engines cite you for specific queries — for that, use Upnotify AI Visibility. Many sites fix the technical layer and still aren\'t cited because their content quality / authority isn\'t there yet. Both are needed.',
     },
     {
       q: 'Are these tools really free?',

@@ -55,7 +55,7 @@ export function OnboardingChecklist({ hasMonitors, hasAlertChannels, hasStatusPa
             All set! You&apos;re ready to go.
           </h3>
           <p style={{ fontSize: 14, color: 'var(--text-secondary)' }}>
-            Your monitors, alerts, and status page are configured. Uptrue is now working for you.
+            Your monitors, alerts, and status page are configured. Upnotify is now working for you.
           </p>
         </div>
       </div>

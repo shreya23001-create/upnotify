@@ -117,7 +117,7 @@ export default function AiProfileHelpPage(): React.ReactElement {
           <ol>
             <li>You enter your domain and pick which AI engines to ask (uses your active engines from
                 AI Visibility settings).</li>
-            <li>Uptrue sends each active introspection prompt — five by default, configurable by your admin —
+            <li>Upnotify sends each active introspection prompt — five by default, configurable by your admin —
                 to every selected engine, with <code>{'{domain}'}</code> substituted with your site.</li>
             <li>Each engine&apos;s response is captured and stored. We highlight any mentions of your domain
                 in green so you can see what the engine knows about you.</li>

@@ -20,12 +20,12 @@ const helpData: Record<string, MonitorHelp> = {
   http: {
     emoji: '🌐',
     name: 'HTTP / HTTPS Uptime',
-    what: 'Checks if your website is reachable and returning a valid response. Uptrue does a double-confirmation before alerting to eliminate false positives.',
+    what: 'Checks if your website is reachable and returning a valid response. Upnotify does a double-confirmation before alerting to eliminate false positives.',
     targetLabel: 'Enter a full URL',
     targetHint: 'e.g. https://yoursite.com or https://yoursite.com/checkout',
     faqs: [
       { q: 'What counts as "down"?', a: 'A 5xx server error or a connection timeout on two consecutive checks within 5 seconds of each other.' },
-      { q: 'Do you follow redirects?', a: 'Yes. Uptrue follows HTTP redirects and reports the final destination status code.' },
+      { q: 'Do you follow redirects?', a: 'Yes. Upnotify follows HTTP redirects and reports the final destination status code.' },
       { q: 'How often does it check?', a: 'Depending on your plan — every 30 seconds to 10 minutes. You set the interval when creating the monitor.' },
     ],
   },
@@ -95,7 +95,7 @@ const helpData: Record<string, MonitorHelp> = {
     targetHint: 'e.g. 203.0.113.5 or server.yoursite.com',
     faqs: [
       { q: 'What if the server blocks ICMP?', a: 'Many firewalls block ICMP. Use Port or HTTP monitoring instead — TCP is rarely blocked.' },
-      { q: 'Can I monitor internal IPs?', a: 'No — Uptrue monitors external IPs only to prevent security risks.' },
+      { q: 'Can I monitor internal IPs?', a: 'No — Upnotify monitors external IPs only to prevent security risks.' },
     ],
   },
   api: {
@@ -113,7 +113,7 @@ const helpData: Record<string, MonitorHelp> = {
   heartbeat: {
     emoji: '💓',
     name: 'Heartbeat Monitor',
-    what: 'Flips the model — your cron job or script pings Uptrue on success. If we stop hearing from it within the expected window, we alert you. Perfect for silent background task failures.',
+    what: 'Flips the model — your cron job or script pings Upnotify on success. If we stop hearing from it within the expected window, we alert you. Perfect for silent background task failures.',
     targetLabel: 'No target needed',
     targetHint: 'Give the monitor a name (e.g. "Daily Backup Job")',
     faqs: [
@@ -278,13 +278,13 @@ const helpData: Record<string, MonitorHelp> = {
   },
   wordpress: {
     emoji: '__wp__',
-    name: 'Uptrue WordPress Monitor',
-    what: 'A lightweight plugin installed on your WordPress site pushes security and health data to Uptrue on a schedule. Unlike external monitors, this runs from inside your site — detecting threats that HTTP checks can never see.',
+    name: 'Upnotify WordPress Monitor',
+    what: 'A lightweight plugin installed on your WordPress site pushes security and health data to Upnotify on a schedule. Unlike external monitors, this runs from inside your site — detecting threats that HTTP checks can never see.',
     targetLabel: 'Enter your WordPress site URL',
     targetHint: 'e.g. https://yoursite.com — the same URL you use to access the site',
     faqs: [
       { q: 'How is this different from uptime monitoring?', a: 'Uptime monitoring only checks if your site responds. This plugin checks inside — file injections in uploads, rogue admin users, modified core files, outdated plugins, and more.' },
-      { q: 'Do I need to install a plugin?', a: 'Yes — after creating this monitor you\'ll get a secure token. Install the Uptrue plugin on your WordPress site and paste the token in Uptrue → Settings. The plugin then pushes data to Uptrue automatically.' },
+      { q: 'Do I need to install a plugin?', a: 'Yes — after creating this monitor you\'ll get a secure token. Install the Upnotify plugin on your WordPress site and paste the token in Upnotify → Settings. The plugin then pushes data to Upnotify automatically.' },
       { q: 'Will the plugin slow down my site?', a: 'No. All scans run via WordPress Cron in the background, staggered across the day so no single run is heavy.' },
       { q: 'What does it check?', a: 'PHP/JS files in uploads, .htaccess & wp-config.php changes, core file modifications, new admin/editor users, recently created pages, foreign-language SEO spam, outdated plugins and themes, PHP version, and debug mode status.' },
       { q: 'What if my site goes down?', a: 'Your standard HTTP uptime monitor (set up separately) covers that. This monitor focuses on security and health from inside the site.' },

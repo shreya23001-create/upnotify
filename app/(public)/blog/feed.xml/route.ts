@@ -40,16 +40,16 @@ export async function GET(): Promise<Response> {
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
-    <title>Uptrue Blog</title>
+    <title>Upnotify Blog</title>
     <link>${appUrl}/blog</link>
-    <description>Uptime monitoring insights, LLM launch coverage, and web infrastructure intelligence from Uptrue.</description>
+    <description>Uptime monitoring insights, LLM launch coverage, and web infrastructure intelligence from Upnotify.</description>
     <language>en-gb</language>
-    <managingEditor>hello@uptrue.io (Uptrue)</managingEditor>
-    <webMaster>hello@uptrue.io (Uptrue)</webMaster>
+    <managingEditor>hello@uptrue.io (Upnotify)</managingEditor>
+    <webMaster>hello@uptrue.io (Upnotify)</webMaster>
     <atom:link href="${appUrl}/blog/feed.xml" rel="self" type="application/rss+xml"/>
     <image>
       <url>${appUrl}/logo.png</url>
-      <title>Uptrue Blog</title>
+      <title>Upnotify Blog</title>
       <link>${appUrl}/blog</link>
     </image>
     ${items}

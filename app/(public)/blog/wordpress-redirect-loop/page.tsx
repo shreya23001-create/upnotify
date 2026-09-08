@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'WordPress Login Redirect Loop: Why wp-admin Keeps Sending You Back to the Login Page',
     description:
-      'What causes the WordPress login redirect loop, how to fix cookie issues and URL mismatches, and how Uptrue HTTP monitoring detects redirect loops on wp-admin automatically.',
+      'What causes the WordPress login redirect loop, how to fix cookie issues and URL mismatches, and how Upnotify HTTP monitoring detects redirect loops on wp-admin automatically.',
     url: 'https://uptrue.io/blog/wordpress-redirect-loop',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'WordPress Login Redirect Loop: Why wp-admin Keeps Sending You Back to the Login Page',
     description:
-      'What causes the WordPress login redirect loop, how to fix cookie issues and URL mismatches, and how Uptrue HTTP monitoring detects redirect loops on wp-admin automatically.',
+      'What causes the WordPress login redirect loop, how to fix cookie issues and URL mismatches, and how Upnotify HTTP monitoring detects redirect loops on wp-admin automatically.',
   },
 }
 
@@ -43,7 +43,7 @@ const FAQ_DATA = [
   {
     question: 'How can monitoring detect a WordPress login redirect loop?',
     answer:
-      'An HTTP monitor configured to check your wp-admin or wp-login.php URL will detect a redirect loop because the server returns a 302 redirect repeatedly rather than a 200 OK with the dashboard page. Uptrue follows redirects up to a limit and flags the loop as an error. You can also use keyword monitoring on your homepage to confirm that the front end is still loading normally while the admin area is broken.',
+      'An HTTP monitor configured to check your wp-admin or wp-login.php URL will detect a redirect loop because the server returns a 302 redirect repeatedly rather than a 200 OK with the dashboard page. Upnotify follows redirects up to a limit and flags the loop as an error. You can also use keyword monitoring on your homepage to confirm that the front end is still loading normally while the admin area is broken.',
   },
 ]
 
@@ -67,7 +67,7 @@ export default function WordPressRedirectLoopPage(): React.ReactElement {
           '@type': 'Article',
           headline: 'WordPress Login Redirect Loop: Why wp-admin Keeps Sending You Back to the Login Page',
           description: 'What causes the WordPress login redirect loop, how to fix cookie issues and URL mismatches, and how HTTP monitoring detects redirect loops automatically.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-03-18',
           dateModified: '2026-03-18',
@@ -222,10 +222,10 @@ export default function WordPressRedirectLoopPage(): React.ReactElement {
           Even if you monitor <code>wp-login.php</code> directly, a basic HTTP check might follow one redirect and see a 200 response — the login page itself — and report it as healthy. It does not know that logging in leads to an infinite loop. You need a monitor that follows the full redirect chain and flags when the number of redirects exceeds a reasonable threshold.
         </p>
 
-        <h2>How to detect the login redirect loop with Uptrue</h2>
+        <h2>How to detect the login redirect loop with Upnotify</h2>
 
         <p>
-          <Link href="/signup">Uptrue&apos;s HTTP monitoring</Link> follows redirect chains and detects when a URL enters a loop. Combined with keyword monitoring, you get complete coverage of both the admin panel and the front end.
+          <Link href="/signup">Upnotify&apos;s HTTP monitoring</Link> follows redirect chains and detects when a URL enters a loop. Combined with keyword monitoring, you get complete coverage of both the admin panel and the front end.
         </p>
 
         <h3>Step 1: Set up an HTTP monitor on wp-admin</h3>
@@ -241,7 +241,7 @@ export default function WordPressRedirectLoopPage(): React.ReactElement {
         </ol>
 
         <p>
-          When a redirect loop occurs, the server returns repeated 302 redirects that never resolve to a final 200 page. Uptrue detects this as a failure and alerts you immediately. A normal wp-admin check returns a single 302 to the login page — but a loop produces a chain of redirects that exceeds the follow limit.
+          When a redirect loop occurs, the server returns repeated 302 redirects that never resolve to a final 200 page. Upnotify detects this as a failure and alerts you immediately. A normal wp-admin check returns a single 302 to the login page — but a loop produces a chain of redirects that exceeds the follow limit.
         </p>
 
         <h3>Step 2: Add a keyword monitor on your homepage</h3>
@@ -269,7 +269,7 @@ export default function WordPressRedirectLoopPage(): React.ReactElement {
         </ol>
 
         <p>
-          If the redirect loop reaches the front end, browsers display an error page. Uptrue detects the absence of your normal content or the presence of redirect error text and alerts you before your visitors start complaining.
+          If the redirect loop reaches the front end, browsers display an error page. Upnotify detects the absence of your normal content or the presence of redirect error text and alerts you before your visitors start complaining.
         </p>
 
         <h3>Step 4: Configure alerts that reach you immediately</h3>
@@ -328,7 +328,7 @@ export default function WordPressRedirectLoopPage(): React.ReactElement {
         </p>
 
         <p>
-          Uptrue monitors your wp-admin URL directly. When a redirect loop starts, you know in minutes — not when you next try to log in and find yourself staring at the same login form for the fifth time.
+          Upnotify monitors your wp-admin URL directly. When a redirect loop starts, you know in minutes — not when you next try to log in and find yourself staring at the same login form for the fifth time.
         </p>
 
         <p>
@@ -359,7 +359,7 @@ export default function WordPressRedirectLoopPage(): React.ReactElement {
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

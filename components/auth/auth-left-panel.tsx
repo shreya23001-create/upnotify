@@ -36,7 +36,7 @@ export function AuthLeftPanel({ currency = 'gbp' }: AuthLeftPanelProps): React.R
       <AuthCanvas onSceneChange={handleSceneChange} />
 
       {/* Logo — matches public nav */}
-      <Link href="/" className="auth-left-logo" aria-label="Uptrue home">
+      <Link href="/" className="auth-left-logo" aria-label="Upnotify home">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 50" height="28" aria-hidden="true">
           <defs>
             <linearGradient id="authNavG" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -48,7 +48,7 @@ export function AuthLeftPanel({ currency = 'gbp' }: AuthLeftPanelProps): React.R
           <text x="10" y="30" fontFamily="system-ui,-apple-system,sans-serif" fontSize="16" fontWeight="800" fill="white" letterSpacing="0.5">
             <tspan dy="0">U</tspan><tspan dy="-5">p</tspan>
           </text>
-          <text x="46" y="34" fontFamily="system-ui,-apple-system,sans-serif" fontSize="28" fontWeight="700" fill="white" letterSpacing="-0.5">Uptrue</text>
+          <text x="46" y="34" fontFamily="system-ui,-apple-system,sans-serif" fontSize="28" fontWeight="700" fill="white" letterSpacing="-0.5">Upnotify</text>
         </svg>
       </Link>
 

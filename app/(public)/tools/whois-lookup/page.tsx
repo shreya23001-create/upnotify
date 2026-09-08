@@ -6,12 +6,12 @@ import Faq from '@/components/landing/faq'
 import { ScrollReveal } from '@/components/landing/scroll-reveal'
 
 export const metadata: Metadata = {
-  title: 'Free WHOIS Lookup — Domain Registration Checker | Uptrue',
+  title: 'Free WHOIS Lookup — Domain Registration Checker | Upnotify',
   description:
     'Look up WHOIS registration data for any domain. See registrar, creation date, expiry date, nameservers, and domain status. Free, instant, no signup.',
   alternates: { canonical: 'https://uptrue.io/tools/whois-lookup' },
   openGraph: {
-    title: 'Free WHOIS Lookup — Domain Registration Checker | Uptrue',
+    title: 'Free WHOIS Lookup — Domain Registration Checker | Upnotify',
     description:
       'Look up WHOIS registration data for any domain. See registrar, creation date, expiry date, and nameservers. Free, no signup.',
     url: 'https://uptrue.io/tools/whois-lookup',
@@ -43,7 +43,7 @@ const faqItems = [
   {
     question: 'How do I check when a domain expires?',
     answer:
-      'The expiry date is shown in the Registration Details section of the results. If the domain is expiring within 90 days, the tool will highlight this with a warning. If it has already expired, it will be shown in red. We recommend setting up automated domain expiry monitoring with Uptrue to get notified well in advance.',
+      'The expiry date is shown in the Registration Details section of the results. If the domain is expiring within 90 days, the tool will highlight this with a warning. If it has already expired, it will be shown in red. We recommend setting up automated domain expiry monitoring with Upnotify to get notified well in advance.',
   },
 ]
 
@@ -125,7 +125,7 @@ export default function WhoisLookupPage(): React.ReactElement {
           <div className="tools-cta reveal">
             <h2>Never let your domain expire</h2>
             <p>
-              Uptrue&apos;s <Link href="/monitoring/domain-expiry-monitoring">domain expiry monitoring</Link>{' '}
+              Upnotify&apos;s <Link href="/monitoring/domain-expiry-monitoring">domain expiry monitoring</Link>{' '}
               alerts you via email, Slack, or webhook at 90, 30, and 7 days before expiry. Pair it with{' '}
               <Link href="/monitoring/whois-registrar-monitoring">WHOIS registrar monitoring</Link> to catch
               unexpected ownership or registrar changes the moment they happen. Set up once and forget about it.

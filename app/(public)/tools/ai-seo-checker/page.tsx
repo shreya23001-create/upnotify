@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: 'https://uptrue.io/tools/ai-seo-checker' },
   openGraph: {
-    title: 'Free AI SEO Checker — Is Your Website Visible to AI Search? | Uptrue',
+    title: 'Free AI SEO Checker — Is Your Website Visible to AI Search? | Upnotify',
     description:
       'Get your AI readiness score in seconds. Check crawler access, structured data, trust signals, and generate your llms.txt — all free. No signup.',
     url: 'https://uptrue.io/tools/ai-seo-checker',
@@ -44,7 +44,7 @@ const FAQ_ITEMS = [
   },
   {
     question: 'What is the difference between AI SEO, AEO, GEO, and LLMO?',
-    answer: 'These terms all describe the same emerging discipline but come from different communities. GEO (Generative Engine Optimization) is the academically coined term gaining traction fast. AI Search Optimization is the plain-English marketing version. AEO (Answer Engine Optimization) is older — it originally covered voice search and featured snippets, but the SEO industry is repurposing it for AI. LLMO (LLM Optimization) is the developer and technical crowd\'s label. AI Visibility is used by enterprise SEO platforms like BrightEdge. At Uptrue we use "AI Visibility" for the dashboard feature and "AI SEO" for the free tool because they are the most broadly understood terms across all audiences.',
+    answer: 'These terms all describe the same emerging discipline but come from different communities. GEO (Generative Engine Optimization) is the academically coined term gaining traction fast. AI Search Optimization is the plain-English marketing version. AEO (Answer Engine Optimization) is older — it originally covered voice search and featured snippets, but the SEO industry is repurposing it for AI. LLMO (LLM Optimization) is the developer and technical crowd\'s label. AI Visibility is used by enterprise SEO platforms like BrightEdge. At Upnotify we use "AI Visibility" for the dashboard feature and "AI SEO" for the free tool because they are the most broadly understood terms across all audiences.',
   },
   {
     question: 'How does this AI SEO checker work?',
@@ -56,11 +56,11 @@ const FAQ_ITEMS = [
   },
   {
     question: 'What is llms.txt and why does it matter for AI search?',
-    answer: 'llms.txt is an emerging open standard (proposed by fast.ai) for a plain text file placed at yourdomain.com/llms.txt. It works like a README for AI — giving language models a structured summary of what your site is about, what pages exist, and how your content can be used. Sites with a well-written llms.txt are more likely to be cited accurately, more frequently, and with correct attribution by AI assistants. Think of it as the robots.txt of the AI era. Sign up free to generate a tailored llms.txt from your Uptrue dashboard.',
+    answer: 'llms.txt is an emerging open standard (proposed by fast.ai) for a plain text file placed at yourdomain.com/llms.txt. It works like a README for AI — giving language models a structured summary of what your site is about, what pages exist, and how your content can be used. Sites with a well-written llms.txt are more likely to be cited accurately, more frequently, and with correct attribution by AI assistants. Think of it as the robots.txt of the AI era. Sign up free to generate a tailored llms.txt from your Upnotify dashboard.',
   },
   {
     question: 'What is AI Citation Monitoring?',
-    answer: 'AI Citation Monitoring tracks whether AI engines are actually citing your website when users ask questions in your niche. You give it target keywords, it queries AI engines like Perplexity (which provides explicit citation URLs) and analyses whether your domain appears in the responses. This moves beyond technical readiness into actual AI search presence measurement — showing you which topics you\'re winning and which competitors are being cited instead. Available with an Uptrue account.',
+    answer: 'AI Citation Monitoring tracks whether AI engines are actually citing your website when users ask questions in your niche. You give it target keywords, it queries AI engines like Perplexity (which provides explicit citation URLs) and analyses whether your domain appears in the responses. This moves beyond technical readiness into actual AI search presence measurement — showing you which topics you\'re winning and which competitors are being cited instead. Available with an Upnotify account.',
   },
   {
     question: 'How is AI SEO different from traditional SEO?',
@@ -76,11 +76,11 @@ const FAQ_ITEMS = [
   },
   {
     question: 'How often should I re-check my AI readiness score?',
-    answer: 'After any major site change — a robots.txt edit, new schema added, structural redesign, or new content published. For ongoing AI search presence monitoring, set up an Uptrue AI Citation Monitor to track your visibility automatically. Your technical readiness score is a foundation; the citation data tells you whether it is actually translating into AI search referrals.',
+    answer: 'After any major site change — a robots.txt edit, new schema added, structural redesign, or new content published. For ongoing AI search presence monitoring, set up an Upnotify AI Citation Monitor to track your visibility automatically. Your technical readiness score is a foundation; the citation data tells you whether it is actually translating into AI search referrals.',
   },
   {
     question: 'What is AI search presence and how do I improve it?',
-    answer: 'AI search presence is the aggregate measure of how often and how accurately AI engines cite your website in responses — combining technical readiness, content quality, and actual citation frequency. To improve it: first fix your AI readiness score (this tool tells you exactly what to fix), then generate and deploy your llms.txt, then use structured content with clear question-and-answer headings, and finally monitor actual citations with a tool like Uptrue AI Citation Monitor to see what is working.',
+    answer: 'AI search presence is the aggregate measure of how often and how accurately AI engines cite your website in responses — combining technical readiness, content quality, and actual citation frequency. To improve it: first fix your AI readiness score (this tool tells you exactly what to fix), then generate and deploy your llms.txt, then use structured content with clear question-and-answer headings, and finally monitor actual citations with a tool like Upnotify AI Citation Monitor to see what is working.',
   },
 ]
 
@@ -114,7 +114,7 @@ export default function AiSeoCheckerPage(): React.ReactElement {
     },
     provider: {
       '@type': 'Organization',
-      name: 'Uptrue',
+      name: 'Upnotify',
       url: 'https://uptrue.io',
     },
     dateModified: new Date().toISOString().split('T')[0],
@@ -140,7 +140,7 @@ export default function AiSeoCheckerPage(): React.ReactElement {
               Updated {new Date().toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}
             </time>
             {' '}· Published by the{' '}
-            <Link href="/about" style={{ color: 'var(--color-primary)' }}>Uptrue team</Link>
+            <Link href="/about" style={{ color: 'var(--color-primary)' }}>Upnotify team</Link>
           </p>
         </div>
 
@@ -285,7 +285,7 @@ export default function AiSeoCheckerPage(): React.ReactElement {
               >
                 fast.ai
               </a>{' '}
-              and is gaining rapid adoption. Uptrue generates one tailored to your site and
+              and is gaining rapid adoption. Upnotify generates one tailored to your site and
               the specific AI engines you want to target — sign up free to access the generator
               in your dashboard.
             </p>
@@ -357,7 +357,7 @@ export default function AiSeoCheckerPage(): React.ReactElement {
                   </tr>
                   <tr>
                     <td data-label="Term"><strong>AI Citation Monitoring</strong></td>
-                    <td data-label="Who uses it">Tools like Uptrue</td>
+                    <td data-label="Who uses it">Tools like Upnotify</td>
                     <td data-label="What it means">Actively tracking which AI engines cite your domain, for which queries</td>
                   </tr>
                   <tr>
@@ -379,7 +379,7 @@ export default function AiSeoCheckerPage(): React.ReactElement {
           <div className="tools-cta reveal">
             <h2>Ready to monitor your AI search presence?</h2>
             <p>
-              This checker gives you a technical readiness score. Uptrue AI Visibility&trade; goes further —
+              This checker gives you a technical readiness score. Upnotify AI Visibility&trade; goes further —
               generate your llms.txt and track whether Perplexity, ChatGPT, and Gemini are actually
               citing you for your target keywords. Pair it with{' '}
               <Link href="/monitoring/robots-txt-monitoring">robots.txt change monitoring</Link> and{' '}

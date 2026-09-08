@@ -48,7 +48,7 @@ const FAQ_DATA = [
   {
     question: 'How often do budget hosting providers actually go down?',
     answer:
-      'Budget hosts typically advertise 99.9% uptime, which allows for about 8.7 hours of downtime per year. In practice, many users report significantly more downtime than this — but the guarantee often only covers complete server outages, not throttling or partial availability. Independent monitoring data from services like Uptrue shows that response time degradation — where the site technically responds but takes 10+ seconds — is far more common than complete outages and is not covered by uptime guarantees.',
+      'Budget hosts typically advertise 99.9% uptime, which allows for about 8.7 hours of downtime per year. In practice, many users report significantly more downtime than this — but the guarantee often only covers complete server outages, not throttling or partial availability. Independent monitoring data from services like Upnotify shows that response time degradation — where the site technically responds but takes 10+ seconds — is far more common than complete outages and is not covered by uptime guarantees.',
   },
   {
     question: 'Should I switch from GoDaddy to another host?',
@@ -63,7 +63,7 @@ const FAQ_DATA = [
   {
     question: 'How do I monitor my hosting provider independently?',
     answer:
-      'Use an external monitoring service that checks your site from outside your hosting environment. Uptrue checks your site every 60 seconds, records response times, and alerts you when performance degrades or your site goes down. This gives you independent data that your hosting provider cannot dispute. When you contact support saying "my site was down for 2 hours on Tuesday" and they say "we see no issues," you have timestamped proof. Set up HTTP monitoring with a 3-second response time threshold to catch both outages and throttling.',
+      'Use an external monitoring service that checks your site from outside your hosting environment. Upnotify checks your site every 60 seconds, records response times, and alerts you when performance degrades or your site goes down. This gives you independent data that your hosting provider cannot dispute. When you contact support saying "my site was down for 2 hours on Tuesday" and they say "we see no issues," you have timestamped proof. Set up HTTP monitoring with a 3-second response time threshold to catch both outages and throttling.',
   },
 ]
 
@@ -87,7 +87,7 @@ export default function BudgetHostingOutagesPage(): React.ReactElement {
           '@type': 'Article',
           headline: 'GoDaddy Down Again? Why Budget Hosts Have the Most Outages',
           description: 'Why GoDaddy, Bluehost, and HostGator have the most user complaints about downtime, what forum users report, and how external monitoring protects your business.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-03-16',
           dateModified: '2026-03-16',
@@ -218,7 +218,7 @@ export default function BudgetHostingOutagesPage(): React.ReactElement {
         <h3>Step 1: Monitor independently</h3>
 
         <p>
-          Never rely on your hosting provider&apos;s own monitoring or status page. Set up <Link href="/signup">external monitoring with Uptrue</Link> that checks your site every 60 seconds from outside your hosting environment.
+          Never rely on your hosting provider&apos;s own monitoring or status page. Set up <Link href="/signup">external monitoring with Upnotify</Link> that checks your site every 60 seconds from outside your hosting environment.
         </p>
 
         <ol>
@@ -282,7 +282,7 @@ export default function BudgetHostingOutagesPage(): React.ReactElement {
         </p>
 
         <p>
-          Uptrue checks your site every 60 seconds. When it goes down or slows down, you know immediately — not when a customer tells you, not when you happen to check, not when you see &quot;GoDaddy down&quot; trending on Twitter.
+          Upnotify checks your site every 60 seconds. When it goes down or slows down, you know immediately — not when a customer tells you, not when you happen to check, not when you see &quot;GoDaddy down&quot; trending on Twitter.
         </p>
 
         <div className="blog-cta-section">
@@ -309,7 +309,7 @@ export default function BudgetHostingOutagesPage(): React.ReactElement {
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

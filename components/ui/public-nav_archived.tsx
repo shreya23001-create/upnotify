@@ -29,7 +29,7 @@ export function PublicNav(): React.ReactElement {
   return (
     <nav className="landing-nav">
       <div className="landing-nav-inner">
-        <Link href="/" className="landing-logo" aria-label="Uptrue home">
+        <Link href="/" className="landing-logo" aria-label="Upnotify home">
           <UptrueLogo />
         </Link>
         <div className="landing-nav-links">

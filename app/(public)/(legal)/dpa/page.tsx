@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = {
   title: 'Data Processing Agreement',
   description:
-    'Uptrue Data Processing Agreement (DPA). Covers data processing terms for GDPR compliance between Uptrue and its customers.',
+    'Upnotify Data Processing Agreement (DPA). Covers data processing terms for GDPR compliance between Upnotify and its customers.',
   alternates: { canonical: 'https://uptrue.io/dpa' },
 }
 
@@ -17,11 +17,11 @@ export default function DataProcessingAgreementPage(): React.ReactElement {
         This Data Processing Agreement (&quot;DPA&quot;) forms part of the agreement between Vision Software Solutions Limited,
         a company registered in England and Wales with its registered office at C/O Benison Solvers Limited, 1000 Great West Road, Brentford, United Kingdom, TW8 9DW
         (&quot;Uptrue&quot;, &quot;Processor&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;), and the customer (&quot;Controller&quot;,
-        &quot;you&quot;, or &quot;your&quot;) who has agreed to the Uptrue <a href="/terms">Terms of Service</a>.
+        &quot;you&quot;, or &quot;your&quot;) who has agreed to the Upnotify <a href="/terms">Terms of Service</a>.
       </p>
       <p>
-        This DPA sets out the terms under which Uptrue processes personal data on behalf of the
-        Controller in connection with the provision of the Uptrue monitoring platform (the &quot;Service&quot;).
+        This DPA sets out the terms under which Upnotify processes personal data on behalf of the
+        Controller in connection with the provision of the Upnotify monitoring platform (the &quot;Service&quot;).
         This DPA is entered into pursuant to Article 28 of the UK General Data Protection Regulation
         (UK GDPR) and, where applicable, Article 28 of the EU General Data Protection Regulation
         (EU GDPR).
@@ -41,7 +41,7 @@ export default function DataProcessingAgreementPage(): React.ReactElement {
         </li>
         <li>
           <strong>&quot;Personal Data&quot;</strong> means any information relating to an identified or
-          identifiable natural person that is processed by Uptrue on behalf of the Controller in
+          identifiable natural person that is processed by Upnotify on behalf of the Controller in
           connection with the Service.
         </li>
         <li>
@@ -51,7 +51,7 @@ export default function DataProcessingAgreementPage(): React.ReactElement {
           or destruction.
         </li>
         <li>
-          <strong>&quot;Sub-processor&quot;</strong> means any third party engaged by Uptrue to process
+          <strong>&quot;Sub-processor&quot;</strong> means any third party engaged by Upnotify to process
           Personal Data on behalf of the Controller.
         </li>
         <li>
@@ -68,7 +68,7 @@ export default function DataProcessingAgreementPage(): React.ReactElement {
       <h2>2. Scope and Purpose of Processing</h2>
       <h3>2.1 Subject Matter</h3>
       <p>
-        Uptrue processes Personal Data on behalf of the Controller solely for the purpose of providing
+        Upnotify processes Personal Data on behalf of the Controller solely for the purpose of providing
         the Service, which includes website and infrastructure monitoring, alerting, status page
         hosting, incident management, and report generation.
       </p>
@@ -87,7 +87,7 @@ export default function DataProcessingAgreementPage(): React.ReactElement {
         <li>IP addresses (from access logs and audit records)</li>
         <li>Organisation name and role assignments</li>
         <li>Monitor configuration data (URLs, endpoints)</li>
-        <li>Billing and transaction data (processed by Stripe; Uptrue does not store payment card details)</li>
+        <li>Billing and transaction data (processed by Stripe; Upnotify does not store payment card details)</li>
       </ul>
       <h3>2.4 Duration</h3>
       <p>
@@ -97,12 +97,12 @@ export default function DataProcessingAgreementPage(): React.ReactElement {
       </p>
 
       <h2>3. Processor Obligations</h2>
-      <p>Uptrue, as the Processor, shall:</p>
+      <p>Upnotify, as the Processor, shall:</p>
       <ul>
         <li>
           Process Personal Data only on the documented instructions of the Controller, including with
           respect to transfers of Personal Data outside the UK or EU, unless required to do so by
-          applicable law, in which case Uptrue shall inform the Controller of that legal requirement
+          applicable law, in which case Upnotify shall inform the Controller of that legal requirement
           before processing (unless prohibited from doing so by law).
         </li>
         <li>
@@ -136,7 +136,7 @@ export default function DataProcessingAgreementPage(): React.ReactElement {
           contribute to audits, including inspections, as described in Section 9.
         </li>
         <li>
-          Immediately inform the Controller if, in Uptrue&apos;s opinion, an instruction from the
+          Immediately inform the Controller if, in Upnotify&apos;s opinion, an instruction from the
           Controller infringes Data Protection Laws.
         </li>
       </ul>
@@ -144,7 +144,7 @@ export default function DataProcessingAgreementPage(): React.ReactElement {
       <h2>4. Sub-processors</h2>
       <h3>4.1 Authorised Sub-processors</h3>
       <p>
-        The Controller provides general written authorisation for Uptrue to engage Sub-processors.
+        The Controller provides general written authorisation for Upnotify to engage Sub-processors.
         The following Sub-processors are currently authorised:
       </p>
       <table>
@@ -198,7 +198,7 @@ export default function DataProcessingAgreementPage(): React.ReactElement {
 
       <h3>4.2 Changes to Sub-processors</h3>
       <p>
-        Uptrue shall notify the Controller by email at least 30 days before adding or replacing a
+        Upnotify shall notify the Controller by email at least 30 days before adding or replacing a
         Sub-processor, providing the Controller with the opportunity to object to the change. If the
         Controller objects on reasonable data protection grounds and the parties cannot resolve the
         objection within 30 days, the Controller may terminate the Service agreement with immediate
@@ -206,14 +206,14 @@ export default function DataProcessingAgreementPage(): React.ReactElement {
       </p>
       <h3>4.3 Sub-processor Agreements</h3>
       <p>
-        Uptrue shall enter into a written agreement with each Sub-processor imposing data protection
-        obligations no less protective than those set out in this DPA. Uptrue remains fully liable
+        Upnotify shall enter into a written agreement with each Sub-processor imposing data protection
+        obligations no less protective than those set out in this DPA. Upnotify remains fully liable
         to the Controller for the performance of each Sub-processor&apos;s obligations.
       </p>
 
       <h2>5. Security Measures</h2>
       <p>
-        Uptrue implements and maintains the following technical and organisational measures to protect
+        Upnotify implements and maintains the following technical and organisational measures to protect
         Personal Data:
       </p>
 
@@ -262,7 +262,7 @@ export default function DataProcessingAgreementPage(): React.ReactElement {
       <h2>6. Data Breach Notification</h2>
       <h3>6.1 Notification to Controller</h3>
       <p>
-        Uptrue shall notify the Controller without undue delay, and in any event within 72 hours of
+        Upnotify shall notify the Controller without undue delay, and in any event within 72 hours of
         becoming aware of a Data Breach affecting Personal Data processed on behalf of the Controller.
       </p>
       <h3>6.2 Content of Notification</h3>
@@ -275,15 +275,15 @@ export default function DataProcessingAgreementPage(): React.ReactElement {
       </ul>
       <h3>6.3 Cooperation</h3>
       <p>
-        Uptrue shall cooperate with the Controller and take all reasonable steps to assist in the
-        investigation, mitigation, and remediation of any Data Breach. Uptrue shall also assist the
+        Upnotify shall cooperate with the Controller and take all reasonable steps to assist in the
+        investigation, mitigation, and remediation of any Data Breach. Upnotify shall also assist the
         Controller in meeting its obligations to notify the relevant supervisory authority and affected
         Data Subjects, as applicable.
       </p>
 
       <h2>7. Data Subject Requests</h2>
       <p>
-        Uptrue shall, taking into account the nature of the processing, assist the Controller by
+        Upnotify shall, taking into account the nature of the processing, assist the Controller by
         appropriate technical and organisational measures, insofar as this is possible, in fulfilling
         the Controller&apos;s obligations to respond to Data Subject requests to exercise their rights
         under Data Protection Laws, including:
@@ -297,7 +297,7 @@ export default function DataProcessingAgreementPage(): React.ReactElement {
         <li>Right to object</li>
       </ul>
       <p>
-        If Uptrue receives a request directly from a Data Subject, Uptrue shall promptly notify the
+        If Upnotify receives a request directly from a Data Subject, Upnotify shall promptly notify the
         Controller and shall not respond to the request directly unless instructed to do so by the
         Controller or required to do so by applicable law.
       </p>
@@ -310,7 +310,7 @@ export default function DataProcessingAgreementPage(): React.ReactElement {
       <h2>8. Data Deletion and Return</h2>
       <h3>8.1 Upon Termination</h3>
       <p>
-        Upon termination of the Service agreement, at the Controller&apos;s choice, Uptrue shall:
+        Upon termination of the Service agreement, at the Controller&apos;s choice, Upnotify shall:
       </p>
       <ul>
         <li>
@@ -323,12 +323,12 @@ export default function DataProcessingAgreementPage(): React.ReactElement {
       </ul>
       <p>
         The Controller has 30 days from the date of termination to request return of data. After
-        this period, Uptrue shall securely delete all Personal Data, unless retention is required
+        this period, Upnotify shall securely delete all Personal Data, unless retention is required
         by applicable law.
       </p>
       <h3>8.2 Retention Exceptions</h3>
       <p>
-        Uptrue may retain Personal Data beyond the termination date solely to the extent required by
+        Upnotify may retain Personal Data beyond the termination date solely to the extent required by
         applicable law (e.g., financial and tax records for 7 years under UK law). Such retained data
         will continue to be protected in accordance with this DPA and will be deleted as soon as the
         legal retention period expires.
@@ -337,13 +337,13 @@ export default function DataProcessingAgreementPage(): React.ReactElement {
       <h2>9. Audit Rights</h2>
       <h3>9.1 Information</h3>
       <p>
-        Uptrue shall make available to the Controller all information necessary to demonstrate
+        Upnotify shall make available to the Controller all information necessary to demonstrate
         compliance with the obligations in this DPA and in Article 28 of the UK GDPR / EU GDPR.
       </p>
       <h3>9.2 Audits</h3>
       <p>
         The Controller, or an independent third-party auditor mandated by the Controller, may conduct
-        an audit of Uptrue&apos;s processing activities and compliance with this DPA, subject to the
+        an audit of Upnotify&apos;s processing activities and compliance with this DPA, subject to the
         following conditions:
       </p>
       <ul>
@@ -352,11 +352,11 @@ export default function DataProcessingAgreementPage(): React.ReactElement {
         </li>
         <li>
           Audits shall be conducted during normal business hours and shall not unreasonably disrupt
-          Uptrue&apos;s operations.
+          Upnotify&apos;s operations.
         </li>
         <li>
           The Controller shall bear the costs of the audit, unless the audit reveals a material
-          breach by Uptrue, in which case Uptrue shall bear the reasonable costs.
+          breach by Upnotify, in which case Upnotify shall bear the reasonable costs.
         </li>
         <li>
           The Controller may conduct no more than one audit per 12-month period, unless a Data Breach
@@ -368,8 +368,8 @@ export default function DataProcessingAgreementPage(): React.ReactElement {
       </ul>
       <h3>9.3 Alternative Assurance</h3>
       <p>
-        Where Uptrue has obtained a relevant third-party certification or audit report (such as SOC 2
-        Type II or ISO 27001), Uptrue may provide such report to the Controller as an alternative to
+        Where Upnotify has obtained a relevant third-party certification or audit report (such as SOC 2
+        Type II or ISO 27001), Upnotify may provide such report to the Controller as an alternative to
         an on-site audit, provided the report is current and covers the relevant processing activities.
       </p>
 
@@ -381,7 +381,7 @@ export default function DataProcessingAgreementPage(): React.ReactElement {
       <h3>10.2 Transfers Outside the EU/UK</h3>
       <p>
         Where Personal Data is transferred to Sub-processors located outside the EU/UK (as identified
-        in Section 4.1), Uptrue ensures that appropriate safeguards are in place, including:
+        in Section 4.1), Upnotify ensures that appropriate safeguards are in place, including:
       </p>
       <ul>
         <li>
@@ -396,7 +396,7 @@ export default function DataProcessingAgreementPage(): React.ReactElement {
       </ul>
       <h3>10.3 Transfer Impact Assessments</h3>
       <p>
-        Uptrue conducts transfer impact assessments for each international data transfer to evaluate
+        Upnotify conducts transfer impact assessments for each international data transfer to evaluate
         whether the laws of the destination country provide an adequate level of protection and
         whether supplementary measures are required.
       </p>
@@ -405,7 +405,7 @@ export default function DataProcessingAgreementPage(): React.ReactElement {
       <p>
         This DPA comes into effect when the Controller begins using the Service and remains in effect
         for the duration of the processing. Upon termination of the Service agreement, the provisions
-        of this DPA shall continue to apply to any Personal Data retained by Uptrue until such data
+        of this DPA shall continue to apply to any Personal Data retained by Upnotify until such data
         is securely deleted.
       </p>
 

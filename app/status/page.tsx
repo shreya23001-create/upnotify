@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: 'System Status — Uptrue',
-  description: 'Current operational status of Uptrue monitoring services.',
+  title: 'System Status — Upnotify',
+  description: 'Current operational status of Upnotify monitoring services.',
   alternates: { canonical: 'https://uptrue.io/status' },
 }
 
@@ -23,7 +23,7 @@ export default function StatusPage(): React.ReactElement {
         <div style={{ fontSize: 48, marginBottom: 12 }}>🟢</div>
         <h1 style={{ fontSize: 28, fontWeight: 800, marginBottom: 8 }}>All Systems Operational</h1>
         <p style={{ color: 'var(--text-secondary, #64748b)', fontSize: 15 }}>
-          All Uptrue services are running normally.
+          All Upnotify services are running normally.
         </p>
       </div>
 
@@ -54,7 +54,7 @@ export default function StatusPage(): React.ReactElement {
 
       <div style={{ textAlign: 'center' }}>
         <Link href="/" style={{ color: 'var(--accent, #3b82f6)', fontSize: 14, textDecoration: 'none' }}>
-          ← Back to Uptrue
+          ← Back to Upnotify
         </Link>
       </div>
     </main>

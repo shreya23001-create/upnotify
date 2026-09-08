@@ -65,7 +65,7 @@ export function IndustryLandingPage({ data }: { data: IndustryLandingData }): Re
             '@graph': [
               {
                 '@type': 'SoftwareApplication',
-                name: `${data.heroTitle} — Uptrue`,
+                name: `${data.heroTitle} — Upnotify`,
                 description: data.seoDescription,
                 url: `https://uptrue.io/monitoring/${data.slug}`,
                 applicationCategory: 'BusinessApplication',
@@ -78,7 +78,7 @@ export function IndustryLandingPage({ data }: { data: IndustryLandingData }): Re
                 },
                 publisher: {
                   '@type': 'Organization',
-                  name: 'Uptrue',
+                  name: 'Upnotify',
                   url: 'https://uptrue.io',
                 },
               },
@@ -210,7 +210,7 @@ export function IndustryLandingPage({ data }: { data: IndustryLandingData }): Re
             Monitors that matter
           </h2>
           <p style={{ fontSize: 15, color: 'var(--text-secondary)', marginBottom: 24 }}>
-            These are the Uptrue monitor types that map most directly to the failures
+            These are the Upnotify monitor types that map most directly to the failures
             above. Each links to a full setup guide.
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -307,7 +307,7 @@ export function IndustryLandingPage({ data }: { data: IndustryLandingData }): Re
             Ready to set up monitoring?
           </h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: 14, marginBottom: 24, maxWidth: 520, margin: '0 auto 24px' }}>
-            Join teams who monitor their infrastructure with Uptrue. Free plan, no
+            Join teams who monitor their infrastructure with Upnotify. Free plan, no
             credit card required. Or browse all{' '}
             <Link href="/monitoring">24 monitor types</Link> first.
           </p>

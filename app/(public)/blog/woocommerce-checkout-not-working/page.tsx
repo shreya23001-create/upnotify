@@ -67,7 +67,7 @@ export default function WooCommerceCheckoutNotWorkingPage(): React.ReactElement 
           '@type': 'Article',
           headline: 'WooCommerce Checkout Not Working? Here\'s Why Your Store Is Losing Sales Right Now',
           description: 'What causes WooCommerce checkout failures, how to fix each one, and how to set up keyword monitoring that detects checkout problems automatically.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-03-21',
           dateModified: '2026-03-21',
@@ -214,10 +214,10 @@ export default function WooCommerceCheckoutNotWorkingPage(): React.ReactElement 
           You need monitoring that checks what the checkout page actually contains.
         </p>
 
-        <h2>How to monitor your WooCommerce checkout with Uptrue</h2>
+        <h2>How to monitor your WooCommerce checkout with Upnotify</h2>
 
         <p>
-          <Link href="/signup">Uptrue&apos;s keyword monitoring</Link> checks the actual content of your checkout page. If the &quot;Place Order&quot; button disappears, if an error message appears, or if the page content changes unexpectedly, you know about it before your next customer tries to check out.
+          <Link href="/signup">Upnotify&apos;s keyword monitoring</Link> checks the actual content of your checkout page. If the &quot;Place Order&quot; button disappears, if an error message appears, or if the page content changes unexpectedly, you know about it before your next customer tries to check out.
         </p>
 
         <h3>Step 1: Set up a keyword monitor to verify the checkout page works</h3>
@@ -234,7 +234,7 @@ export default function WooCommerceCheckoutNotWorkingPage(): React.ReactElement 
         </ol>
 
         <p>
-          If the &quot;Place Order&quot; button is not on the page — because of a PHP crash, a JavaScript error that prevents rendering, or a plugin conflict that strips the checkout form — Uptrue detects it and alerts you immediately.
+          If the &quot;Place Order&quot; button is not on the page — because of a PHP crash, a JavaScript error that prevents rendering, or a plugin conflict that strips the checkout form — Upnotify detects it and alerts you immediately.
         </p>
 
         <h3>Step 2: Add a negative keyword monitor to detect error messages</h3>
@@ -340,7 +340,7 @@ export default function WooCommerceCheckoutNotWorkingPage(): React.ReactElement 
         </p>
 
         <p>
-          Uptrue checks your checkout page every 60 seconds. If the &quot;Place Order&quot; button disappears, if an error message appears, if the page stops loading — you know in under a minute. Before the next customer gives up. Before you lose another sale. Before a checkout bug costs you a day of revenue.
+          Upnotify checks your checkout page every 60 seconds. If the &quot;Place Order&quot; button disappears, if an error message appears, if the page stops loading — you know in under a minute. Before the next customer gives up. Before you lose another sale. Before a checkout bug costs you a day of revenue.
         </p>
 
         <div className="blog-cta-section">
@@ -367,7 +367,7 @@ export default function WooCommerceCheckoutNotWorkingPage(): React.ReactElement 
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

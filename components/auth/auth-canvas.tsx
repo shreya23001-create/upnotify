@@ -122,7 +122,7 @@ export function AuthCanvas({ onSceneChange }: AuthCanvasProps): React.ReactEleme
       ctx.fillStyle = '#ef4444'; ctx.fill()
       ctx.globalAlpha = 1
       t2('checkout.shop.io is DOWN', cx-84, cardY+22, 10, '#fca5a5', cardAlpha, '700')
-      t2('Uptrue is alerting your team now', cx-84, cardY+38, 9, 'rgba(255,255,255,0.4)', cardAlpha, '400')
+      t2('Upnotify is alerting your team now', cx-84, cardY+38, 9, 'rgba(255,255,255,0.4)', cardAlpha, '400')
       const clockAlpha = Math.min(1, Math.max(0, (_t-800)/500))
       ctx.textAlign = 'center'
       t2('2:47 AM', cx, H*0.58, 26, 'rgba(255,255,255,0.06)', clockAlpha, '800')

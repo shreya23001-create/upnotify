@@ -10,15 +10,15 @@ const FAQ_SCHEMA = {
   mainEntity: [
     {
       '@type': 'Question',
-      name: 'How do community credits work in Uptrue?',
+      name: 'How do community credits work in Upnotify?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Community credits are earned by contributing to Uptrue -- embedding a badge on your site, referring friends, leaving reviews, or reporting bugs. Credits are applied as a discount on your next bill, up to 10 pounds per month.',
+        text: 'Community credits are earned by contributing to Upnotify -- embedding a badge on your site, referring friends, leaving reviews, or reporting bugs. Credits are applied as a discount on your next bill, up to 10 pounds per month.',
       },
     },
     {
       '@type': 'Question',
-      name: 'What is the maximum I can earn from Uptrue credits each month?',
+      name: 'What is the maximum I can earn from Upnotify credits each month?',
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'The monthly cap is 10 pounds. Credits above the cap roll over to the next month. If you cancel your subscription, unused credits expire.',
@@ -26,7 +26,7 @@ const FAQ_SCHEMA = {
     },
     {
       '@type': 'Question',
-      name: 'When are Uptrue credits applied to my bill?',
+      name: 'When are Upnotify credits applied to my bill?',
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'Credits are applied automatically to your next invoice. You can see your current balance and earning history in Settings under the Credits tab.',
@@ -57,7 +57,7 @@ export default function CreditsHelpPage(): React.ReactElement {
           <div className="help-article-hero">
             <h1 className="help-article-title">Community Credits</h1>
             <p className="help-article-intro">
-              We believe the people who help Uptrue grow should benefit too. Community
+              We believe the people who help Upnotify grow should benefit too. Community
               credits let you earn real money off your bill just by being part of the
               community.
             </p>
@@ -66,7 +66,7 @@ export default function CreditsHelpPage(): React.ReactElement {
           <section className="help-section">
             <h2 className="help-section-title">How credits work</h2>
             <p>
-              Credits are earned through specific actions that help Uptrue grow. Each
+              Credits are earned through specific actions that help Upnotify grow. Each
               credit has a pound value that gets applied as a discount on your next
               monthly or annual invoice. Think of it as cashback for being a good
               community member.
@@ -85,7 +85,7 @@ export default function CreditsHelpPage(): React.ReactElement {
             <ul className="help-list">
               <li>
                 <strong>Badge embeds -- &pound;2 per month</strong><br />
-                Add an Uptrue status badge to your website. As long as the badge is live
+                Add an Upnotify status badge to your website. As long as the badge is live
                 and detectable, you earn &pound;2 every month automatically. Go to
                 <strong> Status Pages</strong> &rarr; <strong>Badge</strong> to grab the embed code.
               </li>

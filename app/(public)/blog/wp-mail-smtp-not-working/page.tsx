@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'WP Mail SMTP Not Sending Emails: Why Your WordPress Site Is Silently Broken',
     description:
-      'What causes WP Mail SMTP to silently stop sending emails, how to fix SMTP credential expiry and OAuth token failures, and how Uptrue heartbeat monitoring detects broken email delivery.',
+      'What causes WP Mail SMTP to silently stop sending emails, how to fix SMTP credential expiry and OAuth token failures, and how Upnotify heartbeat monitoring detects broken email delivery.',
     url: 'https://uptrue.io/blog/wp-mail-smtp-not-working',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'WP Mail SMTP Not Sending Emails: Why Your WordPress Site Is Silently Broken',
     description:
-      'What causes WP Mail SMTP to silently stop sending emails, how to fix SMTP credential expiry and OAuth token failures, and how Uptrue heartbeat monitoring detects broken email delivery.',
+      'What causes WP Mail SMTP to silently stop sending emails, how to fix SMTP credential expiry and OAuth token failures, and how Upnotify heartbeat monitoring detects broken email delivery.',
   },
 }
 
@@ -33,7 +33,7 @@ const FAQ_DATA = [
   {
     question: 'How do I know if my WordPress emails are actually being delivered?',
     answer:
-      'You cannot know from within WordPress alone. The wp_mail() function returns true if it hands the message to the server, not if the email actually reaches the recipient. To verify delivery, send a test email from WP Mail SMTP settings, check your SMTP provider dashboard for delivery logs, and set up external monitoring that submits a form on a schedule and verifies receipt. Uptrue heartbeat monitoring can detect when expected pings from your forms stop arriving.',
+      'You cannot know from within WordPress alone. The wp_mail() function returns true if it hands the message to the server, not if the email actually reaches the recipient. To verify delivery, send a test email from WP Mail SMTP settings, check your SMTP provider dashboard for delivery logs, and set up external monitoring that submits a form on a schedule and verifies receipt. Upnotify heartbeat monitoring can detect when expected pings from your forms stop arriving.',
   },
   {
     question: 'Can I use WP Mail SMTP with Gmail or Google Workspace?',
@@ -67,7 +67,7 @@ export default function WpMailSmtpNotWorkingPage(): React.ReactElement {
           '@type': 'Article',
           headline: 'WP Mail SMTP Not Sending Emails: Why Your WordPress Site Is Silently Broken',
           description: 'What causes WP Mail SMTP to stop sending emails silently, how to fix credential and OAuth failures, and how heartbeat monitoring detects broken email delivery.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-03-20',
           dateModified: '2026-03-20',
@@ -217,10 +217,10 @@ export default function WpMailSmtpNotWorkingPage(): React.ReactElement {
           <Link href="/blog/wordpress-contact-form-not-sending">Contact Form 7</Link> and other form plugins are particularly vulnerable because they show a green success message to the visitor regardless of whether the email was actually delivered. The visitor walks away satisfied. You never receive their message.
         </p>
 
-        <h2>How to detect broken email delivery with Uptrue</h2>
+        <h2>How to detect broken email delivery with Upnotify</h2>
 
         <p>
-          <Link href="/signup">Uptrue&apos;s heartbeat and keyword monitoring</Link> can detect when your WordPress email system stops working — even when everything else on your site looks perfectly fine.
+          <Link href="/signup">Upnotify&apos;s heartbeat and keyword monitoring</Link> can detect when your WordPress email system stops working — even when everything else on your site looks perfectly fine.
         </p>
 
         <h3>Step 1: Set up a heartbeat monitor on your contact form</h3>
@@ -229,13 +229,13 @@ export default function WpMailSmtpNotWorkingPage(): React.ReactElement {
           <li>Sign up at <Link href="/signup">uptrue.io/signup</Link> (free plan available)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>Heartbeat</strong> as the monitor type</li>
-          <li>Configure your contact form (or a test form) to send a ping to the Uptrue heartbeat URL after successful email delivery</li>
+          <li>Configure your contact form (or a test form) to send a ping to the Upnotify heartbeat URL after successful email delivery</li>
           <li>Set the expected interval — for example, <strong>every 24 hours</strong></li>
-          <li>If the heartbeat ping does not arrive within the expected window, Uptrue alerts you</li>
+          <li>If the heartbeat ping does not arrive within the expected window, Upnotify alerts you</li>
         </ol>
 
         <p>
-          A heartbeat monitor works on the principle of &quot;if I do not hear from you, something is wrong.&quot; You configure a scheduled task or a monitoring form that sends a ping to Uptrue after successfully delivering an email. If WP Mail SMTP breaks and emails stop sending, the ping stops arriving, and Uptrue alerts you.
+          A heartbeat monitor works on the principle of &quot;if I do not hear from you, something is wrong.&quot; You configure a scheduled task or a monitoring form that sends a ping to Upnotify after successfully delivering an email. If WP Mail SMTP breaks and emails stop sending, the ping stops arriving, and Upnotify alerts you.
         </p>
 
         <h3>Step 2: Set up a keyword monitor on your form confirmation page</h3>
@@ -288,7 +288,7 @@ export default function WpMailSmtpNotWorkingPage(): React.ReactElement {
           <li><strong>Slack</strong> — instant notification, not dependent on your WordPress email</li>
           <li><strong>Microsoft Teams</strong> — same benefit, different platform</li>
           <li><strong>Webhook</strong> — send alerts to PagerDuty, Opsgenie, or a custom endpoint</li>
-          <li><strong>Email</strong> — Uptrue sends from its own servers, not from your WordPress site, so even if your site email is broken, Uptrue alerts still arrive</li>
+          <li><strong>Email</strong> — Upnotify sends from its own servers, not from your WordPress site, so even if your site email is broken, Upnotify alerts still arrive</li>
         </ul>
 
         <div className="blog-cta-section">
@@ -343,7 +343,7 @@ export default function WpMailSmtpNotWorkingPage(): React.ReactElement {
         </p>
 
         <p>
-          Uptrue&apos;s heartbeat monitoring detects when expected pings stop arriving. Keyword monitoring confirms your forms are loading correctly. Combined, they catch both visible crashes and invisible email failures. One minute checks. Alerts on Slack, Teams, email, and webhook. From outside your server, so WordPress email failures do not affect your monitoring.
+          Upnotify&apos;s heartbeat monitoring detects when expected pings stop arriving. Keyword monitoring confirms your forms are loading correctly. Combined, they catch both visible crashes and invisible email failures. One minute checks. Alerts on Slack, Teams, email, and webhook. From outside your server, so WordPress email failures do not affect your monitoring.
         </p>
 
         <div className="blog-cta-section">
@@ -370,7 +370,7 @@ export default function WpMailSmtpNotWorkingPage(): React.ReactElement {
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

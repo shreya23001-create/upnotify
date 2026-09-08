@@ -21,7 +21,7 @@ const FAQ_SCHEMA = {
       name: 'Can I use a custom domain for my status page?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Yes. On the Scale plan, you can point your own domain (e.g. status.yourcompany.com) to your Uptrue status page by adding a CNAME record to your DNS.',
+        text: 'Yes. On the Scale plan, you can point your own domain (e.g. status.yourcompany.com) to your Upnotify status page by adding a CNAME record to your DNS.',
       },
     },
     {
@@ -66,7 +66,7 @@ export default function StatusPagesPage(): React.ReactElement {
           <section className="help-section">
             <h2 className="help-section-title">What is a status page?</h2>
             <p>
-              A status page is a public web page -- hosted by Uptrue or on your own domain -- that
+              A status page is a public web page -- hosted by Upnotify or on your own domain -- that
               shows your customers the real-time health of your services. It pulls data directly
               from your monitors, so it is always accurate and always up to date.
             </p>
@@ -84,7 +84,7 @@ export default function StatusPagesPage(): React.ReactElement {
               <li>Give it a name (e.g. &ldquo;Acme Corp Status&rdquo;).</li>
               <li>Choose which monitors to display. Only the ones you pick will be visible to the public.</li>
               <li>Customise the appearance -- upload your logo, pick your brand colours, add a custom message.</li>
-              <li>Click <strong>Publish</strong>. Uptrue gives you a shareable link immediately.</li>
+              <li>Click <strong>Publish</strong>. Upnotify gives you a shareable link immediately.</li>
             </ol>
             <p>
               Your status page is live. Share the link in your documentation, footer, or support
@@ -101,7 +101,7 @@ export default function StatusPagesPage(): React.ReactElement {
             </p>
             <p>
               This is a huge time saver. Instead of manually emailing customers during an outage,
-              Uptrue does it for you while you focus on fixing the problem.
+              Upnotify does it for you while you focus on fixing the problem.
             </p>
           </section>
 
@@ -114,9 +114,9 @@ export default function StatusPagesPage(): React.ReactElement {
             </p>
             <ol className="help-steps">
               <li>Open your status page settings and enter your custom domain.</li>
-              <li>Go to your DNS provider and add a CNAME record pointing to the address Uptrue gives you.</li>
+              <li>Go to your DNS provider and add a CNAME record pointing to the address Upnotify gives you.</li>
               <li>Wait for DNS to propagate (usually a few minutes, sometimes up to 24 hours).</li>
-              <li>Uptrue automatically provisions an SSL certificate for your domain.</li>
+              <li>Upnotify automatically provisions an SSL certificate for your domain.</li>
             </ol>
             <p>
               Custom domains make your status page feel like a natural extension of your product
@@ -128,7 +128,7 @@ export default function StatusPagesPage(): React.ReactElement {
             <h2 className="help-section-title">Plan availability</h2>
             <ul className="help-list">
               <li><strong>Free</strong> -- Status pages are not available.</li>
-              <li><strong>Lite</strong> -- 1 branded status page on an Uptrue subdomain.</li>
+              <li><strong>Lite</strong> -- 1 branded status page on an Upnotify subdomain.</li>
               <li><strong>Builder</strong> -- Up to 5 status pages with custom domain support.</li>
               <li><strong>Scale</strong> -- Unlimited status pages with custom domains.</li>
             </ul>

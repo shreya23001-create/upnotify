@@ -16,7 +16,7 @@ export function UptrueLogo({ variant = 'dark', width = 140, height = 35 }: LogoP
       viewBox="0 0 200 50"
       width={width}
       height={height}
-      aria-label="Uptrue"
+      aria-label="Upnotify"
       role="img"
     >
       <defs>
@@ -50,7 +50,7 @@ export function UptrueLogo({ variant = 'dark', width = 140, height = 35 }: LogoP
         fill={textColor}
         letterSpacing="-0.5"
       >
-        Uptrue
+        Upnotify
       </text>
     </svg>
   )
@@ -64,7 +64,7 @@ export function UptrueIcon({ size = 32 }: { size?: number }): React.ReactElement
       viewBox="0 0 40 48"
       width={size}
       height={size}
-      aria-label="Uptrue"
+      aria-label="Upnotify"
       role="img"
     >
       <defs>

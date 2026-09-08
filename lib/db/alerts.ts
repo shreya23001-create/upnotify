@@ -55,6 +55,7 @@ export async function createAlertChannel(channelData: {
   name: string
   config: Record<string, unknown>
   severity_filter?: string[]
+  monitor_ids?: string[] | null
 }): Promise<AlertChannel | null> {
   const supabase = createAdminClient()
   const { data: channel, error } = await supabase
@@ -63,6 +64,7 @@ export async function createAlertChannel(channelData: {
       ...channelData,
       config: channelData.config as import('@/lib/types/database.types').Json,
       severity_filter: channelData.severity_filter || ['P1', 'P2', 'P3', 'P4'],
+      monitor_ids: channelData.monitor_ids?.length ? channelData.monitor_ids : null,
     })
     .select()
     .single()
@@ -134,13 +136,14 @@ export async function getAlertChannelById(id: string): Promise<AlertChannel | nu
 
 export async function updateAlertChannel(
   id: string,
-  updates: { name?: string; config?: Record<string, unknown>; severity_filter?: string[] }
+  updates: { name?: string; config?: Record<string, unknown>; severity_filter?: string[]; monitor_ids?: string[] | null }
 ): Promise<AlertChannel | null> {
   const supabase = createAdminClient()
   const updateData: Record<string, unknown> = {}
   if (updates.name) updateData.name = updates.name
   if (updates.config) updateData.config = updates.config as import('@/lib/types/database.types').Json
   if (updates.severity_filter) updateData.severity_filter = updates.severity_filter
+  if (updates.monitor_ids !== undefined) updateData.monitor_ids = updates.monitor_ids?.length ? updates.monitor_ids : null
 
   const { data, error } = await supabase
     .from('alert_channels')

@@ -132,6 +132,7 @@ export type Database = {
           created_at: string
           id: string
           is_enabled: boolean
+          monitor_ids: string[] | null
           name: string
           org_id: string
           severity_filter: string[]
@@ -144,6 +145,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_enabled?: boolean
+          monitor_ids?: string[] | null
           name: string
           org_id: string
           severity_filter?: string[]
@@ -156,6 +158,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_enabled?: boolean
+          monitor_ids?: string[] | null
           name?: string
           org_id?: string
           severity_filter?: string[]

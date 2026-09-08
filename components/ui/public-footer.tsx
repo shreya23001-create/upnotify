@@ -103,7 +103,7 @@ export async function PublicFooter(): Promise<React.ReactElement> {
 
           {/* Brand */}
           <div className="footer-brand">
-            <Link href="/" className="nav-logo" aria-label="Uptrue home" style={{ marginBottom: 'var(--space-4)', display: 'inline-flex' }}>
+            <Link href="/" className="nav-logo" aria-label="Upnotify home" style={{ marginBottom: 'var(--space-4)', display: 'inline-flex' }}>
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 50" height="28" aria-hidden="true">
                 <defs>
                   <linearGradient id="ftG" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -115,7 +115,7 @@ export async function PublicFooter(): Promise<React.ReactElement> {
                 <text x="10" y="30" fontFamily="system-ui,-apple-system,sans-serif" fontSize="16" fontWeight="800" fill="white" letterSpacing="0.5">
                   <tspan dy="0">U</tspan><tspan dy="-5">p</tspan>
                 </text>
-                <text x="46" y="34" fontFamily="system-ui,-apple-system,sans-serif" fontSize="28" fontWeight="700" fill="#ffffff" letterSpacing="-0.5">Uptrue</text>
+                <text x="46" y="34" fontFamily="system-ui,-apple-system,sans-serif" fontSize="28" fontWeight="700" fill="#ffffff" letterSpacing="-0.5">Upnotify</text>
               </svg>
             </Link>
             <p className="footer-desc">{description}</p>

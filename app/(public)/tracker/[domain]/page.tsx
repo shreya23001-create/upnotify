@@ -61,8 +61,8 @@ export async function generateMetadata({ params }: { params: Promise<{ domain: s
   // (related sites + signup CTA) but don't index the URL.
   if (!monitorAny) {
     return {
-      title: `${canonicalDomain || 'Site'} not in tracker — monitor any site free | Uptrue`,
-      description: `${canonicalDomain || 'This site'} isn't in the public Uptrue tracker yet. Monitor it yourself in 2 minutes on the Free plan, or browse other tracked sites.`,
+      title: `${canonicalDomain || 'Site'} not in tracker — monitor any site free | Upnotify`,
+      description: `${canonicalDomain || 'This site'} isn't in the public Upnotify tracker yet. Monitor it yourself in 2 minutes on the Free plan, or browse other tracked sites.`,
       robots: { index: false, follow: true },
     }
   }
@@ -71,8 +71,8 @@ export async function generateMetadata({ params }: { params: Promise<{ domain: s
   // so Google can deindex the old URL cleanly.
   if (!monitorAny.is_active) {
     return {
-      title: `${monitorAny.display_name} no longer tracked | Uptrue`,
-      description: `${monitorAny.display_name} was previously on the Uptrue public tracker and has been removed.`,
+      title: `${monitorAny.display_name} no longer tracked | Upnotify`,
+      description: `${monitorAny.display_name} was previously on the Upnotify public tracker and has been removed.`,
       robots: { index: false, follow: false },
     }
   }
@@ -82,7 +82,7 @@ export async function generateMetadata({ params }: { params: Promise<{ domain: s
   const siteName = siteInfo?.name ?? monitor.display_name
 
   // Per-domain SEO override takes precedence when present (e.g. salesforce → "sfdc status" keyword)
-  const rawTitle = siteInfo?.seoTitle ?? `Is ${siteName} Down? Live Status & Uptime Tracker | Uptrue`
+  const rawTitle = siteInfo?.seoTitle ?? `Is ${siteName} Down? Live Status & Uptime Tracker | Upnotify`
   const title = siteInfo?.seoTitle ? { absolute: siteInfo.seoTitle } : rawTitle
   const description = siteInfo?.seoDescription ?? (siteInfo
     ? `Check if ${siteName} is down right now. Live status, response time, uptime history, and incident log for ${siteName} (${monitor.domain}). Get alerts when ${siteName} goes down.`
@@ -221,7 +221,7 @@ function buildFaqItems(
   return [
     {
       question: `Is ${siteName} down right now?`,
-      answer: `Based on our monitoring, ${siteName} is currently ${getStatusLabelSimple(status)}. Last checked ${formatTimeAgoSeconds(lastCheckedAt)} ago. This page updates every 5 minutes with real monitoring data from Uptrue's infrastructure.`,
+      answer: `Based on our monitoring, ${siteName} is currently ${getStatusLabelSimple(status)}. Last checked ${formatTimeAgoSeconds(lastCheckedAt)} ago. This page updates every 5 minutes with real monitoring data from Upnotify's infrastructure.`,
     },
     {
       question: `How often does ${siteName} go down?`,
@@ -255,7 +255,7 @@ function buildFaqItems(
     },
     {
       question: `Can I get notified when ${siteName} goes down?`,
-      answer: `Yes. Use the subscribe form above to enter your email address. Uptrue will send you an alert the moment ${siteName} goes down and again when it recovers. It is completely free and you can unsubscribe at any time.`,
+      answer: `Yes. Use the subscribe form above to enter your email address. Upnotify will send you an alert the moment ${siteName} goes down and again when it recovers. It is completely free and you can unsubscribe at any time.`,
     },
   ]
 }
@@ -526,10 +526,10 @@ export default async function TrackerDomainPage({
         <p className="tracker-about-description">
           {siteInfo
             ? siteInfo.description
-            : `${monitor.display_name} is a website that Uptrue monitors for uptime and performance. We check ${monitor.domain} every 5 minutes from multiple locations to detect downtime, slow responses, and SSL issues.`}
+            : `${monitor.display_name} is a website that Upnotify monitors for uptime and performance. We check ${monitor.domain} every 5 minutes from multiple locations to detect downtime, slow responses, and SSL issues.`}
           {' '}
           <Link href="/pricing" className="tracker-link">
-            Monitor your own website with Uptrue
+            Monitor your own website with Upnotify
           </Link>
           {' '}and get instant alerts when anything goes wrong.
         </p>
@@ -573,7 +573,7 @@ export default async function TrackerDomainPage({
           </div>
           <div className="tracker-reasons-cta">
             <p className="tracker-reasons-footer">
-              Don&apos;t just track {siteName} — protect your own uptime. Uptrue monitors your website 24/7 and alerts you via email, SMS, or Slack.
+              Don&apos;t just track {siteName} — protect your own uptime. Upnotify monitors your website 24/7 and alerts you via email, SMS, or Slack.
             </p>
             <Link href="/pricing" className="tracker-reasons-cta-btn">
               Start Free Monitoring →
@@ -743,9 +743,9 @@ export default async function TrackerDomainPage({
       {/* Disclaimer */}
       <div className="tracker-disclaimer">
         <p>
-          This page shows automated checks from Uptrue&apos;s monitoring
+          This page shows automated checks from Upnotify&apos;s monitoring
           infrastructure. Status may not reflect your local experience. Results
-          are provided for informational purposes only. Uptrue is not affiliated
+          are provided for informational purposes only. Upnotify is not affiliated
           with {siteName}.
         </p>
       </div>

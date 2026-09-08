@@ -38,7 +38,7 @@ const FAQ_DATA = [
   {
     question: 'How do I check my website response time?',
     answer:
-      'Open your browser\'s developer tools (F12), go to the Network tab, reload the page, click on the first HTML document in the list, and look at the "Waiting (TTFB)" value in the Timing section. For more detailed analysis, use Google PageSpeed Insights (look for "Reduce initial server response time" under Opportunities), WebPageTest.org (waterfall view shows TTFB clearly), or GTmetrix. For ongoing monitoring rather than one-off tests, use an uptime monitoring tool like Uptrue that checks your TTFB every minute and alerts you when it exceeds a threshold.',
+      'Open your browser\'s developer tools (F12), go to the Network tab, reload the page, click on the first HTML document in the list, and look at the "Waiting (TTFB)" value in the Timing section. For more detailed analysis, use Google PageSpeed Insights (look for "Reduce initial server response time" under Opportunities), WebPageTest.org (waterfall view shows TTFB clearly), or GTmetrix. For ongoing monitoring rather than one-off tests, use an uptime monitoring tool like Upnotify that checks your TTFB every minute and alerts you when it exceeds a threshold.',
   },
   {
     question: 'Does slow response time affect Google rankings?',
@@ -48,7 +48,7 @@ const FAQ_DATA = [
   {
     question: 'My website is fast in my browser but slow for visitors. Why?',
     answer:
-      'Several factors can explain this discrepancy. First, browser caching: your browser caches your site aggressively after multiple visits, so it loads fast for you but is slower for first-time visitors. Second, geography: if you are geographically close to your server but your visitors are not, they experience higher latency. Test from multiple locations using tools like WebPageTest or Uptrue\'s multi-region monitoring. Third, server load: your site may be fast when you are the only one on it but slow under real traffic. Fourth, your ISP: your internet connection speed and routing affects perceived response time from your location.',
+      'Several factors can explain this discrepancy. First, browser caching: your browser caches your site aggressively after multiple visits, so it loads fast for you but is slower for first-time visitors. Second, geography: if you are geographically close to your server but your visitors are not, they experience higher latency. Test from multiple locations using tools like WebPageTest or Upnotify\'s multi-region monitoring. Third, server load: your site may be fast when you are the only one on it but slow under real traffic. Fourth, your ISP: your internet connection speed and routing affects perceived response time from your location.',
   },
 ]
 
@@ -72,7 +72,7 @@ export default function WebsiteResponseTimePage(): React.ReactElement {
           '@type': 'Article',
           headline: 'What Is a Good Website Response Time? (And How to Fix a Slow Server)',
           description: 'What good website response time looks like, what causes high TTFB, how to fix slow server response, and how to monitor it continuously.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-04-06',
           dateModified: '2026-04-06',
@@ -281,7 +281,7 @@ export default function WebsiteResponseTimePage(): React.ReactElement {
         </ul>
 
         <p>
-          Set up an HTTP monitor in <Link href="https://uptrue.io/signup">Uptrue</Link> for each critical page on your site. Configure a response time threshold — 1,000ms is a good starting point — so you get alerted when the server is slow, not just when it is completely down.
+          Set up an HTTP monitor in <Link href="https://uptrue.io/signup">Upnotify</Link> for each critical page on your site. Configure a response time threshold — 1,000ms is a good starting point — so you get alerted when the server is slow, not just when it is completely down.
         </p>
 
         <p>
@@ -291,7 +291,7 @@ export default function WebsiteResponseTimePage(): React.ReactElement {
         <div className="blog-cta-section">
           <h3>Track your server response time on every check</h3>
           <p>
-            Uptrue measures TTFB every minute and alerts you when your server slows down — before it crashes completely. Free plan available, no credit card required.
+            Upnotify measures TTFB every minute and alerts you when your server slows down — before it crashes completely. Free plan available, no credit card required.
           </p>
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             <Link href="https://uptrue.io/signup" className="btn btn-primary btn-lg">
@@ -327,7 +327,7 @@ export default function WebsiteResponseTimePage(): React.ReactElement {
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

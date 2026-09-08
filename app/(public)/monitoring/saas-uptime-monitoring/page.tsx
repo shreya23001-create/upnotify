@@ -6,7 +6,7 @@ const data: IndustryLandingData = {
   heroTitle: 'SaaS Uptime Monitoring',
   heroSubtitle:
     'Catch API regressions, login failures and silent partial outages before paying customers churn. Built for SaaS founders, engineering teams and platform operators.',
-  seoTitle: 'SaaS Uptime Monitoring — API, Login & Status Page Reliability | Uptrue',
+  seoTitle: 'SaaS Uptime Monitoring — API, Login & Status Page Reliability | Upnotify',
   seoDescription:
     'SaaS uptime monitoring built for product teams: API endpoint checks, response time SLAs, login flow keyword detection, SSL expiry alerts, and a public status page on the Free plan. Stop losing customers to silent regressions.',
   whyItMatters: [
@@ -73,7 +73,7 @@ const data: IndustryLandingData = {
     },
     {
       q: 'Can we white-label a public status page for our customers?',
-      a: 'Free and Lite plans include a branded uptrue.io public status page. White-label custom-domain status pages are on the V1.5 roadmap. Until then, embed our status badge on your marketing site and link to your Uptrue status page from your help docs.',
+      a: 'Free and Lite plans include a branded uptrue.io public status page. White-label custom-domain status pages are on the V1.5 roadmap. Until then, embed our status badge on your marketing site and link to your Upnotify status page from your help docs.',
     },
     {
       q: 'How quickly will my engineering team be alerted to a problem?',
@@ -81,7 +81,7 @@ const data: IndustryLandingData = {
     },
     {
       q: 'Do you integrate with PagerDuty, Opsgenie, or similar?',
-      a: 'Native PagerDuty and Opsgenie integrations are on the V1.5 roadmap. In the meantime, every Uptrue alert can fire as a signed webhook — point that at your incident management tool and you have full integration in 5 minutes.',
+      a: 'Native PagerDuty and Opsgenie integrations are on the V1.5 roadmap. In the meantime, every Upnotify alert can fire as a signed webhook — point that at your incident management tool and you have full integration in 5 minutes.',
     },
   ],
 }

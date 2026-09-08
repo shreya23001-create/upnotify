@@ -17,12 +17,12 @@ const PAGE_SIZE = 20
 export const revalidate = 60
 
 export const metadata: Metadata = {
-  title: 'Is It Down? Live Website Status Tracker — Real-Time Uptime | Uptrue',
+  title: 'Is It Down? Live Website Status Tracker — Real-Time Uptime | Upnotify',
   description:
     'Check if popular websites are down right now. Live uptime monitoring for Google, Facebook, GitHub, AWS, OpenAI and 100+ more services. Real-time status, response time, incident history.',
   alternates: { canonical: 'https://uptrue.io/tracker' },
   openGraph: {
-    title: 'Is It Down? Live Website Status Tracker — Real-Time Uptime | Uptrue',
+    title: 'Is It Down? Live Website Status Tracker — Real-Time Uptime | Upnotify',
     description:
       'Real-time uptime monitoring for popular websites and services. Free, public, no signup required.',
     url: 'https://uptrue.io/tracker',
@@ -41,7 +41,7 @@ const FAQ = [
   },
   {
     q: 'How can I add a site to the public tracker?',
-    a: 'The public tracker covers popular websites that everyone wants to know about. To monitor your own site, sign up for a free Uptrue account — you get HTTP, SSL, DNS and response-time monitoring with email alerts on the Free plan.',
+    a: 'The public tracker covers popular websites that everyone wants to know about. To monitor your own site, sign up for a free Upnotify account — you get HTTP, SSL, DNS and response-time monitoring with email alerts on the Free plan.',
   },
   {
     q: 'Can I monitor my own site continuously instead of refreshing this page?',
@@ -53,7 +53,7 @@ const FAQ = [
   },
   {
     q: 'Is there a way to subscribe to alerts for specific sites?',
-    a: 'Subscriber alerts on the public tracker are coming. For now, the fastest path is to add the sites you care about as monitors in your own Uptrue account — you can monitor any public URL on the Free plan and receive email, Slack, Telegram, or Microsoft Teams alerts on every status change.',
+    a: 'Subscriber alerts on the public tracker are coming. For now, the fastest path is to add the sites you care about as monitors in your own Upnotify account — you can monitor any public URL on the Free plan and receive email, Slack, Telegram, or Microsoft Teams alerts on every status change.',
   },
 ]
 

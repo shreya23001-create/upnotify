@@ -155,8 +155,8 @@ function fallbackAlertCopy(monitorName: string): AlertCopyTemplate {
     subject: `[Alert] ${monitorName} has an issue`,
     headline: `${monitorName} detected an issue`,
     detail: `An issue was detected on ${monitorName} at {{checkedAt}}. Please investigate.`,
-    shortText: `[Uptrue] ${monitorName} has an issue at {{checkedAt}}.`,
-    voiceScript: `This is an Uptrue alert. ${monitorName} has detected an issue. Please investigate immediately.`,
+    shortText: `[Upnotify] ${monitorName} has an issue at {{checkedAt}}.`,
+    voiceScript: `This is an Upnotify alert. ${monitorName} has detected an issue. Please investigate immediately.`,
   }
 }
 
@@ -165,7 +165,7 @@ function fallbackRecoveryCopy(monitorName: string): AlertCopyTemplate {
     subject: `✅ ${monitorName} has recovered`,
     headline: `${monitorName} is back to normal`,
     detail: `${monitorName} has recovered as of {{resolvedAt}}. Downtime was {{downDuration}}.`,
-    shortText: `[Uptrue] ${monitorName} has recovered.`,
-    voiceScript: `This is an Uptrue recovery alert. ${monitorName} has recovered.`,
+    shortText: `[Upnotify] ${monitorName} has recovered.`,
+    voiceScript: `This is an Upnotify recovery alert. ${monitorName} has recovered.`,
   }
 }

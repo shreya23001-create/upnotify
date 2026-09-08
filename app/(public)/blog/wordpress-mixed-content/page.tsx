@@ -6,12 +6,12 @@ import Faq from '@/components/landing/faq'
 export const metadata: Metadata = {
   title: 'WordPress Mixed Content Errors: Why Your Site Shows \'Not Secure\' After Installing SSL',
   description:
-    'You installed an SSL certificate but your browser still shows "Not Secure." Hardcoded HTTP URLs in your database, plugin assets loading over HTTP, CDN misconfigurations, and images with absolute HTTP paths all cause mixed content errors. Learn how to find every mixed content source and how Uptrue SSL and keyword monitoring catches them automatically.',
+    'You installed an SSL certificate but your browser still shows "Not Secure." Hardcoded HTTP URLs in your database, plugin assets loading over HTTP, CDN misconfigurations, and images with absolute HTTP paths all cause mixed content errors. Learn how to find every mixed content source and how Upnotify SSL and keyword monitoring catches them automatically.',
   alternates: { canonical: 'https://uptrue.io/blog/wordpress-mixed-content' },
   openGraph: {
     title: 'WordPress Mixed Content Errors: Why Your Site Shows \'Not Secure\' After Installing SSL',
     description:
-      'Why your WordPress site still shows "Not Secure" after installing SSL, how to find and fix every mixed content source, and how Uptrue monitoring catches insecure elements automatically.',
+      'Why your WordPress site still shows "Not Secure" after installing SSL, how to find and fix every mixed content source, and how Upnotify monitoring catches insecure elements automatically.',
     url: 'https://uptrue.io/blog/wordpress-mixed-content',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'WordPress Mixed Content Errors: Why Your Site Shows \'Not Secure\' After Installing SSL',
     description:
-      'Why your WordPress site still shows "Not Secure" after installing SSL, how to find and fix every mixed content source, and how Uptrue monitoring catches insecure elements automatically.',
+      'Why your WordPress site still shows "Not Secure" after installing SSL, how to find and fix every mixed content source, and how Upnotify monitoring catches insecure elements automatically.',
   },
 }
 
@@ -41,9 +41,9 @@ const FAQ_DATA = [
       'Yes. Google has used HTTPS as a ranking signal since 2014 and Chrome marks pages with mixed content as "Not Secure" in the address bar. Pages that trigger mixed content warnings may receive lower trust signals from Google. Active mixed content that browsers block can also break page functionality — missing scripts can prevent forms, navigation, and interactive elements from working. If Google crawls a page where critical scripts are blocked due to mixed content, the page may be indexed without important content, affecting both rankings and how the page appears in search results.',
   },
   {
-    question: 'Can Uptrue detect mixed content errors on my WordPress site?',
+    question: 'Can Upnotify detect mixed content errors on my WordPress site?',
     answer:
-      'Yes. Uptrue offers two monitoring approaches that catch mixed content issues. The SSL monitor validates your certificate and detects configuration problems that contribute to mixed content warnings. The keyword monitor can check your pages for the presence of "not secure" indicators or verify that specific secure elements are loading correctly. Combined, these monitors alert you within 60 seconds if a plugin update, content change, or CDN misconfiguration reintroduces mixed content on any monitored page.',
+      'Yes. Upnotify offers two monitoring approaches that catch mixed content issues. The SSL monitor validates your certificate and detects configuration problems that contribute to mixed content warnings. The keyword monitor can check your pages for the presence of "not secure" indicators or verify that specific secure elements are loading correctly. Combined, these monitors alert you within 60 seconds if a plugin update, content change, or CDN misconfiguration reintroduces mixed content on any monitored page.',
   },
 ]
 
@@ -66,8 +66,8 @@ export default function WordPressMixedContentPage(): React.ReactElement {
           '@context': 'https://schema.org',
           '@type': 'Article',
           headline: 'WordPress Mixed Content Errors: Why Your Site Shows \'Not Secure\' After Installing SSL',
-          description: 'Why your WordPress site still shows "Not Secure" after installing SSL, how to find and fix every mixed content source, and how Uptrue monitoring catches insecure elements automatically.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          description: 'Why your WordPress site still shows "Not Secure" after installing SSL, how to find and fix every mixed content source, and how Upnotify monitoring catches insecure elements automatically.',
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-04-04',
           dateModified: '2026-04-04',
@@ -287,14 +287,14 @@ export default function WordPressMixedContentPage(): React.ReactElement {
           provides a comprehensive reference on how browsers handle different types of mixed content and which resources are blocked versus warned.
         </p>
 
-        <h2>How to detect mixed content automatically with Uptrue</h2>
+        <h2>How to detect mixed content automatically with Upnotify</h2>
 
         <p>
           Fixing mixed content once is relatively straightforward. The real challenge is keeping it fixed. A plugin update can reintroduce HTTP asset URLs. A content editor can paste an HTTP image link into a post. A CDN configuration change can revert to HTTP. A theme update can reset a hardcoded URL.
         </p>
 
         <p>
-          <Link href="/signup">Uptrue&apos;s monitoring</Link> catches these regressions automatically, so you do not discover them from a customer complaint or a Google ranking drop.
+          <Link href="/signup">Upnotify&apos;s monitoring</Link> catches these regressions automatically, so you do not discover them from a customer complaint or a Google ranking drop.
         </p>
 
         <h3>Step 1: Set up an SSL monitor for your domain</h3>
@@ -370,7 +370,7 @@ export default function WordPressMixedContentPage(): React.ReactElement {
 
         <h3>Audit after every plugin and theme update</h3>
         <p>
-          Plugin and theme updates can reintroduce hardcoded HTTP URLs in their settings or asset files. After updating any plugin or theme, check the browser console on a few key pages for new mixed content warnings. Better yet, rely on Uptrue&apos;s monitoring to alert you automatically if an update reintroduces insecure resources.
+          Plugin and theme updates can reintroduce hardcoded HTTP URLs in their settings or asset files. After updating any plugin or theme, check the browser console on a few key pages for new mixed content warnings. Better yet, rely on Upnotify&apos;s monitoring to alert you automatically if an update reintroduces insecure resources.
         </p>
 
         <h3>Train content editors to use HTTPS URLs</h3>
@@ -391,7 +391,7 @@ export default function WordPressMixedContentPage(): React.ReactElement {
         </p>
 
         <p>
-          Uptrue monitors your SSL configuration continuously and checks your critical pages every minute. When a plugin update, content change, or CDN misconfiguration reintroduces mixed content, you get alerted before your visitors see the warning. You fix it in minutes instead of losing traffic for days.
+          Upnotify monitors your SSL configuration continuously and checks your critical pages every minute. When a plugin update, content change, or CDN misconfiguration reintroduces mixed content, you get alerted before your visitors see the warning. You fix it in minutes instead of losing traffic for days.
         </p>
 
         <p>
@@ -422,7 +422,7 @@ export default function WordPressMixedContentPage(): React.ReactElement {
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

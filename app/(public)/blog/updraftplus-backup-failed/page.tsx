@@ -6,7 +6,7 @@ import Faq from '@/components/landing/faq'
 export const metadata: Metadata = {
   title: 'UpdraftPlus Backup Failed: When Your Safety Net Has a Hole in It',
   description:
-    'UpdraftPlus can silently stop backing up your WordPress site. Disk space exhaustion, PHP timeouts, and expired remote storage credentials are the most common causes. Learn what makes backups fail, how to fix each cause, and how Uptrue HTTP monitoring catches the 500 errors that disk-full servers produce.',
+    'UpdraftPlus can silently stop backing up your WordPress site. Disk space exhaustion, PHP timeouts, and expired remote storage credentials are the most common causes. Learn what makes backups fail, how to fix each cause, and how Upnotify HTTP monitoring catches the 500 errors that disk-full servers produce.',
   alternates: { canonical: 'https://uptrue.io/blog/updraftplus-backup-failed' },
   openGraph: {
     title: 'UpdraftPlus Backup Failed: When Your Safety Net Has a Hole in It',
@@ -67,7 +67,7 @@ export default function UpdraftPlusBackupFailedPage(): React.ReactElement {
           '@type': 'Article',
           headline: 'UpdraftPlus Backup Failed: When Your Safety Net Has a Hole in It',
           description: 'Why UpdraftPlus backups fail silently, how to fix each cause, and how HTTP monitoring catches the disk-full 500 errors that follow.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-04-01',
           dateModified: '2026-04-01',
@@ -207,10 +207,10 @@ export default function UpdraftPlusBackupFailedPage(): React.ReactElement {
           A disk-full server does not produce a clean error message. It produces intermittent, unpredictable failures. Some pages load. Some return 500. Some load partially. The behaviour changes with every request because it depends on whether PHP happens to find enough temporary space for that specific request.
         </p>
 
-        <h2>How Uptrue HTTP monitoring catches disk-full 500 errors</h2>
+        <h2>How Upnotify HTTP monitoring catches disk-full 500 errors</h2>
 
         <p>
-          <Link href="/signup">Uptrue&apos;s HTTP monitoring</Link> checks your site every 60 seconds and verifies the server returns a 200 status code. When your disk fills up and WordPress starts returning 500 errors, Uptrue detects it immediately. You do not discover the problem hours later when a customer emails you about a broken website — you know within a minute.
+          <Link href="/signup">Upnotify&apos;s HTTP monitoring</Link> checks your site every 60 seconds and verifies the server returns a 200 status code. When your disk fills up and WordPress starts returning 500 errors, Upnotify detects it immediately. You do not discover the problem hours later when a customer emails you about a broken website — you know within a minute.
         </p>
 
         <h3>Step 1: Set up HTTP monitoring on your homepage</h3>
@@ -226,7 +226,7 @@ export default function UpdraftPlusBackupFailedPage(): React.ReactElement {
         </ol>
 
         <p>
-          When a disk-full server starts returning 500 errors, Uptrue detects it on the next check. You are alerted within 60 seconds of the first failure.
+          When a disk-full server starts returning 500 errors, Upnotify detects it on the next check. You are alerted within 60 seconds of the first failure.
         </p>
 
         <h3>Step 2: Monitor key inner pages for intermittent failures</h3>
@@ -323,7 +323,7 @@ export default function UpdraftPlusBackupFailedPage(): React.ReactElement {
         </p>
 
         <p>
-          Uptrue cannot monitor your backup plugin directly. But it catches the most destructive downstream consequence of backup failures: your server filling up with partial backup files and your WordPress site going offline with 500 errors. When that alert fires at 3 AM, you know something is wrong with your server before your first morning visitor hits a broken page.
+          Upnotify cannot monitor your backup plugin directly. But it catches the most destructive downstream consequence of backup failures: your server filling up with partial backup files and your WordPress site going offline with 500 errors. When that alert fires at 3 AM, you know something is wrong with your server before your first morning visitor hits a broken page.
         </p>
 
         <div className="blog-cta-section">
@@ -350,7 +350,7 @@ export default function UpdraftPlusBackupFailedPage(): React.ReactElement {
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

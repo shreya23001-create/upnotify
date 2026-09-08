@@ -12,14 +12,14 @@ import { ScrollReveal } from '@/components/landing/scroll-reveal'
 export const revalidate = 300
 
 export const metadata: Metadata = {
-  title: 'Uptime Leaderboard — Most Reliable Websites Ranked by Uptime | Uptrue',
+  title: 'Uptime Leaderboard — Most Reliable Websites Ranked by Uptime | Upnotify',
   description:
-    'The top 50 most reliable websites ranked by 30-day uptime percentage. Real-time leaderboard powered by Uptrue monitoring data — see who is genuinely the most stable. Is your site in the top 50?',
+    'The top 50 most reliable websites ranked by 30-day uptime percentage. Real-time leaderboard powered by Upnotify monitoring data — see who is genuinely the most stable. Is your site in the top 50?',
   alternates: { canonical: 'https://uptrue.io/leaderboard' },
   openGraph: {
-    title: 'Uptime Leaderboard — Most Reliable Websites Ranked by Uptime | Uptrue',
+    title: 'Uptime Leaderboard — Most Reliable Websites Ranked by Uptime | Upnotify',
     description:
-      'The top 50 most reliable websites ranked by uptime. Real-time data from Uptrue monitoring.',
+      'The top 50 most reliable websites ranked by uptime. Real-time data from Upnotify monitoring.',
     url: 'https://uptrue.io/leaderboard',
     type: 'website',
   },
@@ -36,7 +36,7 @@ const FAQ = [
   },
   {
     q: 'How can my site appear on the leaderboard?',
-    a: 'The leaderboard is curated from popular public sites we already monitor on the public tracker. To track your own uptime privately, sign up for a free Uptrue account — you get the same monitoring engine, alerts, and 30-day uptime stats on your own dashboard.',
+    a: 'The leaderboard is curated from popular public sites we already monitor on the public tracker. To track your own uptime privately, sign up for a free Upnotify account — you get the same monitoring engine, alerts, and 30-day uptime stats on your own dashboard.',
   },
   {
     q: 'What does it take to hit 99.99% uptime?',
@@ -48,7 +48,7 @@ const FAQ = [
   },
   {
     q: 'Can I get a badge for my site?',
-    a: 'Sites that rank in the top 10 can embed a "Top 10 on Uptrue Leaderboard" badge. The badge updates dynamically — if a site drops out of the top 10, the badge automatically reflects the new ranking.',
+    a: 'Sites that rank in the top 10 can embed a "Top 10 on Upnotify Leaderboard" badge. The badge updates dynamically — if a site drops out of the top 10, the badge automatically reflects the new ranking.',
   },
 ]
 
@@ -238,13 +238,13 @@ export default async function LeaderboardPage(): Promise<React.ReactElement> {
         <div className="leaderboard-badge-section reveal">
           <h2 className="leaderboard-badge-title">Earn a Leaderboard Badge</h2>
           <p className="leaderboard-badge-text">
-            Sites ranked in the top 10 can embed a &quot;Top 10 on Uptrue Leaderboard&quot;
+            Sites ranked in the top 10 can embed a &quot;Top 10 on Upnotify Leaderboard&quot;
             badge on their website. A mark of exceptional reliability.
           </p>
           <div className="leaderboard-badge-preview">
             <div className="leaderboard-embeddable-badge">
               <span className="leaderboard-badge-icon">&#9733;</span>
-              <span>Top 10 on Uptrue Leaderboard</span>
+              <span>Top 10 on Upnotify Leaderboard</span>
             </div>
           </div>
         </div>

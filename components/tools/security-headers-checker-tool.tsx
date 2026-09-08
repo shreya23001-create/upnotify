@@ -38,7 +38,7 @@ function importanceLabel(importance: 'critical' | 'important' | 'recommended'): 
 function importanceColor(importance: 'critical' | 'important' | 'recommended'): string {
   if (importance === 'critical') return '#ef4444'
   if (importance === 'important') return '#f59e0b'
-  return '#6366f1'
+  return '#00c94a'
 }
 
 function formatHeaderName(name: string): string {
@@ -266,7 +266,7 @@ export function SecurityHeadersCheckerTool(): React.ReactElement {
               {result.score < 100 && (
                 <div className="card" style={{ padding: '1.25rem', marginTop: '0.5rem', background: 'var(--color-surface-secondary, #f8fafc)' }}>
                   <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--color-text-secondary)' }}>
-                    <strong>Want automatic security header monitoring?</strong> Uptrue can check your headers daily and alert you when something changes or a header is removed.{' '}
+                    <strong>Want automatic security header monitoring?</strong> Upnotify can check your headers daily and alert you when something changes or a header is removed.{' '}
                     <a href="/signup" style={{ color: 'var(--color-primary)' }}>Start free →</a>
                   </p>
                 </div>

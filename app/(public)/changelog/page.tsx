@@ -4,12 +4,12 @@ import { Rocket, Sparkles, ArrowUpCircle, Wrench, Mail } from 'lucide-react'
 import { ScrollReveal } from '@/components/landing/scroll-reveal'
 
 export const metadata: Metadata = {
-  title: 'Changelog — Uptrue',
-  description: 'See what\'s new in Uptrue. Product updates, new features, and improvements shipped by the Uptrue team.',
+  title: 'Changelog — Upnotify',
+  description: 'See what\'s new in Upnotify. Product updates, new features, and improvements shipped by the Upnotify team.',
   alternates: { canonical: 'https://uptrue.io/changelog' },
   openGraph: {
-    title: 'Changelog — Uptrue',
-    description: 'See what\'s new in Uptrue. Product updates, new features, and improvements.',
+    title: 'Changelog — Upnotify',
+    description: 'See what\'s new in Upnotify. Product updates, new features, and improvements.',
     url: 'https://uptrue.io/changelog',
     type: 'website',
   },
@@ -39,7 +39,7 @@ const ENTRIES = [
     badge: 'Beta',
     badgeIcon: Sparkles,
     items: [
-      { type: 'new', text: 'Uptrue launched — 10 core monitor types: HTTP/HTTPS uptime, SSL certificate, DNS records, keyword detection, domain expiry, port check, ping, API endpoint, heartbeat, and page change detection' },
+      { type: 'new', text: 'Upnotify launched — 10 core monitor types: HTTP/HTTPS uptime, SSL certificate, DNS records, keyword detection, domain expiry, port check, ping, API endpoint, heartbeat, and page change detection' },
       { type: 'new', text: 'Alert channels — email, Slack, Microsoft Teams, Telegram, and HMAC-signed webhooks' },
       { type: 'new', text: 'Public status pages — branded pages with real-time incident feed and subscriber notifications' },
       { type: 'new', text: 'AI executive reports — monthly summaries powered by Claude API' },

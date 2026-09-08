@@ -6,7 +6,7 @@ import Faq from '@/components/landing/faq'
 import { ScrollReveal } from '@/components/landing/scroll-reveal'
 
 export const metadata: Metadata = {
-  title: 'Free HTTP Status Checker — Check URL Response Codes | Uptrue',
+  title: 'Free HTTP Status Checker — Check URL Response Codes | Upnotify',
   description:
     'Check any URL\'s HTTP status code instantly. See response codes, redirect chains, response headers, and server information. Free HTTP checker, no signup required.',
   alternates: { canonical: 'https://uptrue.io/tools/http-status-checker' },
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     'redirect checker',
   ],
   openGraph: {
-    title: 'Free HTTP Status Checker — Check URL Response Codes | Uptrue',
+    title: 'Free HTTP Status Checker — Check URL Response Codes | Upnotify',
     description:
       'Check any URL\'s HTTP status code instantly. See redirects, response headers, and server information.',
     url: 'https://uptrue.io/tools/http-status-checker',
@@ -165,7 +165,7 @@ export default function HttpStatusCheckerPage(): React.ReactElement {
           <div className="tools-cta reveal">
             <h2>Monitor your URLs around the clock</h2>
             <p>
-              Uptrue&apos;s <Link href="/monitoring/http-uptime-monitoring">HTTP uptime monitoring</Link>{' '}
+              Upnotify&apos;s <Link href="/monitoring/http-uptime-monitoring">HTTP uptime monitoring</Link>{' '}
               checks every minute and alerts you the moment a page goes down or returns the wrong status code.
               Pair it with <Link href="/monitoring/redirect-chain-monitoring">redirect chain monitoring</Link> so a
               broken 301 chain doesn&apos;t silently kill SEO between deploys.

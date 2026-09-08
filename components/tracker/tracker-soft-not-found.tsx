@@ -131,7 +131,7 @@ export function TrackerSoftNotFound({
           Want to monitor {requestedDomain} continuously?
         </h2>
         <p style={{ fontSize: 14, lineHeight: 1.65, color: 'var(--text-secondary)', marginBottom: 12 }}>
-          Uptrue's Free plan lets you monitor any public URL — including {requestedDomain} — with
+          Upnotify's Free plan lets you monitor any public URL — including {requestedDomain} — with
           email alerts, response-time tracking, SSL expiry warnings and DNS change detection.
           No credit card required.
         </p>

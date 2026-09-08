@@ -38,7 +38,7 @@ const FAQ_DATA = [
   {
     question: 'Can uptime monitoring detect 502 Bad Gateway errors?',
     answer:
-      'Yes. Unlike some WordPress errors that return a 200 status code with error text in the body, a 502 Bad Gateway returns a clear 502 HTTP status code. Any HTTP uptime monitor that checks for a 200 response will detect a 502 immediately. Uptrue HTTP monitoring checks your site every 60 seconds and alerts you the moment a 502 is returned. For complete coverage, add keyword monitoring as well — some 502 errors are caught by caching layers that return a cached 200 page instead of the 502.',
+      'Yes. Unlike some WordPress errors that return a 200 status code with error text in the body, a 502 Bad Gateway returns a clear 502 HTTP status code. Any HTTP uptime monitor that checks for a 200 response will detect a 502 immediately. Upnotify HTTP monitoring checks your site every 60 seconds and alerts you the moment a 502 is returned. For complete coverage, add keyword monitoring as well — some 502 errors are caught by caching layers that return a cached 200 page instead of the 502.',
   },
   {
     question: 'How do I fix 502 Bad Gateway on WordPress?',
@@ -67,7 +67,7 @@ export default function WordPress502BadGatewayPage(): React.ReactElement {
           '@type': 'Article',
           headline: '502 Bad Gateway on WordPress: What It Means and How to Fix It Fast',
           description: 'What causes 502 Bad Gateway errors on WordPress, how to fix each cause, and how HTTP monitoring catches them instantly.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-03-23',
           dateModified: '2026-03-23',
@@ -213,10 +213,10 @@ export default function WordPress502BadGatewayPage(): React.ReactElement {
           But there is a caveat. If you use Cloudflare, a CDN, or a caching reverse proxy, the caching layer might serve a cached version of the page even when the origin returns a 502. Your monitor checks the cached page, gets a 200, and reports everything as fine. Your cache eventually expires, and then the 502 is exposed to visitors. Adding keyword monitoring alongside HTTP monitoring catches this edge case.
         </p>
 
-        <h2>How to detect 502 errors with Uptrue</h2>
+        <h2>How to detect 502 errors with Upnotify</h2>
 
         <p>
-          <Link href="/signup">Uptrue&apos;s HTTP monitoring</Link> checks your site every 60 seconds and alerts you the moment it receives a non-200 response. Combined with keyword monitoring, you catch 502 errors whether they come from the origin server or are hidden behind a caching layer.
+          <Link href="/signup">Upnotify&apos;s HTTP monitoring</Link> checks your site every 60 seconds and alerts you the moment it receives a non-200 response. Combined with keyword monitoring, you catch 502 errors whether they come from the origin server or are hidden behind a caching layer.
         </p>
 
         <h3>Step 1: Set up an HTTP monitor to catch 502 status codes</h3>
@@ -232,7 +232,7 @@ export default function WordPress502BadGatewayPage(): React.ReactElement {
         </ol>
 
         <p>
-          The moment your site returns a 502 instead of 200, Uptrue triggers an alert. Uptrue uses a two-confirmation check — if the first check fails, it retries from a different location before alerting. This eliminates false positives from momentary network issues while still catching real 502 errors within two minutes.
+          The moment your site returns a 502 instead of 200, Upnotify triggers an alert. Upnotify uses a two-confirmation check — if the first check fails, it retries from a different location before alerting. This eliminates false positives from momentary network issues while still catching real 502 errors within two minutes.
         </p>
 
         <h3>Step 2: Add a keyword monitor for CDN-cached sites</h3>
@@ -260,7 +260,7 @@ export default function WordPress502BadGatewayPage(): React.ReactElement {
         </ol>
 
         <p>
-          This is your safety net. If your normal content disappears for any reason — a 502, a white screen, a critical error, a hacked page, or anything else — you know something is wrong. It does not matter what specific error replaced your content. If your expected content is gone, Uptrue alerts you.
+          This is your safety net. If your normal content disappears for any reason — a 502, a white screen, a critical error, a hacked page, or anything else — you know something is wrong. It does not matter what specific error replaced your content. If your expected content is gone, Upnotify alerts you.
         </p>
 
         <h3>Step 4: Monitor critical inner pages</h3>
@@ -338,7 +338,7 @@ export default function WordPress502BadGatewayPage(): React.ReactElement {
         </p>
 
         <p>
-          Uptrue checks your site every 60 seconds. The moment a 502 is returned, you know. On Slack, Teams, email, or webhook. Before your visitors complain. Before Google crawls an error page. Before your client calls to ask why their site is down. Under a minute. Every time.
+          Upnotify checks your site every 60 seconds. The moment a 502 is returned, you know. On Slack, Teams, email, or webhook. Before your visitors complain. Before Google crawls an error page. Before your client calls to ask why their site is down. Under a minute. Every time.
         </p>
 
         <div className="blog-cta-section">
@@ -365,7 +365,7 @@ export default function WordPress502BadGatewayPage(): React.ReactElement {
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

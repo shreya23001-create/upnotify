@@ -138,7 +138,7 @@ export function AgencyWaitlistPopup({ isOpen, onClose }: AgencyWaitlistPopupProp
             <div style={{ fontSize: 48, marginBottom: 16 }}>{'\u2705'}</div>
             <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 8 }}>You are on the list!</h2>
             <p style={{ color: 'var(--text-muted)', fontSize: 14, lineHeight: 1.6 }}>
-              Thank you for your interest in Uptrue Agency. We will review your application
+              Thank you for your interest in Upnotify Agency. We will review your application
               and be in touch within 48 hours.
             </p>
             <button className="btn btn-primary" onClick={onClose} style={{ marginTop: 20 }}>Close</button>
@@ -147,7 +147,7 @@ export function AgencyWaitlistPopup({ isOpen, onClose }: AgencyWaitlistPopupProp
           <>
             <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 4 }}>Join the Agency Waitlist</h2>
             <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 20, lineHeight: 1.6 }}>
-              Uptrue Agency is coming soon. White-label monitoring, custom branding,
+              Upnotify Agency is coming soon. White-label monitoring, custom branding,
               and revenue sharing for agencies managing multiple client sites.
             </p>
 

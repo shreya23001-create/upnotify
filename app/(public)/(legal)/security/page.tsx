@@ -2,9 +2,9 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: 'Security — Uptrue',
+  title: 'Security — Upnotify',
   description:
-    'How Uptrue protects your data: encryption, infrastructure security, access controls, vulnerability management, and compliance.',
+    'How Upnotify protects your data: encryption, infrastructure security, access controls, vulnerability management, and compliance.',
   alternates: { canonical: 'https://uptrue.io/security' },
 }
 
@@ -15,7 +15,7 @@ export default function SecurityPage(): React.ReactElement {
       <p className="legal-updated">Last updated: April 2026</p>
 
       <p>
-        Security is foundational to Uptrue. As a monitoring platform, we understand that you trust us
+        Security is foundational to Upnotify. As a monitoring platform, we understand that you trust us
         with information about your infrastructure. This page describes the measures we take to protect
         your data and our platform.
       </p>
@@ -23,7 +23,7 @@ export default function SecurityPage(): React.ReactElement {
       <h2>1. Infrastructure</h2>
       <ul>
         <li>
-          <strong>Hosting:</strong> Uptrue runs on Vercel&apos;s edge network with automatic scaling,
+          <strong>Hosting:</strong> Upnotify runs on Vercel&apos;s edge network with automatic scaling,
           DDoS protection, and global CDN.
         </li>
         <li>
@@ -139,7 +139,7 @@ export default function SecurityPage(): React.ReactElement {
 
       <h2>8. Responsible Disclosure</h2>
       <p>
-        If you discover a security vulnerability in Uptrue, please report it responsibly by emailing{' '}
+        If you discover a security vulnerability in Upnotify, please report it responsibly by emailing{' '}
         <a href="mailto:security@uptrue.io">security@uptrue.io</a>. We will acknowledge receipt
         within 24 hours and provide an initial assessment within 5 business days.
       </p>

@@ -72,7 +72,7 @@ export default function UptimeMonitoringToolsPage(): React.ReactElement {
           '@type': 'Article',
           headline: 'Best Uptime Monitoring Tools in 2026: What to Look For',
           description: 'How to evaluate uptime monitoring tools: check frequency, multi-region, SSL monitoring, alert channels, status pages, and response time tracking.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-04-06',
           dateModified: '2026-04-06',
@@ -250,7 +250,7 @@ export default function UptimeMonitoringToolsPage(): React.ReactElement {
         </p>
 
         <p>
-          The best monitoring tools include built-in public status page creation. Uptrue&apos;s status pages update automatically based on monitor status — when a monitor goes down, the status page reflects it immediately without any manual action on your part.
+          The best monitoring tools include built-in public status page creation. Upnotify&apos;s status pages update automatically based on monitor status — when a monitor goes down, the status page reflects it immediately without any manual action on your part.
         </p>
 
         <p>
@@ -308,10 +308,10 @@ export default function UptimeMonitoringToolsPage(): React.ReactElement {
           <li>Downloadable reports for SLA documentation</li>
         </ul>
 
-        <h2>What Uptrue offers</h2>
+        <h2>What Upnotify offers</h2>
 
         <p>
-          Uptrue was built with all of the above criteria in mind. It includes HTTP/HTTPS monitoring with 1-minute check intervals, two-confirmation checks to eliminate false alarms, multi-region monitoring from Europe and North America, SSL certificate monitoring with configurable alert thresholds, TTFB measurement on every check, keyword monitoring, DNS record monitoring, and heartbeat monitoring for scheduled jobs.
+          Upnotify was built with all of the above criteria in mind. It includes HTTP/HTTPS monitoring with 1-minute check intervals, two-confirmation checks to eliminate false alarms, multi-region monitoring from Europe and North America, SSL certificate monitoring with configurable alert thresholds, TTFB measurement on every check, keyword monitoring, DNS record monitoring, and heartbeat monitoring for scheduled jobs.
         </p>
 
         <p>
@@ -319,7 +319,7 @@ export default function UptimeMonitoringToolsPage(): React.ReactElement {
         </p>
 
         <p>
-          The free plan includes 5 monitors with 5-minute check intervals — enough to evaluate whether Uptrue fits your needs. Paid plans start with 1-minute intervals and higher monitor counts.
+          The free plan includes 5 monitors with 5-minute check intervals — enough to evaluate whether Upnotify fits your needs. Paid plans start with 1-minute intervals and higher monitor counts.
         </p>
 
         <div className="blog-cta-section">
@@ -362,7 +362,7 @@ export default function UptimeMonitoringToolsPage(): React.ReactElement {
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

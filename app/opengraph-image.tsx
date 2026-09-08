@@ -1,7 +1,7 @@
 import { ImageResponse } from 'next/og'
 
 export const runtime = 'edge'
-export const alt = 'Uptrue — Uptime Monitoring for Agencies & Teams'
+export const alt = 'Upnotify — Uptime Monitoring for Agencies & Teams'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
 
@@ -57,7 +57,7 @@ export default function OgImage() {
             >
               <span style={{ color: 'white', fontSize: 24, fontWeight: 800 }}>U</span>
             </div>
-            <span style={{ color: 'white', fontSize: 36, fontWeight: 800, letterSpacing: -1 }}>Uptrue</span>
+            <span style={{ color: 'white', fontSize: 36, fontWeight: 800, letterSpacing: -1 }}>Upnotify</span>
           </div>
 
           {/* Headline */}

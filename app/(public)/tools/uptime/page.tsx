@@ -4,7 +4,7 @@ import '../../landing.css'
 
 const data: ToolPillarData = {
   pillarSlug: 'uptime',
-  seoTitle: 'Free Uptime & Performance Tools — Status Checker, Speed Test, SLA Calculator | Uptrue',
+  seoTitle: 'Free Uptime & Performance Tools — Status Checker, Speed Test, SLA Calculator | Upnotify',
   seoDescription:
     'Free uptime and performance tools: HTTP status checker, full website health score, response-time / TTFB speed test, and uptime SLA calculator. Run one-off checks now or set up continuous monitoring on the free plan.',
   heroTitle: 'Free Uptime & Performance Tools',
@@ -63,7 +63,7 @@ const data: ToolPillarData = {
   faq: [
     {
       q: 'What\'s the difference between these tools and continuous monitoring?',
-      a: 'Each tool runs a one-off check at the moment you click the button. Continuous monitoring runs the same check every minute (or every 5 minutes) automatically, and alerts you the moment something changes. The Free Uptrue plan includes 3 continuous monitors with email alerts.',
+      a: 'Each tool runs a one-off check at the moment you click the button. Continuous monitoring runs the same check every minute (or every 5 minutes) automatically, and alerts you the moment something changes. The Free Upnotify plan includes 3 continuous monitors with email alerts.',
     },
     {
       q: 'Which tool should I run first?',
@@ -71,7 +71,7 @@ const data: ToolPillarData = {
     },
     {
       q: 'How accurate is the speed test from one location?',
-      a: 'Accurate for the test region. Real-world performance varies by user location, network, and time of day. For a representative view, set up Response Time monitoring on your domain — Uptrue runs continuous checks and tracks the rolling 24-hour average.',
+      a: 'Accurate for the test region. Real-world performance varies by user location, network, and time of day. For a representative view, set up Response Time monitoring on your domain — Upnotify runs continuous checks and tracks the rolling 24-hour average.',
     },
     {
       q: 'What uptime percentage should I aim for?',

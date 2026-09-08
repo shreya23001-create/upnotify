@@ -96,7 +96,7 @@ export function LoginForm({ mode = 'login', next }: { mode?: 'login' | 'signup';
         {mode === 'login' ? 'Welcome back' : 'Start monitoring free'}
       </div>
       <p className="auth-form-sub">
-        {mode === 'login' ? 'Sign in to your Uptrue account' : 'No credit card. 3 monitors free forever.'}
+        {mode === 'login' ? 'Sign in to your Upnotify account' : 'No credit card. 3 monitors free forever.'}
       </p>
 
       {error && (

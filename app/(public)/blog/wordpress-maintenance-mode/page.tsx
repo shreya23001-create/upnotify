@@ -67,7 +67,7 @@ export default function WordPressMaintenanceModePage(): React.ReactElement {
           '@type': 'Article',
           headline: 'WordPress Stuck in Maintenance Mode: How to Fix It and Never Get Stuck Again',
           description: 'What causes WordPress to get stuck in maintenance mode, how to fix it in seconds, and how keyword monitoring detects it automatically.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-03-22',
           dateModified: '2026-03-22',
@@ -232,10 +232,10 @@ export default function WordPressMaintenanceModePage(): React.ReactElement {
           <strong>Second:</strong> even when the HTTP monitor catches the 503, it does not tell you the cause. A 503 could be maintenance mode, a server overload, a PHP-FPM crash, or a hosting-level issue. Keyword monitoring tells you exactly what your visitors see — including the specific text of the maintenance message.
         </p>
 
-        <h2>How to detect maintenance mode with Uptrue</h2>
+        <h2>How to detect maintenance mode with Upnotify</h2>
 
         <p>
-          <Link href="/signup">Uptrue&apos;s keyword monitoring</Link> checks the actual text on your pages. If the maintenance message appears, you know within 60 seconds — and you know exactly what the problem is, not just that a status code changed.
+          <Link href="/signup">Upnotify&apos;s keyword monitoring</Link> checks the actual text on your pages. If the maintenance message appears, you know within 60 seconds — and you know exactly what the problem is, not just that a status code changed.
         </p>
 
         <h3>Step 1: Set up a keyword monitor to detect the maintenance message</h3>
@@ -252,7 +252,7 @@ export default function WordPressMaintenanceModePage(): React.ReactElement {
         </ol>
 
         <p>
-          The moment WordPress enters maintenance mode and does not come back, Uptrue detects the message and alerts you. You connect via FTP, delete the <code>.maintenance</code> file, and your site is back. Total downtime: minutes instead of hours.
+          The moment WordPress enters maintenance mode and does not come back, Upnotify detects the message and alerts you. You connect via FTP, delete the <code>.maintenance</code> file, and your site is back. Total downtime: minutes instead of hours.
         </p>
 
         <h3>Step 2: Add a positive keyword monitor as a safety net</h3>
@@ -346,7 +346,7 @@ export default function WordPressMaintenanceModePage(): React.ReactElement {
         </p>
 
         <p>
-          Uptrue checks your pages every 60 seconds. If the maintenance message appears — or if your normal content disappears — you know in under a minute. Delete one file and your site is back. Total downtime: the time it takes you to open an FTP client instead of the hours it takes you to notice on your own.
+          Upnotify checks your pages every 60 seconds. If the maintenance message appears — or if your normal content disappears — you know in under a minute. Delete one file and your site is back. Total downtime: the time it takes you to open an FTP client instead of the hours it takes you to notice on your own.
         </p>
 
         <div className="blog-cta-section">
@@ -373,7 +373,7 @@ export default function WordPressMaintenanceModePage(): React.ReactElement {
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

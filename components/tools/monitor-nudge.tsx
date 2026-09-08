@@ -146,7 +146,7 @@ export function MonitorNudge({ toolType, domain = '', detail, signupHref = '/sig
         position: 'relative',
       }}
       role="complementary"
-      aria-label="Monitor this with Uptrue"
+      aria-label="Monitor this with Upnotify"
     >
       {/* Left accent bar */}
       <div style={{

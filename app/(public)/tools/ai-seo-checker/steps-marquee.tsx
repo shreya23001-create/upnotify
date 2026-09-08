@@ -26,7 +26,7 @@ const STEPS = [
   {
     icon: FileCode,
     title: 'Generate and deploy your llms.txt',
-    body: 'Even a simple one-page file improves your AI search presence by giving models a direct description of your site. Use the free Uptrue generator to create one tailored to selected AI engines.',
+    body: 'Even a simple one-page file improves your AI search presence by giving models a direct description of your site. Use the free Upnotify generator to create one tailored to selected AI engines.',
   },
   {
     icon: Braces,

@@ -10,7 +10,7 @@ const FAQ_SCHEMA = {
   mainEntity: [
     {
       '@type': 'Question',
-      name: 'How does the Uptrue referral program work?',
+      name: 'How does the Upnotify referral program work?',
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'Share your unique referral link with a friend. When they sign up and upgrade to any paid plan, you both get one month free on your current plan. You can refer up to 5 friends for a maximum of 25 pounds in total value.',
@@ -18,7 +18,7 @@ const FAQ_SCHEMA = {
     },
     {
       '@type': 'Question',
-      name: 'Where do I find my Uptrue referral link?',
+      name: 'Where do I find my Upnotify referral link?',
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'Go to Settings, then click the Referrals tab. Your unique link is displayed there and you can copy it with one click.',
@@ -26,7 +26,7 @@ const FAQ_SCHEMA = {
     },
     {
       '@type': 'Question',
-      name: 'Is there a limit to how many people I can refer to Uptrue?',
+      name: 'Is there a limit to how many people I can refer to Upnotify?',
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'Yes. The referral programme is capped at 5 successful referrals per account, which gives you up to 25 pounds in total value (5 months free).',
@@ -57,7 +57,7 @@ export default function ReferralsHelpPage(): React.ReactElement {
           <div className="help-article-hero">
             <h1 className="help-article-title">Referral Program</h1>
             <p className="help-article-intro">
-              Good tools spread by word of mouth. If you like Uptrue enough to
+              Good tools spread by word of mouth. If you like Upnotify enough to
               recommend it, we want to say thanks -- with free monitoring for you
               and the person you refer.
             </p>
@@ -121,10 +121,10 @@ export default function ReferralsHelpPage(): React.ReactElement {
           <section className="help-section">
             <h2 className="help-section-title">Fine print</h2>
             <ul className="help-list">
-              <li>The referred person must be a new Uptrue user -- existing accounts do not count.</li>
+              <li>The referred person must be a new Upnotify user -- existing accounts do not count.</li>
               <li>They must upgrade within 30 days of signing up for the referral to qualify.</li>
               <li>Self-referrals are detected and will be declined.</li>
-              <li>Uptrue reserves the right to modify or end the programme with 30 days notice.</li>
+              <li>Upnotify reserves the right to modify or end the programme with 30 days notice.</li>
             </ul>
           </section>
 

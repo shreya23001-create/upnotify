@@ -225,7 +225,7 @@ export function ScanClient({
               }}>
                 <WordPressIcon size={32} />
                 <div style={{ flex: 1, textAlign: 'left' }}>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 3 }}>Uptrue WordPress Monitor</div>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 3 }}>Upnotify WordPress Monitor</div>
                   <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
                     Install a lightweight plugin on your WordPress site. Monitors file injections, outdated plugins, unknown admin users, suspicious pages, and more — from inside your site.
                   </div>
@@ -403,7 +403,7 @@ export function ScanClient({
             ⚙️ <strong style={{ color: 'var(--text-primary)' }}>Need more?</strong> Keyword, API Endpoint, Heartbeat, Port Check require manual setup.{' '}
             <a href="/dashboard/monitors/new/manual" style={{ color: 'var(--accent)', textDecoration: 'underline' }}>Add individually →</a>
             {' · '}
-            <a href="/dashboard/monitors/new/wordpress" style={{ color: '#667eea', textDecoration: 'underline' }}>🔌 WordPress Monitor →</a>
+            <a href="/dashboard/monitors/new/wordpress" style={{ color: '#00a83d', textDecoration: 'underline' }}>🔌 WordPress Monitor →</a>
           </div>
         </div>
       )}

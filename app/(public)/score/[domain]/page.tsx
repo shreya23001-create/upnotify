@@ -1,5 +1,5 @@
 /**
- * /score/[domain] — Results page for Uptrue Score.
+ * /score/[domain] — Results page for Upnotify Score.
  * ISR with 1-hour revalidation. Calls the score service server-side.
  */
 
@@ -21,10 +21,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: `${decodedDomain} — Website Health Score`,
-    description: `${decodedDomain} website health score. Free analysis of uptime, SSL, DNS, security headers, and performance by Uptrue.`,
+    description: `${decodedDomain} website health score. Free analysis of uptime, SSL, DNS, security headers, and performance by Upnotify.`,
     alternates: { canonical: `https://uptrue.io/score/${encodeURIComponent(decodedDomain)}` },
     openGraph: {
-      title: `${decodedDomain} — Health Score | Uptrue`,
+      title: `${decodedDomain} — Health Score | Upnotify`,
       description: `See the website health score for ${decodedDomain}. Instant analysis across 5 categories.`,
       images: [`/api/badge/score/${encodeURIComponent(decodedDomain)}`],
     },
@@ -117,7 +117,7 @@ function JsonLd({ result }: { result: ScoreResult }): React.ReactElement {
   const structuredData = {
     '@context': 'https://schema.org',
     '@type': 'WebApplication',
-    name: 'Uptrue Score',
+    name: 'Upnotify Score',
     url: `https://uptrue.io/score/${encodeURIComponent(result.domain)}`,
     description: `Website health score for ${result.domain}: ${result.grade} (${result.totalScore}/100)`,
     applicationCategory: 'WebApplication',
@@ -213,7 +213,7 @@ export default async function ScoreResultsPage({ params }: PageProps): Promise<R
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={`/api/badge/score/${encodeURIComponent(result.domain)}`}
-                alt={`Uptrue Score: ${result.grade}`}
+                alt={`Upnotify Score: ${result.grade}`}
                 width="160"
                 height="28"
               />
@@ -222,7 +222,7 @@ export default async function ScoreResultsPage({ params }: PageProps): Promise<R
               <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>Copy and paste this HTML into your website:</span>
             </div>
             <code className="score-badge-code">
-              {`<a href="https://uptrue.io/score/${encodeURIComponent(result.domain)}"><img src="https://uptrue.io/api/badge/score/${encodeURIComponent(result.domain)}" alt="Uptrue Score" /></a>`}
+              {`<a href="https://uptrue.io/score/${encodeURIComponent(result.domain)}"><img src="https://uptrue.io/api/badge/score/${encodeURIComponent(result.domain)}" alt="Upnotify Score" /></a>`}
             </code>
             <div style={{ marginTop: 12, fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.7 }}>
               <strong>How to add it:</strong>
@@ -251,7 +251,7 @@ export default async function ScoreResultsPage({ params }: PageProps): Promise<R
               <h2>Monitor {result.domain} 24/7</h2>
               <p>
                 Get instant alerts when your site goes down. Monitor uptime, SSL, DNS,
-                and performance continuously with Uptrue.
+                and performance continuously with Upnotify.
               </p>
               <Link href="/signup" className="btn btn-primary" style={{ marginTop: '16px' }}>
                 Start free monitoring
@@ -271,7 +271,7 @@ export default async function ScoreResultsPage({ params }: PageProps): Promise<R
           This score is generated automatically by scanning publicly available data. It is
           provided for informational purposes only and does not constitute professional security
           advice. Results may vary between scans due to network conditions, caching, and server
-          configuration. Uptrue is not responsible for any decisions made based on this score.
+          configuration. Upnotify is not responsible for any decisions made based on this score.
         </p>
       </div>
 

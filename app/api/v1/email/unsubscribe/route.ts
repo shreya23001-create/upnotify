@@ -81,7 +81,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     return new NextResponse(
       renderPage(
         'Unsubscribed',
-        `You've been unsubscribed from all Uptrue marketing emails. You will still receive critical alert notifications for your monitors.<br><br>You can re-enable emails anytime from your <a href="${escapeHtml(appUrl)}/dashboard/settings" style="color:#3b82f6;text-decoration:underline;">account settings</a>.`,
+        `You've been unsubscribed from all Upnotify marketing emails. You will still receive critical alert notifications for your monitors.<br><br>You can re-enable emails anytime from your <a href="${escapeHtml(appUrl)}/dashboard/settings" style="color:#3b82f6;text-decoration:underline;">account settings</a>.`,
         false
       ),
       { status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8' } }
@@ -118,7 +118,7 @@ function renderPage(title: string, message: string, isError: boolean): string {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${escapeHtml(title)} - Uptrue</title>
+<title>${escapeHtml(title)} - Upnotify</title>
 </head>
 <body style="margin:0;padding:0;background-color:#f4f4f7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;">
 <div style="max-width:480px;width:100%;margin:24px;padding:40px;background-color:#ffffff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.06);text-align:center;">

@@ -15,13 +15,13 @@ export default function HelpCompetePage(): React.ReactElement {
       <div className="help-main">
         <article className="help-article">
           <div className="help-article-hero">
-            <h1 className="help-article-title">Uptrue Compete</h1>
+            <h1 className="help-article-title">Upnotify Compete</h1>
             <p className="help-article-intro">Track competitor prices, detect stock changes, and get alerts when competitors adjust their pricing. Compete is a separate add-on available with any paid monitoring plan.</p>
           </div>
 
           <section className="help-section">
             <h2 className="help-section-title">What is Compete?</h2>
-            <p>Uptrue Compete monitors competitor product prices and stock availability automatically. It extracts prices from any ecommerce site using intelligent parsing (JSON-LD, Open Graph, Microdata, or custom CSS selectors) — no code or browser extensions needed.</p>
+            <p>Upnotify Compete monitors competitor product prices and stock availability automatically. It extracts prices from any ecommerce site using intelligent parsing (JSON-LD, Open Graph, Microdata, or custom CSS selectors) — no code or browser extensions needed.</p>
           </section>
 
           <section className="help-section">
@@ -34,7 +34,7 @@ export default function HelpCompetePage(): React.ReactElement {
             <ol className="help-steps">
               <li>Go to <strong>Compete</strong> in the dashboard</li>
               <li>Click <strong>Add Product</strong> and paste a product URL from any ecommerce site</li>
-              <li>Uptrue extracts the price, stock status, and product name automatically</li>
+              <li>Upnotify extracts the price, stock status, and product name automatically</li>
               <li>Preview the extraction before confirming — check the price, confidence score, and extraction method</li>
               <li>Organise products into groups for easier comparison</li>
             </ol>

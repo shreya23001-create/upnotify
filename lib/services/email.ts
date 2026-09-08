@@ -279,10 +279,10 @@ export async function testEmailProvider(
   provider: EmailProvider,
   testTo: string
 ): Promise<EmailResult> {
-  return sendViaProvider(provider, testTo, 'Uptrue — Email Provider Test', `
+  return sendViaProvider(provider, testTo, 'Upnotify — Email Provider Test', `
     <p style="font-family:sans-serif;font-size:15px;color:#111;">
       ✅ <strong>${provider.name}</strong> is working correctly.<br><br>
-      This is a test email from your Uptrue admin panel.
+      This is a test email from your Upnotify admin panel.
     </p>
   `)
 }
@@ -297,7 +297,7 @@ function baseTemplate(content: string): string {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Uptrue Alert</title>
+<title>Upnotify Alert</title>
 </head>
 <body style="margin:0;padding:0;background-color:#f4f4f7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f4f7;">
@@ -306,7 +306,7 @@ function baseTemplate(content: string): string {
 
 <!-- Header -->
 <tr><td style="padding:24px 32px 16px;border-bottom:1px solid #eaeaea;">
-<span style="font-size:20px;font-weight:700;color:#111827;letter-spacing:-0.3px;">Uptrue</span>
+<span style="font-size:20px;font-weight:700;color:#111827;letter-spacing:-0.3px;">Upnotify</span>
 </td></tr>
 
 <!-- Content -->
@@ -317,7 +317,7 @@ ${content}
 <!-- Footer -->
 <tr><td style="padding:16px 32px;background-color:#f9fafb;border-top:1px solid #eaeaea;">
 <p style="margin:0;font-size:12px;color:#9ca3af;line-height:1.5;">
-You are receiving this because you have alert notifications enabled on Uptrue.<br>
+You are receiving this because you have alert notifications enabled on Upnotify.<br>
 <a href="https://uptrue.io" style="color:#6b7280;text-decoration:underline;">uptrue.io</a>
 </p>
 </td></tr>
@@ -504,16 +504,16 @@ interface TeamInviteEmailParams {
 }
 
 /**
- * Sends an email inviting someone to join an organisation on Uptrue.
+ * Sends an email inviting someone to join an organisation on Upnotify.
  */
 export async function sendTeamInviteEmail(params: TeamInviteEmailParams): Promise<EmailResult> {
-  const subject = `You've been invited to join ${params.orgName} on Uptrue`
+  const subject = `You've been invited to join ${params.orgName} on Upnotify`
 
   const html = baseTemplate(`
     <h2 style="margin:0 0 8px;font-size:18px;color:#111827;">You&rsquo;ve been invited!</h2>
     <p style="margin:0 0 20px;font-size:14px;color:#6b7280;line-height:1.6;">
       ${escapeHtml(params.inviterName)} has invited you to join
-      <strong>${escapeHtml(params.orgName)}</strong> on Uptrue as a
+      <strong>${escapeHtml(params.orgName)}</strong> on Upnotify as a
       <strong>${escapeHtml(params.role)}</strong>.
     </p>
 
@@ -620,10 +620,10 @@ export async function sendBlogApprovalEmail(params: BlogApprovalEmailParams): Pr
 
   const headerTitle = `New Blog Draft — ${categoryLabel}`
   const headerDesc = params.category === 'down_alert'
-    ? `Uptrue auto-generated a blog post about the <strong>${escapeHtml(params.siteDisplayName)}</strong> outage.`
+    ? `Upnotify auto-generated a blog post about the <strong>${escapeHtml(params.siteDisplayName)}</strong> outage.`
     : params.category === 'llm_news'
-    ? `Uptrue detected a new LLM launch: <strong>${escapeHtml(params.siteDisplayName)}</strong>.`
-    : `Uptrue auto-generated a blog post for topic: <strong>${escapeHtml(params.siteDisplayName)}</strong>.`
+    ? `Upnotify detected a new LLM launch: <strong>${escapeHtml(params.siteDisplayName)}</strong>.`
+    : `Upnotify auto-generated a blog post for topic: <strong>${escapeHtml(params.siteDisplayName)}</strong>.`
 
   const html = baseTemplate(`
     <h2 style="margin:0 0 4px;font-size:18px;color:#111827;">${escapeHtml(headerTitle)}</h2>
@@ -808,7 +808,7 @@ interface BossDigestResult extends EmailResult {
 export async function sendBossDigestEmail(params: BossDigestEmailParams): Promise<BossDigestResult> {
   const { app } = getServerConfig()
   const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
-  const subject = `📋 Uptrue Daily Boss Digest — ${today} (${params.posts.length} draft${params.posts.length === 1 ? '' : 's'})`
+  const subject = `📋 Upnotify Daily Boss Digest — ${today} (${params.posts.length} draft${params.posts.length === 1 ? '' : 's'})`
   const html = buildDigestHtml(params.posts, app.url, today)
 
   const results = await Promise.all(
@@ -836,7 +836,7 @@ function buildDigestHtml(posts: BossDigestPostCard[], appUrl: string, today: str
   `
 
   const inner = `
-    <h1 style="font-family:sans-serif;font-size:22px;color:#0f172a;margin:0 0 8px;">Uptrue Daily Boss Digest</h1>
+    <h1 style="font-family:sans-serif;font-size:22px;color:#0f172a;margin:0 0 8px;">Upnotify Daily Boss Digest</h1>
     <div style="font-family:sans-serif;font-size:13px;color:#64748b;margin:0 0 24px;">${today} · ${posts.length} draft${posts.length === 1 ? '' : 's'}</div>
     ${summary}
     ${cards}

@@ -2,9 +2,9 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: 'Refund Policy — Uptrue',
+  title: 'Refund Policy — Upnotify',
   description:
-    'Uptrue refund policy covering free, Lite (annual), Builder, and Scale plans. Learn about cooling-off periods, cancellations, and how to request a refund.',
+    'Upnotify refund policy covering free, Lite (annual), Builder, and Scale plans. Learn about cooling-off periods, cancellations, and how to request a refund.',
   alternates: { canonical: 'https://uptrue.io/refund-policy' },
 }
 
@@ -15,14 +15,14 @@ export default function RefundPolicyPage(): React.ReactElement {
       <p className="legal-updated">Last updated: April 2026</p>
 
       <p>
-        This Refund Policy explains how refunds and cancellations work for each Uptrue subscription
-        plan. By subscribing to Uptrue, you agree to the terms set out below. This policy should be
+        This Refund Policy explains how refunds and cancellations work for each Upnotify subscription
+        plan. By subscribing to Upnotify, you agree to the terms set out below. This policy should be
         read alongside our <Link href="/terms">Terms of Service</Link>.
       </p>
 
       <h2>1. Free Plan</h2>
       <p>
-        The Uptrue Free plan does not require any payment. As no charges are made, no refund applies.
+        The Upnotify Free plan does not require any payment. As no charges are made, no refund applies.
       </p>
 
       <h2>2. Lite Plan (Annual Billing)</h2>
@@ -79,7 +79,7 @@ export default function RefundPolicyPage(): React.ReactElement {
 
       <h2>5. Payment Processing</h2>
       <p>
-        All payments are processed securely through <strong>Stripe</strong>. Uptrue does not store
+        All payments are processed securely through <strong>Stripe</strong>. Upnotify does not store
         your credit card details. For payment disputes or failed charges, please refer to your Stripe
         receipt or contact our billing team.
       </p>
@@ -117,7 +117,7 @@ export default function RefundPolicyPage(): React.ReactElement {
 
       <h2>8. AppSumo Deals</h2>
       <p>
-        If you purchased Uptrue through AppSumo (or any third-party marketplace), refunds are governed
+        If you purchased Upnotify through AppSumo (or any third-party marketplace), refunds are governed
         by <strong>AppSumo&apos;s own refund policy</strong>, which typically provides a 60-day
         money-back guarantee. Please contact AppSumo directly for refund requests related to
         marketplace purchases.

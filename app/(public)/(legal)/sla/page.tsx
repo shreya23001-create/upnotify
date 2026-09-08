@@ -1,9 +1,9 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Service Level Agreement — Uptrue',
+  title: 'Service Level Agreement — Upnotify',
   description:
-    'Uptrue platform SLA: 99.9% uptime target, how we measure availability, service credits, exclusions, and how to file a claim.',
+    'Upnotify platform SLA: 99.9% uptime target, how we measure availability, service credits, exclusions, and how to file a claim.',
   alternates: { canonical: 'https://uptrue.io/sla' },
 }
 
@@ -15,18 +15,18 @@ export default function SLAPage(): React.ReactElement {
 
       <p>
         This Service Level Agreement (&quot;SLA&quot;) describes the availability commitment for the
-        Uptrue monitoring platform operated by Vision Software Solutions Limited. This SLA applies to
+        Upnotify monitoring platform operated by Vision Software Solutions Limited. This SLA applies to
         paid plans only and is subject to the terms and exclusions below.
       </p>
       <p>
-        <strong>Important:</strong> This is the SLA for the Uptrue platform itself &mdash; not for the
-        websites and services you monitor using Uptrue. We commit to keeping Uptrue available so that
+        <strong>Important:</strong> This is the SLA for the Upnotify platform itself &mdash; not for the
+        websites and services you monitor using Upnotify. We commit to keeping Upnotify available so that
         your monitoring runs reliably.
       </p>
 
       <h2>1. Uptime Target</h2>
       <p>
-        Uptrue targets <strong>99.9% platform availability</strong> per calendar month for all paid
+        Upnotify targets <strong>99.9% platform availability</strong> per calendar month for all paid
         plans. This means no more than approximately 43 minutes of unscheduled downtime per month.
       </p>
 
@@ -40,7 +40,7 @@ export default function SLAPage(): React.ReactElement {
       </p>
       <p>
         <strong>Downtime</strong> is defined as any period of 5 or more consecutive minutes during
-        which the Uptrue platform is unable to receive check results, process alerts, or serve the
+        which the Upnotify platform is unable to receive check results, process alerts, or serve the
         dashboard to authenticated users, as measured by our internal monitoring systems.
       </p>
       <p>
@@ -49,7 +49,7 @@ export default function SLAPage(): React.ReactElement {
 
       <h2>3. Service Credits</h2>
       <p>
-        If Uptrue fails to meet the 99.9% uptime target in any calendar month, affected customers on
+        If Upnotify fails to meet the 99.9% uptime target in any calendar month, affected customers on
         paid plans may request service credits as follows:
       </p>
       <table className="legal-table">
@@ -142,7 +142,7 @@ export default function SLAPage(): React.ReactElement {
       <h2>7. Sole Remedy</h2>
       <p>
         Service credits as described in this SLA are your sole and exclusive remedy for any failure by
-        Uptrue to meet the availability target. This SLA does not modify or replace any other provision
+        Upnotify to meet the availability target. This SLA does not modify or replace any other provision
         of our <a href="/terms">Terms of Service</a>.
       </p>
 

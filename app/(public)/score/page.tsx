@@ -1,5 +1,5 @@
 /**
- * /score — Public input page for Uptrue Score.
+ * /score — Public input page for Upnotify Score.
  * Server component with a client-side form that redirects to /score/[domain].
  */
 
@@ -10,7 +10,7 @@ import { ScoreForm } from '@/components/score/score-form'
 import Faq from '@/components/landing/faq'
 
 export const metadata: Metadata = {
-  title: 'Free Website Health Score Checker — Test Site Health Online | Uptrue',
+  title: 'Free Website Health Score Checker — Test Site Health Online | Upnotify',
   description:
     'Free website health score across 5 categories — uptime, SSL, DNS, security headers, and performance. Instant grade from A+ to F. No signup required. Pairs with continuous uptime monitoring.',
   alternates: { canonical: 'https://uptrue.io/score' },
@@ -70,11 +70,11 @@ const FAQ = [
   },
   {
     q: 'Can I monitor these checks continuously instead of one-off?',
-    a: 'Yes. The Free Uptrue plan includes 3 monitors at email-alerts. Each of the five score categories maps to a continuous monitor type: HTTP uptime, SSL certificate monitoring, DNS monitoring, security headers monitoring, and response time monitoring. Set up once, get alerted whenever something breaks.',
+    a: 'Yes. The Free Upnotify plan includes 3 monitors at email-alerts. Each of the five score categories maps to a continuous monitor type: HTTP uptime, SSL certificate monitoring, DNS monitoring, security headers monitoring, and response time monitoring. Set up once, get alerted whenever something breaks.',
   },
   {
     q: 'How is this different from PageSpeed or GTmetrix?',
-    a: 'PageSpeed and GTmetrix focus on browser performance metrics. The Uptrue Health Score is broader — it includes infrastructure (DNS, SSL chain), security posture (headers), and uptime in a single grade designed for site owners and agencies, not just developers.',
+    a: 'PageSpeed and GTmetrix focus on browser performance metrics. The Upnotify Health Score is broader — it includes infrastructure (DNS, SSL chain), security posture (headers), and uptime in a single grade designed for site owners and agencies, not just developers.',
   },
   {
     q: 'What should I do if my score is low?',

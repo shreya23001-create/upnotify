@@ -51,12 +51,12 @@ import type {
 export const revalidate = 600
 
 export const metadata: Metadata = {
-  title: 'Free Uptime Monitoring for Agencies, SaaS & Dev Teams — Uptrue',
+  title: 'Monitoring Suite for Agencies & Teams — Upnotify',
   description:
     'Monitor uptime, SSL, DNS, APIs & more across all your sites. 1-min checks, 2-region confirm, zero false alarms. Free — no card needed.',
   alternates: { canonical: 'https://uptrue.io' },
   openGraph: {
-    title: 'Free Uptime Monitoring for Agencies, SaaS & Dev Teams — Uptrue',
+    title: 'Monitoring Suite for Agencies & Teams — Upnotify',
     description:
       'Monitor uptime, SSL, DNS, APIs & more across all your sites. 1-min checks, 2-region confirm, zero false alarms. Free — no card needed.',
     url: 'https://uptrue.io',
@@ -89,7 +89,7 @@ const DEFAULT_STEPS = [
     number: '2',
     title: 'Get Alerted Instantly',
     description:
-      'When something goes wrong, Uptrue confirms from a second region and fires an alert to your preferred channel — Slack, email, Teams, or webhook.',
+      'When something goes wrong, Upnotify confirms from a second region and fires an alert to your preferred channel — Slack, email, Teams, or webhook.',
   },
   {
     number: '3',
@@ -102,7 +102,7 @@ const DEFAULT_STEPS = [
 const DEFAULT_TESTIMONIALS = [
   {
     quote:
-      "We caught three client outages before their users noticed. Our clients still don't know how close it was. Uptrue paid for itself in the first week.",
+      "We caught three client outages before their users noticed. Our clients still don't know how close it was. Upnotify paid for itself in the first week.",
     name: 'Sarah Mitchell',
     role: 'Founder · Brightwave Digital Agency',
     initials: 'SM',
@@ -129,7 +129,7 @@ const DEFAULT_TESTIMONIALS = [
   },
   {
     quote:
-      'We manage uptime for 40+ client sites. Uptrue is the only tool that made that manageable from a single dashboard — the alert grouping alone saved us hours every week.',
+      'We manage uptime for 40+ client sites. Upnotify is the only tool that made that manageable from a single dashboard — the alert grouping alone saved us hours every week.',
     name: 'Priya Nair',
     role: 'Ops Manager · Northline Agency',
     initials: 'PN',
@@ -200,7 +200,7 @@ export default async function LandingPage(): Promise<React.ReactElement> {
   const faqItems = faq?.items ?? FAQ_ITEMS
 
   // Comparison table columns
-  const compCols   = comparison?.competitors ?? ['Uptrue', 'BetterUptime', 'UptimeRobot']
+  const compCols   = comparison?.competitors ?? ['Upnotify', 'BetterUptime', 'UptimeRobot']
 
   // ── Dynamic section render order ──────────────────────────────────────────
   // Nav/footer (page='global') are always pinned top/bottom — only landing sections are reorderable.
@@ -248,8 +248,8 @@ export default async function LandingPage(): Promise<React.ReactElement> {
                   </div>
                 </div>
                 <h1 className="hero-headline fade-up delay-1">
-                  Know your site is down<br />
-                  <span className="gradient-text hero-tweets-gradient">before a customer tweets.</span>
+                  Get notified before<br />
+                  <span className="gradient-text hero-tweets-gradient">your customers even notice.</span>
                 </h1>
                 <p className="hero-sub fade-up delay-2">
                   24 monitor types. 1-minute checks. Instant alerts to Slack, email or webhook. Built for agencies and dev teams.
@@ -340,13 +340,13 @@ export default async function LandingPage(): Promise<React.ReactElement> {
             <div className="container">
               <div className="section-header reveal-title">
                 <div className="section-eyebrow">{features?.eyebrow ?? '24 monitor types'}</div>
-                <h2 className="section-title">{features?.headline ?? (<>One platform.<br /><em>Every</em> kind of monitor.</>)}</h2>
+                <h2 className="section-title">{features?.headline ?? (<>One dashboard.<br /><em>Every</em> signal that matters.</>)}</h2>
                 <p className="section-sub">
                   {features?.subheadline ?? (
                     <>
                       <Link href="/monitoring/http-uptime-monitoring">HTTP uptime</Link>,{' '}
                       <Link href="/monitoring/ssl-certificate-monitoring">SSL certificates</Link>,{' '}
-                      <Link href="/monitoring/dns-monitoring">DNS records</Link>, keyword detection, APIs, blacklists, sitemaps, and more. Most tools give you one or two. Uptrue gives you all of them.
+                      <Link href="/monitoring/dns-monitoring">DNS records</Link>, keyword detection, APIs, blacklists, sitemaps, and more. Most tools give you one or two. Upnotify gives you all of them.
                     </>
                   )}
                 </p>
@@ -362,7 +362,7 @@ export default async function LandingPage(): Promise<React.ReactElement> {
             <div className="container">
               <div className="section-header reveal-title">
                 <div className="section-eyebrow">{howItWorks?.eyebrow ?? 'No setup scripts. No agents.'}</div>
-                <h2 className="section-title hiw-title-gradient">{howItWorks?.headline ?? (<>Up and running<br />in <em>2 minutes</em>.</>)}</h2>
+                <h2 className="section-title hiw-title-gradient">{howItWorks?.headline ?? (<>From signup to alert<br />in <em>2 minutes</em>.</>)}</h2>
               </div>
               <div className="hiw-steps reveal-stagger">
                 {steps.map((step) => (
@@ -384,15 +384,15 @@ export default async function LandingPage(): Promise<React.ReactElement> {
               <div className="ai-inner">
                 <div className="ai-text reveal-title">
                   <div className="section-eyebrow">{aiFeatures?.eyebrow ?? 'Powered by Claude AI'}</div>
-                  <h2 className="section-title ai-title-gradient">{aiFeatures?.headline ?? (<>Monitoring that actually<br /><em>explains</em> itself.</>)}</h2>
+                  <h2 className="section-title ai-title-gradient">{aiFeatures?.headline ?? (<>Alerts that <em>explain</em><br />themselves.</>)}</h2>
                   <p className="section-sub">
-                    {aiFeatures?.subheadline ?? "Most tools just tell you something broke. Uptrue tells you why, what it means for your business, and what to fix — in plain English."}
+                    {aiFeatures?.subheadline ?? "Most tools just tell you something broke. Upnotify tells you why, what it means for your business, and what to fix — in plain English."}
                   </p>
                   <div className="ai-features-list reveal-stagger">
                     {(aiFeatures?.features ?? [
                       { icon: '🤖', color: 'purple', title: 'Executive AI Reports',             description: 'One click and Claude analyses 90 days of uptime data, incident patterns, and performance trends — generating a polished summary you can send to clients or stakeholders.' },
-                      { icon: '🔍', color: 'cyan',   title: 'Outage Pattern Detection',          description: "Uptrue learns your monitor's normal behaviour and flags anomalies before they become incidents. Recurring issues are spotted and surfaced automatically." },
-                      { icon: '📰', color: 'pink',   title: 'AI Outage News & Blog',             description: 'When a public service goes down, Uptrue researches and publishes an outage report automatically — with your logo and brand. Real-time SEO content on autopilot.' },
+                      { icon: '🔍', color: 'cyan',   title: 'Outage Pattern Detection',          description: "Upnotify learns your monitor's normal behaviour and flags anomalies before they become incidents. Recurring issues are spotted and surfaced automatically." },
+                      { icon: '📰', color: 'pink',   title: 'AI Outage News & Blog',             description: 'When a public service goes down, Upnotify researches and publishes an outage report automatically — with your logo and brand. Real-time SEO content on autopilot.' },
                       { icon: '💡', color: 'blue',   title: 'Plain Language Incident Summaries', description: 'Every incident automatically gets a human-readable summary. No log-diving, no decoding stack traces. Just "your checkout was down for 8 minutes on Tuesday."' },
                     ]).map((f, i) => {
                       const AiFeatureIcon = AI_FEATURE_ICONS[i % AI_FEATURE_ICONS.length]
@@ -450,7 +450,7 @@ export default async function LandingPage(): Promise<React.ReactElement> {
                       <button className="btn-ai-ghost">Share</button>
                     </div>
                     <div className="ai-powered-by">
-                      <span className="ai-powered-dot" />Uptrue AI Reports
+                      <span className="ai-powered-dot" />Upnotify AI Reports
                     </div>
                   </div>
                 </div>
@@ -472,7 +472,7 @@ export default async function LandingPage(): Promise<React.ReactElement> {
                   gap: 'var(--space-4)',
                   padding: 'var(--space-6) var(--space-8)',
                   borderRadius: 'var(--radius-lg)',
-                  background: 'linear-gradient(135deg, #1e293b 0%, #312e81 100%)',
+                  background: 'linear-gradient(135deg, #0a2f16 0%, #00873a 100%)',
                   color: '#fff',
                 }}
               >
@@ -483,14 +483,14 @@ export default async function LandingPage(): Promise<React.ReactElement> {
                       fontWeight: 700,
                       letterSpacing: '0.1em',
                       textTransform: 'uppercase',
-                      color: '#a5b4fc',
+                      color: '#4dff88',
                       marginBottom: 6,
                     }}
                   >
                     🆕 New product
                   </div>
                   <div style={{ fontSize: 22, fontWeight: 700, marginBottom: 6 }}>
-                    Uptrue AI Visibility&trade;
+                    Upnotify AI Visibility&trade;
                   </div>
                   <p style={{ fontSize: 15, color: '#cbd5e1', margin: 0, maxWidth: 640, lineHeight: 1.5 }}>
                     See how ChatGPT, Claude, Perplexity, Gemini, Grok and Copilot cite your brand.
@@ -583,17 +583,17 @@ export default async function LandingPage(): Promise<React.ReactElement> {
                 <h2 className="section-title">
                   {(() => {
                     const headline = comparison?.headline
-                    if (typeof headline === 'string' && headline.startsWith('Uptrue ')) {
+                    if (typeof headline === 'string' && headline.startsWith('Upnotify ')) {
                       return (
                         <>
-                          <span className="uptrue-col-name">Uptrue</span>{headline.slice('Uptrue'.length)}
+                          <span className="uptrue-col-name">Upnotify</span>{headline.slice('Upnotify'.length)}
                         </>
                       )
                     }
                     return headline ?? (<>The honest comparison<br />nobody <em>else</em> will show you.</>)
                   })()}
                 </h2>
-                <p className="section-sub">{comparison?.subheadline ?? "We checked. The others don't offer AI reports, citation monitoring, or 24 monitor types. Uptrue does."}</p>
+                <p className="section-sub">{comparison?.subheadline ?? "We checked. The others don't offer AI reports, citation monitoring, or 24 monitor types. Upnotify does."}</p>
               </div>
               <div className="comparison-scroll-hint">Swipe to compare →</div>
               <div className="comparison-table-wrap reveal">
@@ -665,8 +665,8 @@ export default async function LandingPage(): Promise<React.ReactElement> {
                   <Zap size={12} strokeWidth={2.5} />
                   {ctaBand?.eyebrow ?? 'Start in 2 minutes'}
                 </div>
-                <h2>{ctaBand?.headline ?? (<>Stop finding out you&apos;re down<br />from a <em>customer tweet.</em></>)}</h2>
-                <p>{ctaBand?.subheadline ?? 'Uptrue watches your sites, APIs, and infrastructure 24/7 — and tells you first. Free plan. No credit card. Up in 2 minutes.'}</p>
+                <h2>{ctaBand?.headline ?? (<>Get the alert first.<br />Fix it before <em>anyone notices.</em></>)}</h2>
+                <p>{ctaBand?.subheadline ?? 'Upnotify watches your sites, APIs, and infrastructure 24/7 — and tells you first. Free plan. No credit card. Up in 2 minutes.'}</p>
                 <div className="cta-band-buttons">
                   <Link href={ctaBand?.cta_primary?.href ?? '/signup'} className="btn-cta-white">
                     <Zap size={16} strokeWidth={2.5} />

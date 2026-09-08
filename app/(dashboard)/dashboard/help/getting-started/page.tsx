@@ -10,23 +10,23 @@ const FAQ_SCHEMA = {
   mainEntity: [
     {
       '@type': 'Question',
-      name: 'How do I create my first monitor in Uptrue?',
+      name: 'How do I create my first monitor in Upnotify?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Go to your dashboard, click "Add Monitor", enter your website URL, pick a check interval, and save. Uptrue starts monitoring immediately.',
+        text: 'Go to your dashboard, click "Add Monitor", enter your website URL, pick a check interval, and save. Upnotify starts monitoring immediately.',
       },
     },
     {
       '@type': 'Question',
-      name: 'How long does it take for Uptrue to detect downtime?',
+      name: 'How long does it take for Upnotify to detect downtime?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Uptrue uses two-confirmation checks. When the first check fails, a second check runs 30 seconds later from a different region. If both fail, you are alerted. This avoids false alarms from temporary network blips.',
+        text: 'Upnotify uses two-confirmation checks. When the first check fails, a second check runs 30 seconds later from a different region. If both fail, you are alerted. This avoids false alarms from temporary network blips.',
       },
     },
     {
       '@type': 'Question',
-      name: 'Can I use Uptrue for free?',
+      name: 'Can I use Upnotify for free?',
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'Yes. The Free plan includes 3 monitors with 10-minute check intervals and email alerts. No credit card required.',
@@ -55,10 +55,10 @@ export default function GettingStartedPage(): React.ReactElement {
 
         <article className="help-article">
           <div className="help-article-hero">
-            <h1 className="help-article-title">Getting Started with Uptrue</h1>
+            <h1 className="help-article-title">Getting Started with Upnotify</h1>
             <p className="help-article-intro">
-              You signed up because you never want to be the last person to know your site is down.
-              Good call. Let us get you set up in under five minutes.
+              You signed up so you're never the last to know your site is down.
+              Smart move. Here's how to get set up in under five minutes.
             </p>
           </div>
 
@@ -72,7 +72,7 @@ export default function GettingStartedPage(): React.ReactElement {
             <ol className="help-steps">
               <li>Open your <strong>Dashboard</strong> and click <strong>Add Monitor</strong>.</li>
               <li>Paste your website URL (e.g. <code>https://yoursite.com</code>).</li>
-              <li>Pick how often you want Uptrue to check -- every 1, 5, or 10 minutes.</li>
+              <li>Pick how often you want Upnotify to check -- every 1, 5, or 10 minutes.</li>
               <li>Choose a monitor type. <strong>HTTP</strong> is the most common and checks whether your page loads successfully.</li>
               <li>Hit <strong>Save</strong>. Your first check runs within seconds.</li>
             </ol>
@@ -82,7 +82,7 @@ export default function GettingStartedPage(): React.ReactElement {
           </section>
 
           <section className="help-section">
-            <h2 className="help-section-title">2. Understand your dashboard</h2>
+            <h2 className="help-section-title">2. Read your dashboard at a glance</h2>
             <p>
               Your dashboard is mission control. Here is what you will see:
             </p>

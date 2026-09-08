@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'WooCommerce Payment Gateway Error: Why Stripe, PayPal, and Square Randomly Stop Working',
     description:
-      'What causes WooCommerce payment gateway errors, how API credential expiry and TLS mismatches break payments silently, and how Uptrue HTTP and keyword monitoring on payment callback URLs catches failures automatically.',
+      'What causes WooCommerce payment gateway errors, how API credential expiry and TLS mismatches break payments silently, and how Upnotify HTTP and keyword monitoring on payment callback URLs catches failures automatically.',
     url: 'https://uptrue.io/blog/woocommerce-payment-gateway-error',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'WooCommerce Payment Gateway Error: Why Stripe, PayPal, and Square Randomly Stop Working',
     description:
-      'What causes WooCommerce payment gateway errors, how API credential expiry and TLS mismatches break payments silently, and how Uptrue HTTP and keyword monitoring on payment callback URLs catches failures automatically.',
+      'What causes WooCommerce payment gateway errors, how API credential expiry and TLS mismatches break payments silently, and how Upnotify HTTP and keyword monitoring on payment callback URLs catches failures automatically.',
   },
 }
 
@@ -67,7 +67,7 @@ export default function WooCommercePaymentGatewayErrorPage(): React.ReactElement
           '@type': 'Article',
           headline: 'WooCommerce Payment Gateway Error: Why Stripe, PayPal, and Square Randomly Stop Working',
           description: 'What causes WooCommerce payment gateway failures, how API credential expiry and TLS mismatches silently break payments, and how HTTP and keyword monitoring catches checkout failures.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-04-03',
           dateModified: '2026-04-03',
@@ -216,10 +216,10 @@ export default function WooCommercePaymentGatewayErrorPage(): React.ReactElement
           Multi-currency WooCommerce setups are especially vulnerable. If you use a currency switcher plugin and the gateway does not support the selected currency, payments fail only for customers using that currency. Your checkout works in GBP but fails in EUR. You test in GBP because that is your base currency and assume everything is fine.
         </p>
 
-        <h2>How to monitor WooCommerce payment gateways with Uptrue</h2>
+        <h2>How to monitor WooCommerce payment gateways with Upnotify</h2>
 
         <p>
-          <Link href="/signup">Uptrue&apos;s HTTP and keyword monitoring</Link> cannot simulate a payment transaction — no external monitor can. But it can detect the signals that indicate your payment gateway is failing: error messages on the checkout page, webhook endpoints returning errors, and gateway communication failures that manifest as page-level problems.
+          <Link href="/signup">Upnotify&apos;s HTTP and keyword monitoring</Link> cannot simulate a payment transaction — no external monitor can. But it can detect the signals that indicate your payment gateway is failing: error messages on the checkout page, webhook endpoints returning errors, and gateway communication failures that manifest as page-level problems.
         </p>
 
         <h3>Step 1: Monitor your checkout page for error text</h3>
@@ -250,7 +250,7 @@ export default function WooCommercePaymentGatewayErrorPage(): React.ReactElement
         </ol>
 
         <p>
-          The webhook endpoint must be accessible and returning 200 for your payment gateway to communicate with your store. If a security plugin blocks it, if a server error crashes it, or if a WordPress update changes the URL structure, the endpoint returns a non-200 status and Uptrue alerts you. This is the most direct way to monitor gateway-to-store communication without actually processing a payment.
+          The webhook endpoint must be accessible and returning 200 for your payment gateway to communicate with your store. If a security plugin blocks it, if a server error crashes it, or if a WordPress update changes the URL structure, the endpoint returns a non-200 status and Upnotify alerts you. This is the most direct way to monitor gateway-to-store communication without actually processing a payment.
         </p>
 
         <h3>Step 3: Add a keyword monitor for &quot;no payment methods available&quot;</h3>
@@ -338,7 +338,7 @@ export default function WooCommercePaymentGatewayErrorPage(): React.ReactElement
         </p>
 
         <p>
-          Uptrue monitors your checkout page and webhook endpoints every 60 seconds. When an error message appears on the checkout page, when the webhook endpoint stops responding, when the payment form fails to render — you know in under a minute. Before the next customer tries to pay. Before another sale is lost. Before a gateway misconfiguration costs you a day of revenue.
+          Upnotify monitors your checkout page and webhook endpoints every 60 seconds. When an error message appears on the checkout page, when the webhook endpoint stops responding, when the payment form fails to render — you know in under a minute. Before the next customer tries to pay. Before another sale is lost. Before a gateway misconfiguration costs you a day of revenue.
         </p>
 
         <div className="blog-cta-section">
@@ -365,7 +365,7 @@ export default function WooCommercePaymentGatewayErrorPage(): React.ReactElement
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

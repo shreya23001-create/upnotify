@@ -25,7 +25,7 @@ export default function CompeteFaqClient({
       <div className="landing-container">
         <h2 className="landing-section-title">Frequently asked questions</h2>
         <p className="landing-section-subtitle">
-          Everything you need to know about Uptrue Compete
+          Everything you need to know about Upnotify Compete
         </p>
         <div className="faq-list">
           {items.map((item, index) => (

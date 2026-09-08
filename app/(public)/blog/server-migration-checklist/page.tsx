@@ -87,7 +87,7 @@ export default function ServerMigrationChecklistPage(): React.ReactElement {
           '@type': 'Article',
           headline: 'Server Migration Checklist: How to Move Hosts Without Losing Your Site',
           description: 'Complete server migration checklist covering DNS propagation, SSL transfer, database migration, email continuity, and monitoring during the move.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-03-28',
           dateModified: '2026-03-28',
@@ -161,7 +161,7 @@ export default function ServerMigrationChecklistPage(): React.ReactElement {
 
         <h3>Set up monitoring on both servers</h3>
         <p>
-          Before the migration, set up <Link href="/signup">Uptrue monitoring</Link> on your current site. This establishes a performance baseline — you will know your normal response time, uptime pattern, and SSL status. After migration, you can compare the new server&apos;s performance against this baseline.
+          Before the migration, set up <Link href="/signup">Upnotify monitoring</Link> on your current site. This establishes a performance baseline — you will know your normal response time, uptime pattern, and SSL status. After migration, you can compare the new server&apos;s performance against this baseline.
         </p>
         <ol>
           <li>Add an HTTP monitor for your main domain</li>
@@ -224,7 +224,7 @@ export default function ServerMigrationChecklistPage(): React.ReactElement {
 
         <h3>Set up monitoring on the new server</h3>
         <p>
-          Add an HTTP monitor in Uptrue pointing to the new server&apos;s IP address or temporary URL. Verify it responds correctly and note the response time. This confirms the new server is healthy before you send real traffic to it.
+          Add an HTTP monitor in Upnotify pointing to the new server&apos;s IP address or temporary URL. Verify it responds correctly and note the response time. This confirms the new server is healthy before you send real traffic to it.
         </p>
 
         <div className="blog-cta-section">
@@ -274,7 +274,7 @@ export default function ServerMigrationChecklistPage(): React.ReactElement {
           During DNS propagation, traffic is split between old and new servers. Monitor both:
         </p>
         <ul>
-          <li>Your Uptrue HTTP monitor on your domain catches any downtime during the switch</li>
+          <li>Your Upnotify HTTP monitor on your domain catches any downtime during the switch</li>
           <li>Keyword monitoring verifies your content is loading (not a parking page or error)</li>
           <li>SSL monitoring confirms the certificate is valid on the new server</li>
           <li>Response time monitoring shows whether the new server is faster (it should be — that is why you migrated)</li>
@@ -304,7 +304,7 @@ export default function ServerMigrationChecklistPage(): React.ReactElement {
 
         <h3>Compare performance</h3>
         <p>
-          After 7 days on the new server, compare Uptrue&apos;s response time data with your pre-migration baseline. You should see:
+          After 7 days on the new server, compare Upnotify&apos;s response time data with your pre-migration baseline. You should see:
         </p>
         <ul>
           <li>Lower average response time</li>
@@ -338,7 +338,7 @@ export default function ServerMigrationChecklistPage(): React.ReactElement {
           <li>Take a complete backup (files, database, emails, config)</li>
           <li>Document current server configuration (PHP version, extensions, settings)</li>
           <li>Document all DNS records</li>
-          <li>Set up Uptrue monitoring on current site (baseline)</li>
+          <li>Set up Upnotify monitoring on current site (baseline)</li>
           <li>Decouple email to a separate service if possible</li>
           <li>Purchase and set up the new hosting account</li>
         </ol>
@@ -351,7 +351,7 @@ export default function ServerMigrationChecklistPage(): React.ReactElement {
           <li>Set correct file permissions</li>
           <li>Test new server via IP or hosts file — all pages and forms</li>
           <li>Issue SSL certificate on new server (if DNS validation available)</li>
-          <li>Set up Uptrue monitoring on new server IP</li>
+          <li>Set up Upnotify monitoring on new server IP</li>
         </ol>
 
         <h3>Migration day</h3>
@@ -401,7 +401,7 @@ export default function ServerMigrationChecklistPage(): React.ReactElement {
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

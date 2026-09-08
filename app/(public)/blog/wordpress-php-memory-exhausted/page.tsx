@@ -67,7 +67,7 @@ export default function WordPressPhpMemoryExhaustedPage(): React.ReactElement {
           '@type': 'Article',
           headline: 'PHP Fatal Error: Allowed Memory Size Exhausted in WordPress — Complete Fix Guide',
           description: 'What causes the PHP memory limit exhausted error in WordPress, four ways to fix it, and how to monitor for the 500 errors and white screens it causes.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-03-17',
           dateModified: '2026-03-17',
@@ -291,10 +291,10 @@ export default function WordPressPhpMemoryExhaustedPage(): React.ReactElement {
           If the error started suddenly, think about what changed. Did you update a plugin? Install a new one? Import a large dataset? Change your theme? The most recent change is almost always the cause.
         </p>
 
-        <h2>How Uptrue catches the crash automatically</h2>
+        <h2>How Upnotify catches the crash automatically</h2>
 
         <p>
-          The PHP memory exhausted error manifests as a 500 error or a white screen to your visitors. Both are detectable with the right monitoring setup. <Link href="/signup">Uptrue</Link> catches both within 60 seconds.
+          The PHP memory exhausted error manifests as a 500 error or a white screen to your visitors. Both are detectable with the right monitoring setup. <Link href="/signup">Upnotify</Link> catches both within 60 seconds.
         </p>
 
         <h3>Step 1: Set up an HTTP monitor</h3>
@@ -409,7 +409,7 @@ export default function WordPressPhpMemoryExhaustedPage(): React.ReactElement {
         </p>
 
         <p>
-          Uptrue monitors your site every 60 seconds with both HTTP and keyword monitoring. Whether the memory crash causes a 500 error or a blank white page, you know about it in under a minute. Fix it before your customers notice. Fix it before Google crawls the broken page. Fix it before you lose another sale.
+          Upnotify monitors your site every 60 seconds with both HTTP and keyword monitoring. Whether the memory crash causes a 500 error or a blank white page, you know about it in under a minute. Fix it before your customers notice. Fix it before Google crawls the broken page. Fix it before you lose another sale.
         </p>
 
         <div className="blog-cta-section">
@@ -436,7 +436,7 @@ export default function WordPressPhpMemoryExhaustedPage(): React.ReactElement {
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

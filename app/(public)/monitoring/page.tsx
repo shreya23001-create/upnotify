@@ -6,8 +6,8 @@ import { MonitorTypeIcon, MonitorIconGradientDefs } from './monitor-type-icons'
 import { Sparkles, Plug } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Website Monitoring Suite — 24 Monitor Types | Uptrue',
-  description: 'Uptrue monitors 24 types of infrastructure — HTTP uptime, SSL certificates, DNS records, security headers, WordPress site health, MX, SPF/DMARC, blacklists, and more. See every monitoring type explained.',
+  title: 'Website Monitoring Suite — 24 Monitor Types | Upnotify',
+  description: 'Upnotify monitors 24 types of infrastructure — HTTP uptime, SSL certificates, DNS records, security headers, WordPress site health, MX, SPF/DMARC, blacklists, and more. See every monitoring type explained.',
   alternates: { canonical: 'https://uptrue.io/monitoring' },
 }
 
@@ -20,11 +20,11 @@ const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'CollectionPage',
   name: 'Website Monitoring Suite — 24 Monitor Types',
-  description: 'Uptrue monitors 24 types of infrastructure — HTTP uptime, SSL certificates, DNS records, security headers, WordPress site health, MX health, SPF/DMARC, blacklists, and more.',
+  description: 'Upnotify monitors 24 types of infrastructure — HTTP uptime, SSL certificates, DNS records, security headers, WordPress site health, MX health, SPF/DMARC, blacklists, and more.',
   url: 'https://uptrue.io/monitoring',
   publisher: {
     '@type': 'Organization',
-    name: 'Uptrue',
+    name: 'Upnotify',
     url: 'https://uptrue.io',
   },
 }
@@ -58,7 +58,7 @@ export default function MonitoringIndexPage() {
           </h1>
           <p style={{ fontSize: 18, color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: 36, maxWidth: 560, margin: '0 auto 36px' }}>
             From HTTP uptime to WordPress internals, security headers, SPF/DMARC, blacklists, and cookie consent —
-            Uptrue is the only monitoring suite that covers every layer of your stack in one place.
+            Upnotify is the only monitoring suite that covers every layer of your stack in one place.
           </p>
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link href="/signup" className="btn btn-primary btn-lg">
@@ -118,9 +118,9 @@ export default function MonitoringIndexPage() {
         {agentTypes.length > 0 && (
           <section style={{ marginBottom: 64 }}>
             <div style={{ marginBottom: 32 }}>
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'linear-gradient(135deg, #667eea18, #764ba212)', border: '1px solid #667eea35', borderRadius: 'var(--radius-full)', padding: '4px 12px', marginBottom: 12 }}>
-                <Plug size={12} color="#667eea" />
-                <span style={{ fontSize: 11, fontWeight: 700, color: '#667eea', textTransform: 'uppercase', letterSpacing: '0.05em' }}>New — Agent-Based Monitors</span>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'linear-gradient(135deg, #00c94a18, #00a83d12)', border: '1px solid #00c94a35', borderRadius: 'var(--radius-full)', padding: '4px 12px', marginBottom: 12 }}>
+                <Plug size={12} color="#00c94a" />
+                <span style={{ fontSize: 11, fontWeight: 700, color: '#00c94a', textTransform: 'uppercase', letterSpacing: '0.05em' }}>New — Agent-Based Monitors</span>
               </div>
               <h2 style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--text-primary)', marginBottom: 6 }}>Monitor from inside your site</h2>
               <p style={{ color: 'var(--text-secondary)', fontSize: 15 }}>Plugin-based monitors that check what external tools can&apos;t see — file injections, rogue users, and internal compromises.</p>
@@ -135,7 +135,7 @@ export default function MonitoringIndexPage() {
 
         {/* Bottom CTA */}
         <div style={{
-          background: 'linear-gradient(135deg, #6326ed, #ec4899)',
+          background: 'linear-gradient(135deg, #00c94a, #4dff88)',
           borderRadius: 16,
           padding: '40px 48px',
           display: 'flex',
@@ -150,7 +150,7 @@ export default function MonitoringIndexPage() {
           </div>
           <Link href="/signup" style={{
             background: '#fff',
-            color: '#6326ed',
+            color: '#00a83d',
             padding: '12px 28px',
             borderRadius: 10,
             fontWeight: 700,

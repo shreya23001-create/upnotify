@@ -10,15 +10,15 @@ const FAQ_SCHEMA = {
   mainEntity: [
     {
       '@type': 'Question',
-      name: 'How much does Uptrue cost?',
+      name: 'How much does Upnotify cost?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Uptrue has four plans: Free, Lite, Builder, and Scale. For current pricing and limits, visit our pricing page at uptrue.io/#pricing.',
+        text: 'Upnotify has four plans: Free, Lite, Builder, and Scale. For current pricing and limits, visit our pricing page at uptrue.io/#pricing.',
       },
     },
     {
       '@type': 'Question',
-      name: 'What happens when I upgrade my Uptrue plan?',
+      name: 'What happens when I upgrade my Upnotify plan?',
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'Upgrades take effect immediately. You are charged the prorated difference for the rest of your current billing period. All new features and limits are available straight away.',
@@ -26,7 +26,7 @@ const FAQ_SCHEMA = {
     },
     {
       '@type': 'Question',
-      name: 'What happens when I downgrade my Uptrue plan?',
+      name: 'What happens when I downgrade my Upnotify plan?',
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'Downgrades take effect at the end of your current billing period. You keep your current plan features until then. If you have more monitors than the new plan allows, the extra monitors are paused (not deleted) so you do not lose any data.',
@@ -57,7 +57,7 @@ export default function BillingPage(): React.ReactElement {
           <div className="help-article-hero">
             <h1 className="help-article-title">Plans &amp; Billing</h1>
             <p className="help-article-intro">
-              Uptrue is designed so you can start for free and only pay when you genuinely need
+              Upnotify is designed so you can start for free and only pay when you genuinely need
               more. No surprise charges, no hidden fees, no &ldquo;contact sales&rdquo; runaround.
             </p>
           </div>
@@ -66,7 +66,7 @@ export default function BillingPage(): React.ReactElement {
             <h2 className="help-section-title">The four plans</h2>
 
             <p>
-              Uptrue has four plans: <strong>Free</strong>, <strong>Lite</strong>,{' '}
+              Upnotify has four plans: <strong>Free</strong>, <strong>Lite</strong>,{' '}
               <strong>Builder</strong>, and <strong>Scale</strong>. Each plan offers different
               monitor limits, check intervals, data retention, and alert channels. For current pricing and full feature comparisons, see the{' '}
               <Link href="/#pricing">pricing page</Link>.
@@ -77,7 +77,7 @@ export default function BillingPage(): React.ReactElement {
             <h2 className="help-section-title">How upgrades work</h2>
             <p>
               When you upgrade, the change takes effect <strong>immediately</strong>. You get
-              instant access to all the new features and higher limits. Uptrue calculates the
+              instant access to all the new features and higher limits. Upnotify calculates the
               prorated cost for the rest of your billing period so you only pay for the days you
               actually use.
             </p>

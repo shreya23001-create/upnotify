@@ -683,14 +683,14 @@ export default async function User360Page({
 
           {/* Compete Plan Section — only shown if org has active compete subscription */}
           {competeSub && cp && (
-              <div className="card" style={{ padding: 20, marginBottom: 16, borderLeft: '3px solid #8b5cf6' }}>
-                <h3 style={{ fontSize: 13, fontWeight: 700, marginBottom: 16, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#8b5cf6' }}>
+              <div className="card" style={{ padding: 20, marginBottom: 16, borderLeft: '3px solid #2ee06b' }}>
+                <h3 style={{ fontSize: 13, fontWeight: 700, marginBottom: 16, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#2ee06b' }}>
                   Compete Plan
                 </h3>
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 12, marginBottom: 16 }}>
                   {[
-                    { label: 'Plan', value: cp.name, sub: competeSub.billing_cycle, color: '#8b5cf6' },
+                    { label: 'Plan', value: cp.name, sub: competeSub.billing_cycle, color: '#2ee06b' },
                     {
                       label: 'Compete Revenue',
                       value: fmtAmount(competeMonthlyRevPence),
@@ -740,7 +740,7 @@ export default async function User360Page({
                     <div style={{
                       height: '100%',
                       width: `${Math.min(100, productUsagePct)}%`,
-                      background: productUsagePct > 80 ? '#ef4444' : productUsagePct > 50 ? '#f59e0b' : '#8b5cf6',
+                      background: productUsagePct > 80 ? '#ef4444' : productUsagePct > 50 ? '#f59e0b' : '#2ee06b',
                       borderRadius: 4,
                       transition: 'width 0.3s',
                     }} />

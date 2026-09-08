@@ -33,7 +33,7 @@ const FAQ_DATA = [
   {
     question: 'How do I test if my Contact Form 7 is actually sending emails?',
     answer:
-      'Submit a test message and wait. If you do not receive it within a few minutes, check your spam folder. If it is not there either, install WP Mail Logging to see if WordPress is even attempting to send. You can also set up a keyword monitor on your thank-you page with Uptrue — if the confirmation text stops appearing after form submission, you will know immediately.',
+      'Submit a test message and wait. If you do not receive it within a few minutes, check your spam folder. If it is not there either, install WP Mail Logging to see if WordPress is even attempting to send. You can also set up a keyword monitor on your thank-you page with Upnotify — if the confirmation text stops appearing after form submission, you will know immediately.',
   },
   {
     question: 'Do I need an SMTP plugin for Contact Form 7?',
@@ -43,7 +43,7 @@ const FAQ_DATA = [
   {
     question: 'Can I monitor whether my contact form is working without submitting test messages manually?',
     answer:
-      'Yes. With Uptrue keyword monitoring, you can monitor your contact form page and thank-you page automatically every 60 seconds. If the form page stops loading correctly, or if the confirmation message disappears, you get an alert on Slack, email, or Teams. This catches broken forms, plugin conflicts, and page errors without any manual testing.',
+      'Yes. With Upnotify keyword monitoring, you can monitor your contact form page and thank-you page automatically every 60 seconds. If the form page stops loading correctly, or if the confirmation message disappears, you get an alert on Slack, email, or Teams. This catches broken forms, plugin conflicts, and page errors without any manual testing.',
   },
 ]
 
@@ -67,7 +67,7 @@ export default function WordPressContactFormNotSendingPage(): React.ReactElement
           '@type': 'Article',
           headline: 'Contact Form 7 Not Sending Emails: Your Leads Are Disappearing and You Don\'t Know',
           description: 'Why Contact Form 7 stops sending emails, how to fix it, and how to set up monitoring so you catch broken forms before you lose leads.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-03-12',
           dateModified: '2026-03-12',
@@ -189,7 +189,7 @@ export default function WordPressContactFormNotSendingPage(): React.ReactElement
           How long has it been since you tested your own contact form? Be honest. If the answer is &quot;I cannot remember,&quot; you are not alone. Most site owners set up their form once, confirm it works, and never test it again. Then a plugin update, hosting change, or server configuration change breaks it silently, and leads disappear for weeks or months.
         </p>
 
-        <h2>How to monitor your contact form with Uptrue</h2>
+        <h2>How to monitor your contact form with Upnotify</h2>
 
         <p>
           You cannot test your form manually every day. But you can automate the monitoring so you know the moment something breaks.
@@ -306,7 +306,7 @@ export default function WordPressContactFormNotSendingPage(): React.ReactElement
         </p>
 
         <p>
-          Uptrue monitors your site every 60 seconds and alerts you on Slack, email, or Teams the moment something goes wrong — from full outages to subtle content changes that only a keyword monitor catches.
+          Upnotify monitors your site every 60 seconds and alerts you on Slack, email, or Teams the moment something goes wrong — from full outages to subtle content changes that only a keyword monitor catches.
         </p>
 
         <p>
@@ -337,7 +337,7 @@ export default function WordPressContactFormNotSendingPage(): React.ReactElement
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

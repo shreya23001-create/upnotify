@@ -281,15 +281,15 @@ export function CreateMonitorForm({ minCheckInterval = 600, defaultType = 'http'
               <div className="heartbeat-info">
                 <h4 className="heartbeat-info-title">How Heartbeat Monitoring Works</h4>
                 <p className="heartbeat-info-body">
-                  Unlike other monitors where Uptrue checks your server, heartbeat monitoring works the other way around:
-                  <strong> your server sends a ping to Uptrue</strong> at regular intervals. If we stop receiving pings, we alert you.
+                  Unlike other monitors where Upnotify checks your server, heartbeat monitoring works the other way around:
+                  <strong> your server sends a ping to Upnotify</strong> at regular intervals. If we stop receiving pings, we alert you.
                 </p>
                 <p className="heartbeat-info-body"><strong>Setup steps:</strong></p>
                 <ol className="heartbeat-info-list">
                   <li>Create this monitor first — your unique <strong>heartbeat URL</strong> will appear on the monitor detail page after creation</li>
                   <li>Copy that URL and add a cron job on your server that calls it at regular intervals</li>
                   <li>Example cron (every 5 minutes): <code className="heartbeat-code">*/5 * * * * curl -s YOUR_HEARTBEAT_URL</code></li>
-                  <li>Uptrue alerts you if it stops receiving pings</li>
+                  <li>Upnotify alerts you if it stops receiving pings</li>
                 </ol>
                 <p className="heartbeat-info-foot">Ideal for: cron jobs, backup scripts, batch processes, scheduled tasks, queue workers.</p>
               </div>

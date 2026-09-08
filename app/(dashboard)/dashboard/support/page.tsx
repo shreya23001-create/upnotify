@@ -4,7 +4,7 @@ import { getCurrentUser } from '@/lib/db/users'
 import { getTicketsByOrg } from '@/lib/db/support'
 import { TicketList } from '@/components/support/ticket-list'
 
-export const metadata: Metadata = { title: 'Support — Uptrue' }
+export const metadata: Metadata = { title: 'Support — Upnotify' }
 
 export default async function SupportPage(): Promise<React.ReactElement> {
   const user = await getCurrentUser()

@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getCurrentUser } from '@/lib/db/users'
 import { getAlertChannelById } from '@/lib/db/alerts'
+import { getMonitorById, getMonitorsByOrgId } from '@/lib/db/monitors'
 import { sendAlertEmail } from '@/lib/services/email'
 import { sendSlackAlert } from '@/lib/services/slack'
 import { sendWebhookAlert } from '@/lib/services/webhook'
 import { sendTelegramAlert } from '@/lib/services/telegram'
 import { logger } from '@/lib/utils/logger'
 import { checkRateLimit, API_V1_RATE_LIMIT } from '@/lib/utils/rate-limiter'
+import { getConfig } from '@/lib/utils/config'
 
 export const dynamic = 'force-dynamic'
 
@@ -60,8 +62,33 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       return NextResponse.json({ error: 'Alert channel not found' }, { status: 404 })
     }
 
+    // Use a real monitor for realistic test content — prefer one this
+    // channel is actually scoped to, otherwise fall back to any monitor
+    // in the org. If the org has no monitors yet, fall back to placeholders.
+    // The test message mirrors the monitor's real current status so it
+    // doesn't falsely claim a healthy site is "down" — see engineering-app
+    // report: test alerts confused users when they said "Down" for an
+    // up monitor.
+    const monitorIds = channel.monitor_ids as string[] | null
+    let sampleMonitor: { id: string; name: string; target: string; status: string } | null = null
+    if (monitorIds && monitorIds.length > 0) {
+      const monitor = await getMonitorById(monitorIds[0])
+      if (monitor) sampleMonitor = { id: monitor.id, name: monitor.name, target: monitor.target, status: monitor.status }
+    }
+    if (!sampleMonitor) {
+      const orgMonitors = await getMonitorsByOrgId(user.org_id)
+      if (orgMonitors.length > 0) {
+        const first = await getMonitorById(orgMonitors[0].id)
+        if (first) sampleMonitor = { id: first.id, name: first.name, target: first.target, status: first.status }
+      }
+    }
+    // Only claim "Down" when the monitor is confirmed down. Anything else
+    // (up, unknown/never-checked, degraded) shows as the healthy/test-passed
+    // branch — a confusing false "Down" is worse than an optimistic default.
+    const sampleIsUp = sampleMonitor ? sampleMonitor.status !== 'down' : true
+
     const channelConfig = channel.config as unknown as AlertChannelConfig
-    const testMessage = `This is a test alert from Uptrue.\n` +
+    const testMessage = `This is a test alert from Upnotify.\n` +
       `Channel: ${channel.name}\n` +
       `Type: ${channel.type}\n` +
       `Time: ${new Date().toISOString()}\n` +
@@ -73,7 +100,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       case 'email':
         result = await sendAlertEmail({
           to: channelConfig.email || '',
-          subject: '[Test] Uptrue Alert Channel Test',
+          subject: '[Test] Upnotify Alert Channel Test',
           body: testMessage,
         })
         break
@@ -87,7 +114,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
               type: 'section',
               text: {
                 type: 'mrkdwn',
-                text: '*Test Alert* — This is a test notification from Uptrue.',
+                text: '*Test Alert* — This is a test notification from Upnotify.',
               },
             },
             {
@@ -121,7 +148,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
                 body: [
                   {
                     type: 'TextBlock',
-                    text: 'Test Alert — Uptrue',
+                    text: 'Test Alert — Upnotify',
                     weight: 'Bolder',
                     size: 'Medium',
                     color: 'Accent',
@@ -154,23 +181,29 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           secret: channelConfig.webhookSecret,
           payload: {
             event: 'test',
-            message: 'This is a test alert from Uptrue.',
+            message: 'This is a test alert from Upnotify.',
             channel: { id: channel.id, name: channel.name, type: channel.type },
             timestamp: new Date().toISOString(),
           },
         })
         break
 
-      case 'telegram':
+      case 'telegram': {
+        const config = getConfig()
+        const monitorUrl = sampleMonitor
+          ? `${config.app.url}/dashboard/monitors/${sampleMonitor.id}`
+          : `${config.app.url}/dashboard/alerts`
         result = await sendTelegramAlert({
           chatId: channelConfig.telegramChatId || '',
-          monitorName: 'Test Monitor',
-          monitorTarget: 'uptrue.io',
-          isResolved: false,
+          monitorName: sampleMonitor?.name ?? 'Test Monitor',
+          monitorTarget: sampleMonitor?.target ?? 'example.com',
+          isResolved: sampleIsUp,
+          isTest: true,
           severity: 'P2',
-          monitorUrl: 'https://uptrue.io/dashboard/alerts',
+          monitorUrl,
         })
         break
+      }
 
       default:
         result = { success: false, error: `Unsupported channel type: ${channel.type}` }

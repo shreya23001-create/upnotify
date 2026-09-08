@@ -41,9 +41,9 @@ const FAQ_DATA = [
       'Yes. Most shared hosting terms of service allow the provider to suspend accounts that exceed resource limits. Some hosts throttle first and suspend later. Others suspend immediately during peak usage. The suspension page typically shows a generic message like "This site is temporarily unavailable" or "Account suspended." You receive an email notification, but it may take hours to arrive and often lands in spam. Your site is down and your visitors see a suspension notice until you contact support.',
   },
   {
-    question: 'How does Uptrue detect shared hosting throttling?',
+    question: 'How does Upnotify detect shared hosting throttling?',
     answer:
-      'Uptrue\'s HTTP monitor checks your site every 60 seconds and records the response time for each check. When your host throttles your CPU, response times spike from normal levels (under 2 seconds) to 5, 10, or 20+ seconds. Uptrue detects this spike and alerts you via Slack, email, Microsoft Teams, or webhook. You can set response time thresholds so you are alerted when pages take longer than a specific number of seconds — catching the slowdown before it becomes a complete outage.',
+      'Upnotify\'s HTTP monitor checks your site every 60 seconds and records the response time for each check. When your host throttles your CPU, response times spike from normal levels (under 2 seconds) to 5, 10, or 20+ seconds. Upnotify detects this spike and alerts you via Slack, email, Microsoft Teams, or webhook. You can set response time thresholds so you are alerted when pages take longer than a specific number of seconds — catching the slowdown before it becomes a complete outage.',
   },
 ]
 
@@ -67,7 +67,7 @@ export default function WordPressSharedHostingSlowPage(): React.ReactElement {
           '@type': 'Article',
           headline: 'WordPress Site Down on Shared Hosting: Why CPU Limits Are Throttling Your Site',
           description: 'Why shared hosting silently throttles your WordPress site during traffic spikes, how the noisy neighbour effect works, and how response time monitoring catches slowdowns.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-04-03',
           dateModified: '2026-04-03',
@@ -210,10 +210,10 @@ export default function WordPressSharedHostingSlowPage(): React.ReactElement {
           This is why response time monitoring is essential. It does not just check whether the server responded — it checks how fast it responded.
         </p>
 
-        <h2>How to detect hosting throttling with Uptrue</h2>
+        <h2>How to detect hosting throttling with Upnotify</h2>
 
         <p>
-          <Link href="/signup">Uptrue&apos;s HTTP monitoring</Link> records the response time on every check. When your hosting provider throttles your site, the response time spikes — and Uptrue alerts you immediately.
+          <Link href="/signup">Upnotify&apos;s HTTP monitoring</Link> records the response time on every check. When your hosting provider throttles your site, the response time spikes — and Upnotify alerts you immediately.
         </p>
 
         <h3>Step 1: Set up an HTTP monitor with response time alerting</h3>
@@ -250,7 +250,7 @@ export default function WordPressSharedHostingSlowPage(): React.ReactElement {
         <h3>Step 3: Track response time trends over time</h3>
 
         <p>
-          Uptrue records the response time of every check. Over days and weeks, you build a clear picture of your site&apos;s performance. You can see:
+          Upnotify records the response time of every check. Over days and weeks, you build a clear picture of your site&apos;s performance. You can see:
         </p>
 
         <ul>
@@ -326,7 +326,7 @@ export default function WordPressSharedHostingSlowPage(): React.ReactElement {
         </p>
 
         <p>
-          Uptrue checks your site every 60 seconds and tracks the response time on every check. When your hosting provider throttles your site, you see it in the data. When response times exceed your threshold, you get an alert. You stop guessing and start knowing.
+          Upnotify checks your site every 60 seconds and tracks the response time on every check. When your hosting provider throttles your site, you see it in the data. When response times exceed your threshold, you get an alert. You stop guessing and start knowing.
         </p>
 
         <div className="blog-cta-section">
@@ -353,7 +353,7 @@ export default function WordPressSharedHostingSlowPage(): React.ReactElement {
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

@@ -11,14 +11,14 @@ import CompeteFaqClient from './compete-faq-client'
 
 export const metadata: Metadata = {
   title:
-    'Uptrue Compete — Track Competitor Prices & Stock in Real Time',
+    'Upnotify Compete — Track Competitor Prices & Stock in Real Time',
   description:
     'Monitor competitor prices, detect stock changes, and get instant alerts when prices drop. Automatic extraction from any ecommerce site. From \u00A39/month.',
   alternates: {
     canonical: 'https://uptrue.io/compete',
   },
   openGraph: {
-    title: 'Uptrue Compete — Competitor Price & Stock Tracking',
+    title: 'Upnotify Compete — Competitor Price & Stock Tracking',
     description:
       'Track competitor prices, detect stock changes, and get alerts when prices drop. Automatic extraction from any ecommerce site — no code needed.',
     url: 'https://uptrue.io/compete',
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Uptrue Compete — Track Competitor Prices & Stock',
+    title: 'Upnotify Compete — Track Competitor Prices & Stock',
     description:
       'Monitor competitor prices and stock availability. Automatic extraction, real-time alerts, historical charts. From \u00A39/month.',
   },
@@ -38,19 +38,19 @@ export const metadata: Metadata = {
 
 const COMPETE_FAQ_ITEMS = [
   {
-    question: 'What is Uptrue Compete?',
+    question: 'What is Upnotify Compete?',
     answer:
-      'Uptrue Compete is a price and stock tracking add-on that monitors competitor product pages automatically. It extracts prices, detects stock availability changes, and sends you alerts when something changes \u2014 so you can react before your competitors outprice you.',
+      'Upnotify Compete is a price and stock tracking add-on that monitors competitor product pages automatically. It extracts prices, detects stock availability changes, and sends you alerts when something changes \u2014 so you can react before your competitors outprice you.',
   },
   {
     question: 'How does automatic price extraction work?',
     answer:
-      'You paste in any product URL from an ecommerce site. Uptrue visits the page on a schedule, extracts the current price and stock status using intelligent selectors, and stores the data. No code, no browser extensions, no manual checks.',
+      'You paste in any product URL from an ecommerce site. Upnotify visits the page on a schedule, extracts the current price and stock status using intelligent selectors, and stores the data. No code, no browser extensions, no manual checks.',
   },
   {
     question: 'Which ecommerce sites does it work with?',
     answer:
-      'Uptrue Compete works with virtually any ecommerce site that displays a price on its product pages \u2014 including Shopify, WooCommerce, BigCommerce, Magento, Squarespace, Amazon, eBay, and custom-built stores.',
+      'Upnotify Compete works with virtually any ecommerce site that displays a price on its product pages \u2014 including Shopify, WooCommerce, BigCommerce, Magento, Squarespace, Amazon, eBay, and custom-built stores.',
   },
   {
     question: 'Can I get alerts when a competitor changes their price?',
@@ -58,9 +58,9 @@ const COMPETE_FAQ_ITEMS = [
       'Yes. You can set up alerts via email, Slack, Microsoft Teams, and webhooks. You choose the conditions \u2014 for example, alert me when a product drops below a specific price, or when any tracked product goes out of stock.',
   },
   {
-    question: 'Do I need a paid Uptrue monitoring plan to use Compete?',
+    question: 'Do I need a paid Upnotify monitoring plan to use Compete?',
     answer:
-      'Yes. Uptrue Compete is an add-on that requires any paid monitoring plan (Lite, Builder, or Scale). It cannot be purchased standalone.',
+      'Yes. Upnotify Compete is an add-on that requires any paid monitoring plan (Lite, Builder, or Scale). It cannot be purchased standalone.',
   },
   {
     question: 'How often are prices checked?',
@@ -100,13 +100,13 @@ const BENEFITS = [
     icon: '\u{2699}\uFE0F',
     title: 'Automatic Extraction (No Code)',
     description:
-      'Paste a URL. Uptrue handles the rest. Intelligent selectors extract price, stock status, and product name automatically.',
+      'Paste a URL. Upnotify handles the rest. Intelligent selectors extract price, stock status, and product name automatically.',
   },
   {
     icon: '\u{1F310}',
     title: 'Works With Any Ecommerce Site',
     description:
-      'Shopify, WooCommerce, BigCommerce, Magento, Amazon, eBay \u2014 if it has a price on the page, Uptrue can track it.',
+      'Shopify, WooCommerce, BigCommerce, Magento, Amazon, eBay \u2014 if it has a price on the page, Upnotify can track it.',
   },
   {
     icon: '\u{1F4C8}',
@@ -133,7 +133,7 @@ const STEPS_HOW_TO = [
     number: '2',
     title: 'Automatic Extraction',
     description:
-      'Uptrue visits each page on a schedule, extracts the current price and stock status using intelligent selectors. No code needed.',
+      'Upnotify visits each page on a schedule, extracts the current price and stock status using intelligent selectors. No code needed.',
   },
   {
     number: '3',
@@ -242,7 +242,7 @@ export default function CompeteLandingPage(): React.ReactElement {
         data={{
           '@context': 'https://schema.org',
           '@type': 'SoftwareApplication',
-          name: 'Uptrue Compete',
+          name: 'Upnotify Compete',
           applicationCategory: 'BusinessApplication',
           operatingSystem: 'Web',
           url: 'https://uptrue.io/compete',
@@ -321,7 +321,7 @@ export default function CompeteLandingPage(): React.ReactElement {
             {
               '@type': 'ListItem',
               position: 2,
-              name: 'Uptrue Compete',
+              name: 'Upnotify Compete',
               item: 'https://uptrue.io/compete',
             },
           ],
@@ -494,7 +494,7 @@ export default function CompeteLandingPage(): React.ReactElement {
             Everything you need for competitive pricing intelligence
           </h2>
           <p className="landing-section-subtitle">
-            From price alerts to webhook integrations, Uptrue Compete gives you
+            From price alerts to webhook integrations, Upnotify Compete gives you
             the edge.
           </p>
           <div className="features-grid">
@@ -523,7 +523,7 @@ export default function CompeteLandingPage(): React.ReactElement {
               <p className="agency-description">
                 Track competitor prices starting from just {'\u00A3'}9/month.
                 A single day of being overpriced on a high-traffic product can cost more
-                than a year of Uptrue Compete.
+                than a year of Upnotify Compete.
               </p>
               <ul className="agency-features">
                 <li>
@@ -591,7 +591,7 @@ export default function CompeteLandingPage(): React.ReactElement {
       <section className="landing-section landing-features" id="case-studies">
         <div className="landing-container">
           <h2 className="landing-section-title">
-            How businesses use Uptrue Compete
+            How businesses use Upnotify Compete
           </h2>
           <p className="landing-section-subtitle">
             Real-world use cases from ecommerce, dropshipping, and price comparison.
@@ -626,7 +626,7 @@ export default function CompeteLandingPage(): React.ReactElement {
               <div className="step-number">1</div>
               <h3 className="step-title">Sign up and choose a plan</h3>
               <p className="step-description">
-                Create your Uptrue account and subscribe to any paid monitoring plan.
+                Create your Upnotify account and subscribe to any paid monitoring plan.
                 Then add the Compete add-on from your dashboard settings.
               </p>
               {/* Screenshot placeholder */}
@@ -651,7 +651,7 @@ export default function CompeteLandingPage(): React.ReactElement {
               <div className="step-number">2</div>
               <h3 className="step-title">Add product URLs to track</h3>
               <p className="step-description">
-                Paste in competitor product page URLs. Uptrue automatically detects
+                Paste in competitor product page URLs. Upnotify automatically detects
                 the price, product name, and stock status. Review and confirm.
               </p>
               <div
@@ -724,12 +724,12 @@ export default function CompeteLandingPage(): React.ReactElement {
       </section>
 
       {/* ================================================================
-          Why Uptrue Compete — Comparison Table
+          Why Upnotify Compete — Comparison Table
           ================================================================ */}
       <section className="landing-section" id="comparison">
         <div className="landing-container">
           <h2 className="landing-section-title">
-            Why Uptrue Compete
+            Why Upnotify Compete
           </h2>
           <p className="landing-section-subtitle">
             How it compares to manual tracking and other tools.
@@ -758,7 +758,7 @@ export default function CompeteLandingPage(): React.ReactElement {
                       color: 'var(--color-primary)',
                     }}
                   >
-                    Uptrue Compete
+                    Upnotify Compete
                   </th>
                   <th style={{ padding: '12px 16px', fontWeight: 600 }}>Manual Tracking</th>
                   <th style={{ padding: '12px 16px', fontWeight: 600 }}>Other Tools</th>

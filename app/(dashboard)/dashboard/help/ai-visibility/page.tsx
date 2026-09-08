@@ -21,7 +21,7 @@ const FAQ_SCHEMA = {
       name: 'What is AI Citation Monitoring?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'AI Citation Monitoring checks whether real AI engines — ChatGPT, Perplexity, Gemini, and others — are actually mentioning your domain when users ask about your topic or industry. Uptrue queries each engine with your target keywords and analyses the responses for citations of your domain. The result is a citation score and a breakdown of which engines cite you and which do not.',
+        text: 'AI Citation Monitoring checks whether real AI engines — ChatGPT, Perplexity, Gemini, and others — are actually mentioning your domain when users ask about your topic or industry. Upnotify queries each engine with your target keywords and analyses the responses for citations of your domain. The result is a citation score and a breakdown of which engines cite you and which do not.',
       },
     },
     {
@@ -112,7 +112,7 @@ export default function AiVisibilityHelpPage(): React.ReactElement {
                 crawls and reads llms.txt files.
               </li>
               <li>
-                Click <strong>Generate llms.txt</strong>. Uptrue calls the AI engine and drafts a
+                Click <strong>Generate llms.txt</strong>. Upnotify calls the AI engine and drafts a
                 structured file for your domain. This takes a few seconds.
               </li>
               <li>
@@ -253,7 +253,7 @@ export default function AiVisibilityHelpPage(): React.ReactElement {
                 <h3 className="help-faq-q">What is AI Citation Monitoring?</h3>
                 <p className="help-faq-a">
                   AI Citation Monitoring checks whether real AI engines are actually mentioning your domain when
-                  users ask about your topic or industry. Uptrue queries each engine with your target keywords and
+                  users ask about your topic or industry. Upnotify queries each engine with your target keywords and
                   analyses the responses for citations of your domain. The result is a citation score and a
                   breakdown of which engines cite you and which do not.
                 </p>

@@ -48,7 +48,7 @@ const FAQ_DATA = [
   {
     question: 'What is the difference between uptime monitoring and performance monitoring?',
     answer:
-      'Uptime monitoring checks whether your site is up or down. Performance monitoring measures how fast it responds and loads. Good monitoring tools do both — they check if the site is online and track response time on every check. Uptrue records Time to First Byte on every HTTP check, giving you both uptime and performance data.',
+      'Uptime monitoring checks whether your site is up or down. Performance monitoring measures how fast it responds and loads. Good monitoring tools do both — they check if the site is online and track response time on every check. Upnotify records Time to First Byte on every HTTP check, giving you both uptime and performance data.',
   },
   {
     question: 'Do I need uptime monitoring if my hosting provider guarantees 99.9% uptime?',
@@ -87,7 +87,7 @@ export default function WhatIsUptimeMonitoringPage(): React.ReactElement {
           '@type': 'Article',
           headline: 'What Is Uptime Monitoring and Why Every Website Needs It',
           description: 'Uptime monitoring checks if your website is online and working. Learn what it is, how it works, and why every website needs it.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-03-25',
           dateModified: '2026-03-25',
@@ -152,7 +152,7 @@ export default function WhatIsUptimeMonitoringPage(): React.ReactElement {
         </p>
 
         <p>
-          That is the basic version. Modern monitoring tools like <Link href="/signup">Uptrue</Link> go further with additional check types that catch failures a simple HTTP check would miss.
+          That is the basic version. Modern monitoring tools like <Link href="/signup">Upnotify</Link> go further with additional check types that catch failures a simple HTTP check would miss.
         </p>
 
         <h2>The different types of monitoring and what each one catches</h2>
@@ -267,7 +267,7 @@ export default function WhatIsUptimeMonitoringPage(): React.ReactElement {
         <h2>How to set up uptime monitoring in 60 seconds</h2>
 
         <p>
-          You do not need to install anything on your server. You do not need technical expertise. Here is the complete setup with <Link href="/signup">Uptrue</Link>:
+          You do not need to install anything on your server. You do not need technical expertise. Here is the complete setup with <Link href="/signup">Upnotify</Link>:
         </p>
 
         <ol>
@@ -380,7 +380,7 @@ export default function WhatIsUptimeMonitoringPage(): React.ReactElement {
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

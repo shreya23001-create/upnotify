@@ -2,16 +2,16 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: 'Help Centre — Uptrue',
+  title: 'Help Centre — Upnotify',
   description:
-    'Browse Uptrue help topics — getting started, monitors, alerts, status pages, billing, and more. Full articles open in your dashboard.',
+    'Browse Upnotify help topics — getting started, monitors, alerts, status pages, billing, and more. Full articles open in your dashboard.',
   alternates: {
     canonical: 'https://uptrue.io/help',
   },
   openGraph: {
-    title: 'Help Centre — Uptrue',
+    title: 'Help Centre — Upnotify',
     description:
-      'Browse Uptrue help topics — getting started, monitors, alerts, status pages, billing, and more.',
+      'Browse Upnotify help topics — getting started, monitors, alerts, status pages, billing, and more.',
     url: 'https://uptrue.io/help',
     type: 'website',
   },
@@ -81,7 +81,7 @@ const PUBLIC_HELP_TOPICS: HelpTopic[] = [
   {
     href: '/dashboard/help/tools',
     title: 'Free Tools',
-    description: 'SSL Checker, Uptime Calculator, Uptrue Score — free, no signup needed.',
+    description: 'SSL Checker, Uptime Calculator, Upnotify Score — free, no signup needed.',
     icon: '🧰',
   },
 ]
@@ -93,7 +93,7 @@ export default function PublicHelpPage(): React.ReactElement {
         <div className="landing-container">
           <h1 className="about-hero-title">Help Centre</h1>
           <p className="about-hero-subtitle">
-            Guides, walkthroughs and answers for every part of Uptrue. Sign in to read the full articles, or
+            Guides, walkthroughs and answers for every part of Upnotify. Sign in to read the full articles, or
             <Link href="/contact" style={{ marginLeft: 4 }}>contact us</Link> if you need a hand.
           </p>
         </div>

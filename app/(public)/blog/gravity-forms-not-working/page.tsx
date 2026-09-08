@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Gravity Forms Conditional Logic Not Working: Why Your Forms Are Broken After Update',
     description:
-      'What causes Gravity Forms conditional logic to break after updates, how jQuery conflicts and minification destroy form functionality, and how Uptrue keyword monitoring detects broken forms on your WordPress site.',
+      'What causes Gravity Forms conditional logic to break after updates, how jQuery conflicts and minification destroy form functionality, and how Upnotify keyword monitoring detects broken forms on your WordPress site.',
     url: 'https://uptrue.io/blog/gravity-forms-not-working',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Gravity Forms Conditional Logic Not Working: Why Your Forms Are Broken After Update',
     description:
-      'What causes Gravity Forms conditional logic to break after updates, how jQuery conflicts and minification destroy form functionality, and how Uptrue keyword monitoring detects broken forms on your WordPress site.',
+      'What causes Gravity Forms conditional logic to break after updates, how jQuery conflicts and minification destroy form functionality, and how Upnotify keyword monitoring detects broken forms on your WordPress site.',
   },
 }
 
@@ -67,7 +67,7 @@ export default function GravityFormsNotWorkingPage(): React.ReactElement {
           '@type': 'Article',
           headline: 'Gravity Forms Conditional Logic Not Working: Why Your Forms Are Broken After Update',
           description: 'What causes Gravity Forms conditional logic failures, how jQuery conflicts and minification break form functionality, and how keyword monitoring catches broken forms.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-04-02',
           dateModified: '2026-04-02',
@@ -221,10 +221,10 @@ export default function GravityFormsNotWorkingPage(): React.ReactElement {
           Check your payment gateway API keys. Test in Stripe&apos;s or PayPal&apos;s sandbox mode. Check the browser console for JavaScript errors from the payment SDK. Ensure only one instance of the payment SDK loads on the page. Update the payment add-on to its latest version. If the problem persists, disable other plugins that load the same payment SDK.
         </p>
 
-        <h2>How to monitor Gravity Forms with Uptrue</h2>
+        <h2>How to monitor Gravity Forms with Upnotify</h2>
 
         <p>
-          <Link href="/signup">Uptrue&apos;s keyword monitoring</Link> checks that your form pages contain the expected content. If a PHP error, JavaScript failure, or plugin conflict prevents your Gravity Form from rendering, Uptrue detects the missing content and alerts you immediately.
+          <Link href="/signup">Upnotify&apos;s keyword monitoring</Link> checks that your form pages contain the expected content. If a PHP error, JavaScript failure, or plugin conflict prevents your Gravity Form from rendering, Upnotify detects the missing content and alerts you immediately.
         </p>
 
         <h3>Step 1: Set up a keyword monitor on your form page</h3>
@@ -241,7 +241,7 @@ export default function GravityFormsNotWorkingPage(): React.ReactElement {
         </ol>
 
         <p>
-          If a PHP fatal error crashes the form rendering, the submit button text disappears from the page. If a JavaScript error prevents the form from initialising and the form is rendered via JavaScript (AJAX-enabled forms), the form content may be missing. Uptrue detects the missing keyword and alerts you.
+          If a PHP fatal error crashes the form rendering, the submit button text disappears from the page. If a JavaScript error prevents the form from initialising and the form is rendered via JavaScript (AJAX-enabled forms), the form content may be missing. Upnotify detects the missing keyword and alerts you.
         </p>
 
         <h3>Step 2: Monitor for error text on the form page</h3>
@@ -256,7 +256,7 @@ export default function GravityFormsNotWorkingPage(): React.ReactElement {
         </ol>
 
         <p>
-          This catches PHP fatal errors that display on the page instead of the form. If WordPress debug display is accidentally enabled, or if the error occurs before output buffering starts, the error message appears on the page. Uptrue catches it immediately.
+          This catches PHP fatal errors that display on the page instead of the form. If WordPress debug display is accidentally enabled, or if the error occurs before output buffering starts, the error message appears on the page. Upnotify catches it immediately.
         </p>
 
         <h3>Step 3: Add an HTTP monitor for server-level failures</h3>
@@ -337,7 +337,7 @@ export default function GravityFormsNotWorkingPage(): React.ReactElement {
         </p>
 
         <p>
-          Uptrue keyword monitoring checks your form pages every 60 seconds. If the form disappears, if an error message appears, if the submit button text is missing — you know in under a minute. Before the next lead fills out a form that does not work. Before another day of lost submissions.
+          Upnotify keyword monitoring checks your form pages every 60 seconds. If the form disappears, if an error message appears, if the submit button text is missing — you know in under a minute. Before the next lead fills out a form that does not work. Before another day of lost submissions.
         </p>
 
         <div className="blog-cta-section">
@@ -364,7 +364,7 @@ export default function GravityFormsNotWorkingPage(): React.ReactElement {
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

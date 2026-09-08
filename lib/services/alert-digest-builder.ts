@@ -31,7 +31,7 @@ export function buildDigestEmail(events: BufferedEvent[], opts: DigestOptions): 
   if (events.length === 0) {
     // Caller should not invoke for empty buffers, but be defensive.
     return {
-      subject: 'Uptrue digest — no new events',
+      subject: 'Upnotify digest — no new events',
       bodyText: 'No events to report.',
       bodyHtml: '<p>No events to report.</p>',
     }
@@ -82,11 +82,11 @@ export function buildDigestEmail(events: BufferedEvent[], opts: DigestOptions): 
   if (stillDownCount > 0) subjectParts.push(`${stillDownCount} still down`)
   if (recoveredCount > 0) subjectParts.push(`${recoveredCount} recovered`)
   const subjectSummary = subjectParts.join(', ') || 'no active issues'
-  const subject = `[Uptrue] ${totalEvents} ${totalEvents === 1 ? 'event' : 'events'} — ${subjectSummary}`
+  const subject = `[Upnotify] ${totalEvents} ${totalEvents === 1 ? 'event' : 'events'} — ${subjectSummary}`
 
   // ---- Plain-text body ----
   const lines: string[] = []
-  lines.push(`Uptrue digest — last window`)
+  lines.push(`Upnotify digest — last window`)
   lines.push('')
   lines.push(`Events: ${totalEvents}   Still down: ${stillDownCount}   Recovered: ${recoveredCount}`)
   lines.push('')
@@ -217,10 +217,10 @@ function buildHtml(input: HtmlInput): string {
 
   return `
 <!DOCTYPE html>
-<html><head><meta charset="utf-8"><title>Uptrue digest</title></head>
+<html><head><meta charset="utf-8"><title>Upnotify digest</title></head>
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; color: #111;">
   <div style="border-bottom: 2px solid #e5e7eb; padding-bottom: 12px; margin-bottom: 16px;">
-    <div style="font-size: 13px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em;">Uptrue digest</div>
+    <div style="font-size: 13px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em;">Upnotify digest</div>
     <div style="font-size: 18px; font-weight: 600; margin-top: 4px;">
       ${input.totalEvents} ${input.totalEvents === 1 ? 'event' : 'events'} —
       <span style="color:#dc2626;">${input.stillDownCount} still down</span>

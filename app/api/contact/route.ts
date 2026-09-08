@@ -77,7 +77,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     await sendEmail(
       email,
-      'Please confirm your message to Uptrue',
+      'Please confirm your message to Upnotify',
       `<!DOCTYPE html><html><body style="font-family:sans-serif;max-width:560px;margin:40px auto;color:#111;">
         <h2 style="font-size:20px;margin-bottom:8px;">Confirm your message</h2>
         <p style="color:#555;margin-bottom:20px;">

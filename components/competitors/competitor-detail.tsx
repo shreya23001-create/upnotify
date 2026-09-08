@@ -431,7 +431,7 @@ export function CompetitorDetail({ competitor, orgMonitors }: Props): React.Reac
         <div className="card">
           <div className="card-header">
             <div className="card-title">
-              <Sparkles size={14} style={{ marginRight: 6, color: '#8b5cf6' }} />
+              <Sparkles size={14} style={{ marginRight: 6, color: '#2ee06b' }} />
               AI Reliability Summary
             </div>
             <button
@@ -458,7 +458,7 @@ export function CompetitorDetail({ competitor, orgMonitors }: Props): React.Reac
                   {aiSummary}
                 </p>
                 <p style={{ fontSize: 11, color: 'var(--text-muted)', fontStyle: 'italic' }}>
-                  Based on Uptrue&apos;s automated monitoring data only. Does not represent the overall quality or reliability of this service.
+                  Based on Upnotify&apos;s automated monitoring data only. Does not represent the overall quality or reliability of this service.
                   {aiSummaryAt && ` Generated ${timeAgo(aiSummaryAt)}.`}
                 </p>
               </>

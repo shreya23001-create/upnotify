@@ -33,7 +33,7 @@ export default function HelpIndexPage(): React.ReactElement {
             </div>
             <div>
               <h1 className="help-hero-title">Help Center</h1>
-              <p className="help-hero-sub">Everything you need to get the most out of Uptrue.</p>
+              <p className="help-hero-sub">Everything you need to get the most out of Upnotify.</p>
             </div>
           </div>
           <div className="help-search-wrap">

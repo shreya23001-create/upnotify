@@ -1,6 +1,7 @@
 import { notFound, redirect } from 'next/navigation'
 import { getCurrentUser } from '@/lib/db/users'
 import { getAlertChannelById } from '@/lib/db/alerts'
+import { getMonitorsByOrgId } from '@/lib/db/monitors'
 import { EditAlertChannelForm } from '@/components/alerts/edit-alert-channel-form'
 
 export default async function EditAlertChannelPage({
@@ -14,6 +15,8 @@ export default async function EditAlertChannelPage({
   const { id } = await params
   const channel = await getAlertChannelById(id)
   if (!channel) notFound()
+
+  const monitors = await getMonitorsByOrgId(user.org_id)
 
   return (
     <div className="db-content">
@@ -35,7 +38,7 @@ export default async function EditAlertChannelPage({
         <div className="ac-edit-body">
           <div className="card">
             <div className="card-content">
-              <EditAlertChannelForm channel={channel} />
+              <EditAlertChannelForm channel={channel} monitors={monitors} />
             </div>
           </div>
         </div>

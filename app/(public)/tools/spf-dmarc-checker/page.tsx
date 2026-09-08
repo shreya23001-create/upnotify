@@ -6,12 +6,12 @@ import Faq from '@/components/landing/faq'
 import { ScrollReveal } from '@/components/landing/scroll-reveal'
 
 export const metadata: Metadata = {
-  title: 'Free SPF & DMARC Record Checker — Email Security Test | Uptrue',
+  title: 'Free SPF & DMARC Record Checker — Email Security Test | Upnotify',
   description:
     'Check your SPF and DMARC DNS records instantly. Validate email authentication setup, detect misconfigurations, and get a security grade. Free tool, no signup.',
   alternates: { canonical: 'https://uptrue.io/tools/spf-dmarc-checker' },
   openGraph: {
-    title: 'Free SPF & DMARC Record Checker — Email Security Test | Uptrue',
+    title: 'Free SPF & DMARC Record Checker — Email Security Test | Upnotify',
     description:
       'Check SPF and DMARC records, detect misconfigurations, and get an email security grade. Free, no signup.',
     url: 'https://uptrue.io/tools/spf-dmarc-checker',
@@ -125,7 +125,7 @@ export default function SpfDmarcCheckerPage(): React.ReactElement {
           <div className="tools-cta reveal">
             <h2>Monitor SPF &amp; DMARC changes automatically</h2>
             <p>
-              Uptrue&apos;s <Link href="/monitoring/spf-dmarc-monitoring">SPF/DMARC validity monitoring</Link>{' '}
+              Upnotify&apos;s <Link href="/monitoring/spf-dmarc-monitoring">SPF/DMARC validity monitoring</Link>{' '}
               watches your authentication records and alerts you the moment something shifts. Pair it with{' '}
               <Link href="/monitoring/mx-health-monitoring">MX health monitoring</Link> so a broken mail flow
               never goes unnoticed — protecting your domain reputation before attackers exploit it.

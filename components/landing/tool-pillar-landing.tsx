@@ -121,7 +121,7 @@ export function ToolPillarLanding({ data }: { data: ToolPillarData }): React.Rea
                 url: `https://uptrue.io/tools/${data.pillarSlug}`,
                 isPartOf: {
                   '@type': 'WebSite',
-                  name: 'Uptrue',
+                  name: 'Upnotify',
                   url: 'https://uptrue.io',
                 },
               },

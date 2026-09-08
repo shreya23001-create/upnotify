@@ -6,7 +6,7 @@ const data: IndustryLandingData = {
   heroTitle: 'Banking Uptime Monitoring',
   heroSubtitle:
     'Catch login outages, slow account pages and silent transaction failures before customers lose trust. Built for retail banks, neobanks, and digital banking platforms.',
-  seoTitle: 'Banking Uptime Monitoring — Login, Account & Transaction Reliability | Uptrue',
+  seoTitle: 'Banking Uptime Monitoring — Login, Account & Transaction Reliability | Upnotify',
   seoDescription:
     'Banking uptime monitoring for retail and digital banks: login flow detection, account page response time, SSL chain validation, security headers compliance, and audit-ready incident logs. Designed to support FCA, PRA, and EBA reliability expectations.',
   whyItMatters: [
@@ -60,27 +60,27 @@ const data: IndustryLandingData = {
   ],
   faq: [
     {
-      q: 'Can Uptrue produce auditor-ready evidence for FCA or PRA reviews?',
-      a: 'Yes — every check, alert, and incident is recorded with a tamper-resistant timestamp. Evidence includes detection time, two-confirmation timing, alert dispatch, and resolution. The data is exportable to support your operational resilience self-assessment. Uptrue is not a substitute for your operational resilience framework but provides the underlying check evidence layer.',
+      q: 'Can Upnotify produce auditor-ready evidence for FCA or PRA reviews?',
+      a: 'Yes — every check, alert, and incident is recorded with a tamper-resistant timestamp. Evidence includes detection time, two-confirmation timing, alert dispatch, and resolution. The data is exportable to support your operational resilience self-assessment. Upnotify is not a substitute for your operational resilience framework but provides the underlying check evidence layer.',
     },
     {
-      q: 'How does Uptrue help meet FCA Operational Resilience expectations?',
-      a: 'The FCA requires firms to identify Important Business Services and define impact tolerances. Uptrue gives you continuous evidence of whether services are within tolerance — uptime, response time, SSL validity, security headers — and an auditable trail of incidents. This supports both annual self-assessment and ad-hoc regulator queries.',
+      q: 'How does Upnotify help meet FCA Operational Resilience expectations?',
+      a: 'The FCA requires firms to identify Important Business Services and define impact tolerances. Upnotify gives you continuous evidence of whether services are within tolerance — uptime, response time, SSL validity, security headers — and an auditable trail of incidents. This supports both annual self-assessment and ad-hoc regulator queries.',
     },
     {
       q: 'Where is monitoring data stored — is it UK or EU resident?',
-      a: 'All Uptrue customer data, including monitor configurations, incident logs, and audit trails, is stored in the EU (Frankfurt region) on Supabase infrastructure. Data is encrypted at rest and in transit. We have a published Data Processing Agreement (DPA) available for Agency and Scale customers, and our subprocessor list is public.',
+      a: 'All Upnotify customer data, including monitor configurations, incident logs, and audit trails, is stored in the EU (Frankfurt region) on Supabase infrastructure. Data is encrypted at rest and in transit. We have a published Data Processing Agreement (DPA) available for Agency and Scale customers, and our subprocessor list is public.',
     },
     {
       q: 'Can we monitor the mobile app API without exposing customer credentials?',
-      a: 'Yes. API Endpoint monitors accept custom HTTP headers, so you can use a dedicated read-only service token scoped to a monitoring user. Best practice: rotate quarterly, restrict source IPs at your gateway to Uptrue check origins, and never use credentials with customer-data access.',
+      a: 'Yes. API Endpoint monitors accept custom HTTP headers, so you can use a dedicated read-only service token scoped to a monitoring user. Best practice: rotate quarterly, restrict source IPs at your gateway to Upnotify check origins, and never use credentials with customer-data access.',
     },
     {
       q: 'How do you handle alert sensitivity in a regulated bank?',
       a: 'Two-confirmation alerting eliminates ~95% of false positives from transient network blips. Smart Digest then collapses repeat events for the same incident into a single follow-up — operations teams get the signal without being paged 50 times during one outage. Alert fatigue is itself a regulatory concern; reducing it materially is part of operational resilience.',
     },
     {
-      q: 'Is Uptrue suitable for monitoring open banking endpoints?',
+      q: 'Is Upnotify suitable for monitoring open banking endpoints?',
       a: 'Yes. Open banking APIs (PSD2 Account Information, Payment Initiation, Confirmation of Funds) all benefit from API Endpoint monitoring with body assertions, response-time thresholds, and SSL certificate monitoring. We do not currently sign requests with eIDAS QWAC certificates — for that you need to monitor your own gateway endpoint that fronts the open banking surface.',
     },
   ],

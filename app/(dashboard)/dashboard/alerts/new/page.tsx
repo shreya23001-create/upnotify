@@ -1,6 +1,11 @@
 import { CreateAlertChannelForm } from '@/components/alerts/create-alert-channel-form'
+import { getCurrentUser } from '@/lib/db/users'
+import { getMonitorsByOrgId } from '@/lib/db/monitors'
 
-export default function NewAlertChannelPage() {
+export default async function NewAlertChannelPage() {
+  const user = await getCurrentUser()
+  const monitors = user ? await getMonitorsByOrgId(user.org_id) : []
+
   return (
     <div className="db-content">
       <div className="ac-edit-wrap">
@@ -21,7 +26,7 @@ export default function NewAlertChannelPage() {
         <div className="ac-edit-body">
           <div className="card">
             <div className="card-content">
-              <CreateAlertChannelForm />
+              <CreateAlertChannelForm monitors={monitors} />
             </div>
           </div>
         </div>

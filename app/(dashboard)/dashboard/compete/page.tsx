@@ -33,7 +33,7 @@ export default async function CompetePage(): Promise<React.ReactElement> {
       <div className="db-content">
         <div className="db-page-header">
           <div>
-            <div className="db-page-title">Uptrue Compete</div>
+            <div className="db-page-title">Upnotify Compete</div>
             <div className="db-page-sub">Track competitor prices, stock levels and get alerted when things change.</div>
           </div>
         </div>

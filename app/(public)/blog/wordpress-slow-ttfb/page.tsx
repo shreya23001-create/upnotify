@@ -6,12 +6,12 @@ import Faq from '@/components/landing/faq'
 export const metadata: Metadata = {
   title: 'WordPress TTFB Over 3 Seconds: Why Your Site Feels Dead Even When It\'s Technically Up',
   description:
-    'A WordPress site with Time to First Byte over 3 seconds feels broken to visitors even when uptime monitors say it is fine. Slow database queries, missing object cache, bloated plugins, and cheap hosting all cause high TTFB. Learn what drives TTFB up, why Google considers anything over 600ms slow, and how Uptrue HTTP monitoring tracks TTFB on every check.',
+    'A WordPress site with Time to First Byte over 3 seconds feels broken to visitors even when uptime monitors say it is fine. Slow database queries, missing object cache, bloated plugins, and cheap hosting all cause high TTFB. Learn what drives TTFB up, why Google considers anything over 600ms slow, and how Upnotify HTTP monitoring tracks TTFB on every check.',
   alternates: { canonical: 'https://uptrue.io/blog/wordpress-slow-ttfb' },
   openGraph: {
     title: 'WordPress TTFB Over 3 Seconds: Why Your Site Feels Dead Even When It\'s Technically Up',
     description:
-      'What causes WordPress TTFB to exceed 3 seconds, why Google penalises slow TTFB, and how Uptrue HTTP monitoring tracks server response time on every check and alerts when thresholds are exceeded.',
+      'What causes WordPress TTFB to exceed 3 seconds, why Google penalises slow TTFB, and how Upnotify HTTP monitoring tracks server response time on every check and alerts when thresholds are exceeded.',
     url: 'https://uptrue.io/blog/wordpress-slow-ttfb',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'WordPress TTFB Over 3 Seconds: Why Your Site Feels Dead Even When It\'s Technically Up',
     description:
-      'What causes WordPress TTFB to exceed 3 seconds, why Google penalises slow TTFB, and how Uptrue HTTP monitoring tracks server response time on every check and alerts when thresholds are exceeded.',
+      'What causes WordPress TTFB to exceed 3 seconds, why Google penalises slow TTFB, and how Upnotify HTTP monitoring tracks server response time on every check and alerts when thresholds are exceeded.',
   },
 }
 
@@ -43,7 +43,7 @@ const FAQ_DATA = [
   {
     question: 'Can uptime monitoring track WordPress TTFB?',
     answer:
-      'Standard uptime monitors only check whether a site returns a 200 status code. They do not measure how long the server took to respond. Uptrue HTTP monitoring tracks TTFB on every single check — every 1, 3, or 5 minutes depending on your plan. You can set a TTFB threshold (for example 1,000ms) and receive alerts when your server response time exceeds it. This means you catch performance degradation before it becomes a full outage and before Google notices the slowdown.',
+      'Standard uptime monitors only check whether a site returns a 200 status code. They do not measure how long the server took to respond. Upnotify HTTP monitoring tracks TTFB on every single check — every 1, 3, or 5 minutes depending on your plan. You can set a TTFB threshold (for example 1,000ms) and receive alerts when your server response time exceeds it. This means you catch performance degradation before it becomes a full outage and before Google notices the slowdown.',
   },
 ]
 
@@ -67,7 +67,7 @@ export default function WordPressSlowTtfbPage(): React.ReactElement {
           '@type': 'Article',
           headline: 'WordPress TTFB Over 3 Seconds: Why Your Site Feels Dead Even When It\'s Technically Up',
           description: 'What causes high WordPress TTFB, why Google penalises slow server response times, and how HTTP monitoring tracks TTFB on every check.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-04-01',
           dateModified: '2026-04-01',
@@ -268,10 +268,10 @@ export default function WordPressSlowTtfbPage(): React.ReactElement {
           Clean up the <code>wp_options</code> table. Remove autoloaded data from plugins you no longer use. Delete expired transients. Remove old post revisions. Optimise table indexes. A bloated <code>wp_options</code> table with 2MB of autoloaded data that loads on every request is a common cause of high TTFB that is easy to fix.
         </p>
 
-        <h2>How Uptrue HTTP monitoring tracks TTFB on every check</h2>
+        <h2>How Upnotify HTTP monitoring tracks TTFB on every check</h2>
 
         <p>
-          <Link href="/signup">Uptrue&apos;s HTTP monitoring</Link> does not just check whether your site returns a 200 status code. It measures the full response time on every single check — including TTFB. You see the actual server response time trend over hours, days, and weeks. You can spot performance degradation before it becomes an outage and before Google notices.
+          <Link href="/signup">Upnotify&apos;s HTTP monitoring</Link> does not just check whether your site returns a 200 status code. It measures the full response time on every single check — including TTFB. You see the actual server response time trend over hours, days, and weeks. You can spot performance degradation before it becomes an outage and before Google notices.
         </p>
 
         <h3>Step 1: Set up an HTTP monitor with a response time threshold</h3>
@@ -288,7 +288,7 @@ export default function WordPressSlowTtfbPage(): React.ReactElement {
         </ol>
 
         <p>
-          Every minute, Uptrue sends a request to your site and measures how long the server takes to respond. If the response time exceeds your threshold, you get an alert. You do not find out about slow performance from an angry customer or a Google Search Console warning three weeks later. You know within 60 seconds.
+          Every minute, Upnotify sends a request to your site and measures how long the server takes to respond. If the response time exceeds your threshold, you get an alert. You do not find out about slow performance from an angry customer or a Google Search Console warning three weeks later. You know within 60 seconds.
         </p>
 
         <h3>Step 2: Monitor multiple pages, not just the homepage</h3>
@@ -308,7 +308,7 @@ export default function WordPressSlowTtfbPage(): React.ReactElement {
         <h3>Step 3: Track TTFB trends over time</h3>
 
         <p>
-          A single slow measurement means nothing. A trend of increasing TTFB over two weeks means your database is growing, your hosting is degrading, or a plugin update introduced a performance regression. Uptrue&apos;s response time charts show you the trend so you can act before the slowdown becomes an outage.
+          A single slow measurement means nothing. A trend of increasing TTFB over two weeks means your database is growing, your hosting is degrading, or a plugin update introduced a performance regression. Upnotify&apos;s response time charts show you the trend so you can act before the slowdown becomes an outage.
         </p>
 
         <h3>Step 4: Set up alerts for performance degradation</h3>
@@ -341,7 +341,7 @@ export default function WordPressSlowTtfbPage(): React.ReactElement {
         </p>
 
         <p>
-          Uptrue tracks TTFB on every check. Every minute, you know exactly how fast your server is responding. When it slows down, you know immediately — not three weeks later when Google Search Console sends you an email about failing Core Web Vitals.
+          Upnotify tracks TTFB on every check. Every minute, you know exactly how fast your server is responding. When it slows down, you know immediately — not three weeks later when Google Search Console sends you an email about failing Core Web Vitals.
         </p>
 
         <div className="blog-cta-section">
@@ -368,7 +368,7 @@ export default function WordPressSlowTtfbPage(): React.ReactElement {
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

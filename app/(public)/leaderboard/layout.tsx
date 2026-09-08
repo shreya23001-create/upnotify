@@ -3,10 +3,10 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = {
   title: {
     template: '%s',
-    default: 'Uptime Leaderboard — Most Reliable Websites | Uptrue',
+    default: 'Uptime Leaderboard — Most Reliable Websites | Upnotify',
   },
   description:
-    'See the most reliable websites ranked by uptime percentage. Real-time leaderboard powered by Uptrue monitoring data.',
+    'See the most reliable websites ranked by uptime percentage. Real-time leaderboard powered by Upnotify monitoring data.',
 }
 
 export default function LeaderboardLayout({ children }: { children: React.ReactNode }): React.ReactElement {

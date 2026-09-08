@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Wordfence Blocking Real Users: When Your Security Plugin Becomes Your Biggest Problem',
     description:
-      'What causes Wordfence to block legitimate traffic, how aggressive rate limiting and country blocking catch real customers, and how Uptrue HTTP monitoring from multiple locations detects when your firewall is blocking visitors.',
+      'What causes Wordfence to block legitimate traffic, how aggressive rate limiting and country blocking catch real customers, and how Upnotify HTTP monitoring from multiple locations detects when your firewall is blocking visitors.',
     url: 'https://uptrue.io/blog/wordfence-blocking-traffic',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Wordfence Blocking Real Users: When Your Security Plugin Becomes Your Biggest Problem',
     description:
-      'What causes Wordfence to block legitimate traffic, how aggressive rate limiting and country blocking catch real customers, and how Uptrue HTTP monitoring from multiple locations detects when your firewall is blocking visitors.',
+      'What causes Wordfence to block legitimate traffic, how aggressive rate limiting and country blocking catch real customers, and how Upnotify HTTP monitoring from multiple locations detects when your firewall is blocking visitors.',
   },
 }
 
@@ -67,7 +67,7 @@ export default function WordfenceBlockingTrafficPage(): React.ReactElement {
           '@type': 'Article',
           headline: 'Wordfence Blocking Real Users: When Your Security Plugin Becomes Your Biggest Problem',
           description: 'What causes Wordfence to block legitimate traffic, how aggressive settings catch real customers, and how multi-location HTTP monitoring detects blocked visitors.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-04-02',
           dateModified: '2026-04-02',
@@ -250,10 +250,10 @@ export default function WordfenceBlockingTrafficPage(): React.ReactElement {
           If you use uptime monitoring, add the monitoring service&apos;s IP addresses to Wordfence&apos;s allowlist. Monitoring services send regular requests to check your site, and aggressive rate limiting can block them — which means your monitoring reports false downtime events, or worse, stops alerting because Wordfence blocks the monitoring checks.
         </p>
 
-        <h2>How to monitor for Wordfence blocking with Uptrue</h2>
+        <h2>How to monitor for Wordfence blocking with Upnotify</h2>
 
         <p>
-          <Link href="/signup">Uptrue&apos;s HTTP monitoring</Link> checks your site from multiple geographic locations. If Wordfence blocks traffic from one region but not another, Uptrue detects the discrepancy. If Wordfence rate limits monitoring IPs, Uptrue&apos;s two-confirmation check from different locations confirms whether the block is real or a false positive.
+          <Link href="/signup">Upnotify&apos;s HTTP monitoring</Link> checks your site from multiple geographic locations. If Wordfence blocks traffic from one region but not another, Upnotify detects the discrepancy. If Wordfence rate limits monitoring IPs, Upnotify&apos;s two-confirmation check from different locations confirms whether the block is real or a false positive.
         </p>
 
         <h3>Step 1: Set up HTTP monitoring from multiple locations</h3>
@@ -269,7 +269,7 @@ export default function WordfenceBlockingTrafficPage(): React.ReactElement {
         </ol>
 
         <p>
-          Uptrue checks from multiple locations. If Wordfence blocks traffic from one of those locations, the check returns a 403 instead of 200 and triggers an alert. The two-confirmation system means a second check runs from a different location before alerting — so if only one location is blocked, you know it is a regional or IP-specific block rather than a full outage.
+          Upnotify checks from multiple locations. If Wordfence blocks traffic from one of those locations, the check returns a 403 instead of 200 and triggers an alert. The two-confirmation system means a second check runs from a different location before alerting — so if only one location is blocked, you know it is a regional or IP-specific block rather than a full outage.
         </p>
 
         <h3>Step 2: Add a keyword monitor to detect the Wordfence block page</h3>
@@ -284,7 +284,7 @@ export default function WordfenceBlockingTrafficPage(): React.ReactElement {
         </ol>
 
         <p>
-          This catches the Wordfence block page specifically. When Wordfence blocks a visitor, it returns a page containing the text &quot;Your access to this site has been limited by the site owner.&quot; If Uptrue&apos;s check receives this page instead of your normal content, the keyword monitor triggers an alert. This works even if Wordfence returns the block page with a 200 status code instead of a 403 — which can happen with certain Wordfence configurations.
+          This catches the Wordfence block page specifically. When Wordfence blocks a visitor, it returns a page containing the text &quot;Your access to this site has been limited by the site owner.&quot; If Upnotify&apos;s check receives this page instead of your normal content, the keyword monitor triggers an alert. This works even if Wordfence returns the block page with a 200 status code instead of a 403 — which can happen with certain Wordfence configurations.
         </p>
 
         <h3>Step 3: Monitor critical pages individually</h3>
@@ -305,7 +305,7 @@ export default function WordfenceBlockingTrafficPage(): React.ReactElement {
         <h3>Step 4: Monitor response time to catch rate limiting slowdowns</h3>
 
         <p>
-          Before Wordfence fully blocks an IP, it may throttle the connection — adding artificial delay to requests. This shows up as increased response time before the block kicks in. Uptrue tracks response time on every check. A sudden increase in response time that precedes a 403 block is a strong signal that Wordfence rate limiting is the cause.
+          Before Wordfence fully blocks an IP, it may throttle the connection — adding artificial delay to requests. This shows up as increased response time before the block kicks in. Upnotify tracks response time on every check. A sudden increase in response time that precedes a 403 block is a strong signal that Wordfence rate limiting is the cause.
         </p>
 
         <h3>Step 5: Set up alerts for fast response</h3>
@@ -344,7 +344,7 @@ export default function WordfenceBlockingTrafficPage(): React.ReactElement {
         </p>
 
         <p>
-          Uptrue HTTP monitoring checks your site from multiple geographic locations every 60 seconds. If Wordfence blocks any of those locations, you know immediately. Before your customers complain. Before your rankings drop. Before your traffic graphs tell a story you do not want to read.
+          Upnotify HTTP monitoring checks your site from multiple geographic locations every 60 seconds. If Wordfence blocks any of those locations, you know immediately. Before your customers complain. Before your rankings drop. Before your traffic graphs tell a story you do not want to read.
         </p>
 
         <div className="blog-cta-section">
@@ -371,7 +371,7 @@ export default function WordfenceBlockingTrafficPage(): React.ReactElement {
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

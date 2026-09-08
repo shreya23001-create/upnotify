@@ -73,18 +73,18 @@ export const MONITOR_TYPES: MonitorTypeDefinition[] = [
       headline: '{{monitorName}} is not responding',
       detail:
         'We detected that {{target}} stopped responding at {{checkedAt}}. We confirmed the outage with a second check from a different location before alerting you.',
-      shortText: '[Uptrue] {{monitorName}} is down as of {{checkedAt}}. Check your site immediately.',
+      shortText: '[Upnotify] {{monitorName}} is down as of {{checkedAt}}. Check your site immediately.',
       voiceScript:
-        'This is an Uptrue alert. {{monitorName}} is down. Your website at {{target}} stopped responding at {{checkedAt}}. Please check your site immediately.',
+        'This is an Upnotify alert. {{monitorName}} is down. Your website at {{target}} stopped responding at {{checkedAt}}. Please check your site immediately.',
     },
     recoveryCopy: {
       subject: '✅ {{monitorName}} is back up',
       headline: '{{monitorName}} has recovered',
       detail:
         '{{target}} is responding normally again as of {{resolvedAt}}. Total downtime was {{downDuration}}.',
-      shortText: '[Uptrue] {{monitorName}} is back up as of {{resolvedAt}}. Downtime: {{downDuration}}.',
+      shortText: '[Upnotify] {{monitorName}} is back up as of {{resolvedAt}}. Downtime: {{downDuration}}.',
       voiceScript:
-        'This is an Uptrue recovery alert. {{monitorName}} is back up. Your website at {{target}} is responding normally as of {{resolvedAt}}. Total downtime was {{downDuration}}.',
+        'This is an Upnotify recovery alert. {{monitorName}} is back up. Your website at {{target}} is responding normally as of {{resolvedAt}}. Total downtime was {{downDuration}}.',
     },
   },
   {
@@ -110,18 +110,18 @@ export const MONITOR_TYPES: MonitorTypeDefinition[] = [
       headline: 'SSL certificate expiring soon',
       detail:
         'The SSL certificate for {{target}} expires in {{daysUntilExpiry}} days (issued by {{issuer}}). Renew it now to avoid browser security warnings that will block your visitors.',
-      shortText: '[Uptrue] SSL for {{target}} expires in {{daysUntilExpiry}} days. Renew now to avoid outages.',
+      shortText: '[Upnotify] SSL for {{target}} expires in {{daysUntilExpiry}} days. Renew now to avoid outages.',
       voiceScript:
-        'This is an Uptrue alert. The SSL certificate for {{target}} expires in {{daysUntilExpiry}} days. Please renew it now to prevent visitors seeing security warnings.',
+        'This is an Upnotify alert. The SSL certificate for {{target}} expires in {{daysUntilExpiry}} days. Please renew it now to prevent visitors seeing security warnings.',
     },
     recoveryCopy: {
       subject: '✅ SSL certificate for {{monitorName}} renewed',
       headline: 'SSL certificate is valid',
       detail:
         'The SSL certificate for {{target}} has been renewed and is now valid (issued by {{issuer}}, expires in {{daysUntilExpiry}} days).',
-      shortText: '[Uptrue] SSL for {{target}} is now valid. Expires in {{daysUntilExpiry}} days.',
+      shortText: '[Upnotify] SSL for {{target}} is now valid. Expires in {{daysUntilExpiry}} days.',
       voiceScript:
-        'This is an Uptrue recovery alert. The SSL certificate for {{target}} is now valid and expires in {{daysUntilExpiry}} days.',
+        'This is an Upnotify recovery alert. The SSL certificate for {{target}} is now valid and expires in {{daysUntilExpiry}} days.',
     },
   },
   {
@@ -147,18 +147,18 @@ export const MONITOR_TYPES: MonitorTypeDefinition[] = [
       headline: 'DNS records changed unexpectedly',
       detail:
         'A DNS record change was detected for {{target}} at {{checkedAt}}. This may indicate a misconfiguration, unauthorised change, or DNS hijacking. Review your DNS records immediately.',
-      shortText: '[Uptrue] DNS change detected for {{target}} at {{checkedAt}}. Check your DNS records now.',
+      shortText: '[Upnotify] DNS change detected for {{target}} at {{checkedAt}}. Check your DNS records now.',
       voiceScript:
-        'This is an Uptrue alert. A DNS record change was detected for {{target}} at {{checkedAt}}. This could indicate DNS hijacking. Please review your DNS records immediately.',
+        'This is an Upnotify alert. A DNS record change was detected for {{target}} at {{checkedAt}}. This could indicate DNS hijacking. Please review your DNS records immediately.',
     },
     recoveryCopy: {
       subject: '✅ DNS records for {{monitorName}} are stable',
       headline: 'DNS records restored to expected values',
       detail:
         'DNS records for {{target}} have returned to their expected values as of {{resolvedAt}}.',
-      shortText: '[Uptrue] DNS records for {{target}} are now stable.',
+      shortText: '[Upnotify] DNS records for {{target}} are now stable.',
       voiceScript:
-        'This is an Uptrue recovery alert. DNS records for {{target}} have been restored to their expected values.',
+        'This is an Upnotify recovery alert. DNS records for {{target}} have been restored to their expected values.',
     },
   },
   {
@@ -184,18 +184,18 @@ export const MONITOR_TYPES: MonitorTypeDefinition[] = [
       headline: 'Page content changed unexpectedly',
       detail:
         'A keyword check on {{target}} failed at {{checkedAt}}. A required keyword is missing or a forbidden keyword has appeared. Review the page content immediately.',
-      shortText: '[Uptrue] Keyword issue on {{target}} at {{checkedAt}}. Check page content now.',
+      shortText: '[Upnotify] Keyword issue on {{target}} at {{checkedAt}}. Check page content now.',
       voiceScript:
-        'This is an Uptrue alert. A keyword check on {{target}} failed at {{checkedAt}}. Please review the page content immediately.',
+        'This is an Upnotify alert. A keyword check on {{target}} failed at {{checkedAt}}. Please review the page content immediately.',
     },
     recoveryCopy: {
       subject: '✅ Keyword check passing for {{monitorName}}',
       headline: 'Page content is back to normal',
       detail:
         'The keyword check for {{target}} is passing again as of {{resolvedAt}}.',
-      shortText: '[Uptrue] Keyword check for {{target}} is passing again.',
+      shortText: '[Upnotify] Keyword check for {{target}} is passing again.',
       voiceScript:
-        'This is an Uptrue recovery alert. The keyword check for {{target}} is now passing.',
+        'This is an Upnotify recovery alert. The keyword check for {{target}} is now passing.',
     },
   },
   {
@@ -221,18 +221,18 @@ export const MONITOR_TYPES: MonitorTypeDefinition[] = [
       headline: 'Domain registration expiring soon',
       detail:
         '{{target}} expires in {{daysUntilExpiry}} days. Log into your registrar and renew now. If auto-renewal is enabled, verify your payment method is valid.',
-      shortText: '[Uptrue] Domain {{target}} expires in {{daysUntilExpiry}} days. Renew now.',
+      shortText: '[Upnotify] Domain {{target}} expires in {{daysUntilExpiry}} days. Renew now.',
       voiceScript:
-        'This is an Uptrue alert. The domain {{target}} expires in {{daysUntilExpiry}} days. Please log into your registrar and renew it immediately.',
+        'This is an Upnotify alert. The domain {{target}} expires in {{daysUntilExpiry}} days. Please log into your registrar and renew it immediately.',
     },
     recoveryCopy: {
       subject: '✅ Domain {{monitorName}} has been renewed',
       headline: 'Domain registration is up to date',
       detail:
         '{{target}} is now renewed and valid for another {{daysUntilExpiry}} days.',
-      shortText: '[Uptrue] Domain {{target}} renewed. Valid for {{daysUntilExpiry}} more days.',
+      shortText: '[Upnotify] Domain {{target}} renewed. Valid for {{daysUntilExpiry}} more days.',
       voiceScript:
-        'This is an Uptrue recovery alert. The domain {{target}} has been renewed and is now valid.',
+        'This is an Upnotify recovery alert. The domain {{target}} has been renewed and is now valid.',
     },
   },
   {
@@ -258,18 +258,18 @@ export const MONITOR_TYPES: MonitorTypeDefinition[] = [
       headline: 'Port not responding',
       detail:
         'Port check on {{target}} failed at {{checkedAt}}. The port is no longer accepting connections. Check your firewall rules and service status.',
-      shortText: '[Uptrue] Port check failed for {{target}} at {{checkedAt}}.',
+      shortText: '[Upnotify] Port check failed for {{target}} at {{checkedAt}}.',
       voiceScript:
-        'This is an Uptrue alert. The port check for {{target}} failed at {{checkedAt}}. Please check your server firewall and service status.',
+        'This is an Upnotify alert. The port check for {{target}} failed at {{checkedAt}}. Please check your server firewall and service status.',
     },
     recoveryCopy: {
       subject: '✅ Port check passing for {{monitorName}}',
       headline: 'Port is accepting connections again',
       detail:
         'Port on {{target}} is accepting connections again as of {{resolvedAt}}. Downtime was {{downDuration}}.',
-      shortText: '[Uptrue] Port check for {{target}} is passing again.',
+      shortText: '[Upnotify] Port check for {{target}} is passing again.',
       voiceScript:
-        'This is an Uptrue recovery alert. The port on {{target}} is accepting connections again.',
+        'This is an Upnotify recovery alert. The port on {{target}} is accepting connections again.',
     },
   },
   {
@@ -295,18 +295,18 @@ export const MONITOR_TYPES: MonitorTypeDefinition[] = [
       headline: 'Server is unreachable',
       detail:
         '{{target}} stopped responding to ping at {{checkedAt}}. The server may be offline, overloaded, or the network route may be broken.',
-      shortText: '[Uptrue] {{target}} not responding to ping at {{checkedAt}}.',
+      shortText: '[Upnotify] {{target}} not responding to ping at {{checkedAt}}.',
       voiceScript:
-        'This is an Uptrue alert. {{target}} stopped responding to ping at {{checkedAt}}. Please check if the server is online.',
+        'This is an Upnotify alert. {{target}} stopped responding to ping at {{checkedAt}}. Please check if the server is online.',
     },
     recoveryCopy: {
       subject: '✅ {{monitorName}} is responding again',
       headline: 'Server is reachable',
       detail:
         '{{target}} is responding to ping again as of {{resolvedAt}}. Downtime was {{downDuration}}.',
-      shortText: '[Uptrue] {{target}} is responding to ping again.',
+      shortText: '[Upnotify] {{target}} is responding to ping again.',
       voiceScript:
-        'This is an Uptrue recovery alert. {{target}} is responding to ping again as of {{resolvedAt}}.',
+        'This is an Upnotify recovery alert. {{target}} is responding to ping again as of {{resolvedAt}}.',
     },
   },
   {
@@ -332,18 +332,18 @@ export const MONITOR_TYPES: MonitorTypeDefinition[] = [
       headline: 'API endpoint is not responding correctly',
       detail:
         'The API endpoint at {{target}} returned an unexpected response at {{checkedAt}}. Check your API logs and authentication tokens.',
-      shortText: '[Uptrue] API endpoint {{target}} is down at {{checkedAt}}.',
+      shortText: '[Upnotify] API endpoint {{target}} is down at {{checkedAt}}.',
       voiceScript:
-        'This is an Uptrue alert. The API endpoint at {{target}} is not responding correctly as of {{checkedAt}}. Please check your API service.',
+        'This is an Upnotify alert. The API endpoint at {{target}} is not responding correctly as of {{checkedAt}}. Please check your API service.',
     },
     recoveryCopy: {
       subject: '✅ API endpoint recovered — {{monitorName}}',
       headline: 'API endpoint is responding normally',
       detail:
         '{{target}} is responding correctly again as of {{resolvedAt}}. Downtime was {{downDuration}}.',
-      shortText: '[Uptrue] API endpoint {{target}} is back up.',
+      shortText: '[Upnotify] API endpoint {{target}} is back up.',
       voiceScript:
-        'This is an Uptrue recovery alert. The API endpoint at {{target}} is responding normally again.',
+        'This is an Upnotify recovery alert. The API endpoint at {{target}} is responding normally again.',
     },
   },
   {
@@ -355,7 +355,7 @@ export const MONITOR_TYPES: MonitorTypeDefinition[] = [
     defaultInterval: 60,
     minInterval: 30,
     description:
-      'Your server pings Uptrue at regular intervals. If the ping stops arriving, we alert you. Ideal for cron jobs, backup scripts, queue workers, and any scheduled task.',
+      'Your server pings Upnotify at regular intervals. If the ping stops arriving, we alert you. Ideal for cron jobs, backup scripts, queue workers, and any scheduled task.',
     whatItCatches: [
       'Cron job not running on schedule',
       'Background worker crashed',
@@ -369,18 +369,18 @@ export const MONITOR_TYPES: MonitorTypeDefinition[] = [
       headline: 'Heartbeat signal missed',
       detail:
         '{{monitorName}} has not sent a heartbeat ping since {{checkedAt}}. Your scheduled task or cron job may have stopped running. Check your server and logs immediately.',
-      shortText: "[Uptrue] {{monitorName}} heartbeat missed at {{checkedAt}}. Check your cron job.",
+      shortText: "[Upnotify] {{monitorName}} heartbeat missed at {{checkedAt}}. Check your cron job.",
       voiceScript:
-        'This is an Uptrue alert. {{monitorName}} has not sent a heartbeat since {{checkedAt}}. Your scheduled task may have stopped running. Please check your server logs.',
+        'This is an Upnotify alert. {{monitorName}} has not sent a heartbeat since {{checkedAt}}. Your scheduled task may have stopped running. Please check your server logs.',
     },
     recoveryCopy: {
       subject: '✅ Heartbeat restored — {{monitorName}} is checking in again',
       headline: 'Heartbeat signal restored',
       detail:
         '{{monitorName}} sent a heartbeat ping at {{resolvedAt}}. The task is running again after {{downDuration}} of missed pings.',
-      shortText: '[Uptrue] {{monitorName}} heartbeat restored at {{resolvedAt}}.',
+      shortText: '[Upnotify] {{monitorName}} heartbeat restored at {{resolvedAt}}.',
       voiceScript:
-        'This is an Uptrue recovery alert. {{monitorName}} has sent a heartbeat and is running again as of {{resolvedAt}}.',
+        'This is an Upnotify recovery alert. {{monitorName}} has sent a heartbeat and is running again as of {{resolvedAt}}.',
     },
   },
   {
@@ -406,18 +406,18 @@ export const MONITOR_TYPES: MonitorTypeDefinition[] = [
       headline: 'Page content has changed',
       detail:
         'A change was detected on {{target}} at {{checkedAt}}. Review the page to see what has changed.',
-      shortText: '[Uptrue] Page change detected on {{target}} at {{checkedAt}}.',
+      shortText: '[Upnotify] Page change detected on {{target}} at {{checkedAt}}.',
       voiceScript:
-        'This is an Uptrue alert. A page change was detected on {{target}} at {{checkedAt}}. Please review the page.',
+        'This is an Upnotify alert. A page change was detected on {{target}} at {{checkedAt}}. Please review the page.',
     },
     recoveryCopy: {
       subject: '✅ {{monitorName}} — page is back to baseline',
       headline: 'Page has returned to expected content',
       detail:
         '{{target}} matches the baseline snapshot again as of {{resolvedAt}}.',
-      shortText: '[Uptrue] {{target}} is back to baseline content.',
+      shortText: '[Upnotify] {{target}} is back to baseline content.',
       voiceScript:
-        'This is an Uptrue recovery alert. {{target}} has returned to its expected content.',
+        'This is an Upnotify recovery alert. {{target}} has returned to its expected content.',
     },
   },
   {
@@ -444,18 +444,18 @@ export const MONITOR_TYPES: MonitorTypeDefinition[] = [
       headline: 'HTTP security headers are missing or misconfigured',
       detail:
         '{{target}} is missing critical security headers as of {{checkedAt}}: {{missingHeaders}}. These gaps leave your site exposed to clickjacking, XSS, and data injection attacks.',
-      shortText: '[Uptrue] Security headers issue on {{target}}. Missing: {{missingHeaders}}.',
+      shortText: '[Upnotify] Security headers issue on {{target}}. Missing: {{missingHeaders}}.',
       voiceScript:
-        'This is an Uptrue security alert. {{target}} is missing critical HTTP security headers including {{missingHeaders}}. Please review your server configuration.',
+        'This is an Upnotify security alert. {{target}} is missing critical HTTP security headers including {{missingHeaders}}. Please review your server configuration.',
     },
     recoveryCopy: {
       subject: '✅ Security headers restored — {{monitorName}}',
       headline: 'Security headers are correctly configured',
       detail:
         'All required security headers are now present on {{target}} as of {{resolvedAt}}.',
-      shortText: '[Uptrue] Security headers for {{target}} are now correctly configured.',
+      shortText: '[Upnotify] Security headers for {{target}} are now correctly configured.',
       voiceScript:
-        'This is an Uptrue recovery alert. Security headers for {{target}} are now correctly configured.',
+        'This is an Upnotify recovery alert. Security headers for {{target}} are now correctly configured.',
     },
   },
   {
@@ -481,18 +481,18 @@ export const MONITOR_TYPES: MonitorTypeDefinition[] = [
       headline: 'Page response time exceeds threshold',
       detail:
         '{{target}} responded in {{responseTime}} at {{checkedAt}}, exceeding your threshold of {{threshold}}. Investigate server load, database performance, and third-party scripts.',
-      shortText: '[Uptrue] {{target}} is slow: {{responseTime}} (threshold: {{threshold}}).',
+      shortText: '[Upnotify] {{target}} is slow: {{responseTime}} (threshold: {{threshold}}).',
       voiceScript:
-        'This is an Uptrue performance alert. {{target}} responded in {{responseTime}}, exceeding your threshold of {{threshold}}. Please investigate your server performance.',
+        'This is an Upnotify performance alert. {{target}} responded in {{responseTime}}, exceeding your threshold of {{threshold}}. Please investigate your server performance.',
     },
     recoveryCopy: {
       subject: '✅ Response time normalised — {{monitorName}}',
       headline: 'Page response time is back within threshold',
       detail:
         '{{target}} is responding within your threshold again as of {{resolvedAt}}. Current response time: {{responseTime}}.',
-      shortText: '[Uptrue] {{target}} response time is back to normal: {{responseTime}}.',
+      shortText: '[Upnotify] {{target}} response time is back to normal: {{responseTime}}.',
       voiceScript:
-        'This is an Uptrue recovery alert. {{target}} response time is back within your threshold at {{responseTime}}.',
+        'This is an Upnotify recovery alert. {{target}} response time is back within your threshold at {{responseTime}}.',
     },
   },
   {
@@ -518,18 +518,18 @@ export const MONITOR_TYPES: MonitorTypeDefinition[] = [
       headline: 'robots.txt has been modified',
       detail:
         'The robots.txt file at {{target}} changed at {{checkedAt}} ({{changeType}}). If you did not authorise this change, review it immediately — a misconfigured robots.txt can remove your site from search engines.',
-      shortText: '[Uptrue] robots.txt changed on {{target}} at {{checkedAt}}. Check for crawl blocks.',
+      shortText: '[Upnotify] robots.txt changed on {{target}} at {{checkedAt}}. Check for crawl blocks.',
       voiceScript:
-        'This is an Uptrue alert. The robots dot txt file for {{target}} changed at {{checkedAt}}. Please review it to ensure search engines are not blocked.',
+        'This is an Upnotify alert. The robots dot txt file for {{target}} changed at {{checkedAt}}. Please review it to ensure search engines are not blocked.',
     },
     recoveryCopy: {
       subject: '✅ robots.txt restored — {{monitorName}}',
       headline: 'robots.txt is back to expected content',
       detail:
         'robots.txt at {{target}} has returned to its expected content as of {{resolvedAt}}.',
-      shortText: '[Uptrue] robots.txt for {{target}} is back to normal.',
+      shortText: '[Upnotify] robots.txt for {{target}} is back to normal.',
       voiceScript:
-        'This is an Uptrue recovery alert. The robots dot txt file for {{target}} has been restored.',
+        'This is an Upnotify recovery alert. The robots dot txt file for {{target}} has been restored.',
     },
   },
   {
@@ -555,18 +555,18 @@ export const MONITOR_TYPES: MonitorTypeDefinition[] = [
       headline: 'Domain is resolving to a new IP address',
       detail:
         '{{target}} now resolves to {{currentIp}} (previously {{previousIp}}) as of {{checkedAt}}. If you did not make this change, investigate for DNS hijacking immediately.',
-      shortText: '[Uptrue] IP change for {{target}}: now {{currentIp}} (was {{previousIp}}).',
+      shortText: '[Upnotify] IP change for {{target}}: now {{currentIp}} (was {{previousIp}}).',
       voiceScript:
-        'This is an Uptrue security alert. {{target}} is now resolving to a new IP address. If you did not authorise this change, please investigate for DNS hijacking immediately.',
+        'This is an Upnotify security alert. {{target}} is now resolving to a new IP address. If you did not authorise this change, please investigate for DNS hijacking immediately.',
     },
     recoveryCopy: {
       subject: '✅ IP address stable — {{monitorName}}',
       headline: 'Domain IP address is back to expected value',
       detail:
         '{{target}} is resolving to the expected IP address again as of {{resolvedAt}}.',
-      shortText: '[Uptrue] IP for {{target}} is back to expected value.',
+      shortText: '[Upnotify] IP for {{target}} is back to expected value.',
       voiceScript:
-        'This is an Uptrue recovery alert. {{target}} is now resolving to the expected IP address.',
+        'This is an Upnotify recovery alert. {{target}} is now resolving to the expected IP address.',
     },
   },
   {
@@ -592,18 +592,18 @@ export const MONITOR_TYPES: MonitorTypeDefinition[] = [
       headline: 'Email infrastructure problem detected',
       detail:
         'MX health check for {{target}} detected issues at {{checkedAt}}: {{mxIssues}}. Email delivery may be affected. Review your MX records and mail server configuration.',
-      shortText: '[Uptrue] MX issue on {{target}}: {{mxIssues}}. Email may not be delivering.',
+      shortText: '[Upnotify] MX issue on {{target}}: {{mxIssues}}. Email may not be delivering.',
       voiceScript:
-        'This is an Uptrue alert. An email infrastructure problem was detected for {{target}} at {{checkedAt}}. Email delivery may be failing. Please check your MX records.',
+        'This is an Upnotify alert. An email infrastructure problem was detected for {{target}} at {{checkedAt}}. Email delivery may be failing. Please check your MX records.',
     },
     recoveryCopy: {
       subject: '✅ MX health restored — {{monitorName}}',
       headline: 'Email infrastructure is healthy',
       detail:
         'MX health for {{target}} is back to normal as of {{resolvedAt}}.',
-      shortText: '[Uptrue] MX health for {{target}} is back to normal.',
+      shortText: '[Upnotify] MX health for {{target}} is back to normal.',
       voiceScript:
-        'This is an Uptrue recovery alert. Email infrastructure for {{target}} is healthy again.',
+        'This is an Upnotify recovery alert. Email infrastructure for {{target}} is healthy again.',
     },
   },
   {
@@ -629,18 +629,18 @@ export const MONITOR_TYPES: MonitorTypeDefinition[] = [
       headline: 'Domain registrar or ownership details changed',
       detail:
         'WHOIS details for {{target}} changed at {{checkedAt}}. New registrar: {{registrar}}. If you did not authorise this change, contact your registrar immediately — your domain may have been transferred without consent.',
-      shortText: '[Uptrue] WHOIS change on {{target}}. New registrar: {{registrar}}. Verify now.',
+      shortText: '[Upnotify] WHOIS change on {{target}}. New registrar: {{registrar}}. Verify now.',
       voiceScript:
-        'This is an urgent Uptrue alert. WHOIS ownership details for {{target}} have changed. If you did not authorise this, contact your registrar immediately.',
+        'This is an urgent Upnotify alert. WHOIS ownership details for {{target}} have changed. If you did not authorise this, contact your registrar immediately.',
     },
     recoveryCopy: {
       subject: '✅ WHOIS record stabilised — {{monitorName}}',
       headline: 'WHOIS record is back to expected values',
       detail:
         'WHOIS details for {{target}} have returned to expected values as of {{resolvedAt}}.',
-      shortText: '[Uptrue] WHOIS for {{target}} is back to expected values.',
+      shortText: '[Upnotify] WHOIS for {{target}} is back to expected values.',
       voiceScript:
-        'This is an Uptrue recovery alert. WHOIS details for {{target}} are back to their expected values.',
+        'This is an Upnotify recovery alert. WHOIS details for {{target}} are back to their expected values.',
     },
   },
   {
@@ -666,18 +666,18 @@ export const MONITOR_TYPES: MonitorTypeDefinition[] = [
       headline: 'XML sitemap is invalid or unreachable',
       detail:
         'A sitemap issue was detected on {{target}} at {{checkedAt}} ({{changeType}}). Search engines may not be able to crawl your pages correctly. Review and fix the sitemap immediately.',
-      shortText: '[Uptrue] Sitemap issue on {{target}}: {{changeType}}.',
+      shortText: '[Upnotify] Sitemap issue on {{target}}: {{changeType}}.',
       voiceScript:
-        'This is an Uptrue SEO alert. Your XML sitemap at {{target}} has an issue. Search engine crawling may be affected. Please review your sitemap.',
+        'This is an Upnotify SEO alert. Your XML sitemap at {{target}} has an issue. Search engine crawling may be affected. Please review your sitemap.',
     },
     recoveryCopy: {
       subject: '✅ Sitemap is valid — {{monitorName}}',
       headline: 'Sitemap is valid and accessible',
       detail:
         'The sitemap at {{target}} is valid and accessible again as of {{resolvedAt}}.',
-      shortText: '[Uptrue] Sitemap for {{target}} is valid again.',
+      shortText: '[Upnotify] Sitemap for {{target}} is valid again.',
       voiceScript:
-        'This is an Uptrue recovery alert. The sitemap for {{target}} is valid and accessible.',
+        'This is an Upnotify recovery alert. The sitemap for {{target}} is valid and accessible.',
     },
   },
   {
@@ -703,18 +703,18 @@ export const MONITOR_TYPES: MonitorTypeDefinition[] = [
       headline: 'Redirect chain has changed or has too many hops',
       detail:
         'The redirect chain for {{target}} changed at {{checkedAt}}. Hops: {{hopCount}}, final destination: {{finalUrl}}. Excessive or broken redirects hurt performance and SEO.',
-      shortText: '[Uptrue] Redirect issue on {{target}}: {{hopCount}} hops, ending at {{finalUrl}}.',
+      shortText: '[Upnotify] Redirect issue on {{target}}: {{hopCount}} hops, ending at {{finalUrl}}.',
       voiceScript:
-        'This is an Uptrue alert. The redirect chain for {{target}} has changed. There are now {{hopCount}} redirect hops ending at {{finalUrl}}. Please review your redirect configuration.',
+        'This is an Upnotify alert. The redirect chain for {{target}} has changed. There are now {{hopCount}} redirect hops ending at {{finalUrl}}. Please review your redirect configuration.',
     },
     recoveryCopy: {
       subject: '✅ Redirect chain normalised — {{monitorName}}',
       headline: 'Redirect chain is back to expected configuration',
       detail:
         'The redirect chain for {{target}} is back to expected values as of {{resolvedAt}}.',
-      shortText: '[Uptrue] Redirect chain for {{target}} is back to normal.',
+      shortText: '[Upnotify] Redirect chain for {{target}} is back to normal.',
       voiceScript:
-        'This is an Uptrue recovery alert. The redirect chain for {{target}} is back to normal.',
+        'This is an Upnotify recovery alert. The redirect chain for {{target}} is back to normal.',
     },
   },
   {
@@ -740,18 +740,18 @@ export const MONITOR_TYPES: MonitorTypeDefinition[] = [
       headline: 'Email authentication records are invalid or missing',
       detail:
         'SPF/DMARC check for {{target}} failed at {{checkedAt}}. SPF status: {{spfStatus}}. DMARC status: {{dmarcStatus}}. Without these records, your domain can be used for phishing.',
-      shortText: '[Uptrue] SPF/DMARC issue on {{target}}: SPF {{spfStatus}}, DMARC {{dmarcStatus}}.',
+      shortText: '[Upnotify] SPF/DMARC issue on {{target}}: SPF {{spfStatus}}, DMARC {{dmarcStatus}}.',
       voiceScript:
-        'This is an Uptrue security alert. Email authentication records for {{target}} are invalid. SPF status is {{spfStatus}} and DMARC status is {{dmarcStatus}}. Your domain may be vulnerable to spoofing.',
+        'This is an Upnotify security alert. Email authentication records for {{target}} are invalid. SPF status is {{spfStatus}} and DMARC status is {{dmarcStatus}}. Your domain may be vulnerable to spoofing.',
     },
     recoveryCopy: {
       subject: '✅ SPF/DMARC valid — {{monitorName}}',
       headline: 'Email authentication records are correctly configured',
       detail:
         'SPF and DMARC records for {{target}} are valid as of {{resolvedAt}}.',
-      shortText: '[Uptrue] SPF/DMARC for {{target}} are now valid.',
+      shortText: '[Upnotify] SPF/DMARC for {{target}} are now valid.',
       voiceScript:
-        'This is an Uptrue recovery alert. SPF and DMARC records for {{target}} are now correctly configured.',
+        'This is an Upnotify recovery alert. SPF and DMARC records for {{target}} are now correctly configured.',
     },
   },
   {
@@ -777,18 +777,18 @@ export const MONITOR_TYPES: MonitorTypeDefinition[] = [
       headline: 'Domain or IP is on a blacklist',
       detail:
         '{{target}} was found on the following blacklists at {{checkedAt}}: {{listedOn}}. This will cause email delivery failures and may trigger browser security warnings. Request removal immediately.',
-      shortText: '[Uptrue] {{target}} blacklisted on: {{listedOn}}. Request removal now.',
+      shortText: '[Upnotify] {{target}} blacklisted on: {{listedOn}}. Request removal now.',
       voiceScript:
-        'This is an urgent Uptrue alert. {{target}} has been found on a blacklist including {{listedOn}}. Email delivery may be failing. Please request removal immediately.',
+        'This is an urgent Upnotify alert. {{target}} has been found on a blacklist including {{listedOn}}. Email delivery may be failing. Please request removal immediately.',
     },
     recoveryCopy: {
       subject: '✅ {{monitorName}} removed from blacklists',
       headline: 'Domain and IP are clear of all blacklists',
       detail:
         '{{target}} is no longer listed on any monitored blacklists as of {{resolvedAt}}.',
-      shortText: '[Uptrue] {{target}} is no longer blacklisted.',
+      shortText: '[Upnotify] {{target}} is no longer blacklisted.',
       voiceScript:
-        'This is an Uptrue recovery alert. {{target}} has been removed from all monitored blacklists.',
+        'This is an Upnotify recovery alert. {{target}} has been removed from all monitored blacklists.',
     },
   },
   {
@@ -814,18 +814,18 @@ export const MONITOR_TYPES: MonitorTypeDefinition[] = [
       headline: 'Page size exceeds your threshold',
       detail:
         '{{target}} returned a page size of {{pageSize}} at {{checkedAt}}, exceeding your configured threshold. Large pages slow load times and hurt Core Web Vitals scores.',
-      shortText: '[Uptrue] {{target}} page size is {{pageSize}} — above your threshold.',
+      shortText: '[Upnotify] {{target}} page size is {{pageSize}} — above your threshold.',
       voiceScript:
-        'This is an Uptrue performance alert. The page size for {{target}} is {{pageSize}}, which exceeds your threshold. Please investigate what caused the page to grow.',
+        'This is an Upnotify performance alert. The page size for {{target}} is {{pageSize}}, which exceeds your threshold. Please investigate what caused the page to grow.',
     },
     recoveryCopy: {
       subject: '✅ Page size normalised — {{monitorName}}',
       headline: 'Page size is back within threshold',
       detail:
         '{{target}} page size is back within your threshold as of {{resolvedAt}}. Current size: {{pageSize}}.',
-      shortText: '[Uptrue] {{target}} page size is back to normal: {{pageSize}}.',
+      shortText: '[Upnotify] {{target}} page size is back to normal: {{pageSize}}.',
       voiceScript:
-        'This is an Uptrue recovery alert. The page size for {{target}} is back within your threshold.',
+        'This is an Upnotify recovery alert. The page size for {{target}} is back within your threshold.',
     },
   },
   {
@@ -851,18 +851,18 @@ export const MONITOR_TYPES: MonitorTypeDefinition[] = [
       headline: 'Cookie consent banner not detected',
       detail:
         'No cookie consent banner was detected on {{target}} at {{checkedAt}}. This may indicate a GDPR compliance failure. Check your consent management platform and recent deployments.',
-      shortText: '[Uptrue] Cookie consent missing on {{target}} at {{checkedAt}}. GDPR risk.',
+      shortText: '[Upnotify] Cookie consent missing on {{target}} at {{checkedAt}}. GDPR risk.',
       voiceScript:
-        'This is an Uptrue compliance alert. No cookie consent banner was detected on {{target}}. This is a potential GDPR compliance failure. Please investigate immediately.',
+        'This is an Upnotify compliance alert. No cookie consent banner was detected on {{target}}. This is a potential GDPR compliance failure. Please investigate immediately.',
     },
     recoveryCopy: {
       subject: '✅ Cookie consent banner restored — {{monitorName}}',
       headline: 'Cookie consent banner is present',
       detail:
         'Cookie consent banner was detected on {{target}} again as of {{resolvedAt}}.',
-      shortText: '[Uptrue] Cookie consent banner is back on {{target}}.',
+      shortText: '[Upnotify] Cookie consent banner is back on {{target}}.',
       voiceScript:
-        'This is an Uptrue recovery alert. The cookie consent banner for {{target}} is present and functioning again.',
+        'This is an Upnotify recovery alert. The cookie consent banner for {{target}} is present and functioning again.',
     },
   },
   {
@@ -888,30 +888,30 @@ export const MONITOR_TYPES: MonitorTypeDefinition[] = [
       headline: 'Authoritative nameservers have changed',
       detail:
         'Nameservers for {{target}} changed at {{checkedAt}}. If you did not authorise this, your domain may have been hijacked. Contact your registrar and lock your domain immediately.',
-      shortText: '[Uptrue] Nameserver change on {{target}} at {{checkedAt}}. Verify now.',
+      shortText: '[Upnotify] Nameserver change on {{target}} at {{checkedAt}}. Verify now.',
       voiceScript:
-        'This is an urgent Uptrue security alert. Nameservers for {{target}} have changed. If you did not authorise this, contact your registrar immediately as your domain may be compromised.',
+        'This is an urgent Upnotify security alert. Nameservers for {{target}} have changed. If you did not authorise this, contact your registrar immediately as your domain may be compromised.',
     },
     recoveryCopy: {
       subject: '✅ Nameservers stable — {{monitorName}}',
       headline: 'Nameservers are back to expected values',
       detail:
         'Nameservers for {{target}} have returned to expected values as of {{resolvedAt}}.',
-      shortText: '[Uptrue] Nameservers for {{target}} are back to expected values.',
+      shortText: '[Upnotify] Nameservers for {{target}} are back to expected values.',
       voiceScript:
-        'This is an Uptrue recovery alert. Nameservers for {{target}} are back to their expected values.',
+        'This is an Upnotify recovery alert. Nameservers for {{target}} are back to their expected values.',
     },
   },
   {
     type: 'wordpress',
     slug: 'wordpress-site-monitor',
-    name: 'Uptrue WordPress Monitor',
+    name: 'Upnotify WordPress Monitor',
     emoji: '__wp__',
     tagline: 'Deep WordPress security and health monitoring via a lightweight plugin',
     defaultInterval: 7200,
     minInterval: 3600,
     description:
-      'Installs a lightweight plugin on your WordPress site that monitors security threats, software health, content changes, and performance — then sends findings to Uptrue for real-time alerts and AI-powered fix suggestions.',
+      'Installs a lightweight plugin on your WordPress site that monitors security threats, software health, content changes, and performance — then sends findings to Upnotify for real-time alerts and AI-powered fix suggestions.',
     whatItCatches: [
       'PHP and executable files injected into /uploads/',
       'New admin users created without your knowledge',
@@ -927,19 +927,19 @@ export const MONITOR_TYPES: MonitorTypeDefinition[] = [
       subject: '[{{severity}}] Security issue detected on {{monitorName}}',
       headline: 'WordPress security issue detected',
       detail:
-        'Uptrue detected a security issue on {{target}} at {{checkedAt}}. Check your WordPress Monitor dashboard for details and AI-powered fix instructions.',
-      shortText: '[Uptrue] Security issue on {{monitorName}}. Check your dashboard.',
+        'Upnotify detected a security issue on {{target}} at {{checkedAt}}. Check your WordPress Monitor dashboard for details and AI-powered fix instructions.',
+      shortText: '[Upnotify] Security issue on {{monitorName}}. Check your dashboard.',
       voiceScript:
-        'This is an Uptrue alert. A security issue has been detected on your WordPress site {{monitorName}}. Please check your Uptrue dashboard immediately.',
+        'This is an Upnotify alert. A security issue has been detected on your WordPress site {{monitorName}}. Please check your Upnotify dashboard immediately.',
     },
     recoveryCopy: {
       subject: '[Resolved] {{monitorName}} WordPress issue resolved',
       headline: 'WordPress issue resolved',
       detail:
         'The previously detected issue on {{target}} has been resolved as of {{resolvedAt}}.',
-      shortText: '[Uptrue] {{monitorName}} WordPress issue resolved.',
+      shortText: '[Upnotify] {{monitorName}} WordPress issue resolved.',
       voiceScript:
-        'This is an Uptrue alert. The WordPress issue on {{monitorName}} has been resolved.',
+        'This is an Upnotify alert. The WordPress issue on {{monitorName}} has been resolved.',
     },
   },
 ]

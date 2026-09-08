@@ -60,8 +60,8 @@ export const SITE_INFO: Record<string, SiteInfo> = {
     users: '3+ billion monthly active users',
     statusPageUrl: 'https://developers.facebook.com/status/dashboard/',
     alternatives: ['instagram.com', 'twitter.com', 'linkedin.com'],
-    seoTitle: 'Is Facebook Down? Live Status & Uptime | Uptrue',
-    seoDescription: 'Check if Facebook is down right now. Real-time Facebook status, uptime history, response time and instant alerts. Monitor Facebook with Uptrue — free.',
+    seoTitle: 'Is Facebook Down? Live Status & Uptime | Upnotify',
+    seoDescription: 'Check if Facebook is down right now. Real-time Facebook status, uptime history, response time and instant alerts. Monitor Facebook with Upnotify — free.',
   },
   'instagram.com': {
     name: 'Instagram',
@@ -80,8 +80,8 @@ export const SITE_INFO: Record<string, SiteInfo> = {
     users: '500+ million monthly active users',
     statusPageUrl: 'https://api.twitterstat.us/',
     alternatives: ['facebook.com', 'reddit.com', 'linkedin.com'],
-    seoTitle: 'Is Twitter (X) Down? Live Status & Uptime | Uptrue',
-    seoDescription: 'Check if Twitter (X) is down right now. Real-time Twitter status, uptime history, response time and instant alerts. Monitor Twitter with Uptrue — free.',
+    seoTitle: 'Is Twitter (X) Down? Live Status & Uptime | Upnotify',
+    seoDescription: 'Check if Twitter (X) is down right now. Real-time Twitter status, uptime history, response time and instant alerts. Monitor Twitter with Upnotify — free.',
   },
   'linkedin.com': {
     name: 'LinkedIn',
@@ -100,8 +100,8 @@ export const SITE_INFO: Record<string, SiteInfo> = {
     users: '1.7+ billion monthly visits',
     statusPageUrl: 'https://www.redditstatus.com/',
     alternatives: ['twitter.com', 'facebook.com'],
-    seoTitle: 'Is Reddit Down? Live Status & Uptime | Uptrue',
-    seoDescription: 'Check if Reddit is down right now. Real-time Reddit status, uptime history, response time and instant alerts. Monitor Reddit with Uptrue — free.',
+    seoTitle: 'Is Reddit Down? Live Status & Uptime | Upnotify',
+    seoDescription: 'Check if Reddit is down right now. Real-time Reddit status, uptime history, response time and instant alerts. Monitor Reddit with Upnotify — free.',
   },
   'tiktok.com': {
     name: 'TikTok',
@@ -141,8 +141,8 @@ export const SITE_INFO: Record<string, SiteInfo> = {
     users: '260+ million paid subscribers',
     statusPageUrl: 'https://help.netflix.com/en/is-netflix-down',
     alternatives: ['disneyplus.com', 'youtube.com'],
-    seoTitle: 'Is Netflix Down? Live Status & Uptime | Uptrue',
-    seoDescription: 'Check if Netflix is down right now. Real-time Netflix status, uptime history, response time and instant alerts. Monitor Netflix with Uptrue — free.',
+    seoTitle: 'Is Netflix Down? Live Status & Uptime | Upnotify',
+    seoDescription: 'Check if Netflix is down right now. Real-time Netflix status, uptime history, response time and instant alerts. Monitor Netflix with Upnotify — free.',
   },
   'twitch.tv': {
     name: 'Twitch',
@@ -161,8 +161,8 @@ export const SITE_INFO: Record<string, SiteInfo> = {
     users: '620+ million users',
     statusPageUrl: 'https://downdetector.com/status/spotify/',
     alternatives: ['youtube.com', 'netflix.com'],
-    seoTitle: 'Is Spotify Down? Live Status & Uptime | Uptrue',
-    seoDescription: 'Check if Spotify is down right now. Real-time Spotify status, uptime history, response time and instant alerts. Monitor Spotify with Uptrue — free.',
+    seoTitle: 'Is Spotify Down? Live Status & Uptime | Upnotify',
+    seoDescription: 'Check if Spotify is down right now. Real-time Spotify status, uptime history, response time and instant alerts. Monitor Spotify with Upnotify — free.',
   },
   'disneyplus.com': {
     name: 'Disney+',
@@ -511,8 +511,8 @@ export const SITE_INFO: Record<string, SiteInfo> = {
     users: '200+ million weekly active users',
     statusPageUrl: 'https://status.openai.com/',
     alternatives: ['anthropic.com', 'gemini.google.com', 'perplexity.ai'],
-    seoTitle: 'Is ChatGPT Down? Live Status & Uptime | Uptrue',
-    seoDescription: 'Check if ChatGPT is down right now. Real-time ChatGPT status, uptime history, response time and instant alerts. Monitor ChatGPT with Uptrue — free.',
+    seoTitle: 'Is ChatGPT Down? Live Status & Uptime | Upnotify',
+    seoDescription: 'Check if ChatGPT is down right now. Real-time ChatGPT status, uptime history, response time and instant alerts. Monitor ChatGPT with Upnotify — free.',
   },
   'anthropic.com': {
     name: 'Anthropic',
@@ -588,8 +588,8 @@ export const SITE_INFO: Record<string, SiteInfo> = {
     users: '70+ million daily active users',
     statusPageUrl: null,
     alternatives: ['epicgames.com', 'store.steampowered.com'],
-    seoTitle: 'Is Roblox Down? Live Status & Uptime | Uptrue',
-    seoDescription: 'Check if Roblox is down right now. Real-time Roblox status, uptime history, response time and instant alerts. Monitor Roblox with Uptrue — free.',
+    seoTitle: 'Is Roblox Down? Live Status & Uptime | Upnotify',
+    seoDescription: 'Check if Roblox is down right now. Real-time Roblox status, uptime history, response time and instant alerts. Monitor Roblox with Upnotify — free.',
   },
   'playstation.com': {
     name: 'PlayStation',
@@ -863,8 +863,8 @@ export const SITE_INFO: Record<string, SiteInfo> = {
     users: '150,000+ companies',
     statusPageUrl: 'https://status.salesforce.com/',
     alternatives: ['hubspot.com', 'zendesk.com'],
-    seoTitle: 'Is Salesforce (SFDC) Down? Live Status & Uptime | Uptrue',
-    seoDescription: 'Check if Salesforce is down right now. Real-time SFDC status, uptime history, response time and instant alerts. Monitor Salesforce with Uptrue — free.',
+    seoTitle: 'Is Salesforce (SFDC) Down? Live Status & Uptime | Upnotify',
+    seoDescription: 'Check if Salesforce is down right now. Real-time SFDC status, uptime history, response time and instant alerts. Monitor Salesforce with Upnotify — free.',
   },
   'zendesk.com': {
     name: 'Zendesk',
@@ -970,8 +970,8 @@ export const SITE_INFO: Record<string, SiteInfo> = {
     users: 'Millions of active users across India',
     statusPageUrl: null,
     alternatives: ['blinkit.com', 'swiggy.com', 'bigbasket.com'],
-    seoTitle: 'Is Zepto Down? Live Status & Uptime | Uptrue',
-    seoDescription: 'Check if Zepto is down right now. Real-time Zepto status, uptime history, response time and instant alerts. Monitor Zepto with Uptrue — free.',
+    seoTitle: 'Is Zepto Down? Live Status & Uptime | Upnotify',
+    seoDescription: 'Check if Zepto is down right now. Real-time Zepto status, uptime history, response time and instant alerts. Monitor Zepto with Upnotify — free.',
   },
 
   // ── Project Management ────────────────────────────────────────
@@ -984,8 +984,8 @@ export const SITE_INFO: Record<string, SiteInfo> = {
     users: '65,000+ companies',
     statusPageUrl: 'https://jira-software.status.atlassian.com/',
     alternatives: ['asana.com', 'monday.com', 'trello.com'],
-    seoTitle: 'Is Jira Down? Live Status & Uptime | Uptrue',
-    seoDescription: 'Check if Jira is down right now. Real-time Jira status, uptime history, response time and instant alerts. Monitor Jira with Uptrue — free.',
+    seoTitle: 'Is Jira Down? Live Status & Uptime | Upnotify',
+    seoDescription: 'Check if Jira is down right now. Real-time Jira status, uptime history, response time and instant alerts. Monitor Jira with Upnotify — free.',
   },
 }
 

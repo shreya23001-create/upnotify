@@ -62,7 +62,7 @@ function AutoUpdateConfirm({ ruleId, onConfirm, onCancel }: { ruleId: string; on
         <li>Safety limits will be enforced (min/max price, max % change per day)</li>
         <li>Every execution is logged and visible in your rule history</li>
         <li>You can disable auto-update at any time</li>
-        <li>Uptrue accepts no responsibility for pricing decisions made by automated rules</li>
+        <li>Upnotify accepts no responsibility for pricing decisions made by automated rules</li>
       </ul>
       <p style={{ fontSize: 12, color: '#991b1b', marginBottom: 16 }}>
         By enabling this, you agree to our{' '}

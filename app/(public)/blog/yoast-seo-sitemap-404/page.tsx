@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Yoast SEO Sitemap Returning 404: How This Quietly Tanks Your Google Rankings',
     description:
-      'What causes Yoast SEO sitemap 404 errors, how broken permalinks and .htaccess conflicts destroy your sitemap, and how Uptrue HTTP monitoring on /sitemap_index.xml catches the problem before Google drops your pages.',
+      'What causes Yoast SEO sitemap 404 errors, how broken permalinks and .htaccess conflicts destroy your sitemap, and how Upnotify HTTP monitoring on /sitemap_index.xml catches the problem before Google drops your pages.',
     url: 'https://uptrue.io/blog/yoast-seo-sitemap-404',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Yoast SEO Sitemap Returning 404: How This Quietly Tanks Your Google Rankings',
     description:
-      'What causes Yoast SEO sitemap 404 errors, how broken permalinks and .htaccess conflicts destroy your sitemap, and how Uptrue HTTP monitoring on /sitemap_index.xml catches the problem before Google drops your pages.',
+      'What causes Yoast SEO sitemap 404 errors, how broken permalinks and .htaccess conflicts destroy your sitemap, and how Upnotify HTTP monitoring on /sitemap_index.xml catches the problem before Google drops your pages.',
   },
 }
 
@@ -67,7 +67,7 @@ export default function YoastSeoSitemap404Page(): React.ReactElement {
           '@type': 'Article',
           headline: 'Yoast SEO Sitemap Returning 404: How This Quietly Tanks Your Google Rankings',
           description: 'What causes Yoast SEO sitemap 404 errors, how to fix broken permalinks and rewrite rules, and how HTTP monitoring catches the problem before rankings decline.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-04-03',
           dateModified: '2026-04-03',
@@ -202,10 +202,10 @@ export default function YoastSeoSitemap404Page(): React.ReactElement {
           In Yoast SEO, go to Settings &gt; Site Features. Toggle &quot;XML sitemaps&quot; to enabled. If you do not see this option, you are running an older version of Yoast — update to the latest version first.
         </p>
 
-        <h2>How to monitor your sitemap with Uptrue</h2>
+        <h2>How to monitor your sitemap with Upnotify</h2>
 
         <p>
-          <Link href="/signup">Uptrue&apos;s HTTP monitoring</Link> can check your sitemap URL every 60 seconds and alert you the moment it returns a 404. This catches the problem on the same day it occurs — not three weeks later when you notice the traffic decline.
+          <Link href="/signup">Upnotify&apos;s HTTP monitoring</Link> can check your sitemap URL every 60 seconds and alert you the moment it returns a 404. This catches the problem on the same day it occurs — not three weeks later when you notice the traffic decline.
         </p>
 
         <h3>Step 1: Set up an HTTP monitor on your sitemap URL</h3>
@@ -221,7 +221,7 @@ export default function YoastSeoSitemap404Page(): React.ReactElement {
         </ol>
 
         <p>
-          The moment your sitemap returns a 404 instead of 200, Uptrue alerts you. You fix it in 30 seconds by flushing permalinks. Google never misses a crawl. Your rankings stay stable. That is the difference between monitoring your sitemap and discovering the problem in your analytics three weeks later.
+          The moment your sitemap returns a 404 instead of 200, Upnotify alerts you. You fix it in 30 seconds by flushing permalinks. Google never misses a crawl. Your rankings stay stable. That is the difference between monitoring your sitemap and discovering the problem in your analytics three weeks later.
         </p>
 
         <h3>Step 2: Add a keyword monitor to verify sitemap content</h3>
@@ -299,7 +299,7 @@ export default function YoastSeoSitemap404Page(): React.ReactElement {
         </p>
 
         <p>
-          Uptrue HTTP monitoring checks your sitemap URL every five minutes. If it returns a 404, you know immediately. You flush permalinks. The sitemap comes back. Google&apos;s next crawl succeeds. Your rankings hold. A 30-second fix that prevents a month-long SEO decline — but only if you know the problem exists.
+          Upnotify HTTP monitoring checks your sitemap URL every five minutes. If it returns a 404, you know immediately. You flush permalinks. The sitemap comes back. Google&apos;s next crawl succeeds. Your rankings hold. A 30-second fix that prevents a month-long SEO decline — but only if you know the problem exists.
         </p>
 
         <div className="blog-cta-section">
@@ -326,7 +326,7 @@ export default function YoastSeoSitemap404Page(): React.ReactElement {
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

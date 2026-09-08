@@ -75,6 +75,7 @@ interface MonitorAlertTelegramParams {
   severity?: string
   downtimeDuration?: string  // e.g. "4 minutes 22 seconds" — only on recovery
   monitorUrl: string
+  isTest?: boolean          // Prefix as a test so status wording doesn't imply a real incident
 }
 
 /**
@@ -91,10 +92,11 @@ export async function sendTelegramAlert(params: MonitorAlertTelegramParams): Pro
   }
 
   const icon = params.isResolved ? '✅' : '🔴'
-  const status = params.isResolved ? 'Recovered' : 'Down'
+  const status = params.isResolved ? (params.isTest ? 'Up' : 'Recovered') : 'Down'
+  const label = params.isTest ? `[Test] ${status}` : status
 
   const lines = [
-    `${icon} <b>${escapeHtml(status)}: ${escapeHtml(params.monitorName)}</b>`,
+    `${icon} <b>${escapeHtml(label)}: ${escapeHtml(params.monitorName)}</b>`,
     ``,
     `<b>Target:</b> ${escapeHtml(params.monitorTarget)}`,
   ]

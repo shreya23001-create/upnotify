@@ -6,7 +6,7 @@ import Faq from '@/components/landing/faq'
 export const metadata: Metadata = {
   title: 'How to Set Up a Free Public Status Page for Your SaaS',
   description:
-    'Learn why every SaaS needs a public status page, what to include, and how to set one up for free in under five minutes with Uptrue. Build trust and reduce support tickets.',
+    'Learn why every SaaS needs a public status page, what to include, and how to set one up for free in under five minutes with Upnotify. Build trust and reduce support tickets.',
   alternates: { canonical: 'https://uptrue.io/blog/free-status-page-saas' },
   openGraph: {
     title: 'How to Set Up a Free Public Status Page for Your SaaS',
@@ -43,22 +43,22 @@ const FAQ_DATA = [
   {
     question: 'How much does a status page cost?',
     answer:
-      'Dedicated status page providers charge between $29 and $399 per month. Uptrue includes a public status page on the free plan at no cost. The status page is connected to your monitors and updates automatically — no manual updating required during incidents.',
+      'Dedicated status page providers charge between $29 and $399 per month. Upnotify includes a public status page on the free plan at no cost. The status page is connected to your monitors and updates automatically — no manual updating required during incidents.',
   },
   {
     question: 'Can I use a custom domain for my status page?',
     answer:
-      'Yes. With Uptrue, you can point a custom subdomain like status.yourdomain.com to your status page using a CNAME record. This keeps your branding consistent and makes the page look like a native part of your product rather than a third-party service.',
+      'Yes. With Upnotify, you can point a custom subdomain like status.yourdomain.com to your status page using a CNAME record. This keeps your branding consistent and makes the page look like a native part of your product rather than a third-party service.',
   },
   {
     question: 'Does the status page update automatically during outages?',
     answer:
-      'Yes. When your Uptrue monitors detect a failure, the status page updates automatically to reflect the incident. When the monitors confirm recovery, the page updates again. You can also add manual incident updates with custom messages to keep your customers informed about what is happening and what you are doing about it.',
+      'Yes. When your Upnotify monitors detect a failure, the status page updates automatically to reflect the incident. When the monitors confirm recovery, the page updates again. You can also add manual incident updates with custom messages to keep your customers informed about what is happening and what you are doing about it.',
   },
   {
     question: 'How do I handle scheduled maintenance on my status page?',
     answer:
-      'You can create scheduled maintenance windows in Uptrue that appear on your status page in advance. Subscribed users are notified before the maintenance starts. During the window, the affected components show as under maintenance rather than as an outage, setting correct expectations for your customers.',
+      'You can create scheduled maintenance windows in Upnotify that appear on your status page in advance. Subscribed users are notified before the maintenance starts. During the window, the affected components show as under maintenance rather than as an outage, setting correct expectations for your customers.',
   },
   {
     question: 'What do enterprise customers expect from a status page?',
@@ -87,7 +87,7 @@ export default function FreeStatusPageSaasPage(): React.ReactElement {
           '@type': 'Article',
           headline: 'How to Set Up a Free Public Status Page for Your SaaS',
           description: 'Why every SaaS needs a public status page and how to set one up for free in under five minutes.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-04-03',
           dateModified: '2026-04-03',
@@ -235,10 +235,10 @@ export default function FreeStatusPageSaasPage(): React.ReactElement {
           Let visitors subscribe to status updates via email. When an incident occurs, subscribed users get notified automatically. This is the proactive alternative to customers discovering outages on their own and contacting support.
         </p>
 
-        <h2>How to set up a free status page with Uptrue</h2>
+        <h2>How to set up a free status page with Upnotify</h2>
 
         <p>
-          <Link href="/signup">Uptrue</Link> includes public status pages on the free plan. The status page connects directly to your monitors — when a monitor detects a failure, the status page updates automatically. No manual intervention required.
+          <Link href="/signup">Upnotify</Link> includes public status pages on the free plan. The status page connects directly to your monitors — when a monitor detects a failure, the status page updates automatically. No manual intervention required.
         </p>
 
         <h3>Step 1: Set up your monitors</h3>
@@ -263,7 +263,7 @@ export default function FreeStatusPageSaasPage(): React.ReactElement {
         <h3>Step 2: Create the status page</h3>
 
         <ol>
-          <li>Go to <strong>Status Pages</strong> in your Uptrue dashboard</li>
+          <li>Go to <strong>Status Pages</strong> in your Upnotify dashboard</li>
           <li>Click <strong>Create Status Page</strong></li>
           <li>Name your status page — use your product name</li>
           <li>Select which monitors to display as components</li>
@@ -350,7 +350,7 @@ export default function FreeStatusPageSaasPage(): React.ReactElement {
         </ul>
 
         <p>
-          <Link href="/signup">Uptrue</Link> includes public status pages on the free plan because we believe every SaaS — from day one — should have one. Monitor your service and communicate transparently without spending a penny.
+          <Link href="/signup">Upnotify</Link> includes public status pages on the free plan because we believe every SaaS — from day one — should have one. Monitor your service and communicate transparently without spending a penny.
         </p>
 
         <h2>Your customers already expect this</h2>
@@ -387,7 +387,7 @@ export default function FreeStatusPageSaasPage(): React.ReactElement {
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

@@ -6,7 +6,7 @@ const data: IndustryLandingData = {
   heroTitle: 'Fintech Uptime Monitoring',
   heroSubtitle:
     'Meet regulatory uptime SLAs and catch transaction failures before they hit customers. Built for fintech engineering teams, payments platforms, and regulated digital finance.',
-  seoTitle: 'Fintech Uptime Monitoring — Regulatory SLA, API & Transaction Health | Uptrue',
+  seoTitle: 'Fintech Uptime Monitoring — Regulatory SLA, API & Transaction Health | Upnotify',
   seoDescription:
     'Fintech uptime monitoring for regulated digital finance: API endpoint assertions, response time SLAs, SSL certificate alerts, security headers compliance, and audit-ready incident logs. Designed to meet FCA, PSD2, and DORA reliability expectations.',
   whyItMatters: [
@@ -60,20 +60,20 @@ const data: IndustryLandingData = {
   ],
   faq: [
     {
-      q: 'Can Uptrue produce regulator-ready incident reports?',
+      q: 'Can Upnotify produce regulator-ready incident reports?',
       a: 'Yes — every incident has an immutable, time-stamped record including detection time, confirmation, alert dispatch times, and resolution. The data is exportable. While we are not a substitute for your operational resilience framework, we provide the underlying check evidence that regulators expect to see.',
     },
     {
-      q: 'How does Uptrue help with FCA Operational Resilience expectations?',
-      a: 'The FCA requires firms to identify Important Business Services and define impact tolerances. Uptrue monitors give you continuous evidence of whether services are within tolerance — uptime, response time, SSL validity, security headers. The audit trail and incident log support your annual self-assessment.',
+      q: 'How does Upnotify help with FCA Operational Resilience expectations?',
+      a: 'The FCA requires firms to identify Important Business Services and define impact tolerances. Upnotify monitors give you continuous evidence of whether services are within tolerance — uptime, response time, SSL validity, security headers. The audit trail and incident log support your annual self-assessment.',
     },
     {
       q: 'Where is monitoring data stored — is it EU-resident?',
-      a: 'All Uptrue customer data, including monitor configurations, incident logs, and audit trails, is stored in the EU (Frankfurt region) on Supabase infrastructure. Data is encrypted at rest and in transit. We have a published Data Processing Agreement available for Agency and Scale customers.',
+      a: 'All Upnotify customer data, including monitor configurations, incident logs, and audit trails, is stored in the EU (Frankfurt region) on Supabase infrastructure. Data is encrypted at rest and in transit. We have a published Data Processing Agreement available for Agency and Scale customers.',
     },
     {
       q: 'Can we monitor authenticated APIs without exposing credentials?',
-      a: 'Yes. API Endpoint monitors accept custom HTTP headers, so you can use a long-lived service token scoped to a read-only monitoring user. Best practice: rotate quarterly, restrict source IPs at your gateway to Uptrue check origins, and never use admin-tier credentials.',
+      a: 'Yes. API Endpoint monitors accept custom HTTP headers, so you can use a long-lived service token scoped to a read-only monitoring user. Best practice: rotate quarterly, restrict source IPs at your gateway to Upnotify check origins, and never use admin-tier credentials.',
     },
     {
       q: 'Is two-confirmation alerting sufficient for a critical fintech service?',
@@ -81,7 +81,7 @@ const data: IndustryLandingData = {
     },
     {
       q: 'What about DORA (Digital Operational Resilience Act) compliance?',
-      a: 'DORA requires regulated financial entities in the EU to maintain ICT risk management and demonstrate operational resilience including third-party monitoring. Uptrue is a Tier 2 ICT third-party provider for monitoring purposes — we publish our subprocessor list, security practices, and DPA. We are not a substitute for DORA compliance but support the monitoring evidence layer.',
+      a: 'DORA requires regulated financial entities in the EU to maintain ICT risk management and demonstrate operational resilience including third-party monitoring. Upnotify is a Tier 2 ICT third-party provider for monitoring purposes — we publish our subprocessor list, security practices, and DPA. We are not a substitute for DORA compliance but support the monitoring evidence layer.',
     },
   ],
 }

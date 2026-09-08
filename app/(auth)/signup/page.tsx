@@ -4,7 +4,7 @@ import { LoginForm } from '@/components/auth/login-form'
 export const metadata: Metadata = {
   title: 'Sign Up Free',
   description:
-    'Create a free Uptrue account. Start monitoring uptime, performance and infrastructure in 60 seconds. No credit card required.',
+    'Create a free Upnotify account. Start monitoring uptime, performance and infrastructure in 60 seconds. No credit card required.',
   alternates: { canonical: 'https://uptrue.io/signup' },
 }
 

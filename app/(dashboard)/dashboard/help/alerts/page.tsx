@@ -10,18 +10,18 @@ const FAQ_SCHEMA = {
   mainEntity: [
     {
       '@type': 'Question',
-      name: 'What alert channels does Uptrue support?',
+      name: 'What alert channels does Upnotify support?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Uptrue supports email, Slack, Microsoft Teams, and webhook alerts. The Free plan includes email only. Lite and above unlock all channels.',
+        text: 'Upnotify supports email, Slack, Microsoft Teams, and webhook alerts. The Free plan includes email only. Lite and above unlock all channels.',
       },
     },
     {
       '@type': 'Question',
-      name: 'What are Uptrue severity levels?',
+      name: 'What are Upnotify severity levels?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Uptrue uses four severity levels: P1 (Critical, full outage), P2 (High, major feature broken), P3 (Medium, degraded performance), and P4 (Low, minor issues). You can customise which severity levels trigger which alert channels.',
+        text: 'Upnotify uses four severity levels: P1 (Critical, full outage), P2 (High, major feature broken), P3 (Medium, degraded performance), and P4 (Low, minor issues). You can customise which severity levels trigger which alert channels.',
       },
     },
     {
@@ -29,7 +29,7 @@ const FAQ_SCHEMA = {
       name: 'Can I send alerts to Slack?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Yes. On Lite plans and above, you can connect a Slack workspace and choose which channel receives alerts. You will need to create an incoming webhook in Slack and paste the URL into Uptrue.',
+        text: 'Yes. On Lite plans and above, you can connect a Slack workspace and choose which channel receives alerts. You will need to create an incoming webhook in Slack and paste the URL into Upnotify.',
       },
     },
   ],
@@ -65,7 +65,7 @@ export default function AlertsPage(): React.ReactElement {
           <section className="help-section">
             <h2 className="help-section-title">Alert channels</h2>
             <p>
-              An alert channel is where Uptrue sends notifications when a monitor detects a
+              An alert channel is where Upnotify sends notifications when a monitor detects a
               problem. You can set up as many channels as you like and assign them to different
               monitors.
             </p>
@@ -79,7 +79,7 @@ export default function AlertsPage(): React.ReactElement {
             <h3 className="help-subsection-title">Slack</h3>
             <p>
               Get alerts right in your team&rsquo;s Slack channel. You will need to create an
-              incoming webhook in your Slack workspace and paste the URL into Uptrue. Messages
+              incoming webhook in your Slack workspace and paste the URL into Upnotify. Messages
               include the monitor name, status, response time, and a direct link to the incident.
             </p>
 
@@ -91,9 +91,9 @@ export default function AlertsPage(): React.ReactElement {
 
             <h3 className="help-subsection-title">Webhook</h3>
             <p>
-              For developers who want full control. Uptrue sends a JSON payload to any URL you
+              For developers who want full control. Upnotify sends a JSON payload to any URL you
               specify. Every webhook is signed with HMAC-SHA256 so you can verify it really came
-              from Uptrue. Use this to trigger your own automations, PagerDuty, OpsGenie, or
+              from Upnotify. Use this to trigger your own automations, PagerDuty, OpsGenie, or
               anything else.
             </p>
           </section>
@@ -101,7 +101,7 @@ export default function AlertsPage(): React.ReactElement {
           <section className="help-section">
             <h2 className="help-section-title">Severity levels</h2>
             <p>
-              Not every problem is equally urgent. Uptrue uses four severity levels so you can
+              Not every problem is equally urgent. Upnotify uses four severity levels so you can
               respond proportionally:
             </p>
             <ul className="help-list">
@@ -133,7 +133,7 @@ export default function AlertsPage(): React.ReactElement {
           <section className="help-section">
             <h2 className="help-section-title">Smart Digest — fewer emails, same urgency</h2>
             <p>
-              Smart Digest is the default alert delivery mode for all Uptrue accounts. Instead of sending
+              Smart Digest is the default alert delivery mode for all Upnotify accounts. Instead of sending
               one email per event (which causes an email storm during outages), Smart Digest works like this:
             </p>
             <ul className="help-list">

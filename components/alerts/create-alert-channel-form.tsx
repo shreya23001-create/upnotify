@@ -3,12 +3,13 @@
 import { useState, useTransition } from 'react'
 import { Mail, Hash, Users, Webhook, Phone, MessageSquare, Send, AlertTriangle, Info } from 'lucide-react'
 import { createAlertChannelAction } from '@/app/(dashboard)/dashboard/alerts/actions'
+import { MonitorScopeSelect, type MonitorOption } from './monitor-scope-select'
 
 const CHANNEL_TYPES = [
   { value: 'email',    label: 'Email',           desc: 'Send alerts to an email address',           icon: <Mail size={18} />,          color: '#6366f1', bg: 'rgba(99,102,241,0.12)' },
   { value: 'slack',    label: 'Slack',            desc: 'Post to a Slack channel via webhook',        icon: <Hash size={18} />,          color: '#f59e0b', bg: 'rgba(245,158,11,0.12)' },
-  { value: 'teams',    label: 'Microsoft Teams',  desc: 'Send alerts to a Teams channel',             icon: <Users size={18} />,         color: '#3b82f6', bg: 'rgba(59,130,246,0.12)' },
-  { value: 'webhook',  label: 'Webhook',          desc: 'POST to any URL with HMAC signing',          icon: <Webhook size={18} />,       color: '#8b5cf6', bg: 'rgba(139,92,246,0.12)' },
+  { value: 'teams',    label: 'Microsoft Teams',  desc: 'Send alerts to a Teams channel',             icon: <Users size={18} />,         color: '#3b82f6', bg: 'rgba(59,130,246,0.12)', disabled: true },
+  { value: 'webhook',  label: 'Webhook',          desc: 'POST to any URL with HMAC signing',          icon: <Webhook size={18} />,       color: '#2ee06b', bg: 'rgba(46,224,107,0.12)' },
   { value: 'telegram', label: 'Telegram',         desc: 'Instant alerts via Telegram — all plans',   icon: <Send size={18} />,          color: '#06b6d4', bg: 'rgba(6,182,212,0.12)' },
 ]
 
@@ -19,9 +20,10 @@ const SEVERITIES = [
   { value: 'P4', label: 'P4', desc: 'Low',      color: '#6b7280', bg: 'rgba(107,114,128,0.1)' },
 ]
 
-export function CreateAlertChannelForm() {
+export function CreateAlertChannelForm({ monitors = [] }: { monitors?: MonitorOption[] }) {
   const [type, setType] = useState('email')
   const [selectedSeverities, setSelectedSeverities] = useState<string[]>(['P1', 'P2', 'P3', 'P4'])
+  const [selectedMonitorIds, setSelectedMonitorIds] = useState<string[]>([])
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 
@@ -34,6 +36,7 @@ export function CreateAlertChannelForm() {
   function handleSubmit(formData: FormData): void {
     setError(null)
     formData.set('severity_filter', selectedSeverities.join(','))
+    formData.set('monitor_ids', selectedMonitorIds.join(','))
     startTransition(async () => {
       const result = await createAlertChannelAction(formData)
       if (result?.error) setError(result.error)
@@ -68,15 +71,17 @@ export function CreateAlertChannelForm() {
           {CHANNEL_TYPES.map(ct => (
             <label
               key={ct.value}
-              className={`ac-type-card${type === ct.value ? ' ac-type-card--active' : ''}`}
+              className={`ac-type-card${type === ct.value ? ' ac-type-card--active' : ''}${ct.disabled ? ' ac-type-card--disabled' : ''}`}
               style={type === ct.value ? { borderColor: ct.color, background: ct.bg + '60' } : {}}
+              title={ct.disabled ? 'Currently unavailable' : undefined}
             >
               <input
                 type="radio"
                 name="type"
                 value={ct.value}
                 checked={type === ct.value}
-                onChange={() => setType(ct.value)}
+                onChange={() => { if (!ct.disabled) setType(ct.value) }}
+                disabled={ct.disabled}
                 style={{ display: 'none' }}
               />
               <div
@@ -87,7 +92,7 @@ export function CreateAlertChannelForm() {
               </div>
               <div className="ac-type-card-info">
                 <span className="ac-type-card-label">{ct.label}</span>
-                <span className="ac-type-card-desc">{ct.desc}</span>
+                <span className="ac-type-card-desc">{ct.disabled ? 'Currently unavailable' : ct.desc}</span>
               </div>
               {type === ct.value && (
                 <div className="ac-type-card-check" style={{ background: ct.color }}>
@@ -187,7 +192,7 @@ export function CreateAlertChannelForm() {
             <div>
               <strong>How to set up Telegram alerts</strong>
               <ol>
-                <li>Search for <strong>@uptrue_alerts_bot</strong> on Telegram and send any message</li>
+                <li>Search for <strong>@upnotify_alerts_bot</strong> on Telegram and send any message</li>
                 <li>Open <strong>@userinfobot</strong> and send <strong>/start</strong> to get your Chat ID</li>
                 <li>Paste your Chat ID below</li>
               </ol>
@@ -230,6 +235,18 @@ export function CreateAlertChannelForm() {
           </div>
         </>
       )}
+
+      {/* Monitor scope */}
+      <div className="ac-form-section">
+        <label className="ac-form-label">Monitor <span className="ac-form-optional">optional</span></label>
+        <p className="ac-form-sublabel">Choose which monitor sends alerts to this channel. Leave as &quot;All monitors&quot; to apply to everything.</p>
+        <MonitorScopeSelect
+          monitors={monitors}
+          selected={selectedMonitorIds}
+          onChange={setSelectedMonitorIds}
+          disabled={isPending}
+        />
+      </div>
 
       {/* Severity filter */}
       <div className="ac-form-section">

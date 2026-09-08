@@ -10,26 +10,26 @@ const FAQ_SCHEMA = {
   mainEntity: [
     {
       '@type': 'Question',
-      name: 'Are Uptrue free tools really free?',
+      name: 'Are Upnotify free tools really free?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Yes. The SSL Checker, Uptime Calculator, and Uptrue Score are completely free with no signup required. You can use them as many times as you like.',
+        text: 'Yes. The SSL Checker, Uptime Calculator, and Upnotify Score are completely free with no signup required. You can use them as many times as you like.',
       },
     },
     {
       '@type': 'Question',
-      name: 'What does the Uptrue Score measure?',
+      name: 'What does the Upnotify Score measure?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Uptrue Score analyses your website across five areas: SSL certificate health, DNS configuration, security headers, response time, and overall availability. It gives you a grade from A+ to F with specific recommendations for improvement.',
+        text: 'Upnotify Score analyses your website across five areas: SSL certificate health, DNS configuration, security headers, response time, and overall availability. It gives you a grade from A+ to F with specific recommendations for improvement.',
       },
     },
     {
       '@type': 'Question',
-      name: 'Do I need an Uptrue account to use the free tools?',
+      name: 'Do I need an Upnotify account to use the free tools?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'No. All free tools work without an account or login. If you want continuous monitoring with alerts, you can sign up for a free Uptrue account separately.',
+        text: 'No. All free tools work without an account or login. If you want continuous monitoring with alerts, you can sign up for a free Upnotify account separately.',
       },
     },
   ],
@@ -99,9 +99,9 @@ export default function ToolsHelpPage(): React.ReactElement {
           </section>
 
           <section className="help-section">
-            <h2 className="help-section-title">Uptrue Score</h2>
+            <h2 className="help-section-title">Upnotify Score</h2>
             <p>
-              The <Link href="/score">Uptrue Score</Link> is a free health check for any
+              The <Link href="/score">Upnotify Score</Link> is a free health check for any
               website. Enter a domain and it analyses five areas:
             </p>
             <ul className="help-list">
@@ -123,7 +123,7 @@ export default function ToolsHelpPage(): React.ReactElement {
             <p>
               All three tools work without signing up. Run as many checks as you like.
               If you want continuous, automated monitoring with alerts and incident tracking,
-              you can <Link href="/signup">create a free Uptrue account</Link> any time.
+              you can <Link href="/signup">create a free Upnotify account</Link> any time.
             </p>
           </section>
 

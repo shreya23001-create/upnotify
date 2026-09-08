@@ -6,7 +6,7 @@ import Faq from '@/components/landing/faq'
 export const metadata: Metadata = {
   title: 'WP Rocket Cache Serving Stale Pages: Why Your Updates Aren\'t Showing to Visitors',
   description:
-    'WP Rocket can serve outdated cached pages long after you have published changes. Object cache conflicts, CDN layering, and preload bot timing all contribute. Learn what causes stale cache, how to fix it, and how Uptrue keyword monitoring checks what real visitors actually see.',
+    'WP Rocket can serve outdated cached pages long after you have published changes. Object cache conflicts, CDN layering, and preload bot timing all contribute. Learn what causes stale cache, how to fix it, and how Upnotify keyword monitoring checks what real visitors actually see.',
   alternates: { canonical: 'https://uptrue.io/blog/wp-rocket-cache-issues' },
   openGraph: {
     title: 'WP Rocket Cache Serving Stale Pages: Why Your Updates Aren\'t Showing to Visitors',
@@ -67,7 +67,7 @@ export default function WpRocketCacheIssuesPage(): React.ReactElement {
           '@type': 'Article',
           headline: 'WP Rocket Cache Serving Stale Pages: Why Your Updates Aren\'t Showing to Visitors',
           description: 'What causes WP Rocket to serve stale cached pages, how to fix each cause, and how keyword monitoring verifies that visitors see your latest content.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-03-30',
           dateModified: '2026-03-30',
@@ -197,10 +197,10 @@ export default function WpRocketCacheIssuesPage(): React.ReactElement {
           Your visitors are not hitting Ctrl+F5. They are loading the page normally. Their browsers might serve a locally cached version. The CDN edge server near them might serve a different cached version. The server-level cache might serve yet another version. The only way to know what a real visitor actually sees is to check from outside your own browser, outside your own network, and outside any cache layer you control.
         </p>
 
-        <h2>How Uptrue keyword monitoring checks what real visitors see</h2>
+        <h2>How Upnotify keyword monitoring checks what real visitors see</h2>
 
         <p>
-          <Link href="/signup">Uptrue&apos;s keyword monitoring</Link> does exactly what you cannot do manually: it loads your page from an external server, with no cache, no cookies, no login — the same way a first-time visitor experiences your site — and checks whether specific content is present on the page. If WP Rocket, your CDN, your object cache, or your server-level cache is serving stale content, Uptrue detects it.
+          <Link href="/signup">Upnotify&apos;s keyword monitoring</Link> does exactly what you cannot do manually: it loads your page from an external server, with no cache, no cookies, no login — the same way a first-time visitor experiences your site — and checks whether specific content is present on the page. If WP Rocket, your CDN, your object cache, or your server-level cache is serving stale content, Upnotify detects it.
         </p>
 
         <h3>Step 1: Set up a keyword monitor for your most important page</h3>
@@ -217,13 +217,13 @@ export default function WpRocketCacheIssuesPage(): React.ReactElement {
         </ol>
 
         <p>
-          Now, if the cache serves an old version of the page that does not contain your keyword — because the headline changed, the price updated, or the promotion text is different — Uptrue alerts you immediately. You know the cache is stale before any customer notices.
+          Now, if the cache serves an old version of the page that does not contain your keyword — because the headline changed, the price updated, or the promotion text is different — Upnotify alerts you immediately. You know the cache is stale before any customer notices.
         </p>
 
         <h3>Step 2: Add monitors for pages you update frequently</h3>
 
         <p>
-          Some pages change more often than others. Your homepage, pricing page, any active promotion landing pages, and your WooCommerce shop page are prime candidates for stale cache problems. Set up keyword monitors on each one with a phrase that reflects the current content. When you update the page, update the keyword in Uptrue to match the new content. If the cache does not clear properly, you will know within minutes.
+          Some pages change more often than others. Your homepage, pricing page, any active promotion landing pages, and your WooCommerce shop page are prime candidates for stale cache problems. Set up keyword monitors on each one with a phrase that reflects the current content. When you update the page, update the keyword in Upnotify to match the new content. If the cache does not clear properly, you will know within minutes.
         </p>
 
         <h3>Step 3: Monitor for unwanted cached error pages</h3>
@@ -302,7 +302,7 @@ export default function WpRocketCacheIssuesPage(): React.ReactElement {
 
         <h3>Step 5: Verify with an external tool</h3>
         <p>
-          Do not trust your own browser. Use Uptrue, or at minimum, use a private browsing window on a different network (like your phone&apos;s mobile data) to confirm that the page shows the updated content. Better yet, let Uptrue&apos;s keyword monitoring do this automatically every 5 minutes.
+          Do not trust your own browser. Use Upnotify, or at minimum, use a private browsing window on a different network (like your phone&apos;s mobile data) to confirm that the page shows the updated content. Better yet, let Upnotify&apos;s keyword monitoring do this automatically every 5 minutes.
         </p>
 
         <h2>The real cost of serving stale content</h2>
@@ -316,7 +316,7 @@ export default function WpRocketCacheIssuesPage(): React.ReactElement {
         </p>
 
         <p>
-          Uptrue keyword monitoring bridges this gap. It checks what visitors actually see on the page — not just whether the server responds. It is the difference between knowing your server is running and knowing your business is being presented correctly to every visitor.
+          Upnotify keyword monitoring bridges this gap. It checks what visitors actually see on the page — not just whether the server responds. It is the difference between knowing your server is running and knowing your business is being presented correctly to every visitor.
         </p>
 
         <div className="blog-cta-section">
@@ -343,7 +343,7 @@ export default function WpRocketCacheIssuesPage(): React.ReactElement {
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

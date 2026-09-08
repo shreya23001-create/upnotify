@@ -38,7 +38,7 @@ const STEPS = [
 
 const TESTIMONIALS = [
   { quote: 'We caught three client outages before their users noticed. Our clients still don\'t know how close it was. Uptrue paid for itself in the first week.', name: 'Sarah Mitchell', role: 'Founder · Brightwave Digital Agency', initials: 'SM', color: '#3b82f6' },
-  { quote: 'The AI reports are genuinely impressive. I send them to our board every month — they actually read them. It\'s the first monitoring tool that speaks human.', name: 'James Thornton', role: 'CTO · Formly SaaS', initials: 'JT', color: '#8b5cf6' },
+  { quote: 'The AI reports are genuinely impressive. I send them to our board every month — they actually read them. It\'s the first monitoring tool that speaks human.', name: 'James Thornton', role: 'CTO · Formly SaaS', initials: 'JT', color: '#2ee06b' },
   { quote: 'Switched from UptimeRobot. Zero false alarms since day one. The two-region confirmation alone has saved our on-call team from 3am panic alerts.', name: 'Alex Deacon', role: 'DevOps Lead · Cartify Commerce', initials: 'AD', color: '#06b6d4' },
 ]
 

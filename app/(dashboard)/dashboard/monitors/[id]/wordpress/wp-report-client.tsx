@@ -395,8 +395,8 @@ function generatePrintHtml(opts: {
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#1a1a2e;padding:40px;font-size:14px}
-  .hd{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:20px;border-bottom:3px solid #667eea;margin-bottom:28px}
-  .logo{font-size:26px;font-weight:800;color:#667eea;letter-spacing:-0.5px}.logo span{color:#06b6d4}
+  .hd{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:20px;border-bottom:3px solid #00c94a;margin-bottom:28px}
+  .logo{font-size:26px;font-weight:800;color:#00c94a;letter-spacing:-0.5px}.logo span{color:#06b6d4}
   .logo-sub{font-size:11px;color:#9ca3af;margin-top:3px}
   .meta{text-align:right;font-size:12px;color:#6b7280}
   .meta strong{font-size:15px;color:#1a1a2e;display:block;margin-bottom:2px}
@@ -420,7 +420,7 @@ function generatePrintHtml(opts: {
   .fdate{font-size:11px;color:#9ca3af;margin-top:2px}
   .badge{padding:2px 9px;border-radius:4px;font-size:11px;font-weight:600}
   .ai-section{margin-top:28px;padding:20px;background:#f8f9ff;border:1px solid #e0e4ff;border-radius:10px}
-  .ai-header{font-size:14px;font-weight:700;color:#4f46e5;margin-bottom:12px}
+  .ai-header{font-size:14px;font-weight:700;color:#00a83d;margin-bottom:12px}
   .ai-content{font-size:13px;line-height:1.7;white-space:pre-wrap;color:#374151}
   .footer{margin-top:36px;padding-top:14px;border-top:1px solid #e5e7eb;display:flex;justify-content:space-between;font-size:11px;color:#9ca3af}
   @media print{body{padding:20px}}
@@ -498,7 +498,7 @@ ${aiReport ? `<div class="ai-section">
 </div>` : ''}
 
 <div class="footer">
-  <div>Powered by <strong>Uptrue</strong> — uptrue.io</div>
+  <div>Powered by <strong>Upnotify</strong> — uptrue.io</div>
   <div>Automated WordPress monitoring &amp; security scanning</div>
 </div>
 </body>

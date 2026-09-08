@@ -4,7 +4,7 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = {
   title: 'Terms of Service',
   description:
-    'Read the Uptrue Terms of Service. These terms govern your access to and use of the Uptrue uptime monitoring platform.',
+    'Read the Upnotify Terms of Service. These terms govern your access to and use of the Upnotify uptime monitoring platform.',
   alternates: { canonical: 'https://uptrue.io/terms' },
 }
 
@@ -15,7 +15,7 @@ export default function TermsOfServicePage(): React.ReactElement {
       <p className="legal-updated">Last updated: 6 May 2026</p>
 
       <p>
-        These Terms of Service (&quot;Terms&quot;) govern your access to and use of the Uptrue platform,
+        These Terms of Service (&quot;Terms&quot;) govern your access to and use of the Upnotify platform,
         website, and related services (collectively, the &quot;Service&quot;) operated by Vision Software Solutions Limited,
         a company registered in England and Wales with its registered office at C/O Benison Solvers Limited, 1000 Great West Road, Brentford, United Kingdom, TW8 9DW
         (&quot;Uptrue&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;).
@@ -29,7 +29,7 @@ export default function TermsOfServicePage(): React.ReactElement {
 
       <h2>1. Service Description</h2>
       <p>
-        Uptrue is a software-as-a-service (&quot;SaaS&quot;) platform that provides website and infrastructure
+        Upnotify is a software-as-a-service (&quot;SaaS&quot;) platform that provides website and infrastructure
         monitoring services, including but not limited to:
       </p>
       <ul>
@@ -43,8 +43,8 @@ export default function TermsOfServicePage(): React.ReactElement {
         <li>Alerting via email, SMS, WhatsApp, voice call, Slack, and webhook</li>
         <li>Public and private status pages</li>
         <li>Public Tracker &mdash; publicly visible uptime monitoring of major third-party websites and services, provided for informational purposes</li>
-        <li>Uptrue Score &mdash; a free website health assessment tool that scans a given URL and displays a publicly visible health score and diagnostic summary</li>
-        <li>Uptrue Compete &mdash; competitive intelligence features including price tracking and stock monitoring for ecommerce websites (coming soon; availability subject to separate terms when launched)</li>
+        <li>Upnotify Score &mdash; a free website health assessment tool that scans a given URL and displays a publicly visible health score and diagnostic summary</li>
+        <li>Upnotify Compete &mdash; competitive intelligence features including price tracking and stock monitoring for ecommerce websites (coming soon; availability subject to separate terms when launched)</li>
         <li>AI-powered performance and incident reports</li>
         <li>Incident management and resolution tracking</li>
         <li>White-label agency monitoring and client management</li>
@@ -72,7 +72,7 @@ export default function TermsOfServicePage(): React.ReactElement {
       </p>
       <h3>2.3 Organisational Accounts and Roles</h3>
       <p>
-        Uptrue supports organisational accounts with multiple users. The account owner (&quot;Owner&quot;) may
+        Upnotify supports organisational accounts with multiple users. The account owner (&quot;Owner&quot;) may
         invite additional users and assign roles including Administrator, Member, and Viewer. The Owner
         is responsible for the actions of all users within their organisation and for ensuring that all
         users comply with these Terms.
@@ -87,7 +87,7 @@ export default function TermsOfServicePage(): React.ReactElement {
       <h2>3. Subscription Plans and Billing</h2>
       <h3>3.1 Plans</h3>
       <p>
-        Uptrue offers multiple subscription tiers including free and paid options.
+        Upnotify offers multiple subscription tiers including free and paid options.
         Feature availability, monitor limits, check intervals, and alert channel access vary by plan.
         For current pricing and plan details, please visit our{' '}
         <Link href="/#pricing">pricing page</Link>.
@@ -108,7 +108,7 @@ export default function TermsOfServicePage(): React.ReactElement {
         <strong>Regional pricing.</strong> INR pricing is available exclusively to customers whose
         primary billing address and payment method are registered in India. By selecting INR pricing,
         you confirm that your primary place of business or residence is India and that your payment
-        method is issued by an Indian financial institution. Uptrue reserves the right to migrate
+        method is issued by an Indian financial institution. Upnotify reserves the right to migrate
         accounts to GBP pricing, with 30 days&apos; notice, if we determine that this condition is
         not met. We will not disable accounts for this reason — any pricing adjustment will be applied
         at the next renewal date.
@@ -134,7 +134,7 @@ export default function TermsOfServicePage(): React.ReactElement {
       <h3>3.5 Refunds</h3>
       <p>
         As a general policy, fees paid are non-refundable. However, if you experience a material service
-        failure attributable to Uptrue, you may request a credit or refund by contacting
+        failure attributable to Upnotify, you may request a credit or refund by contacting
         support@uptrue.io within 14 days of the issue. Refund requests are assessed on a case-by-case
         basis at our reasonable discretion.
       </p>
@@ -155,9 +155,9 @@ export default function TermsOfServicePage(): React.ReactElement {
 
       <h2>3A. Community Credits</h2>
       <p>
-        Uptrue may offer a credit system (&quot;Community Credits&quot;) that allows you to earn credits
+        Upnotify may offer a credit system (&quot;Community Credits&quot;) that allows you to earn credits
         through certain activities, including but not limited to: referring new users, embedding the
-        Uptrue trust badge on your website, and leaving verified reviews.
+        Upnotify trust badge on your website, and leaving verified reviews.
       </p>
       <p>
         Community Credits are subject to the following conditions:
@@ -168,7 +168,7 @@ export default function TermsOfServicePage(): React.ReactElement {
           from time to time.
         </li>
         <li>
-          Credits may be redeemed only against Uptrue subscription fees or eligible add-on services
+          Credits may be redeemed only against Upnotify subscription fees or eligible add-on services
           within the Service. Credits have no cash value and cannot be exchanged, transferred, or
           cashed out.
         </li>
@@ -191,15 +191,15 @@ export default function TermsOfServicePage(): React.ReactElement {
         </li>
       </ul>
 
-      <h2>3B. Account Access by Uptrue Personnel</h2>
+      <h2>3B. Account Access by Upnotify Personnel</h2>
       <p>
         To provide technical support, diagnose issues, and ensure the integrity of the Service,
-        authorised Uptrue administrators may access your account in a read-only view (&quot;account
+        authorised Upnotify administrators may access your account in a read-only view (&quot;account
         impersonation&quot;). This access is subject to the following safeguards:
       </p>
       <ul>
         <li>
-          Impersonation access is limited to authorised Uptrue personnel only and is used solely
+          Impersonation access is limited to authorised Upnotify personnel only and is used solely
           for customer support, debugging, and operational purposes.
         </li>
         <li>
@@ -218,7 +218,7 @@ export default function TermsOfServicePage(): React.ReactElement {
 
       <h2>4. Service Level Agreement</h2>
       <p>
-        Uptrue targets 99.9% platform availability for the Service, measured on a calendar month basis,
+        Upnotify targets 99.9% platform availability for the Service, measured on a calendar month basis,
         excluding scheduled maintenance windows. Scheduled maintenance will be announced at least 48 hours
         in advance via our status page at status.uptrue.io and by email.
       </p>
@@ -242,7 +242,7 @@ export default function TermsOfServicePage(): React.ReactElement {
         not claim ownership of your Customer Data.
       </p>
       <p>
-        You grant Uptrue a limited, non-exclusive licence to process, store, and transmit your Customer
+        You grant Upnotify a limited, non-exclusive licence to process, store, and transmit your Customer
         Data solely for the purpose of providing the Service to you. This licence terminates when you
         delete your data or close your account.
       </p>
@@ -254,13 +254,13 @@ export default function TermsOfServicePage(): React.ReactElement {
       <h2>6. Intellectual Property</h2>
       <p>
         The Service, including all software, code, design, documentation, trademarks, logos, and content
-        created by Uptrue (&quot;Uptrue IP&quot;), is and remains the exclusive property of Vision Software Solutions Limited. These
-        Terms do not grant you any right, title, or interest in the Uptrue IP except for the limited right
+        created by Upnotify (&quot;Upnotify IP&quot;), is and remains the exclusive property of Vision Software Solutions Limited. These
+        Terms do not grant you any right, title, or interest in the Upnotify IP except for the limited right
         to use the Service in accordance with these Terms.
       </p>
       <p>
         You may not copy, modify, distribute, sell, lease, reverse-engineer, decompile, or create derivative
-        works based on any part of the Service or Uptrue IP without our prior written consent.
+        works based on any part of the Service or Upnotify IP without our prior written consent.
       </p>
       <p>
         Any feedback, suggestions, or ideas you provide to us regarding the Service may be used by us
@@ -302,12 +302,12 @@ export default function TermsOfServicePage(): React.ReactElement {
           Circumvent or attempt to circumvent any rate limits, usage limits, or security measures.
         </li>
         <li>
-          Use the Uptrue Compete feature (or any competitive intelligence functionality) to violate the
+          Use the Upnotify Compete feature (or any competitive intelligence functionality) to violate the
           terms of service of any target website, or to circumvent access controls, CAPTCHAs, or
           anti-scraping measures employed by any third-party website.
         </li>
         <li>
-          Use the Uptrue Compete feature to collect, store, or redistribute data from third-party
+          Use the Upnotify Compete feature to collect, store, or redistribute data from third-party
           websites in a manner that infringes the intellectual property rights or data protection
           rights of the website operator or any third party.
         </li>
@@ -323,7 +323,7 @@ export default function TermsOfServicePage(): React.ReactElement {
       </p>
       <ul>
         <li>
-          <strong>No indirect damages.</strong> In no event shall Uptrue, its directors, employees, or
+          <strong>No indirect damages.</strong> In no event shall Upnotify, its directors, employees, or
           agents be liable for any indirect, incidental, special, consequential, or punitive damages,
           including but not limited to loss of profits, revenue, data, business opportunities, or
           goodwill, arising out of or related to your use of or inability to use the Service, even if
@@ -332,7 +332,7 @@ export default function TermsOfServicePage(): React.ReactElement {
         <li>
           <strong>Liability cap.</strong> Our total aggregate liability to you for any and all claims
           arising under or in connection with these Terms or the Service shall not exceed the total
-          amount you have paid to Uptrue in the three (3) months immediately preceding the event
+          amount you have paid to Upnotify in the three (3) months immediately preceding the event
           giving rise to the claim, or fifty pounds sterling (&pound;50), whichever is less.
         </li>
         <li>
@@ -373,7 +373,7 @@ export default function TermsOfServicePage(): React.ReactElement {
       <ul>
         <li>Breach of these Terms or the Acceptable Use Policy</li>
         <li>Non-payment of fees</li>
-        <li>Conduct that we reasonably believe may harm Uptrue, other users, or third parties</li>
+        <li>Conduct that we reasonably believe may harm Upnotify, other users, or third parties</li>
         <li>If required by law or regulation</li>
       </ul>
       <p>
@@ -406,7 +406,7 @@ export default function TermsOfServicePage(): React.ReactElement {
       <p>
         You acknowledge that uptime monitoring is inherently imperfect and that no monitoring solution
         can guarantee detection of all incidents. You are solely responsible for your own disaster
-        recovery, backup, and incident response procedures. Uptrue is a supplementary tool and does not
+        recovery, backup, and incident response procedures. Upnotify is a supplementary tool and does not
         replace your operational obligations.
       </p>
       <p>
@@ -430,12 +430,12 @@ export default function TermsOfServicePage(): React.ReactElement {
           technical assessment of any Tracked Site or its operator.
         </li>
         <li>
-          <strong>No affiliation.</strong> Uptrue has no affiliation, partnership, or commercial
+          <strong>No affiliation.</strong> Upnotify has no affiliation, partnership, or commercial
           relationship with any Tracked Site. Monitoring a site does not imply any endorsement,
           sponsorship, or association.
         </li>
         <li>
-          <strong>Accuracy.</strong> Watchdog reflects observations made from Uptrue&apos;s monitoring
+          <strong>Accuracy.</strong> Watchdog reflects observations made from Upnotify&apos;s monitoring
           infrastructure at the time of each check. Results may not reflect the experience of all users
           of a Tracked Site and may be affected by geographic, network, or temporary factors outside
           our control.

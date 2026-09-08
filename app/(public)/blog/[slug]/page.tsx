@@ -39,7 +39,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const isNoindex = (post as { noindex?: boolean }).noindex === true
 
   return {
-    title: post.seo_title || `${post.title} | Uptrue`,
+    title: post.seo_title || `${post.title} | Upnotify`,
     description: post.seo_description || post.excerpt || '',
     alternates: { canonical: `https://uptrue.io/blog/${post.slug}` },
     robots: isNoindex ? { index: false, follow: false } : undefined,
@@ -228,7 +228,7 @@ export default async function DynamicBlogPost({ params }: { params: Promise<{ sl
             <div className="blog-post-hero-meta">
               {publishedDate && <span>{publishedDate}</span>}
               <span className="blog-post-hero-meta-dot">&middot;</span>
-              <span>Uptrue Team</span>
+              <span>Upnotify Team</span>
               <span className="blog-post-hero-meta-dot">&middot;</span>
               <span className="blog-post-hero-readtime"><Clock size={13} /> {readTime} min read</span>
             </div>
@@ -260,9 +260,9 @@ export default async function DynamicBlogPost({ params }: { params: Promise<{ sl
           <strong style={{ color: 'var(--text, #111)', display: 'block', marginBottom: 4 }}>
             Automated monitoring report
           </strong>
-          This report was generated automatically by Uptrue when our monitoring system detected a possible issue.
+          This report was generated automatically by Upnotify when our monitoring system detected a possible issue.
           Information may be incomplete or inaccurate — always check the official status page for confirmed updates.
-          Uptrue is an independent monitoring service and has no affiliation with the companies mentioned.
+          Upnotify is an independent monitoring service and has no affiliation with the companies mentioned.
           {' '}To request a correction or removal, email{' '}
           <a href="mailto:reports@uptrue.io" style={{ color: 'var(--accent, #3b82f6)' }}>reports@uptrue.io</a>.
         </div>
@@ -300,7 +300,7 @@ export default async function DynamicBlogPost({ params }: { params: Promise<{ sl
         <footer className="blog-article-footer">
           <div className="blog-author">
             <div className="blog-author-info">
-              <span className="blog-author-name">Uptrue Team</span>
+              <span className="blog-author-name">Upnotify Team</span>
               <span className="blog-author-role">Website Monitoring Platform</span>
             </div>
           </div>
@@ -324,7 +324,7 @@ export default async function DynamicBlogPost({ params }: { params: Promise<{ sl
         <footer className="blog-article-footer">
           <div className="blog-author">
             <div className="blog-author-info">
-              <span className="blog-author-name">Uptrue Team</span>
+              <span className="blog-author-name">Upnotify Team</span>
               <span className="blog-author-role">Website Monitoring Platform</span>
             </div>
           </div>

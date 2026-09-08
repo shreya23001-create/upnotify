@@ -6,7 +6,7 @@ import Faq from '@/components/landing/faq'
 export const metadata: Metadata = {
   title: 'WordPress .htaccess File Corrupted: How a Single File Takes Down Your Entire Site',
   description:
-    'A corrupted .htaccess file can take down your entire WordPress site with a 500 Internal Server Error. Learn what causes .htaccess corruption — plugin rewrites, manual edit typos, encoding issues — how to regenerate it, and how Uptrue HTTP monitoring catches the 500 error before your visitors report it.',
+    'A corrupted .htaccess file can take down your entire WordPress site with a 500 Internal Server Error. Learn what causes .htaccess corruption — plugin rewrites, manual edit typos, encoding issues — how to regenerate it, and how Upnotify HTTP monitoring catches the 500 error before your visitors report it.',
   alternates: { canonical: 'https://uptrue.io/blog/wordpress-htaccess-error' },
   openGraph: {
     title: 'WordPress .htaccess File Corrupted: How a Single File Takes Down Your Entire Site',
@@ -43,7 +43,7 @@ const FAQ_DATA = [
   {
     question: 'Can uptime monitoring detect .htaccess errors?',
     answer:
-      'Yes. A corrupted .htaccess file causes Apache to return a 500 Internal Server Error on every request. Uptrue HTTP monitoring checks your site at regular intervals and detects the 500 status code immediately. Because the error affects every page on the site, monitoring a single URL is enough to detect it. You receive an alert within minutes of the corruption — whether it was caused by a plugin update, a manual edit, or a server configuration change.',
+      'Yes. A corrupted .htaccess file causes Apache to return a 500 Internal Server Error on every request. Upnotify HTTP monitoring checks your site at regular intervals and detects the 500 status code immediately. Because the error affects every page on the site, monitoring a single URL is enough to detect it. You receive an alert within minutes of the corruption — whether it was caused by a plugin update, a manual edit, or a server configuration change.',
   },
 ]
 
@@ -67,7 +67,7 @@ export default function WordPressHtaccessErrorPage(): React.ReactElement {
           '@type': 'Article',
           headline: 'WordPress .htaccess File Corrupted: How a Single File Takes Down Your Entire Site',
           description: 'What causes .htaccess corruption in WordPress, how to regenerate the file, and how HTTP monitoring catches the 500 errors it causes.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-03-28',
           dateModified: '2026-03-28',
@@ -198,10 +198,10 @@ export default function WordPressHtaccessErrorPage(): React.ReactElement {
           Go into each plugin that writes to .htaccess — your security plugin, caching plugin, SEO plugin — and re-save their settings. This triggers each plugin to re-write its rules to the fresh .htaccess file. Do them one at a time, checking the site after each, so you can identify which plugin writes the problematic rule if the error returns.
         </p>
 
-        <h2>How Uptrue HTTP monitoring catches .htaccess errors instantly</h2>
+        <h2>How Upnotify HTTP monitoring catches .htaccess errors instantly</h2>
 
         <p>
-          A corrupted .htaccess file causes a 500 Internal Server Error on every request. This is one of the easiest failures for HTTP monitoring to detect — but only if you have monitoring in place before it happens. Here is how to set up <Link href="/signup">Uptrue</Link> to catch .htaccess errors the moment they occur.
+          A corrupted .htaccess file causes a 500 Internal Server Error on every request. This is one of the easiest failures for HTTP monitoring to detect — but only if you have monitoring in place before it happens. Here is how to set up <Link href="/signup">Upnotify</Link> to catch .htaccess errors the moment they occur.
         </p>
 
         <h3>Step 1: Set up HTTP monitoring</h3>
@@ -217,7 +217,7 @@ export default function WordPressHtaccessErrorPage(): React.ReactElement {
         </ol>
 
         <p>
-          When .htaccess is corrupted, Uptrue&apos;s check receives a 500 status code instead of the expected 200. Uptrue performs a confirmation check from a secondary region to eliminate false positives. If the second check also returns 500, you receive an alert immediately. You know your site is down before any visitor has time to contact you.
+          When .htaccess is corrupted, Upnotify&apos;s check receives a 500 status code instead of the expected 200. Upnotify performs a confirmation check from a secondary region to eliminate false positives. If the second check also returns 500, you receive an alert immediately. You know your site is down before any visitor has time to contact you.
         </p>
 
         <h3>Step 2: Monitor wp-admin separately</h3>
@@ -300,7 +300,7 @@ export default function WordPressHtaccessErrorPage(): React.ReactElement {
         </p>
 
         <p>
-          Uptrue HTTP monitoring does not tell you that your .htaccess is corrupted — it tells you that your site is returning 500 errors, within a minute of it happening. That early alert is the difference between two minutes of downtime (rename the file, regenerate, done) and two hours of downtime (notice from a customer, start debugging, check PHP logs, check database, finally check .htaccess, fix it).
+          Upnotify HTTP monitoring does not tell you that your .htaccess is corrupted — it tells you that your site is returning 500 errors, within a minute of it happening. That early alert is the difference between two minutes of downtime (rename the file, regenerate, done) and two hours of downtime (notice from a customer, start debugging, check PHP logs, check database, finally check .htaccess, fix it).
         </p>
 
         <div className="blog-cta-section">
@@ -327,7 +327,7 @@ export default function WordPressHtaccessErrorPage(): React.ReactElement {
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

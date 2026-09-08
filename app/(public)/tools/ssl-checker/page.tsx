@@ -6,12 +6,12 @@ import Faq from '@/components/landing/faq'
 import { ScrollReveal } from '@/components/landing/scroll-reveal'
 
 export const metadata: Metadata = {
-  title: 'Free SSL Certificate Checker — Check Any SSL | Uptrue',
+  title: 'Free SSL Certificate Checker — Check Any SSL | Upnotify',
   description:
     'Free SSL certificate checker. Check any SSL certificate instantly — issuer, expiry date, days remaining, TLS version, and chain validity. Includes how to read the result and what to do if your certificate is expiring. No signup required.',
   alternates: { canonical: 'https://uptrue.io/tools/ssl-checker' },
   openGraph: {
-    title: 'Free SSL Certificate Checker | Uptrue',
+    title: 'Free SSL Certificate Checker | Upnotify',
     description:
       'Check any SSL certificate instantly. See issuer, expiry, TLS version, and chain validity.',
     url: 'https://uptrue.io/tools/ssl-checker',
@@ -36,7 +36,7 @@ const faqSchema = {
       name: 'Is the SSL checker free to use?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Yes, completely free. No account, no email capture, no credit card. You can check as many domains as you need. If you want continuous monitoring instead of one-off checks, that is what the paid Uptrue plans are for — but the checker stays free forever.',
+        text: 'Yes, completely free. No account, no email capture, no credit card. You can check as many domains as you need. If you want continuous monitoring instead of one-off checks, that is what the paid Upnotify plans are for — but the checker stays free forever.',
       },
     },
     {
@@ -68,7 +68,7 @@ const faqSchema = {
       name: 'Can I monitor SSL certificates continuously, not just one-off checks?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Yes. Uptrue’s SSL Certificate Monitoring runs the same check every hour by default, alerts you if the certificate enters the expiry warning window, and notifies you via email, Slack, Telegram, or webhook when something changes. The Free plan includes 3 monitors so you can cover your most important domain at no cost.',
+        text: 'Yes. Upnotify’s SSL Certificate Monitoring runs the same check every hour by default, alerts you if the certificate enters the expiry warning window, and notifies you via email, Slack, Telegram, or webhook when something changes. The Free plan includes 3 monitors so you can cover your most important domain at no cost.',
       },
     },
   ],
@@ -118,7 +118,7 @@ export default function SslCheckerPage(): React.ReactElement {
         <div className="tools-cta reveal">
           <h2>Monitor this SSL certificate 24/7</h2>
           <p>
-            Get alerted before your SSL certificate expires. Uptrue&apos;s{' '}
+            Get alerted before your SSL certificate expires. Upnotify&apos;s{' '}
             <Link href="/monitoring/ssl-certificate-monitoring">SSL certificate monitoring</Link>{' '}
             checks every hour and pairs naturally with{' '}
             <Link href="/monitoring/security-headers-monitoring">security headers monitoring</Link>{' '}

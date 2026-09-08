@@ -38,7 +38,7 @@ const FAQ_DATA = [
   {
     question: 'Can agencies white-label monitoring reports for their clients?',
     answer:
-      'Yes, some monitoring platforms offer full white-label capabilities. This means the monitoring dashboard, status pages, alert emails, and reports all display your agency branding instead of the monitoring tool\'s brand. Uptrue\'s agency plan includes full white-label — your logo, your colours, your domain — so clients never see Uptrue\'s branding at all.',
+      'Yes, some monitoring platforms offer full white-label capabilities. This means the monitoring dashboard, status pages, alert emails, and reports all display your agency branding instead of the monitoring tool\'s brand. Upnotify\'s agency plan includes full white-label — your logo, your colours, your domain — so clients never see Upnotify\'s branding at all.',
   },
 ]
 
@@ -62,7 +62,7 @@ export default function UptimeMonitoringAgenciesPage(): React.ReactElement {
           '@type': 'Article',
           headline: 'Uptime Monitoring for Agencies: Managing 100+ Client Sites',
           description: 'What agencies actually need to monitor hundreds of client websites at scale.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-03-07',
           dateModified: '2026-03-07',
@@ -322,7 +322,7 @@ export default function UptimeMonitoringAgenciesPage(): React.ReactElement {
           <h3>Built for agencies, not side projects</h3>
           <p>
             Multi-tenant workspaces, white-label branding, per-client alerting, and AI-powered
-            reports. Uptrue is the monitoring platform agencies have been asking for.
+            reports. Upnotify is the monitoring platform agencies have been asking for.
           </p>
           <a href="mailto:agencies@uptrue.io?subject=Agency%20Waitlist%20%E2%80%94%20Early%20Access" className="btn btn-primary btn-lg">
             Join the Agency Waitlist
@@ -362,7 +362,7 @@ export default function UptimeMonitoringAgenciesPage(): React.ReactElement {
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

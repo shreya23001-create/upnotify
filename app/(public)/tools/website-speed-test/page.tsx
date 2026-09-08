@@ -6,12 +6,12 @@ import Faq from '@/components/landing/faq'
 import { ScrollReveal } from '@/components/landing/scroll-reveal'
 
 export const metadata: Metadata = {
-  title: 'Free Website Speed Test — Check Page Load Time | Uptrue',
+  title: 'Free Website Speed Test — Check Page Load Time | Upnotify',
   description:
     'Test your website\'s response time and TTFB (Time to First Byte) instantly. Get a performance grade and actionable tips to speed up your site. Free tool, no signup.',
   alternates: { canonical: 'https://uptrue.io/tools/website-speed-test' },
   openGraph: {
-    title: 'Free Website Speed Test — Check Page Load Time | Uptrue',
+    title: 'Free Website Speed Test — Check Page Load Time | Upnotify',
     description:
       'Test your website\'s TTFB and load time. Get a performance grade and actionable tips to speed up your site.',
     url: 'https://uptrue.io/tools/website-speed-test',
@@ -138,7 +138,7 @@ export default function WebsiteSpeedTestPage(): React.ReactElement {
         <div className="tools-cta reveal">
           <h2>Monitor response time 24/7</h2>
           <p>
-            Uptrue&apos;s <Link href="/monitoring/response-time-monitoring">response time threshold monitoring</Link>{' '}
+            Upnotify&apos;s <Link href="/monitoring/response-time-monitoring">response time threshold monitoring</Link>{' '}
             checks every minute and alerts you the moment latency drifts past your threshold. Pair it with{' '}
             <Link href="/monitoring/page-size-monitoring">page size monitoring</Link> to catch deploys that
             silently bloat the site — both contribute to slow page loads.

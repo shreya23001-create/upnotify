@@ -7,16 +7,16 @@ import {
 import { ContactForm } from '@/components/contact-form'
 
 export const metadata: Metadata = {
-  title: 'Contact Uptrue — Get in Touch',
+  title: 'Contact Upnotify — Get in Touch',
   description:
-    'Contact the Uptrue team for support, agency enquiries, or partnership opportunities. Vision Software Solutions Limited, Brentford, UK.',
+    'Contact the Upnotify team for support, agency enquiries, or partnership opportunities. Vision Software Solutions Limited, Brentford, UK.',
   alternates: {
     canonical: 'https://uptrue.io/contact',
   },
   openGraph: {
-    title: 'Contact Uptrue — Get in Touch',
+    title: 'Contact Upnotify — Get in Touch',
     description:
-      'Contact the Uptrue team for support, agency enquiries, or partnership opportunities.',
+      'Contact the Upnotify team for support, agency enquiries, or partnership opportunities.',
     url: 'https://uptrue.io/contact',
     type: 'website',
   },

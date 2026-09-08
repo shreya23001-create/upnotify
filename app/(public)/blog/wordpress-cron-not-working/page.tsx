@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'WordPress wp-cron Not Firing: Why Scheduled Posts, Emails, and Backups Silently Stop',
     description:
-      'Why WordPress wp-cron fails on low-traffic sites, what breaks when DISABLE_WP_CRON is set without a server cron replacement, and how Uptrue heartbeat monitoring keeps wp-cron firing on schedule.',
+      'Why WordPress wp-cron fails on low-traffic sites, what breaks when DISABLE_WP_CRON is set without a server cron replacement, and how Upnotify heartbeat monitoring keeps wp-cron firing on schedule.',
     url: 'https://uptrue.io/blog/wordpress-cron-not-working',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'WordPress wp-cron Not Firing: Why Scheduled Posts, Emails, and Backups Silently Stop',
     description:
-      'Why WordPress wp-cron fails on low-traffic sites, what breaks when DISABLE_WP_CRON is set without a server cron replacement, and how Uptrue heartbeat monitoring keeps wp-cron firing on schedule.',
+      'Why WordPress wp-cron fails on low-traffic sites, what breaks when DISABLE_WP_CRON is set without a server cron replacement, and how Upnotify heartbeat monitoring keeps wp-cron firing on schedule.',
   },
 }
 
@@ -38,12 +38,12 @@ const FAQ_DATA = [
   {
     question: 'Can uptime monitoring fix WordPress cron problems?',
     answer:
-      'Yes, indirectly. Uptrue heartbeat monitoring can be configured to ping your wp-cron.php URL on a fixed schedule — every 1, 5, or 15 minutes. Each ping triggers WordPress to check for and execute any due cron tasks. This effectively turns the unreliable traffic-based wp-cron into a reliable schedule-based system. Combined with DISABLE_WP_CRON in wp-config.php, this gives you full control over when cron runs without relying on visitor traffic.',
+      'Yes, indirectly. Upnotify heartbeat monitoring can be configured to ping your wp-cron.php URL on a fixed schedule — every 1, 5, or 15 minutes. Each ping triggers WordPress to check for and execute any due cron tasks. This effectively turns the unreliable traffic-based wp-cron into a reliable schedule-based system. Combined with DISABLE_WP_CRON in wp-config.php, this gives you full control over when cron runs without relying on visitor traffic.',
   },
   {
     question: 'How do I set up a real cron job for WordPress?',
     answer:
-      'First, add define("DISABLE_WP_CRON", true) to your wp-config.php to disable the traffic-based trigger. Then set up a server-level cron job that calls wp-cron.php on a fixed schedule. On Linux servers, use crontab: */5 * * * * wget -q -O /dev/null https://yourdomain.com/wp-cron.php?doing_wp_cron. On managed hosting without crontab access, use an external service like Uptrue heartbeat monitoring to ping wp-cron.php every few minutes. The external ping triggers WordPress to process all due scheduled tasks.',
+      'First, add define("DISABLE_WP_CRON", true) to your wp-config.php to disable the traffic-based trigger. Then set up a server-level cron job that calls wp-cron.php on a fixed schedule. On Linux servers, use crontab: */5 * * * * wget -q -O /dev/null https://yourdomain.com/wp-cron.php?doing_wp_cron. On managed hosting without crontab access, use an external service like Upnotify heartbeat monitoring to ping wp-cron.php every few minutes. The external ping triggers WordPress to process all due scheduled tasks.',
   },
 ]
 
@@ -67,7 +67,7 @@ export default function WordPressCronNotWorkingPage(): React.ReactElement {
           '@type': 'Article',
           headline: 'WordPress wp-cron Not Firing: Why Scheduled Posts, Emails, and Backups Silently Stop',
           description: 'Why WordPress wp-cron relies on traffic, what breaks when it stops firing, and how heartbeat monitoring keeps scheduled tasks running reliably.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-03-26',
           dateModified: '2026-03-26',
@@ -237,14 +237,14 @@ export default function WordPressCronNotWorkingPage(): React.ReactElement {
 
         <p>
           If your hosting does not provide crontab access — which is common on managed WordPress hosts and shared hosting — you need an external service to ping wp-cron.php on a schedule. This is where{' '}
-          <Link href="/signup">Uptrue&apos;s heartbeat monitoring</Link>
+          <Link href="/signup">Upnotify&apos;s heartbeat monitoring</Link>
           {' '}provides a dual benefit: it triggers your cron tasks on a fixed schedule and monitors that wp-cron.php is responding correctly.
         </p>
 
-        <h2>How Uptrue heartbeat monitoring keeps wp-cron firing</h2>
+        <h2>How Upnotify heartbeat monitoring keeps wp-cron firing</h2>
 
         <p>
-          <Link href="/signup">Uptrue&apos;s heartbeat monitoring</Link> was designed to monitor scheduled tasks — but it works equally well as a cron trigger. By pointing a heartbeat monitor at your wp-cron.php URL, every ping serves double duty: it triggers WordPress to process any due cron tasks, and it monitors that wp-cron.php is responding correctly.
+          <Link href="/signup">Upnotify&apos;s heartbeat monitoring</Link> was designed to monitor scheduled tasks — but it works equally well as a cron trigger. By pointing a heartbeat monitor at your wp-cron.php URL, every ping serves double duty: it triggers WordPress to process any due cron tasks, and it monitors that wp-cron.php is responding correctly.
         </p>
 
         <h3>Step 1: Disable the built-in wp-cron trigger</h3>
@@ -261,7 +261,7 @@ export default function WordPressCronNotWorkingPage(): React.ReactElement {
           This stops WordPress from running wp-cron on every page load, which improves page load performance and prevents race conditions where multiple simultaneous visitors trigger cron at the same time.
         </p>
 
-        <h3>Step 2: Set up an Uptrue heartbeat monitor</h3>
+        <h3>Step 2: Set up an Upnotify heartbeat monitor</h3>
 
         <ol>
           <li>Sign up at <Link href="/signup">uptrue.io/signup</Link> (free plan available)</li>
@@ -273,7 +273,7 @@ export default function WordPressCronNotWorkingPage(): React.ReactElement {
         </ol>
 
         <p>
-          Every 5 minutes, Uptrue pings your wp-cron.php URL. This triggers WordPress to check for and execute any due scheduled tasks. If wp-cron.php returns an error — a 403 because hosting blocked it, a 500 because a plugin crashed, or a timeout because the server is overloaded — Uptrue alerts you immediately. You know the moment your scheduled tasks stop working.
+          Every 5 minutes, Upnotify pings your wp-cron.php URL. This triggers WordPress to check for and execute any due scheduled tasks. If wp-cron.php returns an error — a 403 because hosting blocked it, a 500 because a plugin crashed, or a timeout because the server is overloaded — Upnotify alerts you immediately. You know the moment your scheduled tasks stop working.
         </p>
 
         <h3>Step 3: Add an HTTP monitor for your homepage</h3>
@@ -329,14 +329,14 @@ export default function WordPressCronNotWorkingPage(): React.ReactElement {
 
         <h3>Missed schedule error on posts</h3>
         <p>
-          If posts show &quot;Missed schedule&quot; in wp-admin, wp-cron is not firing frequently enough. Either increase your site traffic, set up a server-level cron job, or use Uptrue heartbeat monitoring to ping wp-cron.php on a fixed schedule. There is also a{' '}
+          If posts show &quot;Missed schedule&quot; in wp-admin, wp-cron is not firing frequently enough. Either increase your site traffic, set up a server-level cron job, or use Upnotify heartbeat monitoring to ping wp-cron.php on a fixed schedule. There is also a{' '}
           <a href="https://wordpress.org/plugins/search/missed+schedule/" target="_blank" rel="noopener noreferrer">Missed Schedule plugin</a>
           {' '}that retries publishing missed posts, but it still depends on wp-cron firing — it does not fix the underlying trigger problem.
         </p>
 
         <h3>WP-Cron running too frequently on high-traffic sites</h3>
         <p>
-          On high-traffic sites, every page load triggers wp-cron. Hundreds of simultaneous requests all try to run cron at the same time. This causes database locks, slow page loads, and resource spikes. The fix is to disable the page-load trigger with <code>DISABLE_WP_CRON</code> and use a server-level cron job or Uptrue heartbeat monitor instead. One request every 5 minutes is far more efficient than hundreds of requests per minute all checking the cron queue.
+          On high-traffic sites, every page load triggers wp-cron. Hundreds of simultaneous requests all try to run cron at the same time. This causes database locks, slow page loads, and resource spikes. The fix is to disable the page-load trigger with <code>DISABLE_WP_CRON</code> and use a server-level cron job or Upnotify heartbeat monitor instead. One request every 5 minutes is far more efficient than hundreds of requests per minute all checking the cron queue.
         </p>
 
         <h3>Cron tasks piling up and never completing</h3>
@@ -358,7 +358,7 @@ export default function WordPressCronNotWorkingPage(): React.ReactElement {
         </p>
 
         <p>
-          Uptrue heartbeat monitoring pings your wp-cron.php every few minutes on a fixed schedule. Every ping triggers WordPress to process due tasks. Every ping also verifies that wp-cron.php is responding. If it stops responding — because hosting blocked it, a plugin crashed it, or the server is down — you know in under five minutes. Your cron fires reliably. Your scheduled tasks run on time. And you get alerted the moment something breaks.
+          Upnotify heartbeat monitoring pings your wp-cron.php every few minutes on a fixed schedule. Every ping triggers WordPress to process due tasks. Every ping also verifies that wp-cron.php is responding. If it stops responding — because hosting blocked it, a plugin crashed it, or the server is down — you know in under five minutes. Your cron fires reliably. Your scheduled tasks run on time. And you get alerted the moment something breaks.
         </p>
 
         <div className="blog-cta-section">
@@ -385,7 +385,7 @@ export default function WordPressCronNotWorkingPage(): React.ReactElement {
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

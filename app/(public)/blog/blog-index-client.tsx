@@ -12,7 +12,7 @@ const POSTS_PER_PAGE = 12
 const FILTER_TABS = ['All posts', 'Guide', 'WordPress', 'Security', 'Performance', 'Ecommerce', 'Hosting', 'Incident Report', 'Agency', 'AI Tools']
 
 const BADGE_STYLES: Record<string, { bg: string; color: string; border: string }> = {
-  Guide: { bg: 'rgba(139,92,246,0.1)', color: '#8b5cf6', border: 'rgba(139,92,246,0.2)' },
+  Guide: { bg: 'rgba(46,224,107,0.1)', color: '#2ee06b', border: 'rgba(46,224,107,0.2)' },
   WordPress: { bg: 'rgba(59,130,246,0.1)', color: '#3b82f6', border: 'rgba(59,130,246,0.2)' },
   Security: { bg: 'rgba(239,68,68,0.1)', color: '#ef4444', border: 'rgba(239,68,68,0.2)' },
   Performance: { bg: 'rgba(16,185,129,0.1)', color: '#10b981', border: 'rgba(16,185,129,0.2)' },
@@ -101,7 +101,7 @@ function BlogIndexContent({ posts }: { posts: UnifiedPost[] }) {
       <div className="blog-hero">
         <div className="container" style={{ maxWidth: 1080, padding: '0 24px', margin: '0 auto' }}>
           <div className="blog-hero-inner reveal-title">
-            <div className="blog-hero-eyebrow">Uptrue Blog</div>
+            <div className="blog-hero-eyebrow">Upnotify Blog</div>
             <h1>Uptime, monitoring &amp;<br />reliability insights</h1>
             <p className="blog-hero-sub">
               Practical guides, incident reports, and deep dives for developers and agencies who care about keeping sites up.
@@ -156,7 +156,7 @@ function BlogIndexContent({ posts }: { posts: UnifiedPost[] }) {
                   <div className="blog-author">
                     <div className="blog-author-avatar" style={{ background: 'linear-gradient(135deg,#3b82f6,#06b6d4)' }}>U</div>
                     <div>
-                      <div className="blog-author-name">Uptrue Team</div>
+                      <div className="blog-author-name">Upnotify Team</div>
                       <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{featuredPost.displayDate}</div>
                     </div>
                   </div>

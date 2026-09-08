@@ -62,7 +62,7 @@ export default function CompetitorAnalysisEcommercePage(): React.ReactElement {
           '@type': 'Article',
           headline: 'Website Competitor Analysis Tools for Ecommerce in 2026',
           description: 'What to track, which tools help, and how to turn competitive intelligence into a business advantage.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-03-10',
           dateModified: '2026-03-10',
@@ -327,10 +327,10 @@ export default function CompetitorAnalysisEcommercePage(): React.ReactElement {
           it cheaper elsewhere.
         </p>
 
-        <h2>Introducing Uptrue Compete</h2>
+        <h2>Introducing Upnotify Compete</h2>
 
         <p>
-          We are building something specifically for this use case. Uptrue Compete is our
+          We are building something specifically for this use case. Upnotify Compete is our
           upcoming competitor monitoring feature that combines uptime tracking, performance
           benchmarking, SSL monitoring, and content change detection into a single competitive
           intelligence dashboard.
@@ -339,11 +339,11 @@ export default function CompetitorAnalysisEcommercePage(): React.ReactElement {
         <p>
           Instead of cobbling together four different tools, you get a unified view: your
           performance versus your competitors&apos;, updated every minute, with alerts when something
-          significant changes. Early access is launching soon for Uptrue users.
+          significant changes. Early access is launching soon for Upnotify users.
         </p>
 
         <div className="blog-cta-section">
-          <h3>Get early access to Uptrue Compete</h3>
+          <h3>Get early access to Upnotify Compete</h3>
           <p>
             Competitive intelligence meets monitoring. Track competitor performance, uptime, SSL,
             and content changes — all from one dashboard. Sign up to be first in line.
@@ -409,7 +409,7 @@ export default function CompetitorAnalysisEcommercePage(): React.ReactElement {
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

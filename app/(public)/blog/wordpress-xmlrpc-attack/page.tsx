@@ -6,7 +6,7 @@ import Faq from '@/components/landing/faq'
 export const metadata: Metadata = {
   title: 'WordPress XML-RPC Brute Force Attack: How Hackers Slow Down Your Site Without You Knowing',
   description:
-    'WordPress xmlrpc.php allows attackers to try hundreds of passwords in a single request using system.multicall. Your site slows to a crawl while uptime monitors say it is fine. Learn how XML-RPC attacks work, how to disable xmlrpc.php properly, and how Uptrue HTTP monitoring catches the response time spike before the crash.',
+    'WordPress xmlrpc.php allows attackers to try hundreds of passwords in a single request using system.multicall. Your site slows to a crawl while uptime monitors say it is fine. Learn how XML-RPC attacks work, how to disable xmlrpc.php properly, and how Upnotify HTTP monitoring catches the response time spike before the crash.',
   alternates: { canonical: 'https://uptrue.io/blog/wordpress-xmlrpc-attack' },
   openGraph: {
     title: 'WordPress XML-RPC Brute Force Attack: How Hackers Slow Down Your Site Without You Knowing',
@@ -43,7 +43,7 @@ const FAQ_DATA = [
   {
     question: 'Can monitoring detect an XML-RPC brute force attack?',
     answer:
-      'Standard uptime monitoring that only checks for a 200 status code will not detect an XML-RPC attack until the site has already crashed. The attack causes gradual resource exhaustion — your site stays up but response times climb from hundreds of milliseconds to seconds, then tens of seconds. HTTP monitoring that tracks response time detects this progression. Uptrue records response time on every check and alerts you when it exceeds a threshold — catching the attack while your site is still responding but degraded, giving you time to block the attack before it causes a full outage.',
+      'Standard uptime monitoring that only checks for a 200 status code will not detect an XML-RPC attack until the site has already crashed. The attack causes gradual resource exhaustion — your site stays up but response times climb from hundreds of milliseconds to seconds, then tens of seconds. HTTP monitoring that tracks response time detects this progression. Upnotify records response time on every check and alerts you when it exceeds a threshold — catching the attack while your site is still responding but degraded, giving you time to block the attack before it causes a full outage.',
   },
 ]
 
@@ -67,7 +67,7 @@ export default function WordPressXmlrpcAttackPage(): React.ReactElement {
           '@type': 'Article',
           headline: 'WordPress XML-RPC Brute Force Attack: How Hackers Slow Down Your Site Without You Knowing',
           description: 'How attackers exploit xmlrpc.php system.multicall for amplified brute force attacks, why your site slows down, and how HTTP monitoring catches the response time spike.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-04-04',
           dateModified: '2026-04-04',
@@ -247,14 +247,14 @@ export default function WordPressXmlrpcAttackPage(): React.ReactElement {
           If your site is behind Cloudflare or another Web Application Firewall, create a rule to block all requests to <code>/xmlrpc.php</code>. In Cloudflare, go to Security &gt; WAF &gt; Custom Rules and create a rule where &quot;URI Path equals /xmlrpc.php&quot; with the action &quot;Block.&quot; This stops the request at the edge before it ever reaches your server — zero CPU impact on your origin.
         </p>
 
-        <h2>How to detect XML-RPC attacks with Uptrue before your site crashes</h2>
+        <h2>How to detect XML-RPC attacks with Upnotify before your site crashes</h2>
 
         <p>
           The dangerous thing about XML-RPC attacks is the gap between when the attack starts and when your site actually crashes. The attack might run for hours, gradually exhausting your server&apos;s resources, while your uptime monitor reports that everything is fine — because the site is still technically returning 200 status codes. It is just taking 15 seconds to do it.
         </p>
 
         <p>
-          <Link href="/signup">Uptrue&apos;s HTTP monitoring</Link> tracks response time on every check. It does not just tell you whether your site is up or down — it tells you how fast your site is responding. When an XML-RPC attack starts consuming CPU and slowing your server, Uptrue detects the response time increase and alerts you before the site goes down.
+          <Link href="/signup">Upnotify&apos;s HTTP monitoring</Link> tracks response time on every check. It does not just tell you whether your site is up or down — it tells you how fast your site is responding. When an XML-RPC attack starts consuming CPU and slowing your server, Upnotify detects the response time increase and alerts you before the site goes down.
         </p>
 
         <h3>Step 1: Set up an HTTP monitor with response time alerting</h3>
@@ -270,7 +270,7 @@ export default function WordPressXmlrpcAttackPage(): React.ReactElement {
         </ol>
 
         <p>
-          Uptrue records response time on every check. When your site is healthy, response time is consistent — say 300ms to 800ms. During an XML-RPC attack, response time climbs steadily as PHP workers become occupied with authentication attempts. You will see the response time graph spike from hundreds of milliseconds to seconds. The alert fires when response time exceeds your threshold, giving you time to investigate and block the attack.
+          Upnotify records response time on every check. When your site is healthy, response time is consistent — say 300ms to 800ms. During an XML-RPC attack, response time climbs steadily as PHP workers become occupied with authentication attempts. You will see the response time graph spike from hundreds of milliseconds to seconds. The alert fires when response time exceeds your threshold, giving you time to investigate and block the attack.
         </p>
 
         <h3>Step 2: Monitor xmlrpc.php directly</h3>
@@ -284,7 +284,7 @@ export default function WordPressXmlrpcAttackPage(): React.ReactElement {
         </ol>
 
         <p>
-          If you have blocked xmlrpc.php at the server level, this monitor confirms the block is still active. If the expected status changes from 403 back to 200 (meaning the block was removed — perhaps by a WordPress update overwriting .htaccess or a server configuration change), Uptrue alerts you immediately. This prevents the attack surface from silently reopening.
+          If you have blocked xmlrpc.php at the server level, this monitor confirms the block is still active. If the expected status changes from 403 back to 200 (meaning the block was removed — perhaps by a WordPress update overwriting .htaccess or a server configuration change), Upnotify alerts you immediately. This prevents the attack surface from silently reopening.
         </p>
 
         <h3>Step 3: Monitor wp-login.php for parallel attacks</h3>
@@ -356,7 +356,7 @@ export default function WordPressXmlrpcAttackPage(): React.ReactElement {
         </p>
 
         <p>
-          Uptrue checks your site every 60 seconds and tracks response time on every check. When an XML-RPC attack starts degrading your site&apos;s performance, you see the response time climbing in real time. You get alerted when it crosses your threshold — while your site is still responding, while you can still log in and apply a fix, while your visitors are experiencing a slowdown rather than a complete outage.
+          Upnotify checks your site every 60 seconds and tracks response time on every check. When an XML-RPC attack starts degrading your site&apos;s performance, you see the response time climbing in real time. You get alerted when it crosses your threshold — while your site is still responding, while you can still log in and apply a fix, while your visitors are experiencing a slowdown rather than a complete outage.
         </p>
 
         <p>
@@ -387,7 +387,7 @@ export default function WordPressXmlrpcAttackPage(): React.ReactElement {
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

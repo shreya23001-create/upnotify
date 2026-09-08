@@ -26,7 +26,7 @@ const BLANK_FORM = {
   name: '',
   type: 'resend' as EmailProviderType,
   from_email: '',
-  from_name: 'Uptrue',
+  from_name: 'Upnotify',
   is_active: true,
   api_key: '',
   smtp_host: '',

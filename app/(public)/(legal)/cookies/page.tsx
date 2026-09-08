@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = {
   title: 'Cookie Policy',
   description:
-    'Uptrue Cookie Policy. Understand what cookies and similar technologies we use on our website and monitoring platform.',
+    'Upnotify Cookie Policy. Understand what cookies and similar technologies we use on our website and monitoring platform.',
   alternates: { canonical: 'https://uptrue.io/cookies' },
 }
 
@@ -66,8 +66,8 @@ export default function CookiePolicyPage(): React.ReactElement {
           </tr>
           <tr>
             <td>uptrue_impersonate</td>
-            <td>Uptrue (first-party)</td>
-            <td>Set only when an authorised Uptrue administrator accesses your account for support purposes (account impersonation). This cookie identifies the active impersonation session and ensures it is properly scoped and audited. It is never set during normal user activity.</td>
+            <td>Upnotify (first-party)</td>
+            <td>Set only when an authorised Upnotify administrator accesses your account for support purposes (account impersonation). This cookie identifies the active impersonation session and ensures it is properly scoped and audited. It is never set during normal user activity.</td>
             <td>Session (cleared when impersonation ends)</td>
           </tr>
         </tbody>
@@ -106,7 +106,7 @@ export default function CookiePolicyPage(): React.ReactElement {
 
       <h3>2.3 Analytics Cookies</h3>
       <p>
-        At present, Uptrue does not set any analytics cookies on the platform. We do not use Google
+        At present, Upnotify does not set any analytics cookies on the platform. We do not use Google
         Analytics, Facebook Pixel, or any other third-party analytics tracker on the core Service.
       </p>
       <p>
@@ -114,7 +114,7 @@ export default function CookiePolicyPage(): React.ReactElement {
         their own Google Tag Manager (GTM) container, Google Analytics (GA4) property, or Meta Pixel
         on their white-labelled monitoring pages. If an Agency has configured such tracking, those
         third-party cookies will be set by the respective third party (Google, Meta, etc.) and are
-        governed by that third party&apos;s privacy and cookie policies, not by Uptrue. Uptrue&apos;s own
+        governed by that third party&apos;s privacy and cookie policies, not by Upnotify. Upnotify&apos;s own
         analytics are never injected on white-label pages.
       </p>
 

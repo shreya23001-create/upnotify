@@ -67,7 +67,7 @@ export default function WordPressWhiteScreenOfDeathPage(): React.ReactElement {
           '@type': 'Article',
           headline: 'WordPress White Screen of Death: How to Detect It Before Your Visitors Do',
           description: 'What causes the WordPress WSOD, how to fix it, and how to set up keyword monitoring that detects a blank page in under 60 seconds.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-03-13',
           dateModified: '2026-03-13',
@@ -204,10 +204,10 @@ export default function WordPressWhiteScreenOfDeathPage(): React.ReactElement {
           This is why keyword monitoring exists.
         </p>
 
-        <h2>How to detect the WSOD with Uptrue</h2>
+        <h2>How to detect the WSOD with Upnotify</h2>
 
         <p>
-          <Link href="/signup">Uptrue&apos;s keyword monitoring</Link> solves this problem by checking what your page actually contains, not just whether the server responded. If your content disappears — for any reason — you know about it in under a minute.
+          <Link href="/signup">Upnotify&apos;s keyword monitoring</Link> solves this problem by checking what your page actually contains, not just whether the server responded. If your content disappears — for any reason — you know about it in under a minute.
         </p>
 
         <h3>Step 1: Set up a keyword monitor for your homepage</h3>
@@ -224,7 +224,7 @@ export default function WordPressWhiteScreenOfDeathPage(): React.ReactElement {
         </ol>
 
         <p>
-          When the WSOD hits, your homepage becomes blank. The keyword is gone. Uptrue detects the missing content within 60 seconds and sends you an alert.
+          When the WSOD hits, your homepage becomes blank. The keyword is gone. Upnotify detects the missing content within 60 seconds and sends you an alert.
         </p>
 
         <h3>Step 2: Monitor your critical pages too</h3>
@@ -340,7 +340,7 @@ export default function WordPressWhiteScreenOfDeathPage(): React.ReactElement {
         </p>
 
         <p>
-          Uptrue monitors your site every 60 seconds and alerts you on Slack, email, or Teams the moment something goes wrong — from full outages to subtle content changes that only a keyword monitor catches.
+          Upnotify monitors your site every 60 seconds and alerts you on Slack, email, or Teams the moment something goes wrong — from full outages to subtle content changes that only a keyword monitor catches.
         </p>
 
         <p>
@@ -348,7 +348,7 @@ export default function WordPressWhiteScreenOfDeathPage(): React.ReactElement {
         </p>
 
         <p>
-          Uptrue checks your pages every 60 seconds. If your content disappears, you know in under a minute.
+          Upnotify checks your pages every 60 seconds. If your content disappears, you know in under a minute.
         </p>
 
         <div className="blog-cta-section">
@@ -375,7 +375,7 @@ export default function WordPressWhiteScreenOfDeathPage(): React.ReactElement {
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

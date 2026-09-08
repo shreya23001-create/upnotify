@@ -6,12 +6,12 @@ import Faq from '@/components/landing/faq'
 import { ScrollReveal } from '@/components/landing/scroll-reveal'
 
 export const metadata: Metadata = {
-  title: 'Free Port Checker — Check If a TCP Port Is Open | Uptrue',
+  title: 'Free Port Checker — Check If a TCP Port Is Open | Upnotify',
   description:
     'Check if any TCP port is open on any host. Test ports 80, 443, 22, 3306, and more. Free open port checker, instant results, no signup required.',
   alternates: { canonical: 'https://uptrue.io/tools/port-checker' },
   openGraph: {
-    title: 'Free Port Checker — Check If a TCP Port Is Open | Uptrue',
+    title: 'Free Port Checker — Check If a TCP Port Is Open | Upnotify',
     description:
       'Check if any TCP port is open on any host. Test ports 80, 443, 22, 3306, and more instantly.',
     url: 'https://uptrue.io/tools/port-checker',
@@ -116,7 +116,7 @@ export default function PortCheckerPage(): React.ReactElement {
         <div className="tools-cta reveal">
           <h2>Monitor your ports 24/7</h2>
           <p>
-            Uptrue&apos;s <Link href="/monitoring/port-monitoring">port check monitoring</Link> watches any TCP
+            Upnotify&apos;s <Link href="/monitoring/port-monitoring">port check monitoring</Link> watches any TCP
             port every minute and alerts you instantly if it stops accepting connections. Pair it with{' '}
             <Link href="/monitoring/ping-monitoring">ping/reachability monitoring</Link> so you can tell a port
             issue from a host outage at a glance.

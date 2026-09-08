@@ -530,7 +530,7 @@ function CitationTab({ engines, freeEngineIds, runs, planSlug, runsThisMonth, mo
           <div className="aiv-field">
             <label className="aiv-label">Brand / product name <span className="aiv-label-hint">(optional)</span></label>
             <input className="form-input" type="text" value={brand}
-              onChange={e => setBrand(e.target.value)} placeholder="e.g. Uptrue" maxLength={100} />
+              onChange={e => setBrand(e.target.value)} placeholder="e.g. Upnotify" maxLength={100} />
           </div>
 
           <div className="aiv-field">

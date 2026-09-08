@@ -1,9 +1,9 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'AI Content Disclaimer — Uptrue',
+  title: 'AI Content Disclaimer — Upnotify',
   description:
-    'How Uptrue uses artificial intelligence for report summaries, score analysis, and competitive intelligence. Important limitations and disclaimers.',
+    'How Upnotify uses artificial intelligence for report summaries, score analysis, and competitive intelligence. Important limitations and disclaimers.',
   alternates: { canonical: 'https://uptrue.io/ai-disclaimer' },
 }
 
@@ -13,9 +13,9 @@ export default function AIDisclaimerPage(): React.ReactElement {
       <h1>AI Content Disclaimer</h1>
       <p className="legal-updated">Last updated: April 2026</p>
 
-      <h2>1. How Uptrue Uses AI</h2>
+      <h2>1. How Upnotify Uses AI</h2>
       <p>
-        Uptrue uses artificial intelligence technology provided by <strong>Anthropic</strong> (Claude)
+        Upnotify uses artificial intelligence technology provided by <strong>Anthropic</strong> (Claude)
         to generate certain content within the platform. AI is currently used for:
       </p>
       <ul>
@@ -35,7 +35,7 @@ export default function AIDisclaimerPage(): React.ReactElement {
 
       <h2>2. Informational Purposes Only</h2>
       <p>
-        All AI-generated content on Uptrue is provided <strong>for informational purposes only</strong>.
+        All AI-generated content on Upnotify is provided <strong>for informational purposes only</strong>.
         It is intended to supplement &mdash; not replace &mdash; your own analysis, professional
         judgement, and decision-making processes.
       </p>
@@ -43,7 +43,7 @@ export default function AIDisclaimerPage(): React.ReactElement {
       <h2>3. Accuracy and Reliability</h2>
       <p>
         While we strive to provide useful and accurate AI-generated insights, artificial intelligence
-        can and does make mistakes. <strong>Uptrue does not guarantee the accuracy, completeness,
+        can and does make mistakes. <strong>Upnotify does not guarantee the accuracy, completeness,
         reliability, or timeliness of any AI-generated content.</strong>
       </p>
       <p>
@@ -81,7 +81,7 @@ export default function AIDisclaimerPage(): React.ReactElement {
 
       <h2>5. Limitation of Liability</h2>
       <p>
-        Uptrue and Vision Software Solutions Limited are <strong>not liable</strong> for any decisions
+        Upnotify and Vision Software Solutions Limited are <strong>not liable</strong> for any decisions
         made, actions taken, or losses incurred based on AI-generated content. This includes, but is
         not limited to, decisions regarding infrastructure changes, service provider selection,
         incident response, or business strategy.
@@ -97,7 +97,7 @@ export default function AIDisclaimerPage(): React.ReactElement {
 
       <h2>7. No Professional Advice</h2>
       <p>
-        AI-generated content on Uptrue does not constitute professional advice of any kind, including
+        AI-generated content on Upnotify does not constitute professional advice of any kind, including
         but not limited to technical, legal, financial, or security advice. For enterprise-critical
         decisions or specialised guidance, always consult a qualified professional in the relevant
         field.
@@ -113,11 +113,11 @@ export default function AIDisclaimerPage(): React.ReactElement {
 
       <h2>9. Automated Outage Detection Reports</h2>
       <p>
-        Uptrue publishes <strong>automated monitoring reports</strong> when our systems detect a possible
+        Upnotify publishes <strong>automated monitoring reports</strong> when our systems detect a possible
         issue with a publicly tracked website or service. These reports are:
       </p>
       <ul>
-        <li>Generated automatically using AI based on Uptrue&apos;s own monitoring data and publicly available sources</li>
+        <li>Generated automatically using AI based on Upnotify&apos;s own monitoring data and publicly available sources</li>
         <li>Reviewed and approved by a human administrator before publication</li>
         <li>Written using cautious, hedged language (e.g. &ldquo;may be experiencing&rdquo;, &ldquo;possible issue&rdquo;) to reflect
           that our detection is an indication, not a confirmed outage</li>
@@ -126,20 +126,20 @@ export default function AIDisclaimerPage(): React.ReactElement {
 
       <h3>9.1 Independence and No Affiliation</h3>
       <p>
-        Uptrue is an <strong>independent monitoring service</strong>. We have no affiliation, partnership, or
+        Upnotify is an <strong>independent monitoring service</strong>. We have no affiliation, partnership, or
         commercial relationship with any company whose services we monitor or report on. Monitoring reports
         do not imply endorsement, criticism, or any business relationship with the companies mentioned.
       </p>
 
       <h3>9.2 Accuracy and Sources</h3>
       <p>
-        Automated reports draw on Uptrue&apos;s own detection data alongside publicly available sources
+        Automated reports draw on Upnotify&apos;s own detection data alongside publicly available sources
         including official status pages, news publications, and social media posts. All external sources
         are attributed with links. We do not fabricate information. Where facts are uncertain, reports
         use explicit hedging (&ldquo;details are still emerging&rdquo;, &ldquo;reports suggest&rdquo;).
       </p>
       <p>
-        <strong>Uptrue does not guarantee the accuracy, completeness, or timeliness of automated monitoring
+        <strong>Upnotify does not guarantee the accuracy, completeness, or timeliness of automated monitoring
         reports.</strong> The situation may have changed since the report was published. Always check the
         relevant company&apos;s official status page for authoritative updates.
       </p>
@@ -153,7 +153,7 @@ export default function AIDisclaimerPage(): React.ReactElement {
         that affect many people.
       </p>
       <p>
-        All reports use honest, hedged language that represents Uptrue&apos;s genuine, reasonable belief
+        All reports use honest, hedged language that represents Upnotify&apos;s genuine, reasonable belief
         based on monitoring data at the time of detection. This approach is consistent with the honest
         opinion defence under <strong>Section 3 of the UK Defamation Act 2013</strong>.
       </p>

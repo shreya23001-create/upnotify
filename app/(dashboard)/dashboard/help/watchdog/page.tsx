@@ -10,7 +10,7 @@ const FAQ_SCHEMA = {
   mainEntity: [
     {
       '@type': 'Question',
-      name: 'What does Watchdog do in Uptrue?',
+      name: 'What does Watchdog do in Upnotify?',
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'Watchdog monitors the uptime and response time of competitor websites you choose, so you can compare their reliability against your own sites. You get side-by-side data showing who has better uptime and faster response times.',
@@ -18,7 +18,7 @@ const FAQ_SCHEMA = {
     },
     {
       '@type': 'Question',
-      name: 'How many sites can I track with Watchdog on each Uptrue plan?',
+      name: 'How many sites can I track with Watchdog on each Upnotify plan?',
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'Free plan: 3 sites. Lite plan: 5 sites. Builder plan: 10 sites. Scale plan: 25 sites. These limits are per workspace.',
@@ -60,14 +60,14 @@ export default function WatchdogHelpPage(): React.ReactElement {
               Knowing your own uptime is good. Knowing how it compares to the
               competition is better. Watchdog lets you monitor any website —
               a direct competitor, an industry leader, or anyone you want to
-              benchmark against — right inside your Uptrue dashboard.
+              benchmark against — right inside your Upnotify dashboard.
             </p>
           </div>
 
           <section className="help-section">
             <h2 className="help-section-title">What Watchdog does</h2>
             <p>
-              Uptrue checks the websites you add to Watchdog every few minutes,
+              Upnotify checks the websites you add to Watchdog every few minutes,
               tracking their uptime and response time the same way it tracks your
               own monitors. You get a live side-by-side comparison showing who is
               more reliable and who is faster.
@@ -85,7 +85,7 @@ export default function WatchdogHelpPage(): React.ReactElement {
               <li>Go to <strong>Watchdog</strong> in the sidebar.</li>
               <li>Click <strong>Add Site</strong>.</li>
               <li>Enter their domain (e.g. <code>example.com</code>).</li>
-              <li>Uptrue starts monitoring immediately — the first data point appears within minutes.</li>
+              <li>Upnotify starts monitoring immediately — the first data point appears within minutes.</li>
             </ol>
             <p>
               You do not need an account with them or any special access. Watchdog
@@ -134,7 +134,7 @@ export default function WatchdogHelpPage(): React.ReactElement {
             <h2 className="help-section-title">Important notice</h2>
             <p>
               Watchdog monitors publicly accessible URLs using standard HTTP requests — the same way any
-              web browser or visitor would. Data reflects Uptrue&apos;s independent observations and is not
+              web browser or visitor would. Data reflects Upnotify&apos;s independent observations and is not
               provided by, endorsed by, or affiliated with any of the services you choose to monitor.
             </p>
             <p>

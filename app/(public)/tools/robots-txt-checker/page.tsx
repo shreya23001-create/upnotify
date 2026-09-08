@@ -6,12 +6,12 @@ import Faq from '@/components/landing/faq'
 import { ScrollReveal } from '@/components/landing/scroll-reveal'
 
 export const metadata: Metadata = {
-  title: 'Free robots.txt Checker & Validator — Test Your robots.txt | Uptrue',
+  title: 'Free robots.txt Checker & Validator — Test Your robots.txt | Upnotify',
   description:
     'Check and validate your robots.txt file instantly. See if you\'re accidentally blocking Googlebot, find missing sitemaps, and validate crawl rules. Free tool.',
   alternates: { canonical: 'https://uptrue.io/tools/robots-txt-checker' },
   openGraph: {
-    title: 'Free robots.txt Checker & Validator — Test Your robots.txt | Uptrue',
+    title: 'Free robots.txt Checker & Validator — Test Your robots.txt | Upnotify',
     description:
       'Validate your robots.txt instantly. Check Googlebot access, missing sitemaps, and crawl rules.',
     url: 'https://uptrue.io/tools/robots-txt-checker',
@@ -119,7 +119,7 @@ export default function RobotsTxtCheckerPage(): React.ReactElement {
         <div className="tools-cta reveal">
           <h2>Monitor your robots.txt for changes</h2>
           <p>
-            Uptrue&apos;s <Link href="/monitoring/robots-txt-monitoring">robots.txt change monitoring</Link>{' '}
+            Upnotify&apos;s <Link href="/monitoring/robots-txt-monitoring">robots.txt change monitoring</Link>{' '}
             alerts you the moment a deploy modifies your crawl rules. Pair it with{' '}
             <Link href="/monitoring/sitemap-monitoring">sitemap validity monitoring</Link> so a broken
             sitemap reference never silently sinks your indexation.

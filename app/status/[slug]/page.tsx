@@ -26,14 +26,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     description,
     alternates: { canonical: `https://uptrue.io/status/${slug}` },
     openGraph: {
-      title: `${statusPage.name} — Status | Uptrue`,
+      title: `${statusPage.name} — Status | Upnotify`,
       description,
       url: `https://uptrue.io/status/${slug}`,
       type: 'website',
     },
     twitter: {
       card: 'summary',
-      title: `${statusPage.name} — Status | Uptrue`,
+      title: `${statusPage.name} — Status | Upnotify`,
       description,
     },
   }
@@ -108,13 +108,13 @@ export default async function PublicStatusPage({
       <nav className="sp-nav">
         <div className="sp-nav-brand">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/favicon.svg" alt="Uptrue" className="sp-nav-uptrue-logo" />
+          <img src="/favicon.svg" alt="Upnotify" className="sp-nav-uptrue-logo" />
           {statusPage.name} — Status
         </div>
         <div className="sp-nav-right">
           {!hasWhiteLabel && (
             <a href="https://uptrue.io" target="_blank" rel="noopener noreferrer" className="sp-nav-powered">
-              Powered by <span className="sp-nav-powered-brand">Uptrue</span>
+              Powered by <span className="sp-nav-powered-brand">Upnotify</span>
             </a>
           )}
           <div className={`sp-nav-status ${anyDown ? 'down' : openIncidents.length > 0 ? 'warn' : 'up'}`}>
@@ -204,7 +204,7 @@ export default async function PublicStatusPage({
         {!hasWhiteLabel && (
           <div className="sp-footer">
             <div className="sp-footer-text">
-              Powered by <span className="sp-footer-brand">Uptrue</span>{' \u00b7 '}
+              Powered by <span className="sp-footer-brand">Upnotify</span>{' \u00b7 '}
               <a href="/privacy">Privacy</a>{' \u00b7 '}
               <a href="https://uptrue.io" target="_blank" rel="noopener noreferrer">uptrue.io</a>
             </div>

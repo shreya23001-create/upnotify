@@ -6,12 +6,12 @@ import Faq from '@/components/landing/faq'
 export const metadata: Metadata = {
   title: 'WordPress Core Web Vitals Failing: How LCP, FID, and CLS Failures Hurt Your Traffic',
   description:
-    'Your WordPress site is failing Core Web Vitals — LCP over 2.5 seconds, poor FID from heavy plugins, and CLS from ads and lazy loading. Google uses these metrics for ranking. Learn what causes each failure, how to fix them, and how Uptrue HTTP monitoring tracks TTFB as the server component of LCP.',
+    'Your WordPress site is failing Core Web Vitals — LCP over 2.5 seconds, poor FID from heavy plugins, and CLS from ads and lazy loading. Google uses these metrics for ranking. Learn what causes each failure, how to fix them, and how Upnotify HTTP monitoring tracks TTFB as the server component of LCP.',
   alternates: { canonical: 'https://uptrue.io/blog/wordpress-core-web-vitals' },
   openGraph: {
     title: 'WordPress Core Web Vitals Failing: How LCP, FID, and CLS Failures Hurt Your Traffic',
     description:
-      'Why WordPress sites fail Core Web Vitals, how LCP, FID, and CLS failures hurt Google rankings, and how Uptrue HTTP monitoring tracks server-side performance.',
+      'Why WordPress sites fail Core Web Vitals, how LCP, FID, and CLS failures hurt Google rankings, and how Upnotify HTTP monitoring tracks server-side performance.',
     url: 'https://uptrue.io/blog/wordpress-core-web-vitals',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'WordPress Core Web Vitals Failing: How LCP, FID, and CLS Failures Hurt Your Traffic',
     description:
-      'Why WordPress sites fail Core Web Vitals, how LCP, FID, and CLS failures hurt Google rankings, and how Uptrue HTTP monitoring tracks server-side performance.',
+      'Why WordPress sites fail Core Web Vitals, how LCP, FID, and CLS failures hurt Google rankings, and how Upnotify HTTP monitoring tracks server-side performance.',
   },
 }
 
@@ -41,9 +41,9 @@ const FAQ_DATA = [
       'WordPress plugins degrade Core Web Vitals in three ways. First, every plugin that adds JavaScript increases the total JavaScript payload — sliders, analytics tools, chat widgets, social sharing buttons, and page builders all add scripts that compete for CPU time, increasing FID and INP. Second, plugins that inject above-the-fold content without reserved dimensions — cookie consent banners, notification bars, email popup overlays — cause layout shifts that increase CLS. Third, plugins that add database queries to every page load increase server response time (TTFB), which directly affects LCP. The average WordPress site loads scripts from 10-15 different plugins on every page. Removing or replacing even a few heavy plugins can dramatically improve all three Core Web Vitals metrics.',
   },
   {
-    question: 'Can Uptrue monitor Core Web Vitals on my WordPress site?',
+    question: 'Can Upnotify monitor Core Web Vitals on my WordPress site?',
     answer:
-      'Uptrue HTTP monitoring tracks Time to First Byte (TTFB) on every check — the server-side component that directly affects LCP. TTFB measures how long it takes your server to start sending the response after receiving the request. If your TTFB climbs from 400ms to 2 seconds due to a plugin conflict, database issue, or hosting problem, Uptrue detects the increase and alerts you. While full Core Web Vitals measurement requires real browser rendering (which tools like Google PageSpeed Insights and Chrome UX Report provide), TTFB monitoring catches the server-side performance problems that are the most common root cause of LCP failures on WordPress sites.',
+      'Upnotify HTTP monitoring tracks Time to First Byte (TTFB) on every check — the server-side component that directly affects LCP. TTFB measures how long it takes your server to start sending the response after receiving the request. If your TTFB climbs from 400ms to 2 seconds due to a plugin conflict, database issue, or hosting problem, Upnotify detects the increase and alerts you. While full Core Web Vitals measurement requires real browser rendering (which tools like Google PageSpeed Insights and Chrome UX Report provide), TTFB monitoring catches the server-side performance problems that are the most common root cause of LCP failures on WordPress sites.',
   },
 ]
 
@@ -66,8 +66,8 @@ export default function WordPressCoreWebVitalsPage(): React.ReactElement {
           '@context': 'https://schema.org',
           '@type': 'Article',
           headline: 'WordPress Core Web Vitals Failing: How LCP, FID, and CLS Failures Hurt Your Traffic',
-          description: 'Why WordPress sites fail Core Web Vitals, how to fix each metric, and how Uptrue HTTP monitoring tracks TTFB as the server component of LCP.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          description: 'Why WordPress sites fail Core Web Vitals, how to fix each metric, and how Upnotify HTTP monitoring tracks TTFB as the server component of LCP.',
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-04-04',
           dateModified: '2026-04-04',
@@ -280,14 +280,14 @@ export default function WordPressCoreWebVitalsPage(): React.ReactElement {
           provides detailed guidance on measuring and improving each metric, including field data analysis and lab testing techniques.
         </p>
 
-        <h2>How Uptrue monitors the server side of Core Web Vitals</h2>
+        <h2>How Upnotify monitors the server side of Core Web Vitals</h2>
 
         <p>
           Core Web Vitals are measured in the browser — they reflect what real visitors experience on real devices. Tools like Google PageSpeed Insights, Chrome UX Report, and Lighthouse measure the full rendering pipeline. But the server side is where many of the root causes live.
         </p>
 
         <p>
-          <Link href="/signup">Uptrue&apos;s HTTP monitoring</Link> tracks TTFB on every check — how long your server takes to start sending the response. TTFB is the foundation that LCP is built on. If your server response time doubles because a plugin conflict is generating slow queries, or your hosting provider is throttling your CPU, or your cache is not building, Uptrue detects it immediately.
+          <Link href="/signup">Upnotify&apos;s HTTP monitoring</Link> tracks TTFB on every check — how long your server takes to start sending the response. TTFB is the foundation that LCP is built on. If your server response time doubles because a plugin conflict is generating slow queries, or your hosting provider is throttling your CPU, or your cache is not building, Upnotify detects it immediately.
         </p>
 
         <h3>Step 1: Set up an HTTP monitor to track TTFB</h3>
@@ -303,7 +303,7 @@ export default function WordPressCoreWebVitalsPage(): React.ReactElement {
         </ol>
 
         <p>
-          Uptrue records response time on every check and displays it on your dashboard graph. You can see TTFB trends over time — whether your server is getting slower day by day, whether there are spikes at specific times, and whether a change you made (installing a plugin, updating WordPress, changing hosting) improved or degraded server response time.
+          Upnotify records response time on every check and displays it on your dashboard graph. You can see TTFB trends over time — whether your server is getting slower day by day, whether there are spikes at specific times, and whether a change you made (installing a plugin, updating WordPress, changing hosting) improved or degraded server response time.
         </p>
 
         <h3>Step 2: Monitor critical landing pages individually</h3>
@@ -315,13 +315,13 @@ export default function WordPressCoreWebVitalsPage(): React.ReactElement {
         <h3>Step 3: Monitor after every change</h3>
 
         <p>
-          Core Web Vitals on WordPress change every time you install a plugin, update a theme, add a script, or change your hosting configuration. After any change, watch your Uptrue response time graph for the next 24 hours. If TTFB increased, the change made your server slower. If TTFB decreased, the change helped. This data-driven approach replaces guessing with measurement.
+          Core Web Vitals on WordPress change every time you install a plugin, update a theme, add a script, or change your hosting configuration. After any change, watch your Upnotify response time graph for the next 24 hours. If TTFB increased, the change made your server slower. If TTFB decreased, the change helped. This data-driven approach replaces guessing with measurement.
         </p>
 
         <h3>Step 4: Set response time thresholds</h3>
 
         <p>
-          Configure Uptrue to alert you when response time exceeds a threshold that matters for your LCP target. If you need LCP under 2.5 seconds and your page content takes 500ms to render after receiving the first byte, your TTFB budget is 2 seconds. Set an alert for when TTFB exceeds 1.5 seconds — giving you a warning buffer before it impacts your Core Web Vitals score.
+          Configure Upnotify to alert you when response time exceeds a threshold that matters for your LCP target. If you need LCP under 2.5 seconds and your page content takes 500ms to render after receiving the first byte, your TTFB budget is 2 seconds. Set an alert for when TTFB exceeds 1.5 seconds — giving you a warning buffer before it impacts your Core Web Vitals score.
         </p>
 
         <div className="blog-cta-section">
@@ -345,7 +345,7 @@ export default function WordPressCoreWebVitalsPage(): React.ReactElement {
         </p>
 
         <p>
-          This is why server-side monitoring is essential for Core Web Vitals. Google PageSpeed Insights tells you that your LCP is 4.2 seconds. Uptrue tells you that 2.1 seconds of that is TTFB — immediately pointing you to the server as the root cause instead of spending hours optimising images and CSS that account for the other 2.1 seconds.
+          This is why server-side monitoring is essential for Core Web Vitals. Google PageSpeed Insights tells you that your LCP is 4.2 seconds. Upnotify tells you that 2.1 seconds of that is TTFB — immediately pointing you to the server as the root cause instead of spending hours optimising images and CSS that account for the other 2.1 seconds.
         </p>
 
         <h2>Stop losing Google rankings to slow server response</h2>
@@ -359,7 +359,7 @@ export default function WordPressCoreWebVitalsPage(): React.ReactElement {
         </p>
 
         <p>
-          Uptrue tracks your server response time every 60 seconds. When TTFB increases — whether from a plugin conflict, a hosting issue, or a traffic spike — you know immediately. You fix the server-side component of LCP before Google&apos;s next crawl measures the degradation and adjusts your rankings.
+          Upnotify tracks your server response time every 60 seconds. When TTFB increases — whether from a plugin conflict, a hosting issue, or a traffic spike — you know immediately. You fix the server-side component of LCP before Google&apos;s next crawl measures the degradation and adjusts your rankings.
         </p>
 
         <div className="blog-cta-section">
@@ -386,7 +386,7 @@ export default function WordPressCoreWebVitalsPage(): React.ReactElement {
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

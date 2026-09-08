@@ -6,7 +6,7 @@ import { getTicketById, getMessages } from '@/lib/db/support'
 import { TicketThread } from '@/components/support/ticket-thread'
 import { IconArrowLeft } from '@/components/icons'
 
-export const metadata: Metadata = { title: 'Ticket — Uptrue Support' }
+export const metadata: Metadata = { title: 'Ticket — Upnotify Support' }
 
 interface PageProps {
   params: Promise<{ id: string }>

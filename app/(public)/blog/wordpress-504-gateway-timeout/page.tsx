@@ -38,7 +38,7 @@ const FAQ_DATA = [
   {
     question: 'Can uptime monitoring detect 504 Gateway Timeout errors?',
     answer:
-      'Yes. A 504 Gateway Timeout returns a clear 504 HTTP status code. Any HTTP uptime monitor that checks for a 200 response will detect a 504 immediately. Uptrue HTTP monitoring checks your site every 60 seconds and alerts you the moment a 504 is returned. Uptrue also tracks response time trends over time, so you can see your site getting slower before it hits the timeout threshold — giving you a chance to fix the problem before it causes a full 504.',
+      'Yes. A 504 Gateway Timeout returns a clear 504 HTTP status code. Any HTTP uptime monitor that checks for a 200 response will detect a 504 immediately. Upnotify HTTP monitoring checks your site every 60 seconds and alerts you the moment a 504 is returned. Upnotify also tracks response time trends over time, so you can see your site getting slower before it hits the timeout threshold — giving you a chance to fix the problem before it causes a full 504.',
   },
   {
     question: 'How do I fix a 504 Gateway Timeout on WordPress?',
@@ -67,7 +67,7 @@ export default function WordPress504GatewayTimeoutPage(): React.ReactElement {
           '@type': 'Article',
           headline: '504 Gateway Timeout on WordPress: Why Your Pages Take Forever and Then Fail',
           description: 'What causes 504 Gateway Timeout on WordPress, how to fix each cause, and how HTTP monitoring detects them and tracks response time degradation.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-03-24',
           dateModified: '2026-03-24',
@@ -229,10 +229,10 @@ export default function WordPress504GatewayTimeoutPage(): React.ReactElement {
           This means the 504 is actually an opportunity. If you track response times over time, you can see the degradation happening before it causes an outage. A site averaging 500ms that suddenly averages 3 seconds is already in trouble — even though it is still loading for visitors. If you catch it at 3 seconds, you can fix the problem before it hits 60 seconds and triggers a 504. If you wait for the 504, you are already in an outage.
         </p>
 
-        <h2>How to detect 504 errors and performance degradation with Uptrue</h2>
+        <h2>How to detect 504 errors and performance degradation with Upnotify</h2>
 
         <p>
-          <Link href="/signup">Uptrue&apos;s HTTP monitoring</Link> catches 504 errors the moment they happen. But more importantly, it tracks response time trends so you can see your site slowing down before it reaches the timeout threshold.
+          <Link href="/signup">Upnotify&apos;s HTTP monitoring</Link> catches 504 errors the moment they happen. But more importantly, it tracks response time trends so you can see your site slowing down before it reaches the timeout threshold.
         </p>
 
         <h3>Step 1: Set up an HTTP monitor to catch 504 status codes</h3>
@@ -248,13 +248,13 @@ export default function WordPress504GatewayTimeoutPage(): React.ReactElement {
         </ol>
 
         <p>
-          The moment your site returns a 504 instead of 200, Uptrue triggers an alert. Uptrue uses a two-confirmation check — if the first check fails, it retries from a different location before alerting. This eliminates false positives from momentary network issues while still catching real 504 errors within two minutes.
+          The moment your site returns a 504 instead of 200, Upnotify triggers an alert. Upnotify uses a two-confirmation check — if the first check fails, it retries from a different location before alerting. This eliminates false positives from momentary network issues while still catching real 504 errors within two minutes.
         </p>
 
         <h3>Step 2: Track response time trends to catch slowdowns early</h3>
 
         <p>
-          Every HTTP check records the response time. Uptrue displays this as a trend over time in your dashboard. A healthy site shows a flat line around a consistent response time. A site heading towards a 504 shows a gradual upward trend — response times creeping higher week by week.
+          Every HTTP check records the response time. Upnotify displays this as a trend over time in your dashboard. A healthy site shows a flat line around a consistent response time. A site heading towards a 504 shows a gradual upward trend — response times creeping higher week by week.
         </p>
 
         <p>
@@ -348,7 +348,7 @@ export default function WordPress504GatewayTimeoutPage(): React.ReactElement {
         </p>
 
         <p>
-          Uptrue checks your site every 60 seconds and records the response time on every check. The moment a 504 is returned, you know. But more importantly, you can see the trend. You can see your site slowing down from 400ms to 2 seconds to 8 seconds — and you can fix it before it reaches the 60-second timeout that triggers the error.
+          Upnotify checks your site every 60 seconds and records the response time on every check. The moment a 504 is returned, you know. But more importantly, you can see the trend. You can see your site slowing down from 400ms to 2 seconds to 8 seconds — and you can fix it before it reaches the 60-second timeout that triggers the error.
         </p>
 
         <div className="blog-cta-section">
@@ -375,7 +375,7 @@ export default function WordPress504GatewayTimeoutPage(): React.ReactElement {
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

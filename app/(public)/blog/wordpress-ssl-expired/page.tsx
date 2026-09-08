@@ -6,7 +6,7 @@ import Faq from '@/components/landing/faq'
 export const metadata: Metadata = {
   title: 'WordPress SSL Certificate Expired? Here\'s How to Never Let It Happen Again',
   description:
-    'Let\'s Encrypt auto-renew fails silently more often than you think. DNS changes, server misconfigurations, and hosting migrations all break automatic renewal. Learn what happens when your SSL expires, how to fix it, and how Uptrue warns you 30, 14, and 7 days before expiry.',
+    'Let\'s Encrypt auto-renew fails silently more often than you think. DNS changes, server misconfigurations, and hosting migrations all break automatic renewal. Learn what happens when your SSL expires, how to fix it, and how Upnotify warns you 30, 14, and 7 days before expiry.',
   alternates: { canonical: 'https://uptrue.io/blog/wordpress-ssl-expired' },
   openGraph: {
     title: 'WordPress SSL Certificate Expired? Here\'s How to Never Let It Happen Again',
@@ -41,9 +41,9 @@ const FAQ_DATA = [
       'Yes. Google has used HTTPS as a ranking signal since 2014. When your SSL expires and your site serves security warnings, Google cannot crawl your pages properly. If the expiry lasts long enough for Google to recrawl, your pages may be deindexed or demoted. Recovering rankings after an SSL outage can take days to weeks depending on how long the certificate was expired and how frequently Google crawls your site.',
   },
   {
-    question: 'Can Uptrue monitor my SSL certificate expiry date?',
+    question: 'Can Upnotify monitor my SSL certificate expiry date?',
     answer:
-      'Yes. Uptrue\'s SSL monitor checks your certificate on every scan and tracks the expiry date. It sends alerts at 30 days, 14 days, and 7 days before expiry — giving you multiple warnings before anything breaks. It also detects certificate chain issues, mismatched domains, and revoked certificates. You can also use the free SSL Checker tool at uptrue.io/tools/ssl-checker to check any domain instantly without signing up.',
+      'Yes. Upnotify\'s SSL monitor checks your certificate on every scan and tracks the expiry date. It sends alerts at 30 days, 14 days, and 7 days before expiry — giving you multiple warnings before anything breaks. It also detects certificate chain issues, mismatched domains, and revoked certificates. You can also use the free SSL Checker tool at uptrue.io/tools/ssl-checker to check any domain instantly without signing up.',
   },
 ]
 
@@ -67,7 +67,7 @@ export default function WordPressSSLExpiredPage(): React.ReactElement {
           '@type': 'Article',
           headline: 'WordPress SSL Certificate Expired? Here\'s How to Never Let It Happen Again',
           description: 'Why Let\'s Encrypt auto-renew fails silently, what visitors see when SSL expires, and how SSL monitoring warns you weeks before it happens.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-04-03',
           dateModified: '2026-04-03',
@@ -205,7 +205,7 @@ export default function WordPressSSLExpiredPage(): React.ReactElement {
           Click the padlock icon in your browser&apos;s address bar. In Chrome, click &quot;Connection is secure&quot; then &quot;Certificate is valid.&quot; You will see the expiry date under &quot;Valid to.&quot; If the date is within 30 days, you should investigate whether auto-renewal is working.
         </p>
 
-        <h3>Check instantly with Uptrue&apos;s free SSL Checker</h3>
+        <h3>Check instantly with Upnotify&apos;s free SSL Checker</h3>
 
         <p>
           Go to <Link href="/tools/ssl-checker">uptrue.io/tools/ssl-checker</Link> and enter your domain. The tool shows your certificate issuer, expiry date, certificate chain status, and any configuration issues — all in a single scan. No signup required.
@@ -256,14 +256,14 @@ export default function WordPressSSLExpiredPage(): React.ReactElement {
           <Link href="/blog/wordpress-too-many-redirects">WordPress redirect loops</Link> for details.
         </p>
 
-        <h2>How to detect SSL expiry before it happens with Uptrue</h2>
+        <h2>How to detect SSL expiry before it happens with Upnotify</h2>
 
         <p>
           Fixing an expired certificate is straightforward. The problem is knowing it expired in the first place. Most site owners find out from a customer complaint, a drop in Google Search Console, or stumbling onto their own site on a phone. By then, the damage is done.
         </p>
 
         <p>
-          <Link href="/signup">Uptrue&apos;s SSL monitoring</Link> checks your certificate on every scan and warns you well before it expires — so you fix the renewal problem before your visitors ever see a warning.
+          <Link href="/signup">Upnotify&apos;s SSL monitoring</Link> checks your certificate on every scan and warns you well before it expires — so you fix the renewal problem before your visitors ever see a warning.
         </p>
 
         <h3>Step 1: Add an SSL monitor for your domain</h3>
@@ -279,7 +279,7 @@ export default function WordPressSSLExpiredPage(): React.ReactElement {
         </ol>
 
         <p>
-          Uptrue checks the certificate on every scan and tracks the days remaining until expiry. When the count hits your thresholds, you get an alert. Three separate warnings — at 30, 14, and 7 days — give you plenty of time to investigate and fix the renewal issue.
+          Upnotify checks the certificate on every scan and tracks the days remaining until expiry. When the count hits your thresholds, you get an alert. Three separate warnings — at 30, 14, and 7 days — give you plenty of time to investigate and fix the renewal issue.
         </p>
 
         <h3>Step 2: Add an HTTP monitor as a safety net</h3>
@@ -299,7 +299,7 @@ export default function WordPressSSLExpiredPage(): React.ReactElement {
         <h3>Step 3: Monitor certificate chain and configuration issues</h3>
 
         <p>
-          Uptrue&apos;s SSL monitor does not just check the expiry date. It also validates:
+          Upnotify&apos;s SSL monitor does not just check the expiry date. It also validates:
         </p>
 
         <ul>
@@ -376,7 +376,7 @@ export default function WordPressSSLExpiredPage(): React.ReactElement {
         </p>
 
         <p>
-          Uptrue monitors your SSL certificate on every check. It warns you 30, 14, and 7 days before expiry. It validates your certificate chain, checks for configuration issues, and alerts you on Slack, Teams, email, or webhook. If auto-renewal fails, you know about it weeks before your visitors do.
+          Upnotify monitors your SSL certificate on every check. It warns you 30, 14, and 7 days before expiry. It validates your certificate chain, checks for configuration issues, and alerts you on Slack, Teams, email, or webhook. If auto-renewal fails, you know about it weeks before your visitors do.
         </p>
 
         <div className="blog-cta-section">
@@ -403,7 +403,7 @@ export default function WordPressSSLExpiredPage(): React.ReactElement {
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

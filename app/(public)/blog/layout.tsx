@@ -10,13 +10,13 @@ export const metadata: Metadata = {
     template: '%s',
   },
   description:
-    'Guides, tutorials, and insights on website monitoring, uptime, SSL, status pages, and infrastructure reliability. Written by the Uptrue team.',
+    'Guides, tutorials, and insights on website monitoring, uptime, SSL, status pages, and infrastructure reliability. Written by the Upnotify team.',
   openGraph: {
-    title: 'Uptrue Blog — Website Monitoring Guides & Insights',
+    title: 'Upnotify Blog — Website Monitoring Guides & Insights',
     description:
       'Guides, tutorials, and insights on website monitoring, uptime, SSL, status pages, and infrastructure reliability.',
     url: 'https://uptrue.io/blog',
-    siteName: 'Uptrue',
+    siteName: 'Upnotify',
   },
 }
 

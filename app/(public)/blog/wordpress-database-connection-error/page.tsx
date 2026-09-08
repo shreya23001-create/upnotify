@@ -67,7 +67,7 @@ export default function WordPressDatabaseConnectionErrorPage(): React.ReactEleme
           '@type': 'Article',
           headline: 'Error Establishing a Database Connection in WordPress: Complete Fix and Monitoring Guide',
           description: 'What causes the WordPress database connection error, how to fix each cause, and how to set up monitoring so you catch it before your visitors do.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-03-11',
           dateModified: '2026-03-11',
@@ -220,10 +220,10 @@ export default function WordPressDatabaseConnectionErrorPage(): React.ReactEleme
           Your site is up. It is just not working.
         </p>
 
-        <h2>How to monitor for this error with Uptrue</h2>
+        <h2>How to monitor for this error with Upnotify</h2>
 
         <p>
-          This is exactly the kind of failure that <Link href="/signup">Uptrue</Link> is built to catch. You need two types of monitors working together: an HTTP monitor and a keyword monitor.
+          This is exactly the kind of failure that <Link href="/signup">Upnotify</Link> is built to catch. You need two types of monitors working together: an HTTP monitor and a keyword monitor.
         </p>
 
         <h3>Step 1: Set up an HTTP monitor</h3>
@@ -340,7 +340,7 @@ export default function WordPressDatabaseConnectionErrorPage(): React.ReactEleme
         </p>
 
         <p>
-          Uptrue monitors your site every 60 seconds and alerts you on Slack, email, or Teams the moment something goes wrong — from full outages to subtle content changes that only a keyword monitor catches.
+          Upnotify monitors your site every 60 seconds and alerts you on Slack, email, or Teams the moment something goes wrong — from full outages to subtle content changes that only a keyword monitor catches.
         </p>
 
         <p>
@@ -375,7 +375,7 @@ export default function WordPressDatabaseConnectionErrorPage(): React.ReactEleme
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

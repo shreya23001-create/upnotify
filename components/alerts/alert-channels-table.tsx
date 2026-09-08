@@ -16,7 +16,8 @@ const TYPE_META: Record<string, { label: string; icon: React.ReactNode; color: s
   teams: { label: 'Teams', icon: <Users size={16} />, color: '#3b82f6', bg: 'rgba(59,130,246,0.12)' },
   whatsapp: { label: 'WhatsApp', icon: <MessageSquare size={16} />, color: '#22c55e', bg: 'rgba(34,197,94,0.12)' },
   voice: { label: 'Voice', icon: <Phone size={16} />, color: '#ec4899', bg: 'rgba(236,72,153,0.12)' },
-  webhook: { label: 'Webhook', icon: <Webhook size={16} />, color: '#8b5cf6', bg: 'rgba(139,92,246,0.12)' },
+  webhook: { label: 'Webhook', icon: <Webhook size={16} />, color: '#2ee06b', bg: 'rgba(46,224,107,0.12)' },
+  telegram: { label: 'Telegram', icon: <Send size={16} />, color: '#06b6d4', bg: 'rgba(6,182,212,0.12)' },
 }
 
 const DEFAULT_META = { label: 'Channel', icon: <BellOff size={16} />, color: '#6b7280', bg: 'rgba(107,114,128,0.12)' }
@@ -27,6 +28,7 @@ interface ChannelConfig {
   slackChannel?: string
   teamsWebhookUrl?: string
   webhookUrl?: string
+  telegramChatId?: string
 }
 
 function getDestination(channel: AlertChannel): string {
@@ -36,6 +38,7 @@ function getDestination(channel: AlertChannel): string {
     case 'slack': return config.slackChannel || (config.slackWebhookUrl ? config.slackWebhookUrl.slice(0, 36) + '…' : '—')
     case 'teams': return config.teamsWebhookUrl ? config.teamsWebhookUrl.slice(0, 36) + '…' : '—'
     case 'webhook': return config.webhookUrl ? config.webhookUrl.slice(0, 36) + '…' : '—'
+    case 'telegram': return config.telegramChatId ? `Chat ID: ${config.telegramChatId}` : '—'
     default: return '—'
   }
 }

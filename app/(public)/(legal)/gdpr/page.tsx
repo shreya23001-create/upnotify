@@ -2,9 +2,9 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: 'GDPR Compliance — Uptrue',
+  title: 'GDPR Compliance — Upnotify',
   description:
-    'How Uptrue complies with the General Data Protection Regulation (GDPR). Your rights, our legal basis for processing, data location, and how to exercise your rights.',
+    'How Upnotify complies with the General Data Protection Regulation (GDPR). Your rights, our legal basis for processing, data location, and how to exercise your rights.',
   alternates: { canonical: 'https://uptrue.io/gdpr' },
 }
 
@@ -15,14 +15,14 @@ export default function GDPRPage(): React.ReactElement {
       <p className="legal-updated">Last updated: April 2026</p>
 
       <p>
-        This page explains how Uptrue complies with the General Data Protection Regulation (GDPR) and
+        This page explains how Upnotify complies with the General Data Protection Regulation (GDPR) and
         the UK GDPR. It supplements our <Link href="/privacy">Privacy Policy</Link> and provides
         specific information about your rights under data protection law.
       </p>
 
       <h2>1. Data Controller</h2>
       <p>
-        The data controller for personal data processed through the Uptrue platform is:
+        The data controller for personal data processed through the Upnotify platform is:
       </p>
       <ul>
         <li>
@@ -106,7 +106,7 @@ export default function GDPRPage(): React.ReactElement {
         <li>
           <strong>Rights Related to Automated Decision-Making:</strong> You have the right not to be
           subject to decisions based solely on automated processing that produce legal or similarly
-          significant effects. Uptrue does not currently make automated decisions of this nature.
+          significant effects. Upnotify does not currently make automated decisions of this nature.
         </li>
       </ul>
 
@@ -138,7 +138,7 @@ export default function GDPRPage(): React.ReactElement {
 
       <h2>7. Sub-processors</h2>
       <p>
-        We use a limited number of third-party sub-processors to deliver the Uptrue service. Each
+        We use a limited number of third-party sub-processors to deliver the Upnotify service. Each
         sub-processor has been assessed for GDPR compliance and is bound by appropriate data processing
         agreements. For a full list of our sub-processors, please refer to our{' '}
         <Link href="/dpa">Data Processing Agreement</Link>.

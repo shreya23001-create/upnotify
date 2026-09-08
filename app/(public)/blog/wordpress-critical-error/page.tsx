@@ -67,7 +67,7 @@ export default function WordPressCriticalErrorPage(): React.ReactElement {
           '@type': 'Article',
           headline: 'There Has Been a Critical Error on This Website: What It Means and How to Fix It',
           description: 'What causes the WordPress critical error, how to fix it step by step, and how to set up keyword monitoring that detects it automatically.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-03-14',
           dateModified: '2026-03-14',
@@ -234,10 +234,10 @@ export default function WordPressCriticalErrorPage(): React.ReactElement {
           This is why keyword monitoring is essential. It does not just check whether your server responded — it checks what the response actually contains.
         </p>
 
-        <h2>How to detect the critical error with Uptrue</h2>
+        <h2>How to detect the critical error with Upnotify</h2>
 
         <p>
-          <Link href="/signup">Uptrue&apos;s keyword monitoring</Link> catches this error by checking the actual content of your pages. If your normal content disappears and is replaced by an error message, you know about it in under a minute.
+          <Link href="/signup">Upnotify&apos;s keyword monitoring</Link> catches this error by checking the actual content of your pages. If your normal content disappears and is replaced by an error message, you know about it in under a minute.
         </p>
 
         <h3>Step 1: Set up a keyword monitor to detect the error text</h3>
@@ -254,7 +254,7 @@ export default function WordPressCriticalErrorPage(): React.ReactElement {
         </ol>
 
         <p>
-          The moment that error text appears on your page, Uptrue detects it and sends you an alert. No waiting for a WordPress email that might never arrive. No depending on a customer to tell you about it.
+          The moment that error text appears on your page, Upnotify detects it and sends you an alert. No waiting for a WordPress email that might never arrive. No depending on a customer to tell you about it.
         </p>
 
         <h3>Step 2: Add a positive keyword monitor as a second layer</h3>
@@ -387,7 +387,7 @@ export default function WordPressCriticalErrorPage(): React.ReactElement {
         </p>
 
         <p>
-          Uptrue checks your pages every 60 seconds. If your content disappears — or if an error message appears — you know in under a minute. On Slack, Teams, email, or webhook. Before your customers see it. Before Google crawls it. Before you lose another lead.
+          Upnotify checks your pages every 60 seconds. If your content disappears — or if an error message appears — you know in under a minute. On Slack, Teams, email, or webhook. Before your customers see it. Before Google crawls it. Before you lose another lead.
         </p>
 
         <div className="blog-cta-section">
@@ -414,7 +414,7 @@ export default function WordPressCriticalErrorPage(): React.ReactElement {
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

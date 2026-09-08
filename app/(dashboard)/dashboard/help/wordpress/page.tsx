@@ -21,9 +21,9 @@ export default function WordPressHelpPage(): React.ReactElement {
           <div className="help-article-hero">
             <h1 className="help-article-title">WordPress Site Monitor Plugin</h1>
             <p className="help-article-intro">
-              The Uptrue WordPress plugin monitors your site from the inside — detecting file injections,
+              The Upnotify WordPress plugin monitors your site from the inside — detecting file injections,
               rogue admin users, security misconfigurations, and foreign-language spam content. It runs
-              on WordPress Cron and pushes findings to Uptrue via HTTPS. No inbound ports required.
+              on WordPress Cron and pushes findings to Upnotify via HTTPS. No inbound ports required.
             </p>
           </div>
 
@@ -31,7 +31,7 @@ export default function WordPressHelpPage(): React.ReactElement {
             <h2 className="help-section-title">Installation (2 minutes)</h2>
             <ol className="help-steps">
               <li>
-                In your Uptrue dashboard, go to <strong>Monitors → Add Monitor → WordPress</strong>.
+                In your Upnotify dashboard, go to <strong>Monitors → Add Monitor → WordPress</strong>.
                 You will be given a secure API token for this site.
               </li>
               <li>
@@ -42,8 +42,8 @@ export default function WordPressHelpPage(): React.ReactElement {
                 select the zip, and click <strong>Install Now</strong>, then <strong>Activate</strong>.
               </li>
               <li>
-                Go to <strong>Uptrue → Settings</strong> in your WordPress Admin sidebar. Paste your
-                API token into the <strong>Uptrue API Token</strong> field and click <strong>Save Settings</strong>.
+                Go to <strong>Upnotify → Settings</strong> in your WordPress Admin sidebar. Paste your
+                API token into the <strong>Upnotify API Token</strong> field and click <strong>Save Settings</strong>.
               </li>
               <li>
                 The plugin will immediately run a connection test and schedule the first data push.
@@ -130,23 +130,23 @@ export default function WordPressHelpPage(): React.ReactElement {
           </section>
 
           <section className="help-section">
-            <h2 className="help-section-title">Uptrue App URL setting</h2>
+            <h2 className="help-section-title">Upnotify App URL setting</h2>
             <p>
-              In <strong>Uptrue → Settings</strong> you will see an <strong>Uptrue App URL</strong> field.
+              In <strong>Upnotify → Settings</strong> you will see an <strong>Upnotify App URL</strong> field.
               Leave this blank to use the default (production). If you are testing against
-              the Uptrue dev environment, set it to <code>https://dev.uptrue.io/api/v1/wp-agent</code>.
+              the Upnotify dev environment, set it to <code>https://dev.uptrue.io/api/v1/wp-agent</code>.
             </p>
           </section>
 
           <section className="help-section">
             <h2 className="help-section-title">Push frequency</h2>
             <p>
-              The plugin pushes data on the schedule you set in <strong>Uptrue → Settings → Check Frequency</strong>
+              The plugin pushes data on the schedule you set in <strong>Upnotify → Settings → Check Frequency</strong>
               (default: every 120 minutes). File scans run on staggered daily crons to avoid server load spikes —
               results are cached and included in the next scheduled push.
             </p>
             <p>
-              You can trigger an immediate push at any time from <strong>Uptrue → Settings → Force push now</strong>.
+              You can trigger an immediate push at any time from <strong>Upnotify → Settings → Force push now</strong>.
             </p>
           </section>
 
@@ -154,12 +154,12 @@ export default function WordPressHelpPage(): React.ReactElement {
             <h2 className="help-section-title">Troubleshooting</h2>
             <ul className="help-list">
               <li>
-                <strong>401 — Invalid API token:</strong> Copy the token from the Uptrue WordPress monitor
+                <strong>401 — Invalid API token:</strong> Copy the token from the Upnotify WordPress monitor
                 setup page and re-paste it. Tokens are site-specific.
               </li>
               <li>
-                <strong>405 — Wrong URL:</strong> Set the <strong>Uptrue App URL</strong> field in plugin
-                settings to match the Uptrue environment where your monitor was created.
+                <strong>405 — Wrong URL:</strong> Set the <strong>Upnotify App URL</strong> field in plugin
+                settings to match the Upnotify environment where your monitor was created.
               </li>
               <li>
                 <strong>Network error:</strong> Your hosting provider may block outbound HTTPS requests.
@@ -167,7 +167,7 @@ export default function WordPressHelpPage(): React.ReactElement {
               </li>
               <li>
                 <strong>Monitor shows Stale:</strong> The plugin has not pushed within 3× its check interval.
-                Go to <strong>Uptrue → Settings</strong> and click <strong>Force push now</strong> to
+                Go to <strong>Upnotify → Settings</strong> and click <strong>Force push now</strong> to
                 re-establish the connection.
               </li>
               <li>

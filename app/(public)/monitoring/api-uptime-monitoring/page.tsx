@@ -6,7 +6,7 @@ const data: IndustryLandingData = {
   heroTitle: 'API Uptime Monitoring',
   heroSubtitle:
     'Catch silent API regressions, broken auth flows, and slow responses before they reach customer integrations. Built for backend engineering teams, platform APIs, and developer-facing services.',
-  seoTitle: 'API Uptime Monitoring — REST, GraphQL & Webhook Health Checks | Uptrue',
+  seoTitle: 'API Uptime Monitoring — REST, GraphQL & Webhook Health Checks | Upnotify',
   seoDescription:
     'API uptime monitoring with body assertions, latency thresholds, and authentication header support. Catch the regressions that 200-OK monitors miss: malformed responses, broken auth flows, slow webhooks, and silent dependency failures.',
   whyItMatters: [
@@ -35,7 +35,7 @@ const data: IndustryLandingData = {
     {
       slug: 'heartbeat-monitoring',
       label: 'Heartbeat monitoring',
-      why: 'Inverted check: your API or background worker pings Uptrue. If the heartbeat stops, the worker has died — even if its HTTP endpoint is "up".',
+      why: 'Inverted check: your API or background worker pings Upnotify. If the heartbeat stops, the worker has died — even if its HTTP endpoint is "up".',
     },
     {
       slug: 'http-uptime-monitoring',
@@ -61,11 +61,11 @@ const data: IndustryLandingData = {
   faq: [
     {
       q: 'How is API uptime monitoring different from generic uptime monitoring?',
-      a: 'Generic uptime monitoring asks "did I get a response code?". API uptime monitoring asks "was the response semantically correct?". The right monitor for an API checks: did the status code match the assertion, does the body contain expected content, is the response time within tolerance, are CORS and content-type headers correct. Uptrue\'s API Endpoint monitor handles all four in one check.',
+      a: 'Generic uptime monitoring asks "did I get a response code?". API uptime monitoring asks "was the response semantically correct?". The right monitor for an API checks: did the status code match the assertion, does the body contain expected content, is the response time within tolerance, are CORS and content-type headers correct. Upnotify\'s API Endpoint monitor handles all four in one check.',
     },
     {
       q: 'Can I monitor authenticated APIs without exposing real credentials?',
-      a: 'Yes. API Endpoint monitors accept custom HTTP headers. Best practice: create a dedicated read-only monitoring user, issue a long-lived service token, and rotate the token quarterly. Restrict source IPs at your API gateway to Uptrue check origins for an extra layer of safety.',
+      a: 'Yes. API Endpoint monitors accept custom HTTP headers. Best practice: create a dedicated read-only monitoring user, issue a long-lived service token, and rotate the token quarterly. Restrict source IPs at your API gateway to Upnotify check origins for an extra layer of safety.',
     },
     {
       q: 'Do you support GraphQL endpoints?',
@@ -73,7 +73,7 @@ const data: IndustryLandingData = {
     },
     {
       q: 'How do I monitor a webhook delivery latency?',
-      a: 'Use Heartbeat monitoring. Have the receiving service ping Uptrue immediately on receiving each webhook. If the gap between expected pings exceeds the grace period, the webhook delivery has stopped. Combined with API Endpoint monitoring on the source webhook URL, you get full pipeline coverage.',
+      a: 'Use Heartbeat monitoring. Have the receiving service ping Upnotify immediately on receiving each webhook. If the gap between expected pings exceeds the grace period, the webhook delivery has stopped. Combined with API Endpoint monitoring on the source webhook URL, you get full pipeline coverage.',
     },
     {
       q: 'What\'s the right check interval for an API?',
@@ -81,7 +81,7 @@ const data: IndustryLandingData = {
     },
     {
       q: 'How do I avoid alerting fatigue when an API has many endpoints?',
-      a: 'Two patterns work well: (1) one monitor per critical user-flow (login, checkout, search) rather than one per endpoint, and (2) Smart Digest grouping — first alert in a window goes instant, repeat events for the same incident roll into a single follow-up email instead of 50 pages. Both are included on every Uptrue plan.',
+      a: 'Two patterns work well: (1) one monitor per critical user-flow (login, checkout, search) rather than one per endpoint, and (2) Smart Digest grouping — first alert in a window goes instant, repeat events for the same incident roll into a single follow-up email instead of 50 pages. Both are included on every Upnotify plan.',
     },
   ],
 }

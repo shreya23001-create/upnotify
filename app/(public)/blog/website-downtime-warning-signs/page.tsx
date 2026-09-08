@@ -53,7 +53,7 @@ const FAQ_DATA = [
   {
     question: 'How often should I check my website for warning signs?',
     answer:
-      'Manually checking is not reliable — you will miss things. Automated monitoring every 60 seconds is the standard for business-critical sites. Uptrue checks your site every minute for HTTP status, response time, SSL validity, keyword presence, and DNS records, and alerts you the moment anything changes.',
+      'Manually checking is not reliable — you will miss things. Automated monitoring every 60 seconds is the standard for business-critical sites. Upnotify checks your site every minute for HTTP status, response time, SSL validity, keyword presence, and DNS records, and alerts you the moment anything changes.',
   },
   {
     question: 'What is the most common cause of unexpected website downtime?',
@@ -87,7 +87,7 @@ export default function WebsiteDowntimeWarningSignsPage(): React.ReactElement {
           '@type': 'Article',
           headline: '10 Warning Signs Your Website Is About to Go Down',
           description: 'Learn the 10 warning signs that precede website downtime and how to catch them early with monitoring.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-03-18',
           dateModified: '2026-03-18',
@@ -136,7 +136,7 @@ export default function WebsiteDowntimeWarningSignsPage(): React.ReactElement {
         <p>
           <strong>What to do:</strong> Track your{' '}
           <Link href="/blog/wordpress-slow-ttfb">Time to First Byte (TTFB)</Link>{' '}
-          over time. If it is trending upward over days or weeks, investigate before it plateaus at a timeout. HTTP monitoring with <Link href="/signup">Uptrue</Link> records TTFB on every check, so you can see the trend in your dashboard.
+          over time. If it is trending upward over days or weeks, investigate before it plateaus at a timeout. HTTP monitoring with <Link href="/signup">Upnotify</Link> records TTFB on every check, so you can see the trend in your dashboard.
         </p>
 
         <h2>2. SSL certificate is approaching expiry</h2>
@@ -324,7 +324,7 @@ export default function WebsiteDowntimeWarningSignsPage(): React.ReactElement {
         </p>
 
         <p>
-          <Link href="/signup">Uptrue</Link> monitors your site every 60 seconds for HTTP status, response time, SSL validity, keyword presence, and DNS records. You see trends before they become outages. You get alerts before your visitors notice anything is wrong.
+          <Link href="/signup">Upnotify</Link> monitors your site every 60 seconds for HTTP status, response time, SSL validity, keyword presence, and DNS records. You see trends before they become outages. You get alerts before your visitors notice anything is wrong.
         </p>
 
         <p>
@@ -355,7 +355,7 @@ export default function WebsiteDowntimeWarningSignsPage(): React.ReactElement {
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

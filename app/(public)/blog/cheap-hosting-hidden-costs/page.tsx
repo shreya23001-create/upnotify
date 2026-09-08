@@ -58,7 +58,7 @@ const FAQ_DATA = [
   {
     question: 'How can I tell if my hosting is throttling my site?',
     answer:
-      'Your hosting provider will not tell you. The only reliable way is external monitoring. Set up an HTTP monitor that tracks response time on every check. When your host throttles your CPU, response times spike from under 2 seconds to 5, 10, or 20+ seconds. Uptrue records response times on every check and alerts you when they exceed your threshold — so you see throttling the moment it starts, not after visitors have already left.',
+      'Your hosting provider will not tell you. The only reliable way is external monitoring. Set up an HTTP monitor that tracks response time on every check. When your host throttles your CPU, response times spike from under 2 seconds to 5, 10, or 20+ seconds. Upnotify records response times on every check and alerts you when they exceed your threshold — so you see throttling the moment it starts, not after visitors have already left.',
   },
   {
     question: 'What hosting should I use instead of cheap shared hosting?',
@@ -87,7 +87,7 @@ export default function CheapHostingHiddenCostsPage(): React.ReactElement {
           '@type': 'Article',
           headline: 'Why Cheap Hosting Is the Most Expensive Mistake You Can Make',
           description: 'The hidden costs of cheap shared hosting — overselling, CPU throttling, noisy neighbours, and lost revenue from invisible downtime.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-03-12',
           dateModified: '2026-03-12',
@@ -231,7 +231,7 @@ export default function CheapHostingHiddenCostsPage(): React.ReactElement {
         <h3>Step 1: Find out if your hosting is throttling you</h3>
 
         <p>
-          Set up <Link href="/signup">Uptrue&apos;s HTTP monitoring</Link> on your site. It checks every 60 seconds and records the response time on each check. Within a few days, you will have a clear picture of your site&apos;s real performance — including the throttling episodes your hosting provider never tells you about.
+          Set up <Link href="/signup">Upnotify&apos;s HTTP monitoring</Link> on your site. It checks every 60 seconds and records the response time on each check. Within a few days, you will have a clear picture of your site&apos;s real performance — including the throttling episodes your hosting provider never tells you about.
         </p>
 
         <ol>
@@ -287,7 +287,7 @@ export default function CheapHostingHiddenCostsPage(): React.ReactElement {
         </p>
 
         <p>
-          Uptrue monitors response time on every check, alerts you when performance degrades, and gives you the data you need to make informed decisions about your hosting. Whether you stay on cheap hosting or upgrade, at least you will know what it is actually costing you.
+          Upnotify monitors response time on every check, alerts you when performance degrades, and gives you the data you need to make informed decisions about your hosting. Whether you stay on cheap hosting or upgrade, at least you will know what it is actually costing you.
         </p>
 
         <div className="blog-cta-section">
@@ -314,7 +314,7 @@ export default function CheapHostingHiddenCostsPage(): React.ReactElement {
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

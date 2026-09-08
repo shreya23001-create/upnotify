@@ -38,7 +38,7 @@ const FAQ_DATA = [
   {
     question: 'Can I create a free status page?',
     answer:
-      'Yes. Several monitoring platforms, including Uptrue, offer free status pages. With Uptrue, you can create a branded public status page that automatically updates based on your monitor data — no coding required. The free plan includes one status page with up to 3 monitors displayed.',
+      'Yes. Several monitoring platforms, including Upnotify, offer free status pages. With Upnotify, you can create a branded public status page that automatically updates based on your monitor data — no coding required. The free plan includes one status page with up to 3 monitors displayed.',
   },
 ]
 
@@ -62,7 +62,7 @@ export default function PublicStatusPageGuidePage(): React.ReactElement {
           '@type': 'Article',
           headline: 'How to Create a Public Status Page for Your Website (Free)',
           description: 'Learn what public status pages are, why customers expect them, and how to set one up for free.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-03-06',
           dateModified: '2026-03-06',
@@ -195,7 +195,7 @@ export default function PublicStatusPageGuidePage(): React.ReactElement {
         <h3>Option 1: Use a monitoring platform (recommended)</h3>
 
         <p>
-          Modern monitoring tools like Uptrue include status pages as part of the platform.
+          Modern monitoring tools like Upnotify include status pages as part of the platform.
           Here is how it works:
         </p>
 
@@ -317,7 +317,7 @@ export default function PublicStatusPageGuidePage(): React.ReactElement {
 
         <p>
           If you are interested in using your uptime data for broader visibility, check out
-          the{' '}<Link href="/tracker">Uptrue Tracker</Link>{' '}— it lets anyone check the uptime
+          the{' '}<Link href="/tracker">Upnotify Tracker</Link>{' '}— it lets anyone check the uptime
           status of any website, which is great for transparency and SEO.
         </p>
 
@@ -341,7 +341,7 @@ export default function PublicStatusPageGuidePage(): React.ReactElement {
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

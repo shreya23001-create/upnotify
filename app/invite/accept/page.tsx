@@ -122,7 +122,7 @@ export default function AcceptInvitePage(): React.ReactElement {
           marginBottom: 8,
           letterSpacing: '-0.3px',
         }}>
-          Uptrue
+          Upnotify
         </div>
 
         {status === 'loading' && (
@@ -167,7 +167,7 @@ export default function AcceptInvitePage(): React.ReactElement {
               Sign Up to Accept
             </p>
             <p style={{ color: 'var(--text-muted, #6b7280)', fontSize: 14, lineHeight: 1.6, marginBottom: 20 }}>
-              You need an Uptrue account to accept this invite.
+              You need an Upnotify account to accept this invite.
               Sign up or log in, and we will automatically accept the invite.
             </p>
             <button

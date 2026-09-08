@@ -67,7 +67,7 @@ export default function WordPressRecoveryModePage(): React.ReactElement {
           '@type': 'Article',
           headline: 'WordPress Recovery Mode: What Triggers It, What It Means, and How to Respond',
           description: 'What triggers WordPress recovery mode, why the recovery email is unreliable, and how keyword monitoring detects the errors that cause it.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-03-19',
           dateModified: '2026-03-19',
@@ -210,10 +210,10 @@ export default function WordPressRecoveryModePage(): React.ReactElement {
           That is four independent points of failure, any one of which is enough to leave your site broken with no notification. You need monitoring that works from outside WordPress — something that does not depend on WordPress being functional to tell you it is not functional.
         </p>
 
-        <h2>How to detect recovery mode errors with Uptrue</h2>
+        <h2>How to detect recovery mode errors with Upnotify</h2>
 
         <p>
-          <Link href="/signup">Uptrue&apos;s keyword monitoring</Link> checks your actual page content from outside your server. It does not depend on WordPress being able to send email. It does not depend on your hosting mail configuration. It checks what your visitors actually see and alerts you when the content changes.
+          <Link href="/signup">Upnotify&apos;s keyword monitoring</Link> checks your actual page content from outside your server. It does not depend on WordPress being able to send email. It does not depend on your hosting mail configuration. It checks what your visitors actually see and alerts you when the content changes.
         </p>
 
         <h3>Step 1: Set up a keyword monitor to detect the critical error text</h3>
@@ -289,7 +289,7 @@ export default function WordPressRecoveryModePage(): React.ReactElement {
         </ul>
 
         <p>
-          Uptrue sends alerts from its own infrastructure — not from your WordPress server. When your server cannot send email, Uptrue still can. That is the fundamental difference between recovery mode and external monitoring.
+          Upnotify sends alerts from its own infrastructure — not from your WordPress server. When your server cannot send email, Upnotify still can. That is the fundamental difference between recovery mode and external monitoring.
         </p>
 
         <div className="blog-cta-section">
@@ -305,7 +305,7 @@ export default function WordPressRecoveryModePage(): React.ReactElement {
         <h2>What to do when recovery mode activates</h2>
 
         <p>
-          If you do receive the recovery email — or if Uptrue alerts you and you suspect a fatal error — here is the fastest path to getting your site back online.
+          If you do receive the recovery email — or if Upnotify alerts you and you suspect a fatal error — here is the fastest path to getting your site back online.
         </p>
 
         <h3>If you have the recovery link</h3>
@@ -332,7 +332,7 @@ export default function WordPressRecoveryModePage(): React.ReactElement {
         </p>
 
         <p>
-          External monitoring removes every one of those failure points. Uptrue checks your pages from outside your server, every 60 seconds. If your content disappears or an error message appears, you know in under a minute. Not when you happen to check your spam folder. Not when a customer complains. Not when your traffic drops and you finally investigate.
+          External monitoring removes every one of those failure points. Upnotify checks your pages from outside your server, every 60 seconds. If your content disappears or an error message appears, you know in under a minute. Not when you happen to check your spam folder. Not when a customer complains. Not when your traffic drops and you finally investigate.
         </p>
 
         <p>
@@ -363,7 +363,7 @@ export default function WordPressRecoveryModePage(): React.ReactElement {
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

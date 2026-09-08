@@ -8,14 +8,14 @@ import {
 import { ScrollReveal } from '@/components/landing/scroll-reveal'
 
 export const metadata: Metadata = {
-  title: 'Referral Program — Give 1 Month, Get 1 Month | Uptrue',
+  title: 'Referral Program — Give 1 Month, Get 1 Month | Upnotify',
   description:
-    'Share Uptrue with friends and colleagues. When they sign up and upgrade, you both get a free month of monitoring. Refer up to 5 people and save \u00A325.',
+    'Share Upnotify with friends and colleagues. When they sign up and upgrade, you both get a free month of monitoring. Refer up to 5 people and save \u00A325.',
   alternates: { canonical: 'https://uptrue.io/referrals' },
   openGraph: {
-    title: 'Uptrue Referral Program — Give 1 Month, Get 1 Month',
+    title: 'Upnotify Referral Program — Give 1 Month, Get 1 Month',
     description:
-      'Share Uptrue with friends. When they upgrade, you both get a free month. Refer up to 5 people and save \u00A325 total.',
+      'Share Upnotify with friends. When they upgrade, you both get a free month. Refer up to 5 people and save \u00A325 total.',
     url: 'https://uptrue.io/referrals',
   },
 }
@@ -60,7 +60,7 @@ const RULES = [
   { icon: Users, title: `Max 5 referrals`, desc: `Maximum 5 successful referrals per account (${'£'}25 total).` },
   { icon: Ban, title: 'No self-referrals', desc: 'Self-referrals or duplicate accounts are not eligible.' },
   { icon: RefreshCcw, title: 'Auto-applied credit', desc: 'Credits are applied automatically at the next billing cycle.' },
-  { icon: Settings2, title: 'Subject to change', desc: 'Uptrue reserves the right to modify or end this program at any time.' },
+  { icon: Settings2, title: 'Subject to change', desc: 'Upnotify reserves the right to modify or end this program at any time.' },
 ]
 
 export default function ReferralsPage(): React.ReactElement {
@@ -75,7 +75,7 @@ export default function ReferralsPage(): React.ReactElement {
               <span className="gradient-text referral-title-gradient">Referral</span> Program
             </h1>
             <p className="public-page-subtitle reveal-title">
-              Love Uptrue? Share it with your network. When your friend signs up and upgrades,
+              Love Upnotify? Share it with your network. When your friend signs up and upgrades,
               you both get a free month of monitoring.
             </p>
           </div>

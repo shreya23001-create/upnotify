@@ -69,7 +69,7 @@ export function InvoicePrint({ invoice, organisation, userEmail, seller }: Props
         <div className="invoice-header">
           <div className="invoice-logo-block">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo.svg" alt="Uptrue" className="invoice-logo" />
+            <img src="/logo.svg" alt="Upnotify" className="invoice-logo" />
           </div>
           <div className="invoice-title-block">
             <div className="invoice-title">INVOICE</div>
@@ -160,7 +160,7 @@ export function InvoicePrint({ invoice, organisation, userEmail, seller }: Props
           </thead>
           <tbody>
             <tr>
-              <td>Uptrue Subscription</td>
+              <td>Upnotify Subscription</td>
               <td>
                 {invoice.period_start && invoice.period_end && invoice.period_start !== invoice.period_end
                   ? `${fmt(invoice.period_start)} – ${fmt(invoice.period_end)}`

@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'iThemes Security Locked Me Out of WordPress: How to Regain Access and Prevent It',
     description:
-      'What causes iThemes Security to lock out legitimate users, how brute force protection and file change detection create false alarms, and how Uptrue HTTP monitoring detects lockout pages automatically.',
+      'What causes iThemes Security to lock out legitimate users, how brute force protection and file change detection create false alarms, and how Upnotify HTTP monitoring detects lockout pages automatically.',
     url: 'https://uptrue.io/blog/ithemes-security-locked-out',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'iThemes Security Locked Me Out of WordPress: How to Regain Access and Prevent It',
     description:
-      'What causes iThemes Security to lock out legitimate users, how brute force protection and file change detection create false alarms, and how Uptrue HTTP monitoring detects lockout pages automatically.',
+      'What causes iThemes Security to lock out legitimate users, how brute force protection and file change detection create false alarms, and how Upnotify HTTP monitoring detects lockout pages automatically.',
   },
 }
 
@@ -67,7 +67,7 @@ export default function IthemesSecurityLockedOutPage(): React.ReactElement {
           '@type': 'Article',
           headline: 'iThemes Security Locked Me Out of WordPress: How to Regain Access and Prevent It',
           description: 'What causes iThemes Security lockouts, how brute force protection and file change detection create false alarms, and how HTTP monitoring detects 403 lockout pages.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-04-03',
           dateModified: '2026-04-03',
@@ -222,10 +222,10 @@ export default function IthemesSecurityLockedOutPage(): React.ReactElement {
           Never set file change detection to take automatic action. Configure it to send email alerts only. Review the alerts manually. If you see changes that coincide with a known update, dismiss them. If you see unexpected changes to core files, investigate. The detection feature is useful as a notification tool — it is dangerous as an enforcement tool.
         </p>
 
-        <h2>How Uptrue detects when iThemes Security locks out your visitors</h2>
+        <h2>How Upnotify detects when iThemes Security locks out your visitors</h2>
 
         <p>
-          <Link href="/signup">Uptrue&apos;s HTTP monitoring</Link> checks your site from multiple external locations. When iThemes Security starts blocking IPs — whether through brute force protection, 404 detection, or database corruption — Uptrue detects the 403 responses or lockout pages immediately. You know about the problem before your visitors start contacting you, or worse, before they silently leave and never come back.
+          <Link href="/signup">Upnotify&apos;s HTTP monitoring</Link> checks your site from multiple external locations. When iThemes Security starts blocking IPs — whether through brute force protection, 404 detection, or database corruption — Upnotify detects the 403 responses or lockout pages immediately. You know about the problem before your visitors start contacting you, or worse, before they silently leave and never come back.
         </p>
 
         <h3>Step 1: Set up HTTP monitoring to detect 403 lockout responses</h3>
@@ -241,7 +241,7 @@ export default function IthemesSecurityLockedOutPage(): React.ReactElement {
         </ol>
 
         <p>
-          When iThemes Security locks out Uptrue&apos;s monitoring IP, the check returns 403 instead of 200 and triggers an alert. The two-confirmation system verifies from a second location — if both are blocked, iThemes Security is blocking broadly and your site is effectively down for external visitors.
+          When iThemes Security locks out Upnotify&apos;s monitoring IP, the check returns 403 instead of 200 and triggers an alert. The two-confirmation system verifies from a second location — if both are blocked, iThemes Security is blocking broadly and your site is effectively down for external visitors.
         </p>
 
         <h3>Step 2: Add a keyword monitor for the lockout page text</h3>
@@ -318,7 +318,7 @@ export default function IthemesSecurityLockedOutPage(): React.ReactElement {
         </p>
 
         <p>
-          The solution is not to remove the security plugin. The solution is to configure it carefully, allowlist your own IPs, increase thresholds to reasonable levels, and monitor from the outside. Uptrue checks your site every 60 seconds from external IPs. When iThemes Security decides those IPs are threats — and eventually, with aggressive enough settings, it will — you get an alert. Before your customers are locked out. Before your team is locked out. Before your security becomes your downtime.
+          The solution is not to remove the security plugin. The solution is to configure it carefully, allowlist your own IPs, increase thresholds to reasonable levels, and monitor from the outside. Upnotify checks your site every 60 seconds from external IPs. When iThemes Security decides those IPs are threats — and eventually, with aggressive enough settings, it will — you get an alert. Before your customers are locked out. Before your team is locked out. Before your security becomes your downtime.
         </p>
 
         <div className="blog-cta-section">
@@ -345,7 +345,7 @@ export default function IthemesSecurityLockedOutPage(): React.ReactElement {
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

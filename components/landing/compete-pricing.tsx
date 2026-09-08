@@ -37,7 +37,7 @@ export default function CompetePricing(): React.ReactElement {
       <div className="container">
         <div className="compete-pricing-header">
           <span className="compete-pricing-badge">Add-on</span>
-          <h2 className="section-title">Uptrue Compete</h2>
+          <h2 className="section-title">Upnotify Compete</h2>
           <p className="section-sub">
             Track competitor prices, detect stock changes, and get alerts when prices drop.
             Add to any paid monitoring plan.

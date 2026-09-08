@@ -110,11 +110,11 @@ export function buildSslExpiryEmail(
       </ul>
     </div>
     <p style="margin:0 0 20px;font-size:14px;color:#374151;line-height:1.6;">
-      ${cta.ctaText.includes('free') ? 'Uptrue monitors your SSL certificate and alerts you automatically before it expires — free to start.' : cta.ctaText}
+      ${cta.ctaText.includes('free') ? 'Upnotify monitors your SSL certificate and alerts you automatically before it expires — free to start.' : cta.ctaText}
     </p>
     ${ctaButton(cta.ctaText, cta.ctaUrl)}
     <p style="margin:20px 0 0;font-size:12px;color:#9ca3af;">
-      Uptrue monitors uptime, SSL, DNS and performance automatically. Free plan available.
+      Upnotify monitors uptime, SSL, DNS and performance automatically. Free plan available.
     </p>
   `, buildUnsubscribeUrl(messageId))
 
@@ -154,7 +154,7 @@ export function buildSiteDownEmail(
       </ul>
     </div>
     <p style="margin:0 0 20px;font-size:14px;color:#374151;line-height:1.6;">
-      Uptrue checks your site every minute and sends an instant alert the moment it goes down — so you can fix it before most visitors notice.
+      Upnotify checks your site every minute and sends an instant alert the moment it goes down — so you can fix it before most visitors notice.
     </p>
     ${ctaButton(cta.ctaText, cta.ctaUrl)}
     <p style="margin:20px 0 0;font-size:12px;color:#9ca3af;">
@@ -212,7 +212,7 @@ export function buildSiteSlowEmail(
       </p>
     </div>
     <p style="margin:0 0 20px;font-size:14px;color:#374151;line-height:1.6;">
-      Uptrue tracks your response time around the clock and alerts you when performance degrades — so you catch problems before they cost you traffic.
+      Upnotify tracks your response time around the clock and alerts you when performance degrades — so you catch problems before they cost you traffic.
     </p>
     ${ctaButton(cta.ctaText, cta.ctaUrl)}
   `, buildUnsubscribeUrl(messageId))
@@ -254,7 +254,7 @@ export function buildEcomDownEmail(
       </ul>
     </div>
     <p style="margin:0 0 20px;font-size:14px;color:#374151;line-height:1.6;">
-      Uptrue monitors your store every minute and sends you an instant alert by email (or SMS) the moment it goes down. You'll know before your customers do.
+      Upnotify monitors your store every minute and sends you an instant alert by email (or SMS) the moment it goes down. You'll know before your customers do.
     </p>
     ${ctaButton(cta.ctaText, cta.ctaUrl)}
     <p style="margin:20px 0 0;font-size:12px;color:#9ca3af;">
@@ -290,7 +290,7 @@ export function buildCompeteColdEmail(
       That's great. But do you know how your competitors are performing?
     </p>
     <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;padding:16px 20px;margin-bottom:20px;">
-      <p style="margin:0 0 8px;font-size:14px;color:#1e40af;font-weight:600;">What Uptrue Compete shows you:</p>
+      <p style="margin:0 0 8px;font-size:14px;color:#1e40af;font-weight:600;">What Upnotify Compete shows you:</p>
       <ul style="margin:0;padding-left:20px;font-size:14px;color:#374151;line-height:1.8;">
         <li>Real-time uptime of your top competitors' stores</li>
         <li>Speed comparisons — who loads faster?</li>
@@ -299,7 +299,7 @@ export function buildCompeteColdEmail(
       </ul>
     </div>
     <p style="margin:0 0 20px;font-size:14px;color:#374151;line-height:1.6;">
-      When a competitor goes down, their customers start looking for alternatives. With Uptrue Compete, you know the moment that window opens.
+      When a competitor goes down, their customers start looking for alternatives. With Upnotify Compete, you know the moment that window opens.
     </p>
     ${ctaButton(cta.ctaText, cta.ctaUrl)}
     <p style="margin:20px 0 0;font-size:12px;color:#9ca3af;">
@@ -327,7 +327,7 @@ export function buildAiSeoEmail(
 
   const html = baseLayout(`
     <h2 style="margin:0 0 8px;font-size:18px;font-weight:700;color:#111827;">
-      ${esc(domain)} is <span style="color:#7c3aed;">invisible to AI search</span>
+      ${esc(domain)} is <span style="color:#00c94a;">invisible to AI search</span>
     </h2>
     <p style="margin:0 0 20px;font-size:14px;color:#374151;line-height:1.6;">
       Hi,<br><br>
@@ -337,11 +337,11 @@ export function buildAiSeoEmail(
       which means AI search engines like ChatGPT, Perplexity, and Claude
       <strong>may not be able to read or cite your content</strong>.
     </p>
-    <div style="background:#f5f3ff;border:1px solid #ddd6fe;border-radius:6px;padding:16px 20px;margin-bottom:24px;">
-      <p style="margin:0 0 8px;font-size:14px;color:#5b21b6;font-weight:600;">While you're not visible, your competitors are:</p>
+    <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:16px 20px;margin-bottom:24px;">
+      <p style="margin:0 0 8px;font-size:14px;color:#0a5c26;font-weight:600;">While you're not visible, your competitors are:</p>
       <ul style="margin:0;padding-left:20px;font-size:14px;color:#374151;line-height:1.8;">
         <li>AI-driven search is growing fast — ChatGPT alone answers millions of queries per day</li>
-        <li>Sites with <code style="background:#ede9fe;padding:1px 4px;border-radius:3px;font-size:12px;">llms.txt</code> get cited in AI answers; sites without don't</li>
+        <li>Sites with <code style="background:#dcfce7;padding:1px 4px;border-radius:3px;font-size:12px;">llms.txt</code> get cited in AI answers; sites without don't</li>
         <li>Early movers in AI SEO will hold rankings for years</li>
       </ul>
     </div>
@@ -352,13 +352,13 @@ export function buildAiSeoEmail(
     <!-- Primary CTA: AI Visibility Score -->
     <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:20px 24px;margin-bottom:12px;">
       <div style="margin-bottom:8px;">
-        <span style="display:inline-block;background:#7c3aed;color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;letter-spacing:0.5px;text-transform:uppercase;">Free</span>
+        <span style="display:inline-block;background:#00c94a;color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;letter-spacing:0.5px;text-transform:uppercase;">Free</span>
       </div>
       <p style="margin:0 0 4px;font-size:15px;font-weight:700;color:#111827;">AI Visibility Score</p>
       <p style="margin:0 0 14px;font-size:13px;color:#6b7280;line-height:1.5;">
         See exactly how visible ${esc(domain)} is to AI search engines — scored, explained, and actionable.
       </p>
-      ${ctaButton(cta.primaryCtaText, cta.primaryCtaUrl, '#7c3aed')}
+      ${ctaButton(cta.primaryCtaText, cta.primaryCtaUrl, '#00c94a')}
     </div>
 
     <!-- Secondary CTA: llms.txt Generator -->

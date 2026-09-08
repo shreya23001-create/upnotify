@@ -72,7 +72,7 @@ export default function WoocommerceDownPage(): React.ReactElement {
           '@type': 'Article',
           headline: 'WooCommerce Down? How to Diagnose and Fix a Broken WooCommerce Store',
           description: 'Step-by-step diagnosis guide for WooCommerce not working — plugin conflicts, database errors, PHP memory, hosting, and payment gateway issues.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-04-06',
           dateModified: '2026-04-06',
@@ -297,7 +297,7 @@ define( 'WP_DEBUG_DISPLAY', false );`}</code></pre>
         </p>
 
         <p>
-          Set up the following monitors in <Link href="https://uptrue.io/signup">Uptrue</Link>:
+          Set up the following monitors in <Link href="https://uptrue.io/signup">Upnotify</Link>:
         </p>
 
         <h3>Monitor 1 — Homepage (HTTP, 1 minute interval)</h3>
@@ -349,7 +349,7 @@ define( 'WP_DEBUG_DISPLAY', false );`}</code></pre>
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

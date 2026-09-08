@@ -38,7 +38,7 @@ const FAQ_DATA = [
   {
     question: 'Can uptime monitoring detect 403 Forbidden errors?',
     answer:
-      'Yes. A 403 Forbidden returns a clear 403 HTTP status code. Any HTTP uptime monitor that expects a 200 response will detect a 403 immediately and alert you. Uptrue HTTP monitoring checks your site every 60 seconds, and if any monitored page returns a 403 instead of the expected 200, you are alerted within a minute via Slack, email, Teams, or webhook.',
+      'Yes. A 403 Forbidden returns a clear 403 HTTP status code. Any HTTP uptime monitor that expects a 200 response will detect a 403 immediately and alert you. Upnotify HTTP monitoring checks your site every 60 seconds, and if any monitored page returns a 403 instead of the expected 200, you are alerted within a minute via Slack, email, Teams, or webhook.',
   },
   {
     question: 'How do I fix file permissions causing 403 on WordPress?',
@@ -67,7 +67,7 @@ export default function WordPress403ForbiddenPage(): React.ReactElement {
           '@type': 'Article',
           headline: 'WordPress 403 Forbidden Error: Why Your Pages Are Blocked and How to Fix It',
           description: 'What causes WordPress 403 Forbidden errors, how to fix file permissions, .htaccess deny rules, and mod_security false positives, and how HTTP monitoring catches 403 errors instantly.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-03-21',
           dateModified: '2026-03-21',
@@ -280,10 +280,10 @@ export default function WordPress403ForbiddenPage(): React.ReactElement {
           The only reliable way to know that your visitors can access your site is to check from outside, continuously, the way a visitor would.
         </p>
 
-        <h2>How to detect 403 errors with Uptrue</h2>
+        <h2>How to detect 403 errors with Upnotify</h2>
 
         <p>
-          <Link href="/signup">Uptrue&apos;s HTTP monitoring</Link> catches 403 Forbidden errors instantly because the server returns a clear 403 status code. Unlike errors that hide behind a 200 response, a 403 is unambiguous.
+          <Link href="/signup">Upnotify&apos;s HTTP monitoring</Link> catches 403 Forbidden errors instantly because the server returns a clear 403 status code. Unlike errors that hide behind a 200 response, a 403 is unambiguous.
         </p>
 
         <h3>Step 1: Set up an HTTP monitor for your key pages</h3>
@@ -299,7 +299,7 @@ export default function WordPress403ForbiddenPage(): React.ReactElement {
         </ol>
 
         <p>
-          If your page returns a 403 instead of a 200, Uptrue alerts you within 60 seconds. But do not stop at the homepage — 403 errors often affect specific pages while the homepage is fine.
+          If your page returns a 403 instead of a 200, Upnotify alerts you within 60 seconds. But do not stop at the homepage — 403 errors often affect specific pages while the homepage is fine.
         </p>
 
         <h3>Step 2: Monitor your most critical pages individually</h3>
@@ -332,7 +332,7 @@ export default function WordPress403ForbiddenPage(): React.ReactElement {
         <h3>Step 4: Monitor from multiple perspectives</h3>
 
         <p>
-          Because 403 errors can be IP-specific or region-specific, monitoring from a single location might not catch blocks that affect other regions. Uptrue&apos;s monitoring infrastructure checks from outside your network, seeing your site the way a real visitor would — not the way it looks from your office on your whitelisted IP.
+          Because 403 errors can be IP-specific or region-specific, monitoring from a single location might not catch blocks that affect other regions. Upnotify&apos;s monitoring infrastructure checks from outside your network, seeing your site the way a real visitor would — not the way it looks from your office on your whitelisted IP.
         </p>
 
         <h3>Step 5: Configure alerts that reach you fast</h3>
@@ -400,7 +400,7 @@ export default function WordPress403ForbiddenPage(): React.ReactElement {
         </p>
 
         <p>
-          Uptrue checks your pages every 60 seconds from outside your network. If any page returns a 403 instead of the expected 200, you know in under a minute. Before your ad spend goes to waste. Before Google deindexes your pages. Before a customer gives up and goes to a competitor.
+          Upnotify checks your pages every 60 seconds from outside your network. If any page returns a 403 instead of the expected 200, you know in under a minute. Before your ad spend goes to waste. Before Google deindexes your pages. Before a customer gives up and goes to a competitor.
         </p>
 
         <div className="blog-cta-section">
@@ -427,7 +427,7 @@ export default function WordPress403ForbiddenPage(): React.ReactElement {
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

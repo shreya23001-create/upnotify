@@ -3,14 +3,14 @@ import Link from 'next/link'
 import { Coins, ShieldCheck, PiggyBank, PlayCircle, Tag, Users, Star, Bug } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Community Credits — Earn Discounts on Your Monitoring Plan | Uptrue',
+  title: 'Community Credits — Earn Discounts on Your Monitoring Plan | Upnotify',
   description:
-    'Earn credits toward your Uptrue subscription by embedding badges, referring friends, writing reviews, and reporting bugs. Up to \u00A310/month off your plan.',
+    'Earn credits toward your Upnotify subscription by embedding badges, referring friends, writing reviews, and reporting bugs. Up to \u00A310/month off your plan.',
   alternates: { canonical: 'https://uptrue.io/credits' },
   openGraph: {
     title: 'Community Credits — Earn Discounts on Your Monitoring Plan',
     description:
-      'Earn credits toward your Uptrue subscription. Embed badges, refer friends, write reviews, and report bugs to save up to \u00A310/month.',
+      'Earn credits toward your Upnotify subscription. Embed badges, refer friends, write reviews, and report bugs to save up to \u00A310/month.',
     url: 'https://uptrue.io/credits',
   },
 }
@@ -26,10 +26,10 @@ interface CreditWay {
 const CREDIT_WAYS: CreditWay[] = [
   {
     icon: Tag,
-    title: 'Embed an Uptrue Badge',
+    title: 'Embed an Upnotify Badge',
     amount: '\u00A32/month',
     description:
-      'Add a small "Monitored by Uptrue" badge to your website footer. As long as the badge is live and verified, you earn a recurring monthly credit.',
+      'Add a small "Monitored by Upnotify" badge to your website footer. As long as the badge is live and verified, you earn a recurring monthly credit.',
     frequency: 'Recurring monthly',
   },
   {
@@ -45,7 +45,7 @@ const CREDIT_WAYS: CreditWay[] = [
     title: 'Write a Review',
     amount: '\u00A310 one-time',
     description:
-      'Leave a genuine review of Uptrue on a trusted review platform (G2, Capterra, or Trustpilot). Submit the link and earn a one-time credit once verified.',
+      'Leave a genuine review of Upnotify on a trusted review platform (G2, Capterra, or Trustpilot). Submit the link and earn a one-time credit once verified.',
     frequency: 'One-time',
   },
   {
@@ -67,7 +67,7 @@ export default function CreditsPage(): React.ReactElement {
           <div className="public-page-header">
             <h1 className="public-page-title">Community Credits</h1>
             <p className="public-page-subtitle">
-              Earn credits toward your Uptrue subscription just by being part of the community.
+              Earn credits toward your Upnotify subscription just by being part of the community.
               Save up to <strong>{'\u00A3'}10/month</strong> off your plan.
             </p>
           </div>
@@ -80,12 +80,12 @@ export default function CreditsPage(): React.ReactElement {
                   <path d="M155 320 C 130 350, 100 355, 75 380" stroke="url(#creditsArrow2)" strokeWidth="2" strokeDasharray="5 6" strokeLinecap="round" />
                   <defs>
                     <linearGradient id="creditsArrow1" x1="225" y1="95" x2="240" y2="190" gradientUnits="userSpaceOnUse">
-                      <stop stopColor="#7c3aed" stopOpacity="0.5" />
+                      <stop stopColor="#00c94a" stopOpacity="0.5" />
                       <stop offset="1" stopColor="#ec4899" stopOpacity="0.5" />
                     </linearGradient>
                     <linearGradient id="creditsArrow2" x1="155" y1="320" x2="75" y2="380" gradientUnits="userSpaceOnUse">
                       <stop stopColor="#ec4899" stopOpacity="0.5" />
-                      <stop offset="1" stopColor="#7c3aed" stopOpacity="0.5" />
+                      <stop offset="1" stopColor="#00c94a" stopOpacity="0.5" />
                     </linearGradient>
                   </defs>
                 </svg>

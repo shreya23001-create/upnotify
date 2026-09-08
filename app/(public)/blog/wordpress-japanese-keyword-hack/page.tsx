@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Japanese Keyword Hack on WordPress: How Hackers Hijack Your SEO and You Don\'t Even Know',
     description:
-      'How the Japanese keyword hack works, why you cannot see it from wp-admin, how to clean your site, and how Uptrue keyword monitoring detects Japanese characters on English pages automatically.',
+      'How the Japanese keyword hack works, why you cannot see it from wp-admin, how to clean your site, and how Upnotify keyword monitoring detects Japanese characters on English pages automatically.',
     url: 'https://uptrue.io/blog/wordpress-japanese-keyword-hack',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Japanese Keyword Hack on WordPress: How Hackers Hijack Your SEO and You Don\'t Even Know',
     description:
-      'How the Japanese keyword hack works, why you cannot see it from wp-admin, how to clean your site, and how Uptrue keyword monitoring detects Japanese characters on English pages automatically.',
+      'How the Japanese keyword hack works, why you cannot see it from wp-admin, how to clean your site, and how Upnotify keyword monitoring detects Japanese characters on English pages automatically.',
   },
 }
 
@@ -67,7 +67,7 @@ export default function WordPressJapaneseKeywordHackPage(): React.ReactElement {
           '@type': 'Article',
           headline: 'Japanese Keyword Hack on WordPress: How Hackers Hijack Your SEO and You Don\'t Even Know',
           description: 'How the Japanese keyword hack works, why you cannot see it from wp-admin, how to clean your site, and how keyword monitoring detects Japanese characters on English pages.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-03-22',
           dateModified: '2026-03-22',
@@ -255,10 +255,10 @@ export default function WordPressJapaneseKeywordHackPage(): React.ReactElement {
           Install a reputable security plugin (Wordfence or Sucuri). Enable two-factor authentication for all admin accounts. Disable the WordPress file editor. Set correct file permissions. Consider a web application firewall. These measures do not just protect against reinfection — they prevent the initial compromise from happening again.
         </p>
 
-        <h2>How Uptrue keyword monitoring detects the hack</h2>
+        <h2>How Upnotify keyword monitoring detects the hack</h2>
 
         <p>
-          The Japanese keyword hack is designed to be invisible to site owners. But <Link href="/signup">Uptrue&apos;s keyword monitoring</Link> can catch the signs that human eyes miss.
+          The Japanese keyword hack is designed to be invisible to site owners. But <Link href="/signup">Upnotify&apos;s keyword monitoring</Link> can catch the signs that human eyes miss.
         </p>
 
         <h3>Step 1: Monitor for unexpected Japanese characters</h3>
@@ -363,7 +363,7 @@ export default function WordPressJapaneseKeywordHackPage(): React.ReactElement {
         </p>
 
         <p>
-          Uptrue monitors your pages from the outside, the way search engines and visitors see them. If unexpected content appears — Japanese characters, spam keywords, anything that should not be on your English-language site — you know in under a minute. Not in weeks. Not when a customer tells you. In under a minute.
+          Upnotify monitors your pages from the outside, the way search engines and visitors see them. If unexpected content appears — Japanese characters, spam keywords, anything that should not be on your English-language site — you know in under a minute. Not in weeks. Not when a customer tells you. In under a minute.
         </p>
 
         <div className="blog-cta-section">
@@ -390,7 +390,7 @@ export default function WordPressJapaneseKeywordHackPage(): React.ReactElement {
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

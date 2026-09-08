@@ -6,7 +6,7 @@ const data: IndustryLandingData = {
   heroTitle: 'E-commerce Uptime Monitoring',
   heroSubtitle:
     'Catch broken carts, payment gateway errors and slow checkouts before customers abandon. Built for online retailers, Shopify stores, and headless commerce teams.',
-  seoTitle: 'E-commerce Uptime Monitoring — Cart, Checkout & Payment Gateway | Uptrue',
+  seoTitle: 'E-commerce Uptime Monitoring — Cart, Checkout & Payment Gateway | Upnotify',
   seoDescription:
     'E-commerce uptime monitoring built for online retailers: checkout flow keyword detection, payment gateway response time, SSL expiry, redirect chain monitoring, and Black Friday-grade alerting. Stop losing sales to silent failures.',
   whyItMatters: [
@@ -65,7 +65,7 @@ const data: IndustryLandingData = {
     },
     {
       q: 'Do you monitor Shopify, WooCommerce, BigCommerce stores?',
-      a: 'Yes — Uptrue monitors any public URL regardless of the e-commerce platform. We additionally publish a WordPress plugin (free, on WordPress.org) that runs internal WooCommerce checks: payment gateway health, rogue admin accounts, plugin CVE detection, and order volume anomalies. The browser-side monitors and the plugin are complementary.',
+      a: 'Yes — Upnotify monitors any public URL regardless of the e-commerce platform. We additionally publish a WordPress plugin (free, on WordPress.org) that runs internal WooCommerce checks: payment gateway health, rogue admin accounts, plugin CVE detection, and order volume anomalies. The browser-side monitors and the plugin are complementary.',
     },
     {
       q: 'Can we run a smoke test of the full checkout flow?',
@@ -77,7 +77,7 @@ const data: IndustryLandingData = {
     },
     {
       q: 'Will monitoring add load to our checkout?',
-      a: 'Negligible. A monitor check is a single HTTP request from the edge — comparable to one bot crawl per check interval. At a 1-minute interval that is 1,440 requests per day from Uptrue, against typical checkout traffic of tens of thousands per day. Use HEAD requests or a dedicated /__health endpoint if you want zero-cost checks.',
+      a: 'Negligible. A monitor check is a single HTTP request from the edge — comparable to one bot crawl per check interval. At a 1-minute interval that is 1,440 requests per day from Upnotify, against typical checkout traffic of tens of thousands per day. Use HEAD requests or a dedicated /__health endpoint if you want zero-cost checks.',
     },
     {
       q: 'What about monitoring the payment gateway itself?',

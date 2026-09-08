@@ -30,7 +30,7 @@ export function ReportPrintWrapper({ title, period, generatedAt, hasWhiteLabel =
         {/* Page header */}
         <div className="report-page-header">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.svg" alt="Uptrue" height={28} style={{ display: 'block' }} />
+          <img src="/logo.svg" alt="Upnotify" height={28} style={{ display: 'block' }} />
           <div style={{ textAlign: 'right' }}>
             <div style={{ fontSize: 13, fontWeight: 600, color: '#1a1a2e' }}>{title}</div>
             <div style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>{period}</div>
@@ -46,7 +46,7 @@ export function ReportPrintWrapper({ title, period, generatedAt, hasWhiteLabel =
         <div className="report-page-footer">
           <span>Generated {formatted}</span>
           {!hasWhiteLabel && (
-            <span style={{ fontWeight: 500 }}>Powered by Uptrue · uptrue.io</span>
+            <span style={{ fontWeight: 500 }}>Powered by Upnotify · uptrue.io</span>
           )}
         </div>
       </div>

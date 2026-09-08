@@ -43,7 +43,7 @@ const FAQ_DATA = [
   {
     question: 'Can uptime monitoring detect a redirect loop?',
     answer:
-      'Yes, if your monitoring tool follows redirects and detects loops. Uptrue HTTP monitoring follows the redirect chain and alerts you when it detects a loop or when the number of redirects exceeds the expected count. This catches redirect loops automatically — often within 60 seconds of the problem starting — so you know about it before your visitors report it.',
+      'Yes, if your monitoring tool follows redirects and detects loops. Upnotify HTTP monitoring follows the redirect chain and alerts you when it detects a loop or when the number of redirects exceeds the expected count. This catches redirect loops automatically — often within 60 seconds of the problem starting — so you know about it before your visitors report it.',
   },
 ]
 
@@ -67,7 +67,7 @@ export default function WordPressTooManyRedirectsPage(): React.ReactElement {
           '@type': 'Article',
           headline: 'WordPress Too Many Redirects: Fix ERR_TOO_MANY_REDIRECTS and Prevent It Forever',
           description: 'What causes WordPress redirect loops, how to fix each cause step by step, and how to set up monitoring that catches redirect loops automatically.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-03-15',
           dateModified: '2026-03-15',
@@ -253,10 +253,10 @@ export default function WordPressTooManyRedirectsPage(): React.ReactElement {
           If the site loads, you know the problem is in one of the things you just disabled. Rename <code>plugins-backup</code> back to <code>plugins</code> and reactivate them one by one from wp-admin. Recreate <code>.htaccess</code> by saving your permalink settings. This methodical approach always finds the culprit.
         </p>
 
-        <h2>How Uptrue catches redirect loops automatically</h2>
+        <h2>How Upnotify catches redirect loops automatically</h2>
 
         <p>
-          The redirect loop is one of the few WordPress errors that is relatively easy to detect with standard HTTP monitoring — if your monitoring tool is configured correctly. <Link href="/signup">Uptrue&apos;s HTTP monitoring</Link> follows the redirect chain and detects when a loop occurs.
+          The redirect loop is one of the few WordPress errors that is relatively easy to detect with standard HTTP monitoring — if your monitoring tool is configured correctly. <Link href="/signup">Upnotify&apos;s HTTP monitoring</Link> follows the redirect chain and detects when a loop occurs.
         </p>
 
         <h3>Step 1: Set up an HTTP monitor</h3>
@@ -348,7 +348,7 @@ export default function WordPressTooManyRedirectsPage(): React.ReactElement {
         </p>
 
         <p>
-          Uptrue monitors your site every 60 seconds and alerts you on Slack, email, or Teams the moment something goes wrong. HTTP monitoring detects redirect loops automatically. Keyword monitoring catches the edge cases where the redirect lands on the wrong page instead of looping.
+          Upnotify monitors your site every 60 seconds and alerts you on Slack, email, or Teams the moment something goes wrong. HTTP monitoring detects redirect loops automatically. Keyword monitoring catches the edge cases where the redirect lands on the wrong page instead of looping.
         </p>
 
         <p>
@@ -379,7 +379,7 @@ export default function WordPressTooManyRedirectsPage(): React.ReactElement {
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

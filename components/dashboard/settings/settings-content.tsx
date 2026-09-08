@@ -432,7 +432,7 @@ export function SettingsContent({
                 </div>
                 <div>
                   <div className="stt-section-title">Credits</div>
-                  <div className="stt-section-sub">Earn and spend credits across Uptrue features.</div>
+                  <div className="stt-section-sub">Earn and spend credits across Upnotify features.</div>
                 </div>
               </div>
               <CreditsSection credits={credits} creditRules={creditRules} balancePence={creditBalance} currency={defaultCurrency} />
@@ -464,7 +464,7 @@ export function SettingsContent({
                 </div>
                 <div>
                   <div className="stt-section-title">API Keys</div>
-                  <div className="stt-section-sub">Authenticate with the Uptrue API. Keys are shown once.</div>
+                  <div className="stt-section-sub">Authenticate with the Upnotify API. Keys are shown once.</div>
                 </div>
               </div>
 
@@ -472,7 +472,7 @@ export function SettingsContent({
                 <div className="card stt-upgrade-gate">
                   <div className="stt-gate-icon"><Lock size={32} /></div>
                   <div className="stt-gate-title">API access requires a paid plan</div>
-                  <p className="stt-gate-sub">Upgrade to create API keys and integrate Uptrue with your tools and workflows.</p>
+                  <p className="stt-gate-sub">Upgrade to create API keys and integrate Upnotify with your tools and workflows.</p>
                   <a href="/dashboard/settings?tab=billing" className="btn btn-primary btn-sm">Upgrade plan</a>
                 </div>
               )}
@@ -501,7 +501,7 @@ export function SettingsContent({
                 <div className="card-header card-header-row">
                   <div>
                     <div className="card-title">API Keys</div>
-                    <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 2 }}>Used to authenticate with the Uptrue API and Compete webhooks.</p>
+                    <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 2 }}>Used to authenticate with the Upnotify API and Compete webhooks.</p>
                   </div>
                   {currentPlan?.has_api_access && (
                     <button className="btn btn-primary btn-sm" onClick={() => { setShowCreateForm(f => !f); setCreateError(null) }}>

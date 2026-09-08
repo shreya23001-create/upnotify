@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'WPML Breaking URLs After Update: How Multilingual Plugins Cause 404 Errors Across Your Site',
     description:
-      'What causes WPML to break translated URLs after updates, how language prefix conflicts and slug corruption produce 404 errors, and how Uptrue HTTP monitoring on every language version catches broken pages automatically.',
+      'What causes WPML to break translated URLs after updates, how language prefix conflicts and slug corruption produce 404 errors, and how Upnotify HTTP monitoring on every language version catches broken pages automatically.',
     url: 'https://uptrue.io/blog/wordpress-wpml-404-errors',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'WPML Breaking URLs After Update: How Multilingual Plugins Cause 404 Errors Across Your Site',
     description:
-      'What causes WPML to break translated URLs after updates, how language prefix conflicts and slug corruption produce 404 errors, and how Uptrue HTTP monitoring on every language version catches broken pages automatically.',
+      'What causes WPML to break translated URLs after updates, how language prefix conflicts and slug corruption produce 404 errors, and how Upnotify HTTP monitoring on every language version catches broken pages automatically.',
   },
 }
 
@@ -67,7 +67,7 @@ export default function WpmlFourOhFourErrorsPage(): React.ReactElement {
           '@type': 'Article',
           headline: 'WPML Breaking URLs After Update: How Multilingual Plugins Cause 404 Errors Across Your Site',
           description: 'What causes WPML to break translated URLs, how language prefix conflicts and slug corruption produce 404 errors, and how HTTP monitoring catches broken language versions automatically.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-04-03',
           dateModified: '2026-04-03',
@@ -235,10 +235,10 @@ export default function WpmlFourOhFourErrorsPage(): React.ReactElement {
           Go to WPML &gt; String Translation. Filter by domain &quot;WordPress&quot; and search for slug-related strings. Check that every translated slug has a value. Empty or missing slug translations cause 404 errors for those specific pages. Re-enter the translated slugs and save. Then flush permalinks again.
         </p>
 
-        <h2>How to monitor every language version with Uptrue</h2>
+        <h2>How to monitor every language version with Upnotify</h2>
 
         <p>
-          <Link href="/signup">Uptrue&apos;s HTTP monitoring</Link> lets you set up separate monitors for every language version of your site. Instead of checking only your default homepage and assuming all languages work, you monitor each language individually. When WPML breaks one language&apos;s URLs, you know within 60 seconds — not three days later when a customer emails you in French to ask why your site is broken.
+          <Link href="/signup">Upnotify&apos;s HTTP monitoring</Link> lets you set up separate monitors for every language version of your site. Instead of checking only your default homepage and assuming all languages work, you monitor each language individually. When WPML breaks one language&apos;s URLs, you know within 60 seconds — not three days later when a customer emails you in French to ask why your site is broken.
         </p>
 
         <h3>Step 1: Set up HTTP monitors for every language homepage</h3>
@@ -353,7 +353,7 @@ export default function WpmlFourOhFourErrorsPage(): React.ReactElement {
         </p>
 
         <p>
-          Uptrue HTTP monitoring checks every language version independently, every 60 seconds. When WPML breaks French URLs but leaves German and Spanish working, the French monitor triggers immediately. You fix it before Google deindexes your French pages. Before your French ad campaigns send traffic to 404 pages. Before your French customers think your business has shut down.
+          Upnotify HTTP monitoring checks every language version independently, every 60 seconds. When WPML breaks French URLs but leaves German and Spanish working, the French monitor triggers immediately. You fix it before Google deindexes your French pages. Before your French ad campaigns send traffic to 404 pages. Before your French customers think your business has shut down.
         </p>
 
         <div className="blog-cta-section">
@@ -380,7 +380,7 @@ export default function WpmlFourOhFourErrorsPage(): React.ReactElement {
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

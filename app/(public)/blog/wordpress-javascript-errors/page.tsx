@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'JavaScript Errors Breaking WordPress Page Functionality: When Your Site Is Up But Broken',
     description:
-      'How JavaScript errors silently break WordPress forms, buttons, and navigation while uptime monitors report everything as healthy. What causes them and how Uptrue keyword monitoring detects broken functionality.',
+      'How JavaScript errors silently break WordPress forms, buttons, and navigation while uptime monitors report everything as healthy. What causes them and how Upnotify keyword monitoring detects broken functionality.',
     url: 'https://uptrue.io/blog/wordpress-javascript-errors',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'JavaScript Errors Breaking WordPress Page Functionality: When Your Site Is Up But Broken',
     description:
-      'How JavaScript errors silently break WordPress forms, buttons, and navigation while uptime monitors report everything as healthy. What causes them and how Uptrue keyword monitoring detects broken functionality.',
+      'How JavaScript errors silently break WordPress forms, buttons, and navigation while uptime monitors report everything as healthy. What causes them and how Upnotify keyword monitoring detects broken functionality.',
   },
 }
 
@@ -67,7 +67,7 @@ export default function WordPressJavascriptErrorsPage(): React.ReactElement {
           '@type': 'Article',
           headline: 'JavaScript Errors Breaking WordPress Page Functionality: When Your Site Is Up But Broken',
           description: 'How JavaScript errors silently break WordPress forms, buttons, and navigation, and how keyword monitoring detects broken functionality automatically.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-04-02',
           dateModified: '2026-04-02',
@@ -207,10 +207,10 @@ export default function WordPressJavascriptErrorsPage(): React.ReactElement {
           This is the gap that keyword monitoring fills. While it cannot execute JavaScript either, it can verify that the expected results of JavaScript execution are present. If a form plugin renders the form via JavaScript and the JavaScript fails, the form element is missing from the page content. If a dynamically loaded element fails to appear, the text associated with it is missing. Keyword monitoring catches the symptom — missing content — even when it cannot detect the cause.
         </p>
 
-        <h2>How to monitor for JavaScript-related failures with Uptrue</h2>
+        <h2>How to monitor for JavaScript-related failures with Upnotify</h2>
 
         <p>
-          <Link href="/signup">Uptrue&apos;s keyword monitoring</Link> verifies that functional text and elements are present on your pages. When JavaScript errors break page functionality and cause expected content to disappear, Uptrue detects it and alerts you immediately.
+          <Link href="/signup">Upnotify&apos;s keyword monitoring</Link> verifies that functional text and elements are present on your pages. When JavaScript errors break page functionality and cause expected content to disappear, Upnotify detects it and alerts you immediately.
         </p>
 
         <h3>Step 1: Set up keyword monitors on critical interactive pages</h3>
@@ -227,7 +227,7 @@ export default function WordPressJavascriptErrorsPage(): React.ReactElement {
         </ol>
 
         <p>
-          If a JavaScript error prevents your contact form from rendering, the submit button text disappears from the page. Uptrue detects the missing keyword and alerts you immediately. Repeat this for every page with critical interactive functionality.
+          If a JavaScript error prevents your contact form from rendering, the submit button text disappears from the page. Upnotify detects the missing keyword and alerts you immediately. Repeat this for every page with critical interactive functionality.
         </p>
 
         <h3>Step 2: Monitor functional text on key pages</h3>
@@ -324,7 +324,7 @@ export default function WordPressJavascriptErrorsPage(): React.ReactElement {
         </p>
 
         <p>
-          Uptrue keyword monitoring checks that functional text is present on your pages every 60 seconds. If a JavaScript error causes a form to disappear, a button to vanish, or an error message to appear, you know in under a minute. Before the next visitor tries and fails. Before you lose another lead, sale, or customer.
+          Upnotify keyword monitoring checks that functional text is present on your pages every 60 seconds. If a JavaScript error causes a form to disappear, a button to vanish, or an error message to appear, you know in under a minute. Before the next visitor tries and fails. Before you lose another lead, sale, or customer.
         </p>
 
         <div className="blog-cta-section">
@@ -351,7 +351,7 @@ export default function WordPressJavascriptErrorsPage(): React.ReactElement {
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

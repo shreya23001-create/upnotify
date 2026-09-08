@@ -5,9 +5,9 @@ import {
 } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Sub-processors — Uptrue',
+  title: 'Sub-processors — Upnotify',
   description:
-    'List of third-party sub-processors used by Uptrue to deliver the monitoring platform, including data location and purpose.',
+    'List of third-party sub-processors used by Upnotify to deliver the monitoring platform, including data location and purpose.',
   alternates: { canonical: 'https://uptrue.io/subprocessors' },
 }
 
@@ -95,7 +95,7 @@ export default function SubprocessorsPage(): React.ReactElement {
         <h1>Sub-processors</h1>
         <p className="legal-updated">Last updated: April 2026</p>
         <p className="subp-hero-text">
-          Uptrue uses the following third-party sub-processors to deliver and support the platform.
+          Upnotify uses the following third-party sub-processors to deliver and support the platform.
           Each sub-processor has been assessed for compliance with data protection legislation
           (including GDPR and UK GDPR) and is bound by appropriate data processing agreements.
         </p>

@@ -43,7 +43,7 @@ const FAQ_DATA = [
   {
     question: 'Can monitoring detect when a WordPress auto-update breaks my site?',
     answer:
-      'Yes. An HTTP monitor that checks your site every 60 seconds will detect most auto-update failures immediately. Failed updates typically cause a 500 Internal Server Error, a white screen, or the WordPress critical error message — all of which are detectable by HTTP status code monitoring or keyword monitoring. Uptrue checks your site every minute and alerts you via Slack, email, Microsoft Teams, or webhook the moment the response changes. Without monitoring, you discover the break when a customer tells you — which could be hours later.',
+      'Yes. An HTTP monitor that checks your site every 60 seconds will detect most auto-update failures immediately. Failed updates typically cause a 500 Internal Server Error, a white screen, or the WordPress critical error message — all of which are detectable by HTTP status code monitoring or keyword monitoring. Upnotify checks your site every minute and alerts you via Slack, email, Microsoft Teams, or webhook the moment the response changes. Without monitoring, you discover the break when a customer tells you — which could be hours later.',
   },
 ]
 
@@ -67,7 +67,7 @@ export default function WordPressAutoUpdateBrokeSitePage(): React.ReactElement {
           '@type': 'Article',
           headline: 'WordPress Auto-Update Broke My Site: How to Recover and Prevent It From Happening Again',
           description: 'Why WordPress auto-updates break sites, how to recover from a failed update, and how HTTP monitoring catches the break within 60 seconds.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-04-03',
           dateModified: '2026-04-03',
@@ -239,7 +239,7 @@ export default function WordPressAutoUpdateBrokeSitePage(): React.ReactElement {
         </p>
 
         <p>
-          <Link href="/signup">Uptrue&apos;s HTTP monitoring</Link> closes that gap. It checks your site every 60 seconds. When an auto-update breaks your site, Uptrue detects the failure on the next check and alerts you immediately.
+          <Link href="/signup">Upnotify&apos;s HTTP monitoring</Link> closes that gap. It checks your site every 60 seconds. When an auto-update breaks your site, Upnotify detects the failure on the next check and alerts you immediately.
         </p>
 
         <h3>Step 1: Set up an HTTP monitor for your homepage</h3>
@@ -380,7 +380,7 @@ export default function WordPressAutoUpdateBrokeSitePage(): React.ReactElement {
         </p>
 
         <p>
-          Uptrue checks your site every minute. HTTP monitoring catches 500 errors from failed updates. Keyword monitoring catches critical error messages and maintenance mode pages that return 200 status codes. You get alerted on Slack, Teams, email, or webhook before your visitors or customers notice anything wrong.
+          Upnotify checks your site every minute. HTTP monitoring catches 500 errors from failed updates. Keyword monitoring catches critical error messages and maintenance mode pages that return 200 status codes. You get alerted on Slack, Teams, email, or webhook before your visitors or customers notice anything wrong.
         </p>
 
         <p>
@@ -411,7 +411,7 @@ export default function WordPressAutoUpdateBrokeSitePage(): React.ReactElement {
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

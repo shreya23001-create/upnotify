@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'WordPress Brute Force Attack Slowing Your Site: How Thousands of Login Attempts Cause Downtime',
     description:
-      'What causes WordPress brute force attacks to crash your site, how wp-login.php and xmlrpc.php flooding exhausts server resources, and how Uptrue HTTP monitoring detects response time spikes from active attacks.',
+      'What causes WordPress brute force attacks to crash your site, how wp-login.php and xmlrpc.php flooding exhausts server resources, and how Upnotify HTTP monitoring detects response time spikes from active attacks.',
     url: 'https://uptrue.io/blog/wordpress-brute-force-attack',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'WordPress Brute Force Attack Slowing Your Site: How Thousands of Login Attempts Cause Downtime',
     description:
-      'What causes WordPress brute force attacks to crash your site, how wp-login.php and xmlrpc.php flooding exhausts server resources, and how Uptrue HTTP monitoring detects response time spikes from active attacks.',
+      'What causes WordPress brute force attacks to crash your site, how wp-login.php and xmlrpc.php flooding exhausts server resources, and how Upnotify HTTP monitoring detects response time spikes from active attacks.',
   },
 }
 
@@ -67,7 +67,7 @@ export default function WordPressBruteForceAttackPage(): React.ReactElement {
           '@type': 'Article',
           headline: 'WordPress Brute Force Attack Slowing Your Site: How Thousands of Login Attempts Cause Downtime',
           description: 'What causes WordPress brute force attacks to crash your site, how to harden against them, and how HTTP monitoring catches the response time spike before the crash.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-04-03',
           dateModified: '2026-04-03',
@@ -224,10 +224,10 @@ export default function WordPressBruteForceAttackPage(): React.ReactElement {
           Replace <code>203.0.113.10</code> with your actual IP. This blocks every brute force attempt at the web server level — no PHP execution, no database queries, no CPU cost.
         </p>
 
-        <h2>How to detect brute force attacks with Uptrue</h2>
+        <h2>How to detect brute force attacks with Upnotify</h2>
 
         <p>
-          <Link href="/signup">Uptrue&apos;s HTTP monitoring</Link> tracks both uptime and response time on every check. A brute force attack causes a characteristic response time spike that monitoring catches before the site crashes — giving you time to block the attack and prevent downtime.
+          <Link href="/signup">Upnotify&apos;s HTTP monitoring</Link> tracks both uptime and response time on every check. A brute force attack causes a characteristic response time spike that monitoring catches before the site crashes — giving you time to block the attack and prevent downtime.
         </p>
 
         <h3>Step 1: Set up HTTP monitoring with response time alerting</h3>
@@ -243,7 +243,7 @@ export default function WordPressBruteForceAttackPage(): React.ReactElement {
         </ol>
 
         <p>
-          Uptrue tracks response time on every check. When a brute force attack begins consuming your server resources, response time climbs from your normal baseline to 2, 5, 10 seconds. The response time history in your dashboard shows the exact moment the degradation started — which correlates with the attack start time in your server logs.
+          Upnotify tracks response time on every check. When a brute force attack begins consuming your server resources, response time climbs from your normal baseline to 2, 5, 10 seconds. The response time history in your dashboard shows the exact moment the degradation started — which correlates with the attack start time in your server logs.
         </p>
 
         <h3>Step 2: Monitor wp-login.php directly</h3>
@@ -333,7 +333,7 @@ export default function WordPressBruteForceAttackPage(): React.ReactElement {
         </p>
 
         <p>
-          Uptrue HTTP monitoring tracks your response time on every check. When an attack starts consuming your resources, the response time graph spikes. You get alerted before the crash. You block the attack. Your site stays up. Your visitors never know anything happened. That is the difference between monitoring and hoping.
+          Upnotify HTTP monitoring tracks your response time on every check. When an attack starts consuming your resources, the response time graph spikes. You get alerted before the crash. You block the attack. Your site stays up. Your visitors never know anything happened. That is the difference between monitoring and hoping.
         </p>
 
         <div className="blog-cta-section">
@@ -360,7 +360,7 @@ export default function WordPressBruteForceAttackPage(): React.ReactElement {
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

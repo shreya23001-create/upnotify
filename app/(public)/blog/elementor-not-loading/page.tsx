@@ -6,7 +6,7 @@ import Faq from '@/components/landing/faq'
 export const metadata: Metadata = {
   title: 'Elementor Not Loading After Update? Fix the White Screen Before You Lose Traffic',
   description:
-    'Elementor can break after a WordPress or plugin update — showing a white screen, missing widgets, or a 500 error. Learn why it happens (PHP version, theme conflicts, stale cache, memory limits) and how Uptrue HTTP and keyword monitoring catches Elementor failures before your visitors do.',
+    'Elementor can break after a WordPress or plugin update — showing a white screen, missing widgets, or a 500 error. Learn why it happens (PHP version, theme conflicts, stale cache, memory limits) and how Upnotify HTTP and keyword monitoring catches Elementor failures before your visitors do.',
   alternates: { canonical: 'https://uptrue.io/blog/elementor-not-loading' },
   openGraph: {
     title: 'Elementor Not Loading After Update? Fix the White Screen Before You Lose Traffic',
@@ -67,7 +67,7 @@ export default function ElementorNotLoadingPage(): React.ReactElement {
           '@type': 'Article',
           headline: 'Elementor Not Loading After Update? Fix the White Screen Before You Lose Traffic',
           description: 'Why Elementor breaks after updates, how to fix it, and how HTTP and keyword monitoring catches broken pages automatically.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-03-27',
           dateModified: '2026-03-27',
@@ -205,10 +205,10 @@ export default function ElementorNotLoadingPage(): React.ReactElement {
           This is why HTTP status code monitoring alone is not enough for sites built with Elementor. You need monitoring that checks what is actually on the page — not just whether the server responded successfully.
         </p>
 
-        <h2>How Uptrue catches Elementor failures automatically</h2>
+        <h2>How Upnotify catches Elementor failures automatically</h2>
 
         <p>
-          <Link href="/signup">Uptrue</Link> combines HTTP monitoring with keyword monitoring to catch both server-level crashes and content-level failures. Here is how to set it up for an Elementor-powered site.
+          <Link href="/signup">Upnotify</Link> combines HTTP monitoring with keyword monitoring to catch both server-level crashes and content-level failures. Here is how to set it up for an Elementor-powered site.
         </p>
 
         <h3>Step 1: Set up HTTP monitoring to catch 500 errors</h3>
@@ -224,7 +224,7 @@ export default function ElementorNotLoadingPage(): React.ReactElement {
         </ol>
 
         <p>
-          This catches the worst-case scenario: a PHP fatal error from a bad update that returns a 500 Internal Server Error. Uptrue confirms the failure with a second check from a different region before alerting you, so you do not get false positives from temporary network issues.
+          This catches the worst-case scenario: a PHP fatal error from a bad update that returns a 500 Internal Server Error. Upnotify confirms the failure with a second check from a different region before alerting you, so you do not get false positives from temporary network issues.
         </p>
 
         <h3>Step 2: Set up keyword monitoring to catch missing content</h3>
@@ -239,7 +239,7 @@ export default function ElementorNotLoadingPage(): React.ReactElement {
         </ol>
 
         <p>
-          Now if Elementor fails to render and your carefully designed content disappears — replaced by a white screen, a fallback theme layout, or unstyled text — Uptrue detects that the keyword is missing and alerts you. The page returned 200. A basic uptime tool would say everything is fine. Uptrue tells you the content is gone.
+          Now if Elementor fails to render and your carefully designed content disappears — replaced by a white screen, a fallback theme layout, or unstyled text — Upnotify detects that the keyword is missing and alerts you. The page returned 200. A basic uptime tool would say everything is fine. Upnotify tells you the content is gone.
         </p>
 
         <h3>Step 3: Monitor multiple critical pages</h3>
@@ -302,7 +302,7 @@ export default function ElementorNotLoadingPage(): React.ReactElement {
           <li>Regenerate Elementor CSS: Elementor &gt; Tools &gt; Regenerate CSS.</li>
           <li>Clear all caches — plugin cache, hosting cache, CDN cache.</li>
           <li>Test in an incognito window (not logged in) to see what visitors see.</li>
-          <li>Check your Uptrue dashboard to confirm all monitors are green.</li>
+          <li>Check your Upnotify dashboard to confirm all monitors are green.</li>
         </ol>
 
         <h2>When to roll back instead of debugging</h2>
@@ -322,7 +322,7 @@ export default function ElementorNotLoadingPage(): React.ReactElement {
         </p>
 
         <p>
-          Uptrue keyword monitoring checks your pages every few minutes and verifies that the content Elementor is supposed to render actually appears in the HTML. The moment it disappears — whether from a bad update, a PHP memory crash, a cache serving stale assets, or a theme conflict — you know. Not tomorrow. Not when a customer complains. Right now.
+          Upnotify keyword monitoring checks your pages every few minutes and verifies that the content Elementor is supposed to render actually appears in the HTML. The moment it disappears — whether from a bad update, a PHP memory crash, a cache serving stale assets, or a theme conflict — you know. Not tomorrow. Not when a customer complains. Right now.
         </p>
 
         <div className="blog-cta-section">
@@ -349,7 +349,7 @@ export default function ElementorNotLoadingPage(): React.ReactElement {
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

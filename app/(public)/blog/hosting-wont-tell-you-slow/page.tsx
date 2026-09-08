@@ -58,7 +58,7 @@ const FAQ_DATA = [
   {
     question: 'How can I prove to my hosting provider that my site is slow?',
     answer:
-      'External monitoring with timestamped response time data is the most effective proof. When you contact support saying "my site is slow," they will run a quick test from their end and often reply "it loads fine for us" — because they are testing from within their own network. An external monitoring service like Uptrue records response times from outside the hosting environment every 60 seconds. You can show support the exact times when TTFB spiked, how long the degradation lasted, and the pattern over days or weeks. This is data they cannot dismiss.',
+      'External monitoring with timestamped response time data is the most effective proof. When you contact support saying "my site is slow," they will run a quick test from their end and often reply "it loads fine for us" — because they are testing from within their own network. An external monitoring service like Upnotify records response times from outside the hosting environment every 60 seconds. You can show support the exact times when TTFB spiked, how long the degradation lasted, and the pattern over days or weeks. This is data they cannot dismiss.',
   },
   {
     question: 'What response time should I consider too slow?',
@@ -87,7 +87,7 @@ export default function HostingWontTellYouSlowPage(): React.ReactElement {
           '@type': 'Article',
           headline: 'Your Hosting Provider Won\'t Tell You When Your Site Is Slow',
           description: 'Hosting providers do not monitor or alert you to individual site performance degradation. TTFB spikes, resource contention, and throttling happen silently.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-03-22',
           dateModified: '2026-03-22',
@@ -214,7 +214,7 @@ export default function HostingWontTellYouSlowPage(): React.ReactElement {
         <h3>Step 1: Set up response time monitoring</h3>
 
         <p>
-          <Link href="/signup">Uptrue&apos;s HTTP monitoring</Link> checks your site every 60 seconds and records the response time on each check. Within 24 hours, you have a clear picture of your site&apos;s actual performance — including the degradation periods your hosting provider never mentions.
+          <Link href="/signup">Upnotify&apos;s HTTP monitoring</Link> checks your site every 60 seconds and records the response time on each check. Within 24 hours, you have a clear picture of your site&apos;s actual performance — including the degradation periods your hosting provider never mentions.
         </p>
 
         <ol>
@@ -323,7 +323,7 @@ export default function HostingWontTellYouSlowPage(): React.ReactElement {
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

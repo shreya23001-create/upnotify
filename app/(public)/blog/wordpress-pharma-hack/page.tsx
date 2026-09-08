@@ -38,7 +38,7 @@ const FAQ_DATA = [
   {
     question: 'Can uptime monitoring detect the WordPress pharma hack?',
     answer:
-      'Standard HTTP uptime monitoring will not detect the pharma hack because the site continues to return 200 OK responses and loads normally for visitors. However, keyword monitoring can detect it. Uptrue keyword monitoring checks the actual HTML content of your pages. By setting up a monitor that alerts if pharmaceutical terms like "viagra," "cialis," or "pharmacy" appear on your pages, you catch the hack even when it uses CSS to hide the text from visual display. The keywords are still in the HTML source code.',
+      'Standard HTTP uptime monitoring will not detect the pharma hack because the site continues to return 200 OK responses and loads normally for visitors. However, keyword monitoring can detect it. Upnotify keyword monitoring checks the actual HTML content of your pages. By setting up a monitor that alerts if pharmaceutical terms like "viagra," "cialis," or "pharmacy" appear on your pages, you catch the hack even when it uses CSS to hide the text from visual display. The keywords are still in the HTML source code.',
   },
   {
     question: 'How do I remove the pharma hack from WordPress?',
@@ -67,7 +67,7 @@ export default function WordPressPharmaHackPage(): React.ReactElement {
           '@type': 'Article',
           headline: 'WordPress Pharma Hack: Hidden Viagra Links in Your Site That Only Google Sees',
           description: 'How the WordPress pharma hack works, why you cannot see the injected content, how to clean it, and how keyword monitoring detects pharmaceutical spam on your pages.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-03-25',
           dateModified: '2026-03-25',
@@ -269,10 +269,10 @@ export default function WordPressPharmaHackPage(): React.ReactElement {
           {' '}for the full reconsideration process.
         </p>
 
-        <h2>How Uptrue keyword monitoring detects the pharma hack</h2>
+        <h2>How Upnotify keyword monitoring detects the pharma hack</h2>
 
         <p>
-          The pharma hack is designed to be invisible to the human eye. But <Link href="/signup">Uptrue&apos;s keyword monitoring</Link> does not use eyes. It reads the raw HTML of your pages — the same HTML that Google reads. If pharmaceutical terms appear anywhere in your page source, keyword monitoring catches them.
+          The pharma hack is designed to be invisible to the human eye. But <Link href="/signup">Upnotify&apos;s keyword monitoring</Link> does not use eyes. It reads the raw HTML of your pages — the same HTML that Google reads. If pharmaceutical terms appear anywhere in your page source, keyword monitoring catches them.
         </p>
 
         <h3>Step 1: Monitor for pharmaceutical keywords</h3>
@@ -381,7 +381,7 @@ export default function WordPressPharmaHackPage(): React.ReactElement {
         </p>
 
         <p>
-          Uptrue keyword monitoring reads the raw HTML of your pages every 60 seconds. If pharmaceutical terms appear anywhere in the source — in hidden divs, in tiny text, in injected scripts — you know in under a minute. Not in weeks. Not when a customer tells you. Not when Google penalises you. In under a minute.
+          Upnotify keyword monitoring reads the raw HTML of your pages every 60 seconds. If pharmaceutical terms appear anywhere in the source — in hidden divs, in tiny text, in injected scripts — you know in under a minute. Not in weeks. Not when a customer tells you. Not when Google penalises you. In under a minute.
         </p>
 
         <div className="blog-cta-section">
@@ -408,7 +408,7 @@ export default function WordPressPharmaHackPage(): React.ReactElement {
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

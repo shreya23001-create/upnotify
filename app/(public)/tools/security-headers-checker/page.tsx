@@ -6,7 +6,7 @@ import Faq from '@/components/landing/faq'
 import { ScrollReveal } from '@/components/landing/scroll-reveal'
 
 export const metadata: Metadata = {
-  title: 'Free Security Headers Checker — Test HTTP Headers | Uptrue',
+  title: 'Free Security Headers Checker — Test HTTP Headers | Upnotify',
   description:
     'Check your website\'s HTTP security headers instantly. Test for HSTS, CSP, X-Frame-Options, and more. Get a security grade and actionable recommendations. Free tool.',
   alternates: { canonical: 'https://uptrue.io/tools/security-headers-checker' },
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     'security headers grade',
   ],
   openGraph: {
-    title: 'Free Security Headers Checker — Test HTTP Headers | Uptrue',
+    title: 'Free Security Headers Checker — Test HTTP Headers | Upnotify',
     description:
       'Check your website\'s HTTP security headers instantly. Get a security grade, see missing headers, and fix vulnerabilities.',
     url: 'https://uptrue.io/tools/security-headers-checker',
@@ -165,7 +165,7 @@ export default function SecurityHeadersCheckerPage(): React.ReactElement {
           <div className="tools-cta reveal">
             <h2>Monitor your security headers 24/7</h2>
             <p>
-              Security headers go missing in deployments more often than teams realise. Uptrue&apos;s{' '}
+              Security headers go missing in deployments more often than teams realise. Upnotify&apos;s{' '}
               <Link href="/monitoring/security-headers-monitoring">security headers monitoring</Link> checks
               every six hours and pairs naturally with{' '}
               <Link href="/monitoring/ssl-certificate-monitoring">SSL certificate monitoring</Link> for the full

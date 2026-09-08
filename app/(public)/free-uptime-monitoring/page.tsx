@@ -4,12 +4,12 @@ import { getPlanBySlug } from '@/lib/db/plans'
 import type { Plan } from '@/lib/types'
 
 export const metadata: Metadata = {
-  title: 'Free Uptime Monitoring — No Credit Card, No Trial | Uptrue',
+  title: 'Free Uptime Monitoring — No Credit Card, No Trial | Upnotify',
   description:
     'Free uptime monitoring with email alerts. HTTP/HTTPS, SSL certificate, DNS, response time and 20 other monitor types. Genuinely free — not a trial. No credit card required.',
   alternates: { canonical: 'https://uptrue.io/free-uptime-monitoring' },
   openGraph: {
-    title: 'Free Uptime Monitoring — No Credit Card, No Trial | Uptrue',
+    title: 'Free Uptime Monitoring — No Credit Card, No Trial | Upnotify',
     description:
       'Genuinely free uptime monitoring with email alerts. No credit card, no trial.',
     url: 'https://uptrue.io/free-uptime-monitoring',
@@ -71,7 +71,7 @@ const FAQ_BASE = [
   },
   {
     q: 'What types of monitors can I run on the Free plan?',
-    a: 'All 24 Uptrue monitor types are available on every plan including Free: HTTP/HTTPS uptime, SSL certificate, DNS records, response time, keyword detection, security headers, redirect chain, blacklist, SPF/DMARC, port checks, ping, API endpoint, heartbeat, and more. You just pick your set within the plan\'s monitor limit.',
+    a: 'All 24 Upnotify monitor types are available on every plan including Free: HTTP/HTTPS uptime, SSL certificate, DNS records, response time, keyword detection, security headers, redirect chain, blacklist, SPF/DMARC, port checks, ping, API endpoint, heartbeat, and more. You just pick your set within the plan\'s monitor limit.',
   },
   {
     q: 'When would I need to upgrade to Lite?',
@@ -79,7 +79,7 @@ const FAQ_BASE = [
   },
   {
     q: 'Will my monitors be paused if I do not upgrade?',
-    a: 'No. The Free plan is permanent. You can run your free monitors for as long as the Uptrue service is running. We will never pause Free monitors to coerce an upgrade.',
+    a: 'No. The Free plan is permanent. You can run your free monitors for as long as the Upnotify service is running. We will never pause Free monitors to coerce an upgrade.',
   },
   {
     q: 'Do you have a longer free trial of paid features?',
@@ -124,7 +124,7 @@ export default async function FreeUptimeMonitoringPage(): Promise<React.ReactEle
     { title: freeInterval, description: 'Two-confirmation logic eliminates 95% of false positives from transient blips. No alert until two consecutive checks fail.' },
     { title: freeRetention, description: 'Full incident timeline, response time charts, and uptime percentage on every monitor.' },
     { title: 'Free monitoring tools', description: 'Unlimited use of all 14 free tools — SSL Checker, DNS Lookup, Security Headers Checker, blacklist checker, and more — without signing up.' },
-    { title: 'WordPress plugin', description: 'Free Uptrue WordPress plugin available on the Free plan and above. Internal site checks, integrity scans, and more.' },
+    { title: 'WordPress plugin', description: 'Free Upnotify WordPress plugin available on the Free plan and above. Internal site checks, integrity scans, and more.' },
   ]
 
   const compareRows = [
@@ -146,7 +146,7 @@ export default async function FreeUptimeMonitoringPage(): Promise<React.ReactEle
     '@graph': [
       {
         '@type': 'SoftwareApplication',
-        name: 'Uptrue Free Uptime Monitoring',
+        name: 'Upnotify Free Uptime Monitoring',
         description: `Free uptime monitoring with ${freeMonitors} monitor${freeMonitors === '1' ? '' : 's'} and email alerts. Genuinely free — no card, no trial.`,
         url: 'https://uptrue.io/free-uptime-monitoring',
         applicationCategory: 'BusinessApplication',
@@ -159,7 +159,7 @@ export default async function FreeUptimeMonitoringPage(): Promise<React.ReactEle
         },
         publisher: {
           '@type': 'Organization',
-          name: 'Uptrue',
+          name: 'Upnotify',
           url: 'https://uptrue.io',
         },
       },
@@ -320,7 +320,7 @@ export default async function FreeUptimeMonitoringPage(): Promise<React.ReactEle
           <ul className="about-list" style={{ fontSize: 15, lineHeight: 1.9 }}>
             <li><Link href="/integrations/slack">Slack integration</Link> — block-formatted alerts in your team channel.</li>
             <li><Link href="/integrations/teams">Microsoft Teams integration</Link> — MessageCard alerts in any channel.</li>
-            <li><Link href="/integrations/telegram">Telegram integration</Link> — mobile push alerts via the Uptrue bot.</li>
+            <li><Link href="/integrations/telegram">Telegram integration</Link> — mobile push alerts via the Upnotify bot.</li>
             <li><Link href="/integrations/webhook">Signed webhooks</Link> — wire alerts into PagerDuty, Opsgenie, n8n, anything.</li>
           </ul>
         </section>

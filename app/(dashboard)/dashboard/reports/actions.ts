@@ -64,7 +64,7 @@ export async function generateReportAction(formData: FormData): Promise<{ error?
         for (const email of emails) {
           await sendEmail(
             email,
-            `Uptrue ${reportType.charAt(0).toUpperCase() + reportType.slice(1)} Report — ${periodStart} to ${periodEnd}`,
+            `Upnotify ${reportType.charAt(0).toUpperCase() + reportType.slice(1)} Report — ${periodStart} to ${periodEnd}`,
             `Your ${reportType} report is ready. View it at: ${appUrl}/dashboard/reports/${report.id}`
           )
         }

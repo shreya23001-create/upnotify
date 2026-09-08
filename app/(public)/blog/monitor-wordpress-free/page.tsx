@@ -6,7 +6,7 @@ import Faq from '@/components/landing/faq'
 export const metadata: Metadata = {
   title: 'How to Monitor Your WordPress Site for Free in 2026',
   description:
-    'Learn how to monitor your WordPress site for free — uptime checks, SSL monitoring, performance tracking, and keyword monitoring. Set up in 60 seconds with Uptrue.',
+    'Learn how to monitor your WordPress site for free — uptime checks, SSL monitoring, performance tracking, and keyword monitoring. Set up in 60 seconds with Upnotify.',
   alternates: { canonical: 'https://uptrue.io/blog/monitor-wordpress-free' },
   openGraph: {
     title: 'How to Monitor Your WordPress Site for Free in 2026',
@@ -28,7 +28,7 @@ const FAQ_DATA = [
   {
     question: 'Can I really monitor my WordPress site for free?',
     answer:
-      'Yes. Uptrue offers a free plan that includes HTTP uptime monitoring, SSL certificate monitoring, and keyword monitoring. You get one-minute check intervals and alerts via email. No credit card is required to sign up.',
+      'Yes. Upnotify offers a free plan that includes HTTP uptime monitoring, SSL certificate monitoring, and keyword monitoring. You get one-minute check intervals and alerts via email. No credit card is required to sign up.',
   },
   {
     question: 'What should I monitor on my WordPress site?',
@@ -38,7 +38,7 @@ const FAQ_DATA = [
   {
     question: 'How often should my WordPress site be checked?',
     answer:
-      'Every 60 seconds is the standard for business-critical sites. If your site generates revenue, leads, or serves customers, a one-minute check interval means you know about problems within a minute instead of hours. Uptrue free plan supports one-minute checks.',
+      'Every 60 seconds is the standard for business-critical sites. If your site generates revenue, leads, or serves customers, a one-minute check interval means you know about problems within a minute instead of hours. Upnotify free plan supports one-minute checks.',
   },
   {
     question: 'Will monitoring slow down my WordPress site?',
@@ -51,19 +51,19 @@ const FAQ_DATA = [
       'Keyword monitoring checks that specific text exists on your page. WordPress can return a 200 OK status code while showing error messages like "Error Establishing a Database Connection" or a white screen. A standard HTTP check sees "up" but keyword monitoring catches the broken content.',
   },
   {
-    question: 'How is Uptrue different from other free monitoring tools?',
+    question: 'How is Upnotify different from other free monitoring tools?',
     answer:
-      'Most free monitoring tools only check HTTP status codes. Uptrue includes keyword monitoring on the free plan, which catches WordPress-specific failures like database errors, white screens, and hacked content that return 200 OK but show broken pages. You also get SSL monitoring and a public status page.',
+      'Most free monitoring tools only check HTTP status codes. Upnotify includes keyword monitoring on the free plan, which catches WordPress-specific failures like database errors, white screens, and hacked content that return 200 OK but show broken pages. You also get SSL monitoring and a public status page.',
   },
   {
     question: 'Do I need a plugin to monitor my WordPress site?',
     answer:
-      'No. External monitoring like Uptrue works without installing any plugin. In fact, external monitoring is more reliable because it checks your site from outside your server — exactly the way your visitors experience it. Plugins can only monitor from inside, and if your server is down, the plugin is down too.',
+      'No. External monitoring like Upnotify works without installing any plugin. In fact, external monitoring is more reliable because it checks your site from outside your server — exactly the way your visitors experience it. Plugins can only monitor from inside, and if your server is down, the plugin is down too.',
   },
   {
     question: 'What happens when my WordPress site goes down?',
     answer:
-      'Uptrue sends you an alert immediately via your chosen channel — email, Slack, or Microsoft Teams. The alert includes what failed, when it failed, and the response your site returned. You can also set up a public status page so your visitors can check the status themselves.',
+      'Upnotify sends you an alert immediately via your chosen channel — email, Slack, or Microsoft Teams. The alert includes what failed, when it failed, and the response your site returned. You can also set up a public status page so your visitors can check the status themselves.',
   },
 ]
 
@@ -87,7 +87,7 @@ export default function MonitorWordPressFreePage(): React.ReactElement {
           '@type': 'Article',
           headline: 'How to Monitor Your WordPress Site for Free in 2026',
           description: 'Learn how to monitor your WordPress site for free — uptime, SSL, performance, and keyword monitoring. Set up in 60 seconds.',
-          author: { '@type': 'Organization', name: 'Uptrue' },
+          author: { '@type': 'Organization', name: 'Upnotify' },
           publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
           datePublished: '2026-03-10',
           dateModified: '2026-03-10',
@@ -203,10 +203,10 @@ export default function MonitorWordPressFreePage(): React.ReactElement {
           <Link href="/blog/dns-monitoring-explained">DNS monitoring guide</Link>.
         </p>
 
-        <h2>How to set up free WordPress monitoring with Uptrue</h2>
+        <h2>How to set up free WordPress monitoring with Upnotify</h2>
 
         <p>
-          <Link href="/signup">Uptrue</Link> covers all five of these monitoring types on the free plan. Here is how to set it up in under five minutes.
+          <Link href="/signup">Upnotify</Link> covers all five of these monitoring types on the free plan. Here is how to set it up in under five minutes.
         </p>
 
         <h3>Step 1: Create your free account</h3>
@@ -320,7 +320,7 @@ export default function MonitorWordPressFreePage(): React.ReactElement {
         </p>
 
         <p>
-          External monitoring works from outside your server. <Link href="/signup">Uptrue</Link> checks your site from independent infrastructure. When your server is down, Uptrue is still running and still sending you alerts. It sees your site the way your visitors see it — from the outside.
+          External monitoring works from outside your server. <Link href="/signup">Upnotify</Link> checks your site from independent infrastructure. When your server is down, Upnotify is still running and still sending you alerts. It sees your site the way your visitors see it — from the outside.
         </p>
 
         <p>
@@ -381,7 +381,7 @@ export default function MonitorWordPressFreePage(): React.ReactElement {
       <footer className="blog-article-footer">
         <div className="blog-author">
           <div className="blog-author-info">
-            <span className="blog-author-name">Uptrue Team</span>
+            <span className="blog-author-name">Upnotify Team</span>
             <span className="blog-author-role">Website Monitoring Platform</span>
           </div>
         </div>

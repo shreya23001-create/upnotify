@@ -3,14 +3,14 @@ import Link from 'next/link'
 import Faq from '@/components/landing/faq'
 
 export const metadata: Metadata = {
-  title: 'Uptrue Integrations — Slack, Microsoft Teams, Telegram, Webhooks',
+  title: 'Upnotify Integrations — Slack, Microsoft Teams, Telegram, Webhooks',
   description:
-    'Send Uptrue monitoring alerts to Slack, Microsoft Teams, Telegram, or any signed webhook endpoint. Native formatting, severity-coded messages, one-click links to the monitor. Free plan supports email; Lite (£1/month) unlocks every channel.',
+    'Send Upnotify monitoring alerts to Slack, Microsoft Teams, Telegram, or any signed webhook endpoint. Native formatting, severity-coded messages, one-click links to the monitor. Free plan supports email; Lite (£1/month) unlocks every channel.',
   alternates: { canonical: 'https://uptrue.io/integrations' },
   openGraph: {
-    title: 'Uptrue Integrations — Slack, Teams, Telegram, Webhooks',
+    title: 'Upnotify Integrations — Slack, Teams, Telegram, Webhooks',
     description:
-      'Pipe Uptrue uptime, SSL and security alerts into Slack, Teams, Telegram, or any webhook endpoint with HMAC signing.',
+      'Pipe Upnotify uptime, SSL and security alerts into Slack, Teams, Telegram, or any webhook endpoint with HMAC signing.',
     url: 'https://uptrue.io/integrations',
     type: 'website',
   },
@@ -37,9 +37,9 @@ const INTEGRATIONS = [
     slug: 'telegram',
     name: 'Telegram',
     emoji: '✈️',
-    tagline: 'Mobile push alerts via the Uptrue Telegram bot',
+    tagline: 'Mobile push alerts via the Upnotify Telegram bot',
     description:
-      'Add the Uptrue bot to any chat or channel, paste the chat ID into Uptrue, and start receiving alerts on every device.',
+      'Add the Upnotify bot to any chat or channel, paste the chat ID into Upnotify, and start receiving alerts on every device.',
   },
   {
     slug: 'webhook',
@@ -54,7 +54,7 @@ const INTEGRATIONS = [
 const FAQ = [
   {
     q: 'Which integration should I pick?',
-    a: 'For team-wide visibility on incidents, Slack or Microsoft Teams. For mobile push to on-call engineers, Telegram. For wiring Uptrue into PagerDuty, Opsgenie, Datadog, or your own incident management, signed webhooks. Most customers run two or three channels in parallel for redundancy.',
+    a: 'For team-wide visibility on incidents, Slack or Microsoft Teams. For mobile push to on-call engineers, Telegram. For wiring Upnotify into PagerDuty, Opsgenie, Datadog, or your own incident management, signed webhooks. Most customers run two or three channels in parallel for redundancy.',
   },
   {
     q: 'Are integrations free?',
@@ -66,15 +66,15 @@ const FAQ = [
   },
   {
     q: 'What about PagerDuty, Opsgenie, Datadog?',
-    a: 'Native PagerDuty and Opsgenie integrations are on the V1.5 roadmap. In the meantime, every Uptrue alert can fire as a signed webhook — point that at PagerDuty\'s generic webhook integration and you have a full integration in 5 minutes.',
+    a: 'Native PagerDuty and Opsgenie integrations are on the V1.5 roadmap. In the meantime, every Upnotify alert can fire as a signed webhook — point that at PagerDuty\'s generic webhook integration and you have a full integration in 5 minutes.',
   },
   {
-    q: 'How does Uptrue prevent alert fatigue across channels?',
+    q: 'How does Upnotify prevent alert fatigue across channels?',
     a: 'Two-confirmation detection eliminates 95% of false positives from transient network blips. Smart Digest collapses repeat events for the same incident into a single follow-up email — you get the signal without 50 pages during one outage.',
   },
   {
     q: 'What if my integration endpoint is down when an alert fires?',
-    a: 'The dispatch is recorded as failed in the alerts table and the error is logged. Uptrue does not currently retry failed dispatches. Best practice on critical infrastructure: pair every channel with at least one other for redundancy.',
+    a: 'The dispatch is recorded as failed in the alerts table and the error is logged. Upnotify does not currently retry failed dispatches. Best practice on critical infrastructure: pair every channel with at least one other for redundancy.',
   },
 ]
 
@@ -114,7 +114,7 @@ export default function IntegrationsIndexPage(): React.ReactElement {
             Integrations
           </h1>
           <p style={{ fontSize: 18, color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: 28, maxWidth: 720, margin: '0 auto 28px' }}>
-            Pipe Uptrue uptime, SSL and security alerts into Slack, Microsoft Teams, Telegram, or any signed webhook endpoint. Free plan covers email; Lite (£1/month) unlocks every channel.
+            Pipe Upnotify uptime, SSL and security alerts into Slack, Microsoft Teams, Telegram, or any signed webhook endpoint. Free plan covers email; Lite (£1/month) unlocks every channel.
           </p>
         </div>
       </section>
@@ -161,7 +161,7 @@ export default function IntegrationsIndexPage(): React.ReactElement {
             What can you alert on?
           </h2>
           <p style={{ fontSize: 15, color: 'var(--text-secondary)', marginBottom: 20 }}>
-            Every Uptrue monitor type fires alerts to every channel you configure. Some of the most common:
+            Every Upnotify monitor type fires alerts to every channel you configure. Some of the most common:
           </p>
           <ul className="about-list" style={{ fontSize: 15, lineHeight: 1.9 }}>
             <li><Link href="/monitoring/http-uptime-monitoring">HTTP uptime monitoring</Link> — site goes down, channel goes off.</li>

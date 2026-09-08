@@ -52,7 +52,7 @@ function getRemedies(result: SslResult): string[] {
 
   if (result.valid && result.daysUntilExpiry > 0 && result.daysUntilExpiry <= 30) {
     remedies.push(`Your certificate expires in ${result.daysUntilExpiry} days. Renew it now to avoid downtime.`)
-    remedies.push('Set up automated monitoring with Uptrue to get alerted before expiry.')
+    remedies.push('Set up automated monitoring with Upnotify to get alerted before expiry.')
   }
 
   return remedies
@@ -141,7 +141,7 @@ export function SslCheckerTool(): React.ReactElement {
                   <p className="ssl-disclaimer">
                     These suggestions are for informational purposes only. We recommend consulting
                     a qualified technical professional before making changes to your server configuration.
-                    Uptrue accepts no responsibility for any actions taken based on these suggestions.
+                    Upnotify accepts no responsibility for any actions taken based on these suggestions.
                   </p>
                 </div>
               )}
@@ -209,7 +209,7 @@ export function SslCheckerTool(): React.ReactElement {
                     <p className="ssl-disclaimer">
                       These suggestions are for informational purposes only. We recommend consulting
                       a qualified technical professional before making changes to your server configuration.
-                      Uptrue accepts no responsibility for any actions taken based on these suggestions.
+                      Upnotify accepts no responsibility for any actions taken based on these suggestions.
                     </p>
                   </div>
                 </div>

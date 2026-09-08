@@ -14,7 +14,7 @@ export default async function AuthLayout({ children }: { children: React.ReactNo
           {children}
         </div>
         <p style={{ position: 'absolute', bottom: 20, fontSize: 12, color: 'var(--text-muted)' }}>
-          <Link href="/" style={{ color: 'var(--text-muted)', textDecoration: 'none' }}>← Back to Uptrue.io</Link>
+          <Link href="/" style={{ color: 'var(--text-muted)', textDecoration: 'none' }}>← Back to Upnotify.io</Link>
         </p>
       </div>
     </div>

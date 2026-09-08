@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = {
   title: 'Privacy Policy',
   description:
-    'Uptrue Privacy Policy. Learn how we collect, use, store, and protect your personal data. GDPR compliant with EU data storage.',
+    'Upnotify Privacy Policy. Learn how we collect, use, store, and protect your personal data. GDPR compliant with EU data storage.',
   alternates: { canonical: 'https://uptrue.io/privacy' },
 }
 
@@ -165,12 +165,12 @@ export default function PrivacyPolicyPage(): React.ReactElement {
       <ul>
         <li>
           <strong>Public Tracker:</strong> Uptime monitoring results for selected third-party websites
-          and services are displayed publicly on the Uptrue website. This data relates to the monitored
+          and services are displayed publicly on the Upnotify website. This data relates to the monitored
           third-party services, not to your personal data. No personal data from your account is
           included in Public Tracker results.
         </li>
         <li>
-          <strong>Uptrue Score:</strong> When you or any visitor uses the Uptrue Score tool to scan a
+          <strong>Upnotify Score:</strong> When you or any visitor uses the Upnotify Score tool to scan a
           URL, the resulting health score and diagnostic summary may be cached and displayed publicly.
           The scanned URL and the resulting score are not linked to your account or personal data
           unless you are logged in at the time of the scan, in which case the scan is associated with
@@ -182,10 +182,10 @@ export default function PrivacyPolicyPage(): React.ReactElement {
         </li>
       </ul>
 
-      <h2>4B. Account Access by Uptrue Personnel</h2>
+      <h2>4B. Account Access by Upnotify Personnel</h2>
       <p>
         To provide customer support, diagnose technical issues, and maintain the integrity of the
-        Service, authorised Uptrue administrators may access your account in a read-only view
+        Service, authorised Upnotify administrators may access your account in a read-only view
         (&quot;account impersonation&quot;). When this occurs:
       </p>
       <ul>
@@ -215,7 +215,7 @@ export default function PrivacyPolicyPage(): React.ReactElement {
       <h2>4C. Watchdog — Competitor Monitoring Data</h2>
       <p>
         When you use the Watchdog feature to monitor third-party websites (&quot;Tracked Sites&quot;),
-        Uptrue sends standard HTTP requests to the URLs you configure and records:
+        Upnotify sends standard HTTP requests to the URLs you configure and records:
       </p>
       <ul>
         <li>The URL you have chosen to monitor</li>
@@ -223,7 +223,7 @@ export default function PrivacyPolicyPage(): React.ReactElement {
         <li>Timestamps of each check and any detected downtime events</li>
       </ul>
       <p>
-        Uptrue does <strong>not</strong> collect any personal data from Tracked Sites. Checks are
+        Upnotify does <strong>not</strong> collect any personal data from Tracked Sites. Checks are
         performed against publicly accessible URLs only and do not attempt to authenticate or access
         any non-public content.
       </p>
