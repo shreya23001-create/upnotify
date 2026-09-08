@@ -464,18 +464,23 @@ export async function cancelSubscription(
   }
 
   // ── 3. Update DB — always happens, even if Stripe was already gone ─────────
+  // Supabase's client returns { error } rather than throwing on failures like
+  // constraint violations, so that must be checked explicitly — a caught
+  // exception alone won't catch a rejected UPDATE.
   try {
     if (isPaused) {
-      await supabase
+      const { error: updateErr } = await supabase
         .from('subscriptions')
         .update({ status: 'canceled', canceled_at: new Date().toISOString() })
         .eq('stripe_subscription_id', stripeSubscriptionId)
+      if (updateErr) throw updateErr
       await enforceDowngradeLimits(orgId, userId)
     } else {
-      await supabase
+      const { error: updateErr } = await supabase
         .from('subscriptions')
-        .update({ status: 'cancelling' })
+        .update({ status: 'cancelling', canceled_at: new Date().toISOString() })
         .eq('stripe_subscription_id', stripeSubscriptionId)
+      if (updateErr) throw updateErr
     }
   } catch (dbErr) {
     logger.error('Failed to update subscription status after cancel', {

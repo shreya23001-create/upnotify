@@ -69,6 +69,21 @@ export async function getInvoiceById(id: string, orgId: string): Promise<Invoice
   return data
 }
 
+export async function getPlanByStripePriceId(stripePriceId: string): Promise<Plan | null> {
+  const supabase = createAdminClient()
+  const { data, error } = await supabase
+    .from('plans')
+    .select('*')
+    .or(`stripe_price_id_monthly.eq.${stripePriceId},stripe_price_id_annual.eq.${stripePriceId}`)
+    .maybeSingle()
+
+  if (error) {
+    logger.error('Failed to get plan by Stripe price ID', { error: error.message, stripePriceId })
+    return null
+  }
+  return data
+}
+
 export async function getPlanBySlug(slug: string): Promise<Plan | null> {
   const supabase = createAdminClient()
   const { data, error } = await supabase

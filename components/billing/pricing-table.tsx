@@ -189,7 +189,7 @@ function getPlanCta(plan: Plan, isCurrent: boolean, isHigherTier: boolean): stri
   if (isCurrent) return 'Current Plan'
   if (plan.slug === 'free') return 'Current Plan'
   if (isHigherTier) return 'Upgrade'
-  return 'Switch Plan'
+  return 'Downgrade'
 }
 
 export function PricingTable({ plans, currentPlanSlug, subscription, creditBalancePence = 0, defaultCurrency = 'gbp' }: Props): React.ReactElement {
@@ -206,6 +206,9 @@ export function PricingTable({ plans, currentPlanSlug, subscription, creditBalan
   const isPaused = sub?.status === 'paused'
   const isCancelling = sub?.status === 'cancelling'
   const pauseUntil = sub?.pause_until as string | null | undefined
+  // Existing Stripe subscribers switch plans in place; everyone else (no
+  // subscription yet, or Razorpay-only) goes through the checkout flow.
+  const hasStripeSubscription = Boolean(sub?.stripe_subscription_id) && (sub?.status === 'active' || sub?.status === 'cancelling' || sub?.status === 'past_due')
 
   const directPlans = plans.filter(p => p.type === 'direct')
 
@@ -233,6 +236,29 @@ export function PricingTable({ plans, currentPlanSlug, subscription, creditBalan
         } else {
           setError('No checkout URL received. Please try again.')
         }
+      } catch {
+        setError('Something went wrong. Please check your connection and try again.')
+      }
+    })
+  }
+
+  // For orgs with an existing Stripe subscription, switch the plan in place
+  // (upgrade or downgrade) instead of starting a brand new checkout session.
+  function handleChangePlan(planSlug: string, billingCycle: string): void {
+    setError(null)
+    startTransition(async () => {
+      try {
+        const res = await fetch('/api/v1/billing/change-plan', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ planSlug, billingCycle }),
+        })
+        const data: { success?: boolean; error?: string } = await res.json()
+        if (!res.ok) {
+          setError(data.error || 'Failed to change plan. Please try again.')
+          return
+        }
+        router.refresh()
       } catch {
         setError('Something went wrong. Please check your connection and try again.')
       }
@@ -443,6 +469,14 @@ export function PricingTable({ plans, currentPlanSlug, subscription, creditBalan
               ) : isFree ? (
                 <button className="btn btn-secondary btn-full" disabled>
                   Free Plan
+                </button>
+              ) : hasStripeSubscription ? (
+                <button
+                  className={isHigherTier ? 'btn btn-primary btn-full' : 'btn btn-secondary btn-full'}
+                  onClick={() => handleChangePlan(plan.slug, billingCycle)}
+                  disabled={isPending}
+                >
+                  {isPending ? 'Updating…' : ctaText}
                 </button>
               ) : isInrMode && isHigherTier ? (
                 <button

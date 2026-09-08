@@ -4,6 +4,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
 import { getServerConfig } from '@/lib/utils/config'
 import { enforceDowngradeLimits, notifyPlanChange } from '@/lib/services/plan-enforcement'
+import { getPlanByStripePriceId } from '@/lib/db/subscriptions'
 import { writeAuditLog } from '@/lib/db/audit'
 import type Stripe from 'stripe'
 
@@ -349,12 +350,18 @@ async function handleSubscriptionUpdated(
 ): Promise<void> {
   const supabase = createAdminClient()
   const sub = subObj as unknown as Record<string, unknown>
-  const items = (sub.items as { data: Array<{ current_period_start?: number; current_period_end?: number }> }).data
+  const items = (sub.items as { data: Array<{ current_period_start?: number; current_period_end?: number; price?: { id?: string } }> }).data
   const item = items?.[0]
 
   // Stripe API 2025+ moved current_period_* to subscription item level
   const periodStart = (sub.current_period_start as number | undefined) ?? item?.current_period_start
   const periodEnd   = (sub.current_period_end   as number | undefined) ?? item?.current_period_end
+
+  // Resolve the current plan from the subscription's active price — covers
+  // in-place plan changes (subscriptions.update with a new price), which
+  // fire this event but no checkout.session.completed.
+  const currentPriceId = item?.price?.id
+  const currentPlan = currentPriceId ? await getPlanByStripePriceId(currentPriceId) : null
 
   // cancel_at_period_end=true means user cancelled but keeps access until period end
   const cancelAtPeriodEnd = sub.cancel_at_period_end as boolean | undefined
@@ -385,6 +392,7 @@ async function handleSubscriptionUpdated(
     ...(periodEnd   ? { current_period_end:   new Date(periodEnd   * 1000).toISOString() } : {}),
     // Only set canceled_at when Stripe actually provides it — never clear it on unrelated events
     ...(sub.canceled_at ? { canceled_at: new Date((sub.canceled_at as number) * 1000).toISOString() } : {}),
+    ...(currentPlan ? { plan_id: currentPlan.id } : {}),
   }
 
   // Update base subscription
