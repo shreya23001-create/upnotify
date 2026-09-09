@@ -16,7 +16,7 @@ const TYPE_META: Record<string, { label: string; icon: React.ReactNode; color: s
   teams: { label: 'Teams', icon: <Users size={16} />, color: '#3b82f6', bg: 'rgba(59,130,246,0.12)' },
   whatsapp: { label: 'WhatsApp', icon: <MessageSquare size={16} />, color: '#22c55e', bg: 'rgba(34,197,94,0.12)' },
   voice: { label: 'Voice', icon: <Phone size={16} />, color: '#ec4899', bg: 'rgba(236,72,153,0.12)' },
-  webhook: { label: 'Webhook', icon: <Webhook size={16} />, color: '#2ee06b', bg: 'rgba(46,224,107,0.12)' },
+  webhook: { label: 'Webhook', icon: <Webhook size={16} />, color: '#0068DB', bg: 'rgba(0, 104, 219,0.12)' },
   telegram: { label: 'Telegram', icon: <Send size={16} />, color: '#06b6d4', bg: 'rgba(6,182,212,0.12)' },
 }
 

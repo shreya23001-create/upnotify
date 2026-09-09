@@ -6,9 +6,9 @@ import type { SupportedCurrency } from '@/lib/utils/currency'
 import { getPlanFeatures, formatPlanPrice } from '@/lib/utils/plan-display'
 import type { PlanDisplayData } from '@/lib/utils/plan-display'
 
-export default function PricingTable({ defaultCurrency = 'gbp' }: { defaultCurrency?: SupportedCurrency }): React.ReactElement {
+export default function PricingTable(): React.ReactElement {
   const [isAnnual, setIsAnnual] = useState(true)
-  const [currency, setCurrency] = useState<SupportedCurrency>(defaultCurrency)
+  const currency: SupportedCurrency = 'inr'
   const [plans, setPlans] = useState<PlanDisplayData[]>([])
   const [loading, setLoading] = useState(true)
   const [fetchError, setFetchError] = useState(false)
@@ -49,35 +49,9 @@ export default function PricingTable({ defaultCurrency = 'gbp' }: { defaultCurre
               <div className="toggle-thumb" />
             </div>
             <span className="toggle-label">Annual</span>
-            {currency === 'gbp' && <span className="save-badge">Save up to 20%</span>}
-          </div>
-
-          {/* Currency selector */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 500 }}>View as:</span>
-            {(['gbp', 'inr'] as SupportedCurrency[]).map(c => (
-              <button
-                key={c}
-                type="button"
-                onClick={() => setCurrency(c)}
-                style={{
-                  padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600,
-                  cursor: 'pointer', border: '1.5px solid',
-                  background: currency === c ? 'var(--brand-blue, #3b82f6)' : 'transparent',
-                  color: currency === c ? '#fff' : 'var(--text-secondary)',
-                  borderColor: currency === c ? 'var(--brand-blue, #3b82f6)' : 'var(--border-input)',
-                  transition: 'all 0.15s',
-                }}
-                aria-pressed={currency === c}
-              >
-                {c === 'gbp' ? '🇬🇧 GBP (£)' : '🇮🇳 INR (₹)'}
-              </button>
-            ))}
           </div>
         </div>
-        {currency === 'inr' && (
-          <p style={{ textAlign: 'center', fontSize: 13, color: 'var(--text-muted)', marginBottom: 24 }}>+ 18% GST · Secure checkout via Razorpay</p>
-        )}
+        <p style={{ textAlign: 'center', fontSize: 13, color: 'var(--text-muted)', marginBottom: 24 }}>+ 18% GST · Secure checkout via Razorpay</p>
 
         {loading && (
           <p style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '40px 0' }}>Loading plans…</p>

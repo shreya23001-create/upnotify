@@ -6,16 +6,10 @@ import { useState, useEffect } from 'react'
 import { useWorkspace } from '@/components/providers/workspace-provider'
 import { useAuth } from '@/components/providers/auth-provider'
 import type { SupportedCurrency } from '@/lib/utils/currency'
-import { formatGbp, formatInr } from '@/lib/utils/currency'
-
-// Credit monthly cap: 1000 pence (£10) or equivalent INR (1000 × 107 paise = ₹1,070)
-function formatCreditCap(currency: SupportedCurrency): string {
-  return currency === 'inr' ? formatInr(1000 * 107) : formatGbp(1000)
-}
 import {
   IconDashboard, IconActivity, IconGlobe, IconAlertTriangle,
   IconBuilding, IconSettings, IconShield, IconChevronLeft, IconChevronRight,
-  IconHelpCircle, IconTrendingUp, IconWatchdog, IconSparkles, IconInbox,
+  IconHelpCircle, IconTrendingUp, IconWatchdog, IconInbox,
 } from '@/components/icons'
 
 interface NavSection {
@@ -38,8 +32,8 @@ const mainNavItems: NavItem[] = [
   { href: '/dashboard/incidents', label: 'Incidents', icon: IconAlertTriangle },
   { href: '/dashboard/status-pages', label: 'Status Pages', icon: IconGlobe },
   { href: '/dashboard/reports', label: 'Reports', icon: IconTrendingUp },
-  { href: '/dashboard/watchdog', label: 'Watchdog', icon: IconWatchdog },
-  { href: '/dashboard/ai-visibility', label: 'AI Visibility', icon: IconSparkles },
+  { href: '/dashboard/watchdog', label: 'Competitor', icon: IconWatchdog },
+  // AI Visibility hidden per request
   // Compete hidden — launching in v1.5
 ]
 
@@ -54,7 +48,7 @@ interface SidebarProps {
   forceExpanded?: boolean
 }
 
-export function Sidebar({ currency = 'gbp', forceExpanded = false }: SidebarProps): React.ReactElement {
+export function Sidebar({ forceExpanded = false }: SidebarProps): React.ReactElement {
   const pathname = usePathname()
   const { isAgency } = useWorkspace()
   const { user } = useAuth()
@@ -174,11 +168,6 @@ export function Sidebar({ currency = 'gbp', forceExpanded = false }: SidebarProp
         )}
       </nav>
 
-      {/* Credits promo — collapsible, only for non-admin users */}
-      {!effectiveCollapsed && !user?.is_super_admin && (
-        <CreditsPromo currency={currency} />
-      )}
-
       <div className="sidebar-user-footer">
         {user && (
           <>
@@ -204,29 +193,6 @@ export function Sidebar({ currency = 'gbp', forceExpanded = false }: SidebarProp
         )}
       </div>
     </aside>
-  )
-}
-
-function CreditsPromo({ currency = 'gbp' }: { currency?: SupportedCurrency }): React.ReactElement {
-  const [open, setOpen] = useState(true)
-  const cap = formatCreditCap(currency)
-
-  return (
-    <div className="sidebar-credits-promo">
-      <div className="sidebar-credits-promo-header" onClick={() => setOpen(!open)}>
-        <span className="sidebar-credits-promo-icon"><IconSparkles size={16} /></span>
-        <span className="sidebar-credits-promo-title">Earn Credits</span>
-        <span className="sidebar-credits-promo-toggle" style={{ transform: open ? 'rotate(0deg)' : 'rotate(-90deg)', transition: 'transform 0.2s' }}>
-          <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-        </span>
-      </div>
-      <div className={`sidebar-credits-promo-body${open ? '' : ' collapsed'}`}>
-        <div className="sidebar-credits-promo-text">Get up to {cap}/mo off your plan by referring friends.</div>
-        <Link href="/dashboard/settings?tab=referrals" className="sidebar-credits-promo-link">
-          Learn how →
-        </Link>
-      </div>
-    </div>
   )
 }
 

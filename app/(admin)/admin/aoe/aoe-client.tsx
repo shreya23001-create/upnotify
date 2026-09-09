@@ -296,7 +296,7 @@ export function AdminAoeClientPage({ canWrite = true }: { canWrite?: boolean }):
                       <td style={{ fontWeight: 500 }}>
                         {CAMPAIGN_LABELS[campaign] ?? campaign}
                         {isAiSeo && (
-                          <span style={{ marginLeft: 8, fontSize: 11, background: '#00c94a', color: '#fff', padding: '1px 7px', borderRadius: 8, fontWeight: 600 }}>
+                          <span style={{ marginLeft: 8, fontSize: 11, background: '#1392FB', color: '#fff', padding: '1px 7px', borderRadius: 8, fontWeight: 600 }}>
                             Harvey review pending
                           </span>
                         )}

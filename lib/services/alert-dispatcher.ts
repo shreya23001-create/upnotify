@@ -13,12 +13,20 @@ import type { Incident, Monitor, AlertChannel } from '@/lib/types'
 
 interface AlertChannelConfig {
   email?: string
+  emails?: string[]
   webhookUrl?: string
   slackWebhookUrl?: string
   slackChannel?: string
   webhookSecret?: string
   teamsWebhookUrl?: string
   telegramChatId?: string
+}
+
+/** Combine the legacy single `email` field with the newer `emails` array
+ * into one deduped list, so both old and new alert channels work. */
+function getAllRecipients(config: AlertChannelConfig): string[] {
+  const all = [config.email, ...(config.emails ?? [])].filter((e): e is string => Boolean(e?.trim()))
+  return Array.from(new Set(all))
 }
 
 
@@ -82,8 +90,9 @@ export async function dispatchAlerts(incident: Incident, monitor: Monitor): Prom
             // Smart Digest decides whether this email goes out instantly,
             // gets buffered for the digest, or both. See routeEmailEvent.
             if (emailRouting.sendInstant) {
+              const recipients = getAllRecipients(channelConfig)
               const result = await sendAlertEmail({
-                to: channelConfig.email || '',
+                to: recipients.length > 0 ? recipients : '',
                 subject: copy.subject,
                 body: `${copy.headline}\n\n${copy.detail}\n\nView monitor: ${monitorUrl}`,
               })

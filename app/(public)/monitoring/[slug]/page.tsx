@@ -609,7 +609,7 @@ export default async function MonitoringTypePage({ params }: { params: Promise<{
           </div>
           <Link href="/signup" style={{
             background: '#fff',
-            color: '#00a83d',
+            color: '#0068DB',
             padding: '10px 22px',
             borderRadius: 8,
             fontWeight: 700,

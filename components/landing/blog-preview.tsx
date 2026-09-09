@@ -3,7 +3,7 @@ import { ArrowRight, ShieldCheck, Zap, Globe, Cpu, AlertTriangle, Building2, Boo
 import { getPublishedBlogPosts } from '@/lib/db/blog-posts'
 
 const BADGE_STYLES: Record<string, { bg: string; color: string; border: string; grad: string }> = {
-  Guide: { bg: 'rgba(59,130,246,0.1)', color: '#3b82f6', border: 'rgba(59,130,246,0.2)', grad: 'linear-gradient(135deg,#00c94a,#3b82f6)' },
+  Guide: { bg: 'rgba(59,130,246,0.1)', color: '#3b82f6', border: 'rgba(59,130,246,0.2)', grad: 'linear-gradient(135deg,#1392FB,#3b82f6)' },
   Security: { bg: 'rgba(239,68,68,0.1)', color: '#ef4444', border: 'rgba(239,68,68,0.2)', grad: 'linear-gradient(135deg,#dc2626,#b45309)' },
   Performance: { bg: 'rgba(16,185,129,0.1)', color: '#10b981', border: 'rgba(16,185,129,0.2)', grad: 'linear-gradient(135deg,#047857,#0e7490)' },
   Ecommerce: { bg: 'rgba(245,158,11,0.1)', color: '#f59e0b', border: 'rgba(245,158,11,0.2)', grad: 'linear-gradient(135deg,#b45309,#9d174d)' },
@@ -12,7 +12,7 @@ const BADGE_STYLES: Record<string, { bg: string; color: string; border: string; 
   WordPress: { bg: 'rgba(59,130,246,0.1)', color: '#3b82f6', border: 'rgba(59,130,246,0.2)', grad: 'linear-gradient(135deg,#1d4ed8,#0e7490)' },
   Hosting: { bg: 'rgba(16,185,129,0.1)', color: '#10b981', border: 'rgba(16,185,129,0.2)', grad: 'linear-gradient(135deg,#047857,#1d4ed8)' },
   Outage: { bg: 'rgba(239,68,68,0.1)', color: '#ef4444', border: 'rgba(239,68,68,0.2)', grad: 'linear-gradient(135deg,#b91c1c,#00873a)' },
-  'AI-VISIBILITY': { bg: 'rgba(46,224,107,0.1)', color: '#2ee06b', border: 'rgba(46,224,107,0.2)', grad: 'linear-gradient(135deg,#00c94a,#1d4ed8)' },
+  'AI-VISIBILITY': { bg: 'rgba(0, 104, 219,0.1)', color: '#0068DB', border: 'rgba(0, 104, 219,0.2)', grad: 'linear-gradient(135deg,#1392FB,#1d4ed8)' },
   Insights: { bg: 'rgba(6,182,212,0.1)', color: '#06b6d4', border: 'rgba(6,182,212,0.2)', grad: 'linear-gradient(135deg,#0e7490,#1d4ed8)' },
 }
 

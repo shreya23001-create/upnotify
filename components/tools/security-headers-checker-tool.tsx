@@ -38,7 +38,7 @@ function importanceLabel(importance: 'critical' | 'important' | 'recommended'): 
 function importanceColor(importance: 'critical' | 'important' | 'recommended'): string {
   if (importance === 'critical') return '#ef4444'
   if (importance === 'important') return '#f59e0b'
-  return '#00c94a'
+  return '#1392FB'
 }
 
 function formatHeaderName(name: string): string {

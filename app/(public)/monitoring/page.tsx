@@ -118,9 +118,9 @@ export default function MonitoringIndexPage() {
         {agentTypes.length > 0 && (
           <section style={{ marginBottom: 64 }}>
             <div style={{ marginBottom: 32 }}>
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'linear-gradient(135deg, #00c94a18, #00a83d12)', border: '1px solid #00c94a35', borderRadius: 'var(--radius-full)', padding: '4px 12px', marginBottom: 12 }}>
-                <Plug size={12} color="#00c94a" />
-                <span style={{ fontSize: 11, fontWeight: 700, color: '#00c94a', textTransform: 'uppercase', letterSpacing: '0.05em' }}>New — Agent-Based Monitors</span>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'linear-gradient(135deg, #1392FB18, #0068DB12)', border: '1px solid #1392FB35', borderRadius: 'var(--radius-full)', padding: '4px 12px', marginBottom: 12 }}>
+                <Plug size={12} color="#1392FB" />
+                <span style={{ fontSize: 11, fontWeight: 700, color: '#1392FB', textTransform: 'uppercase', letterSpacing: '0.05em' }}>New — Agent-Based Monitors</span>
               </div>
               <h2 style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--text-primary)', marginBottom: 6 }}>Monitor from inside your site</h2>
               <p style={{ color: 'var(--text-secondary)', fontSize: 15 }}>Plugin-based monitors that check what external tools can&apos;t see — file injections, rogue users, and internal compromises.</p>
@@ -135,7 +135,7 @@ export default function MonitoringIndexPage() {
 
         {/* Bottom CTA */}
         <div style={{
-          background: 'linear-gradient(135deg, #00c94a, #4dff88)',
+          background: 'linear-gradient(135deg, #1392FB, #0068DB)',
           borderRadius: 16,
           padding: '40px 48px',
           display: 'flex',
@@ -150,7 +150,7 @@ export default function MonitoringIndexPage() {
           </div>
           <Link href="/signup" style={{
             background: '#fff',
-            color: '#00a83d',
+            color: '#0068DB',
             padding: '12px 28px',
             borderRadius: 10,
             fontWeight: 700,

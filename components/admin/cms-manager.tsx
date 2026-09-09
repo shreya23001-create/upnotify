@@ -51,7 +51,7 @@ function VisualField({ fieldKey, value, onChange }: {
         <label className="cms-field-label">
           {label}
           {isUrl  && <span style={{ marginLeft: 6, fontSize: 10, fontWeight: 700, color: '#3b82f6' }}>URL</span>}
-          {isHtml && <span style={{ marginLeft: 6, fontSize: 10, fontWeight: 700, color: '#2ee06b' }}>HTML</span>}
+          {isHtml && <span style={{ marginLeft: 6, fontSize: 10, fontWeight: 700, color: '#0068DB' }}>HTML</span>}
         </label>
         {isLong ? (
           <textarea className="cms-json-editor"
@@ -684,7 +684,7 @@ const DEFAULT_THEME: CmsThemeSettings = {
   colors: {
     brand_primary:   '#3b82f6',
     brand_secondary: '#06b6d4',
-    accent:          '#2ee06b',
+    accent:          '#0068DB',
     success:         '#10b981',
     warning:         '#f59e0b',
     danger:          '#ef4444',

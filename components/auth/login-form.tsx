@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useTransition } from 'react'
-import { signInWithEmail, signInWithGoogle } from '@/lib/auth/actions'
+import { signInWithPassword, signUpWithPassword } from '@/lib/auth/actions'
 
 const HINT_COOKIE = 'uptrue_user_hint'
 
@@ -18,7 +18,6 @@ function setEmailHint(email: string): void {
 }
 
 export function LoginForm({ mode = 'login', next }: { mode?: 'login' | 'signup'; next?: string }) {
-  const [emailSent, setEmailSent] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
   const [hintEmail, setHintEmail] = useState('')
@@ -31,9 +30,9 @@ export function LoginForm({ mode = 'login', next }: { mode?: 'login' | 'signup';
     const params = new URLSearchParams(window.location.search)
     const urlError = params.get('error')
     if (urlError === 'auth_error') {
-      setError('This magic link has expired or is invalid. Please request a new one below.')
+      setError('That link has expired or is invalid. Please sign in below.')
     } else if (urlError === 'no_code') {
-      setError('Invalid sign-in link. Please request a new magic link below.')
+      setError('Invalid link. Please sign in below.')
     }
   }, [])
 
@@ -42,44 +41,24 @@ export function LoginForm({ mode = 'login', next }: { mode?: 'login' | 'signup';
     return new URLSearchParams(window.location.search).get('ref')
   }
 
-  function handleEmailSubmit(formData: FormData): void {
+  function handleSubmit(formData: FormData): void {
     setError(null)
     formData.set('origin', window.location.origin)
     const ref = getRefCode()
     if (ref) formData.set('ref', ref)
     if (next) formData.set('next', next)
     const email = formData.get('email') as string
+
     startTransition(async () => {
-      const result = await signInWithEmail(formData)
-      if (result.error) setError(result.error)
-      else {
-        if (email) setEmailHint(email)
-        setEmailSent(true)
+      const result = mode === 'signup'
+        ? await signUpWithPassword(formData)
+        : await signInWithPassword(formData)
+      if (result?.error) {
+        setError(result.error)
+      } else if (email) {
+        setEmailHint(email)
       }
     })
-  }
-
-  function handleGoogleClick(): void {
-    setError(null)
-    const ref = getRefCode()
-    startTransition(async () => {
-      const result = await signInWithGoogle(window.location.origin, ref ?? undefined, next ?? undefined)
-      if (result.error) setError(result.error)
-      else if (result.url) window.location.href = result.url
-    })
-  }
-
-  if (emailSent) {
-    return (
-      <div style={{ textAlign: 'center', padding: '24px 0' }}>
-        <div style={{ fontSize: 40, marginBottom: 16 }}>📬</div>
-        <h2 className="auth-form-heading">Check your email</h2>
-        <p className="auth-form-sub">We sent you a magic link. Click it to sign in.</p>
-        <button className="auth-submit" onClick={() => setEmailSent(false)} style={{ marginTop: 16 }}>
-          Try a different email
-        </button>
-      </div>
-    )
   }
 
   return (
@@ -109,28 +88,7 @@ export function LoginForm({ mode = 'login', next }: { mode?: 'login' | 'signup';
         </div>
       )}
 
-      {/* Google */}
-      <button className="auth-google-btn" onClick={handleGoogleClick} disabled={isPending} type="button">
-        <svg width="18" height="18" viewBox="0 0 24 24">
-          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
-          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-        </svg>
-        {mode === 'login' ? 'Continue with Google' : 'Sign up with Google'}
-      </button>
-
-      {/* Divider */}
-      <div className="auth-divider">
-        <div className="auth-divider-line" />
-        <span className="auth-divider-text">
-          {mode === 'login' ? 'or continue with email' : 'or use your email'}
-        </span>
-        <div className="auth-divider-line" />
-      </div>
-
-      {/* Email form */}
-      <form action={handleEmailSubmit} autoComplete="on">
+      <form action={handleSubmit} autoComplete="on">
         {mode === 'signup' && (
           <div className="auth-input-wrap">
             <label className="auth-label" htmlFor="fullname">Full name</label>
@@ -165,8 +123,29 @@ export function LoginForm({ mode = 'login', next }: { mode?: 'login' | 'signup';
             disabled={isPending}
           />
         </div>
+        <div className="auth-input-wrap">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+            <label className="auth-label" htmlFor="password">Password</label>
+            {mode === 'login' && (
+              <a href="/forgot-password" style={{ fontSize: 12 }}>Forgot password?</a>
+            )}
+          </div>
+          <input
+            className="auth-input"
+            id="password"
+            name="password"
+            type="password"
+            placeholder={mode === 'signup' ? 'At least 8 characters' : 'Your password'}
+            minLength={mode === 'signup' ? 8 : undefined}
+            required
+            autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
+            disabled={isPending}
+          />
+        </div>
         <button type="submit" className="auth-submit" disabled={isPending}>
-          {isPending ? 'Sending…' : mode === 'login' ? 'Send Magic Link →' : 'Create Free Account →'}
+          {isPending
+            ? (mode === 'login' ? 'Signing in…' : 'Creating account…')
+            : (mode === 'login' ? 'Log In →' : 'Create Free Account →')}
         </button>
       </form>
 

@@ -202,7 +202,7 @@ export default function WordPressMonitorPage() {
           </nav>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20, flexWrap: 'wrap' }}>
-            <span style={{ fontSize: 11, fontWeight: 700, color: 'rgb(26 181 78)', background: 'rgba(77,255,136,0.15)', border: '1px solid rgba(77,255,136,0.3)', padding: '3px 10px', borderRadius: 20, textTransform: 'uppercase', letterSpacing: 1 }}>
+            <span style={{ fontSize: 11, fontWeight: 700, color: 'rgb(26 181 78)', background: 'rgba(0, 104, 219,0.15)', border: '1px solid rgba(0, 104, 219,0.3)', padding: '3px 10px', borderRadius: 20, textTransform: 'uppercase', letterSpacing: 1 }}>
               Plugin-Based · Agent Monitor
             </span>
             <span style={{ fontSize: 11, fontWeight: 700, color: '#4ade80', background: 'rgba(74,222,128,0.1)', border: '1px solid rgba(74,222,128,0.25)', padding: '3px 10px', borderRadius: 20, display: 'inline-flex', alignItems: 'center', gap: 5 }}>
@@ -235,7 +235,7 @@ export default function WordPressMonitorPage() {
 
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
             <Link href="/signup" style={{
-              background: 'linear-gradient(135deg, #00c94a, #00a83d)',
+              background: 'linear-gradient(135deg, #1392FB, #0068DB)',
               color: '#fff',
               padding: '13px 28px',
               borderRadius: 10,
@@ -271,7 +271,7 @@ export default function WordPressMonitorPage() {
         <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', gap: 32, flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center' }}>
           {[
             { value: '100', label: 'Health Score', color: '#10b981' },
-            { value: '8', label: 'Threat Categories', color: '#00c94a' },
+            { value: '8', label: 'Threat Categories', color: '#1392FB' },
             { value: '25+', label: 'Checks Per Scan', color: '#f59e0b' },
             { value: '2 min', label: 'Setup Time', color: '#06b6d4' },
           ].map(stat => (
@@ -305,8 +305,8 @@ export default function WordPressMonitorPage() {
                   <div style={{
                     width: 40, height: 40, flexShrink: 0,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    background: 'linear-gradient(135deg, #00c94a18, #00a83d12)',
-                    borderRadius: 10, color: '#00c94a',
+                    background: 'linear-gradient(135deg, #1392FB18, #0068DB12)',
+                    borderRadius: 10, color: '#1392FB',
                   }}><item.icon size={19} strokeWidth={2} /></div>
                   <div>
                     <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 5 }}>{item.title}</div>
@@ -415,8 +415,8 @@ export default function WordPressMonitorPage() {
         <div className="reveal" style={{
           marginBottom: 64,
           padding: '28px 32px',
-          background: 'linear-gradient(135deg, #00c94a12, #00a83d10)',
-          border: '1px solid #00c94a30',
+          background: 'linear-gradient(135deg, #1392FB12, #0068DB10)',
+          border: '1px solid #1392FB30',
           borderRadius: 14,
           display: 'grid',
           gridTemplateColumns: '80px 1fr',
@@ -451,15 +451,15 @@ export default function WordPressMonitorPage() {
           background: 'var(--bg-card, #fff)',
           border: '1px solid var(--border, #e5e7eb)',
           borderRadius: 12,
-          borderLeft: '3px solid #00c94a',
+          borderLeft: '3px solid #1392FB',
           boxShadow: '0 1px 3px rgba(15,23,42,0.04)',
           display: 'flex', gap: 14, alignItems: 'flex-start',
         }}>
           <div style={{
             width: 36, height: 36, flexShrink: 0,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: 'linear-gradient(135deg, #00c94a18, #00a83d12)',
-            borderRadius: 9, color: '#00c94a', marginTop: 2,
+            background: 'linear-gradient(135deg, #1392FB18, #0068DB12)',
+            borderRadius: 9, color: '#1392FB', marginTop: 2,
           }}><Bot size={18} strokeWidth={2} /></div>
           <div>
             <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 8 }}>AI Security Report</div>
@@ -553,11 +553,11 @@ export default function WordPressMonitorPage() {
                       <span style={{
                         width: 38, height: 38, flexShrink: 0,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        background: 'linear-gradient(135deg, #00c94a18, #00a83d12)',
-                        borderRadius: 10, color: '#00c94a',
+                        background: 'linear-gradient(135deg, #1392FB18, #0068DB12)',
+                        borderRadius: 10, color: '#1392FB',
                       }}><rel.icon size={18} strokeWidth={2} /></span>
                       <span className="pair-monitor-arrow" style={{
-                        color: '#00c94a', opacity: 0, transform: 'translateX(-4px)',
+                        color: '#1392FB', opacity: 0, transform: 'translateX(-4px)',
                         transition: 'opacity 0.2s, transform 0.2s',
                         display: 'flex',
                       }}>
@@ -582,14 +582,14 @@ export default function WordPressMonitorPage() {
           }}>
             <div style={{
               position: 'absolute', inset: 0, opacity: 0.5,
-              backgroundImage: 'radial-gradient(circle at 25% 30%, #00c94a 0%, transparent 55%), radial-gradient(circle at 75% 70%, #00a83d 0%, transparent 55%)',
+              backgroundImage: 'radial-gradient(circle at 25% 30%, #1392FB 0%, transparent 55%), radial-gradient(circle at 75% 70%, #0068DB 0%, transparent 55%)',
               pointerEvents: 'none',
             }} />
             <div style={{ position: 'relative' }}>
               <span style={{
                 display: 'inline-flex', alignItems: 'center', gap: 6,
-                fontSize: 11, fontWeight: 700, color: '#4dff88',
-                background: 'rgba(77,255,136,0.15)', border: '1px solid rgba(77,255,136,0.3)',
+                fontSize: 11, fontWeight: 700, color: '#0068DB',
+                background: 'rgba(0, 104, 219,0.15)', border: '1px solid rgba(0, 104, 219,0.3)',
                 padding: '4px 12px', borderRadius: 20, textTransform: 'uppercase', letterSpacing: 1,
                 marginBottom: 18,
               }}>
@@ -603,7 +603,7 @@ export default function WordPressMonitorPage() {
               </div>
               <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
                 <Link href="/signup" style={{
-                  background: 'linear-gradient(135deg, #00c94a, #00a83d)',
+                  background: 'linear-gradient(135deg, #1392FB, #0068DB)',
                   color: '#fff',
                   padding: '14px 30px',
                   borderRadius: 10,
@@ -611,7 +611,7 @@ export default function WordPressMonitorPage() {
                   fontSize: 15,
                   textDecoration: 'none',
                   display: 'inline-flex', alignItems: 'center', gap: 8,
-                  boxShadow: '0 4px 16px rgba(0,201,74,0.4)',
+                  boxShadow: '0 4px 16px rgba(19, 146, 251,0.4)',
                 }}>
                   <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                   Create Free Account
@@ -648,9 +648,9 @@ function LandingSection({ title, icon: Icon, children }: { title: string; icon: 
         <span style={{
           width: 40, height: 40, flexShrink: 0,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          background: 'linear-gradient(135deg, #00c94a18, #00a83d12)',
-          border: '1px solid #00c94a30',
-          borderRadius: 10, color: '#00c94a',
+          background: 'linear-gradient(135deg, #1392FB18, #0068DB12)',
+          border: '1px solid #1392FB30',
+          borderRadius: 10, color: '#1392FB',
         }}><Icon size={20} strokeWidth={2.25} /></span>
         <h2 style={{ fontSize: 24, fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--text-primary)', opacity: 1, margin: 0 }}>{title}</h2>
       </div>

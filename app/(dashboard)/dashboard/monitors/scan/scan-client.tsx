@@ -403,7 +403,7 @@ export function ScanClient({
             ⚙️ <strong style={{ color: 'var(--text-primary)' }}>Need more?</strong> Keyword, API Endpoint, Heartbeat, Port Check require manual setup.{' '}
             <a href="/dashboard/monitors/new/manual" style={{ color: 'var(--accent)', textDecoration: 'underline' }}>Add individually →</a>
             {' · '}
-            <a href="/dashboard/monitors/new/wordpress" style={{ color: '#00a83d', textDecoration: 'underline' }}>🔌 WordPress Monitor →</a>
+            <a href="/dashboard/monitors/new/wordpress" style={{ color: '#0068DB', textDecoration: 'underline' }}>🔌 WordPress Monitor →</a>
           </div>
         </div>
       )}

@@ -327,7 +327,7 @@ export function buildAiSeoEmail(
 
   const html = baseLayout(`
     <h2 style="margin:0 0 8px;font-size:18px;font-weight:700;color:#111827;">
-      ${esc(domain)} is <span style="color:#00c94a;">invisible to AI search</span>
+      ${esc(domain)} is <span style="color:#1392FB;">invisible to AI search</span>
     </h2>
     <p style="margin:0 0 20px;font-size:14px;color:#374151;line-height:1.6;">
       Hi,<br><br>
@@ -352,13 +352,13 @@ export function buildAiSeoEmail(
     <!-- Primary CTA: AI Visibility Score -->
     <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:20px 24px;margin-bottom:12px;">
       <div style="margin-bottom:8px;">
-        <span style="display:inline-block;background:#00c94a;color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;letter-spacing:0.5px;text-transform:uppercase;">Free</span>
+        <span style="display:inline-block;background:#1392FB;color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;letter-spacing:0.5px;text-transform:uppercase;">Free</span>
       </div>
       <p style="margin:0 0 4px;font-size:15px;font-weight:700;color:#111827;">AI Visibility Score</p>
       <p style="margin:0 0 14px;font-size:13px;color:#6b7280;line-height:1.5;">
         See exactly how visible ${esc(domain)} is to AI search engines — scored, explained, and actionable.
       </p>
-      ${ctaButton(cta.primaryCtaText, cta.primaryCtaUrl, '#00c94a')}
+      ${ctaButton(cta.primaryCtaText, cta.primaryCtaUrl, '#1392FB')}
     </div>
 
     <!-- Secondary CTA: llms.txt Generator -->

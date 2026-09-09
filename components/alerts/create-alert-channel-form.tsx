@@ -4,12 +4,13 @@ import { useState, useTransition } from 'react'
 import { Mail, Hash, Users, Webhook, Phone, MessageSquare, Send, AlertTriangle, Info } from 'lucide-react'
 import { createAlertChannelAction } from '@/app/(dashboard)/dashboard/alerts/actions'
 import { MonitorScopeSelect, type MonitorOption } from './monitor-scope-select'
+import { MultiEmailInput } from './multi-email-input'
 
 const CHANNEL_TYPES = [
   { value: 'email',    label: 'Email',           desc: 'Send alerts to an email address',           icon: <Mail size={18} />,          color: '#6366f1', bg: 'rgba(99,102,241,0.12)' },
   { value: 'slack',    label: 'Slack',            desc: 'Post to a Slack channel via webhook',        icon: <Hash size={18} />,          color: '#f59e0b', bg: 'rgba(245,158,11,0.12)' },
   { value: 'teams',    label: 'Microsoft Teams',  desc: 'Send alerts to a Teams channel',             icon: <Users size={18} />,         color: '#3b82f6', bg: 'rgba(59,130,246,0.12)', disabled: true },
-  { value: 'webhook',  label: 'Webhook',          desc: 'POST to any URL with HMAC signing',          icon: <Webhook size={18} />,       color: '#2ee06b', bg: 'rgba(46,224,107,0.12)' },
+  { value: 'webhook',  label: 'Webhook',          desc: 'POST to any URL with HMAC signing',          icon: <Webhook size={18} />,       color: '#0068DB', bg: 'rgba(0, 104, 219,0.12)' },
   { value: 'telegram', label: 'Telegram',         desc: 'Instant alerts via Telegram — all plans',   icon: <Send size={18} />,          color: '#06b6d4', bg: 'rgba(6,182,212,0.12)' },
 ]
 
@@ -108,17 +109,7 @@ export function CreateAlertChannelForm({ monitors = [] }: { monitors?: MonitorOp
 
       {/* Email */}
       {type === 'email' && (
-        <div className="ac-form-section">
-          <label className="ac-form-label">Email Address</label>
-          <input
-            className="form-input"
-            name="email"
-            type="email"
-            required
-            placeholder="alerts@example.com"
-            disabled={isPending}
-          />
-        </div>
+        <MultiEmailInput disabled={isPending} />
       )}
 
       {/* Slack */}

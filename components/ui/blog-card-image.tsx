@@ -3,14 +3,14 @@
 // DO NOT duplicate gradient/icon logic anywhere else.
 
 const GRADIENTS: Record<string, [string, string]> = {
-  Guide:             ['#00c94a', '#3b82f6'],
+  Guide:             ['#1392FB', '#3b82f6'],
   Security:          ['#dc2626', '#b45309'],
   Performance:       ['#047857', '#0e7490'],
   Ecommerce:         ['#b45309', '#9d174d'],
   'Incident Report': ['#b91c1c', '#00873a'],
   Outage:            ['#b91c1c', '#00873a'],
   Agency:            ['#1e3a5f', '#1d4ed8'],
-  WordPress:         ['#00c94a', '#ec4899'],
+  WordPress:         ['#1392FB', '#ec4899'],
   Hosting:           ['#047857', '#1d4ed8'],
   Default:           ['#1d4ed8', '#0e7490'],
 }

@@ -14,6 +14,7 @@ export const dynamic = 'force-dynamic'
 
 interface AlertChannelConfig {
   email?: string
+  emails?: string[]
   webhookUrl?: string
   slackWebhookUrl?: string
   slackChannel?: string
@@ -97,13 +98,15 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     let result: { success: boolean; error?: string }
 
     switch (channel.type) {
-      case 'email':
+      case 'email': {
+        const recipients = [channelConfig.email, ...(channelConfig.emails ?? [])].filter((e): e is string => Boolean(e?.trim()))
         result = await sendAlertEmail({
-          to: channelConfig.email || '',
+          to: recipients.length > 0 ? Array.from(new Set(recipients)) : '',
           subject: '[Test] Upnotify Alert Channel Test',
           body: testMessage,
         })
         break
+      }
 
       case 'slack':
         result = await sendSlackAlert({

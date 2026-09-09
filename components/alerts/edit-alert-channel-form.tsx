@@ -5,12 +5,13 @@ import { Mail, Hash, Users, Webhook, Phone, MessageSquare, Send, AlertTriangle, 
 import { updateAlertChannelAction } from '@/app/(dashboard)/dashboard/alerts/actions'
 import type { AlertChannel } from '@/lib/types'
 import { MonitorScopeSelect, type MonitorOption } from './monitor-scope-select'
+import { MultiEmailInput } from './multi-email-input'
 
 const TYPE_META: Record<string, { label: string; icon: React.ReactNode; color: string; bg: string }> = {
   email:    { label: 'Email',             icon: <Mail size={18} />,          color: '#6366f1', bg: 'rgba(99,102,241,0.12)' },
   slack:    { label: 'Slack',             icon: <Hash size={18} />,          color: '#f59e0b', bg: 'rgba(245,158,11,0.12)' },
   teams:    { label: 'Microsoft Teams',   icon: <Users size={18} />,         color: '#3b82f6', bg: 'rgba(59,130,246,0.12)' },
-  webhook:  { label: 'Webhook',           icon: <Webhook size={18} />,       color: '#2ee06b', bg: 'rgba(46,224,107,0.12)' },
+  webhook:  { label: 'Webhook',           icon: <Webhook size={18} />,       color: '#0068DB', bg: 'rgba(0, 104, 219,0.12)' },
   telegram: { label: 'Telegram',          icon: <Send size={18} />,          color: '#06b6d4', bg: 'rgba(6,182,212,0.12)' },
   whatsapp: { label: 'WhatsApp',          icon: <MessageSquare size={18} />, color: '#22c55e', bg: 'rgba(34,197,94,0.12)' },
   voice:    { label: 'Voice',             icon: <Phone size={18} />,         color: '#ec4899', bg: 'rgba(236,72,153,0.12)' },
@@ -27,6 +28,7 @@ const SEVERITIES = [
 
 interface ChannelConfig {
   email?: string
+  emails?: string[]
   slackWebhookUrl?: string
   slackChannel?: string
   teamsWebhookUrl?: string
@@ -102,18 +104,11 @@ export function EditAlertChannelForm({ channel, monitors = [] }: { channel: Aler
 
       {/* Type-specific fields */}
       {channel.type === 'email' && (
-        <div className="ac-form-section">
-          <label className="ac-form-label">Email Address</label>
-          <input
-            className="form-input"
-            name="email"
-            type="email"
-            required
-            defaultValue={config.email || ''}
-            disabled={isPending}
-            placeholder="alerts@example.com"
-          />
-        </div>
+        <MultiEmailInput
+          primaryDefault={config.email || ''}
+          extraDefaults={config.emails ?? []}
+          disabled={isPending}
+        />
       )}
 
       {channel.type === 'slack' && (

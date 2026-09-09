@@ -60,7 +60,7 @@ const TOOLS: { slug: string; title: string; description: string; tag: string; hr
       'Free multi-check grade across 5 categories — uptime, SSL, DNS, security headers, and performance. Enter any URL and get an instant A+ to F score with actionable recommendations. No signup required.',
     tag: 'Featured',
     icon: Gauge,
-    accent: '#00c94a',
+    accent: '#1392FB',
   },
   {
     slug: 'wordpress-monitor',
@@ -70,7 +70,7 @@ const TOOLS: { slug: string; title: string; description: string; tag: string; hr
       'Free plugin that monitors your WordPress site from the inside — detecting file injections, rogue admin users, foreign-language content, brute force attacks, security misconfigurations, and more. No inbound ports. Works behind Cloudflare.',
     tag: 'Free Plugin',
     icon: Plug,
-    accent: '#00a83d',
+    accent: '#0068DB',
   },
   {
     slug: 'ai-seo-checker',
@@ -106,7 +106,7 @@ const TOOLS: { slug: string; title: string; description: string; tag: string; hr
       'Look up domain registration details, expiry date, registrar, nameservers, and RDAP data for any domain.',
     tag: '',
     icon: Landmark,
-    accent: '#2ee06b',
+    accent: '#0068DB',
   },
   {
     slug: 'security-headers-checker',

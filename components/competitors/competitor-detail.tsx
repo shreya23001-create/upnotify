@@ -431,7 +431,7 @@ export function CompetitorDetail({ competitor, orgMonitors }: Props): React.Reac
         <div className="card">
           <div className="card-header">
             <div className="card-title">
-              <Sparkles size={14} style={{ marginRight: 6, color: '#2ee06b' }} />
+              <Sparkles size={14} style={{ marginRight: 6, color: '#0068DB' }} />
               AI Reliability Summary
             </div>
             <button

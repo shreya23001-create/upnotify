@@ -128,9 +128,9 @@ export function CreateStatusPageForm({ monitors }: { monitors: Monitor[] }) {
                   onClick={() => setDomainFilter(null)}
                   style={{
                     padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: 'pointer', border: '1.5px solid',
-                    background: domainFilter === null ? '#00c94a' : 'transparent',
+                    background: domainFilter === null ? '#1392FB' : 'transparent',
                     color: domainFilter === null ? '#fff' : 'var(--text-secondary)',
-                    borderColor: domainFilter === null ? '#00c94a' : 'var(--border-input)',
+                    borderColor: domainFilter === null ? '#1392FB' : 'var(--border-input)',
                     transition: 'all 0.15s',
                   }}
                 >
@@ -143,9 +143,9 @@ export function CreateStatusPageForm({ monitors }: { monitors: Monitor[] }) {
                     onClick={() => setDomainFilter(domainFilter === d ? null : d)}
                     style={{
                       padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: 'pointer', border: '1.5px solid',
-                      background: domainFilter === d ? '#00c94a' : 'transparent',
+                      background: domainFilter === d ? '#1392FB' : 'transparent',
                       color: domainFilter === d ? '#fff' : 'var(--text-secondary)',
-                      borderColor: domainFilter === d ? '#00c94a' : 'var(--border-input)',
+                      borderColor: domainFilter === d ? '#1392FB' : 'var(--border-input)',
                       transition: 'all 0.15s',
                     }}
                   >
@@ -162,7 +162,7 @@ export function CreateStatusPageForm({ monitors }: { monitors: Monitor[] }) {
                 onClick={allFilteredSelected ? deselectAll : selectAll}
                 style={{
                   fontSize: 12, fontWeight: 600, cursor: 'pointer', background: 'none', border: 'none',
-                  color: '#00c94a', padding: 0, textDecoration: 'underline',
+                  color: '#1392FB', padding: 0, textDecoration: 'underline',
                 }}
               >
                 {allFilteredSelected ? 'Deselect all' : 'Select all'}
@@ -197,11 +197,11 @@ export function CreateStatusPageForm({ monitors }: { monitors: Monitor[] }) {
                 filteredMonitors.map(m => (
                   <label key={m.id} style={{
                     display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px',
-                    border: selectedMonitors.has(m.id) ? '2px solid #00c94a' : '1.5px solid var(--border-input)',
+                    border: selectedMonitors.has(m.id) ? '2px solid #1392FB' : '1.5px solid var(--border-input)',
                     borderRadius: 10, cursor: 'pointer', background: selectedMonitors.has(m.id) ? 'var(--bg-hover)' : 'var(--bg-card)',
                     transition: 'all 0.15s',
                   }}>
-                    <input type="checkbox" checked={selectedMonitors.has(m.id)} onChange={() => toggleMonitor(m.id)} style={{ accentColor: '#00c94a' }} />
+                    <input type="checkbox" checked={selectedMonitors.has(m.id)} onChange={() => toggleMonitor(m.id)} style={{ accentColor: '#1392FB' }} />
                     <MonitorTypeIcon type={m.type} />
                     <span style={{ fontWeight: 500, flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.name}</span>
                     <span className={`badge ${m.status === 'up' ? 'badge-success' : m.status === 'down' ? 'badge-danger' : 'badge-outline'}`} style={{ flexShrink: 0 }}>

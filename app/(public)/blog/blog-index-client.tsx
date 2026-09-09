@@ -12,7 +12,7 @@ const POSTS_PER_PAGE = 12
 const FILTER_TABS = ['All posts', 'Guide', 'WordPress', 'Security', 'Performance', 'Ecommerce', 'Hosting', 'Incident Report', 'Agency', 'AI Tools']
 
 const BADGE_STYLES: Record<string, { bg: string; color: string; border: string }> = {
-  Guide: { bg: 'rgba(46,224,107,0.1)', color: '#2ee06b', border: 'rgba(46,224,107,0.2)' },
+  Guide: { bg: 'rgba(0, 104, 219,0.1)', color: '#0068DB', border: 'rgba(0, 104, 219,0.2)' },
   WordPress: { bg: 'rgba(59,130,246,0.1)', color: '#3b82f6', border: 'rgba(59,130,246,0.2)' },
   Security: { bg: 'rgba(239,68,68,0.1)', color: '#ef4444', border: 'rgba(239,68,68,0.2)' },
   Performance: { bg: 'rgba(16,185,129,0.1)', color: '#10b981', border: 'rgba(16,185,129,0.2)' },

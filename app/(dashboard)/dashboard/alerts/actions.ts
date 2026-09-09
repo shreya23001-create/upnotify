@@ -47,6 +47,8 @@ export async function createAlertChannelAction(formData: FormData): Promise<{ er
   if (type === 'email') {
     config.email = formData.get('email') as string
     if (!config.email) return { error: 'Email address is required' }
+    const extraEmails = (formData.getAll('extra_email') as string[]).map(e => e.trim()).filter(Boolean)
+    if (extraEmails.length > 0) config.emails = extraEmails
   }
 
   if (type === 'slack') {
@@ -121,6 +123,8 @@ export async function updateAlertChannelAction(channelId: string, formData: Form
 
   if (type === 'email') {
     config.email = formData.get('email') as string
+    const extraEmails = (formData.getAll('extra_email') as string[]).map(e => e.trim()).filter(Boolean)
+    if (extraEmails.length > 0) config.emails = extraEmails
   }
   if (type === 'slack') {
     config.slackWebhookUrl = formData.get('slackWebhookUrl') as string

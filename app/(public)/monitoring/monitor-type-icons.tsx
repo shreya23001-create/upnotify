@@ -41,8 +41,8 @@ export function MonitorIconGradientDefs() {
     <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true">
       <defs>
         <linearGradient id={GRADIENT_ID} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#00c94a" />
-          <stop offset="100%" stopColor="#4dff88" />
+          <stop offset="0%" stopColor="#1392FB" />
+          <stop offset="100%" stopColor="#0068DB" />
         </linearGradient>
       </defs>
     </svg>

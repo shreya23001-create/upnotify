@@ -483,7 +483,7 @@ export default async function LandingPage(): Promise<React.ReactElement> {
                       fontWeight: 700,
                       letterSpacing: '0.1em',
                       textTransform: 'uppercase',
-                      color: '#4dff88',
+                      color: '#0068DB',
                       marginBottom: 6,
                     }}
                   >
@@ -510,7 +510,7 @@ export default async function LandingPage(): Promise<React.ReactElement> {
         )
 
       case 'pricing':
-        return <PricingTable key="pricing" defaultCurrency={defaultCurrency} />
+        return <PricingTable key="pricing" />
 
       case 'agency':
         return (
@@ -702,7 +702,7 @@ export default async function LandingPage(): Promise<React.ReactElement> {
   }
 
   return (
-    <>
+    <div className="homepage-orange-cta">
       <OrganizationJsonLd />
       <SoftwareApplicationJsonLd />
       <WebSiteJsonLd />
@@ -718,6 +718,6 @@ export default async function LandingPage(): Promise<React.ReactElement> {
       {/* FOOTER — always pinned to bottom (global section, not reorderable) */}
 
 
-    </>
+    </div>
   )
 }

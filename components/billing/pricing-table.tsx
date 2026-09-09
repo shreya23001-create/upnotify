@@ -324,7 +324,7 @@ export function PricingTable({ plans, currentPlanSlug, subscription, creditBalan
           : `${data.planName ?? planSlug} · ${billingCycle === 'annual' ? 'Annual' : 'Monthly'} (incl. 18% GST)`,
         image:            `${process.env.NEXT_PUBLIC_APP_URL ?? 'https://uptrue.io'}/logo.svg`,
         prefill:          { email: data.userEmail ?? '', name: data.orgName ?? '' },
-        theme:            { color: '#00c94a' },
+        theme:            { color: '#1392FB' },
         handler:          (_response: unknown) => {
           // Payment captured — webhook will activate the subscription
           window.location.href = '/dashboard/settings?tab=billing&billing=success'

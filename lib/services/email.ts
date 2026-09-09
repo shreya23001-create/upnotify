@@ -14,7 +14,7 @@ interface EmailResult {
 }
 
 interface AlertEmailParams {
-  to: string
+  to: string | string[]
   subject: string
   body: string
 }
@@ -112,7 +112,7 @@ function incrementAndCheckRate(): { allowed: boolean; remaining: number } {
 
 async function sendViaResend(
   provider: EmailProvider,
-  to: string,
+  to: string | string[],
   subject: string,
   html: string
 ): Promise<EmailResult> {
@@ -123,7 +123,7 @@ async function sendViaResend(
   const client = new Resend(apiKey)
   const { error } = await client.emails.send({
     from: `${provider.from_name} <${provider.from_email}>`,
-    to: [to],
+    to: Array.isArray(to) ? to : [to],
     subject,
     html,
   })
@@ -133,7 +133,7 @@ async function sendViaResend(
 
 async function sendViaSendGrid(
   provider: EmailProvider,
-  to: string,
+  to: string | string[],
   subject: string,
   html: string
 ): Promise<EmailResult> {
@@ -153,7 +153,7 @@ async function sendViaSendGrid(
 
 async function sendViaSmtp(
   provider: EmailProvider,
-  to: string,
+  to: string | string[],
   subject: string,
   html: string
 ): Promise<EmailResult> {
@@ -187,7 +187,7 @@ async function sendViaSmtp(
 
 async function sendViaProvider(
   provider: EmailProvider,
-  to: string,
+  to: string | string[],
   subject: string,
   html: string
 ): Promise<EmailResult> {
@@ -213,7 +213,7 @@ function getEnvResendClient(): Resend | null {
 }
 
 async function sendViaEnvResend(
-  to: string,
+  to: string | string[],
   subject: string,
   html: string
 ): Promise<EmailResult> {
@@ -231,7 +231,7 @@ async function sendViaEnvResend(
 
   const { error } = await client.emails.send({
     from: `${config.resend.fromName} <${config.resend.fromEmail}>`,
-    to: [to],
+    to: Array.isArray(to) ? to : [to],
     subject,
     html,
   })
@@ -244,7 +244,7 @@ async function sendViaEnvResend(
 // ---------------------------------------------------------------------------
 
 export async function sendEmail(
-  to: string,
+  to: string | string[],
   subject: string,
   html: string,
   emailType: EmailType = 'system'

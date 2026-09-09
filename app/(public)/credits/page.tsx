@@ -80,12 +80,12 @@ export default function CreditsPage(): React.ReactElement {
                   <path d="M155 320 C 130 350, 100 355, 75 380" stroke="url(#creditsArrow2)" strokeWidth="2" strokeDasharray="5 6" strokeLinecap="round" />
                   <defs>
                     <linearGradient id="creditsArrow1" x1="225" y1="95" x2="240" y2="190" gradientUnits="userSpaceOnUse">
-                      <stop stopColor="#00c94a" stopOpacity="0.5" />
+                      <stop stopColor="#1392FB" stopOpacity="0.5" />
                       <stop offset="1" stopColor="#ec4899" stopOpacity="0.5" />
                     </linearGradient>
                     <linearGradient id="creditsArrow2" x1="155" y1="320" x2="75" y2="380" gradientUnits="userSpaceOnUse">
                       <stop stopColor="#ec4899" stopOpacity="0.5" />
-                      <stop offset="1" stopColor="#00c94a" stopOpacity="0.5" />
+                      <stop offset="1" stopColor="#1392FB" stopOpacity="0.5" />
                     </linearGradient>
                   </defs>
                 </svg>
