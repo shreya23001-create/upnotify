@@ -1,12 +1,9 @@
 'use client'
 
-export function ThemeScript(): React.ReactElement {
-  return (
-    <script
-      // biome-ignore lint: intentional inline script for theme init before first paint
-      dangerouslySetInnerHTML={{
-        __html: `(function(){try{var s=localStorage.getItem('uptrue_theme');if(s!=='light')document.documentElement.classList.add('dark');}catch(e){}})();`,
-      }}
-    />
-  )
+// Dark mode is currently disabled site-wide (see theme-toggle.tsx) — light
+// mode is the only theme shown, so this script no longer needs to add the
+// dark class before first paint. Kept as a no-op component so existing
+// <ThemeScript /> usages don't need to be removed.
+export function ThemeScript(): React.ReactElement | null {
+  return null
 }
