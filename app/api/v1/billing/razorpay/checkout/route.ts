@@ -8,6 +8,7 @@ import { getServerConfig } from '@/lib/utils/config'
 import {
   ensureRazorpayCustomer,
   createRazorpaySubscription,
+  razorpayErrorMessage,
 } from '@/lib/services/payments-razorpay'
 import { checkRateLimit, API_V1_RATE_LIMIT } from '@/lib/utils/rate-limiter'
 
@@ -158,7 +159,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     })
   } catch (error) {
     logger.error('Razorpay checkout error', {
-      error: error instanceof Error ? error.message : String(error),
+      error: error instanceof Error ? error.message : razorpayErrorMessage(error),
     })
     return NextResponse.json(
       { error: 'Failed to create Razorpay checkout. Please try again.' },

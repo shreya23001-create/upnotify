@@ -11,7 +11,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { createRazorpayPlan } from '@/lib/services/payments-razorpay'
+import { createRazorpayPlan, razorpayErrorMessage } from '@/lib/services/payments-razorpay'
 import { logger } from '@/lib/utils/logger'
 
 export const dynamic = 'force-dynamic'
@@ -53,10 +53,11 @@ export async function POST(): Promise<NextResponse> {
     return NextResponse.json({ error: 'Failed to fetch plans' }, { status: 500 })
   }
 
-  const results: { slug: string; monthly?: string; annual?: string; skipped?: string[] }[] = []
+  const results: { slug: string; monthly?: string; annual?: string; skipped?: string[]; errors?: string[] }[] = []
 
   for (const plan of plans as unknown as PlanRow[]) {
     const skipped: string[] = []
+    const errors: string[] = []
     let monthlyPlanId = plan.razorpay_monthly_plan_id
     let annualPlanId  = plan.razorpay_annual_plan_id
 
@@ -72,8 +73,10 @@ export async function POST(): Promise<NextResponse> {
         })
         monthlyPlanId = rzpPlan.id
       } catch (err) {
-        logger.error('Razorpay sync: failed to create monthly plan', { slug: plan.slug, error: String(err) })
+        const msg = razorpayErrorMessage(err)
+        logger.error('Razorpay sync: failed to create monthly plan', { slug: plan.slug, error: msg })
         skipped.push('monthly')
+        errors.push(`monthly: ${msg}`)
       }
     } else if (monthlyPlanId) {
       skipped.push('monthly (already exists)')
@@ -91,8 +94,10 @@ export async function POST(): Promise<NextResponse> {
         })
         annualPlanId = rzpPlan.id
       } catch (err) {
-        logger.error('Razorpay sync: failed to create annual plan', { slug: plan.slug, error: String(err) })
+        const msg = razorpayErrorMessage(err)
+        logger.error('Razorpay sync: failed to create annual plan', { slug: plan.slug, error: msg })
         skipped.push('annual')
+        errors.push(`annual: ${msg}`)
       }
     } else if (annualPlanId) {
       skipped.push('annual (already exists)')
@@ -114,6 +119,7 @@ export async function POST(): Promise<NextResponse> {
       monthly: monthlyPlanId ?? undefined,
       annual:  annualPlanId  ?? undefined,
       skipped: skipped.length ? skipped : undefined,
+      errors:  errors.length ? errors : undefined,
     })
   }
 

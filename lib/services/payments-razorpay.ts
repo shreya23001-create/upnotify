@@ -9,6 +9,25 @@ import crypto from 'crypto'
 import { getServerConfig } from '@/lib/utils/config'
 import { logger } from '@/lib/utils/logger'
 
+// Razorpay's SDK throws structured objects (not Error instances), so
+// String(err)/err.message yield "[object Object]" everywhere they're caught.
+// Extract the real description so logs and API responses are useful.
+export function razorpayErrorMessage(err: unknown): string {
+  const e = err as { statusCode?: number; error?: { code?: string; description?: string; field?: string } }
+  if (e?.error?.description) {
+    return `[${e.statusCode ?? '?'}] ${e.error.code ?? ''} ${e.error.description}${e.error.field ? ` (field: ${e.error.field})` : ''}`.trim()
+  }
+  if (e?.statusCode) {
+    return `[${e.statusCode}] Razorpay request failed with no error description (check API key validity/permissions)`
+  }
+  if (err instanceof Error) return err.message
+  try {
+    return JSON.stringify(err)
+  } catch {
+    return String(err)
+  }
+}
+
 // ─── Client singleton ─────────────────────────────────────────────────────────
 
 let _client: Razorpay | null = null
@@ -54,8 +73,10 @@ export interface RazorpayCustomerResult {
 
 /**
  * Create or retrieve a Razorpay customer for an org.
- * `fail_existing: 0` means Razorpay returns the existing customer
- * if one already exists with this email.
+ * `fail_existing: 0` is documented to make Razorpay return the existing
+ * customer instead of erroring, but in practice it still throws a 400
+ * "Customer already exists" — so on that specific error we fall back to
+ * looking the customer up by email instead.
  */
 export async function ensureRazorpayCustomer(
   email: string,
@@ -70,8 +91,29 @@ export async function ensureRazorpayCustomer(
     }) as unknown as RazorpayCustomerResult
     return customer.id
   } catch (err) {
-    logger.error('Razorpay: failed to create customer', { email, error: String(err) })
-    throw err
+    const e = err as { statusCode?: number; error?: { description?: string } }
+    const alreadyExists = e?.statusCode === 400 && e?.error?.description?.toLowerCase().includes('already exists')
+
+    if (alreadyExists) {
+      try {
+        const rzp = getRazorpay()
+        const existing = await rzp.customers.all({ count: 100 }) as unknown as { items: RazorpayCustomerResult[] }
+        const match = existing.items?.find(c => c.email?.toLowerCase() === email.toLowerCase())
+        if (match) {
+          logger.info('Razorpay: reused existing customer', { email, customerId: match.id })
+          return match.id
+        }
+      } catch (lookupErr) {
+        logger.error('Razorpay: failed to look up existing customer after "already exists" error', {
+          email,
+          error: razorpayErrorMessage(lookupErr),
+        })
+      }
+    }
+
+    const msg = razorpayErrorMessage(err)
+    logger.error('Razorpay: failed to create customer', { email, error: msg })
+    throw new Error(`Razorpay customer creation failed: ${msg}`)
   }
 }
 

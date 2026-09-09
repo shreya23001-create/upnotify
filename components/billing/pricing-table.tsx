@@ -194,7 +194,9 @@ function getPlanCta(plan: Plan, isCurrent: boolean, isHigherTier: boolean): stri
 
 export function PricingTable({ plans, currentPlanSlug, subscription, creditBalancePence = 0, defaultCurrency = 'gbp' }: Props): React.ReactElement {
   const [isPending, startTransition] = useTransition()
-  const [isRazorpayPending, setIsRazorpayPending] = useState(false)
+  // Track which specific plan's Razorpay checkout is loading, not a single
+  // shared flag — otherwise every card shows "Opening…" at once.
+  const [razorpayPendingSlug, setRazorpayPendingSlug] = useState<string | null>(null)
   const [showCancelModal, setShowCancelModal] = useState(false)
   const [mockCheckout, setMockCheckout] = useState<MockCheckoutData | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -210,7 +212,9 @@ export function PricingTable({ plans, currentPlanSlug, subscription, creditBalan
   // subscription yet, or Razorpay-only) goes through the checkout flow.
   const hasStripeSubscription = Boolean(sub?.stripe_subscription_id) && (sub?.status === 'active' || sub?.status === 'cancelling' || sub?.status === 'past_due')
 
-  const directPlans = plans.filter(p => p.type === 'direct')
+  // Temporarily showing only Lite and Builder on the pricing grid.
+  const VISIBLE_PLAN_SLUGS = new Set(['lite', 'builder'])
+  const directPlans = plans.filter(p => p.type === 'direct' && VISIBLE_PLAN_SLUGS.has(p.slug))
 
   // Determine the index of the current plan for upgrade/downgrade logic
   const currentPlanIndex = directPlans.findIndex(p => p.slug === currentPlanSlug)
@@ -267,7 +271,7 @@ export function PricingTable({ plans, currentPlanSlug, subscription, creditBalan
 
   const handleRazorpayCheckout = useCallback(async (planSlug: string, billingCycle: string): Promise<void> => {
     setError(null)
-    setIsRazorpayPending(true)
+    setRazorpayPendingSlug(planSlug)
     try {
       // 1. Create Razorpay subscription server-side
       const res = await fetch('/api/v1/billing/razorpay/checkout', {
@@ -289,7 +293,7 @@ export function PricingTable({ plans, currentPlanSlug, subscription, creditBalan
       }
       if (!res.ok || !data.subscriptionId) {
         setError(data.error ?? 'Failed to start checkout. Please try again.')
-        setIsRazorpayPending(false)
+        setRazorpayPendingSlug(null)
         return
       }
 
@@ -304,7 +308,7 @@ export function PricingTable({ plans, currentPlanSlug, subscription, creditBalan
           userEmail:      data.userEmail ?? '',
           orgName:        data.orgName ?? '',
         })
-        setIsRazorpayPending(false)
+        setRazorpayPendingSlug(null)
         return
       }
 
@@ -320,19 +324,19 @@ export function PricingTable({ plans, currentPlanSlug, subscription, creditBalan
           : `${data.planName ?? planSlug} · ${billingCycle === 'annual' ? 'Annual' : 'Monthly'} (incl. 18% GST)`,
         image:            `${process.env.NEXT_PUBLIC_APP_URL ?? 'https://uptrue.io'}/logo.svg`,
         prefill:          { email: data.userEmail ?? '', name: data.orgName ?? '' },
-        theme:            { color: '#3b82f6' },
+        theme:            { color: '#00c94a' },
         handler:          (_response: unknown) => {
           // Payment captured — webhook will activate the subscription
           window.location.href = '/dashboard/settings?tab=billing&billing=success'
         },
         modal: {
-          ondismiss: () => { setIsRazorpayPending(false) },
+          ondismiss: () => { setRazorpayPendingSlug(null) },
         },
       })
       rzp.open()
     } catch (err) {
       setError('Something went wrong. Please try again.')
-      setIsRazorpayPending(false)
+      setRazorpayPendingSlug(null)
     }
   }, [])
 
@@ -344,7 +348,7 @@ export function PricingTable({ plans, currentPlanSlug, subscription, creditBalan
       {mockCheckout && (
         <MockRazorpayModal
           data={mockCheckout}
-          onClose={() => { setMockCheckout(null); setIsRazorpayPending(false) }}
+          onClose={() => { setMockCheckout(null); setRazorpayPendingSlug(null) }}
         />
       )}
 
@@ -482,9 +486,9 @@ export function PricingTable({ plans, currentPlanSlug, subscription, creditBalan
                 <button
                   className="btn btn-primary btn-full"
                   onClick={() => void handleRazorpayCheckout(plan.slug, billingCycle)}
-                  disabled={isRazorpayPending}
+                  disabled={razorpayPendingSlug !== null}
                 >
-                  {isRazorpayPending ? 'Opening…' : ctaText}
+                  {razorpayPendingSlug === plan.slug ? 'Opening…' : ctaText}
                 </button>
               ) : isHigherTier ? (
                 <button

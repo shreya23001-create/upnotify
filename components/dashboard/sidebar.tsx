@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import { UptrueLogo } from '@/components/ui/uptrue-logo'
 import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { useWorkspace } from '@/components/providers/workspace-provider'
@@ -130,7 +129,7 @@ export function Sidebar({ currency = 'gbp', forceExpanded = false }: SidebarProp
           {effectiveCollapsed ? (
             <span className="sidebar-logo-mark">U</span>
           ) : (
-            <UptrueLogo variant="dark" />
+            <img src="/Logo_2.png" alt="Upnotify" height={35} style={{ height: 35, width: 'auto' }} />
           )}
         </Link>
       </div>

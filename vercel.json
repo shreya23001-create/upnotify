@@ -5,11 +5,11 @@
   "crons": [
     {
       "path": "/api/cron/check-runner",
-      "schedule": "* * * * *"
+      "schedule": "0 6 * * *"
     },
     {
       "path": "/api/cron/public-checks",
-      "schedule": "* * * * *"
+      "schedule": "0 7 * * *"
     },
     {
       "path": "/api/cron/nurture-emails",
@@ -21,7 +21,7 @@
     },
     {
       "path": "/api/cron/compete-checks",
-      "schedule": "0 * * * *"
+      "schedule": "0 9 * * *"
     },
     {
       "path": "/api/cron/aoe/quota-manager",
@@ -53,7 +53,7 @@
     },
     {
       "path": "/api/cron/competitor-checks",
-      "schedule": "0 * * * *"
+      "schedule": "0 10 * * *"
     },
     {
       "path": "/api/cron/razorpay-recovery",
@@ -61,11 +61,11 @@
     },
     {
       "path": "/api/cron/public-incident-cleanup",
-      "schedule": "*/30 * * * *"
+      "schedule": "0 11 * * *"
     },
     {
       "path": "/api/cron/pmb/daily-publisher",
-      "schedule": "*/5 * * * *"
+      "schedule": "0 12 * * *"
     },
     {
       "path": "/api/cron/pmb/monthly-generator",
@@ -81,7 +81,7 @@
     },
     {
       "path": "/api/cron/calendar/draft-runner",
-      "schedule": "0 8,14,20 * * *"
+      "schedule": "0 14 * * *"
     },
     {
       "path": "/api/cron/boss-digest",
@@ -89,7 +89,7 @@
     },
     {
       "path": "/api/cron/alert-digest-flusher",
-      "schedule": "*/5 * * * *"
+      "schedule": "0 13 * * *"
     },
     {
       "path": "/api/cron/legal-review-overdue",
