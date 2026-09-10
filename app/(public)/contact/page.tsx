@@ -11,13 +11,13 @@ export const metadata: Metadata = {
   description:
     'Contact the Upnotify team for support, agency enquiries, or partnership opportunities. Vision Software Solutions Limited, Brentford, UK.',
   alternates: {
-    canonical: 'https://uptrue.io/contact',
+    canonical: 'https://upnotify-monitoring.vercel.app/contact',
   },
   openGraph: {
     title: 'Contact Upnotify — Get in Touch',
     description:
       'Contact the Upnotify team for support, agency enquiries, or partnership opportunities.',
-    url: 'https://uptrue.io/contact',
+    url: 'https://upnotify-monitoring.vercel.app/contact',
     type: 'website',
   },
 }
@@ -27,19 +27,19 @@ const CONTACT_CHANNELS = [
     icon: Mail,
     title: 'General Support',
     description: 'Questions about your account, billing, or monitoring setup.',
-    email: 'support@uptrue.io',
+    email: 'shreya23001@gmail.com',
   },
   {
     icon: Building2,
     title: 'For Agencies',
     description: 'White-label, multi-client workspaces, and revenue sharing enquiries.',
-    email: 'agencies@uptrue.io',
+    email: 'shreya23001@gmail.com',
   },
   {
     icon: Handshake,
     title: 'Partnerships',
     description: 'Integration partnerships, reseller programmes, and collaboration.',
-    email: 'partners@uptrue.io',
+    email: 'shreya23001@gmail.com',
   },
 ]
 

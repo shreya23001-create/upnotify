@@ -11,8 +11,8 @@
  *   payment.failed           → log failed payment attempt
  *
  * Register this URL in Razorpay Dashboard → Settings → Webhooks:
- *   https://dev.uptrue.io/api/webhooks/razorpay  (dev)
- *   https://uptrue.io/api/webhooks/razorpay      (prod)
+ *   https://upnotify-monitoring.vercel.app/api/webhooks/razorpay  (dev)
+ *   https://upnotify-monitoring.vercel.app/api/webhooks/razorpay      (prod)
  */
 
 import { NextResponse } from 'next/server'
@@ -62,11 +62,90 @@ interface RzpWebhookEvent {
 
 // ─── Handlers ─────────────────────────────────────────────────────────────────
 
+/**
+ * Add-On Plan activation. Kept entirely separate from the base-plan flow
+ * below — it writes to org_addon_subscriptions, not subscriptions, and
+ * deliberately does NOT cancel any other subscription for the org. An org
+ * can hold any number of active add-ons at once, each billing on its own
+ * cycle from its own purchase date, independent of the base plan.
+ */
+async function handleAddonSubscriptionActivated(sub: RzpSubscription): Promise<void> {
+  const supabase = createAdminClient()
+  const orgId = sub.notes?.org_id
+  const planSlug = sub.notes?.plan_slug
+
+  if (!orgId || !planSlug) {
+    logger.error('Razorpay webhook (addon): missing org_id or plan_slug in subscription notes', { subId: sub.id })
+    return
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: existing } = await (supabase as any)
+    .from('org_addon_subscriptions')
+    .select('id')
+    .eq('razorpay_subscription_id', sub.id)
+    .maybeSingle()
+
+  if (existing) {
+    logger.info('Razorpay (addon): subscription already recorded, skipping', { subId: sub.id })
+    return
+  }
+
+  const { data: plan } = await supabase
+    .from('plans')
+    .select('id, name')
+    .eq('slug', planSlug)
+    .single()
+
+  if (!plan) {
+    logger.error('Razorpay (addon): plan not found in DB', { planSlug })
+    return
+  }
+
+  const periodStart = sub.current_start ? new Date(sub.current_start * 1000).toISOString() : new Date().toISOString()
+  const periodEnd   = sub.current_end   ? new Date(sub.current_end   * 1000).toISOString() : null
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  await (supabase as any).from('org_addon_subscriptions').insert({
+    org_id: orgId,
+    addon_plan_id: plan.id,
+    razorpay_subscription_id: sub.id,
+    status: 'active',
+    current_period_start: periodStart,
+    current_period_end: periodEnd ?? new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+  })
+
+  logger.info('Razorpay: add-on subscription activated', { subId: sub.id, orgId, planSlug })
+
+  await writeAuditLog({
+    orgId,
+    userId: null,
+    action: 'addon_subscription.created',
+    resourceType: 'org_addon_subscription',
+    metadata: {
+      razorpay_subscription_id: sub.id,
+      plan_slug: planSlug,
+      plan_name: plan.name,
+      currency: 'inr',
+      source: 'razorpay_webhook',
+    },
+  })
+}
+
 async function handleSubscriptionActivated(sub: RzpSubscription): Promise<void> {
   // Reject mock subscription IDs — they exist only for dev testing and must never
   // be processed by real webhook logic (idempotency guard would miss them otherwise)
   if (sub.id.startsWith('mock_')) {
     logger.info('Razorpay webhook: ignoring mock subscription ID', { subId: sub.id })
+    return
+  }
+
+  // Add-on subscriptions are tagged at creation time (see addon-checkout route)
+  // and take a completely separate code path — they must never enter the
+  // base-plan flow below, which cancels every other active subscription for
+  // the org. Routing here first guarantees that safety property.
+  if (sub.notes?.is_addon === 'true') {
+    await handleAddonSubscriptionActivated(sub)
     return
   }
 
@@ -278,6 +357,39 @@ async function handleSubscriptionActivated(sub: RzpSubscription): Promise<void> 
   })
 }
 
+/** Add-on's own renewal-charge handling — updates org_addon_subscriptions
+ *  instead of subscriptions. Invoice rows still get written against the
+ *  org either way, so billing history stays unified for the customer. */
+async function handleAddonSubscriptionCharged(addonSubId: string, sub: RzpSubscription): Promise<boolean> {
+  const supabase = createAdminClient()
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: addonRecord } = await (supabase as any)
+    .from('org_addon_subscriptions')
+    .select('id, status')
+    .eq('id', addonSubId)
+    .maybeSingle()
+
+  if (!addonRecord) return false
+
+  if (sub.current_start && sub.current_end) {
+    const updatePayload: Record<string, unknown> = {
+      current_period_start: new Date(sub.current_start * 1000).toISOString(),
+      current_period_end:   new Date(sub.current_end   * 1000).toISOString(),
+    }
+    if (addonRecord.status === 'past_due') {
+      updatePayload.status = 'active'
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase as any)
+      .from('org_addon_subscriptions')
+      .update(updatePayload)
+      .eq('id', addonRecord.id)
+  }
+
+  return true
+}
+
 async function handleSubscriptionCharged(sub: RzpSubscription, payment: RzpPayment | null): Promise<void> {
   const supabase = createAdminClient()
   const orgId    = sub.notes?.org_id
@@ -297,6 +409,24 @@ async function handleSubscriptionCharged(sub: RzpSubscription, payment: RzpPayme
     .select('id, status')
     .eq('razorpay_subscription_id', sub.id)
     .maybeSingle()
+
+  if (!subRecord) {
+    // Not a base-plan subscription — check whether this charge belongs to an
+    // active Add-On Plan subscription instead before giving up.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: addonRecord } = await (supabase as any)
+      .from('org_addon_subscriptions')
+      .select('id')
+      .eq('razorpay_subscription_id', sub.id)
+      .maybeSingle()
+
+    if (addonRecord) {
+      await handleAddonSubscriptionCharged(addonRecord.id, sub)
+      logger.info('Razorpay: add-on renewal charged', { subId: sub.id, orgId, paymentId: payment.id })
+    } else {
+      logger.warn('Razorpay subscription.charged: no matching subscription or add-on found', { subId: sub.id })
+    }
+  }
 
   // Update period dates. Only flip status to 'active' when recovering from 'past_due'.
   // Never overwrite 'cancelling' — user requested cancel-at-period-end and a renewal
@@ -360,9 +490,68 @@ async function handleSubscriptionCharged(sub: RzpSubscription, payment: RzpPayme
   })
 }
 
+/** Returns 'base' if this Razorpay subscription id belongs to the org's
+ *  main subscriptions row, 'addon' if it belongs to org_addon_subscriptions,
+ *  or null if it matches neither (unknown/mock/stale subscription). */
+async function findSubscriptionTable(razorpaySubId: string): Promise<'base' | 'addon' | null> {
+  const supabase = createAdminClient()
+
+  const { data: baseRow } = await supabase
+    .from('subscriptions')
+    .select('id')
+    .eq('razorpay_subscription_id', razorpaySubId)
+    .maybeSingle()
+  if (baseRow) return 'base'
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: addonRow } = await (supabase as any)
+    .from('org_addon_subscriptions')
+    .select('id')
+    .eq('razorpay_subscription_id', razorpaySubId)
+    .maybeSingle()
+  if (addonRow) return 'addon'
+
+  return null
+}
+
 async function handleSubscriptionCancelled(sub: RzpSubscription): Promise<void> {
   const supabase = createAdminClient()
   const orgId = sub.notes?.org_id
+  const table = await findSubscriptionTable(sub.id)
+
+  if (table === 'addon') {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: existing } = await (supabase as any)
+      .from('org_addon_subscriptions')
+      .select('status')
+      .eq('razorpay_subscription_id', sub.id)
+      .maybeSingle()
+
+    if (existing?.status === 'canceled') {
+      logger.info('Razorpay webhook: add-on already canceled in DB — skipping', { subId: sub.id })
+      return
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase as any)
+      .from('org_addon_subscriptions')
+      .update({ status: 'canceled', canceled_at: new Date().toISOString() })
+      .eq('razorpay_subscription_id', sub.id)
+
+    if (orgId) await enforceDowngradeLimits(orgId)
+    logger.info('Razorpay: add-on subscription cancelled via webhook', { subId: sub.id, orgId })
+
+    if (orgId) {
+      await writeAuditLog({
+        orgId,
+        userId: null,
+        action: 'addon_subscription.canceled',
+        resourceType: 'org_addon_subscription',
+        metadata: { razorpay_subscription_id: sub.id, source: 'razorpay_webhook' },
+      })
+    }
+    return
+  }
 
   // The cancel route already sets status='canceled' before this webhook arrives.
   // Skip if already canceled to avoid a race-condition overwrite.
@@ -405,6 +594,29 @@ async function handleSubscriptionCancelled(sub: RzpSubscription): Promise<void> 
 async function handleSubscriptionHalted(sub: RzpSubscription): Promise<void> {
   // Halted = all retry attempts failed. Mark past_due.
   const supabase = createAdminClient()
+  const table = await findSubscriptionTable(sub.id)
+  const orgId = sub.notes?.org_id
+
+  if (table === 'addon') {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase as any)
+      .from('org_addon_subscriptions')
+      .update({ status: 'past_due' })
+      .eq('razorpay_subscription_id', sub.id)
+
+    logger.warn('Razorpay: add-on subscription halted (all payment retries failed)', { subId: sub.id, orgId })
+
+    if (orgId) {
+      await writeAuditLog({
+        orgId,
+        userId: null,
+        action: 'addon_subscription.halted',
+        resourceType: 'org_addon_subscription',
+        metadata: { razorpay_subscription_id: sub.id, reason: 'all_payment_retries_failed', source: 'razorpay_webhook' },
+      })
+    }
+    return
+  }
 
   await supabase
     .from('subscriptions')
@@ -416,7 +628,6 @@ async function handleSubscriptionHalted(sub: RzpSubscription): Promise<void> {
     orgId: sub.notes?.org_id,
   })
 
-  const orgId = sub.notes?.org_id
   if (orgId) {
     await writeAuditLog({
       orgId,
@@ -434,6 +645,33 @@ async function handleSubscriptionHalted(sub: RzpSubscription): Promise<void> {
 
 async function handleSubscriptionResumed(sub: RzpSubscription): Promise<void> {
   const supabase = createAdminClient()
+  const table = await findSubscriptionTable(sub.id)
+
+  if (table === 'addon') {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase as any)
+      .from('org_addon_subscriptions')
+      .update({
+        status: 'active',
+        current_period_start: sub.current_start ? new Date(sub.current_start * 1000).toISOString() : undefined,
+        current_period_end:   sub.current_end   ? new Date(sub.current_end   * 1000).toISOString() : undefined,
+      })
+      .eq('razorpay_subscription_id', sub.id)
+
+    logger.info('Razorpay: add-on subscription resumed', { subId: sub.id })
+
+    const addonOrgId = sub.notes?.org_id
+    if (addonOrgId) {
+      await writeAuditLog({
+        orgId: addonOrgId,
+        userId: null,
+        action: 'addon_subscription.resumed',
+        resourceType: 'org_addon_subscription',
+        metadata: { razorpay_subscription_id: sub.id, source: 'razorpay_webhook' },
+      })
+    }
+    return
+  }
 
   await supabase
     .from('subscriptions')
@@ -481,7 +719,7 @@ export async function POST(request: Request): Promise<NextResponse> {
   // engineering-app#62 — verify signature in EVERY environment whenever the
   // webhook secret is configured. Previously dev/staging accepted unsigned
   // requests, which let anyone POST a fake subscription.activated event to
-  // dev.uptrue.io and forge plan changes against any org id they could
+  // upnotify-monitoring.vercel.app and forge plan changes against any org id they could
   // guess. The env name is not the right signal; the presence of the secret
   // is. If the secret isn't set, the integration isn't wired up — return
   // 503 rather than silently accepting unsigned payloads.

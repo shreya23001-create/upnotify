@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: 'Website Competitor Analysis Tools for Ecommerce in 2026',
   description:
     'Your competitors\' website performance directly affects your bottom line. Learn what to track, which competitor analysis tools actually help, and how to turn competitive intelligence into a business advantage.',
-  alternates: { canonical: 'https://uptrue.io/blog/competitor-analysis-ecommerce' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/competitor-analysis-ecommerce' },
   openGraph: {
     title: 'Website Competitor Analysis Tools for Ecommerce in 2026',
     description:
       'Learn what to track, which competitor analysis tools actually help, and how to turn competitive intelligence into a business advantage.',
-    url: 'https://uptrue.io/blog/competitor-analysis-ecommerce',
+    url: 'https://upnotify-monitoring.vercel.app/blog/competitor-analysis-ecommerce',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -63,10 +63,10 @@ export default function CompetitorAnalysisEcommercePage(): React.ReactElement {
           headline: 'Website Competitor Analysis Tools for Ecommerce in 2026',
           description: 'What to track, which tools help, and how to turn competitive intelligence into a business advantage.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-10',
           dateModified: '2026-03-10',
-          url: 'https://uptrue.io/blog/competitor-analysis-ecommerce',
+          url: 'https://upnotify-monitoring.vercel.app/blog/competitor-analysis-ecommerce',
         }}
       />
 

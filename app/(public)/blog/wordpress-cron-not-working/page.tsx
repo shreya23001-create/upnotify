@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: 'WordPress wp-cron Not Firing: Why Scheduled Posts, Emails, and Backups Silently Stop',
   description:
     'WordPress wp-cron relies on site traffic to trigger scheduled tasks. On low-traffic sites, cron jobs silently stop firing — scheduled posts publish late, backup emails never arrive, and maintenance tasks pile up. Learn why wp-cron fails and how heartbeat monitoring keeps it running.',
-  alternates: { canonical: 'https://uptrue.io/blog/wordpress-cron-not-working' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/wordpress-cron-not-working' },
   openGraph: {
     title: 'WordPress wp-cron Not Firing: Why Scheduled Posts, Emails, and Backups Silently Stop',
     description:
       'Why WordPress wp-cron fails on low-traffic sites, what breaks when DISABLE_WP_CRON is set without a server cron replacement, and how Upnotify heartbeat monitoring keeps wp-cron firing on schedule.',
-    url: 'https://uptrue.io/blog/wordpress-cron-not-working',
+    url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-cron-not-working',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -68,10 +68,10 @@ export default function WordPressCronNotWorkingPage(): React.ReactElement {
           headline: 'WordPress wp-cron Not Firing: Why Scheduled Posts, Emails, and Backups Silently Stop',
           description: 'Why WordPress wp-cron relies on traffic, what breaks when it stops firing, and how heartbeat monitoring keeps scheduled tasks running reliably.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-26',
           dateModified: '2026-03-26',
-          url: 'https://uptrue.io/blog/wordpress-cron-not-working',
+          url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-cron-not-working',
         }}
       />
 
@@ -264,7 +264,7 @@ export default function WordPressCronNotWorkingPage(): React.ReactElement {
         <h3>Step 2: Set up an Upnotify heartbeat monitor</h3>
 
         <ol>
-          <li>Sign up at <Link href="/signup">uptrue.io/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>Heartbeat</strong> as the monitor type</li>
           <li>Enter the URL: <code>https://yourdomain.com/wp-cron.php?doing_wp_cron</code></li>

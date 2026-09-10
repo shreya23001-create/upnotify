@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: 'What Is Uptime Monitoring and Why Every Website Needs It',
   description:
     'Uptime monitoring checks if your website is online and alerts you when it goes down. Learn how it works, what it checks, and why every website needs it in 2026.',
-  alternates: { canonical: 'https://uptrue.io/blog/what-is-uptime-monitoring' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/what-is-uptime-monitoring' },
   openGraph: {
     title: 'What Is Uptime Monitoring and Why Every Website Needs It',
     description:
       'Learn what uptime monitoring is, how it works, and why your website needs it to stay online and trustworthy.',
-    url: 'https://uptrue.io/blog/what-is-uptime-monitoring',
+    url: 'https://upnotify-monitoring.vercel.app/blog/what-is-uptime-monitoring',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -88,10 +88,10 @@ export default function WhatIsUptimeMonitoringPage(): React.ReactElement {
           headline: 'What Is Uptime Monitoring and Why Every Website Needs It',
           description: 'Uptime monitoring checks if your website is online and working. Learn what it is, how it works, and why every website needs it.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-25',
           dateModified: '2026-03-25',
-          url: 'https://uptrue.io/blog/what-is-uptime-monitoring',
+          url: 'https://upnotify-monitoring.vercel.app/blog/what-is-uptime-monitoring',
         }}
       />
 
@@ -271,7 +271,7 @@ export default function WhatIsUptimeMonitoringPage(): React.ReactElement {
         </p>
 
         <ol>
-          <li>Go to <Link href="/signup">uptrue.io/signup</Link> and create a free account</li>
+          <li>Go to <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> and create a free account</li>
           <li>Click <strong>Add Monitor</strong></li>
           <li>Select <strong>HTTP/HTTPS</strong></li>
           <li>Enter your website URL</li>

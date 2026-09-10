@@ -8,7 +8,7 @@ import { Sparkles, Plug } from 'lucide-react'
 export const metadata: Metadata = {
   title: 'Website Monitoring Suite — 24 Monitor Types | Upnotify',
   description: 'Upnotify monitors 24 types of infrastructure — HTTP uptime, SSL certificates, DNS records, security headers, WordPress site health, MX, SPF/DMARC, blacklists, and more. See every monitoring type explained.',
-  alternates: { canonical: 'https://uptrue.io/monitoring' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/monitoring' },
 }
 
 const coreTypes = ['http', 'ssl', 'dns', 'keyword', 'domain', 'port', 'ping', 'api', 'heartbeat', 'competitor']
@@ -21,17 +21,17 @@ const jsonLd = {
   '@type': 'CollectionPage',
   name: 'Website Monitoring Suite — 24 Monitor Types',
   description: 'Upnotify monitors 24 types of infrastructure — HTTP uptime, SSL certificates, DNS records, security headers, WordPress site health, MX health, SPF/DMARC, blacklists, and more.',
-  url: 'https://uptrue.io/monitoring',
+  url: 'https://upnotify-monitoring.vercel.app/monitoring',
   publisher: {
     '@type': 'Organization',
     name: 'Upnotify',
-    url: 'https://uptrue.io',
+    url: 'https://upnotify-monitoring.vercel.app',
   },
 }
 
 export default function MonitoringIndexPage() {
   return (
-    <>
+    <div className="monitoring-orange-cta">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -135,7 +135,7 @@ export default function MonitoringIndexPage() {
 
         {/* Bottom CTA */}
         <div style={{
-          background: 'linear-gradient(135deg, #1392FB, #0068DB)',
+          background: 'linear-gradient(135deg, #0068DB 0%, #1392FB 45%, #FBA830 100%)',
           borderRadius: 16,
           padding: '40px 48px',
           display: 'flex',
@@ -150,7 +150,7 @@ export default function MonitoringIndexPage() {
           </div>
           <Link href="/signup" style={{
             background: '#fff',
-            color: '#0068DB',
+            color: '#b5670a',
             padding: '12px 28px',
             borderRadius: 10,
             fontWeight: 700,
@@ -165,7 +165,7 @@ export default function MonitoringIndexPage() {
 
       </main>
 
-    </>
+    </div>
   )
 }
 

@@ -100,7 +100,7 @@ vi.mock('@/lib/supabase/admin', () => ({
 
 vi.mock('@/lib/utils/config', () => ({
   getConfig: () => ({
-    app: { url: 'https://uptrue.io' },
+    app: { url: 'https://upnotify-monitoring.vercel.app' },
   }),
 }))
 

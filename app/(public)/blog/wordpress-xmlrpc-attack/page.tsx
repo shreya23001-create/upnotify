@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: 'WordPress XML-RPC Brute Force Attack: How Hackers Slow Down Your Site Without You Knowing',
   description:
     'WordPress xmlrpc.php allows attackers to try hundreds of passwords in a single request using system.multicall. Your site slows to a crawl while uptime monitors say it is fine. Learn how XML-RPC attacks work, how to disable xmlrpc.php properly, and how Upnotify HTTP monitoring catches the response time spike before the crash.',
-  alternates: { canonical: 'https://uptrue.io/blog/wordpress-xmlrpc-attack' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/wordpress-xmlrpc-attack' },
   openGraph: {
     title: 'WordPress XML-RPC Brute Force Attack: How Hackers Slow Down Your Site Without You Knowing',
     description:
       'How attackers exploit xmlrpc.php system.multicall for amplified brute force attacks, why your site slows down, and how HTTP monitoring catches the response time spike.',
-    url: 'https://uptrue.io/blog/wordpress-xmlrpc-attack',
+    url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-xmlrpc-attack',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -68,10 +68,10 @@ export default function WordPressXmlrpcAttackPage(): React.ReactElement {
           headline: 'WordPress XML-RPC Brute Force Attack: How Hackers Slow Down Your Site Without You Knowing',
           description: 'How attackers exploit xmlrpc.php system.multicall for amplified brute force attacks, why your site slows down, and how HTTP monitoring catches the response time spike.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-04-04',
           dateModified: '2026-04-04',
-          url: 'https://uptrue.io/blog/wordpress-xmlrpc-attack',
+          url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-xmlrpc-attack',
         }}
       />
 
@@ -260,7 +260,7 @@ export default function WordPressXmlrpcAttackPage(): React.ReactElement {
         <h3>Step 1: Set up an HTTP monitor with response time alerting</h3>
 
         <ol>
-          <li>Sign up at <Link href="/signup">uptrue.io/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>HTTP/HTTPS</strong> as the monitor type</li>
           <li>Enter your homepage URL</li>

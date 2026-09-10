@@ -48,7 +48,7 @@ function createRequest(domain: string, ip?: string): {
   if (ip) {
     headers.set('x-forwarded-for', ip)
   }
-  const request = new NextRequest(`https://uptrue.io/api/badge/score/${encodeURIComponent(domain)}`, {
+  const request = new NextRequest(`https://upnotify-monitoring.vercel.app/api/badge/score/${encodeURIComponent(domain)}`, {
     method: 'GET',
     headers,
   })

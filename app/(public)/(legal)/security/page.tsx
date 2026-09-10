@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: 'Security — Upnotify',
   description:
     'How Upnotify protects your data: encryption, infrastructure security, access controls, vulnerability management, and compliance.',
-  alternates: { canonical: 'https://uptrue.io/security' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/security' },
 }
 
 export default function SecurityPage(): React.ReactElement {
@@ -140,7 +140,7 @@ export default function SecurityPage(): React.ReactElement {
       <h2>8. Responsible Disclosure</h2>
       <p>
         If you discover a security vulnerability in Upnotify, please report it responsibly by emailing{' '}
-        <a href="mailto:security@uptrue.io">security@uptrue.io</a>. We will acknowledge receipt
+        <a href="mailto:shreya23001@gmail.com">shreya23001@gmail.com</a>. We will acknowledge receipt
         within 24 hours and provide an initial assessment within 5 business days.
       </p>
       <p>
@@ -154,11 +154,11 @@ export default function SecurityPage(): React.ReactElement {
       <ul>
         <li>
           <strong>Security:</strong>{' '}
-          <a href="mailto:security@uptrue.io">security@uptrue.io</a>
+          <a href="mailto:shreya23001@gmail.com">shreya23001@gmail.com</a>
         </li>
         <li>
           <strong>Privacy:</strong>{' '}
-          <a href="mailto:privacy@uptrue.io">privacy@uptrue.io</a>
+          <a href="mailto:shreya23001@gmail.com">shreya23001@gmail.com</a>
         </li>
       </ul>
     </>

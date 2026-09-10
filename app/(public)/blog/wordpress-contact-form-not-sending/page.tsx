@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: 'Contact Form 7 Not Sending Emails: Your Leads Are Disappearing and You Don\'t Know',
   description:
     'Contact Form 7 silently stops sending emails and you lose leads without knowing. Learn why it happens, how to fix it, and how to monitor your forms so you catch broken submissions before your prospects give up.',
-  alternates: { canonical: 'https://uptrue.io/blog/wordpress-contact-form-not-sending' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/wordpress-contact-form-not-sending' },
   openGraph: {
     title: 'Contact Form 7 Not Sending Emails: Your Leads Are Disappearing and You Don\'t Know',
     description:
       'Why Contact Form 7 stops sending emails, how to fix it, and how to set up monitoring so you never lose leads to a broken form again.',
-    url: 'https://uptrue.io/blog/wordpress-contact-form-not-sending',
+    url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-contact-form-not-sending',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -68,10 +68,10 @@ export default function WordPressContactFormNotSendingPage(): React.ReactElement
           headline: 'Contact Form 7 Not Sending Emails: Your Leads Are Disappearing and You Don\'t Know',
           description: 'Why Contact Form 7 stops sending emails, how to fix it, and how to set up monitoring so you catch broken forms before you lose leads.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-12',
           dateModified: '2026-03-12',
-          url: 'https://uptrue.io/blog/wordpress-contact-form-not-sending',
+          url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-contact-form-not-sending',
         }}
       />
 
@@ -202,7 +202,7 @@ export default function WordPressContactFormNotSendingPage(): React.ReactElement
         </p>
 
         <ol>
-          <li>Sign up at <Link href="/signup">uptrue.io/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
           <li>Click <strong>Add Monitor</strong></li>
           <li>Select <strong>Keyword</strong> as the monitor type</li>
           <li>Enter your contact page URL (e.g., <code>yoursite.com/contact</code>)</li>

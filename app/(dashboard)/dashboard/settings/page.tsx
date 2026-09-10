@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic'
 
 import { redirect } from 'next/navigation'
 import { getUserProfile, getUsersByOrg } from '@/lib/db/users'
-import { getSubscription, getInvoices, getAllVisiblePlans, getSubscriptionWithPlan, getLastSubscriptionProvider } from '@/lib/db/subscriptions'
+import { getSubscription, getInvoices, getAllVisiblePlans, getSubscriptionWithPlan, getLastSubscriptionProvider, getActiveAddonSubscriptions } from '@/lib/db/subscriptions'
 import { getApiKeysByOrg } from '@/lib/db/api-keys'
 import { checkTeamMemberLimit } from '@/lib/utils/plan-limits'
 import { getUserCredits, getUserCreditBalance } from '@/lib/db/user-credits'
@@ -28,7 +28,7 @@ export default async function SettingsPage(): Promise<React.ReactElement> {
     credits, creditBalance, creditRules,
     referralCode, referrals,
     cmsSections, cmsTheme,
-    lastProvider,
+    lastProvider, addonSubscriptions,
   ] = await Promise.all([
     getUsersByOrg(organisation.id),
     getSubscription(organisation.id),
@@ -45,6 +45,7 @@ export default async function SettingsPage(): Promise<React.ReactElement> {
     isSuperAdmin ? getAllLandingSections() : Promise.resolve([]),
     isSuperAdmin ? getCmsTheme() : Promise.resolve(null),
     getLastSubscriptionProvider(organisation.id),
+    getActiveAddonSubscriptions(organisation.id),
   ])
 
   const currentPlan = subscriptionWithPlan?.plan ?? null
@@ -68,6 +69,7 @@ export default async function SettingsPage(): Promise<React.ReactElement> {
         apiKeys={apiKeys}
         plans={plans}
         currentPlan={currentPlan}
+        addonSubscriptions={addonSubscriptions}
         teamMemberLimit={teamLimit.limit}
         teamMemberCount={teamLimit.currentCount}
         canInvite={teamLimit.allowed}

@@ -43,7 +43,7 @@ function successPage(heading: string, message: string, colour: string): Response
     <div class="icon">${colour === '#16a34a' ? '✅' : '🗑️'}</div>
     <h1>${safeHeading}</h1>
     <p>${safeMessage}</p>
-    <a href="https://uptrue.io/admin/blog">View Blog Admin</a>
+    <a href="https://upnotify-monitoring.vercel.app/admin/blog">View Blog Admin</a>
   </div>
 </body>
 </html>`,

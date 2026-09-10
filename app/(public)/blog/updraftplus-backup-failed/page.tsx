@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: 'UpdraftPlus Backup Failed: When Your Safety Net Has a Hole in It',
   description:
     'UpdraftPlus can silently stop backing up your WordPress site. Disk space exhaustion, PHP timeouts, and expired remote storage credentials are the most common causes. Learn what makes backups fail, how to fix each cause, and how Upnotify HTTP monitoring catches the 500 errors that disk-full servers produce.',
-  alternates: { canonical: 'https://uptrue.io/blog/updraftplus-backup-failed' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/updraftplus-backup-failed' },
   openGraph: {
     title: 'UpdraftPlus Backup Failed: When Your Safety Net Has a Hole in It',
     description:
       'Why UpdraftPlus backups fail silently, how to fix disk space, timeout, and authentication errors, and how HTTP monitoring catches the server failures that follow.',
-    url: 'https://uptrue.io/blog/updraftplus-backup-failed',
+    url: 'https://upnotify-monitoring.vercel.app/blog/updraftplus-backup-failed',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -68,10 +68,10 @@ export default function UpdraftPlusBackupFailedPage(): React.ReactElement {
           headline: 'UpdraftPlus Backup Failed: When Your Safety Net Has a Hole in It',
           description: 'Why UpdraftPlus backups fail silently, how to fix each cause, and how HTTP monitoring catches the disk-full 500 errors that follow.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-04-01',
           dateModified: '2026-04-01',
-          url: 'https://uptrue.io/blog/updraftplus-backup-failed',
+          url: 'https://upnotify-monitoring.vercel.app/blog/updraftplus-backup-failed',
         }}
       />
 
@@ -216,7 +216,7 @@ export default function UpdraftPlusBackupFailedPage(): React.ReactElement {
         <h3>Step 1: Set up HTTP monitoring on your homepage</h3>
 
         <ol>
-          <li>Sign up at <Link href="/signup">uptrue.io/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>HTTP/HTTPS</strong> as the monitor type</li>
           <li>Enter your homepage URL</li>

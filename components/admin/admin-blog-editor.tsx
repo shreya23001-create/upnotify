@@ -176,7 +176,7 @@ export function AdminBlogEditor({ post }: AdminBlogEditorProps): React.ReactElem
   }, [post?.id, title, slug, excerpt, content, category, status, tags, seoTitle, seoDescription, ogImageUrl, publishedAt, midCta, endCta, isEditing, router])
 
   const displaySeoTitle = seoTitle || title || 'Post Title'
-  const displaySeoUrl = `uptrue.io/blog/${slug || 'post-slug'}`
+  const displaySeoUrl = `upnotify-monitoring.vercel.app/blog/${slug || 'post-slug'}`
   const displaySeoDesc = seoDescription || excerpt || 'Post description will appear here...'
 
   return (

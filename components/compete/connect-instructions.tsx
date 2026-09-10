@@ -16,7 +16,7 @@ export function ConnectInstructions({
 }: ConnectInstructionsProps): React.ReactElement {
   const [activePlatform, setActivePlatform] = useState<Platform>('woocommerce')
 
-  const webhookUrl = 'https://uptrue.io/api/v1/compete/webhook'
+  const webhookUrl = 'https://upnotify-monitoring.vercel.app/api/v1/compete/webhook'
   const webhookUrlWithKey = apiKeyPrefix
     ? `${webhookUrl}?key=YOUR_API_KEY`
     : webhookUrl

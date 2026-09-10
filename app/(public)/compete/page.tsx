@@ -15,13 +15,13 @@ export const metadata: Metadata = {
   description:
     'Monitor competitor prices, detect stock changes, and get instant alerts when prices drop. Automatic extraction from any ecommerce site. From \u00A39/month.',
   alternates: {
-    canonical: 'https://uptrue.io/compete',
+    canonical: 'https://upnotify-monitoring.vercel.app/compete',
   },
   openGraph: {
     title: 'Upnotify Compete — Competitor Price & Stock Tracking',
     description:
       'Track competitor prices, detect stock changes, and get alerts when prices drop. Automatic extraction from any ecommerce site — no code needed.',
-    url: 'https://uptrue.io/compete',
+    url: 'https://upnotify-monitoring.vercel.app/compete',
     type: 'website',
   },
   twitter: {
@@ -245,7 +245,7 @@ export default function CompeteLandingPage(): React.ReactElement {
           name: 'Upnotify Compete',
           applicationCategory: 'BusinessApplication',
           operatingSystem: 'Web',
-          url: 'https://uptrue.io/compete',
+          url: 'https://upnotify-monitoring.vercel.app/compete',
           description:
             'Track competitor prices, detect stock changes, and get alerts when prices drop. Automatic extraction from any ecommerce site.',
           offers: [
@@ -316,13 +316,13 @@ export default function CompeteLandingPage(): React.ReactElement {
               '@type': 'ListItem',
               position: 1,
               name: 'Home',
-              item: 'https://uptrue.io',
+              item: 'https://upnotify-monitoring.vercel.app',
             },
             {
               '@type': 'ListItem',
               position: 2,
               name: 'Upnotify Compete',
-              item: 'https://uptrue.io/compete',
+              item: 'https://upnotify-monitoring.vercel.app/compete',
             },
           ],
         }}
@@ -391,7 +391,7 @@ export default function CompeteLandingPage(): React.ReactElement {
                   <span className="mock-dot mock-dot-yellow" />
                   <span className="mock-dot mock-dot-green" />
                 </div>
-                <span className="mock-url">uptrue.io/compete</span>
+                <span className="mock-url">upnotify-monitoring.vercel.app/compete</span>
               </div>
               <div className="mock-body">
                 <div className="mock-row mock-row-up">

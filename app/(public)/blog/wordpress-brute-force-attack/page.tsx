@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: 'WordPress Brute Force Attack Slowing Your Site: How Thousands of Login Attempts Cause Downtime',
   description:
     'WordPress brute force attacks flood wp-login.php and xmlrpc.php with thousands of login attempts, exhausting CPU, memory, and PHP workers until your site slows to a crawl or crashes completely. Learn what causes the performance impact, how to harden your site, and how HTTP monitoring catches response time spikes from active attacks.',
-  alternates: { canonical: 'https://uptrue.io/blog/wordpress-brute-force-attack' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/wordpress-brute-force-attack' },
   openGraph: {
     title: 'WordPress Brute Force Attack Slowing Your Site: How Thousands of Login Attempts Cause Downtime',
     description:
       'What causes WordPress brute force attacks to crash your site, how wp-login.php and xmlrpc.php flooding exhausts server resources, and how Upnotify HTTP monitoring detects response time spikes from active attacks.',
-    url: 'https://uptrue.io/blog/wordpress-brute-force-attack',
+    url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-brute-force-attack',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -68,10 +68,10 @@ export default function WordPressBruteForceAttackPage(): React.ReactElement {
           headline: 'WordPress Brute Force Attack Slowing Your Site: How Thousands of Login Attempts Cause Downtime',
           description: 'What causes WordPress brute force attacks to crash your site, how to harden against them, and how HTTP monitoring catches the response time spike before the crash.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-04-03',
           dateModified: '2026-04-03',
-          url: 'https://uptrue.io/blog/wordpress-brute-force-attack',
+          url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-brute-force-attack',
         }}
       />
 
@@ -233,7 +233,7 @@ export default function WordPressBruteForceAttackPage(): React.ReactElement {
         <h3>Step 1: Set up HTTP monitoring with response time alerting</h3>
 
         <ol>
-          <li>Sign up at <Link href="/signup">uptrue.io/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>HTTP/HTTPS</strong> as the monitor type</li>
           <li>Enter your homepage URL</li>

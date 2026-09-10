@@ -7,173 +7,8 @@ import type { SupportedCurrency } from '@/lib/utils/currency'
 import { getPlanFeatures, formatPlanPrice } from '@/lib/utils/plan-display'
 import type { PlanDisplayData } from '@/lib/utils/plan-display'
 import { CancelPlanModal } from './cancel-plan-modal'
-
-// ─── Mock Razorpay Modal (dev/staging only — remove when real keys are set) ────
-
-interface MockCheckoutData {
-  subscriptionId: string
-  planSlug: string
-  planName: string
-  billingCycle: 'monthly' | 'annual'
-  amountPaise: number
-  userEmail: string
-  orgName: string
-}
-
-function MockRazorpayModal({
-  data,
-  onClose,
-}: {
-  data: MockCheckoutData
-  onClose: () => void
-}): React.ReactElement {
-  const [isPaying, setIsPaying] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-
-  const amountInr = (data.amountPaise / 100).toLocaleString('en-IN', { minimumFractionDigits: 0 })
-  const label = data.billingCycle === 'annual' ? 'year' : 'month'
-
-  async function handlePay(outcome: 'success' | 'fail'): Promise<void> {
-    setIsPaying(true)
-    setError(null)
-    try {
-      const res = await fetch('/api/dev/razorpay/simulate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          subscriptionId: data.subscriptionId,
-          planSlug:       data.planSlug,
-          billingCycle:   data.billingCycle,
-          amountPaise:    data.amountPaise,
-          outcome,
-        }),
-      })
-      const result = await res.json() as { success: boolean; message?: string; error?: string }
-      if (result.success) {
-        window.location.href = '/dashboard/settings?tab=billing&billing=success'
-      } else {
-        setError(result.message ?? result.error ?? 'Payment failed (simulated)')
-        setIsPaying(false)
-      }
-    } catch {
-      setError('Something went wrong')
-      setIsPaying(false)
-    }
-  }
-
-  return (
-    <div style={{
-      position: 'fixed', inset: 0, zIndex: 9999,
-      background: 'rgba(0,0,0,0.55)', display: 'flex',
-      alignItems: 'center', justifyContent: 'center', padding: 16,
-    }}>
-      <div style={{
-        background: '#fff', borderRadius: 8, width: '100%', maxWidth: 420,
-        boxShadow: '0 20px 60px rgba(0,0,0,0.3)', overflow: 'hidden',
-      }}>
-        {/* Header — Razorpay orange */}
-        <div style={{ background: '#528FF0', padding: '20px 24px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-            <div style={{
-              background: '#fff', borderRadius: 4, padding: '3px 8px',
-              fontSize: 11, fontWeight: 700, color: '#528FF0', letterSpacing: 0.5,
-            }}>
-              TEST MODE
-            </div>
-            <span style={{ color: 'rgba(255,255,255,0.8)', fontSize: 12 }}>
-              Razorpay checkout simulation
-            </span>
-          </div>
-          <div style={{ color: '#fff', fontSize: 20, fontWeight: 700 }}>
-            ₹{amountInr}
-            <span style={{ fontSize: 13, fontWeight: 400, marginLeft: 4 }}>/ {label}</span>
-          </div>
-          <div style={{ color: 'rgba(255,255,255,0.85)', fontSize: 13, marginTop: 4 }}>
-            {data.planName} · {data.billingCycle === 'annual' ? 'Annual' : 'Monthly'} · incl. 18% GST
-          </div>
-        </div>
-
-        {/* Body */}
-        <div style={{ padding: 24 }}>
-          <div style={{ marginBottom: 16, fontSize: 13, color: '#555' }}>
-            <div style={{ fontWeight: 600, marginBottom: 6, color: '#222' }}>Payment details</div>
-            <div style={{ padding: '10px 12px', background: '#f5f7fa', borderRadius: 6, display: 'flex', flexDirection: 'column', gap: 4 }}>
-              <div>Email: <strong>{data.userEmail}</strong></div>
-              <div>Organisation: <strong>{data.orgName}</strong></div>
-              <div>Subscription ID: <code style={{ fontSize: 11 }}>{data.subscriptionId}</code></div>
-            </div>
-          </div>
-
-          {error && (
-            <div style={{
-              background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 6,
-              padding: '10px 12px', fontSize: 13, color: '#dc2626', marginBottom: 12,
-            }}>
-              {error}
-            </div>
-          )}
-
-          <button
-            onClick={() => void handlePay('success')}
-            disabled={isPaying}
-            style={{
-              width: '100%', padding: '12px 0', background: '#528FF0',
-              color: '#fff', border: 'none', borderRadius: 6,
-              fontSize: 15, fontWeight: 600, cursor: isPaying ? 'not-allowed' : 'pointer',
-              opacity: isPaying ? 0.7 : 1, marginBottom: 8,
-            }}
-          >
-            {isPaying ? 'Processing…' : `Pay ₹${amountInr} (Simulated)`}
-          </button>
-
-          <button
-            onClick={() => void handlePay('fail')}
-            disabled={isPaying}
-            style={{
-              width: '100%', padding: '10px 0', background: '#fff',
-              color: '#dc2626', border: '1px solid #fecaca', borderRadius: 6,
-              fontSize: 13, fontWeight: 500, cursor: isPaying ? 'not-allowed' : 'pointer',
-              marginBottom: 8,
-            }}
-          >
-            Simulate Payment Failure
-          </button>
-
-          <button
-            onClick={onClose}
-            disabled={isPaying}
-            style={{
-              width: '100%', padding: '8px 0', background: 'transparent',
-              color: '#888', border: 'none', fontSize: 13,
-              cursor: isPaying ? 'not-allowed' : 'pointer',
-            }}
-          >
-            Cancel
-          </button>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// ─── Razorpay checkout helper ─────────────────────────────────────────────────
-
-declare global {
-  interface Window {
-    Razorpay: new (options: Record<string, unknown>) => { open(): void }
-  }
-}
-
-function loadRazorpayScript(): Promise<void> {
-  return new Promise((resolve, reject) => {
-    if (typeof window !== 'undefined' && window.Razorpay) { resolve(); return }
-    const script = document.createElement('script')
-    script.src = 'https://checkout.razorpay.com/v1/checkout.js'
-    script.onload = () => resolve()
-    script.onerror = () => reject(new Error('Failed to load Razorpay'))
-    document.body.appendChild(script)
-  })
-}
+import type { AddonSubscription } from '@/lib/db/subscriptions'
+import { MockRazorpayModal, type MockCheckoutData, loadRazorpayScript } from './razorpay-checkout-modal'
 
 interface Props {
   plans: Plan[]
@@ -181,6 +16,7 @@ interface Props {
   subscription?: Subscription | null
   creditBalancePence?: number
   defaultCurrency?: SupportedCurrency
+  addonSubscriptions?: AddonSubscription[]
 }
 
 // Feature + price logic lives in lib/utils/plan-display.ts — single source of truth
@@ -192,15 +28,16 @@ function getPlanCta(plan: Plan, isCurrent: boolean, isHigherTier: boolean): stri
   return 'Downgrade'
 }
 
-export function PricingTable({ plans, currentPlanSlug, subscription, creditBalancePence = 0, defaultCurrency = 'gbp' }: Props): React.ReactElement {
+export function PricingTable({ plans, currentPlanSlug, subscription, creditBalancePence = 0, defaultCurrency = 'gbp', addonSubscriptions = [] }: Props): React.ReactElement {
   const [isPending, startTransition] = useTransition()
   // Track which specific plan's Razorpay checkout is loading, not a single
   // shared flag — otherwise every card shows "Opening…" at once.
   const [razorpayPendingSlug, setRazorpayPendingSlug] = useState<string | null>(null)
   const [showCancelModal, setShowCancelModal] = useState(false)
+  const [showAddonConfirm, setShowAddonConfirm] = useState(false)
   const [mockCheckout, setMockCheckout] = useState<MockCheckoutData | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [isAnnual, setIsAnnual] = useState(true)
+  const isAnnual = true
   const currency: SupportedCurrency = defaultCurrency
   const router = useRouter()
 
@@ -211,6 +48,10 @@ export function PricingTable({ plans, currentPlanSlug, subscription, creditBalan
   // Existing Stripe subscribers switch plans in place; everyone else (no
   // subscription yet, or Razorpay-only) goes through the checkout flow.
   const hasStripeSubscription = Boolean(sub?.stripe_subscription_id) && (sub?.status === 'active' || sub?.status === 'cancelling' || sub?.status === 'past_due')
+
+  const hasActiveAddons = addonSubscriptions.length > 0
+  // Add On Plan purchases are Razorpay (INR) only.
+  const canBuyAddon = currency === 'inr'
 
   // Temporarily showing only Lite and Builder on the pricing grid.
   const VISIBLE_PLAN_SLUGS = new Set(['lite', 'builder'])
@@ -322,7 +163,7 @@ export function PricingTable({ plans, currentPlanSlug, subscription, creditBalan
         description:      isTestKey
           ? `${data.planName ?? planSlug} · TEST MODE — Use card: 5267 3181 8797 5449 (Razorpay test Mastercard)`
           : `${data.planName ?? planSlug} · ${billingCycle === 'annual' ? 'Annual' : 'Monthly'} (incl. 18% GST)`,
-        image:            `${process.env.NEXT_PUBLIC_APP_URL ?? 'https://uptrue.io'}/logo.svg`,
+        image:            `${process.env.NEXT_PUBLIC_APP_URL ?? 'https://upnotify-monitoring.vercel.app'}/logo.svg`,
         prefill:          { email: data.userEmail ?? '', name: data.orgName ?? '' },
         theme:            { color: '#1392FB' },
         handler:          (_response: unknown) => {
@@ -340,6 +181,72 @@ export function PricingTable({ plans, currentPlanSlug, subscription, creditBalan
     }
   }, [])
 
+  const [isAddonPending, setIsAddonPending] = useState(false)
+
+  const handleAddonCheckout = useCallback(async (): Promise<void> => {
+    setError(null)
+    setIsAddonPending(true)
+    try {
+      const res = await fetch('/api/v1/billing/razorpay/addon-checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      })
+      const data = await res.json() as {
+        subscriptionId?: string
+        keyId?: string
+        planName?: string
+        amountPaise?: number
+        userEmail?: string
+        orgName?: string
+        mockMode?: boolean
+        error?: string
+      }
+      if (!res.ok || !data.subscriptionId) {
+        setError(data.error ?? 'Failed to start Add On Plan checkout. Please try again.')
+        setIsAddonPending(false)
+        return
+      }
+
+      if (data.mockMode) {
+        setMockCheckout({
+          subscriptionId: data.subscriptionId,
+          planSlug:       'lite',
+          planName:       data.planName ?? 'Add On Plan',
+          billingCycle:   'annual',
+          amountPaise:    data.amountPaise ?? 0,
+          userEmail:      data.userEmail ?? '',
+          orgName:        data.orgName ?? '',
+        })
+        setIsAddonPending(false)
+        return
+      }
+
+      await loadRazorpayScript()
+      const isTestKey = (data.keyId ?? '').startsWith('rzp_test_')
+      const rzp = new window.Razorpay({
+        key:              data.keyId,
+        subscription_id:  data.subscriptionId,
+        name:             'Upnotify',
+        description:      isTestKey
+          ? `${data.planName ?? 'Add On Plan'} · TEST MODE — Use card: 5267 3181 8797 5449 (Razorpay test Mastercard)`
+          : `${data.planName ?? 'Add On Plan'} · Annual (incl. 18% GST)`,
+        image:            `${process.env.NEXT_PUBLIC_APP_URL ?? 'https://upnotify-monitoring.vercel.app'}/logo.svg`,
+        prefill:          { email: data.userEmail ?? '', name: data.orgName ?? '' },
+        theme:            { color: '#FBA830' },
+        handler:          (_response: unknown) => {
+          window.location.href = '/dashboard/settings?tab=billing&billing=addon_success'
+        },
+        modal: {
+          ondismiss: () => { setIsAddonPending(false) },
+        },
+      })
+      rzp.open()
+    } catch {
+      setError('Something went wrong. Please try again.')
+      setIsAddonPending(false)
+    }
+  }, [])
+
   const creditGbp = (creditBalancePence / 100).toFixed(2)
 
   return (
@@ -352,6 +259,60 @@ export function PricingTable({ plans, currentPlanSlug, subscription, creditBalan
         />
       )}
 
+      {/* Add On Plan confirmation — shows what you're buying before Razorpay opens */}
+      {showAddonConfirm && (() => {
+        const addonPlan = directPlans.find(p => p.slug === 'lite')
+        const addonFeatures = addonPlan ? getPlanFeatures(addonPlan as unknown as PlanDisplayData) : []
+        const addonPrice = addonPlan ? formatPlanPrice(addonPlan as unknown as PlanDisplayData, true, 'inr') : null
+        return (
+          <div className="popup-overlay" onClick={() => setShowAddonConfirm(false)}>
+            <div className="popup-content popup-content-lg" onClick={e => e.stopPropagation()}>
+              <button className="popup-close" onClick={() => setShowAddonConfirm(false)}>&times;</button>
+              <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>Add On Plan</h2>
+              <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.7, marginBottom: 16 }}>
+                This adds another <strong>Pre Plan</strong>&apos;s worth of limits on top of your current plan, billed annually on its own cycle starting today.
+              </p>
+
+              {addonPrice && (
+                <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 16 }}>
+                  {addonPrice.symbol}{addonPrice.amount}<span style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-muted)' }}> {addonPrice.period}</span>
+                </div>
+              )}
+
+              <ul className="pricing-features" style={{ marginBottom: 20 }}>
+                {addonFeatures.map((feature, fi) => (
+                  <li
+                    key={fi}
+                    className={`pricing-feature${!feature.included ? ' pricing-feature-disabled' : ''}`}
+                  >
+                    <span className="pricing-feature-icon">
+                      {feature.included
+                        ? <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        : <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                      }
+                    </span>
+                    {feature.text}
+                  </li>
+                ))}
+              </ul>
+
+              {error && <p style={{ color: '#ef4444', marginBottom: 12, fontSize: 13 }}>{error}</p>}
+
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button
+                  className="btn btn-primary"
+                  disabled={isAddonPending}
+                  onClick={() => { setShowAddonConfirm(false); void handleAddonCheckout() }}
+                >
+                  {isAddonPending ? 'Opening…' : 'Continue to Razorpay'}
+                </button>
+                <button className="btn btn-secondary" onClick={() => setShowAddonConfirm(false)}>Cancel</button>
+              </div>
+            </div>
+          </div>
+        )
+      })()}
+
       {/* Cancel / Pause modal — all users */}
       {currentPlanSlug && (
         <CancelPlanModal
@@ -362,27 +323,9 @@ export function PricingTable({ plans, currentPlanSlug, subscription, creditBalan
           onClose={() => setShowCancelModal(false)}
           onComplete={() => router.refresh()}
           cancelProvider={currency === 'inr' ? 'razorpay' : 'stripe'}
+          hasActiveAddons={hasActiveAddons}
         />
       )}
-
-      {/* Billing cycle toggle */}
-      <div style={{ marginBottom: 8 }}>
-        <div className="billing-toggle-wrapper">
-          <button
-            className={`billing-toggle-btn${!isAnnual ? ' billing-toggle-active' : ''}`}
-            onClick={() => setIsAnnual(false)}
-          >
-            Monthly
-          </button>
-          <button
-            className={`billing-toggle-btn${isAnnual ? ' billing-toggle-active' : ''}`}
-            onClick={() => setIsAnnual(true)}
-          >
-            Annual
-            {currency === 'gbp' && <span className="billing-toggle-save">Save up to 20%</span>}
-          </button>
-        </div>
-      </div>
 
       {currency === 'inr' && (
         <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 12 }}>
@@ -401,6 +344,7 @@ export function PricingTable({ plans, currentPlanSlug, subscription, creditBalan
           {error}
         </div>
       )}
+
       <div className="pricing-grid">
         {directPlans.map((plan, index) => {
           const isCurrent = plan.slug === currentPlanSlug || (plan.slug === 'free' && !currentPlanSlug)
@@ -457,7 +401,7 @@ export function PricingTable({ plans, currentPlanSlug, subscription, creditBalan
                     You&apos;re on this plan
                   </div>
                   {!isFree && (
-                    <div style={{ marginTop: 8 }}>
+                    <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 8 }}>
                       {!isCancelling && (
                         <button
                           className="btn btn-ghost btn-full"
@@ -467,6 +411,21 @@ export function PricingTable({ plans, currentPlanSlug, subscription, creditBalan
                           {isPaused ? 'Resume or Cancel' : 'Cancel subscription'}
                         </button>
                       )}
+                      {canBuyAddon && !isPaused && (
+                        <button
+                          className="btn btn-primary btn-full"
+                          style={{ fontSize: 13 }}
+                          onClick={() => setShowAddonConfirm(true)}
+                          disabled={isAddonPending}
+                        >
+                          {isAddonPending ? 'Opening…' : 'Add On Plan'}
+                        </button>
+                      )}
+                    </div>
+                  )}
+                  {canBuyAddon && hasActiveAddons && (
+                    <div style={{ marginTop: 12, fontSize: 12, color: 'var(--text-muted)' }}>
+                      {addonSubscriptions.length} Add On Plan{addonSubscriptions.length > 1 ? 's' : ''} active
                     </div>
                   )}
                 </div>

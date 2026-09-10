@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: 'WordPress Site Down on Shared Hosting: Why CPU Limits Are Throttling Your Site',
   description:
     'Shared hosting providers silently throttle your WordPress site when you hit CPU limits. Traffic spikes, noisy neighbours, and resource suspensions cause slowdowns and outages you never see coming. Learn what happens and how HTTP monitoring catches the throttling.',
-  alternates: { canonical: 'https://uptrue.io/blog/wordpress-shared-hosting-slow' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/wordpress-shared-hosting-slow' },
   openGraph: {
     title: 'WordPress Site Down on Shared Hosting: Why CPU Limits Are Throttling Your Site',
     description:
       'Why shared hosting silently throttles your WordPress site during traffic spikes, how the noisy neighbour effect works, and how response time monitoring catches slowdowns before they become outages.',
-    url: 'https://uptrue.io/blog/wordpress-shared-hosting-slow',
+    url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-shared-hosting-slow',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -68,10 +68,10 @@ export default function WordPressSharedHostingSlowPage(): React.ReactElement {
           headline: 'WordPress Site Down on Shared Hosting: Why CPU Limits Are Throttling Your Site',
           description: 'Why shared hosting silently throttles your WordPress site during traffic spikes, how the noisy neighbour effect works, and how response time monitoring catches slowdowns.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-04-03',
           dateModified: '2026-04-03',
-          url: 'https://uptrue.io/blog/wordpress-shared-hosting-slow',
+          url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-shared-hosting-slow',
         }}
       />
 
@@ -219,7 +219,7 @@ export default function WordPressSharedHostingSlowPage(): React.ReactElement {
         <h3>Step 1: Set up an HTTP monitor with response time alerting</h3>
 
         <ol>
-          <li>Sign up at <Link href="/signup">uptrue.io/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>HTTP/HTTPS</strong> as the monitor type</li>
           <li>Enter your homepage URL</li>

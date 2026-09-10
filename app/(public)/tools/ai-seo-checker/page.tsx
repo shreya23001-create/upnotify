@@ -27,12 +27,12 @@ export const metadata: Metadata = {
     'Perplexity SEO',
     'is my website AI ready',
   ],
-  alternates: { canonical: 'https://uptrue.io/tools/ai-seo-checker' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/tools/ai-seo-checker' },
   openGraph: {
     title: 'Free AI SEO Checker — Is Your Website Visible to AI Search? | Upnotify',
     description:
       'Get your AI readiness score in seconds. Check crawler access, structured data, trust signals, and generate your llms.txt — all free. No signup.',
-    url: 'https://uptrue.io/tools/ai-seo-checker',
+    url: 'https://upnotify-monitoring.vercel.app/tools/ai-seo-checker',
     type: 'website',
   },
 }
@@ -102,7 +102,7 @@ export default function AiSeoCheckerPage(): React.ReactElement {
     '@context': 'https://schema.org',
     '@type': 'WebApplication',
     name: 'Free AI SEO Checker',
-    url: 'https://uptrue.io/tools/ai-seo-checker',
+    url: 'https://upnotify-monitoring.vercel.app/tools/ai-seo-checker',
     description: 'Free tool to check if your website is optimised for AI search engines. Scores AI crawler access, content structure, trust signals, and schema across ChatGPT, Perplexity, Claude, and Gemini.',
     applicationCategory: 'UtilityApplication',
     operatingSystem: 'Web',
@@ -115,7 +115,7 @@ export default function AiSeoCheckerPage(): React.ReactElement {
     provider: {
       '@type': 'Organization',
       name: 'Upnotify',
-      url: 'https://uptrue.io',
+      url: 'https://upnotify-monitoring.vercel.app',
     },
     dateModified: new Date().toISOString().split('T')[0],
   }

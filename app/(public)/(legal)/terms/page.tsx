@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: 'Terms of Service',
   description:
     'Read the Upnotify Terms of Service. These terms govern your access to and use of the Upnotify uptime monitoring platform.',
-  alternates: { canonical: 'https://uptrue.io/terms' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/terms' },
 }
 
 export default function TermsOfServicePage(): React.ReactElement {
@@ -66,7 +66,7 @@ export default function TermsOfServicePage(): React.ReactElement {
       <p>
         You are responsible for maintaining the confidentiality of your account credentials, including
         your password and any API keys issued to your account. You agree to notify us immediately at
-        support@uptrue.io if you become aware of any unauthorised access to or use of your account.
+        shreya23001@gmail.com if you become aware of any unauthorised access to or use of your account.
         We are not liable for any loss or damage arising from your failure to protect your account
         credentials.
       </p>
@@ -135,7 +135,7 @@ export default function TermsOfServicePage(): React.ReactElement {
       <p>
         As a general policy, fees paid are non-refundable. However, if you experience a material service
         failure attributable to Upnotify, you may request a credit or refund by contacting
-        support@uptrue.io within 14 days of the issue. Refund requests are assessed on a case-by-case
+        shreya23001@gmail.com within 14 days of the issue. Refund requests are assessed on a case-by-case
         basis at our reasonable discretion.
       </p>
       <h3>3.6 Plan Changes</h3>
@@ -212,7 +212,7 @@ export default function TermsOfServicePage(): React.ReactElement {
         </li>
         <li>
           You may request a copy of the audit log entries relating to any impersonation access to
-          your account by contacting support@uptrue.io.
+          your account by contacting shreya23001@gmail.com.
         </li>
       </ul>
 
@@ -220,7 +220,7 @@ export default function TermsOfServicePage(): React.ReactElement {
       <p>
         Upnotify targets 99.9% platform availability for the Service, measured on a calendar month basis,
         excluding scheduled maintenance windows. Scheduled maintenance will be announced at least 48 hours
-        in advance via our status page at status.uptrue.io and by email.
+        in advance via our status page at upnotify-monitoring.vercel.app and by email.
       </p>
       <p>
         If we fail to meet the 99.9% uptime target in any calendar month, affected customers on paid plans
@@ -248,7 +248,7 @@ export default function TermsOfServicePage(): React.ReactElement {
       </p>
       <p>
         You may export your Customer Data at any time using the data export feature in your account
-        settings, or by contacting support@uptrue.io.
+        settings, or by contacting shreya23001@gmail.com.
       </p>
 
       <h2>6. Intellectual Property</h2>
@@ -360,7 +360,7 @@ export default function TermsOfServicePage(): React.ReactElement {
       <h2>10. Suspension and Termination</h2>
       <h3>10.1 Termination by You</h3>
       <p>
-        You may close your account at any time by contacting support@uptrue.io or using the account
+        You may close your account at any time by contacting shreya23001@gmail.com or using the account
         deletion feature in your settings. Upon termination, your data will be retained for 30 days to
         allow for recovery, after which it will be permanently deleted in accordance with our Privacy
         Policy.
@@ -529,8 +529,8 @@ export default function TermsOfServicePage(): React.ReactElement {
         If you have any questions about these Terms, please contact us at:
       </p>
       <ul>
-        <li><strong>Email:</strong> legal@uptrue.io</li>
-        <li><strong>Support:</strong> support@uptrue.io</li>
+        <li><strong>Email:</strong> shreya23001@gmail.com</li>
+        <li><strong>Support:</strong> shreya23001@gmail.com</li>
         <li>
           <strong>Post:</strong> Vision Software Solutions Limited, C/O Benison Solvers Limited, 1000 Great West Road, Brentford, United Kingdom, TW8 9DW
         </li>

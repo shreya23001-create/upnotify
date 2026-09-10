@@ -18,26 +18,26 @@ import { Ticker } from '@/components/landing/ticker'
 import { FeatureCarousel } from '@/components/landing/feature-carousel'
 
 export const metadata: Metadata = {
-  title: 'Uptrue — Uptime Monitoring for Agencies & Teams',
+  title: 'Upnotify — Uptime Monitoring for Agencies & Teams',
   description:
     'Monitor uptime, performance and infrastructure across all your sites. 10 monitor types, AI-powered reports, public status pages, multi-channel alerts, and agency white-label — all in one platform. Free plan available.',
-  alternates: { canonical: 'https://uptrue.io' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app' },
   openGraph: {
-    title: 'Uptrue — Uptime Monitoring for Agencies & Teams',
+    title: 'Upnotify — Uptime Monitoring for Agencies & Teams',
     description:
       'Monitor uptime, performance and infrastructure across all your sites. 10 monitor types, AI-powered reports, public status pages, and multi-channel alerts.',
-    url: 'https://uptrue.io',
+    url: 'https://upnotify-monitoring.vercel.app',
   },
 }
 
 const STEPS = [
   { number: '1', title: 'Add a Monitor', description: 'Enter a URL, IP, or domain. Choose from 10 monitor types. Set your check interval — as low as 30 seconds.' },
-  { number: '2', title: 'Get Alerted Instantly', description: 'When something goes wrong, Uptrue confirms from a second region and alerts you via your preferred channel.' },
+  { number: '2', title: 'Get Alerted Instantly', description: 'When something goes wrong, Upnotify confirms from a second region and alerts you via your preferred channel.' },
   { number: '3', title: 'Share Status & Reports', description: 'Publish branded status pages for your customers. Generate AI-powered reports for stakeholders.' },
 ]
 
 const TESTIMONIALS = [
-  { quote: 'We caught three client outages before their users noticed. Our clients still don\'t know how close it was. Uptrue paid for itself in the first week.', name: 'Sarah Mitchell', role: 'Founder · Brightwave Digital Agency', initials: 'SM', color: '#3b82f6' },
+  { quote: 'We caught three client outages before their users noticed. Our clients still don\'t know how close it was. Upnotify paid for itself in the first week.', name: 'Sarah Mitchell', role: 'Founder · Brightwave Digital Agency', initials: 'SM', color: '#3b82f6' },
   { quote: 'The AI reports are genuinely impressive. I send them to our board every month — they actually read them. It\'s the first monitoring tool that speaks human.', name: 'James Thornton', role: 'CTO · Formly SaaS', initials: 'JT', color: '#0068DB' },
   { quote: 'Switched from UptimeRobot. Zero false alarms since day one. The two-region confirmation alone has saved our on-call team from 3am panic alerts.', name: 'Alex Deacon', role: 'DevOps Lead · Cartify Commerce', initials: 'AD', color: '#06b6d4' },
 ]
@@ -71,7 +71,7 @@ export default function LandingPage(): React.ReactElement {
           </p>
           <div className="hero-ctas">
             <Link href="/signup" className="btn btn-primary btn-lg">
-              <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
               Start Monitoring Free
             </Link>
             <Link href="#how-it-works" className="btn btn-secondary btn-lg">See How It Works</Link>
@@ -96,43 +96,43 @@ export default function LandingPage(): React.ReactElement {
                   <span className="mockup-dot mockup-dot-yellow" />
                   <span className="mockup-dot mockup-dot-green" />
                 </div>
-                <div className="mockup-url">app.uptrue.io/dashboard</div>
+                <div className="mockup-url">upnotify-monitoring.vercel.app/dashboard</div>
               </div>
               <div className="mockup-body">
                 {/* Sidebar */}
                 <div className="mockup-sidebar">
                   <div className="ms-logo">
                     <div className="ms-logo-icon">
-                      <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="white" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                      <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="white" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
                     </div>
                     <span className="ms-logo-name">Uptrue</span>
                   </div>
                   <div className="ms-nav">
                     <div className="ms-item ms-item-active">
-                      <svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                      <svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /></svg>
                       Dashboard
                     </div>
                     <div className="ms-item">
-                      <svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                      <svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2" /></svg>
                       Monitors
                       <span className="ms-badge">24</span>
                     </div>
                     <div className="ms-item">
-                      <svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                      <svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
                       Alerts
                     </div>
                     <div className="ms-item">
-                      <svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                      <svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
                       Incidents
                       <span className="ms-badge ms-badge-red">2</span>
                     </div>
                     <div className="ms-divider" />
                     <div className="ms-item">
-                      <svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                      <svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                       Reports
                     </div>
                     <div className="ms-item">
-                      <svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                      <svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><line x1="2" y1="12" x2="22" y2="12" /><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" /></svg>
                       Status Pages
                     </div>
                   </div>
@@ -289,7 +289,7 @@ export default function LandingPage(): React.ReactElement {
             <div className="lp-ai-text">
               <div className="lp-section-eyebrow">Powered by Claude AI</div>
               <h2 className="lp-ai-title">Your monitoring gets smarter over time</h2>
-              <p className="lp-ai-sub">Uptrue doesn&apos;t just tell you something went down — it tells you why, what it means for your business, and what to do next.</p>
+              <p className="lp-ai-sub">Upnotify doesn&apos;t just tell you something went down — it tells you why, what it means for your business, and what to do next.</p>
               <div className="lp-ai-features">
                 <div className="lp-ai-feature">
                   <div className="lp-ai-feature-icon lp-ai-icon-purple">🤖</div>
@@ -302,14 +302,14 @@ export default function LandingPage(): React.ReactElement {
                   <div className="lp-ai-feature-icon lp-ai-icon-cyan">🔍</div>
                   <div>
                     <h4 className="lp-ai-feature-title">Outage Pattern Detection</h4>
-                    <p className="lp-ai-feature-desc">Uptrue learns your monitor&apos;s normal behaviour and flags anomalies before they become incidents.</p>
+                    <p className="lp-ai-feature-desc">Upnotify learns your monitor&apos;s normal behaviour and flags anomalies before they become incidents.</p>
                   </div>
                 </div>
                 <div className="lp-ai-feature">
                   <div className="lp-ai-feature-icon lp-ai-icon-pink">📰</div>
                   <div>
                     <h4 className="lp-ai-feature-title">AI Outage Blog</h4>
-                    <p className="lp-ai-feature-desc">When a public service goes down, Uptrue researches and publishes an outage report automatically. Real-time SEO content on autopilot.</p>
+                    <p className="lp-ai-feature-desc">When a public service goes down, Upnotify researches and publishes an outage report automatically. Real-time SEO content on autopilot.</p>
                   </div>
                 </div>
                 <div className="lp-ai-feature">
@@ -366,7 +366,7 @@ export default function LandingPage(): React.ReactElement {
               </div>
               <div className="lp-ai-card-footer">
                 <span className="lp-ai-card-dot" />
-                Powered by Claude (Anthropic) · Uptrue AI Reports
+                Powered by Claude (Anthropic) · Upnotify AI Reports
               </div>
             </div>
           </div>
@@ -452,8 +452,8 @@ export default function LandingPage(): React.ReactElement {
       <section className="landing-section lp-comparison-section">
         <div className="landing-container">
           <div className="lp-section-eyebrow">How we compare</div>
-          <h2 className="landing-section-title">Uptrue vs the alternatives</h2>
-          <p className="landing-section-subtitle">Not all uptime monitoring is equal. Here&apos;s how Uptrue stacks up against the most popular tools.</p>
+          <h2 className="landing-section-title">Upnotify vs the alternatives</h2>
+          <p className="landing-section-subtitle">Not all uptime monitoring is equal. Here&apos;s how Upnotify stacks up against the most popular tools.</p>
           <div className="lp-comparison-wrap">
             <table className="lp-comparison-table">
               <thead>

@@ -48,7 +48,7 @@ async function fetchOfficialStatus(domain: string, statusPageUrl?: string): Prom
 
       const res = await fetch(url, {
         signal: controller.signal,
-        headers: { 'User-Agent': 'Uptrue/1.0 (uptime monitor; contact@uptrue.io)' },
+        headers: { 'User-Agent': 'Uptrue/1.0 (uptime monitor; shreya23001@gmail.com)' },
       })
       clearTimeout(timeout)
 
@@ -96,7 +96,7 @@ async function fetchGoogleNews(siteName: string): Promise<SourceArticle[]> {
 
     const res = await fetch(url, {
       signal: controller.signal,
-      headers: { 'User-Agent': 'Uptrue/1.0 (uptime monitor; contact@uptrue.io)' },
+      headers: { 'User-Agent': 'Uptrue/1.0 (uptime monitor; shreya23001@gmail.com)' },
     })
     clearTimeout(timeout)
 
@@ -279,7 +279,7 @@ async function fetchHackerNews(siteName: string): Promise<SourceArticle[]> {
 
     const res = await fetch(url, {
       signal: controller.signal,
-      headers: { 'User-Agent': 'Uptrue/1.0 (uptime monitor; contact@uptrue.io)' },
+      headers: { 'User-Agent': 'Uptrue/1.0 (uptime monitor; shreya23001@gmail.com)' },
     })
     clearTimeout(timeout)
 
@@ -334,7 +334,7 @@ async function fetchCategoryRssFeeds(siteName: string, domain: string, categoryS
 
         const res = await fetch(feed.feed_url, {
           signal: controller.signal,
-          headers: { 'User-Agent': 'Uptrue/1.0 (uptime monitor; contact@uptrue.io)' },
+          headers: { 'User-Agent': 'Uptrue/1.0 (uptime monitor; shreya23001@gmail.com)' },
         })
         clearTimeout(timeout)
 

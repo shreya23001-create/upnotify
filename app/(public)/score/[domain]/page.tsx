@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: `${decodedDomain} — Website Health Score`,
     description: `${decodedDomain} website health score. Free analysis of uptime, SSL, DNS, security headers, and performance by Upnotify.`,
-    alternates: { canonical: `https://uptrue.io/score/${encodeURIComponent(decodedDomain)}` },
+    alternates: { canonical: `https://upnotify-monitoring.vercel.app/score/${encodeURIComponent(decodedDomain)}` },
     openGraph: {
       title: `${decodedDomain} — Health Score | Upnotify`,
       description: `See the website health score for ${decodedDomain}. Instant analysis across 5 categories.`,
@@ -118,7 +118,7 @@ function JsonLd({ result }: { result: ScoreResult }): React.ReactElement {
     '@context': 'https://schema.org',
     '@type': 'WebApplication',
     name: 'Upnotify Score',
-    url: `https://uptrue.io/score/${encodeURIComponent(result.domain)}`,
+    url: `https://upnotify-monitoring.vercel.app/score/${encodeURIComponent(result.domain)}`,
     description: `Website health score for ${result.domain}: ${result.grade} (${result.totalScore}/100)`,
     applicationCategory: 'WebApplication',
     operatingSystem: 'All',
@@ -130,7 +130,7 @@ function JsonLd({ result }: { result: ScoreResult }): React.ReactElement {
     author: {
       '@type': 'Organization',
       name: 'Vision Software Solutions Limited',
-      url: 'https://uptrue.io',
+      url: 'https://upnotify-monitoring.vercel.app',
     },
   }
 
@@ -222,7 +222,7 @@ export default async function ScoreResultsPage({ params }: PageProps): Promise<R
               <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>Copy and paste this HTML into your website:</span>
             </div>
             <code className="score-badge-code">
-              {`<a href="https://uptrue.io/score/${encodeURIComponent(result.domain)}"><img src="https://uptrue.io/api/badge/score/${encodeURIComponent(result.domain)}" alt="Upnotify Score" /></a>`}
+              {`<a href="https://upnotify-monitoring.vercel.app/score/${encodeURIComponent(result.domain)}"><img src="https://upnotify-monitoring.vercel.app/api/badge/score/${encodeURIComponent(result.domain)}" alt="Upnotify Score" /></a>`}
             </code>
             <div style={{ marginTop: 12, fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.7 }}>
               <strong>How to add it:</strong>

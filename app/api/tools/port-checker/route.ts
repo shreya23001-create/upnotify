@@ -234,7 +234,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     if (!ALLOWED_PORTS.has(port)) {
       return NextResponse.json(
         {
-          error: 'Port not allowed. The Uptrue port checker only supports common web and mail ports — see https://uptrue.io/help/tools for the full list.',
+          error: 'Port not allowed. The Uptrue port checker only supports common web and mail ports — see https://upnotify-monitoring.vercel.app/help/tools for the full list.',
         },
         { status: 400 }
       )

@@ -23,7 +23,7 @@ export default function DeactivatedPage(): React.ReactElement {
           please contact our support team.
         </p>
         <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
-          <a href="mailto:support@uptrue.io" className="btn btn-primary">
+          <a href="mailto:shreya23001@gmail.com" className="btn btn-primary">
             Contact Support
           </a>
           <Link href="/" className="btn btn-secondary">

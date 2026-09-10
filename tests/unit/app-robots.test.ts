@@ -38,7 +38,7 @@ describe('app/robots.ts — robots.txt generator', () => {
   it('exposes the sitemap on production', () => {
     process.env.VERCEL_ENV = 'production'
     const result = robots()
-    expect(result.sitemap).toBe('https://uptrue.io/sitemap.xml')
+    expect(result.sitemap).toBe('https://upnotify-monitoring.vercel.app/sitemap.xml')
   })
 
   it('includes a wildcard allow rule on production', () => {

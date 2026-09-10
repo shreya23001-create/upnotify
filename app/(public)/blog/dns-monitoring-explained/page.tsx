@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: 'DNS Monitoring Explained: Why Your Domain Records Matter More Than You Think',
   description:
     'DNS records control where your website, email, and services point. Learn what DNS monitoring is, what can go wrong, and how to protect your domain from silent failures.',
-  alternates: { canonical: 'https://uptrue.io/blog/dns-monitoring-explained' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/dns-monitoring-explained' },
   openGraph: {
     title: 'DNS Monitoring Explained: Why Your Domain Records Matter More Than You Think',
     description:
       'Learn what DNS monitoring is, what can go wrong with your domain records, and how monitoring catches changes before they become outages.',
-    url: 'https://uptrue.io/blog/dns-monitoring-explained',
+    url: 'https://upnotify-monitoring.vercel.app/blog/dns-monitoring-explained',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -88,10 +88,10 @@ export default function DnsMonitoringExplainedPage(): React.ReactElement {
           headline: 'DNS Monitoring Explained: Why Your Domain Records Matter More Than You Think',
           description: 'DNS records control where your website and email point. Learn what DNS monitoring catches and why it matters.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-30',
           dateModified: '2026-03-30',
-          url: 'https://uptrue.io/blog/dns-monitoring-explained',
+          url: 'https://upnotify-monitoring.vercel.app/blog/dns-monitoring-explained',
         }}
       />
 
@@ -272,7 +272,7 @@ export default function DnsMonitoringExplainedPage(): React.ReactElement {
         <h3>Step 2: Set up DNS monitoring</h3>
 
         <ol>
-          <li>Sign up at <Link href="/signup">uptrue.io/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
           <li>Click <strong>Add Monitor</strong></li>
           <li>Select <strong>DNS</strong> as the monitor type</li>
           <li>Enter your domain name</li>

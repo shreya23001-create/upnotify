@@ -79,8 +79,8 @@ VALUES (
   'Company No. 02710980',
   'VAT',
   'GB 573 253 734',
-  'billing@uptrue.io',
-  'uptrue.io'
+  'shreya23001@gmail.com',
+  'upnotify-monitoring.vercel.app'
 )
 ON CONFLICT (currency_code) DO NOTHING;
 
@@ -100,7 +100,7 @@ VALUES (
   '09AAMCC8947M1ZP',
   'AAMCC8947M',
   'MRTC07685G',
-  'billing@uptrue.io',
+  'shreya23001@gmail.com',
   'crozent.com'
 )
 ON CONFLICT (currency_code) DO NOTHING;

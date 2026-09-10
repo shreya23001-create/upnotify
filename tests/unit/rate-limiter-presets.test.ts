@@ -19,7 +19,7 @@ import {
 // ---------------------------------------------------------------------------
 
 function makeRequest(ip: string): Request {
-  return new Request('https://uptrue.io/api/test', {
+  return new Request('https://upnotify-monitoring.vercel.app/api/test', {
     headers: { 'x-forwarded-for': ip },
   })
 }

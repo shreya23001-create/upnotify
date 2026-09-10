@@ -208,11 +208,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title: page.seoTitle,
     description: page.seoDescription,
-    alternates: { canonical: `https://uptrue.io/integrations/${slug}` },
+    alternates: { canonical: `https://upnotify-monitoring.vercel.app/integrations/${slug}` },
     openGraph: {
       title: page.seoTitle,
       description: page.seoDescription,
-      url: `https://uptrue.io/integrations/${slug}`,
+      url: `https://upnotify-monitoring.vercel.app/integrations/${slug}`,
       type: 'website',
     },
   }
@@ -234,7 +234,7 @@ export default async function IntegrationPage({ params }: { params: Promise<{ sl
         '@type': 'SoftwareApplication',
         name: `Upnotify ${page.name} Integration`,
         description: page.seoDescription,
-        url: `https://uptrue.io/integrations/${page.slug}`,
+        url: `https://upnotify-monitoring.vercel.app/integrations/${page.slug}`,
         applicationCategory: 'BusinessApplication',
         operatingSystem: 'Web',
         offers: {
@@ -246,7 +246,7 @@ export default async function IntegrationPage({ params }: { params: Promise<{ sl
         publisher: {
           '@type': 'Organization',
           name: 'Upnotify',
-          url: 'https://uptrue.io',
+          url: 'https://upnotify-monitoring.vercel.app',
         },
       },
       {

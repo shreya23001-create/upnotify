@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: 'WordPress .htaccess File Corrupted: How a Single File Takes Down Your Entire Site',
   description:
     'A corrupted .htaccess file can take down your entire WordPress site with a 500 Internal Server Error. Learn what causes .htaccess corruption — plugin rewrites, manual edit typos, encoding issues — how to regenerate it, and how Upnotify HTTP monitoring catches the 500 error before your visitors report it.',
-  alternates: { canonical: 'https://uptrue.io/blog/wordpress-htaccess-error' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/wordpress-htaccess-error' },
   openGraph: {
     title: 'WordPress .htaccess File Corrupted: How a Single File Takes Down Your Entire Site',
     description:
       'What causes WordPress .htaccess corruption, how to fix and regenerate the file, and how HTTP monitoring catches the resulting 500 errors automatically.',
-    url: 'https://uptrue.io/blog/wordpress-htaccess-error',
+    url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-htaccess-error',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -68,10 +68,10 @@ export default function WordPressHtaccessErrorPage(): React.ReactElement {
           headline: 'WordPress .htaccess File Corrupted: How a Single File Takes Down Your Entire Site',
           description: 'What causes .htaccess corruption in WordPress, how to regenerate the file, and how HTTP monitoring catches the 500 errors it causes.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-28',
           dateModified: '2026-03-28',
-          url: 'https://uptrue.io/blog/wordpress-htaccess-error',
+          url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-htaccess-error',
         }}
       />
 
@@ -207,7 +207,7 @@ export default function WordPressHtaccessErrorPage(): React.ReactElement {
         <h3>Step 1: Set up HTTP monitoring</h3>
 
         <ol>
-          <li>Sign up at <Link href="/signup">uptrue.io/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>HTTP/HTTPS</strong> as the monitor type</li>
           <li>Enter your homepage URL</li>

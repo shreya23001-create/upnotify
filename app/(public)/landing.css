@@ -3739,7 +3739,7 @@ html.dark .wp-showcase-desc {
 }
 
 .uptrue-col-name {
-  background: linear-gradient(135deg, #1392FB, #58464f);
+  background: linear-gradient(135deg, #FBA830, #f59e0b);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -3755,11 +3755,26 @@ html.dark .wp-showcase-desc {
 
 /* Monitoring index hero: "your website" gradient */
 .monitoring-hero-gradient {
-  background: linear-gradient(135deg, #1392FB, #58464f);
+  background: linear-gradient(135deg, #1392FB, #FBA830);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+
+/* Monitoring index page (/monitoring): primary buttons use orange instead
+   of the site-wide blue, matching the homepage's two-tone treatment.
+   Scoped to .monitoring-orange-cta on the page's root div. */
+.monitoring-orange-cta .btn.btn-primary {
+  background: linear-gradient(135deg, #FBA830, #f59e0b);
+  color: #1a1200;
+  box-shadow: 0 2px 8px rgba(251, 168, 48, 0.3);
+}
+
+.monitoring-orange-cta .btn.btn-primary:hover {
+  background: linear-gradient(135deg, #f59e0b, #f59e0b);
+  box-shadow: 0 4px 16px rgba(251, 168, 48, 0.4);
+}
+
 
 .comparison-table td {
   padding: 13px var(--space-5);
@@ -5457,17 +5472,17 @@ html.dark .gradient-text {
   background-clip: text;
 }
 
-/* How It Works headline: dark violet-to-light pink gradient */
+/* How It Works headline: blue-to-orange gradient */
 .hiw-title-gradient {
-  background: linear-gradient(135deg, #0a5c26 0%, #fbcfe8 100%);
+  background: linear-gradient(135deg, #1392FB 0%, #FBA830 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-/* Testimonials headline: violet-to-pink gradient */
+/* Testimonials headline: blue-to-orange gradient */
 .testimonials-title-gradient {
-  background: linear-gradient(135deg, #1392FB, #58464f);
+  background: linear-gradient(135deg, #1392FB, #FBA830);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -6057,9 +6072,9 @@ html.dark .trust-item strong {
   color: #ede9ff;
 }
 
-/* gradient-text in dark uses violet→pink */
+/* gradient-text in dark uses blue→orange */
 html.dark .gradient-text {
-  background: linear-gradient(135deg, #11c84d 0%, #7e6472 100%);
+  background: linear-gradient(135deg, #1392FB 0%, #FBA830 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

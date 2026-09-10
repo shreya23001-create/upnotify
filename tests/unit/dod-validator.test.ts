@@ -196,10 +196,10 @@ ${' word'.repeat(820)}
     expect(hubCheck?.pass).toBe(true)
   })
 
-  it('treats absolute uptrue.io URL same as relative path', () => {
+  it('treats absolute upnotify-monitoring.vercel.app URL same as relative path', () => {
     const mixedBody = goodBody.replace(
       '/monitoring/ssl-certificate-monitoring',
-      'https://uptrue.io/monitoring/ssl-certificate-monitoring'
+      'https://upnotify-monitoring.vercel.app/monitoring/ssl-certificate-monitoring'
     )
     // Should still count as same canonical hub link
     const result = validateDoD(makeInput({ bodyMarkdown: mixedBody }))

@@ -7,10 +7,10 @@ const GRADIENTS: Record<string, [string, string]> = {
   Security:          ['#dc2626', '#b45309'],
   Performance:       ['#047857', '#0e7490'],
   Ecommerce:         ['#b45309', '#9d174d'],
-  'Incident Report': ['#b91c1c', '#00873a'],
-  Outage:            ['#b91c1c', '#00873a'],
+  'Incident Report': ['#b91c1c', '#7f1d1d'],
+  Outage:            ['#b91c1c', '#7f1d1d'],
   Agency:            ['#1e3a5f', '#1d4ed8'],
-  WordPress:         ['#1392FB', '#ec4899'],
+  WordPress:         ['#1392FB', '#FBA830'],
   Hosting:           ['#047857', '#1d4ed8'],
   Default:           ['#1d4ed8', '#0e7490'],
 }

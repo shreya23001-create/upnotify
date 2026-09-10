@@ -6,6 +6,7 @@ import { Lock, KeyRound } from 'lucide-react'
 import { DataTable, type Column, type BulkAction } from '@/components/ui/data-table'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import type { Organisation, User, Subscription, Invoice, ApiKey, Plan, UserCredit, CreditRule, Referral } from '@/lib/types'
+import type { AddonSubscription } from '@/lib/db/subscriptions'
 import type { SupportedCurrency } from '@/lib/utils/currency'
 import type { PageSection, CmsTheme } from '@/lib/types/cms'
 import { CurrentPlan } from '@/components/billing/current-plan'
@@ -29,6 +30,7 @@ interface SettingsContentProps {
   apiKeys: ApiKey[]
   plans: Plan[]
   currentPlan: Plan | null
+  addonSubscriptions?: AddonSubscription[]
   teamMemberLimit: number
   teamMemberCount: number
   canInvite: boolean
@@ -53,6 +55,7 @@ export function SettingsContent({
   apiKeys,
   plans,
   currentPlan,
+  addonSubscriptions = [],
   teamMemberLimit,
   teamMemberCount,
   canInvite,
@@ -417,7 +420,7 @@ export function SettingsContent({
               </div>
               <div className="space-y">
                 <CurrentPlan plan={currentPlan} subscription={subscription} />
-                <PricingTable plans={plans} currentPlanSlug={currentPlan?.slug} subscription={subscription} creditBalancePence={creditBalance} defaultCurrency={defaultCurrency} />
+                <PricingTable plans={plans} currentPlanSlug={currentPlan?.slug} subscription={subscription} creditBalancePence={creditBalance} defaultCurrency={defaultCurrency} addonSubscriptions={addonSubscriptions} />
                 <InvoiceList invoices={invoices} />
               </div>
             </div>

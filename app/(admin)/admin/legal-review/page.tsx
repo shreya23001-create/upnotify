@@ -63,7 +63,7 @@ export default async function LegalReviewPage(): Promise<React.ReactElement> {
           <h1 className="admin-page-title">Legal Review Queue</h1>
           <p className="admin-page-subtitle">
             Comparison and commercial pages must be approved here before they can publish.
-            Reviewed by Harvey (legal@uptrue.io).
+            Reviewed by Harvey (shreya23001@gmail.com).
           </p>
         </div>
         <div className="admin-page-header-stat">

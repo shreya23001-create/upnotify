@@ -9,12 +9,12 @@ export const metadata: Metadata = {
   title: 'Free robots.txt Checker & Validator — Test Your robots.txt | Upnotify',
   description:
     'Check and validate your robots.txt file instantly. See if you\'re accidentally blocking Googlebot, find missing sitemaps, and validate crawl rules. Free tool.',
-  alternates: { canonical: 'https://uptrue.io/tools/robots-txt-checker' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/tools/robots-txt-checker' },
   openGraph: {
     title: 'Free robots.txt Checker & Validator — Test Your robots.txt | Upnotify',
     description:
       'Validate your robots.txt instantly. Check Googlebot access, missing sitemaps, and crawl rules.',
-    url: 'https://uptrue.io/tools/robots-txt-checker',
+    url: 'https://upnotify-monitoring.vercel.app/tools/robots-txt-checker',
     type: 'website',
   },
 }

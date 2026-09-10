@@ -60,7 +60,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       // engineering-app#49.
       if (/bucket.*not.*found/i.test(msg)) {
         return NextResponse.json(
-          { error: 'File uploads are temporarily unavailable. Please paste the content into the message body or email support@uptrue.io.' },
+          { error: 'File uploads are temporarily unavailable. Please paste the content into the message body or email shreya23001@gmail.com.' },
           { status: 503 },
         )
       }

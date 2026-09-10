@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: 'WordPress Login Redirect Loop: Why wp-admin Keeps Sending You Back to the Login Page',
   description:
     'Your WordPress login page keeps redirecting back to itself. You enter the correct password, hit Log In, and land right back on the same screen. Learn what causes the wp-admin redirect loop and how to fix it.',
-  alternates: { canonical: 'https://uptrue.io/blog/wordpress-redirect-loop' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/wordpress-redirect-loop' },
   openGraph: {
     title: 'WordPress Login Redirect Loop: Why wp-admin Keeps Sending You Back to the Login Page',
     description:
       'What causes the WordPress login redirect loop, how to fix cookie issues and URL mismatches, and how Upnotify HTTP monitoring detects redirect loops on wp-admin automatically.',
-    url: 'https://uptrue.io/blog/wordpress-redirect-loop',
+    url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-redirect-loop',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -68,10 +68,10 @@ export default function WordPressRedirectLoopPage(): React.ReactElement {
           headline: 'WordPress Login Redirect Loop: Why wp-admin Keeps Sending You Back to the Login Page',
           description: 'What causes the WordPress login redirect loop, how to fix cookie issues and URL mismatches, and how HTTP monitoring detects redirect loops automatically.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-18',
           dateModified: '2026-03-18',
-          url: 'https://uptrue.io/blog/wordpress-redirect-loop',
+          url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-redirect-loop',
         }}
       />
 
@@ -231,7 +231,7 @@ export default function WordPressRedirectLoopPage(): React.ReactElement {
         <h3>Step 1: Set up an HTTP monitor on wp-admin</h3>
 
         <ol>
-          <li>Sign up at <Link href="/signup">uptrue.io/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>HTTP/HTTPS</strong> as the monitor type</li>
           <li>Enter your wp-admin URL: <code>https://yoursite.com/wp-admin/</code></li>

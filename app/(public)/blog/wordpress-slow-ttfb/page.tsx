@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: 'WordPress TTFB Over 3 Seconds: Why Your Site Feels Dead Even When It\'s Technically Up',
   description:
     'A WordPress site with Time to First Byte over 3 seconds feels broken to visitors even when uptime monitors say it is fine. Slow database queries, missing object cache, bloated plugins, and cheap hosting all cause high TTFB. Learn what drives TTFB up, why Google considers anything over 600ms slow, and how Upnotify HTTP monitoring tracks TTFB on every check.',
-  alternates: { canonical: 'https://uptrue.io/blog/wordpress-slow-ttfb' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/wordpress-slow-ttfb' },
   openGraph: {
     title: 'WordPress TTFB Over 3 Seconds: Why Your Site Feels Dead Even When It\'s Technically Up',
     description:
       'What causes WordPress TTFB to exceed 3 seconds, why Google penalises slow TTFB, and how Upnotify HTTP monitoring tracks server response time on every check and alerts when thresholds are exceeded.',
-    url: 'https://uptrue.io/blog/wordpress-slow-ttfb',
+    url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-slow-ttfb',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -68,10 +68,10 @@ export default function WordPressSlowTtfbPage(): React.ReactElement {
           headline: 'WordPress TTFB Over 3 Seconds: Why Your Site Feels Dead Even When It\'s Technically Up',
           description: 'What causes high WordPress TTFB, why Google penalises slow server response times, and how HTTP monitoring tracks TTFB on every check.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-04-01',
           dateModified: '2026-04-01',
-          url: 'https://uptrue.io/blog/wordpress-slow-ttfb',
+          url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-slow-ttfb',
         }}
       />
 
@@ -277,7 +277,7 @@ export default function WordPressSlowTtfbPage(): React.ReactElement {
         <h3>Step 1: Set up an HTTP monitor with a response time threshold</h3>
 
         <ol>
-          <li>Sign up at <Link href="/signup">uptrue.io/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>HTTP/HTTPS</strong> as the monitor type</li>
           <li>Enter your WordPress site URL</li>

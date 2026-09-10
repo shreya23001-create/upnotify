@@ -91,11 +91,11 @@ export async function generateMetadata({ params }: { params: Promise<{ domain: s
   return {
     title,
     description,
-    alternates: { canonical: `https://uptrue.io/tracker/${monitor.domain}` },
+    alternates: { canonical: `https://upnotify-monitoring.vercel.app/tracker/${monitor.domain}` },
     openGraph: {
       title: rawTitle,
       description,
-      url: `https://uptrue.io/tracker/${monitor.domain}`,
+      url: `https://upnotify-monitoring.vercel.app/tracker/${monitor.domain}`,
       type: 'website',
     },
     twitter: {
@@ -348,7 +348,7 @@ export default async function TrackerDomainPage({
 
   const faqJsonLd = buildFaqJsonLd(
     faqItems,
-    `https://uptrue.io/tracker/${monitor.domain}`
+    `https://upnotify-monitoring.vercel.app/tracker/${monitor.domain}`
   )
 
   return (

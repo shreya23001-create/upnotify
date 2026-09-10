@@ -4,7 +4,7 @@ export const metadata: Metadata = {
   title: 'AI Content Disclaimer — Upnotify',
   description:
     'How Upnotify uses artificial intelligence for report summaries, score analysis, and competitive intelligence. Important limitations and disclaimers.',
-  alternates: { canonical: 'https://uptrue.io/ai-disclaimer' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/ai-disclaimer' },
 }
 
 export default function AIDisclaimerPage(): React.ReactElement {
@@ -165,7 +165,7 @@ export default function AIDisclaimerPage(): React.ReactElement {
       </p>
       <ul>
         <li>
-          <strong>Email:</strong> <a href="mailto:reports@uptrue.io">reports@uptrue.io</a>
+          <strong>Email:</strong> <a href="mailto:shreya23001@gmail.com">shreya23001@gmail.com</a>
         </li>
         <li>Include the URL of the report, the specific inaccuracy, and supporting evidence where possible</li>
         <li>We aim to respond within <strong>2 business days</strong> and to action valid requests within <strong>5 business days</strong></li>
@@ -189,10 +189,10 @@ export default function AIDisclaimerPage(): React.ReactElement {
       </p>
       <ul>
         <li>
-          <strong>Email:</strong> <a href="mailto:support@uptrue.io">support@uptrue.io</a>
+          <strong>Email:</strong> <a href="mailto:shreya23001@gmail.com">shreya23001@gmail.com</a>
         </li>
         <li>
-          <strong>Monitoring report corrections:</strong> <a href="mailto:reports@uptrue.io">reports@uptrue.io</a>
+          <strong>Monitoring report corrections:</strong> <a href="mailto:shreya23001@gmail.com">shreya23001@gmail.com</a>
         </li>
         <li>
           <strong>Post:</strong> Vision Software Solutions Limited, C/O Benison Solvers Limited,

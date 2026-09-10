@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: 'WordPress Mixed Content Errors: Why Your Site Shows \'Not Secure\' After Installing SSL',
   description:
     'You installed an SSL certificate but your browser still shows "Not Secure." Hardcoded HTTP URLs in your database, plugin assets loading over HTTP, CDN misconfigurations, and images with absolute HTTP paths all cause mixed content errors. Learn how to find every mixed content source and how Upnotify SSL and keyword monitoring catches them automatically.',
-  alternates: { canonical: 'https://uptrue.io/blog/wordpress-mixed-content' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/wordpress-mixed-content' },
   openGraph: {
     title: 'WordPress Mixed Content Errors: Why Your Site Shows \'Not Secure\' After Installing SSL',
     description:
       'Why your WordPress site still shows "Not Secure" after installing SSL, how to find and fix every mixed content source, and how Upnotify monitoring catches insecure elements automatically.',
-    url: 'https://uptrue.io/blog/wordpress-mixed-content',
+    url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-mixed-content',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -68,10 +68,10 @@ export default function WordPressMixedContentPage(): React.ReactElement {
           headline: 'WordPress Mixed Content Errors: Why Your Site Shows \'Not Secure\' After Installing SSL',
           description: 'Why your WordPress site still shows "Not Secure" after installing SSL, how to find and fix every mixed content source, and how Upnotify monitoring catches insecure elements automatically.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-04-04',
           dateModified: '2026-04-04',
-          url: 'https://uptrue.io/blog/wordpress-mixed-content',
+          url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-mixed-content',
         }}
       />
 
@@ -300,7 +300,7 @@ export default function WordPressMixedContentPage(): React.ReactElement {
         <h3>Step 1: Set up an SSL monitor for your domain</h3>
 
         <ol>
-          <li>Sign up at <Link href="/signup">uptrue.io/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>SSL Certificate</strong> as the monitor type</li>
           <li>Enter your domain name</li>

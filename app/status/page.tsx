@@ -4,7 +4,7 @@ import Link from 'next/link'
 export const metadata: Metadata = {
   title: 'System Status — Upnotify',
   description: 'Current operational status of Upnotify monitoring services.',
-  alternates: { canonical: 'https://uptrue.io/status' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/status' },
 }
 
 const SERVICES = [

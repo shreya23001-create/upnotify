@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: 'CDN vs Better Hosting: What Actually Makes Your Site Faster?',
   description:
     'When does a CDN help your website speed and when do you need better hosting? Learn the difference between origin server TTFB, edge caching, and when each solution actually matters for your performance.',
-  alternates: { canonical: 'https://uptrue.io/blog/cdn-vs-better-hosting' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/cdn-vs-better-hosting' },
   openGraph: {
     title: 'CDN vs Better Hosting: What Actually Makes Your Site Faster?',
     description:
       'CDN or better hosting? Learn when a CDN fixes your speed problems and when it just masks a slow origin server. Origin TTFB, edge caching, and what actually matters for performance.',
-    url: 'https://uptrue.io/blog/cdn-vs-better-hosting',
+    url: 'https://upnotify-monitoring.vercel.app/blog/cdn-vs-better-hosting',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -88,10 +88,10 @@ export default function CdnVsBetterHostingPage(): React.ReactElement {
           headline: 'CDN vs Better Hosting: What Actually Makes Your Site Faster?',
           description: 'When a CDN helps vs when you need better hosting. Origin server TTFB, edge caching layers, and what actually makes your website faster.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-04-02',
           dateModified: '2026-04-02',
-          url: 'https://uptrue.io/blog/cdn-vs-better-hosting',
+          url: 'https://upnotify-monitoring.vercel.app/blog/cdn-vs-better-hosting',
         }}
       />
 

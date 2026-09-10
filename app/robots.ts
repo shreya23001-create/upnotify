@@ -25,9 +25,9 @@ const INTERNAL_PATHS = ['/api/', '/dashboard/', '/settings/', '/admin/', '/invit
 export default function robots(): MetadataRoute.Robots {
   const isProduction = process.env.VERCEL_ENV === 'production'
 
-  // Hard SEO rule: only the production host (uptrue.io / www.uptrue.io)
-  // is indexable. dev.uptrue.io and Vercel preview deployments are blocked
-  // for every user-agent so we never leak duplicate content into search.
+  // Hard SEO rule: only the production host (upnotify-monitoring.vercel.app)
+  // is indexable. Preview and dev deployments are blocked for every
+  // user-agent so we never leak duplicate content into search.
   if (!isProduction) {
     return {
       rules: [
@@ -49,6 +49,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: INTERNAL_PATHS,
       })),
     ],
-    sitemap: 'https://uptrue.io/sitemap.xml',
+    sitemap: 'https://upnotify-monitoring.vercel.app/sitemap.xml',
   }
 }

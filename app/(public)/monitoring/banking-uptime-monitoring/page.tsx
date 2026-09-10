@@ -89,11 +89,11 @@ const data: IndustryLandingData = {
 export const metadata: Metadata = {
   title: data.seoTitle,
   description: data.seoDescription,
-  alternates: { canonical: `https://uptrue.io/monitoring/${data.slug}` },
+  alternates: { canonical: `https://upnotify-monitoring.vercel.app/monitoring/${data.slug}` },
   openGraph: {
     title: data.seoTitle,
     description: data.seoDescription,
-    url: `https://uptrue.io/monitoring/${data.slug}`,
+    url: `https://upnotify-monitoring.vercel.app/monitoring/${data.slug}`,
     type: 'website',
   },
 }

@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: 'Your Hosting Provider Won\'t Tell You When Your Site Is Slow',
   description:
     'Hosting providers do not alert you to performance degradation, TTFB spikes, or shared resource contention. Learn why your host stays silent and how external monitoring catches what they hide.',
-  alternates: { canonical: 'https://uptrue.io/blog/hosting-wont-tell-you-slow' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/hosting-wont-tell-you-slow' },
   openGraph: {
     title: 'Your Hosting Provider Won\'t Tell You When Your Site Is Slow',
     description:
       'Hosting providers have no incentive to tell you when your site is slow. TTFB spikes, resource contention, and throttling happen silently. External monitoring is the only way to know.',
-    url: 'https://uptrue.io/blog/hosting-wont-tell-you-slow',
+    url: 'https://upnotify-monitoring.vercel.app/blog/hosting-wont-tell-you-slow',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -88,10 +88,10 @@ export default function HostingWontTellYouSlowPage(): React.ReactElement {
           headline: 'Your Hosting Provider Won\'t Tell You When Your Site Is Slow',
           description: 'Hosting providers do not monitor or alert you to individual site performance degradation. TTFB spikes, resource contention, and throttling happen silently.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-22',
           dateModified: '2026-03-22',
-          url: 'https://uptrue.io/blog/hosting-wont-tell-you-slow',
+          url: 'https://upnotify-monitoring.vercel.app/blog/hosting-wont-tell-you-slow',
         }}
       />
 
@@ -218,7 +218,7 @@ export default function HostingWontTellYouSlowPage(): React.ReactElement {
         </p>
 
         <ol>
-          <li>Sign up at <Link href="/signup">uptrue.io/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
           <li>Add an HTTP monitor for your homepage</li>
           <li>Set a response time threshold of 3 seconds</li>
           <li>Configure alerts via Slack, email, or Microsoft Teams</li>

@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: 'WordPress Permalink Changes Breaking All URLs: How to Prevent SEO Disaster',
   description:
     'Changing your WordPress permalink structure breaks every URL on your site. Every indexed page returns 404. Every backlink leads nowhere. Every bookmark fails. Learn what causes permalink failures, how to fix them, and how Upnotify HTTP monitoring on multiple pages catches widespread 404 errors before your rankings collapse.',
-  alternates: { canonical: 'https://uptrue.io/blog/wordpress-permalinks-not-working' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/wordpress-permalinks-not-working' },
   openGraph: {
     title: 'WordPress Permalink Changes Breaking All URLs: How to Prevent SEO Disaster',
     description:
       'Why WordPress permalink changes break every URL, how to fix them, and how HTTP monitoring across multiple pages catches widespread 404s before Google notices.',
-    url: 'https://uptrue.io/blog/wordpress-permalinks-not-working',
+    url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-permalinks-not-working',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -68,10 +68,10 @@ export default function WordPressPermalinksNotWorkingPage(): React.ReactElement 
           headline: 'WordPress Permalink Changes Breaking All URLs: How to Prevent SEO Disaster',
           description: 'Why permalink changes break every URL on your WordPress site, how to fix them, and how monitoring multiple pages catches widespread 404 errors.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-29',
           dateModified: '2026-03-29',
-          url: 'https://uptrue.io/blog/wordpress-permalinks-not-working',
+          url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-permalinks-not-working',
         }}
       />
 
@@ -216,7 +216,7 @@ export default function WordPressPermalinksNotWorkingPage(): React.ReactElement 
         <h3>Step 2: Set up HTTP monitors on each page</h3>
 
         <ol>
-          <li>Sign up at <Link href="/signup">uptrue.io/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>HTTP/HTTPS</strong> as the monitor type</li>
           <li>Enter the full URL of one of your important inner pages</li>

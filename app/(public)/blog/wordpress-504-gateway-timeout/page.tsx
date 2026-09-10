@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: '504 Gateway Timeout on WordPress: Why Your Pages Take Forever and Then Fail',
   description:
     'A 504 Gateway Timeout means your server waited too long for a response that never came. Learn what causes 504 errors on WordPress — slow PHP scripts, heavy database queries, proxy timeout limits, and hosting resource caps — and how to monitor for them automatically.',
-  alternates: { canonical: 'https://uptrue.io/blog/wordpress-504-gateway-timeout' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/wordpress-504-gateway-timeout' },
   openGraph: {
     title: '504 Gateway Timeout on WordPress: Why Your Pages Take Forever and Then Fail',
     description:
       'What causes 504 Gateway Timeout on WordPress, how to fix slow PHP scripts and proxy timeouts, and how HTTP monitoring detects 504 errors and tracks response time trends.',
-    url: 'https://uptrue.io/blog/wordpress-504-gateway-timeout',
+    url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-504-gateway-timeout',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -68,10 +68,10 @@ export default function WordPress504GatewayTimeoutPage(): React.ReactElement {
           headline: '504 Gateway Timeout on WordPress: Why Your Pages Take Forever and Then Fail',
           description: 'What causes 504 Gateway Timeout on WordPress, how to fix each cause, and how HTTP monitoring detects them and tracks response time degradation.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-24',
           dateModified: '2026-03-24',
-          url: 'https://uptrue.io/blog/wordpress-504-gateway-timeout',
+          url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-504-gateway-timeout',
         }}
       />
 
@@ -238,7 +238,7 @@ export default function WordPress504GatewayTimeoutPage(): React.ReactElement {
         <h3>Step 1: Set up an HTTP monitor to catch 504 status codes</h3>
 
         <ol>
-          <li>Sign up at <Link href="/signup">uptrue.io/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>HTTP/HTTPS</strong> as the monitor type</li>
           <li>Enter your homepage URL</li>

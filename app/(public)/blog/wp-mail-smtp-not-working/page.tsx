@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: 'WP Mail SMTP Not Sending Emails: Why Your WordPress Site Is Silently Broken',
   description:
     'WP Mail SMTP can stop sending emails without any visible error. Contact form submissions vanish, order confirmations never arrive, and password resets fail silently. Learn what causes it and how to monitor for it.',
-  alternates: { canonical: 'https://uptrue.io/blog/wp-mail-smtp-not-working' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/wp-mail-smtp-not-working' },
   openGraph: {
     title: 'WP Mail SMTP Not Sending Emails: Why Your WordPress Site Is Silently Broken',
     description:
       'What causes WP Mail SMTP to silently stop sending emails, how to fix SMTP credential expiry and OAuth token failures, and how Upnotify heartbeat monitoring detects broken email delivery.',
-    url: 'https://uptrue.io/blog/wp-mail-smtp-not-working',
+    url: 'https://upnotify-monitoring.vercel.app/blog/wp-mail-smtp-not-working',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -68,10 +68,10 @@ export default function WpMailSmtpNotWorkingPage(): React.ReactElement {
           headline: 'WP Mail SMTP Not Sending Emails: Why Your WordPress Site Is Silently Broken',
           description: 'What causes WP Mail SMTP to stop sending emails silently, how to fix credential and OAuth failures, and how heartbeat monitoring detects broken email delivery.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-20',
           dateModified: '2026-03-20',
-          url: 'https://uptrue.io/blog/wp-mail-smtp-not-working',
+          url: 'https://upnotify-monitoring.vercel.app/blog/wp-mail-smtp-not-working',
         }}
       />
 
@@ -226,7 +226,7 @@ export default function WpMailSmtpNotWorkingPage(): React.ReactElement {
         <h3>Step 1: Set up a heartbeat monitor on your contact form</h3>
 
         <ol>
-          <li>Sign up at <Link href="/signup">uptrue.io/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>Heartbeat</strong> as the monitor type</li>
           <li>Configure your contact form (or a test form) to send a ping to the Upnotify heartbeat URL after successful email delivery</li>

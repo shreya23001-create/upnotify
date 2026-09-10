@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = {
   title: 'Automated Pricing Policy | Upnotify',
   description: 'Upnotify Compete automated pricing rules disclaimer. Understand the risks, limitations, and your responsibilities when using automatic price updates.',
-  alternates: { canonical: 'https://uptrue.io/automated-pricing-policy' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/automated-pricing-policy' },
 }
 
 export default function AutomatedPricingPolicyPage(): React.ReactElement {
@@ -138,7 +138,7 @@ export default function AutomatedPricingPolicyPage(): React.ReactElement {
               <h2>10. Contact</h2>
               <p>
                 If you have questions about this policy or automated pricing, contact us at{' '}
-                <a href="mailto:support@uptrue.io">support@uptrue.io</a>.
+                <a href="mailto:shreya23001@gmail.com">shreya23001@gmail.com</a>.
               </p>
             </section>
           </div>

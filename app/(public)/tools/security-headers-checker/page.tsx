@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   title: 'Free Security Headers Checker — Test HTTP Headers | Upnotify',
   description:
     'Check your website\'s HTTP security headers instantly. Test for HSTS, CSP, X-Frame-Options, and more. Get a security grade and actionable recommendations. Free tool.',
-  alternates: { canonical: 'https://uptrue.io/tools/security-headers-checker' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/tools/security-headers-checker' },
   keywords: [
     'security headers checker',
     'http security headers test',
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     title: 'Free Security Headers Checker — Test HTTP Headers | Upnotify',
     description:
       'Check your website\'s HTTP security headers instantly. Get a security grade, see missing headers, and fix vulnerabilities.',
-    url: 'https://uptrue.io/tools/security-headers-checker',
+    url: 'https://upnotify-monitoring.vercel.app/tools/security-headers-checker',
     type: 'website',
   },
 }
@@ -37,7 +37,7 @@ const jsonLd = {
       name: 'Security Headers Checker',
       description:
         'Free tool to check HTTP security headers for any website. Tests for HSTS, CSP, X-Frame-Options, and more. Provides a security grade and actionable recommendations.',
-      url: 'https://uptrue.io/tools/security-headers-checker',
+      url: 'https://upnotify-monitoring.vercel.app/tools/security-headers-checker',
       applicationCategory: 'SecurityApplication',
       operatingSystem: 'Any',
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },

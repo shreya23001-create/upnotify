@@ -74,7 +74,7 @@ export default function OgImage() {
 
           {/* URL */}
           <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: 20, fontWeight: 600, marginTop: 'auto' }}>
-            uptrue.io
+            upnotify-monitoring.vercel.app
           </div>
         </div>
       </div>

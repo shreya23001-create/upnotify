@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: 'There Has Been a Critical Error on This Website: What It Means and How to Fix It',
   description:
     'The WordPress critical error message replaced the White Screen of Death in WordPress 5.2. Learn what triggers it, how to fix it step by step, and how to monitor your site so you catch it before your visitors do.',
-  alternates: { canonical: 'https://uptrue.io/blog/wordpress-critical-error' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/wordpress-critical-error' },
   openGraph: {
     title: 'There Has Been a Critical Error on This Website: What It Means and How to Fix It',
     description:
       'What causes the WordPress critical error, how to fix it via recovery mode and FTP, and how to set up monitoring that detects it automatically.',
-    url: 'https://uptrue.io/blog/wordpress-critical-error',
+    url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-critical-error',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -68,10 +68,10 @@ export default function WordPressCriticalErrorPage(): React.ReactElement {
           headline: 'There Has Been a Critical Error on This Website: What It Means and How to Fix It',
           description: 'What causes the WordPress critical error, how to fix it step by step, and how to set up keyword monitoring that detects it automatically.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-14',
           dateModified: '2026-03-14',
-          url: 'https://uptrue.io/blog/wordpress-critical-error',
+          url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-critical-error',
         }}
       />
 
@@ -243,7 +243,7 @@ export default function WordPressCriticalErrorPage(): React.ReactElement {
         <h3>Step 1: Set up a keyword monitor to detect the error text</h3>
 
         <ol>
-          <li>Sign up at <Link href="/signup">uptrue.io/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>Keyword</strong> as the monitor type</li>
           <li>Enter your homepage URL</li>

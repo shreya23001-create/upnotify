@@ -87,8 +87,7 @@ export function getConfig(): PublicConfig {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? ''
   // Always use NEXT_PUBLIC_APP_URL — never the auto-generated Vercel preview URL
-  // Dev: NEXT_PUBLIC_APP_URL = https://dev.uptrue.io
-  // Prod: NEXT_PUBLIC_APP_URL = https://uptrue.io
+  // Dev & Prod: NEXT_PUBLIC_APP_URL = https://upnotify-monitoring.vercel.app
   // const appUrl = (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000').trim()
     const appUrl = resolveAppUrl()
   const adminEmails = process.env.ADMIN_EMAILS || ''
@@ -144,7 +143,7 @@ export function getServerConfig(): ServerConfig {
     return {
       ...publicConfig,
       supabase: { ...publicConfig.supabase, serviceRoleKey: '' },
-      resend: { apiKey: '', fromEmail: 'alerts@uptrue.io', fromName: 'Uptrue Alerts' },
+      resend: { apiKey: '', fromEmail: 'shreya23001@gmail.com', fromName: 'Uptrue Alerts' },
       stripe: { secretKey: '', webhookSecret: '' },
       razorpay: { keyId: '', keySecret: '', webhookSecret: '' },
       anthropic: { apiKey: '' },
@@ -159,7 +158,7 @@ export function getServerConfig(): ServerConfig {
   }
 
   const resendApiKey = process.env.RESEND_API_KEY ?? ''
-  const resendFromEmail = process.env.RESEND_FROM_EMAIL || 'alerts@uptrue.io'
+  const resendFromEmail = process.env.RESEND_FROM_EMAIL || 'shreya23001@gmail.com'
   const resendFromName = process.env.RESEND_FROM_NAME || 'Uptrue Alerts'
 
   const stripeSecretKey = process.env.STRIPE_SECRET_KEY ?? ''
@@ -256,7 +255,7 @@ export function getServerConfig(): ServerConfig {
  *
  * Resolution order (first non-empty wins):
  *   1. `APP_URL` — server-only env var (NOT inlined; always read at runtime)
- *      — recommended setup: APP_URL=https://uptrue.io (prod), https://dev.uptrue.io (preview)
+ *      — recommended setup: APP_URL=https://upnotify-monitoring.vercel.app (prod & preview)
  *   2. `NEXT_PUBLIC_APP_URL` — client-side compatibility
  *      (subject to inlining; localhost values rejected when on Vercel)
  *   3. Vercel runtime detection — uses VERCEL_ENV + VERCEL_GIT_COMMIT_REF
@@ -290,9 +289,9 @@ function resolveAppUrl(): string {
     const branch = process.env.VERCEL_GIT_COMMIT_REF
     const ciBranch = process.env.CI_COMMIT_REF_NAME // GitLab CI fallback
 
-    if (vercelEnv === 'production') return 'https://uptrue.io'
-    if (branch === 'dev' || ciBranch === 'dev') return 'https://dev.uptrue.io'
-    if (branch === 'master' || branch === 'main' || ciBranch === 'master') return 'https://uptrue.io'
+    if (vercelEnv === 'production') return 'https://upnotify-monitoring.vercel.app'
+    if (branch === 'dev' || ciBranch === 'dev') return 'https://upnotify-monitoring.vercel.app'
+    if (branch === 'master' || branch === 'main' || ciBranch === 'master') return 'https://upnotify-monitoring.vercel.app'
 
     // 4. Vercel auto-generated URL (won't be the alias, but valid URL)
     const branchUrl = process.env.VERCEL_BRANCH_URL

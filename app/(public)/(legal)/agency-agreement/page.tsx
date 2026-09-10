@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: 'Agency Partner Agreement',
   description:
     'Upnotify Agency Partner Agreement. Terms for agencies using white-label monitoring, revenue sharing, and Stripe Connect.',
-  alternates: { canonical: 'https://uptrue.io/agency-agreement' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/agency-agreement' },
 }
 
 export default function AgencyPartnerAgreementPage(): React.ReactElement {
@@ -168,7 +168,7 @@ export default function AgencyPartnerAgreementPage(): React.ReactElement {
           <a href="/terms">Terms of Service</a>.
         </li>
         <li>
-          Provide platform-level technical support to the Agency via email (support@uptrue.io) during
+          Provide platform-level technical support to the Agency via email (shreya23001@gmail.com) during
           standard business hours.
         </li>
         <li>
@@ -238,14 +238,14 @@ export default function AgencyPartnerAgreementPage(): React.ReactElement {
       <h3>6.3 Data Portability</h3>
       <p>
         The Agency may export End Client data at any time using the data export features in the
-        dashboard or by contacting support@uptrue.io.
+        dashboard or by contacting shreya23001@gmail.com.
       </p>
 
       <h2>7. Termination</h2>
       <h3>7.1 Termination by the Agency</h3>
       <p>
         The Agency may terminate this Agreement at any time by providing 30 days&apos; written notice to
-        support@uptrue.io. Upon termination:
+        shreya23001@gmail.com. Upon termination:
       </p>
       <ul>
         <li>
@@ -422,8 +422,8 @@ export default function AgencyPartnerAgreementPage(): React.ReactElement {
         For questions about this Agency Partner Agreement, please contact:
       </p>
       <ul>
-        <li><strong>Email:</strong> partners@uptrue.io</li>
-        <li><strong>Support:</strong> support@uptrue.io</li>
+        <li><strong>Email:</strong> shreya23001@gmail.com</li>
+        <li><strong>Support:</strong> shreya23001@gmail.com</li>
         <li><strong>Post:</strong> Vision Software Solutions Limited, C/O Benison Solvers Limited, 1000 Great West Road, Brentford, United Kingdom, TW8 9DW</li>
       </ul>
     </>

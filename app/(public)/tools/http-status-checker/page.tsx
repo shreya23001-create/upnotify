@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   title: 'Free HTTP Status Checker — Check URL Response Codes | Upnotify',
   description:
     'Check any URL\'s HTTP status code instantly. See response codes, redirect chains, response headers, and server information. Free HTTP checker, no signup required.',
-  alternates: { canonical: 'https://uptrue.io/tools/http-status-checker' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/tools/http-status-checker' },
   keywords: [
     'http status checker',
     'check url status code',
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     title: 'Free HTTP Status Checker — Check URL Response Codes | Upnotify',
     description:
       'Check any URL\'s HTTP status code instantly. See redirects, response headers, and server information.',
-    url: 'https://uptrue.io/tools/http-status-checker',
+    url: 'https://upnotify-monitoring.vercel.app/tools/http-status-checker',
     type: 'website',
   },
 }
@@ -37,7 +37,7 @@ const jsonLd = {
       name: 'HTTP Status Checker',
       description:
         'Free tool to check any URL\'s HTTP status code. See redirect chains, response headers, and server information instantly.',
-      url: 'https://uptrue.io/tools/http-status-checker',
+      url: 'https://upnotify-monitoring.vercel.app/tools/http-status-checker',
       applicationCategory: 'DeveloperApplication',
       operatingSystem: 'Any',
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },

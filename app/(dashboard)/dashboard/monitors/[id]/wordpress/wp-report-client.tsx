@@ -498,7 +498,7 @@ ${aiReport ? `<div class="ai-section">
 </div>` : ''}
 
 <div class="footer">
-  <div>Powered by <strong>Upnotify</strong> — uptrue.io</div>
+  <div>Powered by <strong>Upnotify</strong> — upnotify-monitoring.vercel.app</div>
   <div>Automated WordPress monitoring &amp; security scanning</div>
 </div>
 </body>

@@ -15,12 +15,12 @@ export const metadata: Metadata = {
   title: 'Uptime Leaderboard — Most Reliable Websites Ranked by Uptime | Upnotify',
   description:
     'The top 50 most reliable websites ranked by 30-day uptime percentage. Real-time leaderboard powered by Upnotify monitoring data — see who is genuinely the most stable. Is your site in the top 50?',
-  alternates: { canonical: 'https://uptrue.io/leaderboard' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/leaderboard' },
   openGraph: {
     title: 'Uptime Leaderboard — Most Reliable Websites Ranked by Uptime | Upnotify',
     description:
       'The top 50 most reliable websites ranked by uptime. Real-time data from Upnotify monitoring.',
-    url: 'https://uptrue.io/leaderboard',
+    url: 'https://upnotify-monitoring.vercel.app/leaderboard',
     type: 'website',
   },
 }

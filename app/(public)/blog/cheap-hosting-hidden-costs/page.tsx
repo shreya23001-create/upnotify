@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: 'Why Cheap Hosting Is the Most Expensive Mistake You Can Make',
   description:
     'Shared hosting overselling, CPU throttling, noisy neighbours, and the hidden costs of downtime. Learn why cheap hosting costs more than you think and how monitoring protects your revenue.',
-  alternates: { canonical: 'https://uptrue.io/blog/cheap-hosting-hidden-costs' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/cheap-hosting-hidden-costs' },
   openGraph: {
     title: 'Why Cheap Hosting Is the Most Expensive Mistake You Can Make',
     description:
       'The real cost of cheap hosting is not the monthly fee — it is the revenue you lose during invisible downtime, the customers who leave, and the SEO rankings that never recover.',
-    url: 'https://uptrue.io/blog/cheap-hosting-hidden-costs',
+    url: 'https://upnotify-monitoring.vercel.app/blog/cheap-hosting-hidden-costs',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -88,10 +88,10 @@ export default function CheapHostingHiddenCostsPage(): React.ReactElement {
           headline: 'Why Cheap Hosting Is the Most Expensive Mistake You Can Make',
           description: 'The hidden costs of cheap shared hosting — overselling, CPU throttling, noisy neighbours, and lost revenue from invisible downtime.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-12',
           dateModified: '2026-03-12',
-          url: 'https://uptrue.io/blog/cheap-hosting-hidden-costs',
+          url: 'https://upnotify-monitoring.vercel.app/blog/cheap-hosting-hidden-costs',
         }}
       />
 
@@ -235,7 +235,7 @@ export default function CheapHostingHiddenCostsPage(): React.ReactElement {
         </p>
 
         <ol>
-          <li>Sign up at <Link href="/signup">uptrue.io/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
           <li>Add an HTTP monitor for your homepage</li>
           <li>Set a response time threshold of 3 seconds</li>
           <li>Configure alerts via Slack, email, or Microsoft Teams</li>

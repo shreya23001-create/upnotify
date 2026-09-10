@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: 'WooCommerce Payment Gateway Error: Why Stripe, PayPal, and Square Randomly Stop Working',
   description:
     'WooCommerce payment gateways can silently stop processing orders due to expired API credentials, sandbox vs live mode confusion, TLS version mismatches, and webhook endpoint failures. Your checkout page loads fine but no payments go through. Learn what causes gateway errors and how HTTP and keyword monitoring on payment callback URLs detects them automatically.',
-  alternates: { canonical: 'https://uptrue.io/blog/woocommerce-payment-gateway-error' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/woocommerce-payment-gateway-error' },
   openGraph: {
     title: 'WooCommerce Payment Gateway Error: Why Stripe, PayPal, and Square Randomly Stop Working',
     description:
       'What causes WooCommerce payment gateway errors, how API credential expiry and TLS mismatches break payments silently, and how Upnotify HTTP and keyword monitoring on payment callback URLs catches failures automatically.',
-    url: 'https://uptrue.io/blog/woocommerce-payment-gateway-error',
+    url: 'https://upnotify-monitoring.vercel.app/blog/woocommerce-payment-gateway-error',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -68,10 +68,10 @@ export default function WooCommercePaymentGatewayErrorPage(): React.ReactElement
           headline: 'WooCommerce Payment Gateway Error: Why Stripe, PayPal, and Square Randomly Stop Working',
           description: 'What causes WooCommerce payment gateway failures, how API credential expiry and TLS mismatches silently break payments, and how HTTP and keyword monitoring catches checkout failures.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-04-03',
           dateModified: '2026-04-03',
-          url: 'https://uptrue.io/blog/woocommerce-payment-gateway-error',
+          url: 'https://upnotify-monitoring.vercel.app/blog/woocommerce-payment-gateway-error',
         }}
       />
 
@@ -225,7 +225,7 @@ export default function WooCommercePaymentGatewayErrorPage(): React.ReactElement
         <h3>Step 1: Monitor your checkout page for error text</h3>
 
         <ol>
-          <li>Sign up at <Link href="/signup">uptrue.io/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>Keyword</strong> as the monitor type</li>
           <li>Enter your checkout page URL — typically <code>yourstore.com/checkout/</code></li>

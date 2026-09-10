@@ -24,11 +24,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title,
     description,
-    alternates: { canonical: `https://uptrue.io/status/${slug}` },
+    alternates: { canonical: `https://upnotify-monitoring.vercel.app/status/${slug}` },
     openGraph: {
       title: `${statusPage.name} — Status | Upnotify`,
       description,
-      url: `https://uptrue.io/status/${slug}`,
+      url: `https://upnotify-monitoring.vercel.app/status/${slug}`,
       type: 'website',
     },
     twitter: {
@@ -113,7 +113,7 @@ export default async function PublicStatusPage({
         </div>
         <div className="sp-nav-right">
           {!hasWhiteLabel && (
-            <a href="https://uptrue.io" target="_blank" rel="noopener noreferrer" className="sp-nav-powered">
+            <a href="https://upnotify-monitoring.vercel.app" target="_blank" rel="noopener noreferrer" className="sp-nav-powered">
               Powered by <span className="sp-nav-powered-brand">Upnotify</span>
             </a>
           )}
@@ -206,7 +206,7 @@ export default async function PublicStatusPage({
             <div className="sp-footer-text">
               Powered by <span className="sp-footer-brand">Upnotify</span>{' \u00b7 '}
               <a href="/privacy">Privacy</a>{' \u00b7 '}
-              <a href="https://uptrue.io" target="_blank" rel="noopener noreferrer">uptrue.io</a>
+              <a href="https://upnotify-monitoring.vercel.app" target="_blank" rel="noopener noreferrer">upnotify-monitoring.vercel.app</a>
             </div>
           </div>
         )}

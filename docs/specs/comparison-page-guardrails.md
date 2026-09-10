@@ -43,7 +43,7 @@ Comparison and commercial pages that name competitors carry legal risk if they c
 
 Every comparison/commercial page **must** include the following footer verbatim, placed before the final CTA:
 
-> Spotted something out of date or incorrect? Email [corrections@uptrue.io](mailto:corrections@uptrue.io) and we will review within 5 working days.
+> Spotted something out of date or incorrect? Email [shreya23001@gmail.com](mailto:shreya23001@gmail.com) and we will review within 5 working days.
 
 ---
 
@@ -72,7 +72,7 @@ All `commercial` post_type pages **must** pass through the `/admin/legal-review`
 - Rejected: `legal_review_outcome = 'rejected'` → draft deleted, calendar row reset to `planned`
 - Needs changes: `legal_review_outcome = 'needs_changes'` → draft returned to generator queue with notes
 
-Pages not reviewed within **90 days** trigger an automated overdue alert to `legal@uptrue.io`.
+Pages not reviewed within **90 days** trigger an automated overdue alert to `shreya23001@gmail.com`.
 
 ---
 

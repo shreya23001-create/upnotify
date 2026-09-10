@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: '502 Bad Gateway on WordPress: What It Means and How to Fix It Fast',
   description:
     'A 502 Bad Gateway error means your web server could not get a valid response from PHP. Learn what causes it on WordPress sites — PHP-FPM crashes, upstream timeouts, and hosting resource limits — and how to monitor for 502 errors automatically.',
-  alternates: { canonical: 'https://uptrue.io/blog/wordpress-502-bad-gateway' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/wordpress-502-bad-gateway' },
   openGraph: {
     title: '502 Bad Gateway on WordPress: What It Means and How to Fix It Fast',
     description:
       'What causes 502 Bad Gateway on WordPress, how to fix PHP-FPM crashes and upstream timeouts, and how HTTP monitoring catches 502 errors instantly.',
-    url: 'https://uptrue.io/blog/wordpress-502-bad-gateway',
+    url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-502-bad-gateway',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -68,10 +68,10 @@ export default function WordPress502BadGatewayPage(): React.ReactElement {
           headline: '502 Bad Gateway on WordPress: What It Means and How to Fix It Fast',
           description: 'What causes 502 Bad Gateway errors on WordPress, how to fix each cause, and how HTTP monitoring catches them instantly.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-23',
           dateModified: '2026-03-23',
-          url: 'https://uptrue.io/blog/wordpress-502-bad-gateway',
+          url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-502-bad-gateway',
         }}
       />
 
@@ -222,7 +222,7 @@ export default function WordPress502BadGatewayPage(): React.ReactElement {
         <h3>Step 1: Set up an HTTP monitor to catch 502 status codes</h3>
 
         <ol>
-          <li>Sign up at <Link href="/signup">uptrue.io/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>HTTP/HTTPS</strong> as the monitor type</li>
           <li>Enter your homepage URL</li>

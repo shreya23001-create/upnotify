@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: 'Refund Policy — Upnotify',
   description:
     'Upnotify refund policy covering free, Lite (annual), Builder, and Scale plans. Learn about cooling-off periods, cancellations, and how to request a refund.',
-  alternates: { canonical: 'https://uptrue.io/refund-policy' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/refund-policy' },
 }
 
 export default function RefundPolicyPage(): React.ReactElement {
@@ -87,7 +87,7 @@ export default function RefundPolicyPage(): React.ReactElement {
       <h2>6. How to Request a Refund</h2>
       <p>
         To request a refund (where eligible under this policy), please email us at{' '}
-        <a href="mailto:billing@uptrue.io">billing@uptrue.io</a> with the following details:
+        <a href="mailto:shreya23001@gmail.com">shreya23001@gmail.com</a> with the following details:
       </p>
       <ul>
         <li>Your account email address</li>
@@ -105,7 +105,7 @@ export default function RefundPolicyPage(): React.ReactElement {
       <p>
         If you have an issue with a charge, we strongly encourage you to{' '}
         <strong>contact us first</strong> at{' '}
-        <a href="mailto:billing@uptrue.io">billing@uptrue.io</a> before filing a dispute or
+        <a href="mailto:shreya23001@gmail.com">shreya23001@gmail.com</a> before filing a dispute or
         chargeback with your bank or card issuer. We are committed to resolving billing issues
         fairly and promptly.
       </p>
@@ -134,10 +134,10 @@ export default function RefundPolicyPage(): React.ReactElement {
       <p>If you have any questions about this Refund Policy, please contact us at:</p>
       <ul>
         <li>
-          <strong>Billing:</strong> <a href="mailto:billing@uptrue.io">billing@uptrue.io</a>
+          <strong>Billing:</strong> <a href="mailto:shreya23001@gmail.com">shreya23001@gmail.com</a>
         </li>
         <li>
-          <strong>Support:</strong> <a href="mailto:support@uptrue.io">support@uptrue.io</a>
+          <strong>Support:</strong> <a href="mailto:shreya23001@gmail.com">shreya23001@gmail.com</a>
         </li>
         <li>
           <strong>Post:</strong> Vision Software Solutions Limited, C/O Benison Solvers Limited,

@@ -110,7 +110,7 @@ import { GET } from '@/app/auth/callback/route'
 // ---------------------------------------------------------------------------
 
 function makeCallbackRequest(params: Record<string, string>): Request {
-  const url = new URL('https://uptrue.io/auth/callback')
+  const url = new URL('https://upnotify-monitoring.vercel.app/auth/callback')
   for (const [key, value] of Object.entries(params)) {
     url.searchParams.set(key, value)
   }
@@ -202,63 +202,63 @@ describe('auth callback — redirect path validation (integration)', () => {
 
   it('redirects to /dashboard when next=/dashboard', async () => {
     const response = await GET(makeCallbackRequest({ code: 'valid-code', next: '/dashboard' }))
-    expect(getRedirectUrl(response)).toBe('https://uptrue.io/dashboard')
+    expect(getRedirectUrl(response)).toBe('https://upnotify-monitoring.vercel.app/dashboard')
   })
 
   it('redirects to /settings/billing when next=/settings/billing', async () => {
     const response = await GET(makeCallbackRequest({ code: 'valid-code', next: '/settings/billing' }))
-    expect(getRedirectUrl(response)).toBe('https://uptrue.io/settings/billing')
+    expect(getRedirectUrl(response)).toBe('https://upnotify-monitoring.vercel.app/settings/billing')
   })
 
   it('redirects to / when next=/', async () => {
     const response = await GET(makeCallbackRequest({ code: 'valid-code', next: '/' }))
-    expect(getRedirectUrl(response)).toBe('https://uptrue.io/')
+    expect(getRedirectUrl(response)).toBe('https://upnotify-monitoring.vercel.app/')
   })
 
   // ── Open redirect attacks — all should fallback to /dashboard ────────
 
   it('rejects protocol-relative URL //evil.com and defaults to /dashboard', async () => {
     const response = await GET(makeCallbackRequest({ code: 'valid-code', next: '//evil.com' }))
-    expect(getRedirectUrl(response)).toBe('https://uptrue.io/dashboard')
+    expect(getRedirectUrl(response)).toBe('https://upnotify-monitoring.vercel.app/dashboard')
   })
 
   it('rejects absolute URL https://evil.com and defaults to /dashboard', async () => {
     const response = await GET(makeCallbackRequest({ code: 'valid-code', next: 'https://evil.com' }))
-    expect(getRedirectUrl(response)).toBe('https://uptrue.io/dashboard')
+    expect(getRedirectUrl(response)).toBe('https://upnotify-monitoring.vercel.app/dashboard')
   })
 
   it('rejects javascript: URI and defaults to /dashboard', async () => {
     const response = await GET(makeCallbackRequest({ code: 'valid-code', next: 'javascript:alert(1)' }))
-    expect(getRedirectUrl(response)).toBe('https://uptrue.io/dashboard')
+    expect(getRedirectUrl(response)).toBe('https://upnotify-monitoring.vercel.app/dashboard')
   })
 
   it('rejects http://evil.com and defaults to /dashboard', async () => {
     const response = await GET(makeCallbackRequest({ code: 'valid-code', next: 'http://evil.com' }))
-    expect(getRedirectUrl(response)).toBe('https://uptrue.io/dashboard')
+    expect(getRedirectUrl(response)).toBe('https://upnotify-monitoring.vercel.app/dashboard')
   })
 
   it('rejects path with embedded :// and defaults to /dashboard', async () => {
     const response = await GET(makeCallbackRequest({ code: 'valid-code', next: '/foo://bar' }))
-    expect(getRedirectUrl(response)).toBe('https://uptrue.io/dashboard')
+    expect(getRedirectUrl(response)).toBe('https://upnotify-monitoring.vercel.app/dashboard')
   })
 
   // ── Edge cases ──────────────────────────────────────────────────────
 
   it('defaults to /dashboard when next param is empty string', async () => {
     const response = await GET(makeCallbackRequest({ code: 'valid-code', next: '' }))
-    expect(getRedirectUrl(response)).toBe('https://uptrue.io/dashboard')
+    expect(getRedirectUrl(response)).toBe('https://upnotify-monitoring.vercel.app/dashboard')
   })
 
   it('defaults to /dashboard when no next param is provided', async () => {
     const response = await GET(makeCallbackRequest({ code: 'valid-code' }))
-    expect(getRedirectUrl(response)).toBe('https://uptrue.io/dashboard')
+    expect(getRedirectUrl(response)).toBe('https://upnotify-monitoring.vercel.app/dashboard')
   })
 
   // ── No code provided ───────────────────────────────────────────────
 
   it('redirects to /login?error=no_code when code is missing', async () => {
     const response = await GET(makeCallbackRequest({}))
-    expect(getRedirectUrl(response)).toBe('https://uptrue.io/login?error=no_code')
+    expect(getRedirectUrl(response)).toBe('https://upnotify-monitoring.vercel.app/login?error=no_code')
   })
 
   // ── Auth error ──────────────────────────────────────────────────────
@@ -266,6 +266,6 @@ describe('auth callback — redirect path validation (integration)', () => {
   it('redirects to /login?error=auth_error when exchange fails', async () => {
     mockExchangeCode.mockResolvedValue({ error: { message: 'invalid code' } })
     const response = await GET(makeCallbackRequest({ code: 'bad-code' }))
-    expect(getRedirectUrl(response)).toBe('https://uptrue.io/login?error=auth_error')
+    expect(getRedirectUrl(response)).toBe('https://upnotify-monitoring.vercel.app/login?error=auth_error')
   })
 })

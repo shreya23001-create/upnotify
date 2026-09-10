@@ -4,7 +4,7 @@ export const metadata: Metadata = {
   title: 'Cookie Policy',
   description:
     'Upnotify Cookie Policy. Understand what cookies and similar technologies we use on our website and monitoring platform.',
-  alternates: { canonical: 'https://uptrue.io/cookies' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/cookies' },
 }
 
 export default function CookiePolicyPage(): React.ReactElement {
@@ -15,7 +15,7 @@ export default function CookiePolicyPage(): React.ReactElement {
 
       <p>
         This Cookie Policy explains how Vision Software Solutions Limited (&quot;Uptrue&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;) uses
-        cookies and similar technologies on our website at uptrue.io and our monitoring platform
+        cookies and similar technologies on our website at upnotify-monitoring.vercel.app and our monitoring platform
         (the &quot;Service&quot;). This policy should be read alongside our
         <a href="/privacy">Privacy Policy</a>.
       </p>
@@ -200,7 +200,7 @@ export default function CookiePolicyPage(): React.ReactElement {
 
       <h2>4. Cookie Consent</h2>
       <p>
-        When you first visit uptrue.io, we display a cookie consent banner informing you of the cookies
+        When you first visit upnotify-monitoring.vercel.app, we display a cookie consent banner informing you of the cookies
         in use. Because we currently use only strictly necessary cookies for the core Service, consent
         is not required under the UK Privacy and Electronic Communications Regulations (PECR) or the
         EU ePrivacy Directive for those cookies. However, we display the banner for transparency.
@@ -230,7 +230,7 @@ export default function CookiePolicyPage(): React.ReactElement {
         If you have any questions about this Cookie Policy, please contact us at:
       </p>
       <ul>
-        <li><strong>Email:</strong> <a href="mailto:privacy@uptrue.io">privacy@uptrue.io</a></li>
+        <li><strong>Email:</strong> <a href="mailto:shreya23001@gmail.com">shreya23001@gmail.com</a></li>
         <li><strong>Post:</strong> Vision Software Solutions Limited, C/O Benison Solvers Limited, 1000 Great West Road, Brentford, United Kingdom, TW8 9DW</li>
       </ul>
     </>

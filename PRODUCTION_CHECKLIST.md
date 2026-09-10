@@ -44,7 +44,7 @@ unconditionally in dev, staging and production.
 | Stripe live keys | Pending | Swap test keys for live keys before launch |
 | Supabase prod project | Pending | Create uptrue-prod project in Frankfurt region |
 | Vercel prod env vars | Pending | Copy all env vars, use live keys |
-| DNS cutover | Pending | Point uptrue.io to Vercel prod deployment |
+| DNS cutover | Pending | Point upnotify-monitoring.vercel.app to Vercel prod deployment |
 | Cookie consent banner | Pending | Required before live traffic |
 | Email alerts (Resend) | Pending | Set RESEND_API_KEY in prod env |
 | Cron jobs | Pending | Switch from cron-job.org to Vercel Pro native crons |

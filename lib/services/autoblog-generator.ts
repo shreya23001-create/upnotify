@@ -104,7 +104,7 @@ export interface AutoblogDraft {
 
 
 
-const EDITORIAL_SYSTEM_PROMPT = `You are a staff writer for Uptrue (uptrue.io), a website monitoring and uptime intelligence platform.
+const EDITORIAL_SYSTEM_PROMPT = `You are a staff writer for Uptrue (upnotify-monitoring.vercel.app), a website monitoring and uptime intelligence platform.
 Your readers are developers, startup founders, SaaS product teams, and IT managers. They are smart, busy, and sceptical of marketing fluff.
 
 === WHO YOU ARE ===
@@ -152,7 +152,7 @@ Follow this structure but make each section feel like the next natural thought -
 - First paragraph: Primary keyword appears naturally in first 2 sentences
 - H2 headings: Keyword variations, written as a reader would search them
 - FAQ: Each answer is a complete standalone sentence an AI engine can extract and cite
-- At least 2 natural internal links to: https://uptrue.io, https://uptrue.io/tracker, https://uptrue.io/tools, https://uptrue.io/score
+- At least 2 natural internal links to: https://upnotify-monitoring.vercel.app, https://upnotify-monitoring.vercel.app/tracker, https://upnotify-monitoring.vercel.app/tools, https://upnotify-monitoring.vercel.app/score
 
 === AI SEO ===
 - State key facts as clean attributable sentences: As of [date], [X] does not have a public submission process for website indexing.
@@ -270,7 +270,7 @@ The post should answer these questions - but ONLY if the source articles confirm
 
 
 
-Include a natural mention of Uptrue's AI Visibility feature for tracking citations: https://uptrue.io
+Include a natural mention of Uptrue's AI Visibility feature for tracking citations: https://upnotify-monitoring.vercel.app
 
 
 
@@ -793,7 +793,7 @@ export async function generateAutoblogPost(input: AutoblogInput): Promise<Autobl
 
       buttonLabel: 'Try Uptrue Free',
 
-      buttonUrl: 'https://uptrue.io',
+      buttonUrl: 'https://upnotify-monitoring.vercel.app',
 
     },
 
@@ -803,7 +803,7 @@ export async function generateAutoblogPost(input: AutoblogInput): Promise<Autobl
 
       buttonLabel: 'Start Free',
 
-      buttonUrl: 'https://uptrue.io',
+      buttonUrl: 'https://upnotify-monitoring.vercel.app',
 
     },
 

@@ -37,8 +37,8 @@ const FALLBACK_BY_CURRENCY: Record<string, SellerEntity> = {
     tax_number: 'GB 573 253 734',
     pan: null,
     tan: null,
-    email: 'billing@uptrue.io',
-    website: 'uptrue.io',
+    email: 'shreya23001@gmail.com',
+    website: 'upnotify-monitoring.vercel.app',
   },
   inr: {
     currency_code: 'inr',
@@ -53,7 +53,7 @@ const FALLBACK_BY_CURRENCY: Record<string, SellerEntity> = {
     tax_number: '09AAMCC8947M1ZP',
     pan: 'AAMCC8947M',
     tan: 'MRTC07685G',
-    email: 'billing@uptrue.io',
+    email: 'shreya23001@gmail.com',
     website: 'crozent.com',
   },
 }

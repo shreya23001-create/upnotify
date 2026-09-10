@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: 'GDPR Compliance — Upnotify',
   description:
     'How Upnotify complies with the General Data Protection Regulation (GDPR). Your rights, our legal basis for processing, data location, and how to exercise your rights.',
-  alternates: { canonical: 'https://uptrue.io/gdpr' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/gdpr' },
 }
 
 export default function GDPRPage(): React.ReactElement {
@@ -43,7 +43,7 @@ export default function GDPRPage(): React.ReactElement {
       </p>
       <ul>
         <li>
-          <strong>Email:</strong> <a href="mailto:privacy@uptrue.io">privacy@uptrue.io</a>
+          <strong>Email:</strong> <a href="mailto:shreya23001@gmail.com">shreya23001@gmail.com</a>
         </li>
         <li>
           <strong>Post:</strong> Data Protection, Vision Software Solutions Limited, C/O Benison
@@ -119,7 +119,7 @@ export default function GDPRPage(): React.ReactElement {
         </li>
         <li>
           <strong>By email:</strong> Send your request to{' '}
-          <a href="mailto:privacy@uptrue.io">privacy@uptrue.io</a>. We will verify your identity
+          <a href="mailto:shreya23001@gmail.com">shreya23001@gmail.com</a>. We will verify your identity
           before processing any request.
         </li>
       </ul>
@@ -218,7 +218,7 @@ export default function GDPRPage(): React.ReactElement {
       </ul>
       <p>
         We encourage you to contact us first at{' '}
-        <a href="mailto:privacy@uptrue.io">privacy@uptrue.io</a> so that we can attempt to resolve
+        <a href="mailto:shreya23001@gmail.com">shreya23001@gmail.com</a> so that we can attempt to resolve
         your concern before you escalate to a supervisory authority.
       </p>
 

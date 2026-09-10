@@ -4,7 +4,7 @@ export const metadata: Metadata = {
   title: 'Service Level Agreement — Upnotify',
   description:
     'Upnotify platform SLA: 99.9% uptime target, how we measure availability, service credits, exclusions, and how to file a claim.',
-  alternates: { canonical: 'https://uptrue.io/sla' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/sla' },
 }
 
 export default function SLAPage(): React.ReactElement {
@@ -84,7 +84,7 @@ export default function SLAPage(): React.ReactElement {
       <p>To request a service credit:</p>
       <ol>
         <li>
-          Email <a href="mailto:support@uptrue.io">support@uptrue.io</a> within{' '}
+          Email <a href="mailto:shreya23001@gmail.com">shreya23001@gmail.com</a> within{' '}
           <strong>30 days</strong> of the end of the month in which the downtime occurred.
         </li>
         <li>
@@ -157,7 +157,7 @@ export default function SLAPage(): React.ReactElement {
       <p>For SLA enquiries or credit claims, contact us at:</p>
       <ul>
         <li>
-          <strong>Email:</strong> <a href="mailto:support@uptrue.io">support@uptrue.io</a>
+          <strong>Email:</strong> <a href="mailto:shreya23001@gmail.com">shreya23001@gmail.com</a>
         </li>
         <li>
           <strong>Post:</strong> Vision Software Solutions Limited, C/O Benison Solvers Limited,

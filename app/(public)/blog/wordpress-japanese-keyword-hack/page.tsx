@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: 'Japanese Keyword Hack on WordPress: How Hackers Hijack Your SEO and You Don\'t Even Know',
   description:
     'The Japanese keyword hack injects thousands of spam pages into your WordPress site that only appear in Google search results. You cannot see them from wp-admin. Learn how it works, how to detect it, and how keyword monitoring catches what you cannot see.',
-  alternates: { canonical: 'https://uptrue.io/blog/wordpress-japanese-keyword-hack' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/wordpress-japanese-keyword-hack' },
   openGraph: {
     title: 'Japanese Keyword Hack on WordPress: How Hackers Hijack Your SEO and You Don\'t Even Know',
     description:
       'How the Japanese keyword hack works, why you cannot see it from wp-admin, how to clean your site, and how Upnotify keyword monitoring detects Japanese characters on English pages automatically.',
-    url: 'https://uptrue.io/blog/wordpress-japanese-keyword-hack',
+    url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-japanese-keyword-hack',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -68,10 +68,10 @@ export default function WordPressJapaneseKeywordHackPage(): React.ReactElement {
           headline: 'Japanese Keyword Hack on WordPress: How Hackers Hijack Your SEO and You Don\'t Even Know',
           description: 'How the Japanese keyword hack works, why you cannot see it from wp-admin, how to clean your site, and how keyword monitoring detects Japanese characters on English pages.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-22',
           dateModified: '2026-03-22',
-          url: 'https://uptrue.io/blog/wordpress-japanese-keyword-hack',
+          url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-japanese-keyword-hack',
         }}
       />
 
@@ -264,7 +264,7 @@ export default function WordPressJapaneseKeywordHackPage(): React.ReactElement {
         <h3>Step 1: Monitor for unexpected Japanese characters</h3>
 
         <ol>
-          <li>Sign up at <Link href="/signup">uptrue.io/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>Keyword</strong> as the monitor type</li>
           <li>Enter your homepage URL</li>

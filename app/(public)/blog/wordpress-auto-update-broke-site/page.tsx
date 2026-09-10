@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: 'WordPress Auto-Update Broke My Site: How to Recover and Prevent It From Happening Again',
   description:
     'WordPress auto-updates can break your site silently — theme incompatibility, PHP version mismatch, and file permission errors during update all cause white screens, critical errors, and 500 errors. Learn how to recover and how HTTP monitoring catches the break within 60 seconds.',
-  alternates: { canonical: 'https://uptrue.io/blog/wordpress-auto-update-broke-site' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/wordpress-auto-update-broke-site' },
   openGraph: {
     title: 'WordPress Auto-Update Broke My Site: How to Recover and Prevent It From Happening Again',
     description:
       'Why WordPress auto-updates break sites, how to recover from a failed update, and how HTTP monitoring catches the break within 60 seconds.',
-    url: 'https://uptrue.io/blog/wordpress-auto-update-broke-site',
+    url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-auto-update-broke-site',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -68,10 +68,10 @@ export default function WordPressAutoUpdateBrokeSitePage(): React.ReactElement {
           headline: 'WordPress Auto-Update Broke My Site: How to Recover and Prevent It From Happening Again',
           description: 'Why WordPress auto-updates break sites, how to recover from a failed update, and how HTTP monitoring catches the break within 60 seconds.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-04-03',
           dateModified: '2026-04-03',
-          url: 'https://uptrue.io/blog/wordpress-auto-update-broke-site',
+          url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-auto-update-broke-site',
         }}
       />
 
@@ -245,7 +245,7 @@ export default function WordPressAutoUpdateBrokeSitePage(): React.ReactElement {
         <h3>Step 1: Set up an HTTP monitor for your homepage</h3>
 
         <ol>
-          <li>Sign up at <Link href="/signup">uptrue.io/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>HTTP/HTTPS</strong> as the monitor type</li>
           <li>Enter your homepage URL</li>

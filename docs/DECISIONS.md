@@ -291,7 +291,7 @@ Each entry includes:
 1. Disclaimer box (auto_generated flag in DB)
 2. Hedged language in prompt ("reportedly", "appears to be" — never "is down")
 3. Reddit usernames and X handles stripped from content
-4. Takedown/corrections contact: reports@uptrue.io
+4. Takedown/corrections contact: shreya23001@gmail.com
 5. AI Disclaimer policy page with corrections process
 6. LinkedIn posts from organization account (not personal) when `LINKEDIN_ORGANIZATION_ID` is set
 

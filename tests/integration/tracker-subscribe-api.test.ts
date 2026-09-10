@@ -47,7 +47,7 @@ function createRequest(body: Record<string, unknown>, ip?: string): Request {
   if (ip) {
     headers.set('x-forwarded-for', ip)
   }
-  return new Request('https://uptrue.io/api/v1/tracker/subscribe', {
+  return new Request('https://upnotify-monitoring.vercel.app/api/v1/tracker/subscribe', {
     method: 'POST',
     headers,
     body: JSON.stringify(body),

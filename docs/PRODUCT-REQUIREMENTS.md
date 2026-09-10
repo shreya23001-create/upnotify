@@ -160,8 +160,8 @@ All severities are fully customisable per monitor.
 ### Hosting by Plan
 | Plan | Domain |
 |---|---|
-| Free / Lite | uptrue.io/status/slug |
-| Builder | uptrue.io/status/slug |
+| Free / Lite | upnotify-monitoring.vercel.app/status/slug |
+| Builder | upnotify-monitoring.vercel.app/status/slug |
 | Scale | status.yourclientname.com (CNAME) |
 | Agency (Phase 2) | client's own domain (status.acmecorp.com) |
 
@@ -376,7 +376,7 @@ heartbeat.missed, maintenance.started, maintenance.ended, report.ready
 |---|---|---|---|
 | Development | localhost / 127.0.0.1 | Yellow: "Development mode" | Test keys always |
 | Staging | *.vercel.app | Yellow: "Staging environment" | Test keys always |
-| Production | uptrue.io | None | Respects Live/Test toggle |
+| Production | upnotify-monitoring.vercel.app | None | Respects Live/Test toggle |
 
 ### Live/Test Mode Toggle (production only)
 - Super admin (sachindiwaker@gmail.com) only

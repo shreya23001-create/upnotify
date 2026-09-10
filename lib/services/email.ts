@@ -318,7 +318,7 @@ ${content}
 <tr><td style="padding:16px 32px;background-color:#f9fafb;border-top:1px solid #eaeaea;">
 <p style="margin:0;font-size:12px;color:#9ca3af;line-height:1.5;">
 You are receiving this because you have alert notifications enabled on Upnotify.<br>
-<a href="https://uptrue.io" style="color:#6b7280;text-decoration:underline;">uptrue.io</a>
+<a href="https://upnotify-monitoring.vercel.app" style="color:#6b7280;text-decoration:underline;">upnotify-monitoring.vercel.app</a>
 </p>
 </td></tr>
 
@@ -722,7 +722,7 @@ export async function sendCitationReportEmail(params: CitationReportEmailParams)
     </a>
 
     <p style="margin:20px 0 0;font-size:12px;color:#9ca3af;text-align:center;">
-      Manage your AI Visibility settings at uptrue.io/dashboard/ai-visibility
+      Manage your AI Visibility settings at upnotify-monitoring.vercel.app/dashboard/ai-visibility
     </p>
   `)
 

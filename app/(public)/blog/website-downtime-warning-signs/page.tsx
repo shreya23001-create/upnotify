@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: '10 Warning Signs Your Website Is About to Go Down',
   description:
     'Your website shows warning signs before it crashes. Slow TTFB, SSL expiry, database errors, disk space, and more. Learn the 10 signs and how to catch them early.',
-  alternates: { canonical: 'https://uptrue.io/blog/website-downtime-warning-signs' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/website-downtime-warning-signs' },
   openGraph: {
     title: '10 Warning Signs Your Website Is About to Go Down',
     description:
       'Your website shows warning signs before it crashes. Learn the 10 signs and how to catch them before your visitors do.',
-    url: 'https://uptrue.io/blog/website-downtime-warning-signs',
+    url: 'https://upnotify-monitoring.vercel.app/blog/website-downtime-warning-signs',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -88,10 +88,10 @@ export default function WebsiteDowntimeWarningSignsPage(): React.ReactElement {
           headline: '10 Warning Signs Your Website Is About to Go Down',
           description: 'Learn the 10 warning signs that precede website downtime and how to catch them early with monitoring.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-18',
           dateModified: '2026-03-18',
-          url: 'https://uptrue.io/blog/website-downtime-warning-signs',
+          url: 'https://upnotify-monitoring.vercel.app/blog/website-downtime-warning-signs',
         }}
       />
 

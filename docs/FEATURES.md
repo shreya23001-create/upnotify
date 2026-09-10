@@ -450,7 +450,7 @@ Signup → Free (no subscription record)
 - ✅ Disclaimer box on every auto-generated post (flag: `auto_generated = true`)
 - ✅ Hedged language in AI prompt ("reportedly", "appears to be", not "is down")
 - ✅ Reddit usernames and X handles stripped from generated content
-- ✅ Takedown/corrections email in disclaimer: reports@uptrue.io
+- ✅ Takedown/corrections email in disclaimer: shreya23001@gmail.com
 - ✅ AI Disclaimer policy page — Section 9: monitoring reports, corrections process
 - ✅ LinkedIn posts from organization account when `LINKEDIN_ORGANIZATION_ID` is set
 

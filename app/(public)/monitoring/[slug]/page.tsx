@@ -420,7 +420,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title: `${page.name} | Upnotify — Website Monitoring Suite`,
     description: page.description,
-    alternates: { canonical: `https://uptrue.io/monitoring/${slug}` },
+    alternates: { canonical: `https://upnotify-monitoring.vercel.app/monitoring/${slug}` },
     openGraph: {
       title: `${page.name} | Upnotify — Website Monitoring Suite`,
       description: page.description,
@@ -447,7 +447,7 @@ export default async function MonitoringTypePage({ params }: { params: Promise<{
         '@type': 'SoftwareApplication',
         name: `${page.name} — Upnotify`,
         description: page.description,
-        url: `https://uptrue.io/monitoring/${page.slug}`,
+        url: `https://upnotify-monitoring.vercel.app/monitoring/${page.slug}`,
         applicationCategory: 'BusinessApplication',
         operatingSystem: 'Web',
         offers: {
@@ -459,7 +459,7 @@ export default async function MonitoringTypePage({ params }: { params: Promise<{
         publisher: {
           '@type': 'Organization',
           name: 'Upnotify',
-          url: 'https://uptrue.io',
+          url: 'https://upnotify-monitoring.vercel.app',
         },
       },
       {
@@ -479,7 +479,7 @@ export default async function MonitoringTypePage({ params }: { params: Promise<{
   const relatedTool = RELATED_TOOL[page.slug]
 
   return (
-    <>
+    <div className="monitoring-orange-cta">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -699,7 +699,7 @@ export default async function MonitoringTypePage({ params }: { params: Promise<{
 
       </main>
 
-    </>
+    </div>
   )
 }
 

@@ -49,8 +49,8 @@ Code only. The `uptrue-io/uptrue-app` repository. Dev team only.
 
 | Boss says | Branch | Domain |
 |---|---|---|
-| "deploy", "deploy on dev", "ship it", "push it", "dev release" | `dev` | https://dev.uptrue.io |
-| "deploy on prod", "prod release", "push to master", "go live" | `master` | https://uptrue.io (canonical) + https://www.uptrue.io (307 → apex) |
+| "deploy", "deploy on dev", "ship it", "push it", "dev release" | `dev` | https://upnotify-monitoring.vercel.app |
+| "deploy on prod", "prod release", "push to master", "go live" | `master` | https://upnotify-monitoring.vercel.app |
 
 - All work goes to `dev` only: `git push origin dev`
 - If you are about to run any command containing `origin master` — STOP. Ask first.
@@ -58,23 +58,21 @@ Code only. The `uptrue-io/uptrue-app` repository. Dev team only.
 - The only words that authorise a master push: **"deploy to prod"** or **"push to master"** — explicit, in that session, for that commit.
 - One approval does NOT carry forward to future commits or sessions.
 
-### Vercel routing (canonical host: apex, decided 2026-05-26)
-- `dev.uptrue.io` → project domain with `gitBranch: "dev"` → tracks dev branch deploys
-- `uptrue.io` → **production branch alias (master)** — canonical host
-- `www.uptrue.io` → 307 redirect to `uptrue.io`
-- `uptrue-app.vercel.app` → Vercel default
-
-**Why apex:** Google has already indexed apex URLs (sitemap + canonical
-tags both point there). Email infrastructure (`alerts@`, `reports@`,
-`security@`) uses the apex domain. Shorter URL for marketing. Flipping
-from the earlier 2026-05-02 routing (apex → www) preserves the existing
-Google index — no re-crawl, no ranking volatility.
+### Vercel routing (single domain — no separate dev/prod hosts)
+<!-- NOTE (domain migration, 2026-09-10): this app no longer owns uptrue.io.
+     Both dev and prod deploys resolve to the single Vercel deployment URL
+     below until a real custom domain is purchased. The old apex/www/dev
+     multi-domain routing scheme described here previously no longer applies. -->
+- `upnotify-monitoring.vercel.app` → the only live domain — serves both dev and prod deploys
+- Email infrastructure (`alerts@`, `reports@`, `security@`, etc.) does not yet
+  have real mailboxes — `shreya23001@gmail.com` is the temporary placeholder
+  used everywhere in code/copy until dedicated mailboxes exist.
 
 **Code expectations (already in place; do not change):**
-- `app/sitemap.ts` emits `https://uptrue.io/...` URLs
-- `app/layout.tsx` `metadataBase = new URL('https://uptrue.io')`
-- Page-level `alternates.canonical` declarations all use apex
-- `NEXT_PUBLIC_APP_URL=https://uptrue.io` in Vercel production env vars
+- `app/sitemap.ts` emits `https://upnotify-monitoring.vercel.app/...` URLs
+- `app/layout.tsx` `metadataBase = new URL('https://upnotify-monitoring.vercel.app')`
+- Page-level `alternates.canonical` declarations all use the Vercel URL above
+- `NEXT_PUBLIC_APP_URL=https://upnotify-monitoring.vercel.app` in Vercel production env vars
 
 GitLab CI handles routing automatically: `.gitlab-ci.yml` runs `vercel deploy` (preview + alias) on dev, `vercel deploy --prod` on master.
 
@@ -120,7 +118,7 @@ Before go-live, every item below must be confirmed set in Vercel production env 
 
 ### Core
 - [ ] `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY` + `SUPABASE_SERVICE_ROLE_KEY`
-- [ ] `NEXT_PUBLIC_APP_URL=https://uptrue.io`
+- [ ] `NEXT_PUBLIC_APP_URL=https://upnotify-monitoring.vercel.app`
 - [ ] `ADMIN_EMAILS` + `ADMIN_REPORT_EMAIL`
 - [ ] `CRON_SECRET`
 

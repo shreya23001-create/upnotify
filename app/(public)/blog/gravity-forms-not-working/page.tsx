@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: 'Gravity Forms Conditional Logic Not Working: Why Your Forms Are Broken After Update',
   description:
     'Gravity Forms conditional logic can silently break after updates due to jQuery conflicts, JavaScript minification, PHP 8.x compatibility issues, and payment integration failures. Fields that should show or hide stop responding, calculations break, and payment forms fail to process. Learn what causes it and how keyword monitoring catches broken forms automatically.',
-  alternates: { canonical: 'https://uptrue.io/blog/gravity-forms-not-working' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/gravity-forms-not-working' },
   openGraph: {
     title: 'Gravity Forms Conditional Logic Not Working: Why Your Forms Are Broken After Update',
     description:
       'What causes Gravity Forms conditional logic to break after updates, how jQuery conflicts and minification destroy form functionality, and how Upnotify keyword monitoring detects broken forms on your WordPress site.',
-    url: 'https://uptrue.io/blog/gravity-forms-not-working',
+    url: 'https://upnotify-monitoring.vercel.app/blog/gravity-forms-not-working',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -68,10 +68,10 @@ export default function GravityFormsNotWorkingPage(): React.ReactElement {
           headline: 'Gravity Forms Conditional Logic Not Working: Why Your Forms Are Broken After Update',
           description: 'What causes Gravity Forms conditional logic failures, how jQuery conflicts and minification break form functionality, and how keyword monitoring catches broken forms.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-04-02',
           dateModified: '2026-04-02',
-          url: 'https://uptrue.io/blog/gravity-forms-not-working',
+          url: 'https://upnotify-monitoring.vercel.app/blog/gravity-forms-not-working',
         }}
       />
 
@@ -230,7 +230,7 @@ export default function GravityFormsNotWorkingPage(): React.ReactElement {
         <h3>Step 1: Set up a keyword monitor on your form page</h3>
 
         <ol>
-          <li>Sign up at <Link href="/signup">uptrue.io/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>Keyword</strong> as the monitor type</li>
           <li>Enter the URL of the page containing your Gravity Form</li>

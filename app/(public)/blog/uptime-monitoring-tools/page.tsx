@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: 'Best Uptime Monitoring Tools in 2026: What to Look For',
   description:
     'What features separate good uptime monitoring tools from average ones? Check frequency, multi-region checks, SSL monitoring, alert channels, status pages, and response time tracking all matter. Here is how to evaluate your options.',
-  alternates: { canonical: 'https://uptrue.io/blog/uptime-monitoring-tools' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/uptime-monitoring-tools' },
   openGraph: {
     title: 'Best Uptime Monitoring Tools in 2026: What to Look For',
     description:
       'How to choose the best uptime monitoring tool: check frequency, multi-region, SSL monitoring, alert channels, status pages, API monitoring, and response time tracking explained.',
-    url: 'https://uptrue.io/blog/uptime-monitoring-tools',
+    url: 'https://upnotify-monitoring.vercel.app/blog/uptime-monitoring-tools',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -73,10 +73,10 @@ export default function UptimeMonitoringToolsPage(): React.ReactElement {
           headline: 'Best Uptime Monitoring Tools in 2026: What to Look For',
           description: 'How to evaluate uptime monitoring tools: check frequency, multi-region, SSL monitoring, alert channels, status pages, and response time tracking.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-04-06',
           dateModified: '2026-04-06',
-          url: 'https://uptrue.io/blog/uptime-monitoring-tools',
+          url: 'https://upnotify-monitoring.vercel.app/blog/uptime-monitoring-tools',
         }}
       />
 
@@ -327,7 +327,7 @@ export default function UptimeMonitoringToolsPage(): React.ReactElement {
           <p>
             Free plan available. HTTP, SSL, keyword, and DNS monitoring. Public status pages included. No credit card required.
           </p>
-          <Link href="https://uptrue.io/signup" className="btn btn-primary btn-lg">
+          <Link href="https://upnotify-monitoring.vercel.app/signup" className="btn btn-primary btn-lg">
             Start Free
           </Link>
         </div>

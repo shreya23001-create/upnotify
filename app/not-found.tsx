@@ -31,7 +31,7 @@ export default function NotFound(): React.ReactElement {
         <div className="notfound-card-header">
           <span className="notfound-status-dot" aria-hidden="true" />
           <span className="notfound-status-label">DOWN</span>
-          <span className="notfound-card-url">uptrue.io/this-page</span>
+          <span className="notfound-card-url">upnotify-monitoring.vercel.app/this-page</span>
         </div>
 
         <div className="notfound-card-body">

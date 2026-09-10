@@ -20,12 +20,12 @@ export const metadata: Metadata = {
   title: 'Is It Down? Live Website Status Tracker — Real-Time Uptime | Upnotify',
   description:
     'Check if popular websites are down right now. Live uptime monitoring for Google, Facebook, GitHub, AWS, OpenAI and 100+ more services. Real-time status, response time, incident history.',
-  alternates: { canonical: 'https://uptrue.io/tracker' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/tracker' },
   openGraph: {
     title: 'Is It Down? Live Website Status Tracker — Real-Time Uptime | Upnotify',
     description:
       'Real-time uptime monitoring for popular websites and services. Free, public, no signup required.',
-    url: 'https://uptrue.io/tracker',
+    url: 'https://upnotify-monitoring.vercel.app/tracker',
     type: 'website',
   },
 }

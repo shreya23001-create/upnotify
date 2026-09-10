@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: 'How to Monitor Your WordPress Site for Free in 2026',
   description:
     'Learn how to monitor your WordPress site for free — uptime checks, SSL monitoring, performance tracking, and keyword monitoring. Set up in 60 seconds with Upnotify.',
-  alternates: { canonical: 'https://uptrue.io/blog/monitor-wordpress-free' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/monitor-wordpress-free' },
   openGraph: {
     title: 'How to Monitor Your WordPress Site for Free in 2026',
     description:
       'Free WordPress monitoring covering uptime, SSL, performance, and content changes. No credit card required.',
-    url: 'https://uptrue.io/blog/monitor-wordpress-free',
+    url: 'https://upnotify-monitoring.vercel.app/blog/monitor-wordpress-free',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -88,10 +88,10 @@ export default function MonitorWordPressFreePage(): React.ReactElement {
           headline: 'How to Monitor Your WordPress Site for Free in 2026',
           description: 'Learn how to monitor your WordPress site for free — uptime, SSL, performance, and keyword monitoring. Set up in 60 seconds.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-10',
           dateModified: '2026-03-10',
-          url: 'https://uptrue.io/blog/monitor-wordpress-free',
+          url: 'https://upnotify-monitoring.vercel.app/blog/monitor-wordpress-free',
         }}
       />
 
@@ -212,7 +212,7 @@ export default function MonitorWordPressFreePage(): React.ReactElement {
         <h3>Step 1: Create your free account</h3>
 
         <p>
-          Go to <Link href="/signup">uptrue.io/signup</Link>. Enter your email and you are in. No credit card, no trial expiry, no gotcha. The free plan is free forever.
+          Go to <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link>. Enter your email and you are in. No credit card, no trial expiry, no gotcha. The free plan is free forever.
         </p>
 
         <h3>Step 2: Add an HTTP monitor</h3>

@@ -50,7 +50,7 @@ export async function scrapeArticle(url: string): Promise<string | null> {
     const res = await fetch(url, {
       signal: controller.signal,
       headers: {
-        'User-Agent': 'UptruePulse/1.0 (+https://uptrue.io/about)',
+        'User-Agent': 'UptruePulse/1.0 (+https://upnotify-monitoring.vercel.app/about)',
         'Accept': 'text/html,application/xhtml+xml,*/*',
       },
     })

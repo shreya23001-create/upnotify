@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
   const result = await postOutageBlogToSocial({
     siteDisplayName: 'GitHub',
     blogTitle: 'Is GitHub Down? Current Status and Outage Updates',
-    blogUrl: 'https://uptrue.io/blog/is-github-down-test',
+    blogUrl: 'https://upnotify-monitoring.vercel.app/blog/is-github-down-test',
     excerpt: 'Uptrue detected a GitHub outage. Here is the latest status and incident timeline.',
   })
 

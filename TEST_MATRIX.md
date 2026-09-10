@@ -102,7 +102,7 @@
 | 6.8 | Webhook | Payment success | ✅ (integration) | Stripe webhook → subscription created in DB | ⏳ | |
 | 6.9 | Webhook | Payment failed | ✅ (integration) | Stripe webhook → subscription marked past_due | ⏳ | |
 | 6.10 | Portal | Manage subscription | ⏳ | Click manage → Stripe portal opens | ⏳ | |
-| 6.11 | Redirect | After payment | ⏳ | After Stripe → redirects to dashboard (not uptrue.io) | ⏳ | |
+| 6.11 | Redirect | After payment | ⏳ | After Stripe → redirects to dashboard (not upnotify-monitoring.vercel.app) | ⏳ | |
 | 6.12 | Credits | Balance display | ⏳ | Settings → Credits → shows current balance | ⏳ | |
 | 6.13 | Credits | Earn methods | ⏳ | Shows all 4 ways to earn (badge, referral, review, bug) | ⏳ | |
 | 6.14 | Credits | £10/mo cap | ⏳ | Cannot exceed £10/mo in credits | ⏳ | |
@@ -139,7 +139,7 @@
 | 9.3 | Landing | Dark mode | ⏳ | Toggle → all elements visible, logo switches | ⏳ | |
 | 9.4 | Landing | Mobile responsive | ⏳ | Resize → hamburger menu, stacked layout | ⏳ | |
 | 9.5 | Landing | Pricing section | ⏳ | 4 plans shown, toggle works, CTAs link to signup | ⏳ | |
-| 9.6 | Landing | Agency waitlist | ⏳ | "Join Waitlist" → opens email to agencies@uptrue.io | ⏳ | |
+| 9.6 | Landing | Agency waitlist | ⏳ | "Join Waitlist" → opens email to shreya23001@gmail.com | ⏳ | |
 | 9.7 | Landing | Trusted logos | ⏳ | Admin adds logos → they appear on landing page | ⏳ | |
 | 9.8 | Score | Input page | ⏳ | /score → enter URL → redirects to results | ⏳ | |
 | 9.9 | Score | Results page | ⏳ | /score/[domain] → score circle, 5 categories, badge embed | ⏳ | |
@@ -228,8 +228,8 @@
 | 14.2 | OG Image | Social sharing | ⏳ | Share URL on social → branded preview card | ⏳ | |
 | 14.3 | Sitemap | All pages included | ⏳ | /sitemap.xml → all public pages listed | ⏳ | |
 | 14.4 | Sitemap | Dynamic pages | ⏳ | Tracker sites + status pages auto-included | ⏳ | |
-| 14.5 | Robots | Dev blocked | ⏳ | dev.uptrue.io/robots.txt → Disallow: / | ⏳ | |
-| 14.6 | Robots | Prod allowed | ⏳ | uptrue.io/robots.txt → Allow public, block dashboard | ⏳ | |
+| 14.5 | Robots | Dev blocked | ⏳ | upnotify-monitoring.vercel.app/robots.txt → Disallow: / | ⏳ | |
+| 14.6 | Robots | Prod allowed | ⏳ | upnotify-monitoring.vercel.app/robots.txt → Allow public, block dashboard | ⏳ | |
 | 14.7 | JSON-LD | Structured data | ⏳ | Landing page → Organization, SoftwareApp, FAQ schema | ⏳ | |
 | 14.8 | JSON-LD | Tracker FAQ | ⏳ | Tracker detail → FAQPage schema with dynamic data | ⏳ | |
 | 14.9 | Metadata | All pages | ⏳ | Every public page has title, description, OG tags | ⏳ | |

@@ -1,4 +1,4 @@
-﻿// =============================================================================
+// =============================================================================
 // Cron: public-incident-cleanup
 // Schedule: Every 30 minutes
 // Purpose:
@@ -53,7 +53,7 @@ async function checkSiteUp(domain: string): Promise<boolean> {
     const res = await fetch(url, {
       method: 'GET',
       signal: controller.signal,
-      headers: { 'User-Agent': 'UptruePulse/1.0 (+https://uptrue.io/about)' },
+      headers: { 'User-Agent': 'UptruePulse/1.0 (+https://upnotify-monitoring.vercel.app/about)' },
     })
     clearTimeout(timeout)
     return res.status < 500

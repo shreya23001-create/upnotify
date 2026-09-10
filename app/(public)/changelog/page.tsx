@@ -6,11 +6,11 @@ import { ScrollReveal } from '@/components/landing/scroll-reveal'
 export const metadata: Metadata = {
   title: 'Changelog — Upnotify',
   description: 'See what\'s new in Upnotify. Product updates, new features, and improvements shipped by the Upnotify team.',
-  alternates: { canonical: 'https://uptrue.io/changelog' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/changelog' },
   openGraph: {
     title: 'Changelog — Upnotify',
     description: 'See what\'s new in Upnotify. Product updates, new features, and improvements.',
-    url: 'https://uptrue.io/changelog',
+    url: 'https://upnotify-monitoring.vercel.app/changelog',
     type: 'website',
   },
 }

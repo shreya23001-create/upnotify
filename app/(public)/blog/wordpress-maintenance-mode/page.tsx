@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: 'WordPress Stuck in Maintenance Mode: How to Fix It and Never Get Stuck Again',
   description:
     'WordPress creates a .maintenance file during updates and sometimes forgets to delete it. Learn why your site gets stuck showing "Briefly unavailable for scheduled maintenance," how to fix it in seconds, and how to monitor for it automatically.',
-  alternates: { canonical: 'https://uptrue.io/blog/wordpress-maintenance-mode' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/wordpress-maintenance-mode' },
   openGraph: {
     title: 'WordPress Stuck in Maintenance Mode: How to Fix It and Never Get Stuck Again',
     description:
       'What causes WordPress to get stuck in maintenance mode, how to fix it via FTP, and how keyword monitoring detects it before your visitors do.',
-    url: 'https://uptrue.io/blog/wordpress-maintenance-mode',
+    url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-maintenance-mode',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -68,10 +68,10 @@ export default function WordPressMaintenanceModePage(): React.ReactElement {
           headline: 'WordPress Stuck in Maintenance Mode: How to Fix It and Never Get Stuck Again',
           description: 'What causes WordPress to get stuck in maintenance mode, how to fix it in seconds, and how keyword monitoring detects it automatically.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-22',
           dateModified: '2026-03-22',
-          url: 'https://uptrue.io/blog/wordpress-maintenance-mode',
+          url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-maintenance-mode',
         }}
       />
 
@@ -241,7 +241,7 @@ export default function WordPressMaintenanceModePage(): React.ReactElement {
         <h3>Step 1: Set up a keyword monitor to detect the maintenance message</h3>
 
         <ol>
-          <li>Sign up at <Link href="/signup">uptrue.io/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>Keyword</strong> as the monitor type</li>
           <li>Enter your homepage URL</li>

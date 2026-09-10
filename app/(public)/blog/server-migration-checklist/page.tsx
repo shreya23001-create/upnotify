@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: 'Server Migration Checklist: How to Move Hosts Without Losing Your Site',
   description:
     'A complete server migration checklist covering DNS propagation, SSL transfer, database migration, email continuity, and monitoring during the switch. Move hosting providers without downtime or data loss.',
-  alternates: { canonical: 'https://uptrue.io/blog/server-migration-checklist' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/server-migration-checklist' },
   openGraph: {
     title: 'Server Migration Checklist: How to Move Hosts Without Losing Your Site',
     description:
       'DNS propagation, SSL certificate transfer, database migration, and monitoring during the switch. The complete checklist for moving hosting providers without losing your site.',
-    url: 'https://uptrue.io/blog/server-migration-checklist',
+    url: 'https://upnotify-monitoring.vercel.app/blog/server-migration-checklist',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -88,10 +88,10 @@ export default function ServerMigrationChecklistPage(): React.ReactElement {
           headline: 'Server Migration Checklist: How to Move Hosts Without Losing Your Site',
           description: 'Complete server migration checklist covering DNS propagation, SSL transfer, database migration, email continuity, and monitoring during the move.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-28',
           dateModified: '2026-03-28',
-          url: 'https://uptrue.io/blog/server-migration-checklist',
+          url: 'https://upnotify-monitoring.vercel.app/blog/server-migration-checklist',
         }}
       />
 

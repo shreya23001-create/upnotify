@@ -66,7 +66,7 @@ function createRequest(options: {
   if (options.vercelCron) {
     headers.set('x-vercel-cron', '1')
   }
-  return new Request('https://uptrue.io/api/cron/public-checks', {
+  return new Request('https://upnotify-monitoring.vercel.app/api/cron/public-checks', {
     method: 'GET',
     headers,
   })

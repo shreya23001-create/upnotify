@@ -4,7 +4,7 @@ export const metadata: Metadata = {
   title: 'Data Processing Agreement',
   description:
     'Upnotify Data Processing Agreement (DPA). Covers data processing terms for GDPR compliance between Upnotify and its customers.',
-  alternates: { canonical: 'https://uptrue.io/dpa' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/dpa' },
 }
 
 export default function DataProcessingAgreementPage(): React.ReactElement {
@@ -304,7 +304,7 @@ export default function DataProcessingAgreementPage(): React.ReactElement {
       <p>
         The Service provides self-service data export functionality (JSON and CSV formats) that
         Controllers can use to fulfil access and portability requests. Erasure requests can be
-        fulfilled via the account deletion feature or by contacting support@uptrue.io.
+        fulfilled via the account deletion feature or by contacting shreya23001@gmail.com.
       </p>
 
       <h2>8. Data Deletion and Return</h2>
@@ -431,8 +431,8 @@ export default function DataProcessingAgreementPage(): React.ReactElement {
         For questions about this Data Processing Agreement, please contact:
       </p>
       <ul>
-        <li><strong>Data Protection Officer:</strong> privacy@uptrue.io</li>
-        <li><strong>General Support:</strong> support@uptrue.io</li>
+        <li><strong>Data Protection Officer:</strong> shreya23001@gmail.com</li>
+        <li><strong>General Support:</strong> shreya23001@gmail.com</li>
         <li><strong>Post:</strong> Data Protection Officer, Vision Software Solutions Limited, C/O Benison Solvers Limited, 1000 Great West Road, Brentford, United Kingdom, TW8 9DW</li>
       </ul>
     </>

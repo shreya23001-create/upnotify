@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: 'WordPress Core Web Vitals Failing: How LCP, FID, and CLS Failures Hurt Your Traffic',
   description:
     'Your WordPress site is failing Core Web Vitals — LCP over 2.5 seconds, poor FID from heavy plugins, and CLS from ads and lazy loading. Google uses these metrics for ranking. Learn what causes each failure, how to fix them, and how Upnotify HTTP monitoring tracks TTFB as the server component of LCP.',
-  alternates: { canonical: 'https://uptrue.io/blog/wordpress-core-web-vitals' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/wordpress-core-web-vitals' },
   openGraph: {
     title: 'WordPress Core Web Vitals Failing: How LCP, FID, and CLS Failures Hurt Your Traffic',
     description:
       'Why WordPress sites fail Core Web Vitals, how LCP, FID, and CLS failures hurt Google rankings, and how Upnotify HTTP monitoring tracks server-side performance.',
-    url: 'https://uptrue.io/blog/wordpress-core-web-vitals',
+    url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-core-web-vitals',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -68,10 +68,10 @@ export default function WordPressCoreWebVitalsPage(): React.ReactElement {
           headline: 'WordPress Core Web Vitals Failing: How LCP, FID, and CLS Failures Hurt Your Traffic',
           description: 'Why WordPress sites fail Core Web Vitals, how to fix each metric, and how Upnotify HTTP monitoring tracks TTFB as the server component of LCP.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-04-04',
           dateModified: '2026-04-04',
-          url: 'https://uptrue.io/blog/wordpress-core-web-vitals',
+          url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-core-web-vitals',
         }}
       />
 
@@ -293,7 +293,7 @@ export default function WordPressCoreWebVitalsPage(): React.ReactElement {
         <h3>Step 1: Set up an HTTP monitor to track TTFB</h3>
 
         <ol>
-          <li>Sign up at <Link href="/signup">uptrue.io/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>HTTP/HTTPS</strong> as the monitor type</li>
           <li>Enter your homepage URL</li>

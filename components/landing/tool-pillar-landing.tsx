@@ -118,11 +118,11 @@ export function ToolPillarLanding({ data }: { data: ToolPillarData }): React.Rea
                 '@type': 'WebPage',
                 name: data.seoTitle,
                 description: data.seoDescription,
-                url: `https://uptrue.io/tools/${data.pillarSlug}`,
+                url: `https://upnotify-monitoring.vercel.app/tools/${data.pillarSlug}`,
                 isPartOf: {
                   '@type': 'WebSite',
                   name: 'Upnotify',
-                  url: 'https://uptrue.io',
+                  url: 'https://upnotify-monitoring.vercel.app',
                 },
               },
               {
@@ -158,7 +158,7 @@ export function ToolPillarLanding({ data }: { data: ToolPillarData }): React.Rea
         </div>
       </section>
 
-      <main className="pillar-main">
+      <main className="pillar-main pillar-orange-cta">
         {/* Why it matters */}
         <section className="pillar-section">
           <h2 className="pillar-section-title reveal-title">Why this matters</h2>

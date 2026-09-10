@@ -9,12 +9,12 @@ export const metadata: Metadata = {
   title: 'Free SSL Certificate Checker — Check Any SSL | Upnotify',
   description:
     'Free SSL certificate checker. Check any SSL certificate instantly — issuer, expiry date, days remaining, TLS version, and chain validity. Includes how to read the result and what to do if your certificate is expiring. No signup required.',
-  alternates: { canonical: 'https://uptrue.io/tools/ssl-checker' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/tools/ssl-checker' },
   openGraph: {
     title: 'Free SSL Certificate Checker | Upnotify',
     description:
       'Check any SSL certificate instantly. See issuer, expiry, TLS version, and chain validity.',
-    url: 'https://uptrue.io/tools/ssl-checker',
+    url: 'https://upnotify-monitoring.vercel.app/tools/ssl-checker',
     type: 'website',
   },
 }

@@ -1,4 +1,4 @@
-﻿// =============================================================================
+// =============================================================================
 // AOE — Automated Outreach Engine
 // Cron: outreach-checker — runs nightly at 3am UTC
 // Performs silent HTTP + SSL checks on sites in the discovery queue
@@ -46,7 +46,7 @@ async function checkLlmsTxt(domain: string): Promise<boolean> {
     const res = await fetch(`https://${domain}/llms.txt`, {
       signal: controller.signal,
       redirect: 'follow',
-      headers: { 'User-Agent': 'Uptrue-Bot/1.0 (+https://uptrue.io/bot)' },
+      headers: { 'User-Agent': 'Uptrue-Bot/1.0 (+https://upnotify-monitoring.vercel.app/bot)' },
     })
     clearTimeout(timer)
     return res.ok

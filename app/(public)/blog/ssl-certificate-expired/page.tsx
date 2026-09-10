@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: 'SSL Certificate Expired: What It Means and How to Fix It in 10 Minutes',
   description:
     'Your SSL certificate has expired and visitors see "Your connection is not private." Learn what the browser warning means, why certificates expire even with auto-renew, how to renew for free with Let\'s Encrypt or cPanel, and how to prevent it from happening again.',
-  alternates: { canonical: 'https://uptrue.io/blog/ssl-certificate-expired' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/ssl-certificate-expired' },
   openGraph: {
     title: 'SSL Certificate Expired: What It Means and How to Fix It in 10 Minutes',
     description:
       'How to fix an expired SSL certificate fast. Covers Let\'s Encrypt renewal, cPanel AutoSSL, manual certificate renewal, and how SSL monitoring prevents future expiry.',
-    url: 'https://uptrue.io/blog/ssl-certificate-expired',
+    url: 'https://upnotify-monitoring.vercel.app/blog/ssl-certificate-expired',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -73,10 +73,10 @@ export default function SslCertificateExpiredPage(): React.ReactElement {
           headline: 'SSL Certificate Expired: What It Means and How to Fix It in 10 Minutes',
           description: 'What a browser SSL warning means, why certificates expire despite auto-renew, how to renew a certificate for free, and how to prevent future expiry.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-04-06',
           dateModified: '2026-04-06',
-          url: 'https://uptrue.io/blog/ssl-certificate-expired',
+          url: 'https://upnotify-monitoring.vercel.app/blog/ssl-certificate-expired',
         }}
       />
 
@@ -274,7 +274,7 @@ sudo systemctl reload apache2`}</code></pre>
         </p>
 
         <p>
-          <Link href="https://uptrue.io/signup">Upnotify</Link> monitors your SSL certificate daily, checks certificate chain validity and domain matching, and sends configurable alerts before expiry. Set it up once and never be caught off guard by an expired certificate again.
+          <Link href="https://upnotify-monitoring.vercel.app/signup">Upnotify</Link> monitors your SSL certificate daily, checks certificate chain validity and domain matching, and sends configurable alerts before expiry. Set it up once and never be caught off guard by an expired certificate again.
         </p>
 
         <h3>Monitor all your domains, not just the main one</h3>
@@ -311,7 +311,7 @@ sudo cat /var/log/letsencrypt/letsencrypt.log | tail -50`}</code></pre>
           <p>
             Upnotify monitors your SSL certificate daily and alerts you 30, 14, 7, and 1 day before expiry. Free plan available — set it up in under two minutes.
           </p>
-          <Link href="https://uptrue.io/signup" className="btn btn-primary btn-lg">
+          <Link href="https://upnotify-monitoring.vercel.app/signup" className="btn btn-primary btn-lg">
             Get SSL Alerts Free
           </Link>
         </div>

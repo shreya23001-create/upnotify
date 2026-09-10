@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: 'GoDaddy Down Again? Why Budget Hosts Have the Most Outages',
   description:
     'GoDaddy, Bluehost, and HostGator have the most user complaints about downtime. Learn why budget hosting providers have frequent outages, what forum users actually report, and how to protect your site with monitoring.',
-  alternates: { canonical: 'https://uptrue.io/blog/budget-hosting-outages' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/budget-hosting-outages' },
   openGraph: {
     title: 'GoDaddy Down Again? Why Budget Hosts Have the Most Outages',
     description:
       'Why GoDaddy, Bluehost, and HostGator have frequent outages. Real complaints from hosting forums, what causes the pattern, and how monitoring protects your business.',
-    url: 'https://uptrue.io/blog/budget-hosting-outages',
+    url: 'https://upnotify-monitoring.vercel.app/blog/budget-hosting-outages',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -88,10 +88,10 @@ export default function BudgetHostingOutagesPage(): React.ReactElement {
           headline: 'GoDaddy Down Again? Why Budget Hosts Have the Most Outages',
           description: 'Why GoDaddy, Bluehost, and HostGator have the most user complaints about downtime, what forum users report, and how external monitoring protects your business.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-16',
           dateModified: '2026-03-16',
-          url: 'https://uptrue.io/blog/budget-hosting-outages',
+          url: 'https://upnotify-monitoring.vercel.app/blog/budget-hosting-outages',
         }}
       />
 
@@ -222,7 +222,7 @@ export default function BudgetHostingOutagesPage(): React.ReactElement {
         </p>
 
         <ol>
-          <li>Sign up at <Link href="/signup">uptrue.io/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
           <li>Add an HTTP monitor for your main URL</li>
           <li>Set a response time threshold of 3 seconds</li>
           <li>Configure alerts via Slack, email, or Teams</li>

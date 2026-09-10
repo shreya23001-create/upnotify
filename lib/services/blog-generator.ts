@@ -195,7 +195,7 @@ Write the post in Markdown as Uptrue's honest opinion and observation. The post 
 3. Include a "What People Are Saying" section if there are social/Reddit mentions — paraphrase naturally, do NOT copy verbatim. Credit generically: [reports on Reddit](url) or [posts on X](url). Do NOT include Reddit usernames, X/Twitter handles, or any personal identifiers whatsoever.
 4. Include a "What You Can Do in the Meantime" section with practical workarounds — helpful, not alarmist.
 5. Include the status notice near the end: "${statusLabel}"
-6. Include a "Keep an Eye on ${ctx.siteDisplayName} with Uptrue" section — a natural, low-key mention that Uptrue monitors services like this and readers can add their own for free at https://uptrue.io
+6. Include a "Keep an Eye on ${ctx.siteDisplayName} with Uptrue" section — a natural, low-key mention that Uptrue monitors services like this and readers can add their own for free at https://upnotify-monitoring.vercel.app
 7. Close by noting that this is Uptrue's view based on what we detected at the time, that the situation may have already changed, and pointing readers to ${ctx.siteDisplayName}'s official status page for the authoritative update
 8. Be between 500–700 words
 9. Warm, human tone — conversational, helpful, never alarmist or sensational
@@ -272,12 +272,12 @@ Format your response EXACTLY like this:
     midCta: {
       heading: `Is ${ctx.siteDisplayName} affecting your work?`,
       buttonLabel: 'Monitor Your Sites Free',
-      buttonUrl: 'https://uptrue.io',
+      buttonUrl: 'https://upnotify-monitoring.vercel.app',
     },
     endCta: {
       heading: 'Never be caught off guard by downtime again',
       buttonLabel: 'Start Free Monitoring',
-      buttonUrl: 'https://uptrue.io',
+      buttonUrl: 'https://upnotify-monitoring.vercel.app',
     },
     sources: ctx.research?.articles.map(a => ({ title: a.title, url: a.url, source: a.source })) ?? [],
   }

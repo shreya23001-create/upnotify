@@ -55,7 +55,7 @@ export interface IndustryLandingData {
 
 export function IndustryLandingPage({ data }: { data: IndustryLandingData }): React.ReactElement {
   return (
-    <>
+    <div className="industry-orange-cta">
       {/* JSON-LD: SoftwareApplication + FAQPage in @graph for combined recognition */}
       <script
         type="application/ld+json"
@@ -67,7 +67,7 @@ export function IndustryLandingPage({ data }: { data: IndustryLandingData }): Re
                 '@type': 'SoftwareApplication',
                 name: `${data.heroTitle} — Upnotify`,
                 description: data.seoDescription,
-                url: `https://uptrue.io/monitoring/${data.slug}`,
+                url: `https://upnotify-monitoring.vercel.app/monitoring/${data.slug}`,
                 applicationCategory: 'BusinessApplication',
                 operatingSystem: 'Web',
                 offers: {
@@ -79,7 +79,7 @@ export function IndustryLandingPage({ data }: { data: IndustryLandingData }): Re
                 publisher: {
                   '@type': 'Organization',
                   name: 'Upnotify',
-                  url: 'https://uptrue.io',
+                  url: 'https://upnotify-monitoring.vercel.app',
                 },
               },
               {
@@ -319,6 +319,6 @@ export function IndustryLandingPage({ data }: { data: IndustryLandingData }): Re
           </Link>
         </div>
       </main>
-    </>
+    </div>
   )
 }

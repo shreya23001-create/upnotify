@@ -230,7 +230,7 @@ function BlogIndexContent({ posts }: { posts: UnifiedPost[] }) {
                             <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
                           </svg>
                         </span>
-                        <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>uptrue.io/blog</span>
+                        <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>upnotify-monitoring.vercel.app/blog</span>
                       </div>
                     </Link>
                   )

@@ -9,12 +9,12 @@ export const metadata: Metadata = {
   title: 'Free Port Checker — Check If a TCP Port Is Open | Upnotify',
   description:
     'Check if any TCP port is open on any host. Test ports 80, 443, 22, 3306, and more. Free open port checker, instant results, no signup required.',
-  alternates: { canonical: 'https://uptrue.io/tools/port-checker' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/tools/port-checker' },
   openGraph: {
     title: 'Free Port Checker — Check If a TCP Port Is Open | Upnotify',
     description:
       'Check if any TCP port is open on any host. Test ports 80, 443, 22, 3306, and more instantly.',
-    url: 'https://uptrue.io/tools/port-checker',
+    url: 'https://upnotify-monitoring.vercel.app/tools/port-checker',
     type: 'website',
   },
 }

@@ -13,13 +13,13 @@ export const metadata: Metadata = {
   description:
     'Upnotify is built by Vision Software Solutions Limited in Brentford, UK. Our mission is to make uptime monitoring accessible and intelligent for agencies and businesses worldwide.',
   alternates: {
-    canonical: 'https://uptrue.io/about',
+    canonical: 'https://upnotify-monitoring.vercel.app/about',
   },
   openGraph: {
     title: 'About Upnotify — Website Monitoring for Agencies & Teams',
     description:
       'Upnotify is built by Vision Software Solutions Limited in Brentford, UK. Our mission is to make uptime monitoring accessible and intelligent for agencies and businesses worldwide.',
-    url: 'https://uptrue.io/about',
+    url: 'https://upnotify-monitoring.vercel.app/about',
     type: 'website',
   },
 }
@@ -96,7 +96,7 @@ const FAQ_ITEMS = [
   },
   {
     q: 'How do I contact Upnotify?',
-    a: 'Email billing@uptrue.io for billing questions, support@uptrue.io for product support, or use the contact form. We are GDPR compliant and have a published Data Processing Agreement available for Agency customers.',
+    a: 'Email shreya23001@gmail.com for billing questions, shreya23001@gmail.com for product support, or use the contact form. We are GDPR compliant and have a published Data Processing Agreement available for Agency customers.',
   },
 ]
 
@@ -257,7 +257,7 @@ export default function AboutPage(): React.ReactElement {
               { '@type': 'Question', name: 'Where is my monitoring data stored?', acceptedAnswer: { '@type': 'Answer', text: 'All customer data is stored in the EU (Frankfurt region) on Supabase infrastructure. Data is encrypted at rest and in transit. Row-level security ensures complete data isolation between organisations.' } },
               { '@type': 'Question', name: 'Is there a free plan?', acceptedAnswer: { '@type': 'Answer', text: 'Yes. The Free plan includes 3 monitors with email alerts. No credit card required to start. We also publish over a dozen free website monitoring tools that anyone can use without signing up.' } },
               { '@type': 'Question', name: 'How does Upnotify prevent false alerts?', acceptedAnswer: { '@type': 'Answer', text: 'Two-confirmation detection: when a check detects a potential issue, Upnotify runs a second check. An incident is only created if both checks confirm. We also ship Smart Digest — first event goes instant, subsequent events collect into one digest email.' } },
-              { '@type': 'Question', name: 'How do I contact Upnotify?', acceptedAnswer: { '@type': 'Answer', text: 'Email billing@uptrue.io for billing questions, support@uptrue.io for product support, or use the contact form. We are GDPR compliant and have a published Data Processing Agreement available for Agency customers.' } },
+              { '@type': 'Question', name: 'How do I contact Upnotify?', acceptedAnswer: { '@type': 'Answer', text: 'Email shreya23001@gmail.com for billing questions, shreya23001@gmail.com for product support, or use the contact form. We are GDPR compliant and have a published Data Processing Agreement available for Agency customers.' } },
             ],
           }),
         }}

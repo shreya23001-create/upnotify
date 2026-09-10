@@ -73,7 +73,7 @@ import { NextRequest } from 'next/server'
 // ---------------------------------------------------------------------------
 
 function createRequest(body: Record<string, unknown>): NextRequest {
-  return new NextRequest('https://uptrue.io/api/v1/onboarding', {
+  return new NextRequest('https://upnotify-monitoring.vercel.app/api/v1/onboarding', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),

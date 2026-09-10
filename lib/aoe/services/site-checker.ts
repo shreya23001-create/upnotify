@@ -34,7 +34,7 @@ async function checkHttp(url: string, timeoutMs: number): Promise<{
       method: 'GET',
       redirect: 'follow',
       signal: controller.signal,
-      headers: { 'User-Agent': 'UptrueSiteChecker/1.0 (+https://uptrue.io)' },
+      headers: { 'User-Agent': 'UptrueSiteChecker/1.0 (+https://upnotify-monitoring.vercel.app)' },
     })
 
     clearTimeout(timer)

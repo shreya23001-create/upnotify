@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   title: 'Free Website Health Score Checker — Test Site Health Online | Upnotify',
   description:
     'Free website health score across 5 categories — uptime, SSL, DNS, security headers, and performance. Instant grade from A+ to F. No signup required. Pairs with continuous uptime monitoring.',
-  alternates: { canonical: 'https://uptrue.io/score' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/score' },
 }
 
 const CONTINUOUS_MONITORS = [

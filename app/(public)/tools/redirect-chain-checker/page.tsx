@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   title: 'Free Redirect Chain Checker — Trace URL Redirects | Upnotify',
   description:
     'Trace the full redirect chain for any URL. See every 301, 302, 307 redirect, detect redirect loops, and find SEO-damaging redirect chains. Free tool, no signup.',
-  alternates: { canonical: 'https://uptrue.io/tools/redirect-chain-checker' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/tools/redirect-chain-checker' },
   keywords: [
     'redirect chain checker',
     'url redirect checker',
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     title: 'Free Redirect Chain Checker — Trace URL Redirects | Upnotify',
     description:
       'Trace the full redirect chain for any URL. Detect loops, count hops, and find SEO-damaging redirect chains instantly.',
-    url: 'https://uptrue.io/tools/redirect-chain-checker',
+    url: 'https://upnotify-monitoring.vercel.app/tools/redirect-chain-checker',
     type: 'website',
   },
 }
@@ -37,7 +37,7 @@ const jsonLd = {
       name: 'Redirect Chain Checker',
       description:
         'Free tool to trace the full redirect chain for any URL. Detects redirect loops, counts hops, highlights HTTP→HTTPS upgrades, and flags SEO issues.',
-      url: 'https://uptrue.io/tools/redirect-chain-checker',
+      url: 'https://upnotify-monitoring.vercel.app/tools/redirect-chain-checker',
       applicationCategory: 'DeveloperApplication',
       operatingSystem: 'Any',
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },

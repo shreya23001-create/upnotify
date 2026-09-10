@@ -119,7 +119,7 @@ function makeMonitor(overrides: Record<string, unknown> = {}): Record<string, un
   }
 }
 
-function makeRequest(url: string = 'https://uptrue.io/api/cron/check-runner', headers: Record<string, string> = {}): Request {
+function makeRequest(url: string = 'https://upnotify-monitoring.vercel.app/api/cron/check-runner', headers: Record<string, string> = {}): Request {
   // Cron auth contract (engineering-app#60): Vercel sends Authorization with
   // the real CRON_SECRET when invoking each scheduled URL. Tests mirror that
   // by injecting the config-mock's secret. The legacy `x-vercel-cron` header
@@ -164,7 +164,7 @@ describe('check-runner cron route', () => {
 
   it('returns 401 when cron secret is set and auth header is wrong', async () => {
     // Config mock returns cron.secret = 'test-cron-secret'
-    const req = new Request('https://uptrue.io/api/cron/check-runner', {
+    const req = new Request('https://upnotify-monitoring.vercel.app/api/cron/check-runner', {
       method: 'GET',
       headers: { authorization: 'Bearer wrong' },
     })
@@ -178,7 +178,7 @@ describe('check-runner cron route', () => {
     // The legacy bypass — `X-Vercel-Cron: true` without a valid Authorization
     // header — must now return 401. Any attacker could spoof this header, so
     // the route can no longer treat it as proof of a real Vercel invocation.
-    const req = new Request('https://uptrue.io/api/cron/check-runner', {
+    const req = new Request('https://upnotify-monitoring.vercel.app/api/cron/check-runner', {
       method: 'GET',
       headers: { 'x-vercel-cron': 'true' },
     })
@@ -211,7 +211,7 @@ describe('check-runner cron route', () => {
 
   it('uses getAllActiveMonitors when force=true', async () => {
     mockGetAllActiveMonitors.mockResolvedValue([])
-    const req = makeRequest('https://uptrue.io/api/cron/check-runner?force=true')
+    const req = makeRequest('https://upnotify-monitoring.vercel.app/api/cron/check-runner?force=true')
 
     await GET(req)
     expect(mockGetAllActiveMonitors).toHaveBeenCalled()

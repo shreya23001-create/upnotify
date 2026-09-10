@@ -13,7 +13,7 @@ const FAQ_SCHEMA = {
       name: 'How much does Upnotify cost?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Upnotify has four plans: Free, Lite, Builder, and Scale. For current pricing and limits, visit our pricing page at uptrue.io/#pricing.',
+        text: 'Upnotify has four plans: Free, Lite, Builder, and Scale. For current pricing and limits, visit our pricing page at upnotify-monitoring.vercel.app/#pricing.',
       },
     },
     {

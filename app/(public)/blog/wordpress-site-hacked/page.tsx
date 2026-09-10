@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: 'WordPress Site Defaced: How Hackers Replace Your Homepage and How to Detect It Instantly',
   description:
     'Hackers can replace your WordPress homepage with their own message in seconds. Compromised admin credentials, vulnerable plugins, and theme file injection are the most common attack vectors. Learn how defacement works, how to recover, and how keyword monitoring detects the attack within minutes.',
-  alternates: { canonical: 'https://uptrue.io/blog/wordpress-site-hacked' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/wordpress-site-hacked' },
   openGraph: {
     title: 'WordPress Site Defaced: How Hackers Replace Your Homepage and How to Detect It Instantly',
     description:
       'How WordPress site defacement works, how to recover from it, and how keyword monitoring detects the attack before your customers see a hacker\'s message instead of your homepage.',
-    url: 'https://uptrue.io/blog/wordpress-site-hacked',
+    url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-site-hacked',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -68,10 +68,10 @@ export default function WordPressSiteHackedPage(): React.ReactElement {
           headline: 'WordPress Site Defaced: How Hackers Replace Your Homepage and How to Detect It Instantly',
           description: 'How WordPress defacement attacks work, how to recover, and how keyword monitoring catches the attack before your customers see a hacker\'s message.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-31',
           dateModified: '2026-03-31',
-          url: 'https://uptrue.io/blog/wordpress-site-hacked',
+          url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-site-hacked',
         }}
       />
 
@@ -193,7 +193,7 @@ export default function WordPressSiteHackedPage(): React.ReactElement {
         <h3>Step 1: Set up a keyword monitor for your brand name</h3>
 
         <ol>
-          <li>Sign up at <Link href="/signup">uptrue.io/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>Keyword</strong> as the monitor type</li>
           <li>Enter your homepage URL</li>

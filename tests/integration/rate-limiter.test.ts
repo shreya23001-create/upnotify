@@ -22,7 +22,7 @@ import {
 // ---------------------------------------------------------------------------
 
 function makeRequest(ip: string = '192.168.1.1'): Request {
-  return new Request('https://uptrue.io/api/test', {
+  return new Request('https://upnotify-monitoring.vercel.app/api/test', {
     headers: { 'x-forwarded-for': ip },
   })
 }
@@ -176,7 +176,7 @@ describe('rate-limiter', () => {
   it('extracts IP from x-forwarded-for header (first entry)', () => {
     const limit = { maxRequests: 1, windowMs: 60000 }
 
-    const req = new Request('https://uptrue.io/api/test', {
+    const req = new Request('https://upnotify-monitoring.vercel.app/api/test', {
       headers: { 'x-forwarded-for': '203.0.113.1, 10.0.0.1' },
     })
 
@@ -184,7 +184,7 @@ describe('rate-limiter', () => {
     expect(r1.allowed).toBe(true)
 
     // Same first IP in different header format should be blocked
-    const req2 = new Request('https://uptrue.io/api/test', {
+    const req2 = new Request('https://upnotify-monitoring.vercel.app/api/test', {
       headers: { 'x-forwarded-for': '203.0.113.1' },
     })
     const r2 = checkRateLimit(req2, limit, 'test-xff')
@@ -194,7 +194,7 @@ describe('rate-limiter', () => {
   it('falls back to x-real-ip header', () => {
     const limit = { maxRequests: 1, windowMs: 60000 }
 
-    const req = new Request('https://uptrue.io/api/test', {
+    const req = new Request('https://upnotify-monitoring.vercel.app/api/test', {
       headers: { 'x-real-ip': '198.51.100.1' },
     })
 
@@ -205,15 +205,15 @@ describe('rate-limiter', () => {
   it('falls back to "unknown" when no IP headers present', () => {
     const limit = { maxRequests: 2, windowMs: 60000 }
 
-    const req1 = new Request('https://uptrue.io/api/test')
+    const req1 = new Request('https://upnotify-monitoring.vercel.app/api/test')
     const r1 = checkRateLimit(req1, limit, 'test-no-ip')
     expect(r1.allowed).toBe(true)
 
-    const req2 = new Request('https://uptrue.io/api/test')
+    const req2 = new Request('https://upnotify-monitoring.vercel.app/api/test')
     const r2 = checkRateLimit(req2, limit, 'test-no-ip')
     expect(r2.allowed).toBe(true)
 
-    const req3 = new Request('https://uptrue.io/api/test')
+    const req3 = new Request('https://upnotify-monitoring.vercel.app/api/test')
     const r3 = checkRateLimit(req3, limit, 'test-no-ip')
     expect(r3.allowed).toBe(false)
   })

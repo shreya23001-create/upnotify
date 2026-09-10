@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: 'WooCommerce Checkout Not Working? Here\'s Why Your Store Is Losing Sales Right Now',
   description:
     'WooCommerce checkout failures cost you sales silently. Learn what causes payment gateway timeouts, SSL mismatches, Ajax errors, and plugin conflicts — and how to monitor your checkout page so you catch problems before your customers abandon their carts.',
-  alternates: { canonical: 'https://uptrue.io/blog/woocommerce-checkout-not-working' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/woocommerce-checkout-not-working' },
   openGraph: {
     title: 'WooCommerce Checkout Not Working? Here\'s Why Your Store Is Losing Sales Right Now',
     description:
       'What causes WooCommerce checkout failures, how to fix each one, and how to set up keyword monitoring that detects checkout problems before your customers do.',
-    url: 'https://uptrue.io/blog/woocommerce-checkout-not-working',
+    url: 'https://upnotify-monitoring.vercel.app/blog/woocommerce-checkout-not-working',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -68,10 +68,10 @@ export default function WooCommerceCheckoutNotWorkingPage(): React.ReactElement 
           headline: 'WooCommerce Checkout Not Working? Here\'s Why Your Store Is Losing Sales Right Now',
           description: 'What causes WooCommerce checkout failures, how to fix each one, and how to set up keyword monitoring that detects checkout problems automatically.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-21',
           dateModified: '2026-03-21',
-          url: 'https://uptrue.io/blog/woocommerce-checkout-not-working',
+          url: 'https://upnotify-monitoring.vercel.app/blog/woocommerce-checkout-not-working',
         }}
       />
 
@@ -223,7 +223,7 @@ export default function WooCommerceCheckoutNotWorkingPage(): React.ReactElement 
         <h3>Step 1: Set up a keyword monitor to verify the checkout page works</h3>
 
         <ol>
-          <li>Sign up at <Link href="/signup">uptrue.io/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>Keyword</strong> as the monitor type</li>
           <li>Enter your checkout page URL — typically <code>yourstore.com/checkout/</code></li>

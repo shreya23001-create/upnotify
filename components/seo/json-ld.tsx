@@ -19,8 +19,8 @@ export function OrganizationJsonLd(): React.ReactElement {
     '@type': 'Organization',
     name: 'Upnotify',
     legalName: 'Vision Software Solutions Limited',
-    url: 'https://uptrue.io',
-    logo: 'https://uptrue.io/logo.svg',
+    url: 'https://upnotify-monitoring.vercel.app',
+    logo: 'https://upnotify-monitoring.vercel.app/logo.svg',
     description:
       'Uptime, performance and infrastructure monitoring platform for agencies and teams.',
     foundingDate: '2026',
@@ -33,7 +33,7 @@ export function OrganizationJsonLd(): React.ReactElement {
     },
     contactPoint: {
       '@type': 'ContactPoint',
-      email: 'support@uptrue.io',
+      email: 'shreya23001@gmail.com',
       contactType: 'customer support',
     },
     sameAs: [
@@ -52,7 +52,7 @@ export function SoftwareApplicationJsonLd(): React.ReactElement {
     name: 'Upnotify',
     applicationCategory: 'BusinessApplication',
     operatingSystem: 'Web',
-    url: 'https://uptrue.io',
+    url: 'https://upnotify-monitoring.vercel.app',
     description:
       'Uptime, performance and infrastructure monitoring for agencies and teams. 24 monitor types, AI-powered reports, public status pages, multi-channel alerts, competitor tracking, free SSL checker and uptime calculator, and a public uptime leaderboard.',
     featureList: [
@@ -69,7 +69,7 @@ export function SoftwareApplicationJsonLd(): React.ReactElement {
     publisher: {
       '@type': 'Organization',
       name: 'Vision Software Solutions Limited',
-      url: 'https://uptrue.io',
+      url: 'https://upnotify-monitoring.vercel.app',
     },
     offers: [
       {
@@ -129,7 +129,7 @@ export function WebSiteJsonLd(): React.ReactElement {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: 'Upnotify',
-    url: 'https://uptrue.io',
+    url: 'https://upnotify-monitoring.vercel.app',
     description:
       'Uptime, performance and infrastructure monitoring for agencies and teams.',
     dateModified: new Date().toISOString().split('T')[0],
@@ -137,7 +137,7 @@ export function WebSiteJsonLd(): React.ReactElement {
       '@type': 'SearchAction',
       target: {
         '@type': 'EntryPoint',
-        urlTemplate: 'https://uptrue.io/tracker?q={search_term_string}',
+        urlTemplate: 'https://upnotify-monitoring.vercel.app/tracker?q={search_term_string}',
       },
       'query-input': 'required name=search_term_string',
     },

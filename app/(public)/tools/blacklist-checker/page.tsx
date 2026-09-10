@@ -9,12 +9,12 @@ export const metadata: Metadata = {
   title: 'Free Domain Blacklist Checker — Is My Domain Blacklisted? | Upnotify',
   description:
     'Check if your domain or IP is listed on spam blacklists. Test against Spamhaus, SpamCop, Barracuda, SORBS, and 6 more. Free blacklist checker, instant results.',
-  alternates: { canonical: 'https://uptrue.io/tools/blacklist-checker' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/tools/blacklist-checker' },
   openGraph: {
     title: 'Free Domain Blacklist Checker — Is My Domain Blacklisted? | Upnotify',
     description:
       'Check if your domain or IP is on spam blacklists. Test against Spamhaus, SpamCop, Barracuda, SORBS, and more.',
-    url: 'https://uptrue.io/tools/blacklist-checker',
+    url: 'https://upnotify-monitoring.vercel.app/tools/blacklist-checker',
     type: 'website',
   },
 }

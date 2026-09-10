@@ -15,7 +15,7 @@ import { ChecksMarquee } from './checks-marquee'
 export const metadata: Metadata = {
   title: 'WordPress Site Monitor — Plugin-Based Security & Health Monitoring | Upnotify',
   description: 'Upnotify\'s WordPress Monitor plugin checks your site from the inside — detecting file injections, rogue admin users, outdated plugins, suspicious pages, and more. Get alerted before hackers cause damage.',
-  alternates: { canonical: 'https://uptrue.io/monitoring/wordpress-site-monitor' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/monitoring/wordpress-site-monitor' },
   openGraph: {
     title: 'WordPress Site Monitor — Plugin-Based Security & Health Monitoring | Upnotify',
     description: 'Detect file injections, rogue admin users, outdated plugins, and suspicious content — from inside your WordPress site. Free Upnotify plugin.',
@@ -27,11 +27,11 @@ const jsonLd = {
   '@type': 'SoftwareApplication',
   name: 'Upnotify WordPress Monitor',
   description: 'A lightweight WordPress plugin that monitors your site from the inside — detecting file injections, rogue admin users, outdated plugins, and suspicious pages.',
-  url: 'https://uptrue.io/monitoring/wordpress-site-monitor',
+  url: 'https://upnotify-monitoring.vercel.app/monitoring/wordpress-site-monitor',
   applicationCategory: 'SecurityApplication',
   operatingSystem: 'WordPress',
   offers: { '@type': 'Offer', price: '0', priceCurrency: 'GBP', description: 'Free plan available' },
-  publisher: { '@type': 'Organization', name: 'Upnotify', url: 'https://uptrue.io' },
+  publisher: { '@type': 'Organization', name: 'Upnotify', url: 'https://upnotify-monitoring.vercel.app' },
 }
 
 const threats: { icon: LucideIcon; title: string; desc: string; severity: string }[] = [
@@ -235,8 +235,8 @@ export default function WordPressMonitorPage() {
 
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
             <Link href="/signup" style={{
-              background: 'linear-gradient(135deg, #1392FB, #0068DB)',
-              color: '#fff',
+              background: 'linear-gradient(135deg, #FBA830, #f59e0b)',
+              color: '#1a1200',
               padding: '13px 28px',
               borderRadius: 10,
               fontWeight: 700,
@@ -603,15 +603,15 @@ export default function WordPressMonitorPage() {
               </div>
               <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
                 <Link href="/signup" style={{
-                  background: 'linear-gradient(135deg, #1392FB, #0068DB)',
-                  color: '#fff',
+                  background: 'linear-gradient(135deg, #FBA830, #f59e0b)',
+                  color: '#1a1200',
                   padding: '14px 30px',
                   borderRadius: 10,
                   fontWeight: 700,
                   fontSize: 15,
                   textDecoration: 'none',
                   display: 'inline-flex', alignItems: 'center', gap: 8,
-                  boxShadow: '0 4px 16px rgba(19, 146, 251,0.4)',
+                  boxShadow: '0 4px 16px rgba(251, 168, 48,0.4)',
                 }}>
                   <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                   Create Free Account

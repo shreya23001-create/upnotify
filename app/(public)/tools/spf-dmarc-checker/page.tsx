@@ -9,12 +9,12 @@ export const metadata: Metadata = {
   title: 'Free SPF & DMARC Record Checker — Email Security Test | Upnotify',
   description:
     'Check your SPF and DMARC DNS records instantly. Validate email authentication setup, detect misconfigurations, and get a security grade. Free tool, no signup.',
-  alternates: { canonical: 'https://uptrue.io/tools/spf-dmarc-checker' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/tools/spf-dmarc-checker' },
   openGraph: {
     title: 'Free SPF & DMARC Record Checker — Email Security Test | Upnotify',
     description:
       'Check SPF and DMARC records, detect misconfigurations, and get an email security grade. Free, no signup.',
-    url: 'https://uptrue.io/tools/spf-dmarc-checker',
+    url: 'https://upnotify-monitoring.vercel.app/tools/spf-dmarc-checker',
     type: 'website',
   },
 }
@@ -64,7 +64,7 @@ const jsonLd = {
     {
       '@type': 'WebApplication',
       name: 'SPF & DMARC Checker',
-      url: 'https://uptrue.io/tools/spf-dmarc-checker',
+      url: 'https://upnotify-monitoring.vercel.app/tools/spf-dmarc-checker',
       applicationCategory: 'DeveloperApplication',
       operatingSystem: 'All',
       offers: {

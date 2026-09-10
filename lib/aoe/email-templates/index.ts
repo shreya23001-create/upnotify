@@ -337,11 +337,11 @@ export function buildAiSeoEmail(
       which means AI search engines like ChatGPT, Perplexity, and Claude
       <strong>may not be able to read or cite your content</strong>.
     </p>
-    <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:16px 20px;margin-bottom:24px;">
-      <p style="margin:0 0 8px;font-size:14px;color:#0a5c26;font-weight:600;">While you're not visible, your competitors are:</p>
+    <div style="background:#eff8ff;border:1px solid #bfe0fd;border-radius:6px;padding:16px 20px;margin-bottom:24px;">
+      <p style="margin:0 0 8px;font-size:14px;color:#0068DB;font-weight:600;">While you're not visible, your competitors are:</p>
       <ul style="margin:0;padding-left:20px;font-size:14px;color:#374151;line-height:1.8;">
         <li>AI-driven search is growing fast — ChatGPT alone answers millions of queries per day</li>
-        <li>Sites with <code style="background:#dcfce7;padding:1px 4px;border-radius:3px;font-size:12px;">llms.txt</code> get cited in AI answers; sites without don't</li>
+        <li>Sites with <code style="background:#dbeafe;padding:1px 4px;border-radius:3px;font-size:12px;">llms.txt</code> get cited in AI answers; sites without don't</li>
         <li>Early movers in AI SEO will hold rankings for years</li>
       </ul>
     </div>

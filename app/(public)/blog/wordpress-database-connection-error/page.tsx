@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: 'Error Establishing a Database Connection in WordPress: Complete Fix and Monitoring Guide',
   description:
     'Learn what causes the "Error Establishing a Database Connection" in WordPress, how to fix it step by step, and how to monitor your site so you never discover database errors from your customers again.',
-  alternates: { canonical: 'https://uptrue.io/blog/wordpress-database-connection-error' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/wordpress-database-connection-error' },
   openGraph: {
     title: 'Error Establishing a Database Connection in WordPress: Complete Fix and Monitoring Guide',
     description:
       'What causes the WordPress database connection error, how to fix it, and how to monitor your site so you catch it before your visitors do.',
-    url: 'https://uptrue.io/blog/wordpress-database-connection-error',
+    url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-database-connection-error',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -68,10 +68,10 @@ export default function WordPressDatabaseConnectionErrorPage(): React.ReactEleme
           headline: 'Error Establishing a Database Connection in WordPress: Complete Fix and Monitoring Guide',
           description: 'What causes the WordPress database connection error, how to fix each cause, and how to set up monitoring so you catch it before your visitors do.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-11',
           dateModified: '2026-03-11',
-          url: 'https://uptrue.io/blog/wordpress-database-connection-error',
+          url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-database-connection-error',
         }}
       />
 
@@ -233,7 +233,7 @@ export default function WordPressDatabaseConnectionErrorPage(): React.ReactEleme
         </p>
 
         <ol>
-          <li>Sign up at <Link href="/signup">uptrue.io/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>HTTP/HTTPS</strong> as the monitor type</li>
           <li>Enter your WordPress site URL (your homepage)</li>

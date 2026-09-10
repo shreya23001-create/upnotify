@@ -66,7 +66,23 @@ function extractLimits(plan: Record<string, unknown>): PlanLimits {
   }
 }
 
-/** Fetch plan limits for an org based on its active, cancelling, or trialing subscription.
+/** Add one Add-On Plan's worth of numeric limits onto a base PlanLimits.
+ *  Add-ons only ever grant Pre Plan (slug 'lite') limits, and only the
+ *  numeric/countable fields stack — boolean feature flags and the check
+ *  interval stay governed by the base plan alone. */
+function addAddonLimits(base: PlanLimits, addon: Record<string, unknown>): PlanLimits {
+  return {
+    ...base,
+    monitors: base.monitors === null ? null : base.monitors + ((addon.monitor_limit as number) ?? 0),
+    competitors: base.competitors + ((addon.competitor_limit as number) ?? 0),
+    statusPageLimit: base.statusPageLimit + ((addon.status_page_limit as number) ?? 0),
+    aiReportLimit: base.aiReportLimit < 0 ? base.aiReportLimit : base.aiReportLimit + Math.max((addon.ai_report_limit as number) ?? 0, 0),
+    wpMonitors: base.wpMonitors + ((addon.wp_monitor_limit as number) ?? 0),
+  }
+}
+
+/** Fetch plan limits for an org based on its active, cancelling, or trialing subscription,
+ *  plus any active Add-On Plan purchases stacked additively on top.
  *  Reads from the plans table (single source of truth).
  *  'cancelling' subs retain full plan limits — the user paid until period end.
  *  Trialing subscriptions get the trial plan's limits until trial_ends_at. */
@@ -76,17 +92,31 @@ export async function getPlanLimits(orgId: string): Promise<PlanLimits> {
   // Active, cancelling (paid until period end), paused, or past_due all retain plan limits.
   // past_due means payment failed but Stripe is still retrying — the user paid for this plan
   // and should not be silently downgraded to FREE while Stripe works through its retry schedule.
-  const { data: sub } = await supabase
-    .from('subscriptions')
-    .select('*, plans(*)')
-    .eq('org_id', orgId)
-    .in('status', ['active', 'cancelling', 'paused', 'past_due'])
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .maybeSingle()
+  const [subResult, addonsResult] = await Promise.all([
+    supabase
+      .from('subscriptions')
+      .select('*, plans(*)')
+      .eq('org_id', orgId)
+      .in('status', ['active', 'cancelling', 'paused', 'past_due'])
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (supabase as any)
+      .from('org_addon_subscriptions')
+      .select('*, plans:addon_plan_id(*)')
+      .eq('org_id', orgId)
+      .in('status', ['active', 'cancelling', 'past_due']) as Promise<{ data: Array<{ plans: Record<string, unknown> | null }> | null }>,
+  ])
+
+  const sub = subResult.data
+  const addonPlans = (addonsResult.data ?? [])
+    .map(row => row.plans)
+    .filter((p): p is Record<string, unknown> => Boolean(p))
 
   if (sub && sub.plans) {
-    return extractLimits(sub.plans as Record<string, unknown>)
+    const base = extractLimits(sub.plans as Record<string, unknown>)
+    return addonPlans.reduce(addAddonLimits, base)
   }
 
   // Fall back to trialing subscription
@@ -102,10 +132,14 @@ export async function getPlanLimits(orgId: string): Promise<PlanLimits> {
       ? new Date(trialSub.trial_ends_at)
       : null
     if (trialEnd && trialEnd > new Date()) {
-      return extractLimits(trialSub.plans as Record<string, unknown>)
+      const base = extractLimits(trialSub.plans as Record<string, unknown>)
+      return addonPlans.reduce(addAddonLimits, base)
     }
   }
 
+  // No base subscription — add-ons cannot exist without one, but if data is
+  // ever inconsistent, still fall back to plain free defaults rather than
+  // granting add-on limits with no base plan.
   return FREE_DEFAULTS
 }
 
@@ -129,7 +163,8 @@ export async function checkMonitorLimit(orgId: string): Promise<{
   ])
 
   const override = (orgResult.data?.monitor_limit_override as number | null) ?? null
-  // Override takes precedence over plan limit; null override falls back to plan
+  // An admin override takes precedence over the plan+add-ons limit entirely;
+  // null override falls back to the plan+add-ons limit from getPlanLimits.
   const effectiveLimit = override !== null ? override : limits.monitors
 
   const currentCount = countResult.count ?? 0

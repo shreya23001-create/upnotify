@@ -90,7 +90,7 @@ const CREDIT_TYPES: Array<{
     label: 'Blog Post / Tutorial',
     amount: 500,
     type: 'one-time',
-    description: 'Write a blog post or tutorial about Upnotify on your own website or Medium. Must be at least 500 words and include a link to uptrue.io. Submit the URL below.',
+    description: 'Write a blog post or tutorial about Upnotify on your own website or Medium. Must be at least 500 words and include a link to upnotify-monitoring.vercel.app. Submit the URL below.',
     requiresUrl: true,
     urlPlaceholder: 'https://yourblog.com/uptrue-review',
   },

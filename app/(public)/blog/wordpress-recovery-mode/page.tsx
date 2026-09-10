@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: 'WordPress Recovery Mode: What Triggers It, What It Means, and How to Respond',
   description:
     'WordPress recovery mode activates when a fatal error crashes your site. Learn what triggers it, why the recovery email is unreliable, what your visitors see, and how to monitor for the errors that cause it.',
-  alternates: { canonical: 'https://uptrue.io/blog/wordpress-recovery-mode' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/wordpress-recovery-mode' },
   openGraph: {
     title: 'WordPress Recovery Mode: What Triggers It, What It Means, and How to Respond',
     description:
       'What triggers WordPress recovery mode, why the admin email often never arrives, and how keyword monitoring catches the errors that recovery mode is supposed to catch.',
-    url: 'https://uptrue.io/blog/wordpress-recovery-mode',
+    url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-recovery-mode',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -68,10 +68,10 @@ export default function WordPressRecoveryModePage(): React.ReactElement {
           headline: 'WordPress Recovery Mode: What Triggers It, What It Means, and How to Respond',
           description: 'What triggers WordPress recovery mode, why the recovery email is unreliable, and how keyword monitoring detects the errors that cause it.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-19',
           dateModified: '2026-03-19',
-          url: 'https://uptrue.io/blog/wordpress-recovery-mode',
+          url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-recovery-mode',
         }}
       />
 
@@ -219,7 +219,7 @@ export default function WordPressRecoveryModePage(): React.ReactElement {
         <h3>Step 1: Set up a keyword monitor to detect the critical error text</h3>
 
         <ol>
-          <li>Sign up at <Link href="/signup">uptrue.io/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>Keyword</strong> as the monitor type</li>
           <li>Enter your homepage URL</li>

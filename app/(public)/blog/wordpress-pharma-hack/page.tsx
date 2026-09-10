@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: 'WordPress Pharma Hack: Hidden Viagra Links in Your Site That Only Google Sees',
   description:
     'The WordPress pharma hack injects hidden pharmaceutical spam into your pages — Viagra, Cialis, and online pharmacy links that only appear in Google search results. Learn how it works, how to detect it with keyword monitoring, and how to clean your site before Google penalises you.',
-  alternates: { canonical: 'https://uptrue.io/blog/wordpress-pharma-hack' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/wordpress-pharma-hack' },
   openGraph: {
     title: 'WordPress Pharma Hack: Hidden Viagra Links in Your Site That Only Google Sees',
     description:
       'How the WordPress pharma hack hides pharmaceutical spam in your pages, why you cannot see it, how Google sees it, and how keyword monitoring catches pharma terms automatically.',
-    url: 'https://uptrue.io/blog/wordpress-pharma-hack',
+    url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-pharma-hack',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -68,10 +68,10 @@ export default function WordPressPharmaHackPage(): React.ReactElement {
           headline: 'WordPress Pharma Hack: Hidden Viagra Links in Your Site That Only Google Sees',
           description: 'How the WordPress pharma hack works, why you cannot see the injected content, how to clean it, and how keyword monitoring detects pharmaceutical spam on your pages.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-25',
           dateModified: '2026-03-25',
-          url: 'https://uptrue.io/blog/wordpress-pharma-hack',
+          url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-pharma-hack',
         }}
       />
 
@@ -278,7 +278,7 @@ export default function WordPressPharmaHackPage(): React.ReactElement {
         <h3>Step 1: Monitor for pharmaceutical keywords</h3>
 
         <ol>
-          <li>Sign up at <Link href="/signup">uptrue.io/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>Keyword</strong> as the monitor type</li>
           <li>Enter your homepage URL</li>

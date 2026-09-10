@@ -9,7 +9,7 @@ import { BlogIndexClient } from './blog-index-client'
 export const revalidate = 300
 
 export const metadata: Metadata = {
-  alternates: { canonical: 'https://uptrue.io/blog' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog' },
 }
 
 // Static blog posts (hardcoded content)

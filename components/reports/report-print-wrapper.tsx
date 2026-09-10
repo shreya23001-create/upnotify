@@ -46,7 +46,7 @@ export function ReportPrintWrapper({ title, period, generatedAt, hasWhiteLabel =
         <div className="report-page-footer">
           <span>Generated {formatted}</span>
           {!hasWhiteLabel && (
-            <span style={{ fontWeight: 500 }}>Powered by Upnotify · uptrue.io</span>
+            <span style={{ fontWeight: 500 }}>Powered by Upnotify · upnotify-monitoring.vercel.app</span>
           )}
         </div>
       </div>

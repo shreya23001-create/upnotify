@@ -2,7 +2,7 @@
 
 **Date:** 2026-06-22  
 **Assigned to:** @kritichawla (Kriti Chawla)  
-**Environment:** https://dev.uptrue.io  
+**Environment:** https://upnotify-monitoring.vercel.app  
 **Coverage:** All 18 modules shipped in V1  
 **Total test cases:** 215  
 **Automated gate:** `npx vitest run` — 569 / 569 must pass before any human QA run
@@ -301,7 +301,7 @@ npx vitest run                    # 569 / 569 pass
 | TC-SP-16 | White-label — Free/Lite: branding visible | Free/Lite org | Load status page | Branding shown | |
 | TC-SP-17 | Badge — SVG returned | Valid monitor ID | GET /api/v1/badge/[monitorId] | SVG with correct status colour | |
 | TC-SP-18 | Badge — no auth required | Logged-out browser | GET badge URL | SVG returned without 401 | |
-| TC-SP-19 | Lite — branded page on uptrue.io domain | Lite org | Create status page | URL on uptrue.io, not custom domain | Per KB: "1 branded" |
+| TC-SP-19 | Lite — branded page on upnotify-monitoring.vercel.app domain | Lite org | Create status page | URL on upnotify-monitoring.vercel.app, not custom domain | Per KB: "1 branded" |
 
 ---
 
@@ -502,7 +502,7 @@ npx vitest run                    # 569 / 569 pass
 | TC-BLOG-02 | Disclaimer box on auto-generated post | auto_generated=true | View post | Disclaimer visible | Legal |
 | TC-BLOG-03 | Hedged language | AI prompt used | Read content | "reportedly", "appears to be" — no definitive claims | |
 | TC-BLOG-04 | Usernames stripped | Social data scraped | Content generated | No Reddit usernames or X handles | Harvey legal requirement |
-| TC-BLOG-05 | Takedown email in disclaimer | Disclaimer | Read | reports@uptrue.io visible | |
+| TC-BLOG-05 | Takedown email in disclaimer | Disclaimer | Read | shreya23001@gmail.com visible | |
 | TC-BLOG-06 | Published after approval | Admin approves | Post goes live | At /blog/[slug]; in sitemap | |
 | TC-BLOG-07 | Social posts on publish | Post published | Social cron | X and LinkedIn posts fired | |
 | TC-BLOG-08 | LinkedIn — org account | LINKEDIN_ORGANIZATION_ID set | LinkedIn post | Posted from org account | |
@@ -550,7 +550,7 @@ npx vitest run                    # 569 / 569 pass
 | TC-LEGAL-05 | Shown on all public pages | Fresh browser | Visit /, /pricing, /blog, /monitoring | Banner on all | |
 | TC-LEGAL-06 | Hidden in dashboard | Logged-in user | /dashboard | No cookie banner | |
 | TC-LEGAL-07 | All legal pages accessible | Anonymous | /terms /privacy /cookies /aup /dpa /ai-disclaimer | All load without auth | |
-| TC-LEGAL-08 | AI Disclaimer — corrections email | /ai-disclaimer | Read | reports@uptrue.io with corrections process | |
+| TC-LEGAL-08 | AI Disclaimer — corrections email | /ai-disclaimer | Read | shreya23001@gmail.com with corrections process | |
 
 ---
 

@@ -19,7 +19,7 @@ function getStatusBadgeClass(status: string): string {
 
 export function ReferralSection({ referralCode, referrals }: ReferralSectionProps): React.ReactElement {
   const [copied, setCopied] = useState(false)
-  const origin = typeof window !== 'undefined' ? window.location.origin : 'https://uptrue.io'
+  const origin = typeof window !== 'undefined' ? window.location.origin : 'https://upnotify-monitoring.vercel.app'
   const referralLink = referralCode ? `${origin}/r/${referralCode}` : null
 
   const handleCopy = useCallback((): void => {

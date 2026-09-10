@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: 'Free Uptime Monitoring — No Credit Card, No Trial | Upnotify',
   description:
     'Free uptime monitoring with email alerts. HTTP/HTTPS, SSL certificate, DNS, response time and 20 other monitor types. Genuinely free — not a trial. No credit card required.',
-  alternates: { canonical: 'https://uptrue.io/free-uptime-monitoring' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/free-uptime-monitoring' },
   openGraph: {
     title: 'Free Uptime Monitoring — No Credit Card, No Trial | Upnotify',
     description:
       'Genuinely free uptime monitoring with email alerts. No credit card, no trial.',
-    url: 'https://uptrue.io/free-uptime-monitoring',
+    url: 'https://upnotify-monitoring.vercel.app/free-uptime-monitoring',
     type: 'website',
   },
 }
@@ -148,7 +148,7 @@ export default async function FreeUptimeMonitoringPage(): Promise<React.ReactEle
         '@type': 'SoftwareApplication',
         name: 'Upnotify Free Uptime Monitoring',
         description: `Free uptime monitoring with ${freeMonitors} monitor${freeMonitors === '1' ? '' : 's'} and email alerts. Genuinely free — no card, no trial.`,
-        url: 'https://uptrue.io/free-uptime-monitoring',
+        url: 'https://upnotify-monitoring.vercel.app/free-uptime-monitoring',
         applicationCategory: 'BusinessApplication',
         operatingSystem: 'Web',
         offers: {
@@ -160,7 +160,7 @@ export default async function FreeUptimeMonitoringPage(): Promise<React.ReactEle
         publisher: {
           '@type': 'Organization',
           name: 'Upnotify',
-          url: 'https://uptrue.io',
+          url: 'https://upnotify-monitoring.vercel.app',
         },
       },
       {

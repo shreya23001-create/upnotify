@@ -12,12 +12,12 @@ export const AOE_CONFIG: AoeConfig = {
   product: {
     name: 'Uptrue',
     tagline: 'Website monitoring that works while you sleep',
-    signupUrl: 'https://uptrue.io/signup',
-    logoUrl: 'https://uptrue.io/logo.png',
+    signupUrl: 'https://upnotify-monitoring.vercel.app/signup',
+    logoUrl: 'https://upnotify-monitoring.vercel.app/logo.png',
     primaryColour: '#3b82f6',
     companyName: 'Vision Software Solutions Limited',
     companyAddress: 'Brentford, United Kingdom',
-    unsubscribeUrl: 'https://uptrue.io/api/v1/outreach/unsubscribe',
+    unsubscribeUrl: 'https://upnotify-monitoring.vercel.app/api/v1/outreach/unsubscribe',
   },
 
   // -------------------------------------------------------------------------
@@ -29,37 +29,37 @@ export const AOE_CONFIG: AoeConfig = {
       enabled: true,
       daysBeforeExpiry: [14, 7, 3],
       ctaText: 'Monitor my SSL free →',
-      ctaUrl: 'https://uptrue.io/signup?utm_source=outreach&utm_campaign=ssl_expiry&utm_medium=email',
+      ctaUrl: 'https://upnotify-monitoring.vercel.app/signup?utm_source=outreach&utm_campaign=ssl_expiry&utm_medium=email',
     },
     site_down: {
       enabled: true,
       ctaText: 'Monitor my site free →',
-      ctaUrl: 'https://uptrue.io/signup?utm_source=outreach&utm_campaign=site_down&utm_medium=email',
+      ctaUrl: 'https://upnotify-monitoring.vercel.app/signup?utm_source=outreach&utm_campaign=site_down&utm_medium=email',
     },
     site_slow: {
       enabled: true,
       slowThresholdMs: 3000,
       ctaText: 'See my full performance report →',
-      ctaUrl: 'https://uptrue.io/signup?utm_source=outreach&utm_campaign=site_slow&utm_medium=email',
+      ctaUrl: 'https://upnotify-monitoring.vercel.app/signup?utm_source=outreach&utm_campaign=site_slow&utm_medium=email',
     },
     ecom_down: {
       enabled: true,
       platforms: ['shopify', 'woocommerce'],
       ctaText: 'Protect my store free →',
-      ctaUrl: 'https://uptrue.io/signup?utm_source=outreach&utm_campaign=ecom_down&utm_medium=email',
+      ctaUrl: 'https://upnotify-monitoring.vercel.app/signup?utm_source=outreach&utm_campaign=ecom_down&utm_medium=email',
     },
     compete_cold: {
       enabled: false, // starts disabled — turn on from admin panel when ready
       platforms: ['shopify', 'woocommerce'],
       ctaText: 'Track my competitors free →',
-      ctaUrl: 'https://uptrue.io/signup?utm_source=outreach&utm_campaign=compete_cold&utm_medium=email',
+      ctaUrl: 'https://upnotify-monitoring.vercel.app/signup?utm_source=outreach&utm_campaign=compete_cold&utm_medium=email',
     },
     ai_seo: {
       enabled: false, // starts disabled — turn on from admin panel after Harvey sign-off
       primaryCtaText: 'Check your AI visibility score — free →',
-      primaryCtaUrl: 'https://uptrue.io/tools/ai-visibility?utm_source=outreach&utm_campaign=ai_seo&utm_medium=email',
+      primaryCtaUrl: 'https://upnotify-monitoring.vercel.app/tools/ai-visibility?utm_source=outreach&utm_campaign=ai_seo&utm_medium=email',
       secondaryCtaText: 'Generate your llms.txt — free →',
-      secondaryCtaUrl: 'https://uptrue.io/tools/llms-txt?utm_source=outreach&utm_campaign=ai_seo&utm_medium=email',
+      secondaryCtaUrl: 'https://upnotify-monitoring.vercel.app/tools/llms-txt?utm_source=outreach&utm_campaign=ai_seo&utm_medium=email',
     },
   },
 
@@ -83,6 +83,6 @@ export const AOE_CONFIG: AoeConfig = {
     burstHour: 23,       // 11pm UTC — last day burst
     cooldownDays: 30,    // never email same domain more than once per 30 days
     fromName: 'Uptrue',
-    fromEmail: 'hello@uptrue.io',
+    fromEmail: 'shreya23001@gmail.com',
   },
 }

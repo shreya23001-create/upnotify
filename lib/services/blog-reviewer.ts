@@ -137,7 +137,7 @@ function buildPrompt(input: ReviewInput): string {
   const dodNotes = describeDoD(input.dod)
   return `You are reviewing a draft Uptrue blog post before it reaches the Boss Digest email at 07:00.
 
-The post is destined for uptrue.io/blog. The Boss reads ~4 mini-cards per day and 1-click approves drafts. Your job is to surface what they need to know in <30 seconds per card.
+The post is destined for upnotify-monitoring.vercel.app/blog. The Boss reads ~4 mini-cards per day and 1-click approves drafts. Your job is to surface what they need to know in <30 seconds per card.
 
 ## Draft metadata
 - Title: ${input.title}

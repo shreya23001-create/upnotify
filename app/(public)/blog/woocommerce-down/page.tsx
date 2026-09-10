@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: 'WooCommerce Down? How to Diagnose and Fix a Broken WooCommerce Store',
   description:
     'WooCommerce down or not working? This step-by-step guide covers the most common causes — plugin conflicts, database errors, PHP memory exhaustion, hosting failures, and payment gateway outages — and how to diagnose and fix each one fast.',
-  alternates: { canonical: 'https://uptrue.io/blog/woocommerce-down' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/woocommerce-down' },
   openGraph: {
     title: 'WooCommerce Down? How to Diagnose and Fix a Broken WooCommerce Store',
     description:
       'Step-by-step diagnosis guide for WooCommerce not working. Plugin conflicts, database errors, PHP memory limit, hosting issues, payment gateway down — learn how to find and fix each cause.',
-    url: 'https://uptrue.io/blog/woocommerce-down',
+    url: 'https://upnotify-monitoring.vercel.app/blog/woocommerce-down',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -73,10 +73,10 @@ export default function WoocommerceDownPage(): React.ReactElement {
           headline: 'WooCommerce Down? How to Diagnose and Fix a Broken WooCommerce Store',
           description: 'Step-by-step diagnosis guide for WooCommerce not working — plugin conflicts, database errors, PHP memory, hosting, and payment gateway issues.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-04-06',
           dateModified: '2026-04-06',
-          url: 'https://uptrue.io/blog/woocommerce-down',
+          url: 'https://upnotify-monitoring.vercel.app/blog/woocommerce-down',
         }}
       />
 
@@ -297,7 +297,7 @@ define( 'WP_DEBUG_DISPLAY', false );`}</code></pre>
         </p>
 
         <p>
-          Set up the following monitors in <Link href="https://uptrue.io/signup">Upnotify</Link>:
+          Set up the following monitors in <Link href="https://upnotify-monitoring.vercel.app/signup">Upnotify</Link>:
         </p>
 
         <h3>Monitor 1 — Homepage (HTTP, 1 minute interval)</h3>
@@ -325,7 +325,7 @@ define( 'WP_DEBUG_DISPLAY', false );`}</code></pre>
           <p>
             Get alerted within 60 seconds if your shop, cart, or checkout goes down. Free plan available — no credit card required.
           </p>
-          <Link href="https://uptrue.io/signup" className="btn btn-primary btn-lg">
+          <Link href="https://upnotify-monitoring.vercel.app/signup" className="btn btn-primary btn-lg">
             Start Monitoring Free
           </Link>
         </div>

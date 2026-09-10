@@ -79,7 +79,7 @@ async function fetchStatusPageSummary(domain: string, statusPageUrl?: string): P
       const timeout = setTimeout(() => controller.abort(), 8000)
       const res = await fetch(url, {
         signal: controller.signal,
-        headers: { 'User-Agent': 'Uptrue/1.0 (uptime monitor; contact@uptrue.io)' },
+        headers: { 'User-Agent': 'Uptrue/1.0 (uptime monitor; shreya23001@gmail.com)' },
       })
       clearTimeout(timeout)
       if (!res.ok) continue
@@ -327,7 +327,7 @@ function buildPostHtml(sections: {
   <strong>About This Data</strong><br/>
   All uptime, response time, and incident data is collected by Uptrue's independent monitoring infrastructure.
   HTTP checks run every 5 minutes. An incident is recorded only after 2+ consecutive failed checks.
-  Uptrue is not affiliated with any monitored service. For corrections: <a href="mailto:reports@uptrue.io">reports@uptrue.io</a>
+  Uptrue is not affiliated with any monitored service. For corrections: <a href="mailto:shreya23001@gmail.com">shreya23001@gmail.com</a>
 </div>
 
 <h2>Frequently Asked Questions</h2>

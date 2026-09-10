@@ -179,7 +179,7 @@ function buildEmailHtml(data: MonitorTypeHealth[], date: string, appUrl: string)
       <tr>
         <td style="padding:16px 32px;background:#f8fafc;border-top:1px solid #e2e8f0;text-align:center;">
           <div style="font-size:12px;color:#94a3b8;">Upnotify Super Admin · Monitor Health Report · Sent daily at 8:00 AM</div>
-          <div style="font-size:12px;color:#94a3b8;margin-top:2px;">uptrue.io</div>
+          <div style="font-size:12px;color:#94a3b8;margin-top:2px;">upnotify-monitoring.vercel.app</div>
         </td>
       </tr>
 

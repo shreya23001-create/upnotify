@@ -4,7 +4,7 @@ export const metadata: Metadata = {
   title: 'Acceptable Use Policy',
   description:
     'Upnotify Acceptable Use Policy. Rules and restrictions governing your use of the Upnotify monitoring platform and services.',
-  alternates: { canonical: 'https://uptrue.io/acceptable-use' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/acceptable-use' },
 }
 
 export default function AcceptableUsePolicyPage(): React.ReactElement {
@@ -250,7 +250,7 @@ export default function AcceptableUsePolicyPage(): React.ReactElement {
         </li>
       </ul>
       <p>
-        You may appeal a suspension or termination by contacting support@uptrue.io within 14 days of the
+        You may appeal a suspension or termination by contacting shreya23001@gmail.com within 14 days of the
         action. We will review your appeal and respond within a reasonable timeframe.
       </p>
 
@@ -260,7 +260,7 @@ export default function AcceptableUsePolicyPage(): React.ReactElement {
         immediately at:
       </p>
       <ul>
-        <li><strong>Email:</strong> abuse@uptrue.io</li>
+        <li><strong>Email:</strong> shreya23001@gmail.com</li>
       </ul>
       <p>
         When reporting abuse, please provide as much detail as possible, including:
@@ -325,8 +325,8 @@ export default function AcceptableUsePolicyPage(): React.ReactElement {
         If you have any questions about this Acceptable Use Policy, please contact us at:
       </p>
       <ul>
-        <li><strong>Abuse reports:</strong> abuse@uptrue.io</li>
-        <li><strong>General enquiries:</strong> support@uptrue.io</li>
+        <li><strong>Abuse reports:</strong> shreya23001@gmail.com</li>
+        <li><strong>General enquiries:</strong> shreya23001@gmail.com</li>
         <li><strong>Post:</strong> Vision Software Solutions Limited, C/O Benison Solvers Limited, 1000 Great West Road, Brentford, United Kingdom, TW8 9DW</li>
       </ul>
     </>

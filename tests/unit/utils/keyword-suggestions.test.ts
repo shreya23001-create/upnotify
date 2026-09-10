@@ -75,7 +75,7 @@ describe('getKeywordSuggestions', () => {
   })
 
   it('returns homepage suggestions for .io domains', () => {
-    const suggestions = getKeywordSuggestions('https://uptrue.io')
+    const suggestions = getKeywordSuggestions('https://upnotify-monitoring.vercel.app')
     expect(suggestions.positive).toContain('Home')
     expect(suggestions.negative).toContain('database error')
   })

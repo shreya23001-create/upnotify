@@ -10,6 +10,7 @@ interface CancelPlanModalProps {
   onClose: () => void
   onComplete: () => void
   cancelProvider?: 'stripe' | 'razorpay'
+  hasActiveAddons?: boolean
 }
 
 const REASONS = [
@@ -22,14 +23,15 @@ const REASONS = [
   { value: 'other', label: 'Other reason' },
 ]
 
-type Step = 'reason' | 'confirm_cancel' | 'processing' | 'done'
+type Step = 'reason' | 'addon_choice' | 'confirm_cancel' | 'processing' | 'done'
 
-export function CancelPlanModal({ planName, isOpen, isPaused, pauseUntil, onClose, onComplete, cancelProvider = 'stripe' }: CancelPlanModalProps): React.ReactElement | null {
+export function CancelPlanModal({ planName, isOpen, isPaused, pauseUntil, onClose, onComplete, cancelProvider = 'stripe', hasActiveAddons = false }: CancelPlanModalProps): React.ReactElement | null {
   const [step, setStep] = useState<Step>('reason')
   const [reason, setReason] = useState('')
   const [detail, setDetail] = useState('')
   const [countdown, setCountdown] = useState(5)
   const [error, setError] = useState<string | null>(null)
+  const [cancelAddonsToo, setCancelAddonsToo] = useState<boolean | null>(null)
 
   useEffect(() => {
     if (step !== 'confirm_cancel') return
@@ -49,6 +51,7 @@ export function CancelPlanModal({ planName, isOpen, isPaused, pauseUntil, onClos
       setReason('')
       setDetail('')
       setError(null)
+      setCancelAddonsToo(null)
     }
   }, [isOpen])
 
@@ -57,7 +60,9 @@ export function CancelPlanModal({ planName, isOpen, isPaused, pauseUntil, onClos
   const handleSelectReason = (): void => {
     if (!reason) return
     setError(null)
-    setStep('confirm_cancel')
+    // Razorpay customers with active add-ons need to decide whether
+    // cancelling the base plan should also cancel their add-ons.
+    setStep(cancelProvider === 'razorpay' && hasActiveAddons ? 'addon_choice' : 'confirm_cancel')
   }
 
   const handleCancel = async (): Promise<void> => {
@@ -65,7 +70,11 @@ export function CancelPlanModal({ planName, isOpen, isPaused, pauseUntil, onClos
     setError(null)
     try {
       const res = cancelProvider === 'razorpay'
-        ? await fetch('/api/v1/billing/razorpay/cancel', { method: 'POST', headers: { 'Content-Type': 'application/json' } })
+        ? await fetch('/api/v1/billing/razorpay/cancel', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ cancelAddons: cancelAddonsToo === true }),
+          })
         : await fetch('/api/v1/billing/cancel', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -77,7 +86,7 @@ export function CancelPlanModal({ planName, isOpen, isPaused, pauseUntil, onClos
       } else {
         const msg = data.error ?? 'Something went wrong. Please try again.'
         setError(msg.includes('no payment provider')
-          ? 'Your subscription cannot be cancelled automatically. Please contact support@uptrue.io.'
+          ? 'Your subscription cannot be cancelled automatically. Please contact shreya23001@gmail.com.'
           : msg
         )
         setStep('reason')
@@ -175,6 +184,38 @@ export function CancelPlanModal({ planName, isOpen, isPaused, pauseUntil, onClos
           </div>
         )}
 
+        {/* Step 1.5 (Razorpay + active add-ons only): choose whether to cancel add-ons too */}
+        {step === 'addon_choice' && (
+          <div>
+            <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>What about your Add On Plan?</h2>
+            <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.7, marginBottom: 16 }}>
+              You have at least one active <strong>Add On Plan</strong> on top of your {planName} plan. Do you want to cancel your add-ons as well, or keep them running on their own?
+            </p>
+
+            {error && <p style={{ color: '#ef4444', marginBottom: 12, fontSize: 13 }}>{error}</p>}
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 16 }}>
+              <label style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '10px 14px', borderRadius: 8, border: `1px solid ${cancelAddonsToo === true ? 'var(--accent)' : 'var(--border-primary)'}`, cursor: 'pointer' }}>
+                <input type="radio" name="addonChoice" checked={cancelAddonsToo === true} onChange={() => setCancelAddonsToo(true)} style={{ marginTop: 3 }} />
+                <span style={{ fontSize: 14 }}>
+                  <strong>Cancel everything</strong> — end my {planName} plan and all Add On Plans at the end of their billing periods.
+                </span>
+              </label>
+              <label style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '10px 14px', borderRadius: 8, border: `1px solid ${cancelAddonsToo === false ? 'var(--accent)' : 'var(--border-primary)'}`, cursor: 'pointer' }}>
+                <input type="radio" name="addonChoice" checked={cancelAddonsToo === false} onChange={() => setCancelAddonsToo(false)} style={{ marginTop: 3 }} />
+                <span style={{ fontSize: 14 }}>
+                  <strong>Keep my Add On Plan(s)</strong> — only cancel the {planName} base plan; add-ons keep billing and renewing on their own.
+                </span>
+              </label>
+            </div>
+
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button className="btn btn-danger" disabled={cancelAddonsToo === null} onClick={() => setStep('confirm_cancel')}>Continue</button>
+              <button className="btn btn-secondary" onClick={() => setStep('reason')}>Go Back</button>
+            </div>
+          </div>
+        )}
+
         {/* Step 2: Confirm cancel */}
         {step === 'confirm_cancel' && (
           <div>
@@ -190,6 +231,13 @@ export function CancelPlanModal({ planName, isOpen, isPaused, pauseUntil, onClos
               <div><strong>AI reports:</strong> not available</div>
               <div><strong>API access:</strong> not available</div>
             </div>
+            {hasActiveAddons && cancelProvider === 'razorpay' && cancelAddonsToo !== null && (
+              <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 12 }}>
+                {cancelAddonsToo
+                  ? 'Your Add On Plan(s) will also be cancelled at the end of their billing periods.'
+                  : 'Your Add On Plan(s) will keep running and billing independently.'}
+              </p>
+            )}
             <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 16 }}>
               Your data will not be deleted. You can upgrade again at any time.
             </p>
@@ -198,7 +246,7 @@ export function CancelPlanModal({ planName, isOpen, isPaused, pauseUntil, onClos
               <button className="btn btn-danger" disabled={countdown > 0} onClick={() => void handleCancel()}>
                 {countdown > 0 ? `Wait ${countdown}s…` : 'Cancel My Subscription'}
               </button>
-              <button className="btn btn-secondary" onClick={() => setStep('reason')}>Go Back</button>
+              <button className="btn btn-secondary" onClick={() => setStep(cancelProvider === 'razorpay' && hasActiveAddons ? 'addon_choice' : 'reason')}>Go Back</button>
             </div>
           </div>
         )}

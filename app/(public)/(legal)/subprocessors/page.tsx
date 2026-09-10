@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   title: 'Sub-processors — Upnotify',
   description:
     'List of third-party sub-processors used by Upnotify to deliver the monitoring platform, including data location and purpose.',
-  alternates: { canonical: 'https://uptrue.io/subprocessors' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/subprocessors' },
 }
 
 interface SubProcessor {
@@ -137,8 +137,8 @@ export default function SubprocessorsPage(): React.ReactElement {
           Data Processing Agreement with us that includes a notification obligation, we will notify you
           by email at least 30 days before engaging a new sub-processor that processes personal data.
         </p>
-        <a href="mailto:privacy@uptrue.io" className="subp-contact-link">
-          <Mail size={16} /> privacy@uptrue.io
+        <a href="mailto:shreya23001@gmail.com" className="subp-contact-link">
+          <Mail size={16} /> shreya23001@gmail.com
         </a>
       </div>
     </div>

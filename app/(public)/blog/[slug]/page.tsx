@@ -41,12 +41,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title: post.seo_title || `${post.title} | Upnotify`,
     description: post.seo_description || post.excerpt || '',
-    alternates: { canonical: `https://uptrue.io/blog/${post.slug}` },
+    alternates: { canonical: `https://upnotify-monitoring.vercel.app/blog/${post.slug}` },
     robots: isNoindex ? { index: false, follow: false } : undefined,
     openGraph: {
       title: post.seo_title || post.title,
       description: post.seo_description || post.excerpt || '',
-      url: `https://uptrue.io/blog/${post.slug}`,
+      url: `https://upnotify-monitoring.vercel.app/blog/${post.slug}`,
       type: 'article',
       ...(post.og_image_url ? { images: [{ url: post.og_image_url }] } : {}),
     },
@@ -264,7 +264,7 @@ export default async function DynamicBlogPost({ params }: { params: Promise<{ sl
           Information may be incomplete or inaccurate — always check the official status page for confirmed updates.
           Upnotify is an independent monitoring service and has no affiliation with the companies mentioned.
           {' '}To request a correction or removal, email{' '}
-          <a href="mailto:reports@uptrue.io" style={{ color: 'var(--accent, #3b82f6)' }}>reports@uptrue.io</a>.
+          <a href="mailto:shreya23001@gmail.com" style={{ color: 'var(--accent, #3b82f6)' }}>shreya23001@gmail.com</a>.
         </div>
       )}
 
@@ -282,7 +282,7 @@ export default async function DynamicBlogPost({ params }: { params: Promise<{ sl
 
       <BlogShareSubscribe
         title={post.title}
-        url={`https://uptrue.io/blog/${post.slug}`}
+        url={`https://upnotify-monitoring.vercel.app/blog/${post.slug}`}
         category={post.category}
       />
 

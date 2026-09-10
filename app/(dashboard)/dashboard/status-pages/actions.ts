@@ -46,7 +46,7 @@ export async function createStatusPageAction(formData: FormData): Promise<{ erro
   }
 
   if (await isSlugTaken(normSlug)) {
-    return { error: `The URL "uptrue.io/status/${normSlug}" is already taken. Please choose a different slug.` }
+    return { error: `The URL "upnotify-monitoring.vercel.app/status/${normSlug}" is already taken. Please choose a different slug.` }
   }
 
   const monitorIds = monitorIdsStr ? monitorIdsStr.split(',').filter(Boolean) : []
@@ -63,7 +63,7 @@ export async function createStatusPageAction(formData: FormData): Promise<{ erro
   if (!page) {
     // Race condition: slug was free at check time but taken by the time of insert
     if (await isSlugTaken(normSlug)) {
-      return { error: `The URL "uptrue.io/status/${normSlug}" is already taken. Please choose a different slug.` }
+      return { error: `The URL "upnotify-monitoring.vercel.app/status/${normSlug}" is already taken. Please choose a different slug.` }
     }
     return { error: 'Failed to create status page' }
   }
@@ -101,7 +101,7 @@ export async function updateStatusPageAction(pageId: string, formData: FormData)
   }
 
   if (normSlugUpdate !== existing.slug && await isSlugTaken(normSlugUpdate, pageId)) {
-    return { error: `The URL "uptrue.io/status/${normSlugUpdate}" is already taken. Please choose a different slug.` }
+    return { error: `The URL "upnotify-monitoring.vercel.app/status/${normSlugUpdate}" is already taken. Please choose a different slug.` }
   }
 
   const monitorIds = monitorIdsStr ? monitorIdsStr.split(',').filter(Boolean) : []

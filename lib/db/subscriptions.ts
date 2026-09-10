@@ -255,6 +255,53 @@ export async function createSubscriptionRecord(record: {
   return data
 }
 
+export interface AddonSubscription {
+  id: string
+  org_id: string
+  addon_plan_id: string
+  razorpay_subscription_id: string | null
+  status: string
+  current_period_start: string | null
+  current_period_end: string | null
+  canceled_at: string | null
+  created_at: string
+  plan: Plan | null
+}
+
+/** Every Add-On Plan subscription for this org that currently retains its
+ *  limits — active, cancelling (paid until period end), or past_due. */
+export async function getActiveAddonSubscriptions(orgId: string): Promise<AddonSubscription[]> {
+  const supabase = createAdminClient()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase as any)
+    .from('org_addon_subscriptions')
+    .select('*, plans:addon_plan_id(*)')
+    .eq('org_id', orgId)
+    .in('status', ['active', 'cancelling', 'past_due'])
+    .order('created_at', { ascending: false }) as { data: unknown[] | null; error: { message: string } | null }
+
+  if (error) {
+    logger.error('Failed to get add-on subscriptions', { error: error.message, orgId })
+    return []
+  }
+
+  return (data ?? []).map(row => {
+    const r = row as unknown as Record<string, unknown>
+    return {
+      id: r.id as string,
+      org_id: r.org_id as string,
+      addon_plan_id: r.addon_plan_id as string,
+      razorpay_subscription_id: r.razorpay_subscription_id as string | null,
+      status: r.status as string,
+      current_period_start: r.current_period_start as string | null,
+      current_period_end: r.current_period_end as string | null,
+      canceled_at: r.canceled_at as string | null,
+      created_at: r.created_at as string,
+      plan: (r.plans as Plan | null) ?? null,
+    }
+  })
+}
+
 export async function createInvoiceRecord(record: {
   org_id: string
   subscription_id?: string

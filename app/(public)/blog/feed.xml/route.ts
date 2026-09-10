@@ -13,7 +13,7 @@ function escapeXml(str: string): string {
 }
 
 export async function GET(): Promise<Response> {
-  const appUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://uptrue.io').trim()
+  const appUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://upnotify-monitoring.vercel.app').trim()
   const posts = await getPublishedBlogPosts()
 
   const items = posts.map(post => {
@@ -44,8 +44,8 @@ export async function GET(): Promise<Response> {
     <link>${appUrl}/blog</link>
     <description>Uptime monitoring insights, LLM launch coverage, and web infrastructure intelligence from Upnotify.</description>
     <language>en-gb</language>
-    <managingEditor>hello@uptrue.io (Upnotify)</managingEditor>
-    <webMaster>hello@uptrue.io (Upnotify)</webMaster>
+    <managingEditor>shreya23001@gmail.com (Upnotify)</managingEditor>
+    <webMaster>shreya23001@gmail.com (Upnotify)</webMaster>
     <atom:link href="${appUrl}/blog/feed.xml" rel="self" type="application/rss+xml"/>
     <image>
       <url>${appUrl}/logo.png</url>

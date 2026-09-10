@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: 'JavaScript Errors Breaking WordPress Page Functionality: When Your Site Is Up But Broken',
   description:
     'JavaScript errors on WordPress can break forms, buttons, sliders, and navigation while the page still loads and returns 200 OK. jQuery conflicts, plugin JS errors that cascade to break all subsequent scripts, and minification errors cause invisible functionality failures. Learn what causes them and how keyword monitoring catches broken pages.',
-  alternates: { canonical: 'https://uptrue.io/blog/wordpress-javascript-errors' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/wordpress-javascript-errors' },
   openGraph: {
     title: 'JavaScript Errors Breaking WordPress Page Functionality: When Your Site Is Up But Broken',
     description:
       'How JavaScript errors silently break WordPress forms, buttons, and navigation while uptime monitors report everything as healthy. What causes them and how Upnotify keyword monitoring detects broken functionality.',
-    url: 'https://uptrue.io/blog/wordpress-javascript-errors',
+    url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-javascript-errors',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -68,10 +68,10 @@ export default function WordPressJavascriptErrorsPage(): React.ReactElement {
           headline: 'JavaScript Errors Breaking WordPress Page Functionality: When Your Site Is Up But Broken',
           description: 'How JavaScript errors silently break WordPress forms, buttons, and navigation, and how keyword monitoring detects broken functionality automatically.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-04-02',
           dateModified: '2026-04-02',
-          url: 'https://uptrue.io/blog/wordpress-javascript-errors',
+          url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-javascript-errors',
         }}
       />
 
@@ -216,7 +216,7 @@ export default function WordPressJavascriptErrorsPage(): React.ReactElement {
         <h3>Step 1: Set up keyword monitors on critical interactive pages</h3>
 
         <ol>
-          <li>Sign up at <Link href="/signup">uptrue.io/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>Keyword</strong> as the monitor type</li>
           <li>Enter the URL of your contact page</li>

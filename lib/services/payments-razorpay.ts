@@ -163,6 +163,7 @@ export async function createRazorpaySubscription(params: {
   planSlug: string
   billingCycle: 'monthly' | 'annual'
   userEmail: string
+  isAddon?: boolean
 }): Promise<RazorpaySubscriptionResult> {
   const rzp = getRazorpay()
   const totalCount = params.billingCycle === 'annual' ? 10 : 120
@@ -177,6 +178,7 @@ export async function createRazorpaySubscription(params: {
       org_id: params.orgId,
       plan_slug: params.planSlug,
       billing_cycle: params.billingCycle,
+      ...(params.isAddon ? { is_addon: 'true' } : {}),
     },
     notify_info: {
       notify_phone: '',

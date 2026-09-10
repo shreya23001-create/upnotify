@@ -136,7 +136,7 @@ function makeStripeRequest(
   body: Record<string, unknown>,
   signature: string = 'sig_test_valid'
 ): Request {
-  return new Request('https://uptrue.io/api/webhooks/stripe', {
+  return new Request('https://upnotify-monitoring.vercel.app/api/webhooks/stripe', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -413,7 +413,7 @@ describe('Stripe webhook handler', () => {
     mockWebhookSecret = 'whsec_test'
 
     // Request without stripe-signature header
-    const req = new Request('https://uptrue.io/api/webhooks/stripe', {
+    const req = new Request('https://upnotify-monitoring.vercel.app/api/webhooks/stripe', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ type: 'test' }),
@@ -436,7 +436,7 @@ describe('Stripe webhook handler', () => {
     mockIsProductionValue = false
     mockWebhookSecret = undefined
 
-    const req = new Request('https://uptrue.io/api/webhooks/stripe', {
+    const req = new Request('https://upnotify-monitoring.vercel.app/api/webhooks/stripe', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ type: 'test' }),

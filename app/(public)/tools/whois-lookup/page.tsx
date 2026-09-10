@@ -9,12 +9,12 @@ export const metadata: Metadata = {
   title: 'Free WHOIS Lookup — Domain Registration Checker | Upnotify',
   description:
     'Look up WHOIS registration data for any domain. See registrar, creation date, expiry date, nameservers, and domain status. Free, instant, no signup.',
-  alternates: { canonical: 'https://uptrue.io/tools/whois-lookup' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/tools/whois-lookup' },
   openGraph: {
     title: 'Free WHOIS Lookup — Domain Registration Checker | Upnotify',
     description:
       'Look up WHOIS registration data for any domain. See registrar, creation date, expiry date, and nameservers. Free, no signup.',
-    url: 'https://uptrue.io/tools/whois-lookup',
+    url: 'https://upnotify-monitoring.vercel.app/tools/whois-lookup',
     type: 'website',
   },
 }
@@ -64,7 +64,7 @@ const jsonLd = {
     {
       '@type': 'WebApplication',
       name: 'WHOIS Lookup Tool',
-      url: 'https://uptrue.io/tools/whois-lookup',
+      url: 'https://upnotify-monitoring.vercel.app/tools/whois-lookup',
       applicationCategory: 'DeveloperApplication',
       operatingSystem: 'All',
       offers: {

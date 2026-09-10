@@ -74,13 +74,13 @@ update public.blog_posts set content = '"raw string"'::jsonb where slug = 'websi
 
 ## Human-tester walkthrough (admin editor)
 
-Tester: Boss or Krithi, logged in as super admin on `dev.uptrue.io`.
+Tester: Boss or Krithi, logged in as super admin on `upnotify-monitoring.vercel.app`.
 
 ### Path 1 — New post happy path
 1. Go to `/admin/blog/new`
 2. Title: `Test post — content shape fix verification`
 3. Slug auto-fills
-4. Body: paste 2 paragraphs of markdown including `**bold**` and `[a link](https://uptrue.io)`
+4. Body: paste 2 paragraphs of markdown including `**bold**` and `[a link](https://upnotify-monitoring.vercel.app)`
 5. Mid-CTA: heading "Try Uptrue", label "Start Free", URL "/signup"
 6. End-CTA: leave heading empty
 7. Click **Save Draft**
@@ -100,7 +100,7 @@ Tester: Boss or Krithi, logged in as super admin on `dev.uptrue.io`.
 2. Open in admin editor
 3. Add one paragraph at the end
 4. Save Draft
-5. Reload `dev.uptrue.io/blog/<slug>`
+5. Reload `upnotify-monitoring.vercel.app/blog/<slug>`
    - **Expect:** post renders correctly. Original CTAs and OG image still intact (regression check for the field-restoration in actions.ts).
 
 ### Path 4 — Calendar autoblog drafts
@@ -114,10 +114,10 @@ Tester: Boss or Krithi, logged in as super admin on `dev.uptrue.io`.
 
 ### Path 5 — Existing broken slugs (backfilled by migration)
 After migration runs on dev:
-1. `dev.uptrue.io/blog/api-monitoring-tools` → expect 404 (now unpublished)
-2. `dev.uptrue.io/blog/security-headers` → expect 404 (still draft)
-3. `dev.uptrue.io/blog/website-monitoring` → expect 404 (still draft)
-4. `dev.uptrue.io/blog/monitor-website-content-changes` → expect 404 (still draft)
+1. `upnotify-monitoring.vercel.app/blog/api-monitoring-tools` → expect 404 (now unpublished)
+2. `upnotify-monitoring.vercel.app/blog/security-headers` → expect 404 (still draft)
+3. `upnotify-monitoring.vercel.app/blog/website-monitoring` → expect 404 (still draft)
+4. `upnotify-monitoring.vercel.app/blog/monitor-website-content-changes` → expect 404 (still draft)
 
 In admin, they should all show as drafts with `{}` content — Boss can decide whether to add content or delete.
 

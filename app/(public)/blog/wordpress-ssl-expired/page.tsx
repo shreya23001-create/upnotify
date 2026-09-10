@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: 'WordPress SSL Certificate Expired? Here\'s How to Never Let It Happen Again',
   description:
     'Let\'s Encrypt auto-renew fails silently more often than you think. DNS changes, server misconfigurations, and hosting migrations all break automatic renewal. Learn what happens when your SSL expires, how to fix it, and how Upnotify warns you 30, 14, and 7 days before expiry.',
-  alternates: { canonical: 'https://uptrue.io/blog/wordpress-ssl-expired' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/wordpress-ssl-expired' },
   openGraph: {
     title: 'WordPress SSL Certificate Expired? Here\'s How to Never Let It Happen Again',
     description:
       'Why Let\'s Encrypt auto-renew fails silently, what visitors see when SSL expires, and how SSL monitoring warns you weeks before it happens.',
-    url: 'https://uptrue.io/blog/wordpress-ssl-expired',
+    url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-ssl-expired',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -43,7 +43,7 @@ const FAQ_DATA = [
   {
     question: 'Can Upnotify monitor my SSL certificate expiry date?',
     answer:
-      'Yes. Upnotify\'s SSL monitor checks your certificate on every scan and tracks the expiry date. It sends alerts at 30 days, 14 days, and 7 days before expiry — giving you multiple warnings before anything breaks. It also detects certificate chain issues, mismatched domains, and revoked certificates. You can also use the free SSL Checker tool at uptrue.io/tools/ssl-checker to check any domain instantly without signing up.',
+      'Yes. Upnotify\'s SSL monitor checks your certificate on every scan and tracks the expiry date. It sends alerts at 30 days, 14 days, and 7 days before expiry — giving you multiple warnings before anything breaks. It also detects certificate chain issues, mismatched domains, and revoked certificates. You can also use the free SSL Checker tool at upnotify-monitoring.vercel.app/tools/ssl-checker to check any domain instantly without signing up.',
   },
 ]
 
@@ -68,10 +68,10 @@ export default function WordPressSSLExpiredPage(): React.ReactElement {
           headline: 'WordPress SSL Certificate Expired? Here\'s How to Never Let It Happen Again',
           description: 'Why Let\'s Encrypt auto-renew fails silently, what visitors see when SSL expires, and how SSL monitoring warns you weeks before it happens.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-04-03',
           dateModified: '2026-04-03',
-          url: 'https://uptrue.io/blog/wordpress-ssl-expired',
+          url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-ssl-expired',
         }}
       />
 
@@ -208,7 +208,7 @@ export default function WordPressSSLExpiredPage(): React.ReactElement {
         <h3>Check instantly with Upnotify&apos;s free SSL Checker</h3>
 
         <p>
-          Go to <Link href="/tools/ssl-checker">uptrue.io/tools/ssl-checker</Link> and enter your domain. The tool shows your certificate issuer, expiry date, certificate chain status, and any configuration issues — all in a single scan. No signup required.
+          Go to <Link href="/tools/ssl-checker">upnotify-monitoring.vercel.app/tools/ssl-checker</Link> and enter your domain. The tool shows your certificate issuer, expiry date, certificate chain status, and any configuration issues — all in a single scan. No signup required.
         </p>
 
         <h2>How to fix an expired SSL certificate on WordPress</h2>
@@ -269,7 +269,7 @@ export default function WordPressSSLExpiredPage(): React.ReactElement {
         <h3>Step 1: Add an SSL monitor for your domain</h3>
 
         <ol>
-          <li>Sign up at <Link href="/signup">uptrue.io/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>SSL Certificate</strong> as the monitor type</li>
           <li>Enter your domain name</li>

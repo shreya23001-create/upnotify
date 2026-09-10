@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: 'Wordfence Blocking Real Users: When Your Security Plugin Becomes Your Biggest Problem',
   description:
     'Wordfence can silently block legitimate visitors, paying customers, and even Googlebot through aggressive rate limiting, country blocking misconfiguration, and learning mode failures. Your site is technically up but unreachable for real users. Learn what causes it and how HTTP monitoring from multiple locations detects blocked traffic automatically.',
-  alternates: { canonical: 'https://uptrue.io/blog/wordfence-blocking-traffic' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/wordfence-blocking-traffic' },
   openGraph: {
     title: 'Wordfence Blocking Real Users: When Your Security Plugin Becomes Your Biggest Problem',
     description:
       'What causes Wordfence to block legitimate traffic, how aggressive rate limiting and country blocking catch real customers, and how Upnotify HTTP monitoring from multiple locations detects when your firewall is blocking visitors.',
-    url: 'https://uptrue.io/blog/wordfence-blocking-traffic',
+    url: 'https://upnotify-monitoring.vercel.app/blog/wordfence-blocking-traffic',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -68,10 +68,10 @@ export default function WordfenceBlockingTrafficPage(): React.ReactElement {
           headline: 'Wordfence Blocking Real Users: When Your Security Plugin Becomes Your Biggest Problem',
           description: 'What causes Wordfence to block legitimate traffic, how aggressive settings catch real customers, and how multi-location HTTP monitoring detects blocked visitors.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-04-02',
           dateModified: '2026-04-02',
-          url: 'https://uptrue.io/blog/wordfence-blocking-traffic',
+          url: 'https://upnotify-monitoring.vercel.app/blog/wordfence-blocking-traffic',
         }}
       />
 
@@ -259,7 +259,7 @@ export default function WordfenceBlockingTrafficPage(): React.ReactElement {
         <h3>Step 1: Set up HTTP monitoring from multiple locations</h3>
 
         <ol>
-          <li>Sign up at <Link href="/signup">uptrue.io/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>HTTP/HTTPS</strong> as the monitor type</li>
           <li>Enter your homepage URL</li>

@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: 'WPML Breaking URLs After Update: How Multilingual Plugins Cause 404 Errors Across Your Site',
   description:
     'WPML can silently break every translated URL on your WordPress site after an update. Language prefix conflicts, slug translation corruption, and permalink flush failures cause 404 errors across entire language versions. Learn what causes it and how HTTP monitoring on every language version detects broken URLs automatically.',
-  alternates: { canonical: 'https://uptrue.io/blog/wordpress-wpml-404-errors' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/wordpress-wpml-404-errors' },
   openGraph: {
     title: 'WPML Breaking URLs After Update: How Multilingual Plugins Cause 404 Errors Across Your Site',
     description:
       'What causes WPML to break translated URLs after updates, how language prefix conflicts and slug corruption produce 404 errors, and how Upnotify HTTP monitoring on every language version catches broken pages automatically.',
-    url: 'https://uptrue.io/blog/wordpress-wpml-404-errors',
+    url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-wpml-404-errors',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -68,10 +68,10 @@ export default function WpmlFourOhFourErrorsPage(): React.ReactElement {
           headline: 'WPML Breaking URLs After Update: How Multilingual Plugins Cause 404 Errors Across Your Site',
           description: 'What causes WPML to break translated URLs, how language prefix conflicts and slug corruption produce 404 errors, and how HTTP monitoring catches broken language versions automatically.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-04-03',
           dateModified: '2026-04-03',
-          url: 'https://uptrue.io/blog/wordpress-wpml-404-errors',
+          url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-wpml-404-errors',
         }}
       />
 
@@ -244,7 +244,7 @@ export default function WpmlFourOhFourErrorsPage(): React.ReactElement {
         <h3>Step 1: Set up HTTP monitors for every language homepage</h3>
 
         <ol>
-          <li>Sign up at <Link href="/signup">uptrue.io/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>HTTP/HTTPS</strong> as the monitor type</li>
           <li>Enter your default language homepage URL</li>

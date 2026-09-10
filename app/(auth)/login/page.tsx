@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: 'Log In',
   description:
     'Log in to your Upnotify account. Monitor uptime, performance and infrastructure for all your sites.',
-  alternates: { canonical: 'https://uptrue.io/login' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/login' },
   robots: { index: false, follow: true },
 }
 

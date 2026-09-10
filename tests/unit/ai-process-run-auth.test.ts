@@ -36,7 +36,7 @@ describe('POST /api/ai-visibility/process-run — auth (engineering-app#80)', ()
   it('rejects with 403 when CRON_SECRET is unset and header is missing', async () => {
     delete process.env.CRON_SECRET
     const { POST } = await import('@/app/api/ai-visibility/process-run/route')
-    const req = new Request('https://uptrue.io/api/ai-visibility/process-run', {
+    const req = new Request('https://upnotify-monitoring.vercel.app/api/ai-visibility/process-run', {
       method: 'POST',
       headers: { ...freshIpHeaders(), 'content-type': 'application/json' },
       body: JSON.stringify({ runId: 'foo' }),
@@ -48,7 +48,7 @@ describe('POST /api/ai-visibility/process-run — auth (engineering-app#80)', ()
   it('rejects with 403 when CRON_SECRET is unset and header is an empty string', async () => {
     delete process.env.CRON_SECRET
     const { POST } = await import('@/app/api/ai-visibility/process-run/route')
-    const req = new Request('https://uptrue.io/api/ai-visibility/process-run', {
+    const req = new Request('https://upnotify-monitoring.vercel.app/api/ai-visibility/process-run', {
       method: 'POST',
       headers: {
         ...freshIpHeaders(),
@@ -64,7 +64,7 @@ describe('POST /api/ai-visibility/process-run — auth (engineering-app#80)', ()
   it('rejects with 403 when CRON_SECRET is set but header is missing', async () => {
     process.env.CRON_SECRET = 'real-secret'
     const { POST } = await import('@/app/api/ai-visibility/process-run/route')
-    const req = new Request('https://uptrue.io/api/ai-visibility/process-run', {
+    const req = new Request('https://upnotify-monitoring.vercel.app/api/ai-visibility/process-run', {
       method: 'POST',
       headers: { ...freshIpHeaders(), 'content-type': 'application/json' },
       body: JSON.stringify({ runId: 'foo' }),
@@ -76,7 +76,7 @@ describe('POST /api/ai-visibility/process-run — auth (engineering-app#80)', ()
   it('rejects with 403 when CRON_SECRET is set but header is empty', async () => {
     process.env.CRON_SECRET = 'real-secret'
     const { POST } = await import('@/app/api/ai-visibility/process-run/route')
-    const req = new Request('https://uptrue.io/api/ai-visibility/process-run', {
+    const req = new Request('https://upnotify-monitoring.vercel.app/api/ai-visibility/process-run', {
       method: 'POST',
       headers: {
         ...freshIpHeaders(),
@@ -92,7 +92,7 @@ describe('POST /api/ai-visibility/process-run — auth (engineering-app#80)', ()
   it('rejects with 403 when CRON_SECRET is set but header value is wrong', async () => {
     process.env.CRON_SECRET = 'real-secret'
     const { POST } = await import('@/app/api/ai-visibility/process-run/route')
-    const req = new Request('https://uptrue.io/api/ai-visibility/process-run', {
+    const req = new Request('https://upnotify-monitoring.vercel.app/api/ai-visibility/process-run', {
       method: 'POST',
       headers: {
         ...freshIpHeaders(),
@@ -108,7 +108,7 @@ describe('POST /api/ai-visibility/process-run — auth (engineering-app#80)', ()
   it('proceeds when CRON_SECRET matches the header value', async () => {
     process.env.CRON_SECRET = 'real-secret'
     const { POST } = await import('@/app/api/ai-visibility/process-run/route')
-    const req = new Request('https://uptrue.io/api/ai-visibility/process-run', {
+    const req = new Request('https://upnotify-monitoring.vercel.app/api/ai-visibility/process-run', {
       method: 'POST',
       headers: {
         ...freshIpHeaders(),

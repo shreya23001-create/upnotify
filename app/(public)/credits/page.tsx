@@ -6,12 +6,12 @@ export const metadata: Metadata = {
   title: 'Community Credits — Earn Discounts on Your Monitoring Plan | Upnotify',
   description:
     'Earn credits toward your Upnotify subscription by embedding badges, referring friends, writing reviews, and reporting bugs. Up to \u00A310/month off your plan.',
-  alternates: { canonical: 'https://uptrue.io/credits' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/credits' },
   openGraph: {
     title: 'Community Credits — Earn Discounts on Your Monitoring Plan',
     description:
       'Earn credits toward your Upnotify subscription. Embed badges, refer friends, write reviews, and report bugs to save up to \u00A310/month.',
-    url: 'https://uptrue.io/credits',
+    url: 'https://upnotify-monitoring.vercel.app/credits',
   },
 }
 

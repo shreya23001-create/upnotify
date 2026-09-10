@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: 'PHP Fatal Error: Allowed Memory Size Exhausted in WordPress — Complete Fix Guide',
   description:
     'The PHP memory exhausted error crashes your WordPress site with a white screen or 500 error. Learn what causes it, how to fix it permanently with wp-config, php.ini, and .htaccess, and how to monitor for the 500 errors it causes.',
-  alternates: { canonical: 'https://uptrue.io/blog/wordpress-php-memory-exhausted' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/wordpress-php-memory-exhausted' },
   openGraph: {
     title: 'PHP Fatal Error: Allowed Memory Size Exhausted in WordPress — Complete Fix Guide',
     description:
       'What causes the PHP memory exhausted error, how to fix it with wp-config and php.ini, and how to monitor for the 500 errors and white screens it causes.',
-    url: 'https://uptrue.io/blog/wordpress-php-memory-exhausted',
+    url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-php-memory-exhausted',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -68,10 +68,10 @@ export default function WordPressPhpMemoryExhaustedPage(): React.ReactElement {
           headline: 'PHP Fatal Error: Allowed Memory Size Exhausted in WordPress — Complete Fix Guide',
           description: 'What causes the PHP memory limit exhausted error in WordPress, four ways to fix it, and how to monitor for the 500 errors and white screens it causes.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-17',
           dateModified: '2026-03-17',
-          url: 'https://uptrue.io/blog/wordpress-php-memory-exhausted',
+          url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-php-memory-exhausted',
         }}
       />
 
@@ -300,7 +300,7 @@ export default function WordPressPhpMemoryExhaustedPage(): React.ReactElement {
         <h3>Step 1: Set up an HTTP monitor</h3>
 
         <ol>
-          <li>Sign up at <Link href="/signup">uptrue.io/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>HTTP/HTTPS</strong> as the monitor type</li>
           <li>Enter your WordPress site URL</li>

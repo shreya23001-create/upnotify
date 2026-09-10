@@ -73,7 +73,7 @@ const data: IndustryLandingData = {
     },
     {
       q: 'Can we white-label a public status page for our customers?',
-      a: 'Free and Lite plans include a branded uptrue.io public status page. White-label custom-domain status pages are on the V1.5 roadmap. Until then, embed our status badge on your marketing site and link to your Upnotify status page from your help docs.',
+      a: 'Free and Lite plans include a branded upnotify-monitoring.vercel.app public status page. White-label custom-domain status pages are on the V1.5 roadmap. Until then, embed our status badge on your marketing site and link to your Upnotify status page from your help docs.',
     },
     {
       q: 'How quickly will my engineering team be alerted to a problem?',
@@ -89,11 +89,11 @@ const data: IndustryLandingData = {
 export const metadata: Metadata = {
   title: data.seoTitle,
   description: data.seoDescription,
-  alternates: { canonical: `https://uptrue.io/monitoring/${data.slug}` },
+  alternates: { canonical: `https://upnotify-monitoring.vercel.app/monitoring/${data.slug}` },
   openGraph: {
     title: data.seoTitle,
     description: data.seoDescription,
-    url: `https://uptrue.io/monitoring/${data.slug}`,
+    url: `https://upnotify-monitoring.vercel.app/monitoring/${data.slug}`,
     type: 'website',
   },
 }

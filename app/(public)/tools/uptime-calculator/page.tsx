@@ -9,12 +9,12 @@ export const metadata: Metadata = {
   title: 'Free Uptime & SLA Downtime Calculator | Calculate 99.9% SLA Allowed Downtime | Upnotify',
   description:
     'Free uptime calculator and SLA downtime tool. Calculate how much downtime 99%, 99.9%, 99.95%, 99.99%, and 99.999% SLA levels allow per year, month, week, and day. Estimate downtime costs and compare SLA tiers instantly.',
-  alternates: { canonical: 'https://uptrue.io/tools/uptime-calculator' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/tools/uptime-calculator' },
   openGraph: {
     title: 'Free Uptime & SLA Downtime Calculator | Upnotify',
     description:
       'Calculate allowed downtime for any uptime SLA percentage. Compare SLA tiers, estimate downtime costs, and understand what 99.9% uptime really means.',
-    url: 'https://uptrue.io/tools/uptime-calculator',
+    url: 'https://upnotify-monitoring.vercel.app/tools/uptime-calculator',
     type: 'website',
   },
   keywords: [
@@ -29,12 +29,12 @@ const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebApplication',
   name: 'Upnotify Uptime & SLA Calculator',
-  url: 'https://uptrue.io/tools/uptime-calculator',
+  url: 'https://upnotify-monitoring.vercel.app/tools/uptime-calculator',
   description: 'Free uptime and SLA downtime calculator. Calculate allowed downtime for any SLA percentage.',
   applicationCategory: 'UtilityApplication',
   operatingSystem: 'All',
   offers: { '@type': 'Offer', price: '0', priceCurrency: 'GBP' },
-  author: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+  author: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
 }
 
 export default function UptimeCalculatorPage(): React.ReactElement {

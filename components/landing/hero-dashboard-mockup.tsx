@@ -283,7 +283,7 @@ export function HeroDashboardMockup(): React.ReactElement {
           <div className="titlebar-dot td-red" />
           <div className="titlebar-dot td-yellow" />
           <div className="titlebar-dot td-green" />
-          <div className="mockup-url">app.uptrue.io/dashboard</div>
+          <div className="mockup-url">upnotify-monitoring.vercel.app/dashboard</div>
         </div>
 
         <div className="mockup-body" style={{ position: 'relative' }}>

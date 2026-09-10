@@ -14,12 +14,12 @@ export const metadata: Metadata = {
   title: 'Free Website Monitoring Tools — DNS, SSL, Speed, Security Headers | Upnotify',
   description:
     'Free website monitoring tools: SSL checker, DNS lookup, WHOIS, security headers, HTTP status checker, redirect chain tracer, SPF/DMARC, blacklist checker, speed test, robots.txt, port checker, uptime calculator, and the Upnotify WordPress plugin. No signup required.',
-  alternates: { canonical: 'https://uptrue.io/tools' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/tools' },
   openGraph: {
     title: 'Free Website Monitoring Tools | Upnotify',
     description:
       'DNS lookup, SSL checker, security headers, WHOIS, SPF/DMARC, speed test, and more — all free.',
-    url: 'https://uptrue.io/tools',
+    url: 'https://upnotify-monitoring.vercel.app/tools',
     type: 'website',
   },
 }
@@ -151,7 +151,7 @@ const TOOLS: { slug: string; title: string; description: string; tag: string; hr
       'Check if any TCP port is open on any host. Test SSH, HTTP, HTTPS, SMTP, MySQL, PostgreSQL, Redis, and custom ports.',
     tag: '',
     icon: Plug2,
-    accent: '#00873a',
+    accent: '#8b5cf6',
   },
   {
     slug: 'robots-txt-checker',
@@ -203,7 +203,7 @@ export default function ToolsIndexPage(): React.ReactElement {
   const rest = TOOLS.filter(t => t.tag !== 'Featured' && t.tag !== 'Free Plugin')
 
   return (
-    <div className="tools-page">
+    <div className="tools-page tools-orange-cta">
       <ScrollReveal />
       <div className="tools-hero">
         <h1 className="tools-hero-title reveal-title">Free Website Tools</h1>

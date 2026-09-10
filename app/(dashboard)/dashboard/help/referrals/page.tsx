@@ -85,7 +85,7 @@ export default function ReferralsHelpPage(): React.ReactElement {
             <p>
               Your referral link lives in <strong>Settings</strong> &rarr;
               <strong> Referrals</strong>. It looks something like
-              <code> uptrue.io/r/abc123</code>. Click the copy button to grab it,
+              <code> upnotify-monitoring.vercel.app/r/abc123</code>. Click the copy button to grab it,
               then share it wherever you like -- email, Slack, social media, or a
               quick text.
             </p>

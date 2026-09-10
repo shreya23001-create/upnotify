@@ -85,11 +85,11 @@ const data: ToolPillarData = {
 export const metadata: Metadata = {
   title: data.seoTitle,
   description: data.seoDescription,
-  alternates: { canonical: `https://uptrue.io/tools/${data.pillarSlug}` },
+  alternates: { canonical: `https://upnotify-monitoring.vercel.app/tools/${data.pillarSlug}` },
   openGraph: {
     title: data.seoTitle,
     description: data.seoDescription,
-    url: `https://uptrue.io/tools/${data.pillarSlug}`,
+    url: `https://upnotify-monitoring.vercel.app/tools/${data.pillarSlug}`,
     type: 'website',
   },
 }

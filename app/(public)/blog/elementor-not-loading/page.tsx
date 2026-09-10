@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: 'Elementor Not Loading After Update? Fix the White Screen Before You Lose Traffic',
   description:
     'Elementor can break after a WordPress or plugin update — showing a white screen, missing widgets, or a 500 error. Learn why it happens (PHP version, theme conflicts, stale cache, memory limits) and how Upnotify HTTP and keyword monitoring catches Elementor failures before your visitors do.',
-  alternates: { canonical: 'https://uptrue.io/blog/elementor-not-loading' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/elementor-not-loading' },
   openGraph: {
     title: 'Elementor Not Loading After Update? Fix the White Screen Before You Lose Traffic',
     description:
       'Why Elementor breaks after updates, what causes the white screen, and how HTTP and keyword monitoring detects missing content and 500 errors automatically.',
-    url: 'https://uptrue.io/blog/elementor-not-loading',
+    url: 'https://upnotify-monitoring.vercel.app/blog/elementor-not-loading',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -68,10 +68,10 @@ export default function ElementorNotLoadingPage(): React.ReactElement {
           headline: 'Elementor Not Loading After Update? Fix the White Screen Before You Lose Traffic',
           description: 'Why Elementor breaks after updates, how to fix it, and how HTTP and keyword monitoring catches broken pages automatically.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-27',
           dateModified: '2026-03-27',
-          url: 'https://uptrue.io/blog/elementor-not-loading',
+          url: 'https://upnotify-monitoring.vercel.app/blog/elementor-not-loading',
         }}
       />
 
@@ -214,7 +214,7 @@ export default function ElementorNotLoadingPage(): React.ReactElement {
         <h3>Step 1: Set up HTTP monitoring to catch 500 errors</h3>
 
         <ol>
-          <li>Sign up at <Link href="/signup">uptrue.io/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>HTTP/HTTPS</strong> as the monitor type</li>
           <li>Enter your homepage URL</li>

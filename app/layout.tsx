@@ -7,10 +7,10 @@ import { GoogleTagManager } from "@/components/analytics/google-tag-manager"
 import { MicrosoftClarity } from "@/components/analytics/microsoft-clarity"
 import "./styles.css"
 
-// Hard SEO rule: only the production host (uptrue.io / www.uptrue.io) is
+// Hard SEO rule: only the production host (upnotify-monitoring.vercel.app) is
 // indexable. Vercel sets VERCEL_ENV='production' only on master deploys —
 // any other environment (preview/dev/local) must emit noindex,nofollow so
-// Google never crawls duplicate content under dev.uptrue.io.
+// Google never crawls duplicate content under preview deployments.
 const IS_PRODUCTION_HOST = process.env.VERCEL_ENV === "production"
 
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"], display: "swap" })
@@ -27,7 +27,7 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://uptrue.io"),
+  metadataBase: new URL("https://upnotify-monitoring.vercel.app"),
   title: {
     default: "Free Uptime Monitoring for Agencies, SaaS & Dev Teams — Upnotify",
     template: "%s",
@@ -57,7 +57,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_GB",
-    url: "https://uptrue.io",
+    url: "https://upnotify-monitoring.vercel.app",
     siteName: "Upnotify",
     title: "Free Uptime Monitoring for Agencies, SaaS & Dev Teams — Upnotify",
     description:

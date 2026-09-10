@@ -134,7 +134,7 @@ export default function WordPressHelpPage(): React.ReactElement {
             <p>
               In <strong>Upnotify → Settings</strong> you will see an <strong>Upnotify App URL</strong> field.
               Leave this blank to use the default (production). If you are testing against
-              the Upnotify dev environment, set it to <code>https://dev.uptrue.io/api/v1/wp-agent</code>.
+              the Upnotify dev environment, set it to <code>https://upnotify-monitoring.vercel.app/api/v1/wp-agent</code>.
             </p>
           </section>
 
@@ -163,7 +163,7 @@ export default function WordPressHelpPage(): React.ReactElement {
               </li>
               <li>
                 <strong>Network error:</strong> Your hosting provider may block outbound HTTPS requests.
-                Contact your host and ask them to whitelist outbound connections to uptrue.io.
+                Contact your host and ask them to whitelist outbound connections to upnotify-monitoring.vercel.app.
               </li>
               <li>
                 <strong>Monitor shows Stale:</strong> The plugin has not pushed within 3× its check interval.
@@ -188,7 +188,7 @@ export default function WordPressHelpPage(): React.ReactElement {
           </section>
 
           <div style={{ marginTop: 32, padding: '16px 20px', background: 'var(--bg-secondary)', borderRadius: 8, fontSize: 14 }}>
-            <strong>Need help?</strong> Email <a href="mailto:support@uptrue.io" style={{ color: 'var(--color-primary)' }}>support@uptrue.io</a> or
+            <strong>Need help?</strong> Email <a href="mailto:shreya23001@gmail.com" style={{ color: 'var(--color-primary)' }}>shreya23001@gmail.com</a> or
             visit the <Link href="/monitoring/wordpress-site-monitor" style={{ color: 'var(--color-primary)' }}>WordPress Monitor landing page</Link> for
             full documentation.
           </div>

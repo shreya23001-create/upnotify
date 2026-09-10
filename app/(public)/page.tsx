@@ -54,12 +54,12 @@ export const metadata: Metadata = {
   title: 'Monitoring Suite for Agencies & Teams — Upnotify',
   description:
     'Monitor uptime, SSL, DNS, APIs & more across all your sites. 1-min checks, 2-region confirm, zero false alarms. Free — no card needed.',
-  alternates: { canonical: 'https://uptrue.io' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app' },
   openGraph: {
     title: 'Monitoring Suite for Agencies & Teams — Upnotify',
     description:
       'Monitor uptime, SSL, DNS, APIs & more across all your sites. 1-min checks, 2-region confirm, zero false alarms. Free — no card needed.',
-    url: 'https://uptrue.io',
+    url: 'https://upnotify-monitoring.vercel.app',
   },
 }
 
@@ -472,7 +472,7 @@ export default async function LandingPage(): Promise<React.ReactElement> {
                   gap: 'var(--space-4)',
                   padding: 'var(--space-6) var(--space-8)',
                   borderRadius: 'var(--radius-lg)',
-                  background: 'linear-gradient(135deg, #0a2f16 0%, #00873a 100%)',
+                  background: 'linear-gradient(135deg, #0068DB 0%, #1392FB 60%, #FBA830 100%)',
                   color: '#fff',
                 }}
               >
@@ -483,7 +483,7 @@ export default async function LandingPage(): Promise<React.ReactElement> {
                       fontWeight: 700,
                       letterSpacing: '0.1em',
                       textTransform: 'uppercase',
-                      color: '#0068DB',
+                      color: '#fff',
                       marginBottom: 6,
                     }}
                   >
@@ -499,8 +499,8 @@ export default async function LandingPage(): Promise<React.ReactElement> {
                 </div>
                 <a
                   href="https://aivisibility.uptrue.io"
-                  className="btn btn-primary btn-lg"
-                  style={{ flex: '0 0 auto' }}
+                  className="btn btn-lg"
+                  style={{ flex: '0 0 auto', background: '#fff', color: '#0068DB', fontWeight: 700 }}
                 >
                   Explore AI Visibility&trade; →
                 </a>

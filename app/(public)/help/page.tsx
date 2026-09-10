@@ -6,13 +6,13 @@ export const metadata: Metadata = {
   description:
     'Browse Upnotify help topics — getting started, monitors, alerts, status pages, billing, and more. Full articles open in your dashboard.',
   alternates: {
-    canonical: 'https://uptrue.io/help',
+    canonical: 'https://upnotify-monitoring.vercel.app/help',
   },
   openGraph: {
     title: 'Help Centre — Upnotify',
     description:
       'Browse Upnotify help topics — getting started, monitors, alerts, status pages, billing, and more.',
-    url: 'https://uptrue.io/help',
+    url: 'https://upnotify-monitoring.vercel.app/help',
     type: 'website',
   },
 }

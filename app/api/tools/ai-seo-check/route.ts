@@ -121,7 +121,7 @@ function hasSocialLinks(html: string): boolean {
 // Fetch with max-redirect guard (prevents infinite/deep redirect chains)
 // ---------------------------------------------------------------------------
 const MAX_REDIRECTS = 5
-const SEO_UA = 'UptrueSEOChecker/1.0 (+https://uptrue.io/tools/ai-seo-checker)'
+const SEO_UA = 'UptrueSEOChecker/1.0 (+https://upnotify-monitoring.vercel.app/tools/ai-seo-checker)'
 
 async function fetchWithRedirectLimit(url: string, timeoutMs: number): Promise<Response | null> {
   let current = url
@@ -187,7 +187,7 @@ async function fetchRobots(baseUrl: string): Promise<RobotsResult> {
   try {
     const res = await fetch(`${baseUrl}/robots.txt`, {
       signal: AbortSignal.timeout(5000),
-      headers: { 'User-Agent': 'UptrueSEOChecker/1.0 (+https://uptrue.io/tools/ai-seo-checker)' },
+      headers: { 'User-Agent': 'UptrueSEOChecker/1.0 (+https://upnotify-monitoring.vercel.app/tools/ai-seo-checker)' },
     })
     if (!res.ok) return result
 

@@ -9,12 +9,12 @@ export const metadata: Metadata = {
   title: 'Free Website Speed Test — Check Page Load Time | Upnotify',
   description:
     'Test your website\'s response time and TTFB (Time to First Byte) instantly. Get a performance grade and actionable tips to speed up your site. Free tool, no signup.',
-  alternates: { canonical: 'https://uptrue.io/tools/website-speed-test' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/tools/website-speed-test' },
   openGraph: {
     title: 'Free Website Speed Test — Check Page Load Time | Upnotify',
     description:
       'Test your website\'s TTFB and load time. Get a performance grade and actionable tips to speed up your site.',
-    url: 'https://uptrue.io/tools/website-speed-test',
+    url: 'https://upnotify-monitoring.vercel.app/tools/website-speed-test',
     type: 'website',
   },
 }

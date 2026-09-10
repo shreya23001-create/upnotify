@@ -9,12 +9,12 @@ export const metadata: Metadata = {
   title: 'Free DNS Lookup Tool — Check DNS Records Online | Upnotify',
   description:
     'Look up DNS records for any domain instantly. Check A, AAAA, MX, NS, TXT, CNAME, and SOA records. Free DNS checker, no signup required.',
-  alternates: { canonical: 'https://uptrue.io/tools/dns-lookup' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/tools/dns-lookup' },
   openGraph: {
     title: 'Free DNS Lookup Tool — Check DNS Records Online | Upnotify',
     description:
       'Look up DNS records for any domain instantly. Check A, AAAA, MX, NS, TXT, CNAME, and SOA records. Free, no signup.',
-    url: 'https://uptrue.io/tools/dns-lookup',
+    url: 'https://upnotify-monitoring.vercel.app/tools/dns-lookup',
     type: 'website',
   },
 }
@@ -64,7 +64,7 @@ const jsonLd = {
     {
       '@type': 'WebApplication',
       name: 'DNS Lookup Tool',
-      url: 'https://uptrue.io/tools/dns-lookup',
+      url: 'https://upnotify-monitoring.vercel.app/tools/dns-lookup',
       applicationCategory: 'DeveloperApplication',
       operatingSystem: 'All',
       offers: {

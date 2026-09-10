@@ -80,7 +80,7 @@ export function EditStatusPageForm({ statusPage, monitors }: { statusPage: Statu
               />
             </div>
             <span className="form-hint">
-              Public URL: uptrue.io/status/{statusPage.slug}
+              Public URL: upnotify-monitoring.vercel.app/status/{statusPage.slug}
             </span>
           </div>
 

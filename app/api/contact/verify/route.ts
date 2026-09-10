@@ -52,7 +52,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 
   // Notify admin
   const config = getServerConfig()
-  const adminEmail = config.adminEmails[0] ?? 'support@uptrue.io'
+  const adminEmail = config.adminEmails[0] ?? 'shreya23001@gmail.com'
   const adminUrl = `${config.app.url}/admin/contact`
 
   await sendEmail(

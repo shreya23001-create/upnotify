@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: 'What Is a Good Website Response Time? (And How to Fix a Slow Server)',
   description:
     'What is a good website response time? Under 200ms is excellent, under 800ms is acceptable, over 2 seconds is damaging. Learn what drives slow server response times (TTFB), how to fix each cause, and how to monitor response time continuously.',
-  alternates: { canonical: 'https://uptrue.io/blog/website-response-time' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/website-response-time' },
   openGraph: {
     title: 'What Is a Good Website Response Time? (And How to Fix a Slow Server)',
     description:
       'Learn what good website response time looks like, what causes slow TTFB, and how to fix server response time. With benchmarks, diagnosis steps, and monitoring guide.',
-    url: 'https://uptrue.io/blog/website-response-time',
+    url: 'https://upnotify-monitoring.vercel.app/blog/website-response-time',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -73,10 +73,10 @@ export default function WebsiteResponseTimePage(): React.ReactElement {
           headline: 'What Is a Good Website Response Time? (And How to Fix a Slow Server)',
           description: 'What good website response time looks like, what causes high TTFB, how to fix slow server response, and how to monitor it continuously.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-04-06',
           dateModified: '2026-04-06',
-          url: 'https://uptrue.io/blog/website-response-time',
+          url: 'https://upnotify-monitoring.vercel.app/blog/website-response-time',
         }}
       />
 
@@ -281,7 +281,7 @@ export default function WebsiteResponseTimePage(): React.ReactElement {
         </ul>
 
         <p>
-          Set up an HTTP monitor in <Link href="https://uptrue.io/signup">Upnotify</Link> for each critical page on your site. Configure a response time threshold — 1,000ms is a good starting point — so you get alerted when the server is slow, not just when it is completely down.
+          Set up an HTTP monitor in <Link href="https://upnotify-monitoring.vercel.app/signup">Upnotify</Link> for each critical page on your site. Configure a response time threshold — 1,000ms is a good starting point — so you get alerted when the server is slow, not just when it is completely down.
         </p>
 
         <p>
@@ -294,7 +294,7 @@ export default function WebsiteResponseTimePage(): React.ReactElement {
             Upnotify measures TTFB every minute and alerts you when your server slows down — before it crashes completely. Free plan available, no credit card required.
           </p>
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-            <Link href="https://uptrue.io/signup" className="btn btn-primary btn-lg">
+            <Link href="https://upnotify-monitoring.vercel.app/signup" className="btn btn-primary btn-lg">
               Start Monitoring Free
             </Link>
           </div>

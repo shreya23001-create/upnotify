@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: 'How to Set Up a Free Public Status Page for Your SaaS',
   description:
     'Learn why every SaaS needs a public status page, what to include, and how to set one up for free in under five minutes with Upnotify. Build trust and reduce support tickets.',
-  alternates: { canonical: 'https://uptrue.io/blog/free-status-page-saas' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/free-status-page-saas' },
   openGraph: {
     title: 'How to Set Up a Free Public Status Page for Your SaaS',
     description:
       'Every SaaS needs a public status page. Learn what to include and how to set one up for free in five minutes.',
-    url: 'https://uptrue.io/blog/free-status-page-saas',
+    url: 'https://upnotify-monitoring.vercel.app/blog/free-status-page-saas',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -88,10 +88,10 @@ export default function FreeStatusPageSaasPage(): React.ReactElement {
           headline: 'How to Set Up a Free Public Status Page for Your SaaS',
           description: 'Why every SaaS needs a public status page and how to set one up for free in under five minutes.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-04-03',
           dateModified: '2026-04-03',
-          url: 'https://uptrue.io/blog/free-status-page-saas',
+          url: 'https://upnotify-monitoring.vercel.app/blog/free-status-page-saas',
         }}
       />
 
@@ -267,7 +267,7 @@ export default function FreeStatusPageSaasPage(): React.ReactElement {
           <li>Click <strong>Create Status Page</strong></li>
           <li>Name your status page — use your product name</li>
           <li>Select which monitors to display as components</li>
-          <li>Choose a slug — this becomes <code>uptrue.io/status/your-slug</code></li>
+          <li>Choose a slug — this becomes <code>upnotify-monitoring.vercel.app/status/your-slug</code></li>
           <li>Optionally set a custom domain — <code>status.yourdomain.com</code></li>
         </ol>
 

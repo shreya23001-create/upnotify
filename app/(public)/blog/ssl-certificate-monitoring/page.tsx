@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: 'SSL Certificate Monitoring: Why Auto-Renew Isn\'t Enough',
   description:
     'Auto-renew sounds foolproof, but SSL certificates still fail in production every day. Learn what goes wrong, see real examples, and discover why SSL monitoring catches what automation misses.',
-  alternates: { canonical: 'https://uptrue.io/blog/ssl-certificate-monitoring' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/ssl-certificate-monitoring' },
   openGraph: {
     title: 'SSL Certificate Monitoring: Why Auto-Renew Isn\'t Enough',
     description:
       'Auto-renew sounds foolproof, but SSL certificates still fail in production every day. Learn why monitoring catches what automation misses.',
-    url: 'https://uptrue.io/blog/ssl-certificate-monitoring',
+    url: 'https://upnotify-monitoring.vercel.app/blog/ssl-certificate-monitoring',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -63,10 +63,10 @@ export default function SslCertificateMonitoringPage(): React.ReactElement {
           headline: 'SSL Certificate Monitoring: Why Auto-Renew Isn\'t Enough',
           description: 'Why auto-renew fails and how SSL monitoring catches what automation misses.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-08',
           dateModified: '2026-03-08',
-          url: 'https://uptrue.io/blog/ssl-certificate-monitoring',
+          url: 'https://upnotify-monitoring.vercel.app/blog/ssl-certificate-monitoring',
         }}
       />
 

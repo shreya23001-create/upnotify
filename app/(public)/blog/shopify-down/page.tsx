@@ -56,12 +56,12 @@ export const metadata: Metadata = {
   title: 'Is Shopify Down? How to Check Shopify Status and Protect Your Store',
   description:
     'Wondering if Shopify is down? Learn how to check the official Shopify status page, tell the difference between a Shopify platform outage and a problem with your own theme or apps, what to do during an outage, and how uptime monitoring protects your store.',
-  alternates: { canonical: 'https://uptrue.io/blog/shopify-down' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/shopify-down' },
   openGraph: {
     title: 'Is Shopify Down? How to Check Shopify Status and Protect Your Store',
     description:
       'How to check if Shopify is down, distinguish platform outages from store-specific issues, and protect your store revenue with uptime monitoring.',
-    url: 'https://uptrue.io/blog/shopify-down',
+    url: 'https://upnotify-monitoring.vercel.app/blog/shopify-down',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -123,10 +123,10 @@ export default function ShopifyDownPage(): React.ReactElement {
           headline: 'Is Shopify Down? How to Check Shopify Status and Protect Your Store',
           description: 'How to check if Shopify is down, tell a platform outage from a store problem, and protect your store with uptime monitoring.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-04-06',
           dateModified: '2026-04-06',
-          url: 'https://uptrue.io/blog/shopify-down',
+          url: 'https://upnotify-monitoring.vercel.app/blog/shopify-down',
         }}
       />
 
@@ -247,7 +247,7 @@ export default function ShopifyDownPage(): React.ReactElement {
         <h3>Set up monitoring for your Shopify store</h3>
 
         <p>
-          In <Link href="https://uptrue.io/signup">Upnotify</Link>, set up the following monitors for your Shopify store:
+          In <Link href="https://upnotify-monitoring.vercel.app/signup">Upnotify</Link>, set up the following monitors for your Shopify store:
         </p>
 
         <ol>
@@ -263,7 +263,7 @@ export default function ShopifyDownPage(): React.ReactElement {
           <p>
             Free uptime monitoring for your store URL, checkout, and SSL certificate. Get alerted in 60 seconds when something breaks. No credit card required.
           </p>
-          <Link href="https://uptrue.io/signup" className="btn btn-primary btn-lg">
+          <Link href="https://upnotify-monitoring.vercel.app/signup" className="btn btn-primary btn-lg">
             Start Monitoring Free
           </Link>
         </div>

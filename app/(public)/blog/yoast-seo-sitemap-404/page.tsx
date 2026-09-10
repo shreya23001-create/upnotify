@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: 'Yoast SEO Sitemap Returning 404: How This Quietly Tanks Your Google Rankings',
   description:
     'Your Yoast SEO sitemap can return a 404 error due to broken permalinks, .htaccess rewrite conflicts, plugin conflicts, and server configuration issues. Google cannot find your pages, crawl budget is wasted, and rankings silently decline for weeks before you notice. Learn what causes it and how HTTP monitoring on /sitemap_index.xml catches the problem instantly.',
-  alternates: { canonical: 'https://uptrue.io/blog/yoast-seo-sitemap-404' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/yoast-seo-sitemap-404' },
   openGraph: {
     title: 'Yoast SEO Sitemap Returning 404: How This Quietly Tanks Your Google Rankings',
     description:
       'What causes Yoast SEO sitemap 404 errors, how broken permalinks and .htaccess conflicts destroy your sitemap, and how Upnotify HTTP monitoring on /sitemap_index.xml catches the problem before Google drops your pages.',
-    url: 'https://uptrue.io/blog/yoast-seo-sitemap-404',
+    url: 'https://upnotify-monitoring.vercel.app/blog/yoast-seo-sitemap-404',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -68,10 +68,10 @@ export default function YoastSeoSitemap404Page(): React.ReactElement {
           headline: 'Yoast SEO Sitemap Returning 404: How This Quietly Tanks Your Google Rankings',
           description: 'What causes Yoast SEO sitemap 404 errors, how to fix broken permalinks and rewrite rules, and how HTTP monitoring catches the problem before rankings decline.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-04-03',
           dateModified: '2026-04-03',
-          url: 'https://uptrue.io/blog/yoast-seo-sitemap-404',
+          url: 'https://upnotify-monitoring.vercel.app/blog/yoast-seo-sitemap-404',
         }}
       />
 
@@ -211,7 +211,7 @@ export default function YoastSeoSitemap404Page(): React.ReactElement {
         <h3>Step 1: Set up an HTTP monitor on your sitemap URL</h3>
 
         <ol>
-          <li>Sign up at <Link href="/signup">uptrue.io/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>HTTP/HTTPS</strong> as the monitor type</li>
           <li>Enter <code>https://yourdomain.com/sitemap_index.xml</code> as the URL</li>

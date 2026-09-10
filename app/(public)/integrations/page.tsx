@@ -6,12 +6,12 @@ export const metadata: Metadata = {
   title: 'Upnotify Integrations — Slack, Microsoft Teams, Telegram, Webhooks',
   description:
     'Send Upnotify monitoring alerts to Slack, Microsoft Teams, Telegram, or any signed webhook endpoint. Native formatting, severity-coded messages, one-click links to the monitor. Free plan supports email; Lite (£1/month) unlocks every channel.',
-  alternates: { canonical: 'https://uptrue.io/integrations' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/integrations' },
   openGraph: {
     title: 'Upnotify Integrations — Slack, Teams, Telegram, Webhooks',
     description:
       'Pipe Upnotify uptime, SSL and security alerts into Slack, Teams, Telegram, or any webhook endpoint with HMAC signing.',
-    url: 'https://uptrue.io/integrations',
+    url: 'https://upnotify-monitoring.vercel.app/integrations',
     type: 'website',
   },
 }

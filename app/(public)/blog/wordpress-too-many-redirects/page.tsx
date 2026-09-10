@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: 'WordPress Too Many Redirects: Fix ERR_TOO_MANY_REDIRECTS and Prevent It Forever',
   description:
     'The ERR_TOO_MANY_REDIRECTS error makes your WordPress site completely inaccessible. Learn what causes redirect loops, how to fix each cause, and how to set up monitoring that catches redirect loops before your visitors do.',
-  alternates: { canonical: 'https://uptrue.io/blog/wordpress-too-many-redirects' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/wordpress-too-many-redirects' },
   openGraph: {
     title: 'WordPress Too Many Redirects: Fix ERR_TOO_MANY_REDIRECTS and Prevent It Forever',
     description:
       'What causes WordPress redirect loops, how to fix each cause step by step, and how HTTP monitoring automatically detects redirect loops.',
-    url: 'https://uptrue.io/blog/wordpress-too-many-redirects',
+    url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-too-many-redirects',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -68,10 +68,10 @@ export default function WordPressTooManyRedirectsPage(): React.ReactElement {
           headline: 'WordPress Too Many Redirects: Fix ERR_TOO_MANY_REDIRECTS and Prevent It Forever',
           description: 'What causes WordPress redirect loops, how to fix each cause step by step, and how to set up monitoring that catches redirect loops automatically.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-15',
           dateModified: '2026-03-15',
-          url: 'https://uptrue.io/blog/wordpress-too-many-redirects',
+          url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-too-many-redirects',
         }}
       />
 
@@ -262,7 +262,7 @@ export default function WordPressTooManyRedirectsPage(): React.ReactElement {
         <h3>Step 1: Set up an HTTP monitor</h3>
 
         <ol>
-          <li>Sign up at <Link href="/signup">uptrue.io/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>HTTP/HTTPS</strong> as the monitor type</li>
           <li>Enter your WordPress site URL</li>

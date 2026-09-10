@@ -16,7 +16,7 @@ interface SocialPostResult {
 interface OutageSocialPost {
   siteDisplayName: string
   blogTitle: string
-  blogUrl: string         // full URL e.g. https://uptrue.io/blog/is-github-down-2026-apr-06
+  blogUrl: string         // full URL e.g. https://upnotify-monitoring.vercel.app/blog/is-github-down-2026-apr-06
   excerpt: string
 }
 

@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: 'Sign Up Free',
   description:
     'Create a free Upnotify account. Start monitoring uptime, performance and infrastructure in 60 seconds. No credit card required.',
-  alternates: { canonical: 'https://uptrue.io/signup' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/signup' },
 }
 
 export default async function SignupPage({ searchParams }: { searchParams: Promise<{ next?: string }> }): Promise<React.ReactElement> {

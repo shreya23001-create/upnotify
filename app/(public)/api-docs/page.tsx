@@ -6,13 +6,13 @@ export const metadata: Metadata = {
   description:
     'The Upnotify public REST API and SDKs are launching with our developer platform. Until then, integrate with Upnotify today via webhooks, Slack, Teams, and Zapier-style automations.',
   alternates: {
-    canonical: 'https://uptrue.io/api-docs',
+    canonical: 'https://upnotify-monitoring.vercel.app/api-docs',
   },
   openGraph: {
     title: 'API Documentation — Upnotify',
     description:
       'The Upnotify public REST API is launching with our developer platform. Integrate today via webhooks and integrations.',
-    url: 'https://uptrue.io/api-docs',
+    url: 'https://upnotify-monitoring.vercel.app/api-docs',
     type: 'website',
   },
 }

@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     title: 'Upnotify Blog — Website Monitoring Guides & Insights',
     description:
       'Guides, tutorials, and insights on website monitoring, uptime, SSL, status pages, and infrastructure reliability.',
-    url: 'https://uptrue.io/blog',
+    url: 'https://upnotify-monitoring.vercel.app/blog',
     siteName: 'Upnotify',
   },
 }

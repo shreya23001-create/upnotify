@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: 'WP Rocket Cache Serving Stale Pages: Why Your Updates Aren\'t Showing to Visitors',
   description:
     'WP Rocket can serve outdated cached pages long after you have published changes. Object cache conflicts, CDN layering, and preload bot timing all contribute. Learn what causes stale cache, how to fix it, and how Upnotify keyword monitoring checks what real visitors actually see.',
-  alternates: { canonical: 'https://uptrue.io/blog/wp-rocket-cache-issues' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/wp-rocket-cache-issues' },
   openGraph: {
     title: 'WP Rocket Cache Serving Stale Pages: Why Your Updates Aren\'t Showing to Visitors',
     description:
       'What causes WP Rocket to serve stale cached pages, how to fix each cause, and how keyword monitoring verifies that real visitors see your latest content.',
-    url: 'https://uptrue.io/blog/wp-rocket-cache-issues',
+    url: 'https://upnotify-monitoring.vercel.app/blog/wp-rocket-cache-issues',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -68,10 +68,10 @@ export default function WpRocketCacheIssuesPage(): React.ReactElement {
           headline: 'WP Rocket Cache Serving Stale Pages: Why Your Updates Aren\'t Showing to Visitors',
           description: 'What causes WP Rocket to serve stale cached pages, how to fix each cause, and how keyword monitoring verifies that visitors see your latest content.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-30',
           dateModified: '2026-03-30',
-          url: 'https://uptrue.io/blog/wp-rocket-cache-issues',
+          url: 'https://upnotify-monitoring.vercel.app/blog/wp-rocket-cache-issues',
         }}
       />
 
@@ -206,7 +206,7 @@ export default function WpRocketCacheIssuesPage(): React.ReactElement {
         <h3>Step 1: Set up a keyword monitor for your most important page</h3>
 
         <ol>
-          <li>Sign up at <Link href="/signup">uptrue.io/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>Keyword</strong> as the monitor type</li>
           <li>Enter the URL of the page you want to verify</li>

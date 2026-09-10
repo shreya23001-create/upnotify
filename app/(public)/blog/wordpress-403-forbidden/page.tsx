@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: 'WordPress 403 Forbidden Error: Why Your Pages Are Blocked and How to Fix It',
   description:
     'The 403 Forbidden error means your server is actively refusing to serve your WordPress pages. Learn what causes it — file permissions, .htaccess rules, mod_security, and security plugins — and how to monitor for 403 errors automatically.',
-  alternates: { canonical: 'https://uptrue.io/blog/wordpress-403-forbidden' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/wordpress-403-forbidden' },
   openGraph: {
     title: 'WordPress 403 Forbidden Error: Why Your Pages Are Blocked and How to Fix It',
     description:
       'What causes WordPress 403 Forbidden errors, how to fix file permissions, .htaccess deny rules, and mod_security false positives, and how HTTP monitoring catches 403 errors instantly.',
-    url: 'https://uptrue.io/blog/wordpress-403-forbidden',
+    url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-403-forbidden',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -68,10 +68,10 @@ export default function WordPress403ForbiddenPage(): React.ReactElement {
           headline: 'WordPress 403 Forbidden Error: Why Your Pages Are Blocked and How to Fix It',
           description: 'What causes WordPress 403 Forbidden errors, how to fix file permissions, .htaccess deny rules, and mod_security false positives, and how HTTP monitoring catches 403 errors instantly.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-21',
           dateModified: '2026-03-21',
-          url: 'https://uptrue.io/blog/wordpress-403-forbidden',
+          url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-403-forbidden',
         }}
       />
 
@@ -289,7 +289,7 @@ export default function WordPress403ForbiddenPage(): React.ReactElement {
         <h3>Step 1: Set up an HTTP monitor for your key pages</h3>
 
         <ol>
-          <li>Sign up at <Link href="/signup">uptrue.io/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>HTTP/HTTPS</strong> as the monitor type</li>
           <li>Enter the URL of your homepage</li>

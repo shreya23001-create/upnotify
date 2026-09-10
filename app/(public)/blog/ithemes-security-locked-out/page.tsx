@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: 'iThemes Security Locked Me Out of WordPress: How to Regain Access and Prevent It',
   description:
     'iThemes Security (Solid Security) can lock you out of your own WordPress site through brute force protection, file change detection false alarms, and database ban table corruption. Learn what causes lockouts, how to regain access, and how HTTP monitoring detects 403 lockout pages automatically.',
-  alternates: { canonical: 'https://uptrue.io/blog/ithemes-security-locked-out' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/ithemes-security-locked-out' },
   openGraph: {
     title: 'iThemes Security Locked Me Out of WordPress: How to Regain Access and Prevent It',
     description:
       'What causes iThemes Security to lock out legitimate users, how brute force protection and file change detection create false alarms, and how Upnotify HTTP monitoring detects lockout pages automatically.',
-    url: 'https://uptrue.io/blog/ithemes-security-locked-out',
+    url: 'https://upnotify-monitoring.vercel.app/blog/ithemes-security-locked-out',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -68,10 +68,10 @@ export default function IthemesSecurityLockedOutPage(): React.ReactElement {
           headline: 'iThemes Security Locked Me Out of WordPress: How to Regain Access and Prevent It',
           description: 'What causes iThemes Security lockouts, how brute force protection and file change detection create false alarms, and how HTTP monitoring detects 403 lockout pages.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-04-03',
           dateModified: '2026-04-03',
-          url: 'https://uptrue.io/blog/ithemes-security-locked-out',
+          url: 'https://upnotify-monitoring.vercel.app/blog/ithemes-security-locked-out',
         }}
       />
 
@@ -231,7 +231,7 @@ export default function IthemesSecurityLockedOutPage(): React.ReactElement {
         <h3>Step 1: Set up HTTP monitoring to detect 403 lockout responses</h3>
 
         <ol>
-          <li>Sign up at <Link href="/signup">uptrue.io/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>HTTP/HTTPS</strong> as the monitor type</li>
           <li>Enter your homepage URL</li>

@@ -7,12 +7,12 @@ export const metadata: Metadata = {
   title: 'Uptime Monitoring for Agencies: Managing 100+ Client Sites',
   description:
     'Generic monitoring tools were built for single-site teams. Learn what agencies actually need to monitor hundreds of client websites — multi-tenant workspaces, white-label, and scalable alerting.',
-  alternates: { canonical: 'https://uptrue.io/blog/uptime-monitoring-agencies' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/uptime-monitoring-agencies' },
   openGraph: {
     title: 'Uptime Monitoring for Agencies: Managing 100+ Client Sites',
     description:
       'Generic monitoring tools were built for single-site teams. Learn what agencies actually need to monitor hundreds of client websites.',
-    url: 'https://uptrue.io/blog/uptime-monitoring-agencies',
+    url: 'https://upnotify-monitoring.vercel.app/blog/uptime-monitoring-agencies',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
@@ -63,10 +63,10 @@ export default function UptimeMonitoringAgenciesPage(): React.ReactElement {
           headline: 'Uptime Monitoring for Agencies: Managing 100+ Client Sites',
           description: 'What agencies actually need to monitor hundreds of client websites at scale.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://uptrue.io' },
+          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-07',
           dateModified: '2026-03-07',
-          url: 'https://uptrue.io/blog/uptime-monitoring-agencies',
+          url: 'https://upnotify-monitoring.vercel.app/blog/uptime-monitoring-agencies',
         }}
       />
 
@@ -324,7 +324,7 @@ export default function UptimeMonitoringAgenciesPage(): React.ReactElement {
             Multi-tenant workspaces, white-label branding, per-client alerting, and AI-powered
             reports. Upnotify is the monitoring platform agencies have been asking for.
           </p>
-          <a href="mailto:agencies@uptrue.io?subject=Agency%20Waitlist%20%E2%80%94%20Early%20Access" className="btn btn-primary btn-lg">
+          <a href="mailto:shreya23001@gmail.com?subject=Agency%20Waitlist%20%E2%80%94%20Early%20Access" className="btn btn-primary btn-lg">
             Join the Agency Waitlist
           </a>
         </div>

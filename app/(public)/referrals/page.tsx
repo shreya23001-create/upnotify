@@ -11,12 +11,12 @@ export const metadata: Metadata = {
   title: 'Referral Program — Give 1 Month, Get 1 Month | Upnotify',
   description:
     'Share Upnotify with friends and colleagues. When they sign up and upgrade, you both get a free month of monitoring. Refer up to 5 people and save \u00A325.',
-  alternates: { canonical: 'https://uptrue.io/referrals' },
+  alternates: { canonical: 'https://upnotify-monitoring.vercel.app/referrals' },
   openGraph: {
     title: 'Upnotify Referral Program — Give 1 Month, Get 1 Month',
     description:
       'Share Upnotify with friends. When they upgrade, you both get a free month. Refer up to 5 people and save \u00A325 total.',
-    url: 'https://uptrue.io/referrals',
+    url: 'https://upnotify-monitoring.vercel.app/referrals',
   },
 }
 

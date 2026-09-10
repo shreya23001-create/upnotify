@@ -109,7 +109,7 @@ export default function StatusPagesPage(): React.ReactElement {
             <h2 className="help-section-title">Custom domains</h2>
             <p>
               On the <strong>Scale</strong> plan, you can use your own domain for the status page.
-              For example, instead of <code>status.uptrue.io/your-company</code>, you can use
+              For example, instead of <code>upnotify-monitoring.vercel.app/your-company</code>, you can use
               <code>status.yourcompany.com</code>.
             </p>
             <ol className="help-steps">
