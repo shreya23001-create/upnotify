@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useTransition } from 'react'
 import { signInWithPassword, signUpWithPassword } from '@/lib/auth/actions'
+import { PasswordInput } from './password-input'
 
 const HINT_COOKIE = 'uptrue_user_hint'
 
@@ -21,6 +22,7 @@ export function LoginForm({ mode = 'login', next }: { mode?: 'login' | 'signup';
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
   const [hintEmail, setHintEmail] = useState('')
+  const [agreedToTerms, setAgreedToTerms] = useState(false)
 
   useEffect(() => {
     if (mode === 'login') setHintEmail(readEmailHint())
@@ -130,19 +132,33 @@ export function LoginForm({ mode = 'login', next }: { mode?: 'login' | 'signup';
               <a href="/forgot-password" style={{ fontSize: 12 }}>Forgot password?</a>
             )}
           </div>
-          <input
-            className="auth-input"
+          <PasswordInput
             id="password"
             name="password"
-            type="password"
             placeholder={mode === 'signup' ? 'At least 8 characters' : 'Your password'}
             minLength={mode === 'signup' ? 8 : undefined}
             required
             autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
             disabled={isPending}
+            showToggle={mode === 'signup'}
           />
         </div>
-        <button type="submit" className="auth-submit" disabled={isPending}>
+        {mode === 'signup' && (
+          <label className="auth-terms-checkbox">
+            <input
+              type="checkbox"
+              checked={agreedToTerms}
+              onChange={e => setAgreedToTerms(e.target.checked)}
+              required
+              disabled={isPending}
+            />
+            <span>
+              I agree to the <a href="/terms" target="_blank" rel="noopener noreferrer">Terms</a> and{' '}
+              <a href="/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>.
+            </span>
+          </label>
+        )}
+        <button type="submit" className="auth-submit" disabled={isPending || (mode === 'signup' && !agreedToTerms)}>
           {isPending
             ? (mode === 'login' ? 'Signing in…' : 'Creating account…')
             : (mode === 'login' ? 'Log In →' : 'Create Free Account →')}
@@ -154,10 +170,12 @@ export function LoginForm({ mode = 'login', next }: { mode?: 'login' | 'signup';
           ? <><a href="/signup">Don&apos;t have an account? Sign up free</a></>
           : <><a href="/login">Already have an account? Sign in</a></>}
       </p>
-      <p className="auth-terms">
-        By {mode === 'login' ? 'continuing' : 'signing up'} you agree to our{' '}
-        <a href="/terms">Terms</a> and <a href="/privacy">Privacy Policy</a>.
-      </p>
+      {mode === 'login' && (
+        <p className="auth-terms">
+          By continuing you agree to our{' '}
+          <a href="/terms">Terms</a> and <a href="/privacy">Privacy Policy</a>.
+        </p>
+      )}
     </>
   )
 }

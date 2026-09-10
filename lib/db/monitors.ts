@@ -92,6 +92,40 @@ export async function getMonitorsByOrgId(orgId: string): Promise<Pick<Monitor, '
   return (data ?? []) as Pick<Monitor, 'id' | 'name' | 'target'>[]
 }
 
+export interface DomainMonitorSummary {
+  count: number
+  types: string[]
+}
+
+/** Monitor count + distinct monitor types per target_domain for this org —
+ *  used by the Plans page to show "3 monitors" and a row of type pills
+ *  (HTTP, SSL, DNS, ...) next to a paid website, so customers can see
+ *  exactly what coverage they're getting. Monitors created before the
+ *  per-website billing model have target_domain = null and are grouped
+ *  under the empty-string key. */
+export async function getMonitorSummaryByDomain(orgId: string): Promise<Record<string, DomainMonitorSummary>> {
+  const supabase = createAdminClient()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase as any)
+    .from('monitors')
+    .select('target_domain, type')
+    .eq('org_id', orgId) as { data: Array<{ target_domain: string | null; type: string }> | null; error: { message: string } | null }
+
+  if (error) {
+    logger.error('Failed to get monitor summary by domain', { error: error.message, orgId })
+    return {}
+  }
+
+  const summary: Record<string, DomainMonitorSummary> = {}
+  for (const row of data ?? []) {
+    const key = row.target_domain ?? ''
+    if (!summary[key]) summary[key] = { count: 0, types: [] }
+    summary[key].count += 1
+    if (!summary[key].types.includes(row.type)) summary[key].types.push(row.type)
+  }
+  return summary
+}
+
 export async function getMonitorsByOrg(orgId: string): Promise<Monitor[]> {
   const supabase = await createClient()
   const { data, error } = await supabase
@@ -170,6 +204,7 @@ export async function createMonitor(data: {
   name: string
   type: string
   target: string
+  target_domain?: string
   check_interval_seconds?: number
   timeout_ms?: number
   config?: Record<string, unknown>
@@ -185,6 +220,8 @@ export async function createMonitor(data: {
       name: data.name,
       type: data.type,
       target: data.target,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      target_domain: data.target_domain as any,
       check_interval_seconds: data.check_interval_seconds,
       timeout_ms: data.timeout_ms,
       severity: data.severity,
@@ -200,6 +237,90 @@ export async function createMonitor(data: {
     return null
   }
   return monitor
+}
+
+// Monitor types that need only a domain to be meaningful — no keywords,
+// port number, API method, or other input a customer must supply. These
+// are the types auto-created for every website that pays for the
+// ₹149/month plan. Deliberately excludes: keyword (needs search terms),
+// api (needs method/headers), port (needs a port number), heartbeat
+// (needs an expected interval), competitor (page-change detection is a
+// different setup flow), wordpress (a distinct product, needs the plugin).
+const AUTO_CREATE_MONITOR_TYPES = [
+  'http', 'ssl', 'dns', 'domain', 'ping', 'security-headers', 'response-time',
+  'robots-txt', 'ip-change', 'mx-health', 'whois-change', 'sitemap',
+  'redirect-chain', 'spf-dmarc', 'blacklist', 'page-size', 'cookie-consent',
+  'nameserver-change',
+]
+
+// Same URL-shaped-target list as app/(dashboard)/dashboard/monitors/actions.ts —
+// these types get an https:// prefix, the rest use the bare domain.
+const URL_TARGET_MONITOR_TYPES = new Set([
+  'http', 'ssl', 'domain', 'robots-txt', 'security-headers', 'response-time',
+  'sitemap', 'redirect-chain', 'page-size', 'cookie-consent',
+])
+
+/**
+ * Auto-creates one monitor of every domain-only type (see
+ * AUTO_CREATE_MONITOR_TYPES) for a newly-paid website. Called from the
+ * Razorpay webhook right after a website_subscriptions row activates, so
+ * every website on the ₹149/month plan gets full coverage immediately with
+ * no manual setup. Skips any type that already has a monitor for this
+ * exact target_domain (idempotent — safe to call again on a webhook
+ * retry/duplicate delivery).
+ */
+export async function autoCreateMonitorsForDomain(params: {
+  orgId: string
+  workspaceId: string
+  targetDomain: string
+}): Promise<{ created: number; skipped: number }> {
+  const supabase = createAdminClient()
+  const { orgId, workspaceId, targetDomain } = params
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: existingRows } = await (supabase as any)
+    .from('monitors')
+    .select('type')
+    .eq('org_id', orgId)
+    .eq('target_domain', targetDomain) as { data: Array<{ type: string }> | null }
+  const existingTypes = new Set((existingRows ?? []).map(r => r.type))
+
+  let created = 0
+  let skipped = 0
+  const now = new Date().toISOString()
+
+  for (const type of AUTO_CREATE_MONITOR_TYPES) {
+    if (existingTypes.has(type)) {
+      skipped++
+      continue
+    }
+    const target = URL_TARGET_MONITOR_TYPES.has(type) ? `https://${targetDomain}` : targetDomain
+
+    const { error } = await supabase
+      .from('monitors')
+      .insert({
+        org_id: orgId,
+        workspace_id: workspaceId,
+        name: `${targetDomain} — ${type}`,
+        type,
+        target,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        target_domain: targetDomain as any,
+        severity: 'P2',
+        config: {} as import('@/lib/types/database.types').Json,
+        next_check_at: now,
+        status: 'unknown',
+      })
+
+    if (error) {
+      logger.error('Failed to auto-create monitor for paid website', { error: error.message, orgId, targetDomain, type })
+    } else {
+      created++
+    }
+  }
+
+  logger.info('Auto-created monitors for paid website', { orgId, targetDomain, created, skipped })
+  return { created, skipped }
 }
 
 export async function updateMonitor(

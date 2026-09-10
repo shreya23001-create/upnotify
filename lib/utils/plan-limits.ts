@@ -174,6 +174,49 @@ export async function checkMonitorLimit(orgId: string): Promise<{
   return { allowed, shouldNudge, currentCount, limit: effectiveLimit }
 }
 
+/**
+ * True if the org has a base plan subscription at all (Free-Plan/no-sub
+ * orgs return false) — used to grandfather existing Pre Plan/Pro Plan
+ * subscribers onto the old org-wide monitor-limit system untouched. Every
+ * other org goes through the newer per-website ₹149/year billing instead.
+ */
+export async function hasGrandfatheredBaseSubscription(orgId: string): Promise<boolean> {
+  const supabase = createAdminClient()
+  const { data } = await supabase
+    .from('subscriptions')
+    .select('id')
+    .eq('org_id', orgId)
+    .in('status', ['active', 'cancelling', 'paused', 'past_due', 'trialing'])
+    .limit(1)
+    .maybeSingle()
+  return Boolean(data)
+}
+
+/**
+ * Per-website billing gate (₹149/month per website, see website_subscriptions
+ * table). Only applies to orgs WITHOUT a grandfathered base subscription —
+ * callers should check hasGrandfatheredBaseSubscription first and fall back
+ * to checkMonitorLimit for grandfathered orgs. Every distinct targetDomain
+ * (see lib/utils/validate-domain.ts targetToWebsiteDomain) needs to appear
+ * in the `domains` array of some active website_subscriptions row before a
+ * monitor can be created against it — there is no free allowance in this
+ * model. A single subscription row can cover many domains at once (a
+ * customer can add several websites together in one checkout).
+ */
+export async function checkWebsiteSubscriptionActive(orgId: string, targetDomain: string): Promise<boolean> {
+  const supabase = createAdminClient()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data } = await (supabase as any)
+    .from('website_subscriptions')
+    .select('id')
+    .eq('org_id', orgId)
+    .contains('domains', [targetDomain])
+    .in('status', ['active', 'cancelling', 'past_due'])
+    .limit(1)
+    .maybeSingle()
+  return Boolean(data)
+}
+
 /** Check if the org can create another workspace */
 export async function checkWorkspaceLimit(orgId: string): Promise<{
   allowed: boolean

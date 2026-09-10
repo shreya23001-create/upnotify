@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server'
 import { validateApiKey } from '@/lib/db/api-keys'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createMonitor } from '@/lib/db/monitors'
-import { checkMonitorLimit, getPlanLimits } from '@/lib/utils/plan-limits'
+import { checkMonitorLimit, getPlanLimits, hasGrandfatheredBaseSubscription, checkWebsiteSubscriptionActive } from '@/lib/utils/plan-limits'
+import { targetToWebsiteDomain } from '@/lib/utils/validate-domain'
 import { writeAuditLog } from '@/lib/db/audit'
 import { logger } from '@/lib/utils/logger'
 import { MONITOR_TYPES } from '@/lib/constants/monitor-types'
@@ -114,13 +115,19 @@ export async function POST(request: Request): Promise<NextResponse> {
     )
   }
 
-  // Monitor count limit
-  const limitCheck = await checkMonitorLimit(orgId)
-  if (!limitCheck.allowed) {
-    return NextResponse.json(
-      { error: `Monitor limit reached (${limitCheck.currentCount}/${limitCheck.limit}). Upgrade your plan to add more monitors.` },
-      { status: 403 }
-    )
+  // Grandfathered orgs (existing Pre Plan/Pro Plan subscribers) keep the old
+  // org-wide monitor-count limit. hasApiAccess is false in the newer
+  // per-website ₹149/year model, so in practice only grandfathered orgs
+  // reach this far — checked explicitly anyway for correctness.
+  const isGrandfathered = await hasGrandfatheredBaseSubscription(orgId)
+  if (isGrandfathered) {
+    const limitCheck = await checkMonitorLimit(orgId)
+    if (!limitCheck.allowed) {
+      return NextResponse.json(
+        { error: `Monitor limit reached (${limitCheck.currentCount}/${limitCheck.limit}). Upgrade your plan to add more monitors.` },
+        { status: 403 }
+      )
+    }
   }
 
   // Parse body
@@ -169,6 +176,18 @@ export async function POST(request: Request): Promise<NextResponse> {
     return NextResponse.json({ error: safetyCheck.error }, { status: 400 })
   }
 
+  const targetDomain = targetToWebsiteDomain(normalisedTarget)
+
+  if (!isGrandfathered) {
+    const websiteActive = await checkWebsiteSubscriptionActive(orgId, targetDomain)
+    if (!websiteActive) {
+      return NextResponse.json(
+        { error: `This website isn't paid for yet. Add a ₹149/year plan for ${targetDomain} to start monitoring it.` },
+        { status: 403 }
+      )
+    }
+  }
+
   // Get workspace (use first workspace for the org)
   const supabase = createAdminClient()
   const { data: workspaces } = await supabase
@@ -189,6 +208,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     name: name.trim(),
     type,
     target: normalisedTarget,
+    target_domain: targetDomain,
     check_interval_seconds: interval,
     severity: sev,
   })

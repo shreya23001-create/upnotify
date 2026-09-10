@@ -44,3 +44,17 @@ export function isValidCustomDomain(raw: string): boolean {
   if (!TLD_ALPHA.test(labels[labels.length - 1])) return false
   return true
 }
+
+/**
+ * Grouping key for per-website billing: which monitors count as "the same
+ * website" for the ₹149/year-per-website plan. example.com and
+ * www.example.com are the same website (one payment); blog.example.com is
+ * a different website (separate payment) — normaliseDomain only strips a
+ * leading "www.", nothing deeper, so this falls out for free for real
+ * domains. For monitor targets that aren't valid domains (bare IPs,
+ * host:port pairs, etc.) the normalised-but-unvalidated string is used
+ * as-is — each distinct one is billed as its own "website".
+ */
+export function targetToWebsiteDomain(rawTarget: string): string {
+  return normaliseDomain(rawTarget)
+}

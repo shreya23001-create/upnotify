@@ -24,6 +24,8 @@ import { isProduction } from '@/lib/utils/environment'
 import { getServerConfig } from '@/lib/utils/config'
 import { enforceDowngradeLimits, notifyPlanChange } from '@/lib/services/plan-enforcement'
 import { writeAuditLog } from '@/lib/db/audit'
+import { autoCreateMonitorsForDomain } from '@/lib/db/monitors'
+import { getWorkspacesByOrgAdmin } from '@/lib/db/workspaces'
 
 export const dynamic = 'force-dynamic'
 
@@ -132,6 +134,85 @@ async function handleAddonSubscriptionActivated(sub: RzpSubscription): Promise<v
   })
 }
 
+/**
+ * Per-website (₹149/month × domain count) subscription activation. Kept
+ * entirely separate from the base-plan flow, same rationale as add-ons:
+ * writes to website_subscriptions, not subscriptions, and never cancels
+ * any other subscription for the org. One row here covers every domain
+ * added together in this checkout session — adding more websites later in
+ * a SEPARATE session creates a new row, never merged into this one.
+ */
+async function handleWebsiteSubscriptionActivated(sub: RzpSubscription): Promise<void> {
+  const supabase = createAdminClient()
+  const orgId = sub.notes?.org_id
+  const domainsStr = sub.notes?.domains || sub.notes?.target_domain // fall back to the older single-domain field
+  const domains = domainsStr ? domainsStr.split(',').map(d => d.trim()).filter(Boolean) : []
+
+  if (!orgId || domains.length === 0) {
+    logger.error('Razorpay webhook (website): missing org_id or domains in subscription notes', { subId: sub.id })
+    return
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: existing } = await (supabase as any)
+    .from('website_subscriptions')
+    .select('id')
+    .eq('razorpay_subscription_id', sub.id)
+    .maybeSingle()
+
+  if (existing) {
+    logger.info('Razorpay (website): subscription already recorded, skipping', { subId: sub.id })
+    return
+  }
+
+  const periodStart = sub.current_start ? new Date(sub.current_start * 1000).toISOString() : new Date().toISOString()
+  const periodEnd   = sub.current_end   ? new Date(sub.current_end   * 1000).toISOString() : null
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  await (supabase as any).from('website_subscriptions').insert({
+    org_id: orgId,
+    domains,
+    razorpay_subscription_id: sub.id,
+    status: 'active',
+    current_period_start: periodStart,
+    current_period_end: periodEnd ?? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+  })
+
+  logger.info('Razorpay: website subscription activated', { subId: sub.id, orgId, domains })
+
+  // Every paid website gets full monitor coverage immediately — no manual
+  // setup required. Non-fatal: if this fails, the subscription itself is
+  // still recorded correctly; the customer can add monitors manually.
+  try {
+    const workspaces = await getWorkspacesByOrgAdmin(orgId)
+    const workspaceId = workspaces[0]?.id
+    if (workspaceId) {
+      for (const domain of domains) {
+        await autoCreateMonitorsForDomain({ orgId, workspaceId, targetDomain: domain })
+      }
+    } else {
+      logger.error('Razorpay webhook (website): no workspace found, skipping monitor auto-create', { orgId })
+    }
+  } catch (err) {
+    logger.error('Razorpay webhook (website): monitor auto-create failed (non-fatal)', {
+      orgId, domains, error: err instanceof Error ? err.message : String(err),
+    })
+  }
+
+  await writeAuditLog({
+    orgId,
+    userId: null,
+    action: 'website_subscription.created',
+    resourceType: 'website_subscription',
+    metadata: {
+      razorpay_subscription_id: sub.id,
+      domains,
+      currency: 'inr',
+      source: 'razorpay_webhook',
+    },
+  })
+}
+
 async function handleSubscriptionActivated(sub: RzpSubscription): Promise<void> {
   // Reject mock subscription IDs — they exist only for dev testing and must never
   // be processed by real webhook logic (idempotency guard would miss them otherwise)
@@ -140,12 +221,17 @@ async function handleSubscriptionActivated(sub: RzpSubscription): Promise<void> 
     return
   }
 
-  // Add-on subscriptions are tagged at creation time (see addon-checkout route)
-  // and take a completely separate code path — they must never enter the
-  // base-plan flow below, which cancels every other active subscription for
-  // the org. Routing here first guarantees that safety property.
+  // Add-on subscriptions and per-website subscriptions are tagged at
+  // creation time (see addon-checkout / website-checkout routes) and take
+  // completely separate code paths — they must never enter the base-plan
+  // flow below, which cancels every other active subscription for the org.
+  // Routing here first guarantees that safety property.
   if (sub.notes?.is_addon === 'true') {
     await handleAddonSubscriptionActivated(sub)
+    return
+  }
+  if (sub.notes?.is_website_sub === 'true') {
+    await handleWebsiteSubscriptionActivated(sub)
     return
   }
 
@@ -410,9 +496,11 @@ async function handleSubscriptionCharged(sub: RzpSubscription, payment: RzpPayme
     .eq('razorpay_subscription_id', sub.id)
     .maybeSingle()
 
+  let websiteSubId: string | null = null
+
   if (!subRecord) {
-    // Not a base-plan subscription — check whether this charge belongs to an
-    // active Add-On Plan subscription instead before giving up.
+    // Not a base-plan subscription — check add-on, then per-website, before
+    // giving up.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: addonRecord } = await (supabase as any)
       .from('org_addon_subscriptions')
@@ -424,7 +512,31 @@ async function handleSubscriptionCharged(sub: RzpSubscription, payment: RzpPayme
       await handleAddonSubscriptionCharged(addonRecord.id, sub)
       logger.info('Razorpay: add-on renewal charged', { subId: sub.id, orgId, paymentId: payment.id })
     } else {
-      logger.warn('Razorpay subscription.charged: no matching subscription or add-on found', { subId: sub.id })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: websiteRecord } = await (supabase as any)
+        .from('website_subscriptions')
+        .select('id, status')
+        .eq('razorpay_subscription_id', sub.id)
+        .maybeSingle()
+
+      if (websiteRecord) {
+        websiteSubId = websiteRecord.id
+        if (sub.current_start && sub.current_end) {
+          const updatePayload: Record<string, unknown> = {
+            current_period_start: new Date(sub.current_start * 1000).toISOString(),
+            current_period_end:   new Date(sub.current_end   * 1000).toISOString(),
+          }
+          if (websiteRecord.status === 'past_due') updatePayload.status = 'active'
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          await (supabase as any)
+            .from('website_subscriptions')
+            .update(updatePayload)
+            .eq('id', websiteRecord.id)
+        }
+        logger.info('Razorpay: website renewal charged', { subId: sub.id, orgId, paymentId: payment.id })
+      } else {
+        logger.warn('Razorpay subscription.charged: no matching subscription, add-on, or website found', { subId: sub.id })
+      }
     }
   }
 
@@ -460,6 +572,8 @@ async function handleSubscriptionCharged(sub: RzpSubscription, payment: RzpPayme
   await supabase.from('invoices').insert({
     org_id:          orgId,
     subscription_id: subRecord?.id ?? null,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    website_subscription_id: websiteSubId as any,
     stripe_invoice_id: `rzp_${payment.id}`,  // re-use stripe_invoice_id field as unique invoice ref
     amount_gbp:      payment.amount,          // paise — same as how Stripe pence is stored
     currency:        'inr',
@@ -492,8 +606,9 @@ async function handleSubscriptionCharged(sub: RzpSubscription, payment: RzpPayme
 
 /** Returns 'base' if this Razorpay subscription id belongs to the org's
  *  main subscriptions row, 'addon' if it belongs to org_addon_subscriptions,
- *  or null if it matches neither (unknown/mock/stale subscription). */
-async function findSubscriptionTable(razorpaySubId: string): Promise<'base' | 'addon' | null> {
+ *  'website' if it belongs to website_subscriptions, or null if it matches
+ *  none (unknown/mock/stale subscription). */
+async function findSubscriptionTable(razorpaySubId: string): Promise<'base' | 'addon' | 'website' | null> {
   const supabase = createAdminClient()
 
   const { data: baseRow } = await supabase
@@ -510,6 +625,14 @@ async function findSubscriptionTable(razorpaySubId: string): Promise<'base' | 'a
     .eq('razorpay_subscription_id', razorpaySubId)
     .maybeSingle()
   if (addonRow) return 'addon'
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: websiteRow } = await (supabase as any)
+    .from('website_subscriptions')
+    .select('id')
+    .eq('razorpay_subscription_id', razorpaySubId)
+    .maybeSingle()
+  if (websiteRow) return 'website'
 
   return null
 }
@@ -548,6 +671,39 @@ async function handleSubscriptionCancelled(sub: RzpSubscription): Promise<void> 
         action: 'addon_subscription.canceled',
         resourceType: 'org_addon_subscription',
         metadata: { razorpay_subscription_id: sub.id, source: 'razorpay_webhook' },
+      })
+    }
+    return
+  }
+
+  if (table === 'website') {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: existing } = await (supabase as any)
+      .from('website_subscriptions')
+      .select('status')
+      .eq('razorpay_subscription_id', sub.id)
+      .maybeSingle()
+
+    if (existing?.status === 'canceled') {
+      logger.info('Razorpay webhook: website subscription already canceled in DB — skipping', { subId: sub.id })
+      return
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase as any)
+      .from('website_subscriptions')
+      .update({ status: 'canceled', canceled_at: new Date().toISOString() })
+      .eq('razorpay_subscription_id', sub.id)
+
+    logger.info('Razorpay: website subscription cancelled via webhook', { subId: sub.id, orgId })
+
+    if (orgId) {
+      await writeAuditLog({
+        orgId,
+        userId: null,
+        action: 'website_subscription.canceled',
+        resourceType: 'website_subscription',
+        metadata: { razorpay_subscription_id: sub.id, domains: sub.notes?.domains, source: 'razorpay_webhook' },
       })
     }
     return
@@ -618,6 +774,27 @@ async function handleSubscriptionHalted(sub: RzpSubscription): Promise<void> {
     return
   }
 
+  if (table === 'website') {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase as any)
+      .from('website_subscriptions')
+      .update({ status: 'past_due' })
+      .eq('razorpay_subscription_id', sub.id)
+
+    logger.warn('Razorpay: website subscription halted (all payment retries failed)', { subId: sub.id, orgId })
+
+    if (orgId) {
+      await writeAuditLog({
+        orgId,
+        userId: null,
+        action: 'website_subscription.halted',
+        resourceType: 'website_subscription',
+        metadata: { razorpay_subscription_id: sub.id, reason: 'all_payment_retries_failed', source: 'razorpay_webhook' },
+      })
+    }
+    return
+  }
+
   await supabase
     .from('subscriptions')
     .update({ status: 'past_due' })
@@ -667,6 +844,32 @@ async function handleSubscriptionResumed(sub: RzpSubscription): Promise<void> {
         userId: null,
         action: 'addon_subscription.resumed',
         resourceType: 'org_addon_subscription',
+        metadata: { razorpay_subscription_id: sub.id, source: 'razorpay_webhook' },
+      })
+    }
+    return
+  }
+
+  if (table === 'website') {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase as any)
+      .from('website_subscriptions')
+      .update({
+        status: 'active',
+        current_period_start: sub.current_start ? new Date(sub.current_start * 1000).toISOString() : undefined,
+        current_period_end:   sub.current_end   ? new Date(sub.current_end   * 1000).toISOString() : undefined,
+      })
+      .eq('razorpay_subscription_id', sub.id)
+
+    logger.info('Razorpay: website subscription resumed', { subId: sub.id })
+
+    const websiteOrgId = sub.notes?.org_id
+    if (websiteOrgId) {
+      await writeAuditLog({
+        orgId: websiteOrgId,
+        userId: null,
+        action: 'website_subscription.resumed',
+        resourceType: 'website_subscription',
         metadata: { razorpay_subscription_id: sub.id, source: 'razorpay_webhook' },
       })
     }

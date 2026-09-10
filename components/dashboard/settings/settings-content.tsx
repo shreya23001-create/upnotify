@@ -420,7 +420,13 @@ export function SettingsContent({
               </div>
               <div className="space-y">
                 <CurrentPlan plan={currentPlan} subscription={subscription} />
-                <PricingTable plans={plans} currentPlanSlug={currentPlan?.slug} subscription={subscription} creditBalancePence={creditBalance} defaultCurrency={defaultCurrency} addonSubscriptions={addonSubscriptions} />
+                {/* Pre Plan/Pro Plan picker only makes sense for orgs that
+                    already have one of those org-level plans (grandfathered
+                    subscribers). Everyone else uses the new per-website
+                    ₹149/year model — see the "Plans" sidebar tab instead. */}
+                {currentPlan && (
+                  <PricingTable plans={plans} currentPlanSlug={currentPlan?.slug} subscription={subscription} creditBalancePence={creditBalance} defaultCurrency={defaultCurrency} addonSubscriptions={addonSubscriptions} />
+                )}
                 <InvoiceList invoices={invoices} />
               </div>
             </div>

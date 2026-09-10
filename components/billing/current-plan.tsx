@@ -47,12 +47,12 @@ export function CurrentPlan({ plan, subscription }: Props) {
               <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
             </div>
             <div>
-              <div className="cp-plan-name">Free Plan</div>
-              <div className="cp-plan-meta">3 monitors · 10-minute checks</div>
+              <div className="cp-plan-name">No plan yet</div>
+              <div className="cp-plan-meta">₹149/year per website you monitor</div>
             </div>
           </div>
-          <a href="/dashboard/settings?tab=billing" className="btn btn-primary btn-sm">
-            Upgrade Plan
+          <a href="/dashboard/plans" className="btn btn-primary btn-sm">
+            Add a Website
           </a>
         </div>
       </div>

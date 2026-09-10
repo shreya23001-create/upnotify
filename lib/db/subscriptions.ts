@@ -302,6 +302,56 @@ export async function getActiveAddonSubscriptions(orgId: string): Promise<AddonS
   })
 }
 
+export interface WebsiteSubscription {
+  id: string
+  org_id: string
+  /** Every domain covered by this one combined subscription/invoice. */
+  domains: string[]
+  razorpay_subscription_id: string | null
+  status: string
+  current_period_start: string | null
+  current_period_end: string | null
+  canceled_at: string | null
+  created_at: string
+}
+
+/** Every per-website (₹149/month × domain count) combined subscription for
+ *  this org, any status — the Plans page needs cancelled ones too so a
+ *  customer can see history and re-subscribe. */
+export async function getWebsiteSubscriptions(orgId: string): Promise<WebsiteSubscription[]> {
+  const supabase = createAdminClient()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase as any)
+    .from('website_subscriptions')
+    .select('*')
+    .eq('org_id', orgId)
+    .order('created_at', { ascending: false }) as { data: unknown[] | null; error: { message: string } | null }
+
+  if (error) {
+    logger.error('Failed to get website subscriptions', { error: error.message, orgId })
+    return []
+  }
+
+  return (data ?? []).map(row => row as unknown as WebsiteSubscription)
+}
+
+/** Invoices linked to a specific website_subscription row. */
+export async function getInvoicesByWebsiteSubscription(websiteSubscriptionId: string): Promise<Invoice[]> {
+  const supabase = createAdminClient()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase as any)
+    .from('invoices')
+    .select('*')
+    .eq('website_subscription_id', websiteSubscriptionId)
+    .order('created_at', { ascending: false }) as { data: Invoice[] | null; error: { message: string } | null }
+
+  if (error) {
+    logger.error('Failed to get invoices for website subscription', { error: error.message, websiteSubscriptionId })
+    return []
+  }
+  return data ?? []
+}
+
 export async function createInvoiceRecord(record: {
   org_id: string
   subscription_id?: string

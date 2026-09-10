@@ -9,7 +9,7 @@ import type { SupportedCurrency } from '@/lib/utils/currency'
 import {
   IconDashboard, IconActivity, IconGlobe, IconAlertTriangle,
   IconBuilding, IconSettings, IconShield, IconChevronLeft, IconChevronRight,
-  IconHelpCircle, IconTrendingUp, IconWatchdog, IconInbox,
+  IconHelpCircle, IconTrendingUp, IconWatchdog, IconInbox, IconCreditCard,
 } from '@/components/icons'
 
 interface NavSection {
@@ -33,6 +33,7 @@ const mainNavItems: NavItem[] = [
   { href: '/dashboard/status-pages', label: 'Status Pages', icon: IconGlobe },
   { href: '/dashboard/reports', label: 'Reports', icon: IconTrendingUp },
   { href: '/dashboard/watchdog', label: 'Competitor', icon: IconWatchdog },
+  { href: '/dashboard/plans', label: 'Plans', icon: IconCreditCard },
   // AI Visibility hidden per request
   // Compete hidden — launching in v1.5
 ]

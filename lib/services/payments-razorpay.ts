@@ -164,6 +164,12 @@ export async function createRazorpaySubscription(params: {
   billingCycle: 'monthly' | 'annual'
   userEmail: string
   isAddon?: boolean
+  isWebsiteSub?: boolean
+  targetDomain?: string
+  /** Every domain covered by this one combined website subscription (comma-joined into notes.domains — Razorpay note values must be strings). */
+  websiteDomains?: string[]
+  /** Multiplies the plan's per-unit price — used for "N websites × ₹149/month" combined checkout. Defaults to 1 (every other checkout type). */
+  quantity?: number
 }): Promise<RazorpaySubscriptionResult> {
   const rzp = getRazorpay()
   const totalCount = params.billingCycle === 'annual' ? 10 : 120
@@ -172,13 +178,18 @@ export async function createRazorpaySubscription(params: {
     plan_id: params.razorpayPlanId,
     customer_id: params.customerId,
     total_count: totalCount,
-    quantity: 1,
+    quantity: params.quantity ?? 1,
     customer_notify: 1,
     notes: {
       org_id: params.orgId,
       plan_slug: params.planSlug,
       billing_cycle: params.billingCycle,
       ...(params.isAddon ? { is_addon: 'true' } : {}),
+      ...(params.isWebsiteSub ? {
+        is_website_sub: 'true',
+        target_domain: params.targetDomain ?? '',
+        domains: (params.websiteDomains ?? []).join(','),
+      } : {}),
     },
     notify_info: {
       notify_phone: '',

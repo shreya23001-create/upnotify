@@ -11,9 +11,9 @@ export default function AuthLayout({ children }: { children: React.ReactNode }):
           </Link>
           {children}
         </div>
-        <p className="auth-back-link">
+        {/* <p className="auth-back-link">
           <Link href="/">← Back to Upnotify.io</Link>
-        </p>
+        </p> */}
       </div>
     </div>
   )

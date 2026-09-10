@@ -4,6 +4,7 @@ import { useState, useEffect, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { updatePassword } from '@/lib/auth/actions'
 import { createClient } from '@/lib/supabase/client'
+import { PasswordInput } from './password-input'
 
 export function ResetPasswordForm() {
   const router = useRouter()
@@ -75,11 +76,9 @@ export function ResetPasswordForm() {
       <form action={handleSubmit} autoComplete="on">
         <div className="auth-input-wrap">
           <label className="auth-label" htmlFor="password">New password</label>
-          <input
-            className="auth-input"
+          <PasswordInput
             id="password"
             name="password"
-            type="password"
             placeholder="At least 8 characters"
             minLength={8}
             required

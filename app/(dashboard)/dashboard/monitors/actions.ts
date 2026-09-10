@@ -6,7 +6,8 @@ import { createMonitor, updateMonitor, deleteMonitor, pauseMonitor, resumeMonito
 import { getStatusPagesByMonitorId } from '@/lib/db/status-pages'
 import { getCurrentUser } from '@/lib/db/users'
 import { getWorkspacesByOrg } from '@/lib/db/workspaces'
-import { checkMonitorLimit, getPlanLimits } from '@/lib/utils/plan-limits'
+import { checkMonitorLimit, getPlanLimits, hasGrandfatheredBaseSubscription, checkWebsiteSubscriptionActive } from '@/lib/utils/plan-limits'
+import { targetToWebsiteDomain } from '@/lib/utils/validate-domain'
 import { logger } from '@/lib/utils/logger'
 import { devAuditLog } from '@/lib/db/audit'
 import { impersonationGuard } from '@/lib/auth/impersonation-guard'
@@ -80,18 +81,6 @@ export async function createMonitorAction(formData: FormData): Promise<{ error?:
   const workspace = workspaces[0]
   if (!workspace) return { error: 'No workspace found' }
 
-  // Check plan limits
-  const [limitCheck, planLimits] = await Promise.all([
-    checkMonitorLimit(user.org_id),
-    getPlanLimits(user.org_id),
-  ])
-  if (!limitCheck.allowed) {
-    return { error: `Monitor limit reached (${limitCheck.currentCount}/${limitCheck.limit}). Upgrade your plan to add more monitors.` }
-  }
-
-  // Free plan users can create monitors directly (within their plan limit)
-  // No per-monitor charge — the old usage-based billing model has been removed
-
   const name = formData.get('name') as string
   const type = formData.get('type') as string
   const target = formData.get('target') as string
@@ -108,6 +97,27 @@ export async function createMonitorAction(formData: FormData): Promise<{ error?:
   // SSRF + URL safety validation
   const safetyCheck = isSafeMonitorTarget(normalisedTarget, type)
   if (!safetyCheck.safe) return { error: safetyCheck.error }
+
+  const targetDomain = targetToWebsiteDomain(normalisedTarget)
+
+  // Grandfathered orgs (existing Pre Plan/Pro Plan subscribers) keep the old
+  // org-wide monitor-count limit untouched. Every other org must have an
+  // active ₹149/year subscription for this specific website before adding
+  // a monitor against it — there is no free allowance in the new model.
+  const isGrandfathered = await hasGrandfatheredBaseSubscription(user.org_id)
+  const planLimits = await getPlanLimits(user.org_id)
+
+  if (isGrandfathered) {
+    const limitCheck = await checkMonitorLimit(user.org_id)
+    if (!limitCheck.allowed) {
+      return { error: `Monitor limit reached (${limitCheck.currentCount}/${limitCheck.limit}). Upgrade your plan to add more monitors.` }
+    }
+  } else {
+    const websiteActive = await checkWebsiteSubscriptionActive(user.org_id, targetDomain)
+    if (!websiteActive) {
+      return { error: `This website isn't paid for yet. Add a ₹149/year plan for ${targetDomain} to start monitoring it.` }
+    }
+  }
 
   // Build type-specific config
   const config: Record<string, unknown> = {}
@@ -167,6 +177,7 @@ export async function createMonitorAction(formData: FormData): Promise<{ error?:
     name,
     type,
     target: normalisedTarget,
+    target_domain: targetDomain,
     check_interval_seconds: requestedInterval,
     severity,
     config,
@@ -434,18 +445,33 @@ export async function bulkCreateMonitorsAction(items: BulkCreateItem[]): Promise
   const workspace = workspaces[0]
   if (!workspace) return { created: 0, skipped: 0, error: 'No workspace found' }
 
-  const [limitCheck, planLimits] = await Promise.all([
-    checkMonitorLimit(user.org_id),
-    getPlanLimits(user.org_id),
-  ])
+  const isGrandfathered = await hasGrandfatheredBaseSubscription(user.org_id)
+  const planLimits = await getPlanLimits(user.org_id)
 
-  if (!limitCheck.allowed) {
-    return { created: 0, skipped: items.length, error: `Monitor limit reached (${limitCheck.currentCount}/${limitCheck.limit}). Upgrade your plan to add more monitors.` }
+  let toCreate = items
+  let skipped = 0
+
+  if (isGrandfathered) {
+    const limitCheck = await checkMonitorLimit(user.org_id)
+    if (!limitCheck.allowed) {
+      return { created: 0, skipped: items.length, error: `Monitor limit reached (${limitCheck.currentCount}/${limitCheck.limit}). Upgrade your plan to add more monitors.` }
+    }
+    const remaining = limitCheck.limit === null ? Infinity : limitCheck.limit - limitCheck.currentCount
+    toCreate = items.slice(0, remaining)
+    skipped = items.length - toCreate.length
+  } else {
+    // Only create items whose website already has an active ₹149/year
+    // subscription; skip the rest rather than failing the whole batch.
+    const filtered: BulkCreateItem[] = []
+    for (const item of items) {
+      const domain = targetToWebsiteDomain(normaliseTarget(item.target, item.type))
+      if (await checkWebsiteSubscriptionActive(user.org_id, domain)) {
+        filtered.push(item)
+      }
+    }
+    toCreate = filtered
+    skipped = items.length - toCreate.length
   }
-
-  const remaining = limitCheck.limit === null ? Infinity : limitCheck.limit - limitCheck.currentCount
-  const toCreate = items.slice(0, remaining)
-  const skipped = items.length - toCreate.length
 
   let created = 0
   for (const item of toCreate) {
@@ -459,6 +485,7 @@ export async function bulkCreateMonitorsAction(items: BulkCreateItem[]): Promise
       name: item.name,
       type: item.type,
       target: normalisedTarget,
+      target_domain: targetToWebsiteDomain(normalisedTarget),
       check_interval_seconds: Math.max(
         MONITOR_TYPES.find(t => t.type === item.type)?.defaultInterval ?? planLimits.checkIntervalSeconds,
         planLimits.checkIntervalSeconds
