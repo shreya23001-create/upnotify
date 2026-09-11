@@ -7,7 +7,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }):
       <div className="auth-card-wrap">
         <div className="auth-card">
           <Link href="/" className="auth-card-logo" aria-label="Upnotify home">
-            <img src="/Logo_1.png" alt="Upnotify" height={75} style={{ height: 75, width: 'auto' }} />
+            <img src="/Logo_1.png" alt="Upnotify" height={44} style={{ height: 44, width: 'auto' }} />
           </Link>
           {children}
         </div>

@@ -66,7 +66,7 @@ Monitoring data (last 30 days, ${total} checks, hourly):
 - Maintenance detections: ${maintenanceHits}
 - Error page detections: ${errorHits}
 
-Write 2–3 concise sentences. Be factual and neutral. Do not speculate about causes. Do not make quality judgements beyond what the data shows. Do not mention Uptrue by name.`
+Write 2–3 concise sentences. Be factual and neutral. Do not speculate about causes. Do not make quality judgements beyond what the data shows. Do not mention Upnotify by name.`
 
     const client = new Anthropic({ apiKey })
     const message = await client.messages.create({

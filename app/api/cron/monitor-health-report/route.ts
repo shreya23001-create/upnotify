@@ -63,8 +63,8 @@ function buildEmailHtml(data: MonitorTypeHealth[], date: string, appUrl: string)
   const summaryText = critical.length > 0
     ? `⚠️ ${critical.length} monitor type${critical.length !== 1 ? 's' : ''} need attention`
     : warning.length > 0
-    ? `${warning.length} monitor type${warning.length !== 1 ? 's' : ''} showing warnings`
-    : `All ${healthy.length} monitor types healthy ✓`
+      ? `${warning.length} monitor type${warning.length !== 1 ? 's' : ''} showing warnings`
+      : `All ${healthy.length} monitor types healthy ✓`
 
   const rows = data.map(d => `
     <tr style="border-bottom:1px solid #f1f5f9;">
@@ -104,7 +104,7 @@ function buildEmailHtml(data: MonitorTypeHealth[], date: string, appUrl: string)
           <table width="100%" cellpadding="0" cellspacing="0">
             <tr>
               <td>
-                <div style="font-size:20px;font-weight:800;color:#ffffff;letter-spacing:-0.5px;">uptrue</div>
+                <div style="font-size:20px;font-weight:800;color:#ffffff;letter-spacing:-0.5px;">Upnotify</div>
                 <div style="font-size:12px;color:#94a3b8;margin-top:2px;">Super Admin · Monitor Health Report</div>
               </td>
               <td align="right">
@@ -214,8 +214,8 @@ export async function GET(req: Request): Promise<NextResponse> {
     const subject = critical.length > 0
       ? `🔴 Upnotify Monitor Health — ${critical.length} type${critical.length !== 1 ? 's' : ''} critical — ${date}`
       : warning.length > 0
-      ? `🟡 Upnotify Monitor Health — ${warning.length} warning${warning.length !== 1 ? 's' : ''} — ${date}`
-      : `🟢 Upnotify Monitor Health — All healthy — ${date}`
+        ? `🟡 Upnotify Monitor Health — ${warning.length} warning${warning.length !== 1 ? 's' : ''} — ${date}`
+        : `🟢 Upnotify Monitor Health — All healthy — ${date}`
 
     const html = buildEmailHtml(data, date, appUrl)
 

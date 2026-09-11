@@ -141,7 +141,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         method: 'GET',
         redirect: 'follow',
         signal: controller.signal,
-        headers: { 'User-Agent': 'Uptrue-SpeedTest/1.0' },
+        headers: { 'User-Agent': 'Upnotify-SpeedTest/1.0' },
       })
       ttfbMs = Date.now() - fetchStart
     } catch (err) {

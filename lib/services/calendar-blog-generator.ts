@@ -340,7 +340,7 @@ This post is a comparison or commercial page. All of the following rules are HAR
 3. **Trade mark usage.** Use ™ or ® on first occurrence per page for each competitor brand (e.g. UptimeRobot™, Pingdom®). Nominative use only — do not imply affiliation or endorsement.
 4. **No performance claims** without a dated, reproducible source. When in doubt, omit.
 5. **Corrections footer (required verbatim — include before the final CTA):**
-   > Spotted something out of date or incorrect? Email [shreya23001@gmail.com](mailto:shreya23001@gmail.com) and we will review within 5 working days.
+   > Spotted something out of date or incorrect? Email [info@upnotify.com](mailto:info@upnotify.com) and we will review within 5 working days.
 6. **No mention of "Watchdog"** anywhere on this page. Watchdog is an internal-only feature and must not appear in public-facing comparison pages.
 7. **Anchor-text mix:** 20% exact match / 50% partial match / 30% generic (e.g. "learn more", "read the guide").` : ''
 

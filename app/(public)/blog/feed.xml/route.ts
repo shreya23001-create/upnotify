@@ -44,8 +44,8 @@ export async function GET(): Promise<Response> {
     <link>${appUrl}/blog</link>
     <description>Uptime monitoring insights, LLM launch coverage, and web infrastructure intelligence from Upnotify.</description>
     <language>en-gb</language>
-    <managingEditor>shreya23001@gmail.com (Upnotify)</managingEditor>
-    <webMaster>shreya23001@gmail.com (Upnotify)</webMaster>
+    <managingEditor>info@upnotify.com (Upnotify)</managingEditor>
+    <webMaster>info@upnotify.com (Upnotify)</webMaster>
     <atom:link href="${appUrl}/blog/feed.xml" rel="self" type="application/rss+xml"/>
     <image>
       <url>${appUrl}/logo.png</url>

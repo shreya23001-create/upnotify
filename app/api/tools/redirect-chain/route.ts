@@ -163,7 +163,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
           method: 'GET',
           redirect: 'manual',
           signal: controller.signal,
-          headers: { 'User-Agent': 'Uptrue-RedirectChainChecker/1.0' },
+          headers: { 'User-Agent': 'Upnotify-RedirectChainChecker/1.0' },
         })
         clearTimeout(timeout)
       } catch (err) {

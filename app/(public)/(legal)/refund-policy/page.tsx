@@ -88,7 +88,7 @@ export default function RefundPolicyPage(): React.ReactElement {
       <h2>6. How to Request a Refund</h2>
       <p>
         To request a refund (where eligible under this policy), please email us at{' '}
-        <a href="mailto:shreya23001@gmail.com">shreya23001@gmail.com</a> with the following details:
+        <a href="mailto:info@upnotify.com">info@upnotify.com</a> with the following details:
       </p>
       <ul>
         <li>Your account email address</li>
@@ -106,7 +106,7 @@ export default function RefundPolicyPage(): React.ReactElement {
       <p>
         If you have an issue with a charge, we strongly encourage you to{' '}
         <strong>contact us first</strong> at{' '}
-        <a href="mailto:shreya23001@gmail.com">shreya23001@gmail.com</a> before filing a dispute or
+        <a href="mailto:info@upnotify.com">info@upnotify.com</a> before filing a dispute or
         chargeback with your bank or card issuer. We are committed to resolving billing issues
         fairly and promptly.
       </p>
@@ -135,10 +135,10 @@ export default function RefundPolicyPage(): React.ReactElement {
       <p>If you have any questions about this Refund Policy, please contact us at:</p>
       <ul>
         <li>
-          <strong>Billing:</strong> <a href="mailto:shreya23001@gmail.com">shreya23001@gmail.com</a>
+          <strong>Billing:</strong> <a href="mailto:info@upnotify.com">info@upnotify.com</a>
         </li>
         <li>
-          <strong>Support:</strong> <a href="mailto:shreya23001@gmail.com">shreya23001@gmail.com</a>
+          <strong>Support:</strong> <a href="mailto:info@upnotify.com">info@upnotify.com</a>
         </li>
         <li>
           <strong>Post:</strong> Crozent Techlabs Private Limited, B-59, B-Block, Chipyana,

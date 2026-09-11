@@ -17,7 +17,7 @@ export type AoeCampaign =
 
 export type AoePlatform = 'general' | 'shopify' | 'woocommerce'
 
-export type AoeProduct = 'uptrue' | 'compete'
+export type AoeProduct = 'Upnotify' | 'compete'
 
 export type AoeEmailSource = 'whois' | 'rdap' | 'website_scrape' | 'pattern_guess'
 

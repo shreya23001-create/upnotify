@@ -10,7 +10,7 @@ export const AOE_CONFIG: AoeConfig = {
   // Product — change these when deploying to a different product
   // -------------------------------------------------------------------------
   product: {
-    name: 'Uptrue',
+    name: 'Upnotify',
     tagline: 'Website monitoring that works while you sleep',
     signupUrl: 'https://upnotify-monitoring.vercel.app/signup',
     logoUrl: 'https://upnotify-monitoring.vercel.app/logo.png',
@@ -82,7 +82,7 @@ export const AOE_CONFIG: AoeConfig = {
     dailySendHour: 8,    // 8am UTC — main send
     burstHour: 23,       // 11pm UTC — last day burst
     cooldownDays: 30,    // never email same domain more than once per 30 days
-    fromName: 'Uptrue',
+    fromName: 'Upnotify',
     fromEmail: 'shreya23001@gmail.com',
   },
 }

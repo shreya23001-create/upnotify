@@ -40,7 +40,7 @@ export default function GDPRPage(): React.ReactElement {
       </p>
       <ul>
         <li>
-          <strong>Email:</strong> <a href="mailto:shreya23001@gmail.com">shreya23001@gmail.com</a>
+          <strong>Email:</strong> <a href="mailto:info@upnotify.com">info@upnotify.com</a>
         </li>
         <li>
           <strong>Post:</strong> Data Protection, Crozent Techlabs Private Limited, B-59, B-Block,
@@ -116,7 +116,7 @@ export default function GDPRPage(): React.ReactElement {
         </li>
         <li>
           <strong>By email:</strong> Send your request to{' '}
-          <a href="mailto:shreya23001@gmail.com">shreya23001@gmail.com</a>. We will verify your identity
+          <a href="mailto:info@upnotify.com">info@upnotify.com</a>. We will verify your identity
           before processing any request.
         </li>
       </ul>
@@ -216,7 +216,7 @@ export default function GDPRPage(): React.ReactElement {
       </ul>
       <p>
         We encourage you to contact us first at{' '}
-        <a href="mailto:shreya23001@gmail.com">shreya23001@gmail.com</a> so that we can attempt to resolve
+        <a href="mailto:info@upnotify.com">info@upnotify.com</a> so that we can attempt to resolve
         your concern before you escalate to a supervisory authority.
       </p>
 

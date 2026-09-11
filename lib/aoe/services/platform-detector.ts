@@ -20,7 +20,7 @@ export async function detectPlatform(domain: string, timeoutMs = 8000): Promise<
       method: 'GET',
       redirect: 'follow',
       signal: controller.signal,
-      headers: { 'User-Agent': 'UptrueSiteChecker/1.0 (+https://upnotify-monitoring.vercel.app)' },
+      headers: { 'User-Agent': 'UpnotifySiteChecker/1.0 (+https://upnotify-monitoring.vercel.app)' },
     })
 
     clearTimeout(timer)

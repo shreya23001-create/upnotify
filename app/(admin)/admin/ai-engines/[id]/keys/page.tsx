@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { getAllEnginesAdmin, getEngineKeys } from '@/lib/db/ai-engines'
 import { notFound } from 'next/navigation'
 import { DeleteKeyButton } from './delete-key-button'
-import { TestKeyButton }   from './test-key-button'
+import { TestKeyButton } from './test-key-button'
 
 export const metadata: Metadata = { title: 'Engine API Keys — Admin' }
 
@@ -14,7 +14,7 @@ interface PageProps {
 export default async function EngineKeysPage({ params }: PageProps): Promise<React.ReactElement> {
   const { id } = await params
   const engines = await getAllEnginesAdmin()
-  const engine  = engines.find(e => e.id === id)
+  const engine = engines.find(e => e.id === id)
   if (!engine) notFound()
 
   const keys = await getEngineKeys(id)
@@ -101,7 +101,7 @@ export default async function EngineKeysPage({ params }: PageProps): Promise<Rea
       <div className="admin-card" style={{ background: 'rgba(59,130,246,0.04)', border: '1px solid rgba(59,130,246,0.15)' }}>
         <h3 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', margin: '0 0 8px' }}>How key rotation works</h3>
         <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.7, margin: 0 }}>
-          When a citation check runs, Uptrue picks the active key with the lowest usage that is under its monthly limit.
+          When a citation check runs, Upnotify picks the active key with the lowest usage that is under its monthly limit.
           When a key reaches 999 uses (or its configured limit), the next key in the pool takes over automatically.
           Counters reset on the 1st of each month. Add as many keys as needed — each key should be from a separate API account.
         </p>

@@ -61,7 +61,7 @@ export function ChecksTerminal() {
           marginLeft: 10, fontSize: 12.5, fontFamily: "'SF Mono', 'JetBrains Mono', Consolas, monospace",
           color: '#8b949e', fontWeight: 500,
         }}>
-          uptrue-monitor — security-scan.log
+          Upnotify-monitor — security-scan.log
         </span>
         <span style={{
           marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 6,

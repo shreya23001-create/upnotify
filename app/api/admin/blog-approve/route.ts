@@ -27,7 +27,7 @@ function successPage(heading: string, message: string, colour: string): Response
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>${safeHeading} — Uptrue</title>
+  <title>${safeHeading} — Upnotify</title>
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
     body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f4f4f7;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px}
@@ -62,7 +62,7 @@ function errorPage(message: string): Response {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Error — Uptrue</title>
+  <title>Error — Upnotify</title>
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
     body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f4f4f7;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px}

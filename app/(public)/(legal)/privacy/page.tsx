@@ -15,7 +15,7 @@ export default function PrivacyPolicyPage(): React.ReactElement {
 
       <p>
         This Privacy Policy explains how Crozent Techlabs Private Limited, a company incorporated in India with
-        its registered office at B-59, B-Block, Chipyana, Noida &ndash; 201009, Uttar Pradesh, India (&quot;Uptrue&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;), collects,
+        its registered office at B-59, B-Block, Chipyana, Noida &ndash; 201009, Uttar Pradesh, India (&quot;Upnotify&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;), collects,
         uses, stores, and protects your personal data when you use our website at upnotify-monitoring.vercel.app and our
         monitoring platform (collectively, the &quot;Service&quot;).
       </p>
@@ -31,7 +31,7 @@ export default function PrivacyPolicyPage(): React.ReactElement {
         questions regarding this Privacy Policy or your personal data, please contact us at:
       </p>
       <ul>
-        <li><strong>Email:</strong> shreya23001@gmail.com</li>
+        <li><strong>Email:</strong> info@upnotify.com</li>
         <li><strong>Post:</strong> Data Protection Officer, Crozent Techlabs Private Limited, B-59, B-Block, Chipyana, Noida &ndash; 201009, Uttar Pradesh, India</li>
       </ul>
 
@@ -204,7 +204,7 @@ export default function PrivacyPolicyPage(): React.ReactElement {
         </li>
         <li>
           You may request a copy of the audit log entries relating to any impersonation access to
-          your account by contacting shreya23001@gmail.com.
+          your account by contacting info@upnotify.com.
         </li>
       </ul>
       <p>
@@ -311,7 +311,7 @@ export default function PrivacyPolicyPage(): React.ReactElement {
       <ul>
         <li>
           <strong>EU Standard Contractual Clauses (SCCs)</strong> and <strong>UK International Data
-          Transfer Agreement (IDTA)</strong> with all processors that store or process data outside
+            Transfer Agreement (IDTA)</strong> with all processors that store or process data outside
           the EU/UK.
         </li>
         <li>
@@ -402,7 +402,7 @@ export default function PrivacyPolicyPage(): React.ReactElement {
         </li>
       </ul>
       <p>
-        To exercise any of these rights, please contact us at shreya23001@gmail.com. We will respond to your
+        To exercise any of these rights, please contact us at info@upnotify.com. We will respond to your
         request within one month, or notify you if an extension is required (up to two additional months
         for complex requests). You will not be charged a fee for exercising your rights, except where
         requests are manifestly unfounded or excessive.
@@ -417,7 +417,7 @@ export default function PrivacyPolicyPage(): React.ReactElement {
         knowingly collect personal data from children under 16. If we become aware that we have
         inadvertently collected personal data from a child under 16, we will take steps to delete that
         data as soon as possible. If you believe we may have collected data from a child under 16,
-        please contact us at shreya23001@gmail.com.
+        please contact us at info@upnotify.com.
       </p>
 
       <h2>10. Cookies</h2>
@@ -475,7 +475,7 @@ export default function PrivacyPolicyPage(): React.ReactElement {
         We use AI (Anthropic Claude API) to generate automated report summaries and performance analyses
         based on your monitoring data. These are informational outputs only and do not constitute
         automated decision-making that produces legal or similarly significant effects on you. You may
-        request human review of any AI-generated output by contacting shreya23001@gmail.com.
+        request human review of any AI-generated output by contacting info@upnotify.com.
       </p>
 
       <h2>14. Changes to This Privacy Policy</h2>
@@ -516,8 +516,8 @@ export default function PrivacyPolicyPage(): React.ReactElement {
         please contact:
       </p>
       <ul>
-        <li><strong>Data Protection Officer:</strong> shreya23001@gmail.com</li>
-        <li><strong>General Support:</strong> shreya23001@gmail.com</li>
+        <li><strong>Data Protection Officer:</strong> info@upnotify.com</li>
+        <li><strong>General Support:</strong> info@upnotify.com</li>
         <li><strong>Post:</strong> Data Protection Officer, Crozent Techlabs Private Limited, B-59, B-Block, Chipyana, Noida &ndash; 201009, Uttar Pradesh, India</li>
       </ul>
     </>

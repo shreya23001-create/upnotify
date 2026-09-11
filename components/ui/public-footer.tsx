@@ -69,19 +69,8 @@ export async function PublicFooter(): Promise<React.ReactElement> {
           {/* Brand */}
           <div className="footer-brand">
             <Link href="/" className="nav-logo" aria-label="Upnotify home" style={{ marginBottom: 'var(--space-4)', display: 'inline-flex' }}>
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 50" height="28" aria-hidden="true">
-                <defs>
-                  <linearGradient id="ftG" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#3b82f6"/>
-                    <stop offset="100%" stopColor="#06b6d4"/>
-                  </linearGradient>
-                </defs>
-                <path d="M20 6 L36 12 L36 24 C36 32 28 38 20 42 C12 38 4 32 4 24 L4 12 Z" fill="url(#ftG)"/>
-                <text x="10" y="30" fontFamily="system-ui,-apple-system,sans-serif" fontSize="16" fontWeight="800" fill="white" letterSpacing="0.5">
-                  <tspan dy="0">U</tspan><tspan dy="-5">p</tspan>
-                </text>
-                <text x="46" y="34" fontFamily="system-ui,-apple-system,sans-serif" fontSize="28" fontWeight="700" fill="#ffffff" letterSpacing="-0.5">Upnotify</text>
-              </svg>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/Logo_1_white.png" alt="Upnotify" height={92} style={{ height: 92, width: 'auto' }} />
             </Link>
             <p className="footer-desc">{description}</p>
           </div>

@@ -60,7 +60,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       // engineering-app#49.
       if (/bucket.*not.*found/i.test(msg)) {
         return NextResponse.json(
-          { error: 'File uploads are temporarily unavailable. Please paste the content into the message body or email shreya23001@gmail.com.' },
+          { error: 'File uploads are temporarily unavailable. Please paste the content into the message body or email info@upnotify.com.' },
           { status: 503 },
         )
       }
@@ -88,7 +88,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     return NextResponse.json({
       success: true,
-      url:  signed.signedUrl,    // immediately usable, expires in 7 days
+      url: signed.signedUrl,    // immediately usable, expires in 7 days
       path: safeName,            // durable — store this for regenerating URLs later
       name: file.name,           // original filename for display
       mime: file.type,           // for choosing inline vs link rendering

@@ -89,7 +89,7 @@ function BlogIndexContent({ posts }: { posts: UnifiedPost[] }) {
       <div className="blog-hero">
         <div className="container">
           <div className="blog-hero-inner">
-            <div className="blog-hero-eyebrow">Uptrue Blog</div>
+            <div className="blog-hero-eyebrow">Upnotify Blog</div>
             <h1>Uptime, monitoring &amp;<br />reliability insights</h1>
             <p className="blog-hero-sub">
               Practical guides, incident reports, and deep dives for developers and agencies who care about keeping sites up.
@@ -97,7 +97,7 @@ function BlogIndexContent({ posts }: { posts: UnifiedPost[] }) {
             <div className="blog-search-wrap">
               <div className="blog-search-icon-wrap">
                 <svg className="blog-search-icon" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                  <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                  <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
                 </svg>
                 <input
                   className="blog-search"
@@ -152,14 +152,14 @@ function BlogIndexContent({ posts }: { posts: UnifiedPost[] }) {
                       U
                     </div>
                     <div>
-                      <div className="blog-author-name">Uptrue Team</div>
+                      <div className="blog-author-name">Upnotify Team</div>
                       <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{featuredPost.displayDate}</div>
                     </div>
                   </div>
                   <span className="blog-card-link">
                     Read article
                     <svg className="blog-card-arrow" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                     </svg>
                   </span>
                 </div>
@@ -227,7 +227,7 @@ function BlogIndexContent({ posts }: { posts: UnifiedPost[] }) {
                         <span className="blog-card-link">
                           Read article
                           <svg className="blog-card-arrow" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                           </svg>
                         </span>
                         <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>upnotify-monitoring.vercel.app/blog</span>
@@ -245,7 +245,7 @@ function BlogIndexContent({ posts }: { posts: UnifiedPost[] }) {
                   <button className="btn btn-ghost" onClick={() => goToPage(page + 1)}>
                     Load more articles
                     <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                      <polyline points="6 9 12 15 18 9"/>
+                      <polyline points="6 9 12 15 18 9" />
                     </svg>
                   </button>
                 ) : (

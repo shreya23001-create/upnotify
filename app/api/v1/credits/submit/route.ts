@@ -103,7 +103,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     for (const adminEmail of adminEmails) {
       await sendAlertEmail({
         to: adminEmail,
-        subject: `[Uptrue] New credit submission: ${creditType}`,
+        subject: `[Upnotify] New credit submission: ${creditType}`,
         body: `A user has submitted a credit request.\n\nType: ${creditType}\nUser: ${user.email}\nURL: ${body.submissionUrl || 'N/A'}\nAmount: \u00A3${(creditAmount / 100).toFixed(2)}\n\nReview it at: ${config.app.url}/admin/credits`,
       })
     }

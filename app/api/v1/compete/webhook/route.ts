@@ -9,7 +9,7 @@ import { logger } from '@/lib/utils/logger'
  * Authenticated via API key (query param or Authorization header).
  * Body: { productUrl, price, currency?, stockStatus? }
  *
- * This is how WooCommerce, Shopify, BigCommerce etc. send data to Uptrue.
+ * This is how WooCommerce, Shopify, BigCommerce etc. send data to Upnotify.
  */
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {

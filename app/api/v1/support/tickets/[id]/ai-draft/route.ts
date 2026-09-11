@@ -42,7 +42,7 @@ export async function POST(
       `[${m.author_type === 'admin' ? 'Support Team' : 'User'}]: ${m.body}`
     ).join('\n\n')
 
-    const prompt = `You are a friendly, professional support agent for Uptrue — an uptime monitoring SaaS.
+    const prompt = `You are a friendly, professional support agent for Upnotify — an uptime monitoring SaaS.
 
 A customer has submitted a support ticket. Draft a helpful, concise reply.
 

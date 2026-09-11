@@ -18,7 +18,7 @@ export default function TermsOfServicePage(): React.ReactElement {
         These Terms of Service (&quot;Terms&quot;) govern your access to and use of the Upnotify platform,
         website, and related services (collectively, the &quot;Service&quot;) operated by Crozent Techlabs Private Limited,
         a company incorporated in India with its registered office at B-59, B-Block, Chipyana, Noida &ndash; 201009, Uttar Pradesh, India
-        (&quot;Uptrue&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;).
+        (&quot;Upnotify&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;).
       </p>
       <p>
         By creating an account, accessing, or using the Service, you agree to be bound by these Terms.
@@ -66,7 +66,7 @@ export default function TermsOfServicePage(): React.ReactElement {
       <p>
         You are responsible for maintaining the confidentiality of your account credentials, including
         your password and any API keys issued to your account. You agree to notify us immediately at
-        shreya23001@gmail.com if you become aware of any unauthorised access to or use of your account.
+        info@upnotify.com if you become aware of any unauthorised access to or use of your account.
         We are not liable for any loss or damage arising from your failure to protect your account
         credentials.
       </p>
@@ -135,7 +135,7 @@ export default function TermsOfServicePage(): React.ReactElement {
       <p>
         As a general policy, fees paid are non-refundable. However, if you experience a material service
         failure attributable to Upnotify, you may request a credit or refund by contacting
-        shreya23001@gmail.com within 14 days of the issue. Refund requests are assessed on a case-by-case
+        info@upnotify.com within 14 days of the issue. Refund requests are assessed on a case-by-case
         basis at our reasonable discretion.
       </p>
       <h3>3.6 Plan Changes</h3>
@@ -212,7 +212,7 @@ export default function TermsOfServicePage(): React.ReactElement {
         </li>
         <li>
           You may request a copy of the audit log entries relating to any impersonation access to
-          your account by contacting shreya23001@gmail.com.
+          your account by contacting info@upnotify.com.
         </li>
       </ul>
 
@@ -248,7 +248,7 @@ export default function TermsOfServicePage(): React.ReactElement {
       </p>
       <p>
         You may export your Customer Data at any time using the data export feature in your account
-        settings, or by contacting shreya23001@gmail.com.
+        settings, or by contacting info@upnotify.com.
       </p>
 
       <h2>6. Intellectual Property</h2>
@@ -360,7 +360,7 @@ export default function TermsOfServicePage(): React.ReactElement {
       <h2>10. Suspension and Termination</h2>
       <h3>10.1 Termination by You</h3>
       <p>
-        You may close your account at any time by contacting shreya23001@gmail.com or using the account
+        You may close your account at any time by contacting info@upnotify.com or using the account
         deletion feature in your settings. Upon termination, your data will be retained for 30 days to
         allow for recovery, after which it will be permanently deleted in accordance with our Privacy
         Policy.
@@ -529,8 +529,8 @@ export default function TermsOfServicePage(): React.ReactElement {
         If you have any questions about these Terms, please contact us at:
       </p>
       <ul>
-        <li><strong>Email:</strong> shreya23001@gmail.com</li>
-        <li><strong>Support:</strong> shreya23001@gmail.com</li>
+        <li><strong>Email:</strong> info@upnotify.com</li>
+        <li><strong>Support:</strong> info@upnotify.com</li>
         <li>
           <strong>Post:</strong> Crozent Techlabs Private Limited, B-59, B-Block, Chipyana, Noida &ndash; 201009, Uttar Pradesh, India
         </li>

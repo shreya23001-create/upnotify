@@ -324,7 +324,7 @@ export default function UptimeMonitoringAgenciesPage(): React.ReactElement {
             Multi-tenant workspaces, white-label branding, per-client alerting, and AI-powered
             reports. Upnotify is the monitoring platform agencies have been asking for.
           </p>
-          <a href="mailto:shreya23001@gmail.com?subject=Agency%20Waitlist%20%E2%80%94%20Early%20Access" className="btn btn-primary btn-lg">
+          <a href="mailto:info@upnotify.com?subject=Agency%20Waitlist%20%E2%80%94%20Early%20Access" className="btn btn-primary btn-lg">
             Join the Agency Waitlist
           </a>
         </div>

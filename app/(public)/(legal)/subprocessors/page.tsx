@@ -137,8 +137,8 @@ export default function SubprocessorsPage(): React.ReactElement {
           Data Processing Agreement with us that includes a notification obligation, we will notify you
           by email at least 30 days before engaging a new sub-processor that processes personal data.
         </p>
-        <a href="mailto:shreya23001@gmail.com" className="subp-contact-link">
-          <Mail size={16} /> shreya23001@gmail.com
+        <a href="mailto:info@upnotify.com" className="subp-contact-link">
+          <Mail size={16} /> info@upnotify.com
         </a>
       </div>
     </div>

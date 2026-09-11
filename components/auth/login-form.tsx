@@ -4,7 +4,7 @@ import { useState, useEffect, useTransition } from 'react'
 import { signInWithPassword, signUpWithPassword } from '@/lib/auth/actions'
 import { PasswordInput } from './password-input'
 
-const HINT_COOKIE = 'uptrue_user_hint'
+const HINT_COOKIE = 'Upnotify_user_hint'
 
 function readEmailHint(): string {
   if (typeof document === 'undefined') return ''

@@ -38,7 +38,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     type: body.type,
     config: body.config ?? {},
     from_email: body.from_email,
-    from_name: body.from_name ?? 'Uptrue',
+    from_name: body.from_name ?? 'Upnotify',
     is_active: body.is_active ?? true,
   })
 

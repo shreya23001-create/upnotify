@@ -55,10 +55,10 @@ const data: ToolPillarData = {
     },
   ],
   faq: [
-    {
-      q: 'Is the AI SEO Checker the same as Upnotify AI Visibility?',
-      a: 'No. The AI SEO Checker is a one-off snapshot — does your site appear AI-ready right now (crawler access, metadata, structure, llms.txt). Upnotify AI Visibility (separate product at aivisibility.uptrue.io) is the continuous tracking layer — does ChatGPT actually cite you for the keywords you target, week after week. The Checker is the doorstep diagnostic; AI Visibility is the rolling vital signs.',
-    },
+    // {
+    //   q: 'Is the AI SEO Checker the same as Upnotify AI Visibility?',
+    //   a: 'No. The AI SEO Checker is a one-off snapshot — does your site appear AI-ready right now (crawler access, metadata, structure, llms.txt). Upnotify AI Visibility (separate product at aivisibility.uptrue.io) is the continuous tracking layer — does ChatGPT actually cite you for the keywords you target, week after week. The Checker is the doorstep diagnostic; AI Visibility is the rolling vital signs.',
+    // },
     {
       q: 'How many redirect hops is too many?',
       a: 'Google recommends fewer than 3. Anything over 5 is a strong signal something is wrong (e.g. legacy URL → CDN redirect → HTTPS upgrade → CMS rewrite → final). Long chains slow page load for every visitor and can drop pages from Google\'s index entirely.',

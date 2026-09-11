@@ -86,7 +86,7 @@ export function CancelPlanModal({ planName, isOpen, isPaused, pauseUntil, onClos
       } else {
         const msg = data.error ?? 'Something went wrong. Please try again.'
         setError(msg.includes('no payment provider')
-          ? 'Your subscription cannot be cancelled automatically. Please contact shreya23001@gmail.com.'
+          ? 'Your subscription cannot be cancelled automatically. Please contact info@upnotify.com.'
           : msg
         )
         setStep('reason')

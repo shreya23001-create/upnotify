@@ -168,7 +168,7 @@ async function generateBriefForOrg(
   if (owner.email) {
     await sendAlertEmail({
       to: owner.email,
-      subject: '[Uptrue Compete] Your Weekly Price Intelligence Brief',
+      subject: '[Upnotify Compete] Your Weekly Price Intelligence Brief',
       body: briefText,
     })
   }

@@ -86,7 +86,7 @@ export async function GET(request: Request): Promise<NextResponse> {
       status: 200,
       headers: {
         'Content-Type': 'application/json',
-        'Content-Disposition': 'attachment; filename="uptrue-data-export.json"',
+        'Content-Disposition': 'attachment; filename="Upnotify-data-export.json"',
         'Cache-Control': 'no-store',
       },
     })

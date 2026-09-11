@@ -34,7 +34,7 @@ declare global {
    Constants
    ────────────────────────────────────────────── */
 
-const STORAGE_KEY = 'uptrue_cookie_consent'
+const STORAGE_KEY = 'Upnotify_cookie_consent'
 
 /* ──────────────────────────────────────────────
    Helpers

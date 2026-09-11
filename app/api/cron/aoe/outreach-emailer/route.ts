@@ -109,7 +109,7 @@ async function processSite(
     emailSource: site.email_source ?? 'website_scrape',
     campaign,
     platform: site.platform,
-    product: isCompeteProduct ? 'compete' : 'uptrue',
+    product: isCompeteProduct ? 'compete' : 'Upnotify',
     resendMessageId: result.messageId,
   })
 

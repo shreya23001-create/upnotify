@@ -201,7 +201,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         method: 'GET',
         redirect: 'follow',
         signal: controller.signal,
-        headers: { 'User-Agent': 'Uptrue-SecurityHeadersChecker/1.0' },
+        headers: { 'User-Agent': 'Upnotify-SecurityHeadersChecker/1.0' },
       })
       clearTimeout(timeout)
     } catch (err) {

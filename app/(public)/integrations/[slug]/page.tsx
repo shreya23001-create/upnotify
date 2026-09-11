@@ -14,7 +14,7 @@ interface IntegrationPage {
   /** Two-paragraph "How the integration works". Sourced from the actual
    *  alert-dispatcher implementation in lib/services/alert-dispatcher.ts. */
   howItWorks: string[]
-  /** Setup steps inside Uptrue dashboard. Real flow: Alerts → New Channel. */
+  /** Setup steps inside Upnotify dashboard. Real flow: Alerts → New Channel. */
   setupSteps: string[]
   /** What the user sees / receives when an alert fires. */
   whatYouGet: string[]
@@ -143,26 +143,26 @@ const PAGES: IntegrationPage[] = [
     seoTitle: 'Upnotify Webhook Integration — Signed Alert Webhooks for Any Tool',
     seoDescription: 'Receive Upnotify uptime, SSL and DNS alerts as JSON webhooks signed with HMAC-SHA256. Wire into PagerDuty, Opsgenie, Datadog, your own incident system, or any tool that accepts a webhook. Full payload schema documented.',
     howItWorks: [
-      'When an incident opens or resolves, Upnotify POSTs a JSON payload to the webhook URL you configure. The body is signed with HMAC-SHA256 using a per-channel secret — your endpoint should verify the X-Uptrue-Signature header before trusting the payload.',
+      'When an incident opens or resolves, Upnotify POSTs a JSON payload to the webhook URL you configure. The body is signed with HMAC-SHA256 using a per-channel secret — your endpoint should verify the X-Upnotify-Signature header before trusting the payload.',
       'The payload includes the incident metadata (id, title, status, severity, started_at, resolved_at) and the monitor metadata (id, name, type, target). Both incident-opened and incident-resolved events are sent to the same webhook URL with different event values, so a single endpoint can handle the full lifecycle.',
     ],
     setupSteps: [
       'In Upnotify, open Dashboard → Alerts → New Channel, pick "Webhook" as the type.',
-      'Paste your endpoint URL. Optionally provide a webhook secret — if set, every POST is signed with X-Uptrue-Signature: sha256=<hex>.',
+      'Paste your endpoint URL. Optionally provide a webhook secret — if set, every POST is signed with X-Upnotify-Signature: sha256=<hex>.',
       'Save the channel. The first test request fires immediately — verify your endpoint receives it and that signature verification passes.',
       'Attach the channel to one or more monitors. Both incident-opened and incident-resolved events are POSTed to the same URL.',
     ],
     whatYouGet: [
       'JSON POST with full incident and monitor metadata',
-      'HMAC-SHA256 signature in X-Uptrue-Signature header (when secret is set)',
-      'User-Agent: Uptrue-Webhook/1.0 for easy filtering at your end',
+      'HMAC-SHA256 signature in X-Upnotify-Signature header (when secret is set)',
+      'User-Agent: Upnotify-Webhook/1.0 for easy filtering at your end',
       'Both incident.created and incident.resolved events on the same URL',
       '10-second timeout — your endpoint should ack quickly and process async',
     ],
     payloadSample: `POST /your-endpoint HTTP/1.1
 Content-Type: application/json
-User-Agent: Uptrue-Webhook/1.0
-X-Uptrue-Signature: sha256=<hex digest of body>
+User-Agent: Upnotify-Webhook/1.0
+X-Upnotify-Signature: sha256=<hex digest of body>
 
 {
   "event": "incident.created",
@@ -184,7 +184,7 @@ X-Uptrue-Signature: sha256=<hex digest of body>
 }`,
     faq: [
       { q: 'Is the webhook integration free?', a: 'Webhook channels require a Lite plan or higher. The Free plan includes email alerts on 3 monitors. Lite (£1/month or £10/year) unlocks signed webhooks, Slack, Microsoft Teams, and Telegram.' },
-      { q: 'How do I verify the X-Uptrue-Signature header?', a: 'Compute HMAC-SHA256 over the raw request body using the secret you set when creating the channel, hex-encode the digest, and compare it to the value in the header (after stripping the "sha256=" prefix). Use a constant-time comparison to defend against timing attacks. Most languages have a one-line implementation.' },
+      { q: 'How do I verify the X-Upnotify-Signature header?', a: 'Compute HMAC-SHA256 over the raw request body using the secret you set when creating the channel, hex-encode the digest, and compare it to the value in the header (after stripping the "sha256=" prefix). Use a constant-time comparison to defend against timing attacks. Most languages have a one-line implementation.' },
       { q: 'Can I use the webhook to wire Upnotify into PagerDuty or Opsgenie?', a: 'Yes. PagerDuty has a generic webhook integration; Opsgenie too. Map our event/incident/monitor fields to their expected schema (often a small Cloudflare Worker, Lambda, or n8n workflow does this in a few lines). Native PagerDuty/Opsgenie integrations are on the V1.5 roadmap.' },
       { q: 'What is the payload schema?', a: 'Top-level: event ("incident.created" or "incident.resolved"), incident object, monitor object, timestamp. The full sample is shown above. The schema is stable — we will version it (v2 etc.) before making any breaking changes, with notice.' },
       { q: 'How long do I have to respond to a webhook?', a: 'Upnotify applies a 10-second timeout. Your endpoint should accept the request quickly and process the work asynchronously — for example, queue the alert and return 200 immediately. A slow endpoint will record the dispatch as failed.' },
@@ -276,7 +276,7 @@ export default async function IntegrationPage({ params }: { params: Promise<{ sl
         <div style={{ maxWidth: 880, margin: '0 auto' }}>
           <nav style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 28, display: 'flex', alignItems: 'center', gap: 6 }}>
             <Link href="/integrations" style={{ color: 'var(--accent)', fontWeight: 500 }}>All Integrations</Link>
-            <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+            <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6" /></svg>
             <span>{page.name}</span>
           </nav>
 

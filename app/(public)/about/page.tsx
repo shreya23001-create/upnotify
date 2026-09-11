@@ -96,7 +96,7 @@ const FAQ_ITEMS = [
   },
   {
     q: 'How do I contact Upnotify?',
-    a: 'Reach us at shreya23001@gmail.com for billing questions, shreya23001@gmail.com for product support, or through the contact form. We\u2019re GDPR compliant, and a Data Processing Agreement is available for Agency customers.',
+    a: 'Reach us at info@upnotify.com for billing questions, info@upnotify.com for product support, or through the contact form. We\u2019re GDPR compliant, and a Data Processing Agreement is available for Agency customers.',
   },
 ]
 
@@ -228,7 +228,7 @@ export default function AboutPage(): React.ReactElement {
               { '@type': 'Question', name: 'Where is my monitoring data stored?', acceptedAnswer: { '@type': 'Answer', text: 'Everything lives in the EU, on Supabase infrastructure in the Frankfurt region, encrypted both at rest and in transit. Row-level security keeps every organisation’s data fully isolated from every other.' } },
               { '@type': 'Question', name: 'Is there a free plan?', acceptedAnswer: { '@type': 'Answer', text: 'Yes — 3 monitors with email alerts, no credit card needed to get started. We also publish over a dozen free website monitoring tools that anyone can use without an account.' } },
               { '@type': 'Question', name: 'How does Upnotify prevent false alerts?', acceptedAnswer: { '@type': 'Answer', text: 'That job falls to two-confirmation detection: the moment a check flags a possible issue, Upnotify runs a second check before doing anything else, and only opens an incident if both agree. We also ship Smart Digest — the first event goes out instantly, and later events fold into a single digest email.' } },
-              { '@type': 'Question', name: 'How do I contact Upnotify?', acceptedAnswer: { '@type': 'Answer', text: 'Reach us at shreya23001@gmail.com for billing questions, shreya23001@gmail.com for product support, or through the contact form. We’re GDPR compliant, and a Data Processing Agreement is available for Agency customers.' } },
+              { '@type': 'Question', name: 'How do I contact Upnotify?', acceptedAnswer: { '@type': 'Answer', text: 'Reach us at info@upnotify.com for billing questions, info@upnotify.com for product support, or through the contact form. We’re GDPR compliant, and a Data Processing Agreement is available for Agency customers.' } },
             ],
           }),
         }}

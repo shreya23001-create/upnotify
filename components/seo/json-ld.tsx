@@ -34,13 +34,13 @@ export function OrganizationJsonLd(): React.ReactElement {
     },
     contactPoint: {
       '@type': 'ContactPoint',
-      email: 'shreya23001@gmail.com',
+      email: 'info@upnotify.com',
       contactType: 'customer support',
     },
-    sameAs: [
-      'https://x.com/uptrue_io',
-      'https://www.linkedin.com/company/uptrue-io/',
-    ],
+    // sameAs: [
+    //   'https://x.com/uptrue_io',
+    //   'https://www.linkedin.com/company/uptrue-io/',
+    // ],
   }
 
   return <JsonLd data={data} />

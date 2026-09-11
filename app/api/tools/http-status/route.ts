@@ -165,7 +165,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
           method: 'GET',
           redirect: 'manual',
           signal: controller.signal,
-          headers: { 'User-Agent': 'Uptrue-HttpStatusChecker/1.0' },
+          headers: { 'User-Agent': 'Upnotify-HttpStatusChecker/1.0' },
         })
         clearTimeout(timeout)
       } catch (err) {

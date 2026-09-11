@@ -35,7 +35,7 @@ export default function WordPressHelpPage(): React.ReactElement {
                 You will be given a secure API token for this site.
               </li>
               <li>
-                Download <a href="/downloads/uptrue-monitor.zip" style={{ color: 'var(--color-primary)' }}>uptrue-monitor.zip</a> from the setup page.
+                Download <a href="/downloads/Upnotify-monitor.zip" style={{ color: 'var(--color-primary)' }}>Upnotify-monitor.zip</a> from the setup page.
               </li>
               <li>
                 In your WordPress Admin, go to <strong>Plugins → Add New → Upload Plugin</strong>,
@@ -188,7 +188,7 @@ export default function WordPressHelpPage(): React.ReactElement {
           </section>
 
           <div style={{ marginTop: 32, padding: '16px 20px', background: 'var(--bg-secondary)', borderRadius: 8, fontSize: 14 }}>
-            <strong>Need help?</strong> Email <a href="mailto:shreya23001@gmail.com" style={{ color: 'var(--color-primary)' }}>shreya23001@gmail.com</a> or
+            <strong>Need help?</strong> Email <a href="mailto:info@upnotify.com" style={{ color: 'var(--color-primary)' }}>info@upnotify.com</a> or
             visit the <Link href="/monitoring/wordpress-site-monitor" style={{ color: 'var(--color-primary)' }}>WordPress Monitor landing page</Link> for
             full documentation.
           </div>

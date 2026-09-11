@@ -206,7 +206,7 @@ export default async function AdminBlogPreviewPage({ params }: PreviewPageProps)
             <div className="blog-article-meta-top" style={{ marginTop: 12 }}>
               {publishedDate && <span>{publishedDate}</span>}
               <span>&middot;</span>
-              <span>Uptrue Team</span>
+              <span>Upnotify Team</span>
             </div>
           </header>
 
@@ -239,7 +239,7 @@ export default async function AdminBlogPreviewPage({ params }: PreviewPageProps)
             <footer className="blog-article-footer">
               <div className="blog-author">
                 <div className="blog-author-info">
-                  <span className="blog-author-name">Uptrue Team</span>
+                  <span className="blog-author-name">Upnotify Team</span>
                   <span className="blog-author-role">Website Monitoring Platform</span>
                 </div>
               </div>
@@ -263,7 +263,7 @@ export default async function AdminBlogPreviewPage({ params }: PreviewPageProps)
             <footer className="blog-article-footer">
               <div className="blog-author">
                 <div className="blog-author-info">
-                  <span className="blog-author-name">Uptrue Team</span>
+                  <span className="blog-author-name">Upnotify Team</span>
                   <span className="blog-author-role">Website Monitoring Platform</span>
                 </div>
               </div>

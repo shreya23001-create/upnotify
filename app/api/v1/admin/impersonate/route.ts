@@ -5,7 +5,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { writeAuditLog } from '@/lib/db/audit'
 import { logger } from '@/lib/utils/logger'
 
-const COOKIE_NAME = 'uptrue_impersonate'
+const COOKIE_NAME = 'Upnotify_impersonate'
 const COOKIE_MAX_AGE = 60 * 60 // 1 hour
 
 interface ImpersonateRequestBody {

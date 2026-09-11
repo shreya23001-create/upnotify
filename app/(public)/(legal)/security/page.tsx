@@ -140,7 +140,7 @@ export default function SecurityPage(): React.ReactElement {
       <h2>8. Responsible Disclosure</h2>
       <p>
         If you discover a security vulnerability in Upnotify, please report it responsibly by emailing{' '}
-        <a href="mailto:shreya23001@gmail.com">shreya23001@gmail.com</a>. We will acknowledge receipt
+        <a href="mailto:info@upnotify.com">info@upnotify.com</a>. We will acknowledge receipt
         within 24 hours and provide an initial assessment within 5 business days.
       </p>
       <p>
@@ -154,11 +154,11 @@ export default function SecurityPage(): React.ReactElement {
       <ul>
         <li>
           <strong>Security:</strong>{' '}
-          <a href="mailto:shreya23001@gmail.com">shreya23001@gmail.com</a>
+          <a href="mailto:info@upnotify.com">info@upnotify.com</a>
         </li>
         <li>
           <strong>Privacy:</strong>{' '}
-          <a href="mailto:shreya23001@gmail.com">shreya23001@gmail.com</a>
+          <a href="mailto:info@upnotify.com">info@upnotify.com</a>
         </li>
       </ul>
     </>

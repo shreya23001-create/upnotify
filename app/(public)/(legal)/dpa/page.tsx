@@ -16,7 +16,7 @@ export default function DataProcessingAgreementPage(): React.ReactElement {
       <p>
         This Data Processing Agreement (&quot;DPA&quot;) forms part of the agreement between Crozent Techlabs Private Limited,
         a company incorporated in India with its registered office at B-59, B-Block, Chipyana, Noida &ndash; 201009, Uttar Pradesh, India
-        (&quot;Uptrue&quot;, &quot;Processor&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;), and the customer (&quot;Controller&quot;,
+        (&quot;Upnotify&quot;, &quot;Processor&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;), and the customer (&quot;Controller&quot;,
         &quot;you&quot;, or &quot;your&quot;) who has agreed to the Upnotify <a href="/terms">Terms of Service</a>.
       </p>
       <p>
@@ -304,7 +304,7 @@ export default function DataProcessingAgreementPage(): React.ReactElement {
       <p>
         The Service provides self-service data export functionality (JSON and CSV formats) that
         Controllers can use to fulfil access and portability requests. Erasure requests can be
-        fulfilled via the account deletion feature or by contacting shreya23001@gmail.com.
+        fulfilled via the account deletion feature or by contacting info@upnotify.com.
       </p>
 
       <h2>8. Data Deletion and Return</h2>
@@ -390,7 +390,7 @@ export default function DataProcessingAgreementPage(): React.ReactElement {
         </li>
         <li>
           <strong>UK International Data Transfer Agreement (IDTA)</strong> or the <strong>UK Addendum
-          to the EU SCCs</strong>, as approved by the UK Information Commissioner, where transfers
+            to the EU SCCs</strong>, as approved by the UK Information Commissioner, where transfers
           originate from the UK.
         </li>
       </ul>
@@ -431,8 +431,8 @@ export default function DataProcessingAgreementPage(): React.ReactElement {
         For questions about this Data Processing Agreement, please contact:
       </p>
       <ul>
-        <li><strong>Data Protection Officer:</strong> shreya23001@gmail.com</li>
-        <li><strong>General Support:</strong> shreya23001@gmail.com</li>
+        <li><strong>Data Protection Officer:</strong> info@upnotify.com</li>
+        <li><strong>General Support:</strong> info@upnotify.com</li>
         <li><strong>Post:</strong> Data Protection Officer, Crozent Techlabs Private Limited, B-59, B-Block, Chipyana, Noida &ndash; 201009, Uttar Pradesh, India</li>
       </ul>
     </>

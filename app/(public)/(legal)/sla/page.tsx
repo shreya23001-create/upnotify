@@ -84,7 +84,7 @@ export default function SLAPage(): React.ReactElement {
       <p>To request a service credit:</p>
       <ol>
         <li>
-          Email <a href="mailto:shreya23001@gmail.com">shreya23001@gmail.com</a> within{' '}
+          Email <a href="mailto:info@upnotify.com">info@upnotify.com</a> within{' '}
           <strong>30 days</strong> of the end of the month in which the downtime occurred.
         </li>
         <li>
@@ -157,7 +157,7 @@ export default function SLAPage(): React.ReactElement {
       <p>For SLA enquiries or credit claims, contact us at:</p>
       <ul>
         <li>
-          <strong>Email:</strong> <a href="mailto:shreya23001@gmail.com">shreya23001@gmail.com</a>
+          <strong>Email:</strong> <a href="mailto:info@upnotify.com">info@upnotify.com</a>
         </li>
         <li>
           <strong>Post:</strong> Crozent Techlabs Private Limited, B-59, B-Block, Chipyana,

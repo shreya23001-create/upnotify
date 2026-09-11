@@ -14,7 +14,7 @@ export default function CookiePolicyPage(): React.ReactElement {
       <p className="legal-updated">Last updated: 2 April 2026</p>
 
       <p>
-        This Cookie Policy explains how Crozent Techlabs Private Limited (&quot;Uptrue&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;) uses
+        This Cookie Policy explains how Crozent Techlabs Private Limited (&quot;Upnotify&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;) uses
         cookies and similar technologies on our website at upnotify-monitoring.vercel.app and our monitoring platform
         (the &quot;Service&quot;). This policy should be read alongside our
         <a href="/privacy">Privacy Policy</a>.
@@ -65,7 +65,7 @@ export default function CookiePolicyPage(): React.ReactElement {
             <td>7 days</td>
           </tr>
           <tr>
-            <td>uptrue_impersonate</td>
+            <td>Upnotify_impersonate</td>
             <td>Upnotify (first-party)</td>
             <td>Set only when an authorised Upnotify administrator accesses your account for support purposes (account impersonation). This cookie identifies the active impersonation session and ensures it is properly scoped and audited. It is never set during normal user activity.</td>
             <td>Session (cleared when impersonation ends)</td>
@@ -90,13 +90,13 @@ export default function CookiePolicyPage(): React.ReactElement {
         </thead>
         <tbody>
           <tr>
-            <td>uptrue-workspace-preference</td>
+            <td>Upnotify-workspace-preference</td>
             <td>localStorage</td>
             <td>Remembers your most recently selected workspace so the Service opens to the correct view.</td>
             <td>Persistent (until cleared)</td>
           </tr>
           <tr>
-            <td>uptrue-sidebar-collapsed</td>
+            <td>Upnotify-sidebar-collapsed</td>
             <td>localStorage</td>
             <td>Remembers whether you prefer the sidebar navigation collapsed or expanded.</td>
             <td>Persistent (until cleared)</td>
@@ -230,7 +230,7 @@ export default function CookiePolicyPage(): React.ReactElement {
         If you have any questions about this Cookie Policy, please contact us at:
       </p>
       <ul>
-        <li><strong>Email:</strong> <a href="mailto:shreya23001@gmail.com">shreya23001@gmail.com</a></li>
+        <li><strong>Email:</strong> <a href="mailto:info@upnotify.com">info@upnotify.com</a></li>
         <li><strong>Post:</strong> Crozent Techlabs Private Limited, B-59, B-Block, Chipyana, Noida &ndash; 201009, Uttar Pradesh, India</li>
       </ul>
     </>

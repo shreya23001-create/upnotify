@@ -37,7 +37,7 @@ const FALLBACK_BY_CURRENCY: Record<string, SellerEntity> = {
     tax_number: '09AAMCC8947M1ZP',
     pan: 'AAMCC8947M',
     tan: 'MRTC07685G',
-    email: 'shreya23001@gmail.com',
+    email: 'info@upnotify.com',
     website: 'crozent.com',
   },
   inr: {
@@ -53,7 +53,7 @@ const FALLBACK_BY_CURRENCY: Record<string, SellerEntity> = {
     tax_number: '09AAMCC8947M1ZP',
     pan: 'AAMCC8947M',
     tan: 'MRTC07685G',
-    email: 'shreya23001@gmail.com',
+    email: 'info@upnotify.com',
     website: 'crozent.com',
   },
 }

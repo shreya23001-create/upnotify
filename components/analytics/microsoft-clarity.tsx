@@ -19,7 +19,7 @@ function isExcludedPath(pathname: string): boolean {
 // Cookie consent helpers
 // ---------------------------------------------------------------------------
 
-const STORAGE_KEY = 'uptrue_cookie_consent'
+const STORAGE_KEY = 'Upnotify_cookie_consent'
 
 interface CookiePreferences {
   essential: boolean

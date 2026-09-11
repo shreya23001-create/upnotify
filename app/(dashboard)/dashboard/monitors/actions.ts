@@ -199,7 +199,7 @@ export async function createMonitorAction(formData: FormData): Promise<{ error?:
 // (was at lines 183-221). It was leftover from the old usage-based billing
 // model (per the comment in createMonitorAction at line 92-93) and bypassed
 // the plan-limit check entirely: it read pending monitor data from
-// `localStorage.uptrue_pending_monitor` (caller-controlled) and called
+// `localStorage.Upnotify_pending_monitor` (caller-controlled) and called
 // `createMonitor()` directly with no `checkMonitorLimit()`.
 //
 // Exploit was trivial: DevTools → set the localStorage key → navigate to

@@ -38,7 +38,7 @@ interface SetupWizardProps {
 /* Constants                                                           */
 /* ------------------------------------------------------------------ */
 
-const ONBOARDING_COMPLETE_KEY = 'uptrue_onboarding_complete'
+const ONBOARDING_COMPLETE_KEY = 'Upnotify_onboarding_complete'
 
 /* ------------------------------------------------------------------ */
 /* Helpers                                                             */

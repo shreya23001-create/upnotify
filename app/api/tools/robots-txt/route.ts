@@ -263,7 +263,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     try {
       const res = await fetch(robotsUrl, {
         signal: controller.signal,
-        headers: { 'User-Agent': 'Uptrue/1.0 (+https://upnotify-monitoring.vercel.app)' },
+        headers: { 'User-Agent': 'Upnotify/1.0 (+https://upnotify-monitoring.vercel.app)' },
         redirect: 'follow',
       })
       clearTimeout(timeout)

@@ -175,16 +175,16 @@ export default async function LandingPage(): Promise<React.ReactElement> {
   }
 
   // Pull typed content — null means either hidden or not seeded
-  const hero       = getSection<HeroContent>(sectionMap, 'hero')
-  const statsBar   = getSection<StatsBarContent>(sectionMap, 'stats_bar')
-  const features   = getSection<FeaturesContent>(sectionMap, 'features')
+  const hero = getSection<HeroContent>(sectionMap, 'hero')
+  const statsBar = getSection<StatsBarContent>(sectionMap, 'stats_bar')
+  const features = getSection<FeaturesContent>(sectionMap, 'features')
   const howItWorks = getSection<HowItWorksContent>(sectionMap, 'how_it_works')
   const aiFeatures = getSection<AiFeaturesContent>(sectionMap, 'ai_features')
-  const agency     = getSection<AgencyContent>(sectionMap, 'agency')
-  const faq        = getSection<FaqContent>(sectionMap, 'faq')
+  const agency = getSection<AgencyContent>(sectionMap, 'agency')
+  const faq = getSection<FaqContent>(sectionMap, 'faq')
   const testimonials = getSection<TestimonialsContent>(sectionMap, 'testimonials')
   const comparison = getSection<ComparisonTableContent>(sectionMap, 'comparison_table')
-  const ctaBand    = getSection<CtaBandContent>(sectionMap, 'cta_band')
+  const ctaBand = getSection<CtaBandContent>(sectionMap, 'cta_band')
   const trustedLogos = getSection<TrustedLogosContent>(sectionMap, 'trusted_logos')
 
   // Steps & testimonials with CSS class fallbacks
@@ -199,7 +199,7 @@ export default async function LandingPage(): Promise<React.ReactElement> {
   const faqItems = faq?.items ?? FAQ_ITEMS
 
   // Comparison table columns
-  const compCols   = comparison?.competitors ?? ['Upnotify', 'BetterUptime', 'UptimeRobot']
+  const compCols = comparison?.competitors ?? ['Upnotify', 'BetterUptime', 'UptimeRobot']
 
   // ── Dynamic section render order ──────────────────────────────────────────
   // Nav/footer (page='global') are always pinned top/bottom — only landing sections are reorderable.
@@ -352,10 +352,10 @@ export default async function LandingPage(): Promise<React.ReactElement> {
           <div key="stats_bar" className="stats-bar">
             <div className="stats-bar-inner">
               {(statsBar?.stats ?? [
-                { value: '24',    label: 'Monitor types' },
+                { value: '24', label: 'Monitor types' },
                 { value: '1 min', label: 'Fastest check interval' },
                 { value: '99.9%', label: 'Uptime SLA' },
-                { value: '0',     label: 'False alarms (2-region confirm)' },
+                { value: '0', label: 'False alarms (2-region confirm)' },
               ]).map((stat) => (
                 <div key={stat.label} className="stat-item">
                   <div className="stat-value gradient-text hero-tweets-gradient">{stat.value}</div>
@@ -422,10 +422,10 @@ export default async function LandingPage(): Promise<React.ReactElement> {
                   </p>
                   <div className="ai-features-list reveal-stagger">
                     {(aiFeatures?.features ?? [
-                      { icon: '🤖', color: 'purple', title: 'Executive AI Reports',             description: 'One click and Claude analyses 90 days of uptime data, incident patterns, and performance trends — generating a polished summary you can send to clients or stakeholders.' },
-                      { icon: '🔍', color: 'cyan',   title: 'Outage Pattern Detection',          description: "Upnotify learns your monitor's normal behaviour and flags anomalies before they become incidents. Recurring issues are spotted and surfaced automatically." },
-                      { icon: '📰', color: 'pink',   title: 'AI Outage News & Blog',             description: 'When a public service goes down, Upnotify researches and publishes an outage report automatically — with your logo and brand. Real-time SEO content on autopilot.' },
-                      { icon: '💡', color: 'blue',   title: 'Plain Language Incident Summaries', description: 'Every incident automatically gets a human-readable summary. No log-diving, no decoding stack traces. Just "your checkout was down for 8 minutes on Tuesday."' },
+                      { icon: '🤖', color: 'purple', title: 'Executive AI Reports', description: 'One click and Claude analyses 90 days of uptime data, incident patterns, and performance trends — generating a polished summary you can send to clients or stakeholders.' },
+                      { icon: '🔍', color: 'cyan', title: 'Outage Pattern Detection', description: "Upnotify learns your monitor's normal behaviour and flags anomalies before they become incidents. Recurring issues are spotted and surfaced automatically." },
+                      { icon: '📰', color: 'pink', title: 'AI Outage News & Blog', description: 'When a public service goes down, Upnotify researches and publishes an outage report automatically — with your logo and brand. Real-time SEO content on autopilot.' },
+                      { icon: '💡', color: 'blue', title: 'Plain Language Incident Summaries', description: 'Every incident automatically gets a human-readable summary. No log-diving, no decoding stack traces. Just "your checkout was down for 8 minutes on Tuesday."' },
                     ]).map((f, i) => {
                       const AiFeatureIcon = AI_FEATURE_ICONS[i % AI_FEATURE_ICONS.length]
                       return (
@@ -529,13 +529,13 @@ export default async function LandingPage(): Promise<React.ReactElement> {
                     Track AI search citations the way you track Google rankings — with weekly reports, competitor benchmarks, and citation alerts.
                   </p>
                 </div>
-                <a
+                {/* <a
                   href="https://aivisibility.uptrue.io"
                   className="btn btn-lg"
                   style={{ flex: '0 0 auto', background: '#fff', color: '#0068DB', fontWeight: 700 }}
                 >
                   Explore AI Visibility&trade; →
-                </a>
+                </a> */}
               </div>
             </div>
           </section>
@@ -646,20 +646,20 @@ export default async function LandingPage(): Promise<React.ReactElement> {
                   </thead>
                   <tbody>
                     {(comparison?.rows ?? [
-                      { feature: 'Fastest check interval',                        values: ['1 minute', '30 seconds', '5 minutes'],    type: 'text',    highlight: 0 },
-                      { feature: 'Two-region false alarm prevention',              values: [true, true, false],                         type: 'boolean' },
-                      { feature: 'AI-powered reports',                             values: [true, false, false],                        type: 'boolean' },
-                      { feature: 'Watchdog (competitor tracking)',                 values: [true, false, false],                        type: 'boolean' },
-                      { feature: 'Public uptime leaderboard / tracker',            values: [true, false, false],                        type: 'boolean' },
-                      { feature: 'Public status pages',                            values: [true, true, true],                          type: 'boolean' },
-                      { feature: 'Monitor types (HTTP, SSL, DNS, Keyword…)',       values: ['24 types', '7 types', '6 types'],          type: 'text',    highlight: 0 },
-                      { feature: 'Free plan monitors',                             values: ['3 monitors', '3 monitors', '50 monitors'], type: 'text',    highlight: 0 },
-                      { feature: 'Starting price (paid plan)',                     values: [defaultCurrency === 'inr' ? '₹999/yr Lite' : '£10/yr Lite', '$24/mo', '$7/mo'], type: 'text', highlight: 0 },
-                      { feature: 'GDPR · EU data storage',                        values: [true, true, false],                         type: 'boolean' },
-                      { feature: 'AI outage blog auto-publish',                    values: [true, false, false],                        type: 'boolean' },
-                      { feature: 'Free AI SEO Checker (4-category audit)',         values: [true, false, false],                        type: 'boolean' },
-                      { feature: 'llms.txt Generator',                             values: [true, false, false],                        type: 'boolean' },
-                      { feature: 'AI Citation Monitoring (Perplexity, ChatGPT…)', values: [true, false, false],                        type: 'boolean' },
+                      { feature: 'Fastest check interval', values: ['1 minute', '30 seconds', '5 minutes'], type: 'text', highlight: 0 },
+                      { feature: 'Two-region false alarm prevention', values: [true, true, false], type: 'boolean' },
+                      { feature: 'AI-powered reports', values: [true, false, false], type: 'boolean' },
+                      { feature: 'Watchdog (competitor tracking)', values: [true, false, false], type: 'boolean' },
+                      { feature: 'Public uptime leaderboard / tracker', values: [true, false, false], type: 'boolean' },
+                      { feature: 'Public status pages', values: [true, true, true], type: 'boolean' },
+                      { feature: 'Monitor types (HTTP, SSL, DNS, Keyword…)', values: ['24 types', '7 types', '6 types'], type: 'text', highlight: 0 },
+                      { feature: 'Free plan monitors', values: ['3 monitors', '3 monitors', '50 monitors'], type: 'text', highlight: 0 },
+                      { feature: 'Starting price (paid plan)', values: [defaultCurrency === 'inr' ? '₹999/yr Lite' : '£10/yr Lite', '$24/mo', '$7/mo'], type: 'text', highlight: 0 },
+                      { feature: 'GDPR · EU data storage', values: [true, true, false], type: 'boolean' },
+                      { feature: 'AI outage blog auto-publish', values: [true, false, false], type: 'boolean' },
+                      { feature: 'Free AI SEO Checker (4-category audit)', values: [true, false, false], type: 'boolean' },
+                      { feature: 'llms.txt Generator', values: [true, false, false], type: 'boolean' },
+                      { feature: 'AI Citation Monitoring (Perplexity, ChatGPT…)', values: [true, false, false], type: 'boolean' },
                     ] as Array<{ feature: string; values: Array<boolean | string>; type: string; highlight?: number }>).map((row) => (
                       <tr key={row.feature}>
                         <td>{row.feature}</td>

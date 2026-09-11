@@ -89,7 +89,7 @@ const howItWorks = [
   {
     step: '1',
     title: 'Install the free plugin',
-    desc: 'Download uptrue-monitor.php, upload it to your wp-content/plugins folder, and activate it in WordPress Admin. Takes under 2 minutes.',
+    desc: 'Download Upnotify-monitor.php, upload it to your wp-content/plugins folder, and activate it in WordPress Admin. Takes under 2 minutes.',
   },
   {
     step: '2',
@@ -249,7 +249,7 @@ export default function WordPressMonitorPage() {
               <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
               Add WordPress Monitor Free
             </Link>
-            <a href="/downloads/uptrue-monitor.zip" className="wp-monitor-hero-secondary-btn" style={{
+            <a href="/downloads/Upnotify-monitor.zip" className="wp-monitor-hero-secondary-btn" style={{
               padding: '13px 24px',
               borderRadius: 10,
               fontWeight: 600,
@@ -616,7 +616,7 @@ export default function WordPressMonitorPage() {
                   <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                   Create Free Account
                 </Link>
-                <a href="/downloads/uptrue-monitor.zip" style={{
+                <a href="/downloads/Upnotify-monitor.zip" style={{
                   background: 'rgba(255,255,255,0.08)',
                   color: 'rgba(255,255,255,0.9)',
                   border: '1px solid rgba(255,255,255,0.15)',

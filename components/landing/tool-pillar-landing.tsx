@@ -2,7 +2,7 @@
  * ToolPillarLanding — shared template for the 4 /tools/<pillar> landings.
  *
  * Each pillar (uptime, security, dns, ai-seo) groups 3–4 of the 14 free
- * Uptrue tools by intent. The landing page is an SEO surface for "free
+ * Upnotify tools by intent. The landing page is an SEO surface for "free
  * <category> tools" searches AND an internal hub that cross-links to the
  * matching continuous monitor types under /monitoring/*.
  */

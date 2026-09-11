@@ -116,9 +116,9 @@ export async function GET(request: Request): Promise<NextResponse> {
         if (ownerTyped.email) {
           await sendAlertEmail({
             to: ownerTyped.email,
-            subject: '[Uptrue] Payment failed — action required',
+            subject: '[Upnotify] Payment failed — action required',
             body: [
-              'Your Uptrue subscription payment has failed.',
+              'Your Upnotify subscription payment has failed.',
               '',
               'Razorpay will retry automatically, but you can also update your payment method directly:',
               RAZORPAY_DASHBOARD_URL,

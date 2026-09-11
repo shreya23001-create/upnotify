@@ -9,7 +9,7 @@ import {
 } from 'react'
 import type { Workspace, Organisation } from '@/lib/types'
 
-const STORAGE_KEY = 'uptrue_workspace_id'
+const STORAGE_KEY = 'Upnotify_workspace_id'
 
 interface WorkspaceContextType {
   currentWorkspace: Workspace | null
@@ -24,7 +24,7 @@ const WorkspaceContext = createContext<WorkspaceContextType>({
   workspaces: [],
   organisation: null,
   isAgency: false,
-  setCurrentWorkspace: () => {},
+  setCurrentWorkspace: () => { },
 })
 
 export function useWorkspace(): WorkspaceContextType {

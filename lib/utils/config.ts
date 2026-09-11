@@ -65,9 +65,9 @@ interface ServerConfig extends PublicConfig {
     secret: string
   }
   support: {
-    apiKey:         string  // Bearer token for external tool — set SUPPORT_API_KEY
-    webhookUrl:     string  // Outbound webhook for external tool — set SUPPORT_WEBHOOK_URL
-    webhookSecret:  string  // HMAC secret for webhook signing — set SUPPORT_WEBHOOK_SECRET
+    apiKey: string  // Bearer token for external tool — set SUPPORT_API_KEY
+    webhookUrl: string  // Outbound webhook for external tool — set SUPPORT_WEBHOOK_URL
+    webhookSecret: string  // HMAC secret for webhook signing — set SUPPORT_WEBHOOK_SECRET
   }
   adminEmails: string[]
 }
@@ -89,7 +89,7 @@ export function getConfig(): PublicConfig {
   // Always use NEXT_PUBLIC_APP_URL — never the auto-generated Vercel preview URL
   // Dev & Prod: NEXT_PUBLIC_APP_URL = https://upnotify-monitoring.vercel.app
   // const appUrl = (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000').trim()
-    const appUrl = resolveAppUrl()
+  const appUrl = resolveAppUrl()
   const adminEmails = process.env.ADMIN_EMAILS || ''
   const gaMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? ''
   const gtmId = process.env.NEXT_PUBLIC_GTM_ID ?? ''
@@ -143,7 +143,7 @@ export function getServerConfig(): ServerConfig {
     return {
       ...publicConfig,
       supabase: { ...publicConfig.supabase, serviceRoleKey: '' },
-      resend: { apiKey: '', fromEmail: 'shreya23001@gmail.com', fromName: 'Uptrue Alerts' },
+      resend: { apiKey: '', fromEmail: 'shreya23001@gmail.com', fromName: 'Upnotify Alerts' },
       stripe: { secretKey: '', webhookSecret: '' },
       razorpay: { keyId: '', keySecret: '', webhookSecret: '' },
       anthropic: { apiKey: '' },
@@ -159,7 +159,7 @@ export function getServerConfig(): ServerConfig {
 
   const resendApiKey = process.env.RESEND_API_KEY ?? ''
   const resendFromEmail = process.env.RESEND_FROM_EMAIL || 'shreya23001@gmail.com'
-  const resendFromName = process.env.RESEND_FROM_NAME || 'Uptrue Alerts'
+  const resendFromName = process.env.RESEND_FROM_NAME || 'Upnotify Alerts'
 
   const stripeSecretKey = process.env.STRIPE_SECRET_KEY ?? ''
   const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET ?? ''
@@ -230,8 +230,8 @@ export function getServerConfig(): ServerConfig {
       secret: blogApprovalSecret,
     },
     support: {
-      apiKey:        supportApiKey,
-      webhookUrl:    supportWebhookUrl,
+      apiKey: supportApiKey,
+      webhookUrl: supportWebhookUrl,
       webhookSecret: supportWebhookSecret,
     },
     adminEmails: adminEmailsList,

@@ -166,7 +166,7 @@ export default function AIDisclaimerPage(): React.ReactElement {
       </p>
       <ul>
         <li>
-          <strong>Email:</strong> <a href="mailto:shreya23001@gmail.com">shreya23001@gmail.com</a>
+          <strong>Email:</strong> <a href="mailto:info@upnotify.com">info@upnotify.com</a>
         </li>
         <li>Include the URL of the report, the specific inaccuracy, and supporting evidence where possible</li>
         <li>We aim to respond within <strong>2 business days</strong> and to action valid requests within <strong>5 business days</strong></li>
@@ -190,10 +190,10 @@ export default function AIDisclaimerPage(): React.ReactElement {
       </p>
       <ul>
         <li>
-          <strong>Email:</strong> <a href="mailto:shreya23001@gmail.com">shreya23001@gmail.com</a>
+          <strong>Email:</strong> <a href="mailto:info@upnotify.com">info@upnotify.com</a>
         </li>
         <li>
-          <strong>Monitoring report corrections:</strong> <a href="mailto:shreya23001@gmail.com">shreya23001@gmail.com</a>
+          <strong>Monitoring report corrections:</strong> <a href="mailto:info@upnotify.com">info@upnotify.com</a>
         </li>
         <li>
           <strong>Post:</strong> Crozent Techlabs Private Limited, B-59, B-Block, Chipyana,

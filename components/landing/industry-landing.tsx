@@ -3,7 +3,7 @@
  *
  * Each industry page (/monitoring/<industry>-uptime-monitoring) renders this
  * template with industry-specific data: who the page is for, why uptime
- * matters in that industry, which Uptrue monitor types matter most, and
+ * matters in that industry, which Upnotify monitor types matter most, and
  * an FAQ block targeting industry keywords.
  *
  * The 24-monitor /monitoring/[slug] dynamic route remains the canonical
@@ -104,7 +104,7 @@ export function IndustryLandingPage({ data }: { data: IndustryLandingData }): Re
         <div style={{ maxWidth: 880, margin: '0 auto' }}>
           <nav style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 28, display: 'flex', alignItems: 'center', gap: 6 }}>
             <Link href="/monitoring" style={{ color: 'var(--accent)', fontWeight: 500 }}>All Monitor Types</Link>
-            <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+            <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6" /></svg>
             <span>{data.heroTitle}</span>
           </nav>
 

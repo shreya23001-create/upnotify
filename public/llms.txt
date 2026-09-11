@@ -59,11 +59,11 @@ Uptrue is built and operated by Crozent Techlabs Private Limited, B-59, B-Block,
 - [About](https://uptrue.io/about): Company background, mission, and values.
 - [Referral Program](https://uptrue.io/referrals): Earn account credits by referring new users.
 - [Community Credits](https://uptrue.io/credits): Earn credits via reviews, bug reports, and badge embeds.
-- [Contact](https://uptrue.io/contact): General enquiries — shreya23001@gmail.com
+- [Contact](https://uptrue.io/contact): General enquiries — info@upnotify.com
 - [X (Twitter)](https://x.com/uptrue_io): Product updates and monitoring news.
 - [LinkedIn](https://www.linkedin.com/company/uptrue-io/): Company announcements.
 
 ---
-Maintained by: Crozent Techlabs Private Limited · shreya23001@gmail.com
+Maintained by: Crozent Techlabs Private Limited · info@upnotify.com
 Last updated: April 2026
 Full detail: https://uptrue.io/llms-full.txt

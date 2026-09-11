@@ -22,15 +22,15 @@ interface StoredConsent {
    Constants
    ────────────────────────────────────────────── */
 
-const STORAGE_KEY = 'uptrue_cookie_consent'
+const STORAGE_KEY = 'Upnotify_cookie_consent'
 const CONSENT_VERSION = 1
 const SIX_MONTHS_MS = 180 * 24 * 60 * 60 * 1000
 
 /* Global event name for re-opening the preferences modal */
-const REOPEN_EVENT = 'uptrue:cookie-preferences'
+const REOPEN_EVENT = 'Upnotify:cookie-preferences'
 
 /* Dispatched whenever consent preferences are saved */
-export const CONSENT_CHANGED_EVENT = 'uptrue:consent-changed'
+export const CONSENT_CHANGED_EVENT = 'Upnotify:consent-changed'
 
 /* ──────────────────────────────────────────────
    Helpers
@@ -104,7 +104,7 @@ export function CookieConsent(): React.ReactElement | null {
       const timer = setTimeout(() => setVisible(true), 600)
       return () => clearTimeout(timer)
     }
-    return () => {}
+    return () => { }
   }, [])
 
   /* Listen for re-open event */

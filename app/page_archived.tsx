@@ -105,7 +105,7 @@ export default function LandingPage(): React.ReactElement {
                     <div className="ms-logo-icon">
                       <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="white" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
                     </div>
-                    <span className="ms-logo-name">Uptrue</span>
+                    <span className="ms-logo-name">Upnotify</span>
                   </div>
                   <div className="ms-nav">
                     <div className="ms-item ms-item-active">
@@ -459,7 +459,7 @@ export default function LandingPage(): React.ReactElement {
               <thead>
                 <tr>
                   <th>Feature</th>
-                  <th className="lp-col-uptrue"><div className="lp-uptrue-header">Uptrue<span className="lp-uptrue-badge">Best value</span></div></th>
+                  <th className="lp-col-uptrue"><div className="lp-uptrue-header">Upnotify<span className="lp-uptrue-badge">Best value</span></div></th>
                   <th>BetterUptime</th>
                   <th>UptimeRobot</th>
                 </tr>

@@ -16,7 +16,7 @@ export default function AcceptableUsePolicyPage(): React.ReactElement {
       <p>
         This Acceptable Use Policy (&quot;AUP&quot;) sets out the rules and restrictions governing your use of
         the Upnotify platform and services (the &quot;Service&quot;) operated by Crozent Techlabs Private Limited
-        (&quot;Uptrue&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;). This AUP is incorporated into and forms part of our
+        (&quot;Upnotify&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;). This AUP is incorporated into and forms part of our
         <a href="/terms">Terms of Service</a>.
       </p>
       <p>
@@ -250,7 +250,7 @@ export default function AcceptableUsePolicyPage(): React.ReactElement {
         </li>
       </ul>
       <p>
-        You may appeal a suspension or termination by contacting shreya23001@gmail.com within 14 days of the
+        You may appeal a suspension or termination by contacting info@upnotify.com within 14 days of the
         action. We will review your appeal and respond within a reasonable timeframe.
       </p>
 
@@ -260,7 +260,7 @@ export default function AcceptableUsePolicyPage(): React.ReactElement {
         immediately at:
       </p>
       <ul>
-        <li><strong>Email:</strong> shreya23001@gmail.com</li>
+        <li><strong>Email:</strong> info@upnotify.com</li>
       </ul>
       <p>
         When reporting abuse, please provide as much detail as possible, including:
@@ -325,8 +325,8 @@ export default function AcceptableUsePolicyPage(): React.ReactElement {
         If you have any questions about this Acceptable Use Policy, please contact us at:
       </p>
       <ul>
-        <li><strong>Abuse reports:</strong> shreya23001@gmail.com</li>
-        <li><strong>General enquiries:</strong> shreya23001@gmail.com</li>
+        <li><strong>Abuse reports:</strong> info@upnotify.com</li>
+        <li><strong>General enquiries:</strong> info@upnotify.com</li>
         <li><strong>Post:</strong> Crozent Techlabs Private Limited, B-59, B-Block, Chipyana, Noida &ndash; 201009, Uttar Pradesh, India</li>
       </ul>
     </>

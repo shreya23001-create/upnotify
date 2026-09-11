@@ -98,7 +98,7 @@ function buildBadgeConfig(style: BadgeStyle, uptime: number): BadgeConfig {
     case 'uptime':
       return {
         leftText: `${uptime.toFixed(2)}% Uptime`,
-        rightText: 'Uptrue',
+        rightText: 'Upnotify',
         leftColor: uptimeColor,
         rightColor: '#3b82f6',
         leftWidth: 108,
@@ -107,7 +107,7 @@ function buildBadgeConfig(style: BadgeStyle, uptime: number): BadgeConfig {
 
     case 'shield':
       return {
-        leftText: 'Uptrue',
+        leftText: 'Upnotify',
         rightText: '\u2713 Verified',
         leftColor: '#3b82f6',
         rightColor: '#22c55e',
@@ -119,7 +119,7 @@ function buildBadgeConfig(style: BadgeStyle, uptime: number): BadgeConfig {
     default:
       return {
         leftText: 'Monitored by',
-        rightText: 'Uptrue',
+        rightText: 'Upnotify',
         leftColor: '#555',
         rightColor: '#3b82f6',
         leftWidth: 96,

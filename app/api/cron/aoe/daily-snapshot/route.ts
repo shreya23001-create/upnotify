@@ -29,28 +29,28 @@ function pct(value: number, total: number): string {
 
 function bar(value: number, total: number): string {
   const filled = total > 0 ? Math.round((value / total) * 20) : 0
-  const empty  = 20 - filled
+  const empty = 20 - filled
   return '█'.repeat(filled) + '░'.repeat(empty)
 }
 
 function statusColour(status: string): string {
-  if (status === 'active')               return '#22c55e'
-  if (status === 'paused_85')            return '#f59e0b'
-  if (status === 'upgrade_required_95')  return '#ef4444'
+  if (status === 'active') return '#22c55e'
+  if (status === 'paused_85') return '#f59e0b'
+  if (status === 'upgrade_required_95') return '#ef4444'
   return '#6b7280'
 }
 
 function statusLabel(status: string): string {
-  if (status === 'active')               return '✓ Active'
-  if (status === 'paused_85')            return '⚠ Paused — 85% used'
-  if (status === 'upgrade_required_95')  return '🚨 Upgrade required — 95% used'
+  if (status === 'active') return '✓ Active'
+  if (status === 'paused_85') return '⚠ Paused — 85% used'
+  if (status === 'upgrade_required_95') return '🚨 Upgrade required — 95% used'
   return status
 }
 
 function cronAge(lastRun: string | null): string {
   if (!lastRun) return '<span style="color:#ef4444">Never run</span>'
   const mins = Math.round((Date.now() - new Date(lastRun).getTime()) / 60000)
-  if (mins < 90)   return `<span style="color:#22c55e">${mins}m ago</span>`
+  if (mins < 90) return `<span style="color:#22c55e">${mins}m ago</span>`
   if (mins < 1500) return `<span style="color:#22c55e">${Math.round(mins / 60)}h ago</span>`
   return `<span style="color:#ef4444">${Math.round(mins / 60)}h ago — check logs</span>`
 }
@@ -67,37 +67,37 @@ function buildSnapshotEmail(data: {
   campaigns: Awaited<ReturnType<typeof getAoeCampaignStats>>
   discovery: Record<string, number>
   lastRuns: {
-    quotaManager:    string | null
-    siteDiscovery:   string | null
+    quotaManager: string | null
+    siteDiscovery: string | null
     outreachChecker: string | null
     outreachEmailer: string | null
   }
 }): string {
   const { quota, campaigns, discovery, lastRuns } = data
   const q = quota
-  const totalSent  = q ? q.marketing_sent + q.alert_sent + q.burst_sent : 0
+  const totalSent = q ? q.marketing_sent + q.alert_sent + q.burst_sent : 0
   const totalQuota = q?.total_quota ?? AOE_CONFIG.quota.monthlyLimit
-  const usagePct   = Math.round((totalSent / totalQuota) * 100)
+  const usagePct = Math.round((totalSent / totalQuota) * 100)
   const quotaStatus = q?.status ?? 'unknown'
 
   // Campaign totals
-  const totalEmailed   = campaigns.reduce((s, c) => s + c.sent, 0)
-  const totalOpened    = campaigns.reduce((s, c) => s + c.opened, 0)
-  const totalClicked   = campaigns.reduce((s, c) => s + c.clicked, 0)
+  const totalEmailed = campaigns.reduce((s, c) => s + c.sent, 0)
+  const totalOpened = campaigns.reduce((s, c) => s + c.opened, 0)
+  const totalClicked = campaigns.reduce((s, c) => s + c.clicked, 0)
   const totalConverted = campaigns.reduce((s, c) => s + c.converted, 0)
-  const totalBounced   = campaigns.reduce((s, c) => s + c.bounced, 0)
-  const totalSpam      = campaigns.reduce((s, c) => s + c.spam, 0)
+  const totalBounced = campaigns.reduce((s, c) => s + c.bounced, 0)
+  const totalSpam = campaigns.reduce((s, c) => s + c.spam, 0)
 
-  const openRate    = totalEmailed ? pct(totalOpened, totalEmailed) : '—'
-  const clickRate   = totalEmailed ? pct(totalClicked, totalEmailed) : '—'
+  const openRate = totalEmailed ? pct(totalOpened, totalEmailed) : '—'
+  const clickRate = totalEmailed ? pct(totalClicked, totalEmailed) : '—'
   const convertRate = totalEmailed ? pct(totalConverted, totalEmailed) : '—'
 
   // Discovery totals
-  const discTotal   = Object.values(discovery).reduce((a, b) => a + b, 0)
-  const discReady   = discovery['ready']   ?? 0
+  const discTotal = Object.values(discovery).reduce((a, b) => a + b, 0)
+  const discReady = discovery['ready'] ?? 0
   const discEmailed = discovery['emailed'] ?? 0
   const discChecking = discovery['checking'] ?? 0
-  const discPending  = discovery['pending_check'] ?? 0
+  const discPending = discovery['pending_check'] ?? 0
 
   const campaignRows = campaigns.length > 0
     ? campaigns.map(c => `
@@ -125,7 +125,7 @@ function buildSnapshotEmail(data: {
 <!-- Header -->
 <tr><td style="padding:24px 32px 16px;border-bottom:1px solid #eaeaea;display:flex;justify-content:space-between;align-items:center;">
   <table width="100%" cellpadding="0" cellspacing="0"><tr>
-    <td><span style="font-size:17px;font-weight:700;color:#111827;">Uptrue · AOE Daily Snapshot</span></td>
+    <td><span style="font-size:17px;font-weight:700;color:#111827;">Upnotify · AOE Daily Snapshot</span></td>
     <td align="right"><span style="font-size:13px;color:#9ca3af;">${data.date}</span></td>
   </tr></table>
 </td></tr>
@@ -249,9 +249,9 @@ export async function GET(request: Request): Promise<NextResponse> {
 
   try {
     const supabase = createAdminClient()
-    const month    = getCurrentMonth()
-    const today    = new Date().toISOString().slice(0, 10)
-    const date     = new Date().toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })
+    const month = getCurrentMonth()
+    const today = new Date().toISOString().slice(0, 10)
+    const date = new Date().toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })
 
     const [quota, campaigns, discovery, sentTodayRes, lastRuns] = await Promise.all([
       getQuotaForDashboard(),
@@ -283,8 +283,8 @@ export async function GET(request: Request): Promise<NextResponse> {
       campaigns,
       discovery,
       lastRuns: {
-        quotaManager:    quotaManagerRes.data?.calculated_at ?? null,
-        siteDiscovery:   siteDiscoveryRes.data?.discovered_at ?? null,
+        quotaManager: quotaManagerRes.data?.calculated_at ?? null,
+        siteDiscovery: siteDiscoveryRes.data?.discovered_at ?? null,
         outreachChecker: outreachCheckerRes.data?.checked_at ?? null,
         outreachEmailer: outreachEmailerRes.data?.sent_at ?? null,
       },

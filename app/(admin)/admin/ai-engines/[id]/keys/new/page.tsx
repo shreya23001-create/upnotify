@@ -5,11 +5,11 @@ import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 
 export default function NewEngineKeyPage(): React.ReactElement {
-  const params    = useParams<{ id: string }>()
-  const router    = useRouter()
+  const params = useParams<{ id: string }>()
+  const router = useRouter()
   const [form, setForm] = useState({ label: '', apiKey: '', monthlyLimit: '1000' })
   const [loading, setLoading] = useState(false)
-  const [error, setError]     = useState('')
+  const [error, setError] = useState('')
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -20,8 +20,8 @@ export default function NewEngineKeyPage(): React.ReactElement {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          label:        form.label.trim(),
-          apiKey:       form.apiKey.trim(),
+          label: form.label.trim(),
+          apiKey: form.apiKey.trim(),
           monthlyLimit: parseInt(form.monthlyLimit, 10),
         }),
       })
@@ -68,7 +68,7 @@ export default function NewEngineKeyPage(): React.ReactElement {
           <label className="admin-form-label">Monthly Limit</label>
           <input className="admin-form-input" type="number" min="1" max="1000000"
             value={form.monthlyLimit} onChange={e => setForm(f => ({ ...f, monthlyLimit: e.target.value }))} required />
-          <span className="admin-form-hint">Max queries per month for this key. Uptrue will switch to the next key at 999 uses (or this limit).</span>
+          <span className="admin-form-hint">Max queries per month for this key. Upnotify will switch to the next key at 999 uses (or this limit).</span>
         </div>
 
         <div className="admin-form-actions">

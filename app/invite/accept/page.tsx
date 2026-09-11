@@ -34,7 +34,7 @@ export default function AcceptInvitePage(): React.ReactElement {
         if (res.status === 401) {
           // User not logged in — store token and redirect to signup
           if (typeof window !== 'undefined') {
-            localStorage.setItem('uptrue_invite_token', token ?? '')
+            localStorage.setItem('Upnotify_invite_token', token ?? '')
           }
           setStatus('not-authenticated')
           return
@@ -75,7 +75,7 @@ export default function AcceptInvitePage(): React.ReactElement {
 
       // Clear stored token if any
       if (typeof window !== 'undefined') {
-        localStorage.removeItem('uptrue_invite_token')
+        localStorage.removeItem('Upnotify_invite_token')
       }
 
       setStatus('accepted')

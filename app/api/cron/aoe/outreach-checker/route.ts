@@ -30,9 +30,9 @@ export const maxDuration = 300 // 5 minutes
 // Config
 // ---------------------------------------------------------------------------
 
-const BATCH_SIZE         = 200  // sites to check per run
-const CONCURRENCY        = 10   // parallel checks
-const TIMEOUT_MS         = 10000 // per-site timeout
+const BATCH_SIZE = 200  // sites to check per run
+const CONCURRENCY = 10   // parallel checks
+const TIMEOUT_MS = 10000 // per-site timeout
 const CHECKS_TO_COMPLETE = 18   // 3 nights × 6 runs per night
 
 // ---------------------------------------------------------------------------
@@ -46,7 +46,7 @@ async function checkLlmsTxt(domain: string): Promise<boolean> {
     const res = await fetch(`https://${domain}/llms.txt`, {
       signal: controller.signal,
       redirect: 'follow',
-      headers: { 'User-Agent': 'Uptrue-Bot/1.0 (+https://upnotify-monitoring.vercel.app/bot)' },
+      headers: { 'User-Agent': 'Upnotify-Bot/1.0 (+https://upnotify-monitoring.vercel.app/bot)' },
     })
     clearTimeout(timer)
     return res.ok

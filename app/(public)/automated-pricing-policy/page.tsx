@@ -138,7 +138,7 @@ export default function AutomatedPricingPolicyPage(): React.ReactElement {
               <h2>10. Contact</h2>
               <p>
                 If you have questions about this policy or automated pricing, contact us at{' '}
-                <a href="mailto:shreya23001@gmail.com">shreya23001@gmail.com</a>.
+                <a href="mailto:info@upnotify.com">info@upnotify.com</a>.
               </p>
             </section>
           </div>

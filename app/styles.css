@@ -29001,14 +29001,19 @@ html:not(.dark) .sidebar-credits-promo-link {
 }
 
 /* --- AUTH PAGES --- */
+html:has(.auth-page) {
+  scrollbar-gutter: auto;
+}
+
 .auth-page {
   position: relative;
   min-height: 100vh;
+  max-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 40px 24px;
-  overflow: hidden;
+  padding: 10px 24px;
+  overflow-y: auto;
 }
 
 .auth-page-bg {
@@ -29035,7 +29040,7 @@ html:not(.dark) .sidebar-credits-promo-link {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 24px;
+  margin-bottom: 6px;
 }
 
 .auth-card {
@@ -29044,7 +29049,7 @@ html:not(.dark) .sidebar-credits-promo-link {
   border: 1px solid var(--border-primary);
   border-radius: var(--radius-xl);
   box-shadow: 0 4px 6px rgba(15, 23, 42, 0.04), 0 12px 32px rgba(15, 23, 42, 0.08);
-  padding: 40px 36px;
+  padding: 18px 32px 24px;
 }
 
 .auth-back-link {
@@ -29068,18 +29073,18 @@ html:not(.dark) .sidebar-credits-promo-link {
 }
 
 .auth-form-heading {
-  font-size: 26px;
+  font-size: 22px;
   font-weight: 700;
   color: var(--text-primary);
   letter-spacing: -0.02em;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   text-align: center;
 }
 
 .auth-form-sub {
   font-size: 14px;
   color: var(--text-secondary);
-  margin-bottom: 32px;
+  margin-bottom: 20px;
   text-align: center;
 }
 
@@ -29158,7 +29163,7 @@ html:not(.dark) .sidebar-credits-promo-link {
 }
 
 .auth-input-wrap {
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .auth-password-wrap {
@@ -29242,7 +29247,7 @@ html:not(.dark) .sidebar-credits-promo-link {
 
 .auth-switch {
   text-align: center;
-  margin-top: 20px;
+  margin-top: 14px;
   font-size: 13px;
   color: var(--text-secondary);
 }
@@ -29259,10 +29264,10 @@ html:not(.dark) .sidebar-credits-promo-link {
 
 .auth-terms {
   text-align: center;
-  margin-top: 16px;
+  margin-top: 10px;
   font-size: 11px;
   color: var(--text-muted);
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
 .auth-terms a {
@@ -29277,8 +29282,8 @@ html:not(.dark) .sidebar-credits-promo-link {
   background: rgba(56, 189, 248, 0.08);
   border: 1px solid rgba(56, 189, 248, 0.2);
   border-radius: var(--radius-md);
-  padding: 10px 14px;
-  margin-bottom: 20px;
+  padding: 8px 14px;
+  margin-bottom: 14px;
 }
 
 .auth-returning-banner.show {

@@ -197,7 +197,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         signal: controller.signal,
         redirect: 'follow',
         headers: {
-          'User-Agent': 'Uptrue-SpeedTest/1.0 (+https://upnotify-monitoring.vercel.app)',
+          'User-Agent': 'Upnotify-SpeedTest/1.0 (+https://upnotify-monitoring.vercel.app)',
           'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
           'Accept-Encoding': 'gzip, deflate, br',
         },
@@ -216,9 +216,9 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       isCompressed = /gzip|br|deflate/.test(contentEncoding)
       cacheStatus =
         res.headers.get('cf-cache-status') ||
-        res.headers.get('x-cache') ||
-        res.headers.get('x-cache-status') ||
-        res.headers.get('age')
+          res.headers.get('x-cache') ||
+          res.headers.get('x-cache-status') ||
+          res.headers.get('age')
           ? (res.headers.get('cf-cache-status') || res.headers.get('x-cache') || res.headers.get('x-cache-status') || `age:${res.headers.get('age')}`)
           : null
 

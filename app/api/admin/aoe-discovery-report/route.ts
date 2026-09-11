@@ -66,9 +66,9 @@ function badge(label: string, color: string): string {
 
 function sourceBadge(source: string | null): string {
   const map: Record<string, string> = {
-    whois:         '#7c3aed',
-    rdap:          '#2563eb',
-    website_scrape:'#059669',
+    whois: '#7c3aed',
+    rdap: '#2563eb',
+    website_scrape: '#059669',
     pattern_guess: '#d97706',
   }
   const s = source ?? 'unknown'
@@ -77,16 +77,16 @@ function sourceBadge(source: string | null): string {
 
 function platformBadge(platform: string | null): string {
   const map: Record<string, string> = {
-    shopify:    '#96bf48',
-    woocommerce:'#7f54b3',
-    general:    '#6b7280',
+    shopify: '#96bf48',
+    woocommerce: '#7f54b3',
+    general: '#6b7280',
   }
   const p = platform ?? 'general'
   return badge(p, map[p] ?? '#6b7280')
 }
 
 function llmsBadge(has: boolean | null): string {
-  if (has === true)  return badge('has llms.txt', '#059669')
+  if (has === true) return badge('has llms.txt', '#059669')
   if (has === false) return badge('no llms.txt', '#dc2626')
   return badge('not checked', '#9ca3af')
 }
@@ -96,12 +96,12 @@ function llmsBadge(has: boolean | null): string {
 // ---------------------------------------------------------------------------
 
 function buildReportEmail(rows: DiscoveryRow[]): string {
-  const withEmail    = rows.filter(r => r.email)
+  const withEmail = rows.filter(r => r.email)
   const withoutEmail = rows.filter(r => !r.email)
-  const emailed      = rows.filter(r => r.status === 'emailed')
-  const ready        = rows.filter(r => r.status === 'ready')
-  const checking     = rows.filter(r => r.status === 'checking' || r.status === 'pending_check')
-  const skipped      = rows.filter(r => r.status === 'skip')
+  const emailed = rows.filter(r => r.status === 'emailed')
+  const ready = rows.filter(r => r.status === 'ready')
+  const checking = rows.filter(r => r.status === 'checking' || r.status === 'pending_check')
+  const skipped = rows.filter(r => r.status === 'skip')
 
   const findRate = rows.length > 0 ? Math.round((withEmail.length / rows.length) * 100) : 0
 
@@ -120,9 +120,9 @@ function buildReportEmail(rows: DiscoveryRow[]): string {
   }
 
   // llms.txt stats (only from rows that had it checked)
-  const llmsChecked    = withEmail.filter(r => r.has_llms_txt !== null)
-  const llmsMissing    = llmsChecked.filter(r => r.has_llms_txt === false).length
-  const llmsPresent    = llmsChecked.filter(r => r.has_llms_txt === true).length
+  const llmsChecked = withEmail.filter(r => r.has_llms_txt !== null)
+  const llmsMissing = llmsChecked.filter(r => r.has_llms_txt === false).length
+  const llmsPresent = llmsChecked.filter(r => r.has_llms_txt === true).length
 
   // Skip reason breakdown
   const skipCount: Record<string, number> = {}
@@ -133,16 +133,16 @@ function buildReportEmail(rows: DiscoveryRow[]): string {
 
   // --- Summary section ---
   const summaryRows = [
-    ['Total discovered',          rows.length.toString()],
-    ['With valid email',          `${withEmail.length} <span style="color:#6b7280;font-size:13px;">(${findRate}% find rate)</span>`],
-    ['Without email',             withoutEmail.length.toString()],
-    ['Status — ready to email',   ready.length.toString()],
-    ['Status — checking',         checking.length.toString()],
-    ['Status — emailed',          emailed.length.toString()],
-    ['Status — skipped',          skipped.length.toString()],
-    ['llms.txt — missing',        llmsMissing.toString()],
-    ['llms.txt — present',        llmsPresent.toString()],
-    ['llms.txt — not yet checked',llmsChecked.length === 0 ? '(run outreach-checker first)' : (llmsChecked.length - llmsMissing - llmsPresent).toString()],
+    ['Total discovered', rows.length.toString()],
+    ['With valid email', `${withEmail.length} <span style="color:#6b7280;font-size:13px;">(${findRate}% find rate)</span>`],
+    ['Without email', withoutEmail.length.toString()],
+    ['Status — ready to email', ready.length.toString()],
+    ['Status — checking', checking.length.toString()],
+    ['Status — emailed', emailed.length.toString()],
+    ['Status — skipped', skipped.length.toString()],
+    ['llms.txt — missing', llmsMissing.toString()],
+    ['llms.txt — present', llmsPresent.toString()],
+    ['llms.txt — not yet checked', llmsChecked.length === 0 ? '(run outreach-checker first)' : (llmsChecked.length - llmsMissing - llmsPresent).toString()],
   ]
 
   const summaryHtml = summaryRows.map(([label, value]) => `
@@ -189,7 +189,7 @@ function buildReportEmail(rows: DiscoveryRow[]): string {
   ).join('') || '<li style="font-size:13px;color:#9ca3af;">No skipped sites</li>'
 
   const tableStyle = 'width:100%;border-collapse:collapse;font-family:-apple-system,BlinkMacSystemFont,sans-serif;'
-  const thStyle    = 'padding:8px;font-size:11px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:0.5px;text-align:left;border-bottom:2px solid #e5e7eb;background:#f9fafb;'
+  const thStyle = 'padding:8px;font-size:11px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:0.5px;text-align:left;border-bottom:2px solid #e5e7eb;background:#f9fafb;'
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -205,7 +205,7 @@ function buildReportEmail(rows: DiscoveryRow[]): string {
 
 <!-- Header -->
 <tr><td style="padding:24px 32px 16px;border-bottom:1px solid #eaeaea;background:linear-gradient(135deg,#1e293b,#0f172a);">
-  <span style="font-size:22px;font-weight:800;color:#fff;letter-spacing:-0.5px;">Uptrue</span>
+  <span style="font-size:22px;font-weight:800;color:#fff;letter-spacing:-0.5px;">Upnotify</span>
   <span style="font-size:14px;color:#94a3b8;margin-left:12px;">AOE Discovery Report</span>
   <p style="margin:6px 0 0;font-size:12px;color:#64748b;">Generated: ${new Date().toLocaleString('en-GB', { timeZone: 'UTC' })} UTC</p>
 </td></tr>
@@ -243,8 +243,8 @@ function buildReportEmail(rows: DiscoveryRow[]): string {
   </h2>
   <p style="margin:0 0 16px;font-size:13px;color:#6b7280;">These are outreach candidates. Ready = categorised and queued. Checking = still being monitored.</p>
   ${withEmail.length === 0
-    ? '<p style="color:#9ca3af;font-size:14px;">No sites with email yet. Run the site-discovery cron first.</p>'
-    : `<div style="overflow-x:auto;">
+      ? '<p style="color:#9ca3af;font-size:14px;">No sites with email yet. Run the site-discovery cron first.</p>'
+      : `<div style="overflow-x:auto;">
     <table style="${tableStyle}">
       <thead><tr>
         <th style="${thStyle}">Domain</th>
@@ -268,8 +268,8 @@ function buildReportEmail(rows: DiscoveryRow[]): string {
   </h2>
   <p style="margin:0 0 16px;font-size:13px;color:#6b7280;">Could not find an email. Automatically marked as skip — will not be emailed.</p>
   ${withoutEmail.length === 0
-    ? '<p style="color:#9ca3af;font-size:14px;">None — all discovered sites had an email found.</p>'
-    : `<div style="overflow-x:auto;">
+      ? '<p style="color:#9ca3af;font-size:14px;">None — all discovered sites had an email found.</p>'
+      : `<div style="overflow-x:auto;">
     <table style="${tableStyle}">
       <thead><tr>
         <th style="${thStyle}">Domain</th>
@@ -327,9 +327,9 @@ export async function GET(): Promise<NextResponse> {
     }, { status: 200 })
   }
 
-  const html   = buildReportEmail(rows)
-  const to     = process.env.ADMIN_REPORT_EMAIL || 'sachindiwaker@gmail.com'
-  const withEmail    = rows.filter(r => r.email).length
+  const html = buildReportEmail(rows)
+  const to = process.env.ADMIN_REPORT_EMAIL || 'sachindiwaker@gmail.com'
+  const withEmail = rows.filter(r => r.email).length
   const withoutEmail = rows.filter(r => !r.email).length
   const subject = `AOE Discovery Report — ${rows.length} sites (${withEmail} with email, ${withoutEmail} without)`
 

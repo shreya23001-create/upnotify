@@ -13,7 +13,7 @@ Last updated: April 2026
 Uptrue is built and operated by Crozent Techlabs Private Limited, a company incorporated in India, headquartered at B-59, B-Block, Chipyana, Noida – 201009, Uttar Pradesh, India.
 
 - Website: https://uptrue.io
-- Support: shreya23001@gmail.com
+- Support: info@upnotify.com
 - Security: security@uptrue.io
 - X (Twitter): https://x.com/uptrue_io
 - LinkedIn: https://www.linkedin.com/company/uptrue-io/
@@ -334,11 +334,11 @@ All data is stored in Supabase PostgreSQL in the EU-Central-1 region (Frankfurt,
 - API Documentation: https://uptrue.io/docs
 - Platform Status: https://uptrue.io/status
 - Contact: https://uptrue.io/contact
-- Email: shreya23001@gmail.com
+- Email: info@upnotify.com
 
 ---
 
 Maintained by: Crozent Techlabs Private Limited
 B-59, B-Block, Chipyana, Noida – 201009, Uttar Pradesh, India
-shreya23001@gmail.com · https://uptrue.io
+info@upnotify.com · https://uptrue.io
 Last updated: April 2026

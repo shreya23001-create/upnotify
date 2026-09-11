@@ -84,7 +84,7 @@ VALUES (
   '09AAMCC8947M1ZP',
   'AAMCC8947M',
   'MRTC07685G',
-  'shreya23001@gmail.com',
+  'info@upnotify.com',
   'crozent.com'
 )
 ON CONFLICT (currency_code) DO NOTHING;
@@ -105,7 +105,7 @@ VALUES (
   '09AAMCC8947M1ZP',
   'AAMCC8947M',
   'MRTC07685G',
-  'shreya23001@gmail.com',
+  'info@upnotify.com',
   'crozent.com'
 )
 ON CONFLICT (currency_code) DO NOTHING;

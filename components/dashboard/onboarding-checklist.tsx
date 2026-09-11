@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 
-const DISMISSED_KEY = 'uptrue_onboarding_dismissed'
+const DISMISSED_KEY = 'Upnotify_onboarding_dismissed'
 
 interface OnboardingChecklistProps {
   hasMonitors: boolean

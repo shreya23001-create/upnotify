@@ -48,7 +48,7 @@ setInterval(() => {
 // ---------------------------------------------------------------------------
 
 function generateBadgeSvg(grade: string, gradeColor: string): string {
-  const labelText = 'Uptrue score'
+  const labelText = 'Upnotify score'
   const valueText = grade
 
   const labelWidth = 88

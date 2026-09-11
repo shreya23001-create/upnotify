@@ -27,11 +27,11 @@ const CONCURRENCY = 5
 
 // Category → campaign mapping (same as emailer)
 const CATEGORY_TO_CAMPAIGN = {
-  ssl_expiry:  'ssl_expiry',
-  down:        'site_down',
-  ecom_issue:  'ecom_down',
-  slow:        'site_slow',
-  compete:     'compete_cold',
+  ssl_expiry: 'ssl_expiry',
+  down: 'site_down',
+  ecom_issue: 'ecom_down',
+  slow: 'site_slow',
+  compete: 'compete_cold',
 } as const
 
 // ---------------------------------------------------------------------------
@@ -140,7 +140,7 @@ export async function GET(request: Request): Promise<NextResponse> {
           emailSource: site.email_source ?? 'website_scrape',
           campaign,
           platform: site.platform,
-          product: summary.category === 'compete' ? 'compete' : 'uptrue',
+          product: summary.category === 'compete' ? 'compete' : 'Upnotify',
           resendMessageId: result.messageId,
         })
 

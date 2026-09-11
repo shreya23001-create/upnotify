@@ -264,7 +264,7 @@ export default async function DynamicBlogPost({ params }: { params: Promise<{ sl
           Information may be incomplete or inaccurate — always check the official status page for confirmed updates.
           Upnotify is an independent monitoring service and has no affiliation with the companies mentioned.
           {' '}To request a correction or removal, email{' '}
-          <a href="mailto:shreya23001@gmail.com" style={{ color: 'var(--accent, #3b82f6)' }}>shreya23001@gmail.com</a>.
+          <a href="mailto:info@upnotify.com" style={{ color: 'var(--accent, #3b82f6)' }}>info@upnotify.com</a>.
         </div>
       )}
 

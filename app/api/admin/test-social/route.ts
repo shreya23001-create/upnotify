@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     siteDisplayName: 'GitHub',
     blogTitle: 'Is GitHub Down? Current Status and Outage Updates',
     blogUrl: 'https://upnotify-monitoring.vercel.app/blog/is-github-down-test',
-    excerpt: 'Uptrue detected a GitHub outage. Here is the latest status and incident timeline.',
+    excerpt: 'Upnotify detected a GitHub outage. Here is the latest status and incident timeline.',
   })
 
   return NextResponse.json(result)

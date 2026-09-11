@@ -43,7 +43,7 @@ export async function POST(request: Request): Promise<NextResponse> {
 
   const client = new Anthropic({ apiKey: anthropicConfig.apiKey })
 
-  const prompt = `You are an analyst evaluating an agency application for Uptrue, a SaaS uptime monitoring platform. Analyse the following agency applicant and provide a structured assessment.
+  const prompt = `You are an analyst evaluating an agency application for Upnotify, a SaaS uptime monitoring platform. Analyse the following agency applicant and provide a structured assessment.
 
 Applicant Details:
 - Name: ${entry.name}
@@ -63,7 +63,7 @@ Provide your analysis as a JSON object with exactly this structure (no markdown,
   "recommendation": "<one paragraph recommendation>",
   "riskLevel": "<low|medium|high>",
   "businessSizeEstimate": "<estimated business size description>",
-  "potentialRevenue": "<estimated monthly revenue potential for Uptrue>",
+  "potentialRevenue": "<estimated monthly revenue potential for Upnotify>",
   "legitimacyAssessment": "<assessment of business legitimacy>"
 }
 

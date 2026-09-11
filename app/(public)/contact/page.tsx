@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   },
 }
 
-const CONTACT_EMAIL = 'shreya23001@gmail.com'
+const CONTACT_EMAIL = 'info@upnotify.com'
 
 const CONTACT_CHANNELS = [
   {
