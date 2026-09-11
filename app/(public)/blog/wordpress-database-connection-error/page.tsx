@@ -68,7 +68,7 @@ export default function WordPressDatabaseConnectionErrorPage(): React.ReactEleme
           headline: 'Error Establishing a Database Connection in WordPress: Complete Fix and Monitoring Guide',
           description: 'What causes the WordPress database connection error, how to fix each cause, and how to set up monitoring so you catch it before your visitors do.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-11',
           dateModified: '2026-03-11',
           url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-database-connection-error',

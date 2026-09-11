@@ -10,7 +10,7 @@
 --   3. Single source of truth — invoice page fetches the row at render time.
 --
 -- One row per currency. Currently:
---   gbp → Vision Software Solutions Limited (UK)
+--   gbp → Crozent Techlabs Private Limited (India)
 --   inr → Crozent TechLabs Private Limited (India)
 --
 -- Public read access — sellers appear on customer invoices. Service role
@@ -67,20 +67,25 @@ CREATE TRIGGER seller_entities_touch_updated_at
   FOR EACH ROW EXECUTE FUNCTION trg_seller_entities_touch_updated_at();
 
 -- ----------------------------------------------------------------------------
--- Seed: Vision Software Solutions Limited (UK / GBP)
+-- Seed: Crozent Techlabs Private Limited (India / GBP)
+--   Entity migrated from Vision Software Solutions Limited (UK) to Crozent
+--   Techlabs Private Limited (India). No company registration number is
+--   displayed for the new entity; GST/PAN/TAN mirror the INR seed row below.
 -- ----------------------------------------------------------------------------
 INSERT INTO seller_entities (
-  currency_code, legal_name, address_lines, registration_number, tax_label, tax_number, email, website
+  currency_code, legal_name, address_lines, registration_number, tax_label, tax_number, pan, tan, email, website
 )
 VALUES (
   'gbp',
-  'Vision Software Solutions Limited',
-  ARRAY['C/O Benison Solvers Limited', '1000 Great West Road', 'Brentford, United Kingdom, TW8 9DW'],
-  'Company No. 02710980',
-  'VAT',
-  'GB 573 253 734',
+  'Crozent Techlabs Private Limited',
+  ARRAY['B-59, B-Block, Chipyana', 'Noida – 201009', 'Uttar Pradesh, India'],
+  NULL,
+  'GST',
+  '09AAMCC8947M1ZP',
+  'AAMCC8947M',
+  'MRTC07685G',
   'shreya23001@gmail.com',
-  'upnotify-monitoring.vercel.app'
+  'crozent.com'
 )
 ON CONFLICT (currency_code) DO NOTHING;
 

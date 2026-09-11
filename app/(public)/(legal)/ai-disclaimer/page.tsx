@@ -81,7 +81,7 @@ export default function AIDisclaimerPage(): React.ReactElement {
 
       <h2>5. Limitation of Liability</h2>
       <p>
-        Upnotify and Vision Software Solutions Limited are <strong>not liable</strong> for any decisions
+        Upnotify and Crozent Techlabs Private Limited are <strong>not liable</strong> for any decisions
         made, actions taken, or losses incurred based on AI-generated content. This includes, but is
         not limited to, decisions regarding infrastructure changes, service provider selection,
         incident response, or business strategy.
@@ -144,6 +144,7 @@ export default function AIDisclaimerPage(): React.ReactElement {
         relevant company&apos;s official status page for authoritative updates.
       </p>
 
+      {/* TODO: legal review needed — this clause referenced UK/EU-specific compliance obligations tied to the old entity; verify with counsel whether it still applies or needs Indian-equivalent language */}
       <h3>9.3 Public Interest and Legal Basis</h3>
       <p>
         Automated outage reports are published on a matter of public interest under{' '}
@@ -195,8 +196,8 @@ export default function AIDisclaimerPage(): React.ReactElement {
           <strong>Monitoring report corrections:</strong> <a href="mailto:shreya23001@gmail.com">shreya23001@gmail.com</a>
         </li>
         <li>
-          <strong>Post:</strong> Vision Software Solutions Limited, C/O Benison Solvers Limited,
-          1000 Great West Road, Brentford, United Kingdom, TW8 9DW
+          <strong>Post:</strong> Crozent Techlabs Private Limited, B-59, B-Block, Chipyana,
+          Noida &ndash; 201009, Uttar Pradesh, India
         </li>
       </ul>
     </>

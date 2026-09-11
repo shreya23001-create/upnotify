@@ -68,7 +68,7 @@ export default function WpRocketCacheIssuesPage(): React.ReactElement {
           headline: 'WP Rocket Cache Serving Stale Pages: Why Your Updates Aren\'t Showing to Visitors',
           description: 'What causes WP Rocket to serve stale cached pages, how to fix each cause, and how keyword monitoring verifies that visitors see your latest content.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-30',
           dateModified: '2026-03-30',
           url: 'https://upnotify-monitoring.vercel.app/blog/wp-rocket-cache-issues',

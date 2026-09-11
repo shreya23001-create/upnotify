@@ -88,7 +88,7 @@ export default function CheapHostingHiddenCostsPage(): React.ReactElement {
           headline: 'Why Cheap Hosting Is the Most Expensive Mistake You Can Make',
           description: 'The hidden costs of cheap shared hosting — overselling, CPU throttling, noisy neighbours, and lost revenue from invisible downtime.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-12',
           dateModified: '2026-03-12',
           url: 'https://upnotify-monitoring.vercel.app/blog/cheap-hosting-hidden-costs',

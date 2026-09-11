@@ -68,7 +68,7 @@ export default function WooCommerceCheckoutNotWorkingPage(): React.ReactElement 
           headline: 'WooCommerce Checkout Not Working? Here\'s Why Your Store Is Losing Sales Right Now',
           description: 'What causes WooCommerce checkout failures, how to fix each one, and how to set up keyword monitoring that detects checkout problems automatically.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-21',
           dateModified: '2026-03-21',
           url: 'https://upnotify-monitoring.vercel.app/blog/woocommerce-checkout-not-working',

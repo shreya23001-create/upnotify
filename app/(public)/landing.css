@@ -533,6 +533,26 @@ body::before {
   mask-image: radial-gradient(ellipse at 50% 30%, black 0%, transparent 70%);
 }
 
+.hero-chart-graphic {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 640px;
+  max-height: 100%;
+  opacity: 0.55;
+  pointer-events: none;
+  mask-image: linear-gradient(to bottom, black 0%, black 55%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 0%, black 55%, transparent 100%);
+}
+
+@media (max-width: 900px) {
+  .hero-chart-graphic {
+    height: 480px;
+    opacity: 0.35;
+  }
+}
+
 .hero-content {
   position: relative;
   text-align: center;
@@ -705,16 +725,16 @@ body::before {
 /* Sidebar */
 .mockup-sidebar {
   width: 192px;
-  background: var(--sidebar-bg, #0c1322);
+  background: linear-gradient(160deg, #f2f8ff 0%, #e9f3ff 42%, #eef8ff 72%, #f4f9ff 100%);
   flex-shrink: 0;
-  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  border-right: 1px solid rgba(19, 146, 251, 0.12);
   display: flex;
   flex-direction: column;
 }
 
 .ms-top {
   padding: 10px 10px 8px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid rgba(19, 146, 251, 0.12);
 }
 
 .ms-logo {
@@ -724,7 +744,7 @@ body::before {
   padding: 4px 4px 8px;
   font-size: 13px;
   font-weight: 800;
-  color: white;
+  color: #073d19;
 }
 
 .ms-logo-icon {
@@ -744,19 +764,19 @@ body::before {
   justify-content: space-between;
   padding: 6px 8px;
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(19, 146, 251, 0.14);
 }
 
 .ms-org-name {
   font-size: 11px;
   font-weight: 600;
-  color: #e2e8f0;
+  color: #0f172a;
 }
 
 .ms-org-sub {
   font-size: 9px;
-  color: #94a3b8;
+  color: #64748b;
 }
 
 .ms-nav {
@@ -771,7 +791,7 @@ body::before {
 .ms-section {
   font-size: 8px;
   font-weight: 700;
-  color: #475569;
+  color: rgba(10, 92, 38, 0.5);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   padding: 8px 8px 3px;
@@ -784,7 +804,7 @@ body::before {
   justify-content: space-between;
   padding: 6px 8px;
   font-size: 11px;
-  color: #94a3b8;
+  color: rgba(6, 32, 118, 0.72);
   border-radius: 7px;
   cursor: pointer;
   transition: background 0.15s ease, color 0.15s ease;
@@ -797,14 +817,15 @@ body::before {
 }
 
 .ms-item:hover {
-  background: rgba(255, 255, 255, 0.05);
-  color: #e2e8f0;
+  background: rgba(19, 146, 251, 0.1);
+  color: #0068DB;
 }
 
 .ms-item.active {
-  background: rgba(0, 104, 219, 0.12);
+  background: #fff;
   color: #0068DB;
   font-weight: 600;
+  box-shadow: 0 4px 14px rgba(19, 146, 251, 0.16);
 }
 
 .ms-item.active::before {
@@ -829,7 +850,7 @@ body::before {
 }
 
 .ms-badge-blue {
-  background: rgba(0, 104, 219, 0.2);
+  background: rgba(19, 146, 251, 0.14);
   color: #0068DB;
   font-size: 8px;
   font-weight: 700;
@@ -839,12 +860,12 @@ body::before {
 
 .ms-bottom {
   padding: 8px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 1px solid rgba(19, 146, 251, 0.14);
 }
 
 .ms-credits {
-  background: linear-gradient(135deg, rgba(19, 146, 251, 0.15), rgba(0, 104, 219, 0.15));
-  border: 1px solid rgba(0, 104, 219, 0.2);
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(19, 146, 251, 0.18);
   border-radius: 8px;
   padding: 7px 9px;
 }
@@ -857,7 +878,7 @@ body::before {
 
 .ms-credits-sub {
   font-size: 9px;
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(10, 92, 38, 0.6);
 }
 
 /* Main area */
@@ -1738,70 +1759,27 @@ body::before {
   mix-blend-mode: overlay;
 }
 
-/* floating scattered icons */
-.blog-card-floats {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-.blog-card-float {
-  position: absolute;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: rgba(255, 255, 255, 0.35);
-  animation: blog-float 4s ease-in-out infinite alternate;
-}
-
-.blog-card-float-0 {
-  top: 18%;
-  left: 14%;
-  animation-delay: 0s;
-}
-
-.blog-card-float-1 {
-  top: 22%;
-  right: 16%;
-  animation-delay: 0.8s;
-}
-
-.blog-card-float-2 {
-  bottom: 22%;
-  left: 18%;
-  animation-delay: 1.6s;
-}
-
-@keyframes blog-float {
-  0% {
-    transform: translateY(0px) rotate(0deg);
-    opacity: 0.3;
-  }
-
-  100% {
-    transform: translateY(-5px) rotate(8deg);
-    opacity: 0.55;
-  }
-}
-
-/* center keyword pill */
-.blog-card-center-pill {
+/* single centered category icon — calmer than the old scattered-icon + pill treatment */
+.blog-card-icon {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 13px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: rgba(255, 255, 255, 0.95);
-  background: rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(8px);
-  padding: 6px 16px;
-  border-radius: 99px;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  white-space: nowrap;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(6px);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+.blog-card-icon svg {
+  width: 20px;
+  height: 20px;
 }
 
 /* shine sweep */
@@ -2710,14 +2688,14 @@ html.dark .wp-showcase-desc {
 .pub-footer {
   background: #0b1120;
   border-top: 1px solid rgba(255, 255, 255, 0.07);
-  padding: var(--space-16) 0 var(--space-8);
+  padding: var(--space-8) 0 var(--space-5);
 }
 
 .footer-top {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
-  gap: var(--space-10);
-  margin-bottom: var(--space-12);
+  gap: var(--space-8);
+  margin-bottom: var(--space-6);
 }
 
 .footer-brand .nav-logo {
@@ -2753,19 +2731,19 @@ html.dark .wp-showcase-desc {
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: rgba(255, 255, 255, 0.85);
-  margin-bottom: var(--space-4);
+  margin-bottom: var(--space-2);
 }
 
 .footer-links {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: 2px;
 }
 
 .footer-links li a {
   display: block;
-  padding: 6px 0;
+  padding: 3px 0;
   font-size: 13px;
   color: rgba(255, 255, 255, 0.5);
   transition: color var(--dur-fast);
@@ -2776,7 +2754,7 @@ html.dark .wp-showcase-desc {
 }
 
 .footer-bottom {
-  padding-top: var(--space-6);
+  padding-top: var(--space-4);
   border-top: 1px solid rgba(255, 255, 255, 0.07);
   display: flex;
   align-items: center;

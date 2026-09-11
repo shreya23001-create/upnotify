@@ -24,8 +24,7 @@ import { isProduction } from '@/lib/utils/environment'
 import { getServerConfig } from '@/lib/utils/config'
 import { enforceDowngradeLimits, notifyPlanChange } from '@/lib/services/plan-enforcement'
 import { writeAuditLog } from '@/lib/db/audit'
-import { autoCreateMonitorsForDomain } from '@/lib/db/monitors'
-import { getWorkspacesByOrgAdmin } from '@/lib/db/workspaces'
+import { activateWebsiteSubscription } from '@/lib/services/website-subscription-activation'
 
 export const dynamic = 'force-dynamic'
 
@@ -143,7 +142,6 @@ async function handleAddonSubscriptionActivated(sub: RzpSubscription): Promise<v
  * a SEPARATE session creates a new row, never merged into this one.
  */
 async function handleWebsiteSubscriptionActivated(sub: RzpSubscription): Promise<void> {
-  const supabase = createAdminClient()
   const orgId = sub.notes?.org_id
   const domainsStr = sub.notes?.domains || sub.notes?.target_domain // fall back to the older single-domain field
   const domains = domainsStr ? domainsStr.split(',').map(d => d.trim()).filter(Boolean) : []
@@ -153,63 +151,16 @@ async function handleWebsiteSubscriptionActivated(sub: RzpSubscription): Promise
     return
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: existing } = await (supabase as any)
-    .from('website_subscriptions')
-    .select('id')
-    .eq('razorpay_subscription_id', sub.id)
-    .maybeSingle()
+  const periodStart = sub.current_start ? new Date(sub.current_start * 1000).toISOString() : undefined
+  const periodEnd   = sub.current_end   ? new Date(sub.current_end   * 1000).toISOString() : undefined
 
-  if (existing) {
-    logger.info('Razorpay (website): subscription already recorded, skipping', { subId: sub.id })
-    return
-  }
-
-  const periodStart = sub.current_start ? new Date(sub.current_start * 1000).toISOString() : new Date().toISOString()
-  const periodEnd   = sub.current_end   ? new Date(sub.current_end   * 1000).toISOString() : null
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  await (supabase as any).from('website_subscriptions').insert({
-    org_id: orgId,
-    domains,
-    razorpay_subscription_id: sub.id,
-    status: 'active',
-    current_period_start: periodStart,
-    current_period_end: periodEnd ?? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-  })
-
-  logger.info('Razorpay: website subscription activated', { subId: sub.id, orgId, domains })
-
-  // Every paid website gets full monitor coverage immediately — no manual
-  // setup required. Non-fatal: if this fails, the subscription itself is
-  // still recorded correctly; the customer can add monitors manually.
-  try {
-    const workspaces = await getWorkspacesByOrgAdmin(orgId)
-    const workspaceId = workspaces[0]?.id
-    if (workspaceId) {
-      for (const domain of domains) {
-        await autoCreateMonitorsForDomain({ orgId, workspaceId, targetDomain: domain })
-      }
-    } else {
-      logger.error('Razorpay webhook (website): no workspace found, skipping monitor auto-create', { orgId })
-    }
-  } catch (err) {
-    logger.error('Razorpay webhook (website): monitor auto-create failed (non-fatal)', {
-      orgId, domains, error: err instanceof Error ? err.message : String(err),
-    })
-  }
-
-  await writeAuditLog({
+  await activateWebsiteSubscription({
     orgId,
-    userId: null,
-    action: 'website_subscription.created',
-    resourceType: 'website_subscription',
-    metadata: {
-      razorpay_subscription_id: sub.id,
-      domains,
-      currency: 'inr',
-      source: 'razorpay_webhook',
-    },
+    domains,
+    razorpaySubscriptionId: sub.id,
+    currentPeriodStart: periodStart,
+    currentPeriodEnd: periodEnd,
+    source: 'razorpay_webhook',
   })
 }
 

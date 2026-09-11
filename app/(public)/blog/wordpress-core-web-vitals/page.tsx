@@ -68,7 +68,7 @@ export default function WordPressCoreWebVitalsPage(): React.ReactElement {
           headline: 'WordPress Core Web Vitals Failing: How LCP, FID, and CLS Failures Hurt Your Traffic',
           description: 'Why WordPress sites fail Core Web Vitals, how to fix each metric, and how Upnotify HTTP monitoring tracks TTFB as the server component of LCP.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-04-04',
           dateModified: '2026-04-04',
           url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-core-web-vitals',

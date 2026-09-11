@@ -68,7 +68,7 @@ export default function GravityFormsNotWorkingPage(): React.ReactElement {
           headline: 'Gravity Forms Conditional Logic Not Working: Why Your Forms Are Broken After Update',
           description: 'What causes Gravity Forms conditional logic failures, how jQuery conflicts and minification break form functionality, and how keyword monitoring catches broken forms.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-04-02',
           dateModified: '2026-04-02',
           url: 'https://upnotify-monitoring.vercel.app/blog/gravity-forms-not-working',

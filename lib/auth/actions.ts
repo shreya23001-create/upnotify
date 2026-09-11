@@ -11,6 +11,7 @@ import { checkRateLimitByKey, AUTH_RATE_LIMIT } from '@/lib/utils/rate-limiter'
 import { recordReferralSignup } from '@/lib/db/referrals'
 import { acceptTeamInvite } from '@/lib/db/team'
 import { markConverted } from '@/lib/aoe/db/aoe-outreach-log'
+import { hasAnyActivePlan } from '@/lib/utils/plan-limits'
 
 /**
  * Send a magic-link OTP to the given email address.
@@ -230,7 +231,17 @@ export async function signUpWithPassword(formData: FormData): Promise<{ error?: 
     metadata: { email, provider: 'password', isNewUser: true },
   })
 
-  redirect('/dashboard')
+  const adminClient = createAdminClient()
+  const { data: newUserRow } = await adminClient
+    .from('users')
+    .select('org_id')
+    .eq('id', data.user.id)
+    .single()
+
+  const orgId = newUserRow?.org_id as string | undefined
+  const landingPage = orgId && !(await hasAnyActivePlan(orgId)) ? '/dashboard/plans' : '/dashboard'
+
+  redirect(landingPage)
 }
 
 /**
@@ -279,7 +290,10 @@ export async function signInWithPassword(formData: FormData): Promise<{ error?: 
     metadata: { email, provider, isNewUser: false },
   })
 
-  redirect('/dashboard')
+  const loginOrgId = dbUser?.org_id as string | undefined
+  const loginLandingPage = loginOrgId && !(await hasAnyActivePlan(loginOrgId)) ? '/dashboard/plans' : '/dashboard'
+
+  redirect(loginLandingPage)
 }
 
 /**

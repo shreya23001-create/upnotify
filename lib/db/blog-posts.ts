@@ -51,6 +51,13 @@ export interface PublishedBlogPostSummary {
  * 00096) so the public /blog index doesn't list them. The post itself remains
  * reachable at /blog/<slug> so inbound links don't break, but the rendered
  * page emits robots:noindex,nofollow.
+ *
+ * Also excludes the WordPress category entirely — hidden from the homepage
+ * preview, the /blog listing, and the RSS feed (all three consume this
+ * function) per an explicit request to stop surfacing WordPress content
+ * publicly. Individual WordPress post pages under /blog/<slug> are untouched
+ * (they're static route files, not database-driven) so existing inbound
+ * links don't break.
  */
 export async function getPublishedBlogPosts(): Promise<PublishedBlogPostSummary[]> {
   const supabase = createAdminClient()
@@ -59,6 +66,7 @@ export async function getPublishedBlogPosts(): Promise<PublishedBlogPostSummary[
     .select('id, title, slug, excerpt, category, tags, published_at, created_at')
     .eq('status', 'published')
     .or('noindex.is.null,noindex.eq.false')
+    .neq('category', 'WordPress')
     .order('published_at', { ascending: false })
 
   if (error) {

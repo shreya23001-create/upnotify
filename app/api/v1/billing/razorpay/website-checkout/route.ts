@@ -12,25 +12,24 @@ import {
   razorpayErrorMessage,
 } from '@/lib/services/payments-razorpay'
 import { checkRateLimit, API_V1_RATE_LIMIT } from '@/lib/utils/rate-limiter'
-import { targetToWebsiteDomain } from '@/lib/utils/validate-domain'
 
 export const dynamic = 'force-dynamic'
 
-const WEBSITE_PLAN_SLUG = 'website' // ₹149/month per monitored website, all monitor types included
+const WEBSITE_PLAN_SLUG = 'website' // "Pro Plan" — ₹999/website/year (discounted from ₹1,788), all monitor types included
+const GST_RATE = 0.18
 const MAX_WEBSITES_PER_CHECKOUT = 50
 
 /**
  * POST /api/v1/billing/razorpay/website-checkout
  *
- * Creates ONE combined Razorpay subscription covering every website added
- * in this checkout session — ₹149/month × domain count, one invoice.
- * Body: { targets: string[] } — raw monitor targets the customer wants to
- * pay for, normalized to target_domains the same way monitor creation does.
+ * Creates ONE combined Razorpay subscription (billed yearly, auto-renewing)
+ * covering every SELECTED pending website — ₹999/website/year + 18% GST,
+ * one invoice. Body: { websiteSubscriptionIds: string[] } — ids of the
+ * pending ('incomplete') website_subscriptions rows the user selected on
+ * the Plans page (each holds exactly one domain — see addPendingWebsites).
  *
- * Adding more websites in a LATER, separate checkout creates a SEPARATE
- * combined subscription — batches are never merged. Already-paid domains
- * in the request are silently dropped rather than double-charged; if that
- * leaves nothing to charge for, the whole request is rejected.
+ * Adding more websites later, in a SEPARATE checkout, creates a new
+ * combined subscription — batches are never merged.
  */
 export async function POST(request: Request): Promise<NextResponse> {
   try {
@@ -52,42 +51,40 @@ export async function POST(request: Request): Promise<NextResponse> {
     const org = await getCurrentOrganisation()
     if (!org) return NextResponse.json({ error: 'No organisation found' }, { status: 400 })
 
-    const body = await request.json().catch(() => ({})) as { targets?: unknown }
-    const rawTargets = Array.isArray(body.targets) ? body.targets.filter((t): t is string => typeof t === 'string') : []
-    if (rawTargets.length === 0) {
-      return NextResponse.json({ error: 'At least one website is required' }, { status: 400 })
-    }
-    if (rawTargets.length > MAX_WEBSITES_PER_CHECKOUT) {
-      return NextResponse.json({ error: `You can add up to ${MAX_WEBSITES_PER_CHECKOUT} websites at once.` }, { status: 400 })
-    }
+    const body = await request.json().catch(() => ({})) as { websiteSubscriptionIds?: unknown }
+    const ids = Array.isArray(body.websiteSubscriptionIds)
+      ? body.websiteSubscriptionIds.filter((v): v is string => typeof v === 'string')
+      : []
 
-    const domains = Array.from(new Set(
-      rawTargets.map(t => targetToWebsiteDomain(t.trim())).filter(Boolean)
-    ))
-    if (domains.length === 0) {
-      return NextResponse.json({ error: 'Please enter at least one valid website (e.g. example.com)' }, { status: 400 })
+    if (ids.length === 0) {
+      return NextResponse.json({ error: 'Select at least one website' }, { status: 400 })
+    }
+    if (ids.length > MAX_WEBSITES_PER_CHECKOUT) {
+      return NextResponse.json({ error: `You can subscribe up to ${MAX_WEBSITES_PER_CHECKOUT} websites at once.` }, { status: 400 })
     }
 
     const supabase = createAdminClient()
 
-    // Drop any domain already covered by an active subscription — never
-    // double-charge for a website that's already paid for.
+    // Only pending ('incomplete'), org-owned rows can be paid for — never
+    // trust client-supplied domains directly, only ids the org actually owns.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: activeRows } = await (supabase as any)
+    const { data: pendingRows } = await (supabase as any)
       .from('website_subscriptions')
-      .select('domains')
+      .select('id, domains')
       .eq('org_id', org.id)
-      .in('status', ['active', 'cancelling', 'past_due'])
-    const alreadyPaid = new Set((activeRows ?? []).flatMap((r: { domains: string[] }) => r.domains ?? []))
-    const billableDomains = domains.filter(d => !alreadyPaid.has(d))
+      .eq('status', 'incomplete')
+      .in('id', ids) as { data: Array<{ id: string; domains: string[] }> | null }
 
-    if (billableDomains.length === 0) {
-      return NextResponse.json({ error: 'All of these websites are already paid for.' }, { status: 409 })
+    if (!pendingRows || pendingRows.length === 0) {
+      return NextResponse.json({ error: 'Selected websites are no longer available. Please refresh and try again.' }, { status: 409 })
     }
+
+    const domains = pendingRows.flatMap(r => r.domains ?? [])
+    const websiteCount = domains.length
 
     const { data: plan, error: planError } = await supabase
       .from('plans')
-      .select('id, name, slug, price_monthly_inr, razorpay_monthly_plan_id')
+      .select('id, name, slug, price_annual_inr, razorpay_annual_plan_id')
       .eq('slug', WEBSITE_PLAN_SLUG)
       .single()
 
@@ -97,9 +94,13 @@ export async function POST(request: Request): Promise<NextResponse> {
     }
 
     const p = plan as unknown as Record<string, unknown>
-    let razorpayPlanId = p.razorpay_monthly_plan_id as string | null
-    const perUnitPaise = (p.price_monthly_inr as number) ?? 14900
-    const amountPaise = perUnitPaise * billableDomains.length
+    let razorpayPlanId = p.razorpay_annual_plan_id as string | null
+    const discountedPerUnitPaise = (p.price_annual_inr as number) ?? 99900 // ₹999
+    // Razorpay charges plan.amount × quantity — so the per-unit price must
+    // already be GST-inclusive for the total to come out to
+    // (discounted × count) + 18% GST, matching the UI breakdown exactly.
+    const gstInclusivePerUnitPaise = Math.round(discountedPerUnitPaise * (1 + GST_RATE))
+    const amountPaise = gstInclusivePerUnitPaise * websiteCount
 
     const { razorpay } = getServerConfig()
     const isMockMode = !razorpay.keyId || razorpay.keyId === 'rzp_test_placeholder'
@@ -108,28 +109,28 @@ export async function POST(request: Request): Promise<NextResponse> {
       return NextResponse.json({
         mockMode: true,
         subscriptionId: `mock_website_sub_${crypto.randomUUID().replace(/-/g, '').slice(0, 14)}`,
-        planName: `Website Plan (${billableDomains.length} website${billableDomains.length > 1 ? 's' : ''})`,
-        billingCycle: 'monthly',
+        planName: `Pro Plan (${websiteCount} website${websiteCount > 1 ? 's' : ''})`,
+        billingCycle: 'annual',
         amountPaise,
         userEmail: user.email,
         orgName: org.name,
       })
     }
 
-    // Lazily create the Razorpay plan on first real use and cache it —
-    // this plan is intentionally is_visible=false (never shown on any
-    // pricing picker) so it's never touched by the admin bulk-sync route.
+    // Lazily create the Razorpay plan (GST-inclusive per-unit price) on
+    // first real use and cache it — is_visible=false, never touched by the
+    // admin bulk-sync route.
     if (!razorpayPlanId) {
       try {
         const rzpPlan = await createRazorpayPlan({
-          name: 'Website Plan Monthly',
-          amountPaise: perUnitPaise,
-          period: 'monthly',
+          name: 'Pro Plan Annual (incl. GST)',
+          amountPaise: gstInclusivePerUnitPaise,
+          period: 'yearly',
           planSlug: WEBSITE_PLAN_SLUG,
-          billingCycle: 'monthly',
+          billingCycle: 'annual',
         })
         razorpayPlanId = rzpPlan.id
-        await supabase.from('plans').update({ razorpay_monthly_plan_id: razorpayPlanId }).eq('id', plan.id)
+        await supabase.from('plans').update({ razorpay_annual_plan_id: razorpayPlanId }).eq('id', plan.id)
       } catch (err) {
         logger.error('Failed to create Razorpay website plan', { error: razorpayErrorMessage(err) })
         return NextResponse.json({ error: 'Failed to set up website billing. Please try again.' }, { status: 500 })
@@ -152,21 +153,34 @@ export async function POST(request: Request): Promise<NextResponse> {
       customerId: razorpayCustomerId,
       orgId: org.id,
       planSlug: WEBSITE_PLAN_SLUG,
-      billingCycle: 'monthly',
+      billingCycle: 'annual',
       userEmail: user.email,
       isWebsiteSub: true,
-      websiteDomains: billableDomains,
-      quantity: billableDomains.length,
+      websiteDomains: domains,
+      quantity: websiteCount,
     })
+
+    // The webhook (subscription.activated) deletes these pending rows and
+    // inserts one merged active row once payment actually succeeds — don't
+    // mutate them here, since the payment isn't confirmed yet at this point.
 
     return NextResponse.json({
       subscriptionId: rzpSub.id,
       keyId: razorpay.keyId,
-      planName: `Website Plan (${billableDomains.length} website${billableDomains.length > 1 ? 's' : ''})`,
-      billingCycle: 'monthly',
+      planName: `Pro Plan (${websiteCount} website${websiteCount > 1 ? 's' : ''})`,
+      billingCycle: 'annual',
       amountPaise,
       userEmail: user.email,
       orgName: org.name,
+      // Returned so the client's checkout success handler can call
+      // /api/v1/billing/razorpay/website-confirm right away — the primary
+      // activation path is still the webhook, but that requires
+      // RAZORPAY_WEBHOOK_SECRET to be configured (only possible once this
+      // app is on a real domain Razorpay's dashboard can register a
+      // webhook against). This client-verified path uses Razorpay's
+      // payment signature (HMAC with RAZORPAY_KEY_SECRET) so it's not
+      // trusting an unverified client claim.
+      pendingWebsiteIds: pendingRows.map(r => r.id),
     })
   } catch (error) {
     logger.error('Razorpay website checkout error', {

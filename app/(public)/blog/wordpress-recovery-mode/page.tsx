@@ -68,7 +68,7 @@ export default function WordPressRecoveryModePage(): React.ReactElement {
           headline: 'WordPress Recovery Mode: What Triggers It, What It Means, and How to Respond',
           description: 'What triggers WordPress recovery mode, why the recovery email is unreliable, and how keyword monitoring detects the errors that cause it.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-19',
           dateModified: '2026-03-19',
           url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-recovery-mode',

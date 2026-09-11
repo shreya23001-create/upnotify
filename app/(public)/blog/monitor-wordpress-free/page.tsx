@@ -88,7 +88,7 @@ export default function MonitorWordPressFreePage(): React.ReactElement {
           headline: 'How to Monitor Your WordPress Site for Free in 2026',
           description: 'Learn how to monitor your WordPress site for free — uptime, SSL, performance, and keyword monitoring. Set up in 60 seconds.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-10',
           dateModified: '2026-03-10',
           url: 'https://upnotify-monitoring.vercel.app/blog/monitor-wordpress-free',

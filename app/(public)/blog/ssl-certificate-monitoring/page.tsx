@@ -63,7 +63,7 @@ export default function SslCertificateMonitoringPage(): React.ReactElement {
           headline: 'SSL Certificate Monitoring: Why Auto-Renew Isn\'t Enough',
           description: 'Why auto-renew fails and how SSL monitoring catches what automation misses.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-08',
           dateModified: '2026-03-08',
           url: 'https://upnotify-monitoring.vercel.app/blog/ssl-certificate-monitoring',

@@ -68,7 +68,7 @@ export default function WordPressCriticalErrorPage(): React.ReactElement {
           headline: 'There Has Been a Critical Error on This Website: What It Means and How to Fix It',
           description: 'What causes the WordPress critical error, how to fix it step by step, and how to set up keyword monitoring that detects it automatically.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-14',
           dateModified: '2026-03-14',
           url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-critical-error',

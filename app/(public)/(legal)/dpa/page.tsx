@@ -14,8 +14,8 @@ export default function DataProcessingAgreementPage(): React.ReactElement {
       <p className="legal-updated">Last updated: 30 March 2026</p>
 
       <p>
-        This Data Processing Agreement (&quot;DPA&quot;) forms part of the agreement between Vision Software Solutions Limited,
-        a company registered in England and Wales with its registered office at C/O Benison Solvers Limited, 1000 Great West Road, Brentford, United Kingdom, TW8 9DW
+        This Data Processing Agreement (&quot;DPA&quot;) forms part of the agreement between Crozent Techlabs Private Limited,
+        a company incorporated in India with its registered office at B-59, B-Block, Chipyana, Noida &ndash; 201009, Uttar Pradesh, India
         (&quot;Uptrue&quot;, &quot;Processor&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;), and the customer (&quot;Controller&quot;,
         &quot;you&quot;, or &quot;your&quot;) who has agreed to the Upnotify <a href="/terms">Terms of Service</a>.
       </p>
@@ -419,9 +419,9 @@ export default function DataProcessingAgreementPage(): React.ReactElement {
 
       <h2>13. Governing Law</h2>
       <p>
-        This DPA is governed by and construed in accordance with the laws of England and Wales. Any
+        This DPA is governed by and construed in accordance with the laws of India. Any
         dispute arising under this DPA shall be subject to the exclusive jurisdiction of the courts
-        of England and Wales, without prejudice to the rights of Data Subjects to lodge complaints
+        of Noida, Uttar Pradesh, India, without prejudice to the rights of Data Subjects to lodge complaints
         with supervisory authorities or to seek judicial remedies in their Member State of habitual
         residence.
       </p>
@@ -433,7 +433,7 @@ export default function DataProcessingAgreementPage(): React.ReactElement {
       <ul>
         <li><strong>Data Protection Officer:</strong> shreya23001@gmail.com</li>
         <li><strong>General Support:</strong> shreya23001@gmail.com</li>
-        <li><strong>Post:</strong> Data Protection Officer, Vision Software Solutions Limited, C/O Benison Solvers Limited, 1000 Great West Road, Brentford, United Kingdom, TW8 9DW</li>
+        <li><strong>Post:</strong> Data Protection Officer, Crozent Techlabs Private Limited, B-59, B-Block, Chipyana, Noida &ndash; 201009, Uttar Pradesh, India</li>
       </ul>
     </>
   )

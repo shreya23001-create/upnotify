@@ -18,7 +18,7 @@ export function OrganizationJsonLd(): React.ReactElement {
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: 'Upnotify',
-    legalName: 'Vision Software Solutions Limited',
+    legalName: 'Crozent Techlabs Private Limited',
     url: 'https://upnotify-monitoring.vercel.app',
     logo: 'https://upnotify-monitoring.vercel.app/logo.svg',
     description:
@@ -26,10 +26,11 @@ export function OrganizationJsonLd(): React.ReactElement {
     foundingDate: '2026',
     address: {
       '@type': 'PostalAddress',
-      streetAddress: 'C/O Benison Solvers Limited, 1000 Great West Road',
-      addressLocality: 'Brentford',
-      addressCountry: 'GB',
-      postalCode: 'TW8 9DW',
+      streetAddress: 'B-59, B-Block, Chipyana',
+      addressLocality: 'Noida',
+      addressRegion: 'Uttar Pradesh',
+      addressCountry: 'IN',
+      postalCode: '201009',
     },
     contactPoint: {
       '@type': 'ContactPoint',
@@ -68,7 +69,7 @@ export function SoftwareApplicationJsonLd(): React.ReactElement {
     ],
     publisher: {
       '@type': 'Organization',
-      name: 'Vision Software Solutions Limited',
+      name: 'Crozent Techlabs Private Limited',
       url: 'https://upnotify-monitoring.vercel.app',
     },
     offers: [

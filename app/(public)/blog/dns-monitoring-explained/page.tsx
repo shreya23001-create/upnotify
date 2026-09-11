@@ -88,7 +88,7 @@ export default function DnsMonitoringExplainedPage(): React.ReactElement {
           headline: 'DNS Monitoring Explained: Why Your Domain Records Matter More Than You Think',
           description: 'DNS records control where your website and email point. Learn what DNS monitoring catches and why it matters.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-30',
           dateModified: '2026-03-30',
           url: 'https://upnotify-monitoring.vercel.app/blog/dns-monitoring-explained',

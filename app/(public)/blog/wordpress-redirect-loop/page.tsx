@@ -68,7 +68,7 @@ export default function WordPressRedirectLoopPage(): React.ReactElement {
           headline: 'WordPress Login Redirect Loop: Why wp-admin Keeps Sending You Back to the Login Page',
           description: 'What causes the WordPress login redirect loop, how to fix cookie issues and URL mismatches, and how HTTP monitoring detects redirect loops automatically.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-18',
           dateModified: '2026-03-18',
           url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-redirect-loop',

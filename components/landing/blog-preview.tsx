@@ -52,10 +52,38 @@ interface Post {
   category: string
 }
 
+/** Picks up to 6 posts for the homepage preview, favouring category variety:
+ *  the most recent post from each distinct category comes first, then any
+ *  remaining slots are filled with the next most-recent posts overall. This
+ *  avoids the preview looking repetitive when one category (e.g. WordPress)
+ *  dominates the most recently published posts. */
+function pickVariedPosts(sorted: Post[], limit: number): Post[] {
+  const picked: Post[] = []
+  const seenCategories = new Set<string>()
+
+  for (const post of sorted) {
+    if (picked.length >= limit) break
+    if (!seenCategories.has(post.category)) {
+      seenCategories.add(post.category)
+      picked.push(post)
+    }
+  }
+
+  if (picked.length < limit) {
+    const pickedSlugs = new Set(picked.map(p => p.slug))
+    for (const post of sorted) {
+      if (picked.length >= limit) break
+      if (!pickedSlugs.has(post.slug)) picked.push(post)
+    }
+  }
+
+  return picked.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+}
+
 export async function BlogPreview(): Promise<React.ReactElement> {
   const dbPosts = await getPublishedBlogPosts()
 
-  const posts: Post[] = dbPosts
+  const sortedPosts: Post[] = dbPosts
     .map(p => ({
       slug: p.slug,
       title: p.title,
@@ -65,7 +93,8 @@ export async function BlogPreview(): Promise<React.ReactElement> {
       category: p.category ?? 'Outage',
     }))
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-    .slice(0, 6)
+
+  const posts = pickVariedPosts(sortedPosts, 6)
 
   if (posts.length === 0) return <></>
 
@@ -96,14 +125,8 @@ export async function BlogPreview(): Promise<React.ReactElement> {
                 <div className="blog-card-image" style={{ background: bs.grad }}>
                   {/* mesh overlay */}
                   <div className="blog-card-image-mesh" />
-                  {/* floating scattered icons */}
-                  <div className="blog-card-floats">
-                    {getCategoryIcons(post.category).map((icon, i) => (
-                      <span key={i} className={`blog-card-float blog-card-float-${i}`}>{icon}</span>
-                    ))}
-                  </div>
-                  {/* central keyword pill */}
-                  <div className="blog-card-center-pill">{post.category}</div>
+                  {/* single centered icon, subtle */}
+                  <div className="blog-card-icon">{getCategoryIcons(post.category)[0]}</div>
                   {/* shine sweep on hover */}
                   <div className="blog-card-image-shine" />
                 </div>

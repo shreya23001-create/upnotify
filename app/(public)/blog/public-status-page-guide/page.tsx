@@ -63,7 +63,7 @@ export default function PublicStatusPageGuidePage(): React.ReactElement {
           headline: 'How to Create a Public Status Page for Your Website (Free)',
           description: 'Learn what public status pages are, why customers expect them, and how to set one up for free.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-06',
           dateModified: '2026-03-06',
           url: 'https://upnotify-monitoring.vercel.app/blog/public-status-page-guide',

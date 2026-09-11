@@ -68,7 +68,7 @@ export default function WordPressWhiteScreenOfDeathPage(): React.ReactElement {
           headline: 'WordPress White Screen of Death: How to Detect It Before Your Visitors Do',
           description: 'What causes the WordPress WSOD, how to fix it, and how to set up keyword monitoring that detects a blank page in under 60 seconds.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-13',
           dateModified: '2026-03-13',
           url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-white-screen-of-death',

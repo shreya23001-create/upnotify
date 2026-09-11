@@ -68,7 +68,7 @@ export default function WordPressCronNotWorkingPage(): React.ReactElement {
           headline: 'WordPress wp-cron Not Firing: Why Scheduled Posts, Emails, and Backups Silently Stop',
           description: 'Why WordPress wp-cron relies on traffic, what breaks when it stops firing, and how heartbeat monitoring keeps scheduled tasks running reliably.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-26',
           dateModified: '2026-03-26',
           url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-cron-not-working',

@@ -63,7 +63,7 @@ export default function WebsiteMonitoringGuidePage(): React.ReactElement {
           headline: 'Website Monitoring in 2026: The Complete Guide',
           description: 'Everything you need to know about website monitoring — types of checks, why it matters, how to choose a tool, and how to get started.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-05',
           dateModified: '2026-03-05',
           url: 'https://upnotify-monitoring.vercel.app/blog/website-monitoring-guide',

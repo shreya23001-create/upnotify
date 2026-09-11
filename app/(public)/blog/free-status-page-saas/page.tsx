@@ -88,7 +88,7 @@ export default function FreeStatusPageSaasPage(): React.ReactElement {
           headline: 'How to Set Up a Free Public Status Page for Your SaaS',
           description: 'Why every SaaS needs a public status page and how to set one up for free in under five minutes.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-04-03',
           dateModified: '2026-04-03',
           url: 'https://upnotify-monitoring.vercel.app/blog/free-status-page-saas',

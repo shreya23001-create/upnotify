@@ -1,8 +1,11 @@
 import { getCurrentUser } from '@/lib/db/users'
-import { getMonitorsByWorkspacePaged } from '@/lib/db/monitors'
+import { getMonitorsByWorkspacePaged, getMonitorsGroupedByWebsite } from '@/lib/db/monitors'
 import { getWorkspacesByOrg } from '@/lib/db/workspaces'
+import { getWebsiteSubscriptions } from '@/lib/db/subscriptions'
+import { hasGrandfatheredBaseSubscription } from '@/lib/utils/plan-limits'
 import { getUptimeBarData } from '@/lib/db/check-results'
 import { MonitorTable } from '@/components/monitors/monitor-table'
+import { MonitorChecklist } from '@/components/monitors/monitor-checklist'
 import { AddMonitorButton } from '@/components/monitors/add-monitor-button'
 import { redirect } from 'next/navigation'
 import { parsePage, getPaginationMeta, DEFAULT_PAGE_SIZE } from '@/lib/utils/pagination'
@@ -20,10 +23,29 @@ export default async function MonitorsPage({
   const pageSize = DEFAULT_PAGE_SIZE
   const hasActiveFilters = Boolean(search || status || type)
 
+  const isGrandfathered = await hasGrandfatheredBaseSubscription(user.org_id)
+
+  // Per-website billing orgs: show one grouped checklist section per paid
+  // website (like Incidents), with a monitor count instead of a flat list.
+  let paidDomains: string[] = []
+  let groupedByDomain: Record<string, Awaited<ReturnType<typeof getMonitorsGroupedByWebsite>>[number]> = {}
+  if (!isGrandfathered) {
+    const [websiteSubs, groups] = await Promise.all([
+      getWebsiteSubscriptions(user.org_id),
+      getMonitorsGroupedByWebsite(user.org_id),
+    ])
+    paidDomains = Array.from(new Set(
+      websiteSubs
+        .filter(s => ['active', 'cancelling', 'past_due'].includes(s.status))
+        .flatMap(s => s.domains ?? [])
+    ))
+    groupedByDomain = Object.fromEntries(groups.map(g => [g.domain, g]))
+  }
+
   const workspaces = await getWorkspacesByOrg(user.org_id)
   const defaultWorkspace = workspaces[0]
   const { data: monitors, total } = defaultWorkspace
-    ? await getMonitorsByWorkspacePaged(defaultWorkspace.id, page, pageSize, { search, status, type })
+    ? await getMonitorsByWorkspacePaged(defaultWorkspace.id, page, pageSize, { search, status, type, excludeDomains: paidDomains })
     : { data: [], total: 0 }
 
   const pagination = getPaginationMeta(page, pageSize, total)
@@ -54,14 +76,29 @@ export default async function MonitorsPage({
           <AddMonitorButton hasMonitors={total > 0 || hasActiveFilters} />
         </div>
       </div>
-      <MonitorTable
-        monitors={monitors}
-        uptimeData={uptimeData}
-        initialSearch={search ?? ''}
-        initialStatus={status ?? ''}
-        initialType={type ?? ''}
-        pagination={pagination}
-      />
+
+      {!isGrandfathered && paidDomains.length > 0 && (
+        <div className="mon-website-groups">
+          {paidDomains.map(domain => (
+            <MonitorChecklist
+              key={domain}
+              domain={domain}
+              monitors={groupedByDomain[domain]?.monitors ?? []}
+            />
+          ))}
+        </div>
+      )}
+
+      {(total > 0 || hasActiveFilters || paidDomains.length === 0) && (
+        <MonitorTable
+          monitors={monitors}
+          uptimeData={uptimeData}
+          initialSearch={search ?? ''}
+          initialStatus={status ?? ''}
+          initialType={type ?? ''}
+          pagination={pagination}
+        />
+      )}
     </div>
   )
 }

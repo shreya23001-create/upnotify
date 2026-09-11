@@ -25,6 +25,7 @@ export default function RefundPolicyPage(): React.ReactElement {
         The Upnotify Free plan does not require any payment. As no charges are made, no refund applies.
       </p>
 
+      {/* TODO: legal review needed — this clause referenced UK/EU-specific compliance obligations tied to the old entity; verify with counsel whether it still applies or needs Indian-equivalent language */}
       <h2>2. Lite Plan (Annual Billing)</h2>
       <p>
         The Lite plan is billed annually as a single upfront payment. Under the UK Consumer Rights Act
@@ -140,8 +141,8 @@ export default function RefundPolicyPage(): React.ReactElement {
           <strong>Support:</strong> <a href="mailto:shreya23001@gmail.com">shreya23001@gmail.com</a>
         </li>
         <li>
-          <strong>Post:</strong> Vision Software Solutions Limited, C/O Benison Solvers Limited,
-          1000 Great West Road, Brentford, United Kingdom, TW8 9DW
+          <strong>Post:</strong> Crozent Techlabs Private Limited, B-59, B-Block, Chipyana,
+          Noida &ndash; 201009, Uttar Pradesh, India
         </li>
       </ul>
     </>

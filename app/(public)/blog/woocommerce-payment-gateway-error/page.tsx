@@ -68,7 +68,7 @@ export default function WooCommercePaymentGatewayErrorPage(): React.ReactElement
           headline: 'WooCommerce Payment Gateway Error: Why Stripe, PayPal, and Square Randomly Stop Working',
           description: 'What causes WooCommerce payment gateway failures, how API credential expiry and TLS mismatches silently break payments, and how HTTP and keyword monitoring catches checkout failures.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-04-03',
           dateModified: '2026-04-03',
           url: 'https://upnotify-monitoring.vercel.app/blog/woocommerce-payment-gateway-error',

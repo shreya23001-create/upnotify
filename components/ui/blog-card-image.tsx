@@ -1,6 +1,7 @@
-// Single source of truth for all blog card feature images.
-// Used by: components/landing/blog-preview.tsx AND app/blog/blog-index-client.tsx
-// DO NOT duplicate gradient/icon logic anywhere else.
+// Single source of truth for the /blog listing page's card feature images
+// (app/(public)/blog/blog-index-client.tsx). The homepage preview
+// (components/landing/blog-preview.tsx) uses its own simpler inline gradient
+// + single-icon treatment rather than this component.
 
 const GRADIENTS: Record<string, [string, string]> = {
   Guide:             ['#1392FB', '#3b82f6'],
@@ -17,21 +18,6 @@ const GRADIENTS: Record<string, [string, string]> = {
 
 // SVG canvas
 const W = 280, H = 148, CX = 140, CY = 74
-
-// Deterministic hash — same title always produces same layout, different titles look different
-function hashStr(s: string): number {
-  let h = 0
-  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0
-  return h
-}
-
-// N icons evenly spaced in a ring
-function ringPos(n: number, r: number, startAngle = -90): Array<[number, number]> {
-  return Array.from({ length: n }, (_, i) => {
-    const a = (startAngle + i * (360 / n)) * (Math.PI / 180)
-    return [Math.round(CX + r * Math.cos(a)), Math.round(CY + r * Math.sin(a))] as [number, number]
-  })
-}
 
 // Shared stroke style
 const sp = {
@@ -73,7 +59,7 @@ const IC: Record<string, React.ReactElement> = {
   link:      (<><path {...sp} d="M-2,0 A3,3 0 0,0 2,0 M-1,-1.5 L-4,-4.5 A2,2 0 0,0 -1,-1.5 M1,1.5 L4,4.5 A2,2 0 0,0 1,1.5"/><path {...sp} d="M-5,5 L5,-5"/></>),
 }
 
-// 6 icons per category (layouts with fewer icons use the first N)
+// First icon per category used as the single centered thumbnail glyph
 const ICON_SETS: Record<string, (keyof typeof IC)[]> = {
   Security:          ['lock',    'shield',    'eye',      'key',      'xcircle',  'alert'],
   Performance:       ['pulse',   'chart',     'lightning','gear',     'target',   'wifi'],
@@ -87,122 +73,6 @@ const ICON_SETS: Record<string, (keyof typeof IC)[]> = {
   Default:           ['globe',   'wifi',      'pulse',    'chart',    'server',   'star'],
 }
 
-// 5 layout types — icon bg shape changes to match
-type IconBg = 'circle' | 'triangle' | 'square' | 'hexagon'
-
-interface LayoutDef {
-  positions: Array<[number, number]>
-  iconBg: IconBg
-  connecting: React.ReactElement
-}
-
-function makeLayout(seed: number): LayoutDef {
-  const idx = seed % 5
-
-  switch (idx) {
-    case 0: { // Hexagon ring — 6 icons, dashed circle
-      const pos = ringPos(6, 40)
-      return {
-        positions: pos,
-        iconBg: 'circle',
-        connecting: (
-          <circle cx={CX} cy={CY} r={40} fill="none"
-            stroke="rgba(255,255,255,0.08)" strokeWidth="1" strokeDasharray="3 4"/>
-        ),
-      }
-    }
-    case 1: { // Triangle — 3 icons, dashed triangle outline
-      const pos = ringPos(3, 42, -90)
-      return {
-        positions: pos,
-        iconBg: 'triangle',
-        connecting: (
-          <polygon
-            points={pos.map(([x, y]) => `${x},${y}`).join(' ')}
-            fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="1" strokeDasharray="4 5"/>
-        ),
-      }
-    }
-    case 2: { // Square — 4 icons at corners, dashed square outline
-      const pos = ringPos(4, 38, -45)
-      return {
-        positions: pos,
-        iconBg: 'square',
-        connecting: (
-          <rect x={CX - 33} y={CY - 33} width="66" height="66" rx="4"
-            fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="1" strokeDasharray="4 5"/>
-        ),
-      }
-    }
-    case 3: { // Diamond — 4 icons at cardinal points, dashed diamond outline
-      const pos = ringPos(4, 38, -90)
-      return {
-        positions: pos,
-        iconBg: 'circle',
-        connecting: (
-          <polygon
-            points={`${CX},${CY - 38} ${CX + 38},${CY} ${CX},${CY + 38} ${CX - 38},${CY}`}
-            fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="1" strokeDasharray="4 5"/>
-        ),
-      }
-    }
-    case 4: { // Pentagon — 5 icons, dashed pentagon outline
-      const pos = ringPos(5, 40, -90)
-      return {
-        positions: pos,
-        iconBg: 'hexagon',
-        connecting: (
-          <polygon
-            points={pos.map(([x, y]) => `${x},${y}`).join(' ')}
-            fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="1" strokeDasharray="3 5"/>
-        ),
-      }
-    }
-    default:
-      return makeLayout(0)
-  }
-}
-
-function IconBackground({ type }: { type: IconBg }): React.ReactElement {
-  switch (type) {
-    case 'triangle':
-      return <polygon points="0,-10 9,5 -9,5" fill="rgba(255,255,255,0.1)" stroke="none"/>
-    case 'square':
-      return <rect x="-8" y="-8" width="16" height="16" rx="2" fill="rgba(255,255,255,0.1)" stroke="none"/>
-    case 'hexagon':
-      return <polygon points="0,-9 7.8,-4.5 7.8,4.5 0,9 -7.8,4.5 -7.8,-4.5" fill="rgba(255,255,255,0.1)" stroke="none"/>
-    case 'circle':
-    default:
-      return <circle cx="0" cy="0" r="9" fill="rgba(255,255,255,0.1)" stroke="none"/>
-  }
-}
-
-// Center pill text:
-// — Outage / Incident Report: "Is Twitter down?" → "Twitter ↓"
-// — All others: first word of title
-function getCenterText(category: string, title: string): string {
-  if (category === 'Outage' || category === 'Incident Report') {
-    const m = title.match(/^Is\s+(\S+)\s+down/i)
-    if (m) {
-      const name = m[1].replace(/\.(com|io|net|org|co\.uk|app|dev|ai|co)$/i, '')
-      return name + ' \u2193'
-    }
-  }
-  return (title.trim().split(/\s+/)[0] ?? '').replace(/[^a-zA-Z0-9]/g, '')
-}
-
-function pillFontSize(text: string): number {
-  const len = text.replace(/\s/g, '').length
-  if (len <= 4)  return 20
-  if (len <= 7)  return 16
-  if (len <= 10) return 13
-  return 10
-}
-
-function pillWidth(text: string, fs: number): number {
-  return Math.round(text.length * fs * 0.62 + 20)
-}
-
 interface BlogCardImageProps {
   category: string
   title: string
@@ -213,16 +83,7 @@ interface BlogCardImageProps {
 export function BlogCardImage({ category, title, className, style }: BlogCardImageProps): React.ReactElement {
   const [c1, c2] = GRADIENTS[category] ?? GRADIENTS.Default
   const gradId = `bcg-${category.replace(/[^a-z0-9]/gi, '').toLowerCase()}`
-  const iconKeys = ICON_SETS[category] ?? ICON_SETS.Default
-
-  const layout = makeLayout(hashStr(title))
-  const centerText = getCenterText(category, title)
-  const fs = pillFontSize(centerText)
-  const pillW = pillWidth(centerText, fs)
-  const pillH = fs + 12
-
-  // Use only as many icons as the layout has positions
-  const activeIcons = iconKeys.slice(0, layout.positions.length)
+  const iconKey = (ICON_SETS[category] ?? ICON_SETS.Default)[0]
 
   return (
     <div
@@ -254,41 +115,11 @@ export function BlogCardImage({ category, title, className, style }: BlogCardIma
         {/* Vignette overlay */}
         <rect x="0" y="0" width={W} height={H} fill={`url(#${gradId}-vgn)`}/>
 
-        {/* Connecting shape (circle / triangle / square / diamond / pentagon) */}
-        {layout.connecting}
-
-        {/* Icons at layout positions */}
-        {layout.positions.map(([px, py], i) => (
-          <g key={i} transform={`translate(${px}, ${py})`}>
-            <IconBackground type={layout.iconBg}/>
-            {IC[activeIcons[i] ?? 'globe']}
-          </g>
-        ))}
-
-        {/* Center pill */}
-        <rect
-          x={CX - pillW / 2}
-          y={CY - pillH / 2}
-          width={pillW}
-          height={pillH}
-          rx={pillH / 2}
-          fill="rgba(0,0,0,0.32)"
-          stroke="rgba(255,255,255,0.2)"
-          strokeWidth="1"
-        />
-        <text
-          x={CX}
-          y={CY}
-          textAnchor="middle"
-          dominantBaseline="central"
-          fontSize={fs}
-          fontWeight="700"
-          fill="rgba(255,255,255,0.95)"
-          fontFamily="system-ui, -apple-system, sans-serif"
-          letterSpacing="-0.3"
-        >
-          {centerText}
-        </text>
+        {/* Single centered category icon */}
+        <g transform={`translate(${CX}, ${CY}) scale(1.8)`}>
+          <circle cx="0" cy="0" r="12" fill="rgba(255,255,255,0.14)" stroke="none"/>
+          {IC[iconKey ?? 'globe']}
+        </g>
       </svg>
     </div>
   )

@@ -15,8 +15,8 @@ export const AOE_CONFIG: AoeConfig = {
     signupUrl: 'https://upnotify-monitoring.vercel.app/signup',
     logoUrl: 'https://upnotify-monitoring.vercel.app/logo.png',
     primaryColour: '#3b82f6',
-    companyName: 'Vision Software Solutions Limited',
-    companyAddress: 'Brentford, United Kingdom',
+    companyName: 'Crozent Techlabs Private Limited',
+    companyAddress: 'Noida, Uttar Pradesh, India',
     unsubscribeUrl: 'https://upnotify-monitoring.vercel.app/api/v1/outreach/unsubscribe',
   },
 

@@ -68,7 +68,7 @@ export default function WordfenceBlockingTrafficPage(): React.ReactElement {
           headline: 'Wordfence Blocking Real Users: When Your Security Plugin Becomes Your Biggest Problem',
           description: 'What causes Wordfence to block legitimate traffic, how aggressive settings catch real customers, and how multi-location HTTP monitoring detects blocked visitors.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-04-02',
           dateModified: '2026-04-02',
           url: 'https://upnotify-monitoring.vercel.app/blog/wordfence-blocking-traffic',

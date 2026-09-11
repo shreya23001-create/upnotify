@@ -68,7 +68,7 @@ export default function WordPressMaintenanceModePage(): React.ReactElement {
           headline: 'WordPress Stuck in Maintenance Mode: How to Fix It and Never Get Stuck Again',
           description: 'What causes WordPress to get stuck in maintenance mode, how to fix it in seconds, and how keyword monitoring detects it automatically.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-22',
           dateModified: '2026-03-22',
           url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-maintenance-mode',

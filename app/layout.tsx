@@ -50,9 +50,9 @@ export const metadata: Metadata = {
     "downtime alerts",
     "uptime checker",
   ],
-  authors: [{ name: "Vision Software Solutions Limited" }],
+  authors: [{ name: "Crozent Techlabs Private Limited" }],
   creator: "Upnotify",
-  publisher: "Vision Software Solutions Limited",
+  publisher: "Crozent Techlabs Private Limited",
 
   openGraph: {
     type: "website",

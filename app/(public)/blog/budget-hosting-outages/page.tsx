@@ -88,7 +88,7 @@ export default function BudgetHostingOutagesPage(): React.ReactElement {
           headline: 'GoDaddy Down Again? Why Budget Hosts Have the Most Outages',
           description: 'Why GoDaddy, Bluehost, and HostGator have the most user complaints about downtime, what forum users report, and how external monitoring protects your business.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-16',
           dateModified: '2026-03-16',
           url: 'https://upnotify-monitoring.vercel.app/blog/budget-hosting-outages',

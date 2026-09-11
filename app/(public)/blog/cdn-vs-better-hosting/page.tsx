@@ -88,7 +88,7 @@ export default function CdnVsBetterHostingPage(): React.ReactElement {
           headline: 'CDN vs Better Hosting: What Actually Makes Your Site Faster?',
           description: 'When a CDN helps vs when you need better hosting. Origin server TTFB, edge caching layers, and what actually makes your website faster.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-04-02',
           dateModified: '2026-04-02',
           url: 'https://upnotify-monitoring.vercel.app/blog/cdn-vs-better-hosting',

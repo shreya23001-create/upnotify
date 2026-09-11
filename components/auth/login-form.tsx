@@ -140,7 +140,6 @@ export function LoginForm({ mode = 'login', next }: { mode?: 'login' | 'signup';
             required
             autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
             disabled={isPending}
-            showToggle={mode === 'signup'}
           />
         </div>
         {mode === 'signup' && (

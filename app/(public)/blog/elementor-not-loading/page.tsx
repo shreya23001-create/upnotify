@@ -68,7 +68,7 @@ export default function ElementorNotLoadingPage(): React.ReactElement {
           headline: 'Elementor Not Loading After Update? Fix the White Screen Before You Lose Traffic',
           description: 'Why Elementor breaks after updates, how to fix it, and how HTTP and keyword monitoring catches broken pages automatically.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-27',
           dateModified: '2026-03-27',
           url: 'https://upnotify-monitoring.vercel.app/blog/elementor-not-loading',

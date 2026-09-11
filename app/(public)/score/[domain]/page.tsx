@@ -129,7 +129,7 @@ function JsonLd({ result }: { result: ScoreResult }): React.ReactElement {
     },
     author: {
       '@type': 'Organization',
-      name: 'Vision Software Solutions Limited',
+      name: 'Crozent Techlabs Private Limited',
       url: 'https://upnotify-monitoring.vercel.app',
     },
   }

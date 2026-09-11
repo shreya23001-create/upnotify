@@ -16,8 +16,8 @@ export default function TermsOfServicePage(): React.ReactElement {
 
       <p>
         These Terms of Service (&quot;Terms&quot;) govern your access to and use of the Upnotify platform,
-        website, and related services (collectively, the &quot;Service&quot;) operated by Vision Software Solutions Limited,
-        a company registered in England and Wales with its registered office at C/O Benison Solvers Limited, 1000 Great West Road, Brentford, United Kingdom, TW8 9DW
+        website, and related services (collectively, the &quot;Service&quot;) operated by Crozent Techlabs Private Limited,
+        a company incorporated in India with its registered office at B-59, B-Block, Chipyana, Noida &ndash; 201009, Uttar Pradesh, India
         (&quot;Uptrue&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;).
       </p>
       <p>
@@ -254,7 +254,7 @@ export default function TermsOfServicePage(): React.ReactElement {
       <h2>6. Intellectual Property</h2>
       <p>
         The Service, including all software, code, design, documentation, trademarks, logos, and content
-        created by Upnotify (&quot;Upnotify IP&quot;), is and remains the exclusive property of Vision Software Solutions Limited. These
+        created by Upnotify (&quot;Upnotify IP&quot;), is and remains the exclusive property of Crozent Techlabs Private Limited. These
         Terms do not grant you any right, title, or interest in the Upnotify IP except for the limited right
         to use the Service in accordance with these Terms.
       </p>
@@ -350,7 +350,7 @@ export default function TermsOfServicePage(): React.ReactElement {
 
       <h2>9. Indemnification</h2>
       <p>
-        You agree to indemnify, defend, and hold harmless Vision Software Solutions Limited, its officers, directors,
+        You agree to indemnify, defend, and hold harmless Crozent Techlabs Private Limited, its officers, directors,
         employees, and agents from and against any and all claims, damages, losses, liabilities, costs,
         and expenses (including reasonable legal fees) arising out of or related to: (a) your use of the
         Service; (b) your violation of these Terms; (c) your violation of any applicable law or
@@ -483,10 +483,10 @@ export default function TermsOfServicePage(): React.ReactElement {
 
       <h2>13. Governing Law and Dispute Resolution</h2>
       <p>
-        These Terms are governed by and construed in accordance with the laws of England and Wales. Any
+        These Terms are governed by and construed in accordance with the laws of India. Any
         dispute arising out of or in connection with these Terms, including any question regarding their
         existence, validity, or termination, shall be subject to the exclusive jurisdiction of the courts
-        of England and Wales.
+        of Noida, Uttar Pradesh, India.
       </p>
       <p>
         Before initiating formal proceedings, the parties agree to attempt to resolve any dispute through
@@ -498,7 +498,7 @@ export default function TermsOfServicePage(): React.ReactElement {
       <p>
         These Terms, together with the Privacy Policy, Cookie Policy, Acceptable Use Policy, Data
         Processing Agreement, and (where applicable) the Agency Partner Agreement, constitute the entire
-        agreement between you and Vision Software Solutions Limited regarding the Service and supersede all prior agreements
+        agreement between you and Crozent Techlabs Private Limited regarding the Service and supersede all prior agreements
         and understandings.
       </p>
       <h3>14.2 Severability</h3>
@@ -532,7 +532,7 @@ export default function TermsOfServicePage(): React.ReactElement {
         <li><strong>Email:</strong> shreya23001@gmail.com</li>
         <li><strong>Support:</strong> shreya23001@gmail.com</li>
         <li>
-          <strong>Post:</strong> Vision Software Solutions Limited, C/O Benison Solvers Limited, 1000 Great West Road, Brentford, United Kingdom, TW8 9DW
+          <strong>Post:</strong> Crozent Techlabs Private Limited, B-59, B-Block, Chipyana, Noida &ndash; 201009, Uttar Pradesh, India
         </li>
       </ul>
     </>

@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import { Lock, ShieldCheck, Zap, BadgeCheck } from 'lucide-react'
 import { getLandingSection } from '@/lib/db/page-sections'
 import type { FooterContent } from '@/lib/types/cms'
 
@@ -10,63 +9,31 @@ type FooterColumn = { title: string; links: FooterLink[] }
 
 const DEFAULT_DESCRIPTION = 'Uptime, performance & infrastructure monitoring for agencies and teams.'
 
-const DEFAULT_TRUST_ITEMS = [
-  'Secure Payments via Stripe',
-  'GDPR Compliant · EU Data (Frankfurt)',
-  '99.9% SLA',
-]
-
-// Strips a leading emoji from CMS-sourced strings (older seeded content
-// baked emoji into the text) so we can render a matching Lucide icon instead.
-function stripLeadingEmoji(text: string): string {
-  return text.replace(/^\p{Emoji_Presentation}\p{Extended_Pictographic}?\s*/u, '').trim()
-}
-
-function trustIcon(text: string): React.ReactElement {
-  const lower = text.toLowerCase()
-  if (lower.includes('payment') || lower.includes('stripe')) return <Lock size={13} />
-  if (lower.includes('gdpr') || lower.includes('data')) return <ShieldCheck size={13} />
-  if (lower.includes('sla') || lower.includes('uptime')) return <Zap size={13} />
-  return <BadgeCheck size={13} />
-}
-
 const DEFAULT_COLUMNS: FooterColumn[] = [
   {
     title: 'Product',
     links: [
-      { label: 'Features',        href: '/#features' },
-      { label: 'Pricing',         href: '/#pricing' },
-      { label: 'Score',           href: '/score',                    badge: 'Free' },
-      { label: 'Tracker',         href: '/tracker',                  badge: 'Free' },
-      { label: 'AI SEO Checker',  href: '/tools/ai-seo-checker',    badge: 'Free' },
-      { label: 'All Free Tools',  href: '/tools' },
-      { label: 'Leaderboard',     href: '/leaderboard' },
-      { label: 'Blog',            href: '/blog' },
-      { label: 'Changelog',       href: '/changelog' },
+      { label: 'Features', href: '/#features' },
+      { label: 'Pricing',  href: '/#pricing' },
+      { label: 'Blog',     href: '/blog' },
     ],
   },
   {
     title: 'Legal',
     links: [
-      { label: 'Terms of Service',  href: '/terms' },
-      { label: 'Privacy Policy',    href: '/privacy' },
-      { label: 'Cookie Policy',     href: '/cookies' },
-      { label: 'DPA',               href: '/dpa' },
-      { label: 'Acceptable Use',    href: '/acceptable-use' },
-      { label: 'Refund Policy',     href: '/refund-policy' },
-      { label: 'SLA',               href: '/sla' },
-      { label: 'AI Disclaimer',     href: '/ai-disclaimer' },
+      { label: 'Terms of Service', href: '/terms' },
+      { label: 'Privacy Policy',   href: '/privacy' },
+      { label: 'Cookie Policy',    href: '/cookies' },
+      { label: 'Refund Policy',    href: '/refund-policy' },
+      { label: 'SLA',              href: '/sla' },
+      { label: 'AI Disclaimer',    href: '/ai-disclaimer' },
     ],
   },
   {
     title: 'Company',
     links: [
-      { label: 'About',             href: '/about' },
-      { label: 'Contact',           href: '/contact' },
-      { label: 'Referral Program',  href: '/referrals' },
-      { label: 'Community Credits', href: '/credits' },
-      { label: 'X @uptrue_io',      href: 'https://x.com/uptrue_io',                                  external: true },
-      { label: 'LinkedIn',          href: 'https://www.linkedin.com/company/uptrue-io/', external: true },
+      { label: 'About',   href: '/about' },
+      { label: 'Contact', href: '/contact' },
     ],
   },
   {
@@ -74,7 +41,6 @@ const DEFAULT_COLUMNS: FooterColumn[] = [
     links: [
       { label: 'Help Centre',    href: '/help' },
       { label: 'API Docs',       href: '/api-docs' },
-      { label: 'Status',         href: '/status' },
       { label: 'Security',       href: '/security' },
       { label: 'Sub-processors', href: '/subprocessors' },
     ],
@@ -91,9 +57,8 @@ export async function PublicFooter(): Promise<React.ReactElement> {
 
   const cms = section?.content as FooterContent | undefined
 
-  const description = cms?.description  ?? DEFAULT_DESCRIPTION
-  const trustItems  = cms?.trust_items  ?? DEFAULT_TRUST_ITEMS
-  const columns     = (cms?.columns ?? DEFAULT_COLUMNS) as FooterColumn[]
+  const description = cms?.description ?? DEFAULT_DESCRIPTION
+  const columns = (cms?.columns ?? DEFAULT_COLUMNS) as FooterColumn[]
 
   return (
     <footer className="pub-footer">
@@ -119,17 +84,6 @@ export async function PublicFooter(): Promise<React.ReactElement> {
               </svg>
             </Link>
             <p className="footer-desc">{description}</p>
-            <div className="footer-trust">
-              {trustItems.map((item) => {
-                const label = stripLeadingEmoji(item)
-                return (
-                  <div key={item} className="footer-trust-item">
-                    <span className="footer-trust-icon">{trustIcon(label)}</span>
-                    {label}
-                  </div>
-                )
-              })}
-            </div>
           </div>
 
           {/* Link columns */}
@@ -160,11 +114,7 @@ export async function PublicFooter(): Promise<React.ReactElement> {
 
         <div className="footer-bottom">
           <div>
-            © {new Date().getFullYear()}{' '}
-            <a href="https://find-and-update.company-information.service.gov.uk/company/02710980" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit' }}>
-              Vision Software Solutions Limited
-            </a>
-            {' '}· Brentford, UK · Company No. 02710980
+            © {new Date().getFullYear()} Crozent Techlabs Private Limited, Noida
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-5)' }}>
             <Link href="/terms">Terms</Link>

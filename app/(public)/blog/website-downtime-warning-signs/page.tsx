@@ -88,7 +88,7 @@ export default function WebsiteDowntimeWarningSignsPage(): React.ReactElement {
           headline: '10 Warning Signs Your Website Is About to Go Down',
           description: 'Learn the 10 warning signs that precede website downtime and how to catch them early with monitoring.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-18',
           dateModified: '2026-03-18',
           url: 'https://upnotify-monitoring.vercel.app/blog/website-downtime-warning-signs',

@@ -68,7 +68,7 @@ export default function WordPressMixedContentPage(): React.ReactElement {
           headline: 'WordPress Mixed Content Errors: Why Your Site Shows \'Not Secure\' After Installing SSL',
           description: 'Why your WordPress site still shows "Not Secure" after installing SSL, how to find and fix every mixed content source, and how Upnotify monitoring catches insecure elements automatically.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-04-04',
           dateModified: '2026-04-04',
           url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-mixed-content',

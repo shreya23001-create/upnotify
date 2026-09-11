@@ -68,7 +68,7 @@ export default function WordPressContactFormNotSendingPage(): React.ReactElement
           headline: 'Contact Form 7 Not Sending Emails: Your Leads Are Disappearing and You Don\'t Know',
           description: 'Why Contact Form 7 stops sending emails, how to fix it, and how to set up monitoring so you catch broken forms before you lose leads.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-12',
           dateModified: '2026-03-12',
           url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-contact-form-not-sending',

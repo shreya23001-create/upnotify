@@ -88,7 +88,7 @@ export default function HostingWontTellYouSlowPage(): React.ReactElement {
           headline: 'Your Hosting Provider Won\'t Tell You When Your Site Is Slow',
           description: 'Hosting providers do not monitor or alert you to individual site performance degradation. TTFB spikes, resource contention, and throttling happen silently.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-22',
           dateModified: '2026-03-22',
           url: 'https://upnotify-monitoring.vercel.app/blog/hosting-wont-tell-you-slow',

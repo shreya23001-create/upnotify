@@ -15,7 +15,7 @@ export default function SLAPage(): React.ReactElement {
 
       <p>
         This Service Level Agreement (&quot;SLA&quot;) describes the availability commitment for the
-        Upnotify monitoring platform operated by Vision Software Solutions Limited. This SLA applies to
+        Upnotify monitoring platform operated by Crozent Techlabs Private Limited. This SLA applies to
         paid plans only and is subject to the terms and exclusions below.
       </p>
       <p>
@@ -160,8 +160,8 @@ export default function SLAPage(): React.ReactElement {
           <strong>Email:</strong> <a href="mailto:shreya23001@gmail.com">shreya23001@gmail.com</a>
         </li>
         <li>
-          <strong>Post:</strong> Vision Software Solutions Limited, C/O Benison Solvers Limited,
-          1000 Great West Road, Brentford, United Kingdom, TW8 9DW
+          <strong>Post:</strong> Crozent Techlabs Private Limited, B-59, B-Block, Chipyana,
+          Noida &ndash; 201009, Uttar Pradesh, India
         </li>
       </ul>
     </>

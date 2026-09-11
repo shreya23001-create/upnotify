@@ -96,7 +96,7 @@ ${content}
 <tr><td style="padding:20px 32px;background-color:#f9fafb;border-top:1px solid #eaeaea;">
 <p style="margin:0 0 8px;font-size:12px;color:#9ca3af;line-height:1.5;text-align:center;">
 Uptrue &mdash; Uptime, performance &amp; infrastructure monitoring.<br>
-Vision Software Solutions Limited, Brentford, United Kingdom.
+Crozent Techlabs Private Limited, Noida, Uttar Pradesh, India.
 </p>
 <p style="margin:0;font-size:12px;color:#9ca3af;line-height:1.5;text-align:center;">
 <a href="${escapeHtml(unsubscribeUrl(userId))}" style="color:#6b7280;text-decoration:underline;">Unsubscribe</a>

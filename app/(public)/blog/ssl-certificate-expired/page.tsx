@@ -73,7 +73,7 @@ export default function SslCertificateExpiredPage(): React.ReactElement {
           headline: 'SSL Certificate Expired: What It Means and How to Fix It in 10 Minutes',
           description: 'What a browser SSL warning means, why certificates expire despite auto-renew, how to renew a certificate for free, and how to prevent future expiry.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-04-06',
           dateModified: '2026-04-06',
           url: 'https://upnotify-monitoring.vercel.app/blog/ssl-certificate-expired',

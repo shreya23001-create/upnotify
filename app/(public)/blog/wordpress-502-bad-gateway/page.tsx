@@ -68,7 +68,7 @@ export default function WordPress502BadGatewayPage(): React.ReactElement {
           headline: '502 Bad Gateway on WordPress: What It Means and How to Fix It Fast',
           description: 'What causes 502 Bad Gateway errors on WordPress, how to fix each cause, and how HTTP monitoring catches them instantly.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-23',
           dateModified: '2026-03-23',
           url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-502-bad-gateway',

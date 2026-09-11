@@ -68,7 +68,7 @@ export default function WordPressSiteHackedPage(): React.ReactElement {
           headline: 'WordPress Site Defaced: How Hackers Replace Your Homepage and How to Detect It Instantly',
           description: 'How WordPress defacement attacks work, how to recover, and how keyword monitoring catches the attack before your customers see a hacker\'s message.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-31',
           dateModified: '2026-03-31',
           url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-site-hacked',

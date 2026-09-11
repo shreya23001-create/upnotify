@@ -68,7 +68,7 @@ export default function WordPressPermalinksNotWorkingPage(): React.ReactElement 
           headline: 'WordPress Permalink Changes Breaking All URLs: How to Prevent SEO Disaster',
           description: 'Why permalink changes break every URL on your WordPress site, how to fix them, and how monitoring multiple pages catches widespread 404 errors.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-29',
           dateModified: '2026-03-29',
           url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-permalinks-not-working',

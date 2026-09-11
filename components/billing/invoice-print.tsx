@@ -1,6 +1,5 @@
 'use client'
 
-import { useEffect } from 'react'
 import type { Invoice, Organisation } from '@/lib/types'
 import type { SellerEntity } from '@/lib/db/seller-entities'
 
@@ -27,23 +26,20 @@ interface Props {
   organisation: Organisation
   userEmail: string
   seller: SellerEntity
+  /** Websites covered by this invoice's payment — shown as one line item
+   *  per domain instead of a single generic "Upnotify Subscription" row
+   *  when the invoice is linked to a Pro Plan website_subscriptions row. */
+  domains?: string[]
 }
 
-export function InvoicePrint({ invoice, organisation, userEmail, seller }: Props): React.ReactElement {
+export function InvoicePrint({ invoice, organisation, userEmail, seller, domains = [] }: Props): React.ReactElement {
   const isInr = invoice.currency === 'inr'
-
-  // Auto-trigger print dialog for Razorpay (INR) invoices — Stripe invoices open their own PDF
-  useEffect(() => {
-    if (isInr) {
-      const t = setTimeout(() => window.print(), 800)
-      return () => clearTimeout(t)
-    }
-  }, [isInr])
 
   // GST / VAT calculations for INR invoices (18% GST inclusive)
   const totalPaise = invoice.amount_gbp
   const baseAmountPaise = isInr ? Math.round(totalPaise / 1.18) : totalPaise
   const gstPaise = isInr ? totalPaise - baseAmountPaise : 0
+  const perDomainBasePaise = domains.length > 0 ? Math.round(baseAmountPaise / domains.length) : baseAmountPaise
 
   const taxLine =
     seller.tax_label && seller.tax_number
@@ -159,15 +155,29 @@ export function InvoicePrint({ invoice, organisation, userEmail, seller }: Props
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>Upnotify Subscription</td>
-              <td>
-                {invoice.period_start && invoice.period_end && invoice.period_start !== invoice.period_end
-                  ? `${fmt(invoice.period_start)} – ${fmt(invoice.period_end)}`
-                  : fmt(invoice.created_at)}
-              </td>
-              <td style={{ textAlign: 'right' }}>{fmtAmount(isInr ? baseAmountPaise : totalPaise, invoice.currency)}</td>
-            </tr>
+            {domains.length > 0 ? (
+              domains.map(domain => (
+                <tr key={domain}>
+                  <td>Pro Plan — {domain} (1 year)</td>
+                  <td>
+                    {invoice.period_start && invoice.period_end && invoice.period_start !== invoice.period_end
+                      ? `${fmt(invoice.period_start)} – ${fmt(invoice.period_end)}`
+                      : fmt(invoice.created_at)}
+                  </td>
+                  <td style={{ textAlign: 'right' }}>{fmtAmount(perDomainBasePaise, invoice.currency)}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td>Upnotify Subscription</td>
+                <td>
+                  {invoice.period_start && invoice.period_end && invoice.period_start !== invoice.period_end
+                    ? `${fmt(invoice.period_start)} – ${fmt(invoice.period_end)}`
+                    : fmt(invoice.created_at)}
+                </td>
+                <td style={{ textAlign: 'right' }}>{fmtAmount(isInr ? baseAmountPaise : totalPaise, invoice.currency)}</td>
+              </tr>
+            )}
           </tbody>
           <tfoot>
             {isInr && (

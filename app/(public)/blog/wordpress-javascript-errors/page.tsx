@@ -68,7 +68,7 @@ export default function WordPressJavascriptErrorsPage(): React.ReactElement {
           headline: 'JavaScript Errors Breaking WordPress Page Functionality: When Your Site Is Up But Broken',
           description: 'How JavaScript errors silently break WordPress forms, buttons, and navigation, and how keyword monitoring detects broken functionality automatically.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-04-02',
           dateModified: '2026-04-02',
           url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-javascript-errors',

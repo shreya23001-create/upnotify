@@ -1,8 +1,8 @@
 # Uptrue
 
-> Uptrue is a SaaS uptime and infrastructure monitoring platform for web agencies and development teams. It monitors websites, APIs, SSL certificates, DNS records, domains, ports, keywords, and competitors — alerting teams instantly via email, Slack, Microsoft Teams, Telegram, or webhook when something goes wrong. Built in the UK, GDPR compliant, EU data storage.
+> Uptrue is a SaaS uptime and infrastructure monitoring platform for web agencies and development teams. It monitors websites, APIs, SSL certificates, DNS records, domains, ports, keywords, and competitors — alerting teams instantly via email, Slack, Microsoft Teams, Telegram, or webhook when something goes wrong. Built in India, GDPR compliant, EU data storage.
 
-Uptrue is built and operated by Vision Software Solutions Limited (Company No. 02710980), Brentford, United Kingdom. The platform runs on Vercel with data stored in Supabase (Frankfurt, EU). All plans are subscription-based with no lock-in. A free plan is available with no credit card required.
+Uptrue is built and operated by Crozent Techlabs Private Limited, B-59, B-Block, Chipyana, Noida – 201009, Uttar Pradesh, India. The platform runs on Vercel with data stored in Supabase (Frankfurt, EU). All plans are subscription-based with no lock-in. A free plan is available with no credit card required.
 
 ## Product
 
@@ -59,11 +59,11 @@ Uptrue is built and operated by Vision Software Solutions Limited (Company No. 0
 - [About](https://uptrue.io/about): Company background, mission, and values.
 - [Referral Program](https://uptrue.io/referrals): Earn account credits by referring new users.
 - [Community Credits](https://uptrue.io/credits): Earn credits via reviews, bug reports, and badge embeds.
-- [Contact](https://uptrue.io/contact): General enquiries — support@uptrue.io
+- [Contact](https://uptrue.io/contact): General enquiries — shreya23001@gmail.com
 - [X (Twitter)](https://x.com/uptrue_io): Product updates and monitoring news.
 - [LinkedIn](https://www.linkedin.com/company/uptrue-io/): Company announcements.
 
 ---
-Maintained by: Vision Software Solutions Limited · support@uptrue.io
+Maintained by: Crozent Techlabs Private Limited · shreya23001@gmail.com
 Last updated: April 2026
 Full detail: https://uptrue.io/llms-full.txt

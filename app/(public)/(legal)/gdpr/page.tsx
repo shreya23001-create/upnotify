@@ -26,14 +26,11 @@ export default function GDPRPage(): React.ReactElement {
       </p>
       <ul>
         <li>
-          <strong>Company:</strong> Vision Software Solutions Limited
+          <strong>Company:</strong> Crozent Techlabs Private Limited
         </li>
         <li>
-          <strong>Company Number:</strong> 02710980
-        </li>
-        <li>
-          <strong>Registered Address:</strong> C/O Benison Solvers Limited, 1000 Great West Road,
-          Brentford, United Kingdom, TW8 9DW
+          <strong>Registered Address:</strong> B-59, B-Block, Chipyana, Noida &ndash; 201009,
+          Uttar Pradesh, India
         </li>
       </ul>
 
@@ -46,8 +43,8 @@ export default function GDPRPage(): React.ReactElement {
           <strong>Email:</strong> <a href="mailto:shreya23001@gmail.com">shreya23001@gmail.com</a>
         </li>
         <li>
-          <strong>Post:</strong> Data Protection, Vision Software Solutions Limited, C/O Benison
-          Solvers Limited, 1000 Great West Road, Brentford, United Kingdom, TW8 9DW
+          <strong>Post:</strong> Data Protection, Crozent Techlabs Private Limited, B-59, B-Block,
+          Chipyana, Noida &ndash; 201009, Uttar Pradesh, India
         </li>
       </ul>
 
@@ -192,6 +189,7 @@ export default function GDPRPage(): React.ReactElement {
         </li>
       </ul>
 
+      {/* TODO: legal review needed — this clause referenced UK/EU-specific compliance obligations tied to the old entity; verify with counsel whether it still applies or needs Indian-equivalent language */}
       <h2>11. Right to Complain</h2>
       <p>
         If you believe your data protection rights have been infringed, you have the right to lodge a

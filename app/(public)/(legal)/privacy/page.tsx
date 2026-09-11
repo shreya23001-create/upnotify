@@ -14,8 +14,8 @@ export default function PrivacyPolicyPage(): React.ReactElement {
       <p className="legal-updated">Last updated: 6 May 2026</p>
 
       <p>
-        This Privacy Policy explains how Vision Software Solutions Limited, a company registered in England and Wales with
-        its registered office at C/O Benison Solvers Limited, 1000 Great West Road, Brentford, United Kingdom, TW8 9DW (&quot;Uptrue&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;), collects,
+        This Privacy Policy explains how Crozent Techlabs Private Limited, a company incorporated in India with
+        its registered office at B-59, B-Block, Chipyana, Noida &ndash; 201009, Uttar Pradesh, India (&quot;Uptrue&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;), collects,
         uses, stores, and protects your personal data when you use our website at upnotify-monitoring.vercel.app and our
         monitoring platform (collectively, the &quot;Service&quot;).
       </p>
@@ -27,12 +27,12 @@ export default function PrivacyPolicyPage(): React.ReactElement {
 
       <h2>1. Data Controller</h2>
       <p>
-        Vision Software Solutions Limited is the data controller for personal data collected through the Service. For any
+        Crozent Techlabs Private Limited is the data controller for personal data collected through the Service. For any
         questions regarding this Privacy Policy or your personal data, please contact us at:
       </p>
       <ul>
         <li><strong>Email:</strong> shreya23001@gmail.com</li>
-        <li><strong>Post:</strong> Data Protection Officer, Vision Software Solutions Limited, C/O Benison Solvers Limited, 1000 Great West Road, Brentford, United Kingdom, TW8 9DW</li>
+        <li><strong>Post:</strong> Data Protection Officer, Crozent Techlabs Private Limited, B-59, B-Block, Chipyana, Noida &ndash; 201009, Uttar Pradesh, India</li>
       </ul>
 
       <h2>2. Personal Data We Collect</h2>
@@ -449,6 +449,7 @@ export default function PrivacyPolicyPage(): React.ReactElement {
         incidents.
       </p>
 
+      {/* TODO: legal review needed — this clause referenced UK/EU-specific compliance obligations tied to the old entity; verify with counsel whether it still applies or needs Indian-equivalent language */}
       <h2>12. Data Breach Notification</h2>
       <p>
         In the event of a personal data breach that is likely to result in a risk to your rights and
@@ -488,6 +489,7 @@ export default function PrivacyPolicyPage(): React.ReactElement {
         of this page indicates when the most recent revision was made.
       </p>
 
+      {/* TODO: legal review needed — this clause referenced UK/EU-specific compliance obligations tied to the old entity; verify with counsel whether it still applies or needs Indian-equivalent language */}
       <h2>15. Complaints</h2>
       <p>
         If you are not satisfied with our response to a privacy concern, you have the right to lodge a
@@ -516,7 +518,7 @@ export default function PrivacyPolicyPage(): React.ReactElement {
       <ul>
         <li><strong>Data Protection Officer:</strong> shreya23001@gmail.com</li>
         <li><strong>General Support:</strong> shreya23001@gmail.com</li>
-        <li><strong>Post:</strong> Data Protection Officer, Vision Software Solutions Limited, C/O Benison Solvers Limited, 1000 Great West Road, Brentford, United Kingdom, TW8 9DW</li>
+        <li><strong>Post:</strong> Data Protection Officer, Crozent Techlabs Private Limited, B-59, B-Block, Chipyana, Noida &ndash; 201009, Uttar Pradesh, India</li>
       </ul>
     </>
   )

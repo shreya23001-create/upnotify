@@ -68,7 +68,7 @@ export default function WordPressAutoUpdateBrokeSitePage(): React.ReactElement {
           headline: 'WordPress Auto-Update Broke My Site: How to Recover and Prevent It From Happening Again',
           description: 'Why WordPress auto-updates break sites, how to recover from a failed update, and how HTTP monitoring catches the break within 60 seconds.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-04-03',
           dateModified: '2026-04-03',
           url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-auto-update-broke-site',

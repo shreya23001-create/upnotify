@@ -118,7 +118,7 @@ export default function AutomatedPricingPolicyPage(): React.ReactElement {
             <section>
               <h2>8. Limitation of Liability</h2>
               <p>
-                To the maximum extent permitted by law, Upnotify (Vision Software Solutions Limited) shall not
+                To the maximum extent permitted by law, Upnotify (Crozent Techlabs Private Limited) shall not
                 be liable for any direct, indirect, incidental, special, consequential, or exemplary damages
                 arising from or related to your use of automated pricing rules, including but not limited to
                 loss of revenue, loss of profit, loss of customers, or damage to business reputation.

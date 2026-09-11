@@ -126,6 +126,40 @@ export async function getMonitorSummaryByDomain(orgId: string): Promise<Record<s
   return summary
 }
 
+export interface WebsiteMonitorGroup {
+  domain: string
+  monitors: Monitor[]
+}
+
+/** Full monitor rows for this org grouped by target_domain — used by the
+ *  Monitors page to render one section per website (like Incidents) instead
+ *  of a single flat list. Monitors predating the per-website billing model
+ *  have target_domain = null and are grouped under the empty-string key. */
+export async function getMonitorsGroupedByWebsite(orgId: string): Promise<WebsiteMonitorGroup[]> {
+  const supabase = createAdminClient()
+  const { data, error } = await supabase
+    .from('monitors')
+    .select('*')
+    .eq('org_id', orgId)
+    .order('created_at', { ascending: false })
+
+  if (error) {
+    logger.error('Failed to get monitors grouped by website', { error: error.message, orgId })
+    return []
+  }
+
+  const byDomain = new Map<string, Monitor[]>()
+  for (const row of data ?? []) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const key = ((row as any).target_domain as string | null) ?? ''
+    const existing = byDomain.get(key)
+    if (existing) existing.push(row)
+    else byDomain.set(key, [row])
+  }
+
+  return Array.from(byDomain.entries()).map(([domain, monitors]) => ({ domain, monitors }))
+}
+
 export async function getMonitorsByOrg(orgId: string): Promise<Monitor[]> {
   const supabase = await createClient()
   const { data, error } = await supabase
@@ -412,7 +446,7 @@ export async function getMonitorsByWorkspacePaged(
   workspaceId: string,
   page: number,
   pageSize: number,
-  filters?: { search?: string; status?: string; type?: string }
+  filters?: { search?: string; status?: string; type?: string; excludeDomains?: string[] }
 ): Promise<{ data: Monitor[]; total: number }> {
   const supabase = await createClient()
   const from = (page - 1) * pageSize
@@ -431,6 +465,13 @@ export async function getMonitorsByWorkspacePaged(
   }
   if (filters?.status) query = query.eq('status', filters.status)
   if (filters?.type) query = query.eq('type', filters.type)
+  // Monitors for paid per-website-billing domains are rendered via the
+  // grouped checklist above this table instead — exclude them here so they
+  // don't appear twice on the Monitors page.
+  if (filters?.excludeDomains && filters.excludeDomains.length > 0) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    query = (query as any).not('target_domain', 'in', `(${filters.excludeDomains.map(d => `"${d}"`).join(',')})`)
+  }
 
   const { data, error, count } = await query
     .order('created_at', { ascending: false })

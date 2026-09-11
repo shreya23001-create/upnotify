@@ -9,7 +9,7 @@ import { ScrollReveal } from '@/components/landing/scroll-reveal'
 
 const POSTS_PER_PAGE = 12
 
-const FILTER_TABS = ['All posts', 'Guide', 'WordPress', 'Security', 'Performance', 'Ecommerce', 'Hosting', 'Incident Report', 'Agency', 'AI Tools']
+const FILTER_TABS = ['All posts', 'Guide', 'Security', 'Performance', 'Ecommerce', 'Hosting', 'Incident Report', 'Agency', 'AI Tools']
 
 const BADGE_STYLES: Record<string, { bg: string; color: string; border: string }> = {
   Guide: { bg: 'rgba(0, 104, 219,0.1)', color: '#0068DB', border: 'rgba(0, 104, 219,0.2)' },

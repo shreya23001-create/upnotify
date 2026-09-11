@@ -68,7 +68,7 @@ export default function WordPressHtaccessErrorPage(): React.ReactElement {
           headline: 'WordPress .htaccess File Corrupted: How a Single File Takes Down Your Entire Site',
           description: 'What causes .htaccess corruption in WordPress, how to regenerate the file, and how HTTP monitoring catches the 500 errors it causes.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-28',
           dateModified: '2026-03-28',
           url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-htaccess-error',

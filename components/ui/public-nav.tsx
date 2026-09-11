@@ -6,12 +6,11 @@ import { PublicNavClient } from './public-nav-client'
 // ── Default nav links (mirrors seeded DB content) ─────────────────────────────
 
 const DEFAULT_LINKS: NavContent['links'] = [
-  { label: 'Monitoring', href: '/monitoring' },
-  { label: 'WordPress',  href: '/wordpress-monitor', badge: 'Plugin' },
-  { label: 'Tools',      href: '/tools',             badge: 'Free' },
-  { label: 'Tracker',    href: '/tracker',           badge: 'Free' },
+  { label: 'Monitor',    href: '/monitoring' },
   { label: 'Pricing',    href: '/#pricing' },
-  { label: 'Blog',       href: '/blog' },
+  { label: 'Blogs',      href: '/blog' },
+  { label: 'About Us',   href: '/about' },
+  { label: 'Contact Us', href: '/contact' },
 ]
 
 // Cache the CMS nav section for 60 seconds. Previously this component called

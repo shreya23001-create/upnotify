@@ -68,7 +68,7 @@ export default function WordPressPharmaHackPage(): React.ReactElement {
           headline: 'WordPress Pharma Hack: Hidden Viagra Links in Your Site That Only Google Sees',
           description: 'How the WordPress pharma hack works, why you cannot see the injected content, how to clean it, and how keyword monitoring detects pharmaceutical spam on your pages.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-25',
           dateModified: '2026-03-25',
           url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-pharma-hack',

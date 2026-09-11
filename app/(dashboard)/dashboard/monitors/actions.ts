@@ -2,7 +2,7 @@
 
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
-import { createMonitor, updateMonitor, deleteMonitor, pauseMonitor, resumeMonitor, bulkDeleteMonitors, bulkUpdateMonitorStatus, getMonitorById } from '@/lib/db/monitors'
+import { createMonitor, updateMonitor, deleteMonitor, pauseMonitor, resumeMonitor, bulkDeleteMonitors, bulkUpdateMonitorStatus, getMonitorById, getMonitorsGroupedByWebsite } from '@/lib/db/monitors'
 import { getStatusPagesByMonitorId } from '@/lib/db/status-pages'
 import { getCurrentUser } from '@/lib/db/users'
 import { getWorkspacesByOrg } from '@/lib/db/workspaces'
@@ -420,6 +420,99 @@ export async function bulkResumeMonitorsAction(ids: string[]): Promise<{ error?:
   logger.info('Bulk resumed monitors', { count: ids.length })
   revalidatePath('/dashboard/monitors')
   return {}
+}
+
+const NON_WORDPRESS_TYPES = new Set(MONITOR_TYPES.filter(t => t.type !== 'wordpress').map(t => t.type))
+const MANUAL_CONFIG_TYPES = new Set(['keyword', 'port', 'api', 'heartbeat', 'competitor'])
+
+export interface ToggleMonitorSelectionParams {
+  domain: string
+  type: string
+  action: 'select' | 'deselect'
+  config?: Record<string, unknown>
+}
+
+/** Per-website monitor checklist on the Monitors page: checking a box
+ *  creates that monitor for the domain, unchecking deletes it. Freely
+ *  editable at any time post-payment since pricing is flat per website. */
+export async function toggleMonitorSelectionAction(
+  params: ToggleMonitorSelectionParams
+): Promise<{ error?: string; success?: boolean }> {
+  const guard = await impersonationGuard()
+  if (guard.isBlocked) return { error: guard.error }
+
+  const user = await getCurrentUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  const { domain, type, action, config } = params
+  if (!domain || !NON_WORDPRESS_TYPES.has(type)) return { error: 'Invalid monitor type' }
+
+  // Never trust the client's "this website is paid" state — re-verify server-side.
+  const isGrandfathered = await hasGrandfatheredBaseSubscription(user.org_id)
+  if (!isGrandfathered) {
+    const websiteActive = await checkWebsiteSubscriptionActive(user.org_id, domain)
+    if (!websiteActive) return { error: `This website isn't paid for yet.` }
+  }
+
+  const groups = await getMonitorsGroupedByWebsite(user.org_id)
+  const group = groups.find(g => g.domain === domain)
+  const existing = group?.monitors.find(m => m.type === type)
+
+  if (action === 'deselect') {
+    if (!existing) return { success: true }
+    const openIncident = await getOpenIncidentForMonitor(existing.id)
+    if (openIncident) await resolveIncident(existing.id)
+    const ok = await deleteMonitor(existing.id)
+    if (!ok) return { error: 'Failed to remove monitor' }
+    await devAuditLog({ orgId: user.org_id, userId: user.id, action: 'monitor.deleted', resourceType: 'monitor', resourceId: existing.id, metadata: { type, domain } })
+    revalidatePath('/dashboard/monitors')
+    return { success: true }
+  }
+
+  // action === 'select'
+  if (MANUAL_CONFIG_TYPES.has(type) && !config) {
+    return { error: 'Configuration required for this monitor type' }
+  }
+  if (type === 'keyword') {
+    const pos = (config?.positiveKeywords as string[] | undefined) ?? []
+    const neg = (config?.negativeKeywords as string[] | undefined) ?? []
+    if (pos.length === 0 && neg.length === 0) {
+      return { error: 'Please add at least one positive or negative keyword' }
+    }
+  }
+
+  const monitorTypeDef = MONITOR_TYPES.find(t => t.type === type)
+  const rawTarget = URL_TARGET_TYPES.includes(type) ? `https://${domain}` : domain
+  const target = normaliseTarget(rawTarget, type)
+
+  if (existing) {
+    // Re-configuring an already-selected type updates its config in place.
+    const updated = await updateMonitor(existing.id, { config: config ?? {} })
+    if (!updated) return { error: 'Failed to update monitor configuration' }
+    revalidatePath('/dashboard/monitors')
+    return { success: true }
+  }
+
+  const workspaces = await getWorkspacesByOrg(user.org_id)
+  const workspace = workspaces[0]
+  if (!workspace) return { error: 'No workspace found' }
+
+  const monitor = await createMonitor({
+    org_id: user.org_id,
+    workspace_id: workspace.id,
+    name: `${domain} — ${monitorTypeDef?.name ?? type}`,
+    type,
+    target,
+    target_domain: domain,
+    severity: 'P2',
+    config: config ?? {},
+  })
+
+  if (!monitor) return { error: 'Failed to create monitor' }
+
+  await devAuditLog({ orgId: user.org_id, userId: user.id, action: 'monitor.created', resourceType: 'monitor', resourceId: monitor.id, metadata: { type, domain, source: 'checklist' } })
+  revalidatePath('/dashboard/monitors')
+  return { success: true }
 }
 
 export interface BulkCreateItem {

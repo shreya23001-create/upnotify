@@ -73,7 +73,7 @@ export default function UptimeMonitoringToolsPage(): React.ReactElement {
           headline: 'Best Uptime Monitoring Tools in 2026: What to Look For',
           description: 'How to evaluate uptime monitoring tools: check frequency, multi-region, SSL monitoring, alert channels, status pages, and response time tracking.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-04-06',
           dateModified: '2026-04-06',
           url: 'https://upnotify-monitoring.vercel.app/blog/uptime-monitoring-tools',

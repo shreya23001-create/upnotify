@@ -15,8 +15,8 @@ export default function AgencyPartnerAgreementPage(): React.ReactElement {
       <p className="legal-updated">Last updated: 30 March 2026</p>
 
       <p>
-        This Agency Partner Agreement (&quot;Agreement&quot;) is entered into between Vision Software Solutions Limited, a company
-        registered in England and Wales with its registered office at C/O Benison Solvers Limited, 1000 Great West Road, Brentford, United Kingdom, TW8 9DW
+        This Agency Partner Agreement (&quot;Agreement&quot;) is entered into between Crozent Techlabs Private Limited, a company
+        incorporated in India with its registered office at B-59, B-Block, Chipyana, Noida &ndash; 201009, Uttar Pradesh, India
         (&quot;Uptrue&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;), and the Agency (&quot;you&quot;, &quot;your&quot;, or &quot;Agency&quot;) that
         registers for an Agency plan on the Upnotify platform.
       </p>
@@ -380,9 +380,9 @@ export default function AgencyPartnerAgreementPage(): React.ReactElement {
 
       <h2>12. Governing Law</h2>
       <p>
-        This Agreement is governed by and construed in accordance with the laws of England and Wales.
+        This Agreement is governed by and construed in accordance with the laws of India.
         Any dispute arising out of or in connection with this Agreement shall be subject to the exclusive
-        jurisdiction of the courts of England and Wales.
+        jurisdiction of the courts of Noida, Uttar Pradesh, India.
       </p>
       <p>
         Before initiating formal proceedings, the parties agree to attempt to resolve any dispute through
@@ -424,7 +424,7 @@ export default function AgencyPartnerAgreementPage(): React.ReactElement {
       <ul>
         <li><strong>Email:</strong> shreya23001@gmail.com</li>
         <li><strong>Support:</strong> shreya23001@gmail.com</li>
-        <li><strong>Post:</strong> Vision Software Solutions Limited, C/O Benison Solvers Limited, 1000 Great West Road, Brentford, United Kingdom, TW8 9DW</li>
+        <li><strong>Post:</strong> Crozent Techlabs Private Limited, B-59, B-Block, Chipyana, Noida &ndash; 201009, Uttar Pradesh, India</li>
       </ul>
     </>
   )

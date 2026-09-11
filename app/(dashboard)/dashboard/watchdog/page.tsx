@@ -6,7 +6,7 @@ import { checkCompetitorLimit } from '@/lib/utils/plan-limits'
 import { CompetitorDashboard } from '@/components/competitors/competitor-dashboard'
 
 export const metadata: Metadata = {
-  title: 'Watchdog',
+  title: 'Competitor',
 }
 
 export default async function WatchdogPage(): Promise<React.ReactElement> {
@@ -22,7 +22,7 @@ export default async function WatchdogPage(): Promise<React.ReactElement> {
     <div className="db-content">
       <div className="db-page-header">
         <div>
-          <div className="db-page-title">Watchdog</div>
+          <div className="db-page-title">Competitor</div>
           <div className="db-page-sub">Monitor competitor uptime and compare their reliability against your own sites.</div>
         </div>
       </div>

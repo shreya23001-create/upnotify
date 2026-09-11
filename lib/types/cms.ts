@@ -153,7 +153,10 @@ export interface NavContent {
 export interface FooterContent {
   description?:  string
   trust_items?:  string[]
-  columns: Array<{
+  /** Minimal flat link row (current footer). */
+  links?: Array<{ label: string; href: string; badge?: string; external?: boolean }>
+  /** Legacy multi-column layout, kept only for old seeded rows. */
+  columns?: Array<{
     title: string
     links: Array<{ label: string; href: string; badge?: string; external?: boolean }>
   }>

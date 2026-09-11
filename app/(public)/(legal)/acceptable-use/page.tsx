@@ -15,7 +15,7 @@ export default function AcceptableUsePolicyPage(): React.ReactElement {
 
       <p>
         This Acceptable Use Policy (&quot;AUP&quot;) sets out the rules and restrictions governing your use of
-        the Upnotify platform and services (the &quot;Service&quot;) operated by Vision Software Solutions Limited
+        the Upnotify platform and services (the &quot;Service&quot;) operated by Crozent Techlabs Private Limited
         (&quot;Uptrue&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;). This AUP is incorporated into and forms part of our
         <a href="/terms">Terms of Service</a>.
       </p>
@@ -327,7 +327,7 @@ export default function AcceptableUsePolicyPage(): React.ReactElement {
       <ul>
         <li><strong>Abuse reports:</strong> shreya23001@gmail.com</li>
         <li><strong>General enquiries:</strong> shreya23001@gmail.com</li>
-        <li><strong>Post:</strong> Vision Software Solutions Limited, C/O Benison Solvers Limited, 1000 Great West Road, Brentford, United Kingdom, TW8 9DW</li>
+        <li><strong>Post:</strong> Crozent Techlabs Private Limited, B-59, B-Block, Chipyana, Noida &ndash; 201009, Uttar Pradesh, India</li>
       </ul>
     </>
   )

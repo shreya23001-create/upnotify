@@ -7,7 +7,7 @@ import { Sparkles, Plug } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'Website Monitoring Suite — 24 Monitor Types | Upnotify',
-  description: 'Upnotify monitors 24 types of infrastructure — HTTP uptime, SSL certificates, DNS records, security headers, WordPress site health, MX, SPF/DMARC, blacklists, and more. See every monitoring type explained.',
+  description: 'Upnotify tracks 24 different layers of your infrastructure — HTTP uptime, SSL certificates, DNS records, security headers, WordPress site health, MX, SPF/DMARC, blacklists, and more. Every monitor type explained.',
   alternates: { canonical: 'https://upnotify-monitoring.vercel.app/monitoring' },
 }
 
@@ -20,7 +20,7 @@ const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'CollectionPage',
   name: 'Website Monitoring Suite — 24 Monitor Types',
-  description: 'Upnotify monitors 24 types of infrastructure — HTTP uptime, SSL certificates, DNS records, security headers, WordPress site health, MX health, SPF/DMARC, blacklists, and more.',
+  description: 'Upnotify tracks 24 different layers of your infrastructure — HTTP uptime, SSL certificates, DNS records, security headers, WordPress site health, MX health, SPF/DMARC, blacklists, and more.',
   url: 'https://upnotify-monitoring.vercel.app/monitoring',
   publisher: {
     '@type': 'Organization',
@@ -57,8 +57,8 @@ export default function MonitoringIndexPage() {
             <span className="gradient-text monitoring-hero-gradient">your website</span>
           </h1>
           <p style={{ fontSize: 18, color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: 36, maxWidth: 560, margin: '0 auto 36px' }}>
-            From HTTP uptime to WordPress internals, security headers, SPF/DMARC, blacklists, and cookie consent —
-            Upnotify is the only monitoring suite that covers every layer of your stack in one place.
+            HTTP uptime, WordPress internals, security headers, SPF/DMARC, blacklists, cookie consent —
+            Upnotify is the one monitoring suite built to cover your entire stack at once.
           </p>
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link href="/signup" className="btn btn-primary btn-lg">
@@ -87,8 +87,8 @@ export default function MonitoringIndexPage() {
               <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--color-up)', display: 'inline-block' }} />
               <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--color-up)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Core Monitors</span>
             </div>
-            <h2 style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--text-primary)', marginBottom: 6 }}>The essentials every site needs</h2>
-            <p style={{ color: 'var(--text-secondary)', fontSize: 15 }}>Start with these — they cover uptime, security, and DNS from day one.</p>
+            <h2 style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--text-primary)', marginBottom: 6 }}>What every site should have running</h2>
+            <p style={{ color: 'var(--text-secondary)', fontSize: 15 }}>These cover uptime, security, and DNS from the moment you turn them on.</p>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 5 }}>
             {coreMonitorTypes.map(t => (
@@ -105,7 +105,7 @@ export default function MonitoringIndexPage() {
               <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--brand-blue)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>New — Advanced Monitors</span>
             </div>
             <h2 style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--text-primary)', marginBottom: 6 }}>Security, compliance & change detection</h2>
-            <p style={{ color: 'var(--text-secondary)', fontSize: 15 }}>For teams who need to go beyond basic uptime.</p>
+            <p style={{ color: 'var(--text-secondary)', fontSize: 15 }}>For when plain uptime checks aren't enough.</p>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 5 }}>
             {advancedTypes.map(t => (
@@ -122,8 +122,8 @@ export default function MonitoringIndexPage() {
                 <Plug size={12} color="#1392FB" />
                 <span style={{ fontSize: 11, fontWeight: 700, color: '#1392FB', textTransform: 'uppercase', letterSpacing: '0.05em' }}>New — Agent-Based Monitors</span>
               </div>
-              <h2 style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--text-primary)', marginBottom: 6 }}>Monitor from inside your site</h2>
-              <p style={{ color: 'var(--text-secondary)', fontSize: 15 }}>Plugin-based monitors that check what external tools can&apos;t see — file injections, rogue users, and internal compromises.</p>
+              <h2 style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--text-primary)', marginBottom: 6 }}>A view from inside your site</h2>
+              <p style={{ color: 'var(--text-secondary)', fontSize: 15 }}>Plugin-based monitors catching what external checks can&apos;t reach — injected files, rogue admin accounts, internal compromises.</p>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 5 }}>
               {agentTypes.map(t => (
@@ -145,8 +145,8 @@ export default function MonitoringIndexPage() {
           gap: 24,
         }}>
           <div>
-            <div style={{ fontSize: 22, fontWeight: 800, color: '#fff', marginBottom: 6 }}>Set up all 24 monitor types in minutes</div>
-            <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.75)' }}>Free plan included. No credit card. WordPress plugin included.</div>
+            <div style={{ fontSize: 22, fontWeight: 800, color: '#fff', marginBottom: 6 }}>All 24 monitor types, live in minutes</div>
+            <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.75)' }}>Free plan included, no card required, WordPress plugin comes with it.</div>
           </div>
           <Link href="/signup" style={{
             background: '#fff',

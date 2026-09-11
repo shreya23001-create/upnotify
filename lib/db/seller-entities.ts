@@ -26,29 +26,29 @@ export interface SellerEntity {
 const FALLBACK_BY_CURRENCY: Record<string, SellerEntity> = {
   gbp: {
     currency_code: 'gbp',
-    legal_name: 'Vision Software Solutions Limited',
-    address_lines: [
-      'C/O Benison Solvers Limited',
-      '1000 Great West Road',
-      'Brentford, United Kingdom, TW8 9DW',
-    ],
-    registration_number: 'Company No. 02710980',
-    tax_label: 'VAT',
-    tax_number: 'GB 573 253 734',
-    pan: null,
-    tan: null,
-    email: 'shreya23001@gmail.com',
-    website: 'upnotify-monitoring.vercel.app',
-  },
-  inr: {
-    currency_code: 'inr',
-    legal_name: 'Crozent TechLabs Private Limited',
+    legal_name: 'Crozent Techlabs Private Limited',
     address_lines: [
       'B-59, B-Block, Chipyana',
       'Noida – 201009',
       'Uttar Pradesh, India',
     ],
-    registration_number: 'CIN: U62012UP2025PTC227766',
+    registration_number: null,
+    tax_label: 'GST',
+    tax_number: '09AAMCC8947M1ZP',
+    pan: 'AAMCC8947M',
+    tan: 'MRTC07685G',
+    email: 'shreya23001@gmail.com',
+    website: 'crozent.com',
+  },
+  inr: {
+    currency_code: 'inr',
+    legal_name: 'Crozent Techlabs Private Limited',
+    address_lines: [
+      'B-59, B-Block, Chipyana',
+      'Noida – 201009',
+      'Uttar Pradesh, India',
+    ],
+    registration_number: null,
     tax_label: 'GST',
     tax_number: '09AAMCC8947M1ZP',
     pan: 'AAMCC8947M',
@@ -68,7 +68,7 @@ function client(): SupabaseClient {
  * is missing or unreadable, so invoice rendering can't break.
  *
  * Currency comparison is case-insensitive ('GBP' / 'gbp' both work).
- * Unknown currencies fall back to the GBP entity (Vision Ltd).
+ * Unknown currencies fall back to the GBP entity (Crozent Techlabs).
  */
 export async function getSellerEntityByCurrency(currency: string): Promise<SellerEntity> {
   const code = (currency || '').toLowerCase()

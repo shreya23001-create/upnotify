@@ -68,7 +68,7 @@ export default function WordPressSharedHostingSlowPage(): React.ReactElement {
           headline: 'WordPress Site Down on Shared Hosting: Why CPU Limits Are Throttling Your Site',
           description: 'Why shared hosting silently throttles your WordPress site during traffic spikes, how the noisy neighbour effect works, and how response time monitoring catches slowdowns.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-04-03',
           dateModified: '2026-04-03',
           url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-shared-hosting-slow',

@@ -68,7 +68,7 @@ export default function UpdraftPlusBackupFailedPage(): React.ReactElement {
           headline: 'UpdraftPlus Backup Failed: When Your Safety Net Has a Hole in It',
           description: 'Why UpdraftPlus backups fail silently, how to fix each cause, and how HTTP monitoring catches the disk-full 500 errors that follow.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-04-01',
           dateModified: '2026-04-01',
           url: 'https://upnotify-monitoring.vercel.app/blog/updraftplus-backup-failed',

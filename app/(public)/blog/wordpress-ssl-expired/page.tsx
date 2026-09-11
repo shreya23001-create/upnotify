@@ -68,7 +68,7 @@ export default function WordPressSSLExpiredPage(): React.ReactElement {
           headline: 'WordPress SSL Certificate Expired? Here\'s How to Never Let It Happen Again',
           description: 'Why Let\'s Encrypt auto-renew fails silently, what visitors see when SSL expires, and how SSL monitoring warns you weeks before it happens.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-04-03',
           dateModified: '2026-04-03',
           url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-ssl-expired',

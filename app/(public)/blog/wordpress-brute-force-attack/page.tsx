@@ -68,7 +68,7 @@ export default function WordPressBruteForceAttackPage(): React.ReactElement {
           headline: 'WordPress Brute Force Attack Slowing Your Site: How Thousands of Login Attempts Cause Downtime',
           description: 'What causes WordPress brute force attacks to crash your site, how to harden against them, and how HTTP monitoring catches the response time spike before the crash.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-04-03',
           dateModified: '2026-04-03',
           url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-brute-force-attack',

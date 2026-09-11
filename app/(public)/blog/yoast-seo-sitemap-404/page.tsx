@@ -68,7 +68,7 @@ export default function YoastSeoSitemap404Page(): React.ReactElement {
           headline: 'Yoast SEO Sitemap Returning 404: How This Quietly Tanks Your Google Rankings',
           description: 'What causes Yoast SEO sitemap 404 errors, how to fix broken permalinks and rewrite rules, and how HTTP monitoring catches the problem before rankings decline.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-04-03',
           dateModified: '2026-04-03',
           url: 'https://upnotify-monitoring.vercel.app/blog/yoast-seo-sitemap-404',

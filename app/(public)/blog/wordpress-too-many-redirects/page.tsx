@@ -68,7 +68,7 @@ export default function WordPressTooManyRedirectsPage(): React.ReactElement {
           headline: 'WordPress Too Many Redirects: Fix ERR_TOO_MANY_REDIRECTS and Prevent It Forever',
           description: 'What causes WordPress redirect loops, how to fix each cause step by step, and how to set up monitoring that catches redirect loops automatically.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-15',
           dateModified: '2026-03-15',
           url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-too-many-redirects',

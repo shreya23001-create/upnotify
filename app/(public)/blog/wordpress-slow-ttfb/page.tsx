@@ -68,7 +68,7 @@ export default function WordPressSlowTtfbPage(): React.ReactElement {
           headline: 'WordPress TTFB Over 3 Seconds: Why Your Site Feels Dead Even When It\'s Technically Up',
           description: 'What causes high WordPress TTFB, why Google penalises slow server response times, and how HTTP monitoring tracks TTFB on every check.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-04-01',
           dateModified: '2026-04-01',
           url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-slow-ttfb',

@@ -315,9 +315,11 @@ export interface WebsiteSubscription {
   created_at: string
 }
 
-/** Every per-website (₹149/month × domain count) combined subscription for
- *  this org, any status — the Plans page needs cancelled ones too so a
- *  customer can see history and re-subscribe. */
+/** Every per-website (₹999/website/year + 18% GST) combined subscription
+ *  for this org, any status — the Plans page needs cancelled ones too so a
+ *  customer can see history and re-subscribe. Also includes 'incomplete'
+ *  rows: a website added on the Websites page but not yet selected+paid
+ *  for on the Plans page (one domain per pending row). */
 export async function getWebsiteSubscriptions(orgId: string): Promise<WebsiteSubscription[]> {
   const supabase = createAdminClient()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -333,6 +335,69 @@ export async function getWebsiteSubscriptions(orgId: string): Promise<WebsiteSub
   }
 
   return (data ?? []).map(row => row as unknown as WebsiteSubscription)
+}
+
+/** Single website_subscriptions row by id, org-scoped. Used by the invoice
+ *  page to list which domains a given invoice's payment covered. */
+export async function getWebsiteSubscriptionById(id: string, orgId: string): Promise<WebsiteSubscription | null> {
+  const supabase = createAdminClient()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase as any)
+    .from('website_subscriptions')
+    .select('*')
+    .eq('id', id)
+    .eq('org_id', orgId)
+    .maybeSingle() as { data: unknown | null; error: { message: string } | null }
+
+  if (error) {
+    logger.error('Failed to get website subscription by id', { error: error.message, id, orgId })
+    return null
+  }
+  return data as WebsiteSubscription | null
+}
+
+/**
+ * Adds one or more new websites for an org as pending ('incomplete',
+ * unpaid) rows — one domain per row, since each is not yet grouped into a
+ * paid batch. Skips any domain already present (pending OR paid) for this
+ * org so the same website is never duplicated. Called from the Websites
+ * page; the user later selects some/all of these on the Plans page and
+ * pays, which replaces the selected pending rows with one combined active
+ * subscription (see website-checkout route).
+ */
+export async function addPendingWebsites(orgId: string, domains: string[]): Promise<{ added: number; skipped: number }> {
+  const supabase = createAdminClient()
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: existingRows } = await (supabase as any)
+    .from('website_subscriptions')
+    .select('domains')
+    .eq('org_id', orgId)
+    .neq('status', 'canceled') as { data: Array<{ domains: string[] }> | null }
+  const existingDomains = new Set((existingRows ?? []).flatMap(r => r.domains ?? []))
+
+  const uniqueNew = Array.from(new Set(domains)).filter(d => !existingDomains.has(d))
+  const skipped = domains.length - uniqueNew.length
+
+  if (uniqueNew.length === 0) {
+    return { added: 0, skipped }
+  }
+
+  const rows = uniqueNew.map(domain => ({
+    org_id: orgId,
+    domains: [domain],
+    status: 'incomplete',
+  }))
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabase as any).from('website_subscriptions').insert(rows)
+
+  if (error) {
+    logger.error('Failed to add pending websites', { error: error.message, orgId })
+    return { added: 0, skipped: domains.length }
+  }
+
+  return { added: uniqueNew.length, skipped }
 }
 
 /** Invoices linked to a specific website_subscription row. */

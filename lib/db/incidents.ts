@@ -116,6 +116,72 @@ export type IncidentWithMonitor = Incident & {
   monitor_name?: string | null
 }
 
+export interface WebsiteIncidentGroup {
+  /** Normalized website domain (see lib/utils/validate-domain.ts
+   *  targetToWebsiteDomain) all these incidents' monitors share. Monitors
+   *  created before target_domain existed group under the empty string. */
+  domain: string
+  incidents: IncidentWithMonitor[]
+}
+
+/**
+ * Every incident for the org, grouped by which website its monitor
+ * belongs to — one section per website instead of one flat undifferentiated
+ * list. No pagination: loads everything so a website's incidents are never
+ * split across pages. Sections are ordered by their most recent incident
+ * first; incidents within a section are newest-first.
+ */
+export async function getAllIncidentsGroupedByWebsite(
+  orgId: string, statusFilter?: 'open' | 'resolved'
+): Promise<{ groups: WebsiteIncidentGroup[]; openTotal: number; resolvedTotal: number }> {
+  const supabase = createAdminClient()
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let query = (supabase as any)
+    .from('incidents')
+    .select('*, monitors(name, target_domain)')
+    .eq('org_id', orgId)
+    .order('started_at', { ascending: false })
+    .order('id', { ascending: false })
+
+  if (statusFilter === 'open') query = query.neq('status', 'resolved')
+  else if (statusFilter === 'resolved') query = query.eq('status', 'resolved')
+
+  const [{ data, error }, { count: openCount }, { count: resolvedCount }] = await Promise.all([
+    query as Promise<{ data: unknown[] | null; error: { message: string } | null }>,
+    supabase.from('incidents').select('id', { count: 'exact', head: true }).eq('org_id', orgId).neq('status', 'resolved'),
+    supabase.from('incidents').select('id', { count: 'exact', head: true }).eq('org_id', orgId).eq('status', 'resolved'),
+  ])
+
+  if (error) {
+    logger.error('Failed to get incidents grouped by website', { error: error.message, orgId })
+    return { groups: [], openTotal: 0, resolvedTotal: 0 }
+  }
+
+  const byDomain = new Map<string, IncidentWithMonitor[]>()
+  for (const row of data ?? []) {
+    const r = row as Record<string, unknown> & { monitors: { name: string; target_domain: string | null } | null }
+    const { monitors, ...rest } = r
+    const domain = monitors?.target_domain ?? ''
+    const incident = { ...rest, monitor_name: monitors?.name ?? null } as unknown as IncidentWithMonitor
+    const existing = byDomain.get(domain)
+    if (existing) existing.push(incident)
+    else byDomain.set(domain, [incident])
+  }
+
+  // Order groups by their most recent incident (incidents within each
+  // group are already newest-first from the query's order()).
+  const groups: WebsiteIncidentGroup[] = Array.from(byDomain.entries())
+    .map(([domain, incidents]) => ({ domain, incidents }))
+    .sort((a, b) => {
+      const aLatest = a.incidents[0]?.started_at ?? ''
+      const bLatest = b.incidents[0]?.started_at ?? ''
+      return bLatest.localeCompare(aLatest)
+    })
+
+  return { groups, openTotal: openCount ?? 0, resolvedTotal: resolvedCount ?? 0 }
+}
+
 export async function getAllIncidentsByOrg(orgId: string, limit = 50): Promise<IncidentWithMonitor[]> {
   const supabase = await createClient()
   const { data, error } = await supabase

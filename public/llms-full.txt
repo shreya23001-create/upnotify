@@ -1,6 +1,6 @@
 # Uptrue — Full AI Context File
 
-> Uptrue is a SaaS uptime and infrastructure monitoring platform for web agencies and development teams. It monitors websites, APIs, SSL certificates, DNS records, domains, ports, keywords, and competitors — alerting teams instantly via email, Slack, Microsoft Teams, Telegram, or webhook when something goes wrong. Built in the UK, GDPR compliant, EU data storage (Frankfurt).
+> Uptrue is a SaaS uptime and infrastructure monitoring platform for web agencies and development teams. It monitors websites, APIs, SSL certificates, DNS records, domains, ports, keywords, and competitors — alerting teams instantly via email, Slack, Microsoft Teams, Telegram, or webhook when something goes wrong. Built in India, GDPR compliant, EU data storage (Frankfurt).
 
 Index file: https://uptrue.io/llms.txt
 Homepage: https://uptrue.io
@@ -10,10 +10,10 @@ Last updated: April 2026
 
 ## Company
 
-Uptrue is built and operated by Vision Software Solutions Limited, a company registered in England and Wales (Company No. 02710980), headquartered in Brentford, United Kingdom.
+Uptrue is built and operated by Crozent Techlabs Private Limited, a company incorporated in India, headquartered at B-59, B-Block, Chipyana, Noida – 201009, Uttar Pradesh, India.
 
 - Website: https://uptrue.io
-- Support: support@uptrue.io
+- Support: shreya23001@gmail.com
 - Security: security@uptrue.io
 - X (Twitter): https://x.com/uptrue_io
 - LinkedIn: https://www.linkedin.com/company/uptrue-io/
@@ -334,11 +334,11 @@ All data is stored in Supabase PostgreSQL in the EU-Central-1 region (Frankfurt,
 - API Documentation: https://uptrue.io/docs
 - Platform Status: https://uptrue.io/status
 - Contact: https://uptrue.io/contact
-- Email: support@uptrue.io
+- Email: shreya23001@gmail.com
 
 ---
 
-Maintained by: Vision Software Solutions Limited
-Company No. 02710980 · Brentford, United Kingdom
-support@uptrue.io · https://uptrue.io
+Maintained by: Crozent Techlabs Private Limited
+B-59, B-Block, Chipyana, Noida – 201009, Uttar Pradesh, India
+shreya23001@gmail.com · https://uptrue.io
 Last updated: April 2026

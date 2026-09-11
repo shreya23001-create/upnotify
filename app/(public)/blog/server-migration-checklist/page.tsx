@@ -88,7 +88,7 @@ export default function ServerMigrationChecklistPage(): React.ReactElement {
           headline: 'Server Migration Checklist: How to Move Hosts Without Losing Your Site',
           description: 'Complete server migration checklist covering DNS propagation, SSL transfer, database migration, email continuity, and monitoring during the move.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-28',
           dateModified: '2026-03-28',
           url: 'https://upnotify-monitoring.vercel.app/blog/server-migration-checklist',

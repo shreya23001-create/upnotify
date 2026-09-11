@@ -68,7 +68,7 @@ export default function IthemesSecurityLockedOutPage(): React.ReactElement {
           headline: 'iThemes Security Locked Me Out of WordPress: How to Regain Access and Prevent It',
           description: 'What causes iThemes Security lockouts, how brute force protection and file change detection create false alarms, and how HTTP monitoring detects 403 lockout pages.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-04-03',
           dateModified: '2026-04-03',
           url: 'https://upnotify-monitoring.vercel.app/blog/ithemes-security-locked-out',

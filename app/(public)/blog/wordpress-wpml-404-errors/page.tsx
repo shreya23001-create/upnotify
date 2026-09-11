@@ -68,7 +68,7 @@ export default function WpmlFourOhFourErrorsPage(): React.ReactElement {
           headline: 'WPML Breaking URLs After Update: How Multilingual Plugins Cause 404 Errors Across Your Site',
           description: 'What causes WPML to break translated URLs, how language prefix conflicts and slug corruption produce 404 errors, and how HTTP monitoring catches broken language versions automatically.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-04-03',
           dateModified: '2026-04-03',
           url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-wpml-404-errors',

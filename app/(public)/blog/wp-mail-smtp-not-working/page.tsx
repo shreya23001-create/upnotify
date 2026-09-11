@@ -68,7 +68,7 @@ export default function WpMailSmtpNotWorkingPage(): React.ReactElement {
           headline: 'WP Mail SMTP Not Sending Emails: Why Your WordPress Site Is Silently Broken',
           description: 'What causes WP Mail SMTP to stop sending emails silently, how to fix credential and OAuth failures, and how heartbeat monitoring detects broken email delivery.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-20',
           dateModified: '2026-03-20',
           url: 'https://upnotify-monitoring.vercel.app/blog/wp-mail-smtp-not-working',

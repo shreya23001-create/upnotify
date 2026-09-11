@@ -193,6 +193,29 @@ export async function hasGrandfatheredBaseSubscription(orgId: string): Promise<b
 }
 
 /**
+ * True if the org has ANY plan at all — either a grandfathered base
+ * subscription, or at least one active per-website subscription. Used to
+ * decide the post-login/signup landing page: orgs with no plan yet land on
+ * /dashboard/plans to add their first website; everyone else lands on the
+ * normal /dashboard.
+ */
+export async function hasAnyActivePlan(orgId: string): Promise<boolean> {
+  const supabase = createAdminClient()
+  const [hasGrandfathered, websiteResult] = await Promise.all([
+    hasGrandfatheredBaseSubscription(orgId),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (supabase as any)
+      .from('website_subscriptions')
+      .select('id')
+      .eq('org_id', orgId)
+      .in('status', ['active', 'cancelling', 'past_due'])
+      .limit(1)
+      .maybeSingle() as Promise<{ data: { id: string } | null }>,
+  ])
+  return hasGrandfathered || Boolean(websiteResult.data)
+}
+
+/**
  * Per-website billing gate (₹149/month per website, see website_subscriptions
  * table). Only applies to orgs WITHOUT a grandfathered base subscription —
  * callers should check hasGrandfatheredBaseSubscription first and fall back

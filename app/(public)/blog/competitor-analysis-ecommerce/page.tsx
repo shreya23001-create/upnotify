@@ -63,7 +63,7 @@ export default function CompetitorAnalysisEcommercePage(): React.ReactElement {
           headline: 'Website Competitor Analysis Tools for Ecommerce in 2026',
           description: 'What to track, which tools help, and how to turn competitive intelligence into a business advantage.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-10',
           dateModified: '2026-03-10',
           url: 'https://upnotify-monitoring.vercel.app/blog/competitor-analysis-ecommerce',

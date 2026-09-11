@@ -73,7 +73,7 @@ export default function WoocommerceDownPage(): React.ReactElement {
           headline: 'WooCommerce Down? How to Diagnose and Fix a Broken WooCommerce Store',
           description: 'Step-by-step diagnosis guide for WooCommerce not working — plugin conflicts, database errors, PHP memory, hosting, and payment gateway issues.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-04-06',
           dateModified: '2026-04-06',
           url: 'https://upnotify-monitoring.vercel.app/blog/woocommerce-down',

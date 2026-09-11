@@ -88,7 +88,7 @@ export default function WhatIsUptimeMonitoringPage(): React.ReactElement {
           headline: 'What Is Uptime Monitoring and Why Every Website Needs It',
           description: 'Uptime monitoring checks if your website is online and working. Learn what it is, how it works, and why every website needs it.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-25',
           dateModified: '2026-03-25',
           url: 'https://upnotify-monitoring.vercel.app/blog/what-is-uptime-monitoring',

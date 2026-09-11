@@ -68,7 +68,7 @@ export default function WordPress403ForbiddenPage(): React.ReactElement {
           headline: 'WordPress 403 Forbidden Error: Why Your Pages Are Blocked and How to Fix It',
           description: 'What causes WordPress 403 Forbidden errors, how to fix file permissions, .htaccess deny rules, and mod_security false positives, and how HTTP monitoring catches 403 errors instantly.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-21',
           dateModified: '2026-03-21',
           url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-403-forbidden',

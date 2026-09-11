@@ -3,9 +3,8 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Zap, Info, Check, Bot, Search, Newspaper, Lightbulb, Tag, Users, Coins, FileBarChart, BarChart3 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
-import { Ticker } from '@/components/landing/ticker'
 import { BlogPreview } from '@/components/landing/blog-preview'
-import PricingTable from '@/components/landing/pricing-table'
+import ProPlanPricing from '@/components/landing/pro-plan-pricing'
 import { getDefaultCurrency } from '@/lib/utils/geo.server'
 import { HeroDashboardMockup } from '@/components/landing/hero-dashboard-mockup'
 import { FeatureCarousel } from '@/components/landing/feature-carousel'
@@ -233,12 +232,45 @@ export default async function LandingPage(): Promise<React.ReactElement> {
     switch (key) {
 
       case 'ticker':
-        return <Ticker key="ticker" />
+        return null
 
       case 'hero':
         return (
           <section key="hero" className="hero" id="heroSection">
             <div className="hero-grid" />
+            <svg className="hero-chart-graphic" viewBox="0 0 1200 500" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+              <defs>
+                <linearGradient id="heroChartLine" x1="0%" y1="100%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#1392FB" stopOpacity="0.35" />
+                  <stop offset="100%" stopColor="#0068DB" stopOpacity="0.9" />
+                </linearGradient>
+                <linearGradient id="heroChartFill" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stopColor="#1392FB" stopOpacity="0.14" />
+                  <stop offset="100%" stopColor="#1392FB" stopOpacity="0" />
+                </linearGradient>
+              </defs>
+              <path
+                d="M0 420 L120 400 L220 430 L340 360 L440 380 L560 300 L680 320 L800 220 L920 250 L1040 140 L1160 60 L1200 40 L1200 500 L0 500 Z"
+                fill="url(#heroChartFill)"
+              />
+              <path
+                d="M0 420 L120 400 L220 430 L340 360 L440 380 L560 300 L680 320 L800 220 L920 250 L1040 140 L1160 60 L1200 40"
+                fill="none"
+                stroke="url(#heroChartLine)"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M1120 40 L1200 40 L1200 120"
+                fill="none"
+                stroke="#0068DB"
+                strokeOpacity="0.7"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
             <div className="container">
               <div className="hero-content">
                 <div className="hero-eyebrow fade-up">
@@ -248,11 +280,11 @@ export default async function LandingPage(): Promise<React.ReactElement> {
                   </div>
                 </div>
                 <h1 className="hero-headline fade-up delay-1">
-                  Get notified before<br />
-                  <span className="gradient-text hero-tweets-gradient">your customers even notice.</span>
+                  Spot the outage first —<br />
+                  <span className="gradient-text hero-tweets-gradient">not after your customers do.</span>
                 </h1>
                 <p className="hero-sub fade-up delay-2">
-                  24 monitor types. 1-minute checks. Instant alerts to Slack, email or webhook. Built for agencies and dev teams.
+                  24 monitor types, checks as tight as every 60 seconds, and instant alerts wherever your team already lives — Slack, email, or webhook. Made for agencies and dev teams.
                 </p>
                 <div className="hero-ctas hero-ctas-desktop fade-up delay-3">
                   <Link href={hero?.cta_primary?.href ?? '/signup'} className="btn btn-primary btn-lg">
@@ -510,7 +542,7 @@ export default async function LandingPage(): Promise<React.ReactElement> {
         )
 
       case 'pricing':
-        return <PricingTable key="pricing" />
+        return <ProPlanPricing key="pricing" />
 
       case 'agency':
         return (

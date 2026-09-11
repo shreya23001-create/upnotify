@@ -73,7 +73,7 @@ export default function WebsiteResponseTimePage(): React.ReactElement {
           headline: 'What Is a Good Website Response Time? (And How to Fix a Slow Server)',
           description: 'What good website response time looks like, what causes high TTFB, how to fix slow server response, and how to monitor it continuously.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-04-06',
           dateModified: '2026-04-06',
           url: 'https://upnotify-monitoring.vercel.app/blog/website-response-time',

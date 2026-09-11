@@ -68,7 +68,7 @@ export default function WordPressJapaneseKeywordHackPage(): React.ReactElement {
           headline: 'Japanese Keyword Hack on WordPress: How Hackers Hijack Your SEO and You Don\'t Even Know',
           description: 'How the Japanese keyword hack works, why you cannot see it from wp-admin, how to clean your site, and how keyword monitoring detects Japanese characters on English pages.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-22',
           dateModified: '2026-03-22',
           url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-japanese-keyword-hack',

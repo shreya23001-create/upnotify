@@ -123,7 +123,7 @@ export default function ShopifyDownPage(): React.ReactElement {
           headline: 'Is Shopify Down? How to Check Shopify Status and Protect Your Store',
           description: 'How to check if Shopify is down, tell a platform outage from a store problem, and protect your store with uptime monitoring.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-04-06',
           dateModified: '2026-04-06',
           url: 'https://upnotify-monitoring.vercel.app/blog/shopify-down',

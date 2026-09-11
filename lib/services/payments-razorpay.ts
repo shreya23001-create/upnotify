@@ -229,6 +229,22 @@ export async function cancelRazorpaySubscription(
   })
 }
 
+/** Fetch the actual amount charged (in paise) for a captured payment —
+ *  ground truth for recording an invoice, rather than recomputing pricing
+ *  logic a second time client-side or in the confirm route. Returns null
+ *  for mock-mode payment ids (never a real Razorpay charge). */
+export async function fetchRazorpayPaymentAmount(paymentId: string): Promise<number | null> {
+  if (paymentId.startsWith('mock_')) return null
+  try {
+    const rzp = getRazorpay()
+    const payment = await rzp.payments.fetch(paymentId)
+    return typeof payment.amount === 'number' ? payment.amount : parseInt(String(payment.amount), 10)
+  } catch (err) {
+    logger.error('Failed to fetch Razorpay payment amount', { paymentId, error: razorpayErrorMessage(err) })
+    return null
+  }
+}
+
 // ─── Webhook signature verification ──────────────────────────────────────────
 
 /**

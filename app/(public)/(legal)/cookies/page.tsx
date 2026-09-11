@@ -14,7 +14,7 @@ export default function CookiePolicyPage(): React.ReactElement {
       <p className="legal-updated">Last updated: 2 April 2026</p>
 
       <p>
-        This Cookie Policy explains how Vision Software Solutions Limited (&quot;Uptrue&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;) uses
+        This Cookie Policy explains how Crozent Techlabs Private Limited (&quot;Uptrue&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;) uses
         cookies and similar technologies on our website at upnotify-monitoring.vercel.app and our monitoring platform
         (the &quot;Service&quot;). This policy should be read alongside our
         <a href="/privacy">Privacy Policy</a>.
@@ -231,7 +231,7 @@ export default function CookiePolicyPage(): React.ReactElement {
       </p>
       <ul>
         <li><strong>Email:</strong> <a href="mailto:shreya23001@gmail.com">shreya23001@gmail.com</a></li>
-        <li><strong>Post:</strong> Vision Software Solutions Limited, C/O Benison Solvers Limited, 1000 Great West Road, Brentford, United Kingdom, TW8 9DW</li>
+        <li><strong>Post:</strong> Crozent Techlabs Private Limited, B-59, B-Block, Chipyana, Noida &ndash; 201009, Uttar Pradesh, India</li>
       </ul>
     </>
   )

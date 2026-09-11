@@ -68,7 +68,7 @@ export default function WordPressXmlrpcAttackPage(): React.ReactElement {
           headline: 'WordPress XML-RPC Brute Force Attack: How Hackers Slow Down Your Site Without You Knowing',
           description: 'How attackers exploit xmlrpc.php system.multicall for amplified brute force attacks, why your site slows down, and how HTTP monitoring catches the response time spike.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-04-04',
           dateModified: '2026-04-04',
           url: 'https://upnotify-monitoring.vercel.app/blog/wordpress-xmlrpc-attack',

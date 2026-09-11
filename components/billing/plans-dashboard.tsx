@@ -1,15 +1,16 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useMemo } from 'react'
+import Link from 'next/link'
 import {
   Globe, Lock, Radio, Search, CalendarClock, Plug, Wifi, Zap, HeartPulse,
   Eye, ShieldCheck, Timer, Bot, MapPin, Mail, Landmark, Map, Link2,
-  MailCheck, Ban, Package, Cookie, Network,
+  MailCheck, Ban, Package, Cookie, Network, Check,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import type { Invoice } from '@/lib/types'
 import type { WebsiteSubscription } from '@/lib/db/subscriptions'
-import { getMonitorTypeByType, MONITOR_TYPES } from '@/lib/constants/monitor-types'
+import { MONITOR_TYPES } from '@/lib/constants/monitor-types'
 import { MockRazorpayModal, type MockCheckoutData, loadRazorpayScript } from './razorpay-checkout-modal'
 
 const MONITOR_TYPE_ICONS: Record<string, LucideIcon> = {
@@ -21,7 +22,9 @@ const MONITOR_TYPE_ICONS: Record<string, LucideIcon> = {
   'page-size': Package, 'cookie-consent': Cookie, 'nameserver-change': Network,
 }
 
-const PRICE_PER_WEBSITE_INR = 149
+const ORIGINAL_PRICE_PER_WEBSITE_INR = 1788 // ₹149/month × 12
+const DISCOUNTED_PRICE_PER_WEBSITE_INR = 999
+const GST_RATE = 0.18
 
 interface DomainSummary {
   domain: string
@@ -35,14 +38,24 @@ export interface WebsiteRow {
   invoices: Invoice[]
 }
 
+export interface PendingWebsite {
+  id: string
+  domain: string
+}
+
 interface Props {
   rows: WebsiteRow[]
+  pendingWebsites: PendingWebsite[]
   isGrandfathered: boolean
 }
 
 function fmtDate(d: string | null): string {
   if (!d) return '—'
   return new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+}
+
+function fmtMoney(n: number): string {
+  return n.toLocaleString('en-IN', { minimumFractionDigits: n % 1 === 0 ? 0 : 2, maximumFractionDigits: 2 })
 }
 
 function statusLabel(status: string): { text: string; className: string } {
@@ -55,50 +68,44 @@ function statusLabel(status: string): { text: string; className: string } {
   }
 }
 
-function monitorTypeLabel(type: string): string {
-  return getMonitorTypeByType(type)?.name ?? type
-}
-
-export function PlansDashboard({ rows, isGrandfathered }: Props): React.ReactElement {
-  const [showAddModal, setShowAddModal] = useState(false)
-  const [targets, setTargets] = useState<string[]>([''])
+export function PlansDashboard({ rows, pendingWebsites, isGrandfathered }: Props): React.ReactElement {
+  const [selected, setSelected] = useState<Set<string>>(new Set(pendingWebsites.map(w => w.id)))
   const [isPending, setIsPending] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [mockCheckout, setMockCheckout] = useState<MockCheckoutData | null>(null)
 
-  const nonEmptyTargets = targets.map(t => t.trim()).filter(Boolean)
-  const total = nonEmptyTargets.length * PRICE_PER_WEBSITE_INR
+  const selectedCount = selected.size
 
-  function updateTarget(index: number, value: string): void {
-    setTargets(prev => prev.map((t, i) => (i === index ? value : t)))
+  const pricing = useMemo(() => {
+    const originalTotal = ORIGINAL_PRICE_PER_WEBSITE_INR * selectedCount
+    const discountedTotal = DISCOUNTED_PRICE_PER_WEBSITE_INR * selectedCount
+    const gst = Math.round(discountedTotal * GST_RATE * 100) / 100
+    const finalTotal = Math.round((discountedTotal + gst) * 100) / 100
+    return { originalTotal, discountedTotal, gst, finalTotal }
+  }, [selectedCount])
+
+  function toggleWebsite(id: string): void {
+    setSelected(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
   }
 
-  function addRow(): void {
-    setTargets(prev => [...prev, ''])
-  }
-
-  function removeRow(index: number): void {
-    setTargets(prev => prev.length === 1 ? [''] : prev.filter((_, i) => i !== index))
-  }
-
-  function closeModal(): void {
-    setShowAddModal(false)
-    setTargets([''])
-    setError(null)
-  }
-
-  const handleAddWebsites = useCallback(async (): Promise<void> => {
-    if (nonEmptyTargets.length === 0) {
-      setError('Enter at least one website')
+  const handleCheckout = useCallback(async (): Promise<void> => {
+    if (selected.size === 0) {
+      setError('Select at least one website')
       return
     }
     setError(null)
     setIsPending(true)
     try {
+      const selectedIds = Array.from(selected)
       const res = await fetch('/api/v1/billing/razorpay/website-checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ targets: nonEmptyTargets }),
+        body: JSON.stringify({ websiteSubscriptionIds: selectedIds }),
       })
       const data = await res.json() as {
         subscriptionId?: string
@@ -108,6 +115,7 @@ export function PlansDashboard({ rows, isGrandfathered }: Props): React.ReactEle
         userEmail?: string
         orgName?: string
         mockMode?: boolean
+        pendingWebsiteIds?: string[]
         error?: string
       }
       if (!res.ok || !data.subscriptionId) {
@@ -120,8 +128,8 @@ export function PlansDashboard({ rows, isGrandfathered }: Props): React.ReactEle
         setMockCheckout({
           subscriptionId: data.subscriptionId,
           planSlug: 'website',
-          planName: data.planName ?? 'Website Plan',
-          billingCycle: 'monthly',
+          planName: data.planName ?? 'Pro Plan',
+          billingCycle: 'annual',
           amountPaise: data.amountPaise ?? 0,
           userEmail: data.userEmail ?? '',
           orgName: data.orgName ?? '',
@@ -137,13 +145,37 @@ export function PlansDashboard({ rows, isGrandfathered }: Props): React.ReactEle
         subscription_id: data.subscriptionId,
         name: 'Upnotify',
         description: isTestKey
-          ? `${data.planName ?? 'Website Plan'} · TEST MODE — Use card: 5267 3181 8797 5449 (Razorpay test Mastercard)`
-          : `${data.planName ?? 'Website Plan'} · Monthly (incl. 18% GST)`,
+          ? `${data.planName ?? 'Pro Plan'} · TEST MODE — Use card: 5267 3181 8797 5449 (Razorpay test Mastercard)`
+          : `${data.planName ?? 'Pro Plan'} · Yearly (incl. 18% GST)`,
         image: `${process.env.NEXT_PUBLIC_APP_URL ?? 'https://upnotify-monitoring.vercel.app'}/logo.svg`,
         prefill: { email: data.userEmail ?? '', name: data.orgName ?? '' },
         theme: { color: '#FBA830' },
-        handler: (_response: unknown) => {
-          window.location.href = '/dashboard/plans?added=1'
+        handler: (response: unknown) => {
+          void (async () => {
+            // Client-verified activation fallback — see website-confirm's
+            // docstring. The webhook, once configured on a real domain,
+            // will independently reach the same result; this just means
+            // testing (localhost / Vercel preview) doesn't have to wait
+            // on that setup to see the subscription go active.
+            const r = response as { razorpay_payment_id?: string; razorpay_subscription_id?: string; razorpay_signature?: string }
+            try {
+              await fetch('/api/v1/billing/razorpay/website-confirm', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  razorpaySubscriptionId: r.razorpay_subscription_id ?? data.subscriptionId,
+                  razorpayPaymentId: r.razorpay_payment_id,
+                  razorpaySignature: r.razorpay_signature,
+                  pendingWebsiteIds: data.pendingWebsiteIds ?? selectedIds,
+                }),
+              })
+            } catch {
+              // Non-fatal — the webhook (once configured) is still the
+              // primary path; worst case the customer sees "pending" a
+              // moment longer and can refresh.
+            }
+            window.location.href = '/dashboard/plans?added=1'
+          })()
         },
         modal: {
           ondismiss: () => { setIsPending(false) },
@@ -154,7 +186,7 @@ export function PlansDashboard({ rows, isGrandfathered }: Props): React.ReactEle
       setError('Something went wrong. Please try again.')
       setIsPending(false)
     }
-  }, [nonEmptyTargets])
+  }, [selected])
 
   return (
     <div>
@@ -167,30 +199,27 @@ export function PlansDashboard({ rows, isGrandfathered }: Props): React.ReactEle
 
       {isGrandfathered && (
         <div className="plans-grandfathered-banner">
-          You&apos;re on an existing plan (Pre Plan / Pro Plan) that already covers your monitors. The ₹149/month-per-website plan below is only needed for additional websites outside that plan.
+          You&apos;re on an existing plan (Pre Plan / Pro Plan) that already covers your monitors. The Pro Plan below is only needed for additional websites outside that plan.
         </div>
       )}
 
-      <div className="plans-header-row">
-        <div className="plans-header-sub">
-          {rows.length === 0 ? 'No websites paid for yet.' : `${rows.length} subscription${rows.length === 1 ? '' : 's'}`}
-        </div>
-        <button className="btn btn-primary" onClick={() => setShowAddModal(true)}>
-          + Add Website
-        </button>
-      </div>
+      {pendingWebsites.length === 0 ? (
+        /* Nothing pending — just show the Pro Plan info card, centered,
+           no checkout column since there's nothing to select/pay for. */
+        <div className="pro-plan-columns pro-plan-columns-centered">
+          <div className="pro-plan-card pro-plan-col-solo">
+            <div className="pro-plan-badge">Best Value</div>
+            <div className="pro-plan-name">Pro Plan</div>
+            <div className="pro-plan-tagline">Everything included. One simple price per website.</div>
 
-      {showAddModal && (
-        <div className="popup-overlay" onClick={() => !isPending && closeModal()}>
-          <div className="popup-content popup-content-lg" onClick={e => e.stopPropagation()}>
-            <button className="popup-close" onClick={closeModal} disabled={isPending}>&times;</button>
-            <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>Add website(s)</h2>
-            <p style={{ fontSize: 14, color: 'var(--text-secondary)', marginBottom: 16 }}>
-              ₹149/month per website covers every monitor type (HTTP, SSL, DNS, keyword, and more). Add as many as you need — they&apos;ll be billed together on one invoice.
-            </p>
+            <div className="pro-plan-price-row">
+              <span className="pro-plan-price-original">₹{fmtMoney(ORIGINAL_PRICE_PER_WEBSITE_INR)}/year</span>
+              <span className="pro-plan-price-discounted">₹{fmtMoney(DISCOUNTED_PRICE_PER_WEBSITE_INR)}<span className="pro-plan-price-unit">/website/year</span></span>
+            </div>
+            <div className="pro-plan-price-sub">Normally ₹149/month per website — billed yearly at a discount.</div>
 
             <div className="plans-included-monitors">
-              {MONITOR_TYPES.map(mt => {
+              {MONITOR_TYPES.filter(mt => mt.type !== 'wordpress').map(mt => {
                 const Icon = MONITOR_TYPE_ICONS[mt.type] ?? Globe
                 return (
                   <span key={mt.type} className="plans-included-monitor-pill">
@@ -201,75 +230,111 @@ export function PlansDashboard({ rows, isGrandfathered }: Props): React.ReactEle
               })}
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 8 }}>
-              {targets.map((t, i) => (
-                <div key={i} style={{ display: 'flex', gap: 8 }}>
+            <div className="pro-plan-empty">
+              <p>No websites added yet.</p>
+              <Link href="/dashboard/websites" className="btn btn-primary">+ Add Websites</Link>
+            </div>
+          </div>
+        </div>
+      ) : (
+        /* Two-column layout: plan details left, website selection + total right */
+        <div className="pro-plan-columns">
+          <div className="pro-plan-card pro-plan-col-left">
+            <div className="pro-plan-badge">Best Value</div>
+            <div className="pro-plan-name">Pro Plan</div>
+            <div className="pro-plan-tagline">Everything included. One simple price per website.</div>
+
+            <div className="pro-plan-price-row">
+              <span className="pro-plan-price-original">₹{fmtMoney(ORIGINAL_PRICE_PER_WEBSITE_INR)}/year</span>
+              <span className="pro-plan-price-discounted">₹{fmtMoney(DISCOUNTED_PRICE_PER_WEBSITE_INR)}<span className="pro-plan-price-unit">/website/year</span></span>
+            </div>
+            <div className="pro-plan-price-sub">Normally ₹149/month per website — billed yearly at a discount.</div>
+
+            <div className="plans-included-monitors">
+              {MONITOR_TYPES.filter(mt => mt.type !== 'wordpress').map(mt => {
+                const Icon = MONITOR_TYPE_ICONS[mt.type] ?? Globe
+                return (
+                  <span key={mt.type} className="plans-included-monitor-pill">
+                    <Icon size={14} strokeWidth={2} />
+                    {mt.name}
+                  </span>
+                )
+              })}
+            </div>
+          </div>
+
+          <div className="pro-plan-card pro-plan-col-right">
+            <div className="pro-plan-section-header">
+              <div>
+                <div className="pro-plan-section-title">Websites</div>
+                <div className="pro-plan-section-sub">Select which websites to subscribe to</div>
+              </div>
+              <Link href="/dashboard/websites" className="pro-plan-add-more-link">+ Add more</Link>
+            </div>
+
+            <div className="pro-plan-website-list">
+              {pendingWebsites.map(w => (
+                <label key={w.id} className="pro-plan-website-row">
                   <input
-                    className="form-input"
-                    placeholder="example.com"
-                    value={t}
-                    onChange={e => updateTarget(i, e.target.value)}
+                    type="checkbox"
+                    checked={selected.has(w.id)}
+                    onChange={() => toggleWebsite(w.id)}
                     disabled={isPending}
-                    style={{ flex: 1 }}
                   />
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    onClick={() => removeRow(i)}
-                    disabled={isPending}
-                    aria-label="Remove website"
-                    style={{ padding: '0 12px' }}
-                  >
-                    &times;
-                  </button>
-                </div>
+                  <span className="pro-plan-website-check">
+                    {selected.has(w.id) && <Check size={12} strokeWidth={3} />}
+                  </span>
+                  <span>{w.domain}</span>
+                </label>
               ))}
             </div>
 
+            <div className="pro-plan-summary">
+              <div className="pro-plan-summary-row">
+                <span>{selectedCount} website{selectedCount === 1 ? '' : 's'} × ₹{fmtMoney(ORIGINAL_PRICE_PER_WEBSITE_INR)}/year</span>
+                <span className="pro-plan-summary-strike">₹{fmtMoney(pricing.originalTotal)}</span>
+              </div>
+              <div className="pro-plan-summary-row">
+                <span>{selectedCount} website{selectedCount === 1 ? '' : 's'} × ₹{fmtMoney(DISCOUNTED_PRICE_PER_WEBSITE_INR)}/year</span>
+                <span className="pro-plan-summary-discounted">₹{fmtMoney(pricing.discountedTotal)}</span>
+              </div>
+              <div className="pro-plan-summary-row">
+                <span>18% GST</span>
+                <span>₹{fmtMoney(pricing.gst)}</span>
+              </div>
+              <div className="pro-plan-summary-row pro-plan-summary-total">
+                <span>Total (per year)</span>
+                <span>₹{fmtMoney(pricing.finalTotal)}</span>
+              </div>
+            </div>
+
+            {error && <p style={{ color: '#ef4444', marginBottom: 12, fontSize: 13 }}>{error}</p>}
+
             <button
-              type="button"
-              className="btn btn-ghost"
-              onClick={addRow}
-              disabled={isPending}
-              style={{ marginBottom: 16, fontSize: 13, padding: '6px 10px' }}
+              className="btn btn-primary pro-plan-cta"
+              onClick={() => void handleCheckout()}
+              disabled={isPending || selectedCount === 0}
             >
-              + Add more website
+              {isPending ? 'Opening…' : `Subscribe — ₹${fmtMoney(pricing.finalTotal)}/year`}
             </button>
-
-            <div className="plans-modal-total">
-              <span>{nonEmptyTargets.length} website{nonEmptyTargets.length === 1 ? '' : 's'} × ₹{PRICE_PER_WEBSITE_INR}/month</span>
-              <span className="plans-modal-total-amount">₹{total}/month</span>
-            </div>
-
-            {error && <p style={{ color: '#ef4444', margin: '12px 0 0', fontSize: 13 }}>{error}</p>}
-
-            <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
-              <button className="btn btn-primary" onClick={() => void handleAddWebsites()} disabled={isPending || nonEmptyTargets.length === 0}>
-                {isPending ? 'Opening…' : 'Continue to Razorpay'}
-              </button>
-              <button className="btn btn-secondary" onClick={closeModal} disabled={isPending}>Cancel</button>
-            </div>
           </div>
         </div>
       )}
 
       {rows.length > 0 && (
-        <div className="plans-list">
+        <div className="plans-list" style={{ marginTop: 24 }}>
+          <div className="plans-header-sub" style={{ marginBottom: 12 }}>Active subscriptions</div>
           {rows.map(row => {
             const status = statusLabel(row.subscription.status)
-            const monthlyTotal = row.subscription.domains.length * PRICE_PER_WEBSITE_INR
+            const perDomainYearly = Math.round(DISCOUNTED_PRICE_PER_WEBSITE_INR * (1 + GST_RATE) * 100) / 100
+            const yearlyTotal = Math.round(row.subscription.domains.length * perDomainYearly * 100) / 100
             return (
               <div key={row.subscription.id} className="plans-list-item">
                 <div className="plans-list-main">
                   <div>
-                    <div className="plans-list-domains">
-                      {row.subscription.domains.map(d => (
-                        <span key={d} className="plans-domain-pill">{d}</span>
-                      ))}
-                    </div>
                     <div className="plans-list-meta">
                       <span className={`plans-badge ${status.className}`}>{status.text}</span>
-                      <span>₹{monthlyTotal}/month</span>
+                      <span>₹{fmtMoney(yearlyTotal)}/year total (incl. GST)</span>
                       <span>
                         {row.subscription.status === 'canceled'
                           ? `Ended ${fmtDate(row.subscription.canceled_at)}`
@@ -279,25 +344,11 @@ export function PlansDashboard({ rows, isGrandfathered }: Props): React.ReactEle
                   </div>
                 </div>
 
-                <div className="plans-monitors-section">
-                  {row.perDomain.map(d => (
-                    <div key={d.domain} className="plans-monitors-row">
-                      <span className="plans-monitors-domain">{d.domain}</span>
-                      <div className="plans-monitor-pills">
-                        {d.monitorTypes.length === 0 ? (
-                          <span className="plans-no-invoice">No monitors added yet</span>
-                        ) : (
-                          d.monitorTypes.map(type => {
-                            const Icon = MONITOR_TYPE_ICONS[type] ?? Globe
-                            return (
-                              <span key={type} className="plans-monitor-pill">
-                                <Icon size={13} strokeWidth={2} />
-                                {monitorTypeLabel(type)}
-                              </span>
-                            )
-                          })
-                        )}
-                      </div>
+                <div className="plans-website-price-list">
+                  {row.subscription.domains.map(d => (
+                    <div key={d} className="plans-website-price-row">
+                      <span className="plans-domain-pill">{d}</span>
+                      <span>₹{fmtMoney(perDomainYearly)}/year</span>
                     </div>
                   ))}
                 </div>
@@ -311,6 +362,9 @@ export function PlansDashboard({ rows, isGrandfathered }: Props): React.ReactEle
                         <span>₹{((inv.amount_gbp ?? 0) / 100).toFixed(2)}</span>
                         <span>{fmtDate(inv.created_at)}</span>
                         <span className={`plans-badge ${inv.status === 'paid' ? 'plans-badge-active' : 'plans-badge-muted'}`}>{inv.status}</span>
+                        <Link href={`/dashboard/billing/invoice/${inv.id}`} className="btn btn-secondary btn-sm">
+                          Generate Invoice
+                        </Link>
                       </div>
                     ))
                   )}

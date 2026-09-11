@@ -63,7 +63,7 @@ export default function UptimeMonitoringAgenciesPage(): React.ReactElement {
           headline: 'Uptime Monitoring for Agencies: Managing 100+ Client Sites',
           description: 'What agencies actually need to monitor hundreds of client websites at scale.',
           author: { '@type': 'Organization', name: 'Upnotify' },
-          publisher: { '@type': 'Organization', name: 'Vision Software Solutions Limited', url: 'https://upnotify-monitoring.vercel.app' },
+          publisher: { '@type': 'Organization', name: 'Crozent Techlabs Private Limited', url: 'https://upnotify-monitoring.vercel.app' },
           datePublished: '2026-03-07',
           dateModified: '2026-03-07',
           url: 'https://upnotify-monitoring.vercel.app/blog/uptime-monitoring-agencies',
