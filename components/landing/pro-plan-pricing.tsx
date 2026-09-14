@@ -30,7 +30,7 @@ export default function ProPlanPricing(): React.ReactElement {
   const finalPricePerWebsite = Math.round(DISCOUNTED_PRICE_PER_WEBSITE_INR * (1 + GST_RATE) * 100) / 100
 
   return (
-    <section className="section" id="pricing">
+    <section className="section home-pricing-section" id="pricing">
       <div className="container">
         <div className="section-header">
           <div className="section-eyebrow">No surprises</div>

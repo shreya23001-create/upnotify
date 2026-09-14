@@ -2,29 +2,27 @@
 
 import Link from 'next/link'
 import { Suspense, useState } from 'react'
-import { Search } from 'lucide-react'
+import { Search, BookOpen, ShieldCheck, Zap, ShoppingCart, Server, AlertTriangle, Building2, Sparkles } from 'lucide-react'
 import type { UnifiedPost } from './page'
-import { BlogCardImage } from '@/components/ui/blog-card-image'
 import { ScrollReveal } from '@/components/landing/scroll-reveal'
 
 const POSTS_PER_PAGE = 12
 
 const FILTER_TABS = ['All posts', 'Guide', 'Security', 'Performance', 'Ecommerce', 'Hosting', 'Incident Report', 'Agency', 'AI Tools']
 
-const BADGE_STYLES: Record<string, { bg: string; color: string; border: string }> = {
-  Guide: { bg: 'rgba(0, 104, 219,0.1)', color: '#0068DB', border: 'rgba(0, 104, 219,0.2)' },
-  WordPress: { bg: 'rgba(59,130,246,0.1)', color: '#3b82f6', border: 'rgba(59,130,246,0.2)' },
-  Security: { bg: 'rgba(239,68,68,0.1)', color: '#ef4444', border: 'rgba(239,68,68,0.2)' },
-  Performance: { bg: 'rgba(16,185,129,0.1)', color: '#10b981', border: 'rgba(16,185,129,0.2)' },
-  Ecommerce: { bg: 'rgba(245,158,11,0.1)', color: '#f59e0b', border: 'rgba(245,158,11,0.2)' },
-  Hosting: { bg: 'rgba(249,115,22,0.1)', color: '#f97316', border: 'rgba(249,115,22,0.2)' },
-  'Incident Report': { bg: 'rgba(239,68,68,0.1)', color: '#ef4444', border: 'rgba(239,68,68,0.2)' },
-  Agency: { bg: 'rgba(6,182,212,0.1)', color: '#06b6d4', border: 'rgba(6,182,212,0.2)' },
-  'AI Tools': { bg: 'rgba(16,185,129,0.1)', color: '#10b981', border: 'rgba(16,185,129,0.2)' },
+const BADGE_STYLES: Record<string, { bg: string; color: string; border: string; grad: string; icon: React.ElementType }> = {
+  Guide: { bg: 'rgba(0, 104, 219,0.1)', color: '#0068DB', border: 'rgba(0, 104, 219,0.2)', grad: 'linear-gradient(135deg,#1392FB,#3b82f6)', icon: BookOpen },
+  Security: { bg: 'rgba(239,68,68,0.1)', color: '#ef4444', border: 'rgba(239,68,68,0.2)', grad: 'linear-gradient(135deg,#dc2626,#b45309)', icon: ShieldCheck },
+  Performance: { bg: 'rgba(16,185,129,0.1)', color: '#10b981', border: 'rgba(16,185,129,0.2)', grad: 'linear-gradient(135deg,#047857,#0e7490)', icon: Zap },
+  Ecommerce: { bg: 'rgba(245,158,11,0.1)', color: '#f59e0b', border: 'rgba(245,158,11,0.2)', grad: 'linear-gradient(135deg,#b45309,#9d174d)', icon: ShoppingCart },
+  Hosting: { bg: 'rgba(16,185,129,0.1)', color: '#10b981', border: 'rgba(16,185,129,0.2)', grad: 'linear-gradient(135deg,#047857,#1d4ed8)', icon: Server },
+  'Incident Report': { bg: 'rgba(239,68,68,0.1)', color: '#ef4444', border: 'rgba(239,68,68,0.2)', grad: 'linear-gradient(135deg,#b91c1c,#7f1d1d)', icon: AlertTriangle },
+  Agency: { bg: 'rgba(6,182,212,0.1)', color: '#06b6d4', border: 'rgba(6,182,212,0.2)', grad: 'linear-gradient(135deg,#1e3a5f,#1d4ed8)', icon: Building2 },
+  'AI Tools': { bg: 'rgba(16,185,129,0.1)', color: '#10b981', border: 'rgba(16,185,129,0.2)', grad: 'linear-gradient(135deg,#0e7490,#1d4ed8)', icon: Sparkles },
 }
 
 function badgeStyle(cat: string) {
-  return BADGE_STYLES[cat] ?? BADGE_STYLES['AI Tools'] ?? { bg: 'rgba(59,130,246,0.1)', color: '#3b82f6', border: 'rgba(59,130,246,0.2)' }
+  return BADGE_STYLES[cat] ?? BADGE_STYLES['AI Tools'] ?? { bg: 'rgba(59,130,246,0.1)', color: '#3b82f6', border: 'rgba(59,130,246,0.2)', grad: 'linear-gradient(135deg,#1d4ed8,#0e7490)', icon: Sparkles }
 }
 
 // Normalise category for matching — handles "ai-tools", "AI Tools", "ai tools" all the same
@@ -52,10 +50,8 @@ function BlogIndexContent({ posts }: { posts: UnifiedPost[] }) {
     return matchesCat && matchesSearch
   })
 
-  const featuredPost = filtered[0]
-  const remainingPosts = filtered.slice(1)
-  const pagePosts = remainingPosts.slice(0, visibleCount)
-  const hasMore = visibleCount < remainingPosts.length
+  const pagePosts = filtered.slice(0, visibleCount)
+  const hasMore = visibleCount < filtered.length
 
   function loadMore() {
     setVisibleCount(c => c + POSTS_PER_PAGE)
@@ -126,52 +122,6 @@ function BlogIndexContent({ posts }: { posts: UnifiedPost[] }) {
 
       <div style={{ maxWidth: 1080, padding: '0 24px', margin: '0 auto' }}>
 
-        {/* Featured post */}
-        {featuredPost && (
-          <div className="blog-featured-wrap reveal">
-            <div className="blog-featured-label">Featured</div>
-            <Link href={`/blog/${featuredPost.slug}`} className="blog-featured-card">
-              <div className="blog-featured-img">
-                <BlogCardImage category={featuredPost.category} title={featuredPost.title} style={{ height: '100%' }} />
-              </div>
-              <div className="blog-featured-body">
-                <div className="blog-featured-meta">
-                  <span
-                    className="blog-cat-badge"
-                    style={{
-                      background: badgeStyle(featuredPost.category).bg,
-                      color: badgeStyle(featuredPost.category).color,
-                      border: `1px solid ${badgeStyle(featuredPost.category).border}`,
-                    }}
-                  >
-                    {featuredPost.category}
-                  </span>
-                  <span className="blog-card-readtime">{featuredPost.readTime}</span>
-                  <span className="blog-meta-sep">·</span>
-                  <span className="blog-card-date">{featuredPost.displayDate}</span>
-                </div>
-                <div className="blog-featured-title">{featuredPost.title}</div>
-                <div className="blog-featured-excerpt">{featuredPost.excerpt}</div>
-                <div className="blog-featured-footer">
-                  <div className="blog-author">
-                    <div className="blog-author-avatar" style={{ background: 'linear-gradient(135deg,#3b82f6,#06b6d4)' }}>U</div>
-                    <div>
-                      <div className="blog-author-name">Upnotify Team</div>
-                      <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{featuredPost.displayDate}</div>
-                    </div>
-                  </div>
-                  <span className="blog-card-link">
-                    Read article
-                    <svg className="blog-card-arrow" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-                    </svg>
-                  </span>
-                </div>
-              </div>
-            </Link>
-          </div>
-        )}
-
         {/* Filter row */}
         <div className="blog-filter-row">
           <div className="blog-filter-tabs">
@@ -208,19 +158,25 @@ function BlogIndexContent({ posts }: { posts: UnifiedPost[] }) {
               <div className="blog-posts-grid reveal-stagger">
                 {pagePosts.map(post => {
                   const bs = badgeStyle(post.category)
+                  const Icon = bs.icon
                   return (
-                    <Link key={post.slug} href={`/blog/${post.slug}`} className="blog-card">
-                      <div className="blog-card-image">
-                        <BlogCardImage category={post.category} title={post.title} style={{ height: '100%' }} />
-                      </div>
+                    <Link
+                      key={post.slug}
+                      href={`/blog/${post.slug}`}
+                      className="blog-card"
+                      style={{ '--blog-card-accent': bs.grad } as React.CSSProperties}
+                    >
                       <div className="blog-card-body">
-                        <div className="blog-card-meta">
-                          <span className="blog-cat-badge" style={{ background: bs.bg, color: bs.color, border: `1px solid ${bs.border}` }}>
-                            {post.category}
-                          </span>
-                          <span className="blog-card-readtime">{post.readTime}</span>
-                          <span className="blog-meta-sep">·</span>
-                          <span className="blog-card-date">{post.displayDate}</span>
+                        <div className="blog-card-top">
+                          <div className="blog-card-icon"><Icon size={18} strokeWidth={2} /></div>
+                          <div className="blog-card-meta">
+                            <span className="blog-cat-badge" style={{ background: bs.bg, color: bs.color, border: `1px solid ${bs.border}` }}>
+                              {post.category}
+                            </span>
+                            <span className="blog-card-readtime">{post.readTime}</span>
+                            <span className="blog-meta-sep">·</span>
+                            <span className="blog-card-date">{post.displayDate}</span>
+                          </div>
                         </div>
                         <div className="blog-card-title">{post.title}</div>
                         <div className="blog-card-excerpt">{post.excerpt}</div>
@@ -232,7 +188,6 @@ function BlogIndexContent({ posts }: { posts: UnifiedPost[] }) {
                             <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
                           </svg>
                         </span>
-                        <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>upnotify.io/blog</span>
                       </div>
                     </Link>
                   )

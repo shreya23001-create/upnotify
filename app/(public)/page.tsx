@@ -1,7 +1,7 @@
 import './landing.css'
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { Zap, Info, Check, Bot, Search, Newspaper, Lightbulb, Tag, Users, Coins, FileBarChart, BarChart3 } from 'lucide-react'
+import { Zap, Info, Check, Bot, Search, Newspaper, Lightbulb, Tag, Users, Coins, FileBarChart, BarChart3, Sparkles } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { BlogPreview } from '@/components/landing/blog-preview'
 import ProPlanPricing from '@/components/landing/pro-plan-pricing'
@@ -447,42 +447,44 @@ export default async function LandingPage(): Promise<React.ReactElement> {
                 </div>
                 <div>
                   <div className="ai-report-card">
-                    <div className="ai-report-header">
-                      <div className="ai-report-title">Monthly Performance Report — Acme Agency</div>
+                    <div className="ai-report-chrome">
+                      <div className="ai-report-chrome-dots">
+                        <span /><span /><span />
+                      </div>
                       <div className="ai-report-badge">
-                        <span className="ai-powered-dot" />
+                        <Sparkles size={11} strokeWidth={2.5} />
                         AI Generated
                       </div>
                     </div>
-                    <div className="ai-report-meta">
-                      <span>March 2026</span><span>·</span><span>24 monitors</span><span>·</span><span>AI Generated</span>
-                    </div>
-                    <div className="ai-report-section">
-                      <div className="ai-report-section-label">Executive Summary</div>
-                      <div className="ai-report-line long" /><div className="ai-report-line med" />
-                      <div className="ai-report-line long" /><div className="ai-report-line short" />
-                    </div>
-                    <div className="ai-stat-row">
-                      <div className="ai-stat-box green"><div className="val">99.94%</div><div className="lbl">Avg Uptime</div></div>
-                      <div className="ai-stat-box red"><div className="val">3</div><div className="lbl">Incidents</div></div>
-                      <div className="ai-stat-box blue"><div className="val">142ms</div><div className="lbl">Avg Response</div></div>
-                    </div>
-                    <div className="ai-report-insight">
-                      <div className="ai-insight-icon"><Lightbulb size={16} strokeWidth={2} /></div>
-                      <div className="ai-insight-text">
-                        <strong>AI Insight:</strong> checkout.shop.io has experienced 3 slowdowns on Tuesday mornings between 09:00–10:00 UTC. This pattern suggests a scheduled job or traffic spike. Recommend investigating backend cron tasks.
+
+                    <div className="ai-report-body">
+                      <div className="ai-report-title">Monthly Performance Report</div>
+                      <div className="ai-report-meta">Acme Agency · March 2026 · 24 monitors</div>
+
+                      <div className="ai-stat-row">
+                        <div className="ai-stat-box green"><div className="val">99.94%</div><div className="lbl">Avg Uptime</div></div>
+                        <div className="ai-stat-box red"><div className="val">3</div><div className="lbl">Incidents</div></div>
+                        <div className="ai-stat-box blue"><div className="val">142ms</div><div className="lbl">Avg Response</div></div>
                       </div>
-                    </div>
-                    <div className="ai-report-section" style={{ marginTop: 'var(--space-4)' }}>
+
+                      <div className="ai-report-insight">
+                        <div className="ai-insight-icon"><Lightbulb size={16} strokeWidth={2} /></div>
+                        <div className="ai-insight-text">
+                          <strong>AI Insight —</strong> checkout.shop.io has experienced 3 slowdowns on Tuesday mornings between 09:00–10:00 UTC. This pattern suggests a scheduled job or traffic spike. Recommend investigating backend cron tasks.
+                        </div>
+                      </div>
+
                       <div className="ai-report-section-label">Recommendations</div>
-                      <div className="ai-report-line long" /><div className="ai-report-line med" /><div className="ai-report-line xs" />
-                    </div>
-                    <div className="ai-report-cta">
-                      <button className="btn-ai-primary">Download PDF Report</button>
-                      <button className="btn-ai-ghost">Share</button>
-                    </div>
-                    <div className="ai-powered-by">
-                      <span className="ai-powered-dot" />Upnotify AI Reports
+                      <ul className="ai-report-reco-list">
+                        <li>Move the Tuesday cron job outside peak checkout hours</li>
+                        <li>Add a dedicated monitor for the payment webhook endpoint</li>
+                        <li>Review CDN cache rules for <em>cdn.assets.io</em></li>
+                      </ul>
+
+                      <div className="ai-report-cta">
+                        <button className="btn-ai-primary">Download PDF Report</button>
+                        <button className="btn-ai-ghost">Share</button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -550,11 +552,31 @@ export default async function LandingPage(): Promise<React.ReactElement> {
             <div className="container">
               <div className="agency-card">
                 <div className="agency-text">
-                  <div style={{ marginBottom: 'var(--space-3)' }}>
-                    <span className="agency-coming-badge">{agency?.badge ?? 'Coming Soon · Join Waitlist'}</span>
-                  </div>
+                  <span className="agency-coming-badge">{agency?.badge ?? 'Coming Soon · Join Waitlist'}</span>
                   <h2>{agency?.headline ?? 'Monitor hundreds of client sites under your brand'}</h2>
                   <p>{agency?.description ?? 'The Agency tier gives you full white-label, multi-tenant workspaces, revenue sharing, custom analytics, and AI reports branded with your agency name. Built for agencies managing dozens of clients.'}</p>
+                </div>
+
+                <div className="agency-right">
+                  <div className="agency-clients-mock" aria-hidden="true">
+                    <div className="agency-clients-mock-hdr">
+                      <span className="agency-clients-mock-brand">Your Agency</span>
+                      <span className="agency-clients-mock-live">● Live</span>
+                    </div>
+                    {[
+                      { name: 'clientco.com', pct: '99.98%', status: 'up' as const },
+                      { name: 'shopfront.io', pct: '99.91%', status: 'up' as const },
+                      { name: 'checkout.acme.dev', pct: '97.4%', status: 'warn' as const },
+                    ].map(c => (
+                      <div key={c.name} className="agency-clients-mock-row">
+                        <span className={`agency-clients-mock-dot ${c.status}`} />
+                        <span className="agency-clients-mock-name">{c.name}</span>
+                        <span className="agency-clients-mock-pct">{c.pct}</span>
+                      </div>
+                    ))}
+                    <div className="agency-clients-mock-footer">+ 47 more client sites</div>
+                  </div>
+
                   <div className="agency-badges">
                     {(agency?.badges ?? ['Full white-label', 'Multi-tenant workspaces', 'Revenue sharing', 'Branded AI reports', 'Custom analytics']).map((badge, i) => {
                       const BadgeIcon = AGENCY_BADGE_ICONS[i % AGENCY_BADGE_ICONS.length]
@@ -566,11 +588,12 @@ export default async function LandingPage(): Promise<React.ReactElement> {
                       )
                     })}
                   </div>
-                </div>
-                <div style={{ flexShrink: 0 }}>
-                  <AgencyWaitlistCta />
-                  <div style={{ fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,0.4)', marginTop: 'var(--space-3)', textAlign: 'center' }}>
-                    {agency?.cta_note ?? 'No commitment · Early access pricing'}
+
+                  <div className="agency-cta-row">
+                    <AgencyWaitlistCta />
+                    <span className="agency-cta-note">
+                      {agency?.cta_note ?? 'No commitment · Early access pricing'}
+                    </span>
                   </div>
                 </div>
               </div>

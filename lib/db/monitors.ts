@@ -76,20 +76,27 @@ export async function getDueMonitors(): Promise<Monitor[]> {
   return data ?? []
 }
 
-export async function getMonitorsByOrgId(orgId: string): Promise<Pick<Monitor, 'id' | 'name' | 'target'>[]> {
+export interface MonitorOrgSummary {
+  id: string
+  name: string
+  target: string
+  target_domain: string | null
+}
+
+export async function getMonitorsByOrgId(orgId: string): Promise<MonitorOrgSummary[]> {
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('monitors')
-    .select('id, name, target')
+    .select('id, name, target, target_domain')
     .eq('org_id', orgId)
     .eq('is_paused', false)
-    .order('name', { ascending: true })
+    .order('name', { ascending: true }) as { data: MonitorOrgSummary[] | null; error: { message: string } | null }
 
   if (error) {
     logger.error('Failed to get monitors by org', { error: error.message })
     return []
   }
-  return (data ?? []) as Pick<Monitor, 'id' | 'name' | 'target'>[]
+  return data ?? []
 }
 
 export interface DomainMonitorSummary {

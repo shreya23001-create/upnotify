@@ -1,5 +1,9 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import {
+  Rocket, Radio, FileText, Bell, Globe, CreditCard, AlertTriangle, Sparkles, Wrench,
+  type LucideIcon,
+} from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'Help Centre — Upnotify',
@@ -21,7 +25,7 @@ interface HelpTopic {
   href: string
   title: string
   description: string
-  icon: string
+  icon: LucideIcon
 }
 
 // Mirrors the in-app topic list in app/(dashboard)/dashboard/help/help-sidebar.tsx
@@ -34,55 +38,55 @@ const PUBLIC_HELP_TOPICS: HelpTopic[] = [
     href: '/dashboard/help/getting-started',
     title: 'Getting Started',
     description: 'Create your first monitor, understand your dashboard, and set up alerts in minutes.',
-    icon: '🚀',
+    icon: Rocket,
   },
   {
     href: '/dashboard/help/monitors',
     title: 'Understanding Monitors',
     description: 'All 24 monitor types — HTTP, SSL, DNS, ping, keyword, API, heartbeat and more.',
-    icon: '📡',
+    icon: Radio,
   },
   {
     href: '/dashboard/help/wordpress',
     title: 'WordPress Plugin',
     description: 'Free plugin that watches your WordPress site from the inside — file injections, rogue users, security audits.',
-    icon: '📝',
+    icon: FileText,
   },
   {
     href: '/dashboard/help/alerts',
     title: 'Setting Up Alerts',
     description: 'Get notified by email, Slack, Teams, or webhook when something goes wrong.',
-    icon: '🔔',
+    icon: Bell,
   },
   {
     href: '/dashboard/help/status-pages',
     title: 'Public Status Pages',
     description: 'A branded page that shows your customers whether your services are up.',
-    icon: '🌐',
+    icon: Globe,
   },
   {
     href: '/dashboard/help/billing',
     title: 'Plans & Billing',
     description: 'Understand plans, upgrade or downgrade, and manage your subscription.',
-    icon: '💳',
+    icon: CreditCard,
   },
   {
     href: '/dashboard/help/incidents',
     title: 'Incidents',
     description: 'Manage outage lifecycle from detection to resolution.',
-    icon: '🚨',
+    icon: AlertTriangle,
   },
   {
     href: '/dashboard/help/ai-visibility',
     title: 'AI Visibility',
     description: 'Generate your llms.txt, track AI citations, improve presence on ChatGPT, Perplexity, Claude, Gemini.',
-    icon: '✨',
+    icon: Sparkles,
   },
   {
     href: '/dashboard/help/tools',
     title: 'Free Tools',
     description: 'SSL Checker, Uptime Calculator, Upnotify Score — free, no signup needed.',
-    icon: '🧰',
+    icon: Wrench,
   },
 ]
 
@@ -102,18 +106,21 @@ export default function PublicHelpPage(): React.ReactElement {
       <section className="landing-section">
         <div className="landing-container">
           <div className="help-topics-grid">
-            {PUBLIC_HELP_TOPICS.map((topic) => (
-              <Link key={topic.href} href={topic.href} className="card help-topic-card">
-                <div className="help-topic-icon-wrap">{topic.icon}</div>
-                <h2 className="help-topic-title">{topic.title}</h2>
-                <p className="help-topic-desc">{topic.description}</p>
-                <span className="help-topic-arrow">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
-                  </svg>
-                </span>
-              </Link>
-            ))}
+            {PUBLIC_HELP_TOPICS.map((topic) => {
+              const Icon = topic.icon
+              return (
+                <Link key={topic.href} href={topic.href} className="card help-topic-card">
+                  <div className="help-topic-icon-wrap"><Icon size={22} strokeWidth={2} /></div>
+                  <h2 className="help-topic-title">{topic.title}</h2>
+                  <p className="help-topic-desc">{topic.description}</p>
+                  <span className="help-topic-arrow">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
+                    </svg>
+                  </span>
+                </Link>
+              )
+            })}
           </div>
 
           <div style={{ textAlign: 'center', marginTop: 48 }}>

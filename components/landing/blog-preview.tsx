@@ -120,26 +120,20 @@ export async function BlogPreview(): Promise<React.ReactElement> {
                 key={post.slug}
                 href={`/blog/${post.slug}`}
                 className="blog-card"
+                style={{ '--blog-accent': bs.grad } as React.CSSProperties}
               >
-                {/* Gradient hero image */}
-                <div className="blog-card-image" style={{ background: bs.grad }}>
-                  {/* mesh overlay */}
-                  <div className="blog-card-image-mesh" />
-                  {/* single centered icon, subtle */}
-                  <div className="blog-card-icon">{getCategoryIcons(post.category)[0]}</div>
-                  {/* shine sweep on hover */}
-                  <div className="blog-card-image-shine" />
-                </div>
-
                 <div className="blog-card-body">
-                  <div className="blog-card-meta">
-                    <span className="blog-cat-badge" style={{ background: bs.bg, color: bs.color, border: `1px solid ${bs.border}` }}>
-                      {post.category}
-                    </span>
-                    <span className="blog-meta-sep">·</span>
-                    <span className="blog-card-readtime">{post.readTime}</span>
-                    <span className="blog-meta-sep">·</span>
-                    <span className="blog-card-date">{formatDate(post.date)}</span>
+                  <div className="blog-card-top">
+                    <div className="blog-card-icon">{getCategoryIcons(post.category)[0]}</div>
+                    <div className="blog-card-meta">
+                      <span className="blog-cat-badge" style={{ background: bs.bg, color: bs.color, border: `1px solid ${bs.border}` }}>
+                        {post.category}
+                      </span>
+                      <span className="blog-meta-sep">·</span>
+                      <span className="blog-card-readtime">{post.readTime}</span>
+                      <span className="blog-meta-sep">·</span>
+                      <span className="blog-card-date">{formatDate(post.date)}</span>
+                    </div>
                   </div>
                   <div className="blog-card-title">{post.title}</div>
                   <div className="blog-card-excerpt">{post.excerpt}</div>
@@ -150,7 +144,6 @@ export async function BlogPreview(): Promise<React.ReactElement> {
                     Read article
                     <ArrowRight className="blog-card-arrow" size={13} strokeWidth={2.5} />
                   </span>
-                  <span className="blog-card-domain">upnotify.io/blog</span>
                 </div>
               </Link>
             )

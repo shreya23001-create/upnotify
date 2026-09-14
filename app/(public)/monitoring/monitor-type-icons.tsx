@@ -49,9 +49,9 @@ export function MonitorIconGradientDefs() {
   )
 }
 
-export function MonitorTypeIcon({ type, size = 20, strokeWidth = 2 }: { type: string; size?: number; strokeWidth?: number }) {
+export function MonitorTypeIcon({ type, size = 20, strokeWidth = 2, white = false }: { type: string; size?: number; strokeWidth?: number; white?: boolean }) {
   const Icon = MONITOR_TYPE_ICONS[type] ?? Globe
-  return <Icon size={size} strokeWidth={strokeWidth} stroke={`url(#${GRADIENT_ID})`} />
+  return <Icon size={size} strokeWidth={strokeWidth} stroke={white ? 'currentColor' : `url(#${GRADIENT_ID})`} />
 }
 
 const MONITOR_SLUG_ICONS: Record<string, LucideIcon> = {

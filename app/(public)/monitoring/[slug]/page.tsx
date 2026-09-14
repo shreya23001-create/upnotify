@@ -479,7 +479,7 @@ export default async function MonitoringTypePage({ params }: { params: Promise<{
   const relatedTool = RELATED_TOOL[page.slug]
 
   return (
-    <div className="monitoring-orange-cta">
+    <div>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

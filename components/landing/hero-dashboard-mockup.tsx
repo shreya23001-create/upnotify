@@ -1,6 +1,6 @@
 'use client'
 
-import { Fragment, useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 
 /* ─── Types ─────────────────────────────────────────────────────────────── */
 type Phase = 'normal' | 'degrading' | 'down' | 'recovering'
@@ -59,54 +59,20 @@ const PHASE_DATA: Record<Phase, PhaseState> = {
   },
 }
 
-// Fixed heights — avoids hydration mismatch from Math.random()
-const BARS_GOOD = [10, 14, 8, 16, 12, 15, 9, 13, 11, 16, 14, 10, 15, 12, 8, 14, 13, 11, 16, 9]
-const BARS_BAD  = [10, 14, 8, 16, 12, 15, 9, 13, 11, 16, 14, 10, 15, 12, 8, 7, 4, 2, 1, 0]
-
-const CHECKOUT_SPARK = [24, 25, 23, 26, 0, 0, 16]
-
-const AIV_ENGINES = [
-  { id: 'chatgpt',    name: 'ChatGPT',       color: '#10a37f', letter: 'G', score: 82, cited: true  },
-  { id: 'perplexity', name: 'Perplexity',    color: '#20b2aa', letter: 'P', score: 71, cited: true  },
-  { id: 'claude',     name: 'Claude',        color: '#c97046', letter: 'C', score: 24, cited: false },
-  { id: 'gemini',     name: 'Google Gemini', color: '#4285f4', letter: 'G', score: 68, cited: true  },
+const RECENT_INCIDENTS = [
+  { title: 'Domain registration expiring soon', severity: 'P2', status: 'Open', time: '1d ago' },
+  { title: 'Domain or IP is on a blacklist', severity: 'P2', status: 'Open', time: '1d ago' },
+  { title: 'XML sitemap is invalid or unreachable', severity: 'P3', status: 'Open', time: '1d ago' },
 ]
-const AIV_TOTAL = Math.round(AIV_ENGINES.reduce((s, e) => s + e.score, 0) / AIV_ENGINES.length)
-const AIV_CIRC  = 2 * Math.PI * 44 // r=44
+
+const DOMAINS = [
+  { domain: 'checkout.shop.io', monitors: 24, status: 'down' as const },
+  { domain: 'api.acmecorp.com', monitors: 24, status: 'up' as const },
+  { domain: 'cdn.assets.io', monitors: 24, status: 'degraded' as const },
+  { domain: 'blog.example.com', monitors: 24, status: 'up' as const },
+]
 
 /* ─── Sub-components ────────────────────────────────────────────────────── */
-function StatusBadge({ status }: { status: MonitorStatus | string }): React.ReactElement {
-  const map: Record<string, { cls: string; dot: string; label: string; pulse?: boolean }> = {
-    up:         { cls: 'badge-up',   dot: 'var(--color-up)',   label: 'Up' },
-    down:       { cls: 'badge-down', dot: 'var(--color-down)', label: 'Down',       pulse: true },
-    slow:       { cls: 'badge-warn', dot: 'var(--color-warn)', label: 'Slow' },
-    recovering: { cls: 'badge-warn', dot: 'var(--color-warn)', label: 'Recovering', pulse: true },
-  }
-  const m = map[status] ?? map.up
-  return (
-    <span className={`badge ${m.cls}`} style={{ fontSize: '9px', padding: '2px 7px' }}>
-      <span style={{
-        width: '5px', height: '5px', background: m.dot, borderRadius: '50%',
-        display: 'inline-block', animation: m.pulse ? 'pulse 1s infinite' : undefined,
-      }} />{' '}{m.label}
-    </span>
-  )
-}
-
-function UptimeBars({ bad }: { bad: boolean }): React.ReactElement {
-  const bars = bad ? BARS_BAD : BARS_GOOD
-  return (
-    <div className="mm-uptime-bars">
-      {bars.map((h, i) => {
-        let bg = 'var(--color-up)'
-        if (bad && i >= 17) bg = 'var(--color-down)'
-        else if (bad && i >= 15) bg = 'var(--color-warn)'
-        return <div key={i} className="mm-uptick" style={{ height: `${h}px`, background: bg }} />
-      })}
-    </div>
-  )
-}
-
 /* ─── Notification card ─────────────────────────────────────────────────── */
 interface NotifCardProps {
   visible: boolean
@@ -135,7 +101,6 @@ function NotifCard({ visible, icon, iconBg, source, title, titleColor, body, isR
 /* ─── Main export ────────────────────────────────────────────────────────── */
 export function HeroDashboardMockup(): React.ReactElement {
   const [phase, setPhase]               = useState<Phase>('normal')
-  const [expandedRow, setExpandedRow]   = useState<string | null>(null)
   const [showModal, setShowModal]       = useState(false)
   const [activeFilter, setActiveFilter] = useState<string | null>(null)
   const [userMonitors, setUserMonitors] = useState<UserMonitor[]>([])
@@ -145,14 +110,7 @@ export function HeroDashboardMockup(): React.ReactElement {
   // Notification cards
   const [notif, setNotif] = useState<NotifState>({ email: false, slack: false, telegram: false, recover: false })
 
-  // AI Visibility
-  const [aivOpen, setAivOpen]         = useState(false)
-  const [pulseAiv, setPulseAiv]       = useState(false)
-  const [aivRevealed, setAivRevealed] = useState<Record<string, boolean>>({})
-  const [aivScore, setAivScore]       = useState(0)
-
   const timerRef    = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const aivOpenRef  = useRef(false)
   const notifTimers = useRef<ReturnType<typeof setTimeout>[]>([])
 
   function clearNotifTimers(): void {
@@ -163,7 +121,6 @@ export function HeroDashboardMockup(): React.ReactElement {
   /* ── Auto-animation cycle ───────────────────────────────────────────── */
   const schedule = useCallback((current: Phase): void => {
     timerRef.current = setTimeout(() => {
-      if (aivOpenRef.current) return // paused while AIV is open
       const idx = PHASE_ORDER.indexOf(current)
       const next = PHASE_ORDER[(idx + 1) % PHASE_ORDER.length]
       setPhase(next)
@@ -177,16 +134,9 @@ export function HeroDashboardMockup(): React.ReactElement {
         notifTimers.current.push(setTimeout(() => setNotif(n => ({ ...n, telegram: true })), 1400))
       } else if (next === 'recovering') {
         setNotif({ email: false, slack: false, telegram: false, recover: true })
-        // Pulse AI Visibility after recovery settles
-        notifTimers.current.push(setTimeout(() => {
-          if (!aivOpenRef.current) setPulseAiv(true)
-        }, 1600))
         notifTimers.current.push(setTimeout(() => {
           setNotif(n => ({ ...n, recover: false }))
         }, 2800))
-        notifTimers.current.push(setTimeout(() => {
-          if (!aivOpenRef.current) setPulseAiv(false)
-        }, 5500))
       } else {
         setNotif({ email: false, slack: false, telegram: false, recover: false })
       }
@@ -203,55 +153,9 @@ export function HeroDashboardMockup(): React.ReactElement {
     }
   }, [schedule])
 
-  /* ── AI Visibility open / close ─────────────────────────────────────── */
-  function openAiv(): void {
-    aivOpenRef.current = true
-    setAivOpen(true)
-    if (timerRef.current) clearTimeout(timerRef.current)
-    clearNotifTimers()
-    setNotif({ email: false, slack: false, telegram: false, recover: false })
-    setPulseAiv(false)
-    setAivRevealed({})
-    setAivScore(0)
-
-    // Reveal engines in sequence
-    AIV_ENGINES.forEach((e, i) => {
-      notifTimers.current.push(setTimeout(() => {
-        setAivRevealed(r => ({ ...r, [e.id]: true }))
-        if (i === AIV_ENGINES.length - 1) {
-          // Animate score dial after last engine
-          notifTimers.current.push(setTimeout(() => {
-            const dur = 900
-            const startTs = Date.now()
-            const tick = (): void => {
-              const t = Math.min((Date.now() - startTs) / dur, 1)
-              setAivScore(Math.round(AIV_TOTAL * t))
-              if (t < 1) requestAnimationFrame(tick)
-            }
-            requestAnimationFrame(tick)
-          }, 200))
-        }
-      }, 400 + i * 500))
-    })
-  }
-
-  function closeAiv(): void {
-    aivOpenRef.current = false
-    setAivOpen(false)
-    setAivRevealed({})
-    setAivScore(0)
-    clearNotifTimers()
-    setPhase('normal')
-    schedule('normal')
-  }
-
   /* ── Add monitor modal ──────────────────────────────────────────────── */
   const pd    = PHASE_DATA[phase]
   const total = 24 + userMonitors.length
-
-  function toggleRow(id: string): void {
-    setExpandedRow(r => r === id ? null : id)
-  }
 
   function handleSave(): void {
     if (!form.name.trim() || !form.url.trim()) return
@@ -268,9 +172,6 @@ export function HeroDashboardMockup(): React.ReactElement {
   function statClass(f: string): string {
     return activeFilter === f ? ' hm-stat-active' : ''
   }
-
-  /* ── Computed AIV ring fill ─────────────────────────────────────────── */
-  const aivFilled = (aivScore / 100) * AIV_CIRC
 
   /* ── Render ─────────────────────────────────────────────────────────── */
   return (
@@ -415,106 +316,12 @@ export function HeroDashboardMockup(): React.ReactElement {
             </div>
           )}
 
-          {/* ── AI Visibility panel (overlay) ────────────────────────── */}
-          {aivOpen && (
-            <div className="hm-aiv-panel">
-              {/* Panel header */}
-              <div className="hm-aiv-hdr">
-                <div className="hm-aiv-hdr-left">
-                  <div className="hm-aiv-hdr-icon">
-                    <svg width="11" height="11" fill="none" stroke="white" strokeWidth="2" viewBox="0 0 24 24">
-                      <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
-                    </svg>
-                  </div>
-                  <span className="hm-aiv-hdr-title">AI Visibility</span>
-                  <span className="hm-aiv-badge">NEW</span>
-                </div>
-                <button className="hm-aiv-back" onClick={closeAiv}>
-                  <svg width="9" height="9" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-                  Dashboard
-                </button>
-              </div>
-
-              {/* Panel body */}
-              <div className="hm-aiv-body">
-                {/* Score ring */}
-                <div className="hm-aiv-score-col">
-                  <svg width="104" height="104" viewBox="0 0 104 104">
-                    <circle cx="52" cy="52" r="44" fill="none" stroke="#f1f5f9" strokeWidth="10"/>
-                    <circle
-                      cx="52" cy="52" r="44"
-                      fill="none" strokeWidth="10"
-                      stroke="url(#aivG)"
-                      strokeLinecap="round"
-                      strokeDasharray={`${aivFilled} ${AIV_CIRC}`}
-                      transform="rotate(-90 52 52)"
-                      style={{ transition: 'stroke-dasharray 0.1s linear' }}
-                    />
-                    <defs>
-                      <linearGradient id="aivG" x1="0" y1="0" x2="1" y2="0">
-                        <stop offset="0%" stopColor="#1392FB"/>
-                        <stop offset="100%" stopColor="#0068DB"/>
-                      </linearGradient>
-                    </defs>
-                    <text x="52" y="48" textAnchor="middle" fontSize="22" fontWeight="800" fill="#0f172a">{aivScore}</text>
-                    <text x="52" y="62" textAnchor="middle" fontSize="9" fill="#64748b">/100</text>
-                    <text x="52" y="75" textAnchor="middle" fontSize="8" fill="#64748b">
-                      {aivScore >= 60 ? 'Good visibility' : aivScore > 0 ? 'Moderate' : 'Scanning…'}
-                    </text>
-                  </svg>
-                  <div className="hm-aiv-score-label">
-                    AI Visibility Score<br/>
-                    <strong>mywebsite.com</strong>
-                  </div>
-                  <button className="hm-aiv-back-btn" onClick={closeAiv}>
-                    <svg width="9" height="9" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-                    Back
-                  </button>
-                </div>
-
-                {/* Engine list */}
-                <div className="hm-aiv-engines">
-                  <div className="hm-aiv-engines-label">AI Engine Citations</div>
-                  {AIV_ENGINES.map(e => {
-                    const revealed = aivRevealed[e.id]
-                    return (
-                      <div key={e.id} className="hm-aiv-engine-row">
-                        <div className="hm-aiv-engine-logo" style={{ background: e.color }}>{e.letter}</div>
-                        <div className="hm-aiv-engine-name">{e.name}</div>
-                        <div className="hm-aiv-engine-bar-wrap">
-                          <div className="hm-aiv-engine-bar" style={{ width: revealed ? `${e.score}%` : '0%' }} />
-                        </div>
-                        <div className={`hm-aiv-engine-status${revealed ? (e.cited ? ' cited' : ' notcited') : ''}`}>
-                          {revealed ? (e.cited ? 'Cited ✓' : 'Not cited') : '—'}
-                        </div>
-                      </div>
-                    )
-                  })}
-
-                  {/* CTA */}
-                  <div className="hm-aiv-cta">
-                    <div className="hm-aiv-cta-title">📄 No llms.txt detected</div>
-                    <div className="hm-aiv-cta-body">AI engines can&apos;t read your site structure. Generate your llms.txt to boost citation rate.</div>
-                    <div className="hm-aiv-cta-btn">
-                      <svg width="9" height="9" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                      Generate llms.txt →
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
           {/* ── Sidebar ──────────────────────────────────────────────── */}
           <div className="mockup-sidebar">
             <div className="ms-top">
               <div className="ms-logo">
-                <div className="ms-logo-icon">
-                  <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="white" strokeWidth="2.5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                  </svg>
-                </div>
-                <span className="ms-label">Upnotify</span>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/Logo_2.png" alt="Upnotify" height={22} style={{ height: 22, width: 'auto' }} />
               </div>
               <div className="ms-org-btn">
                 <div>
@@ -525,8 +332,8 @@ export function HeroDashboardMockup(): React.ReactElement {
               </div>
             </div>
             <div className="ms-nav">
-              <div className="ms-section">Monitoring</div>
-              <div className={`ms-item${!aivOpen ? ' active' : ''}`}>
+              <div className="ms-section">Main</div>
+              <div className="ms-item active">
                 <div className="ms-item-left">
                   <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /></svg>
                   <span className="ms-label">Dashboard</span>
@@ -542,7 +349,7 @@ export function HeroDashboardMockup(): React.ReactElement {
               <div className="ms-item">
                 <div className="ms-item-left">
                   <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
-                  <span className="ms-label">Alerts</span>
+                  <span className="ms-label">Alert Channels</span>
                 </div>
               </div>
               <div className="ms-item">
@@ -552,7 +359,12 @@ export function HeroDashboardMockup(): React.ReactElement {
                 </div>
                 {pd.stats.down > 0 && <span className="ms-badge">{pd.stats.down}</span>}
               </div>
-              <div className="ms-section">Reporting</div>
+              <div className="ms-item">
+                <div className="ms-item-left">
+                  <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064" /></svg>
+                  <span className="ms-label">Status Pages</span>
+                </div>
+              </div>
               <div className="ms-item">
                 <div className="ms-item-left">
                   <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
@@ -561,11 +373,16 @@ export function HeroDashboardMockup(): React.ReactElement {
               </div>
               <div className="ms-item">
                 <div className="ms-item-left">
-                  <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064" /></svg>
-                  <span className="ms-label">Status Pages</span>
+                  <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                    <path d="M5 10 C5 5 19 5 19 10 L19 15 C19 19 5 19 5 15 Z" />
+                    <path d="M5 10 C4 7 2 6 3 4 C4 3 6 5 7 7" />
+                    <path d="M19 10 C20 7 22 6 21 4 C20 3 18 5 17 7" />
+                    <circle cx="9" cy="11" r="1" fill="currentColor" stroke="none" />
+                    <circle cx="15" cy="11" r="1" fill="currentColor" stroke="none" />
+                  </svg>
+                  <span className="ms-label">Competitor</span>
                 </div>
               </div>
-              <div className="ms-section">Billing</div>
               <div className="ms-item">
                 <div className="ms-item-left">
                   <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
@@ -578,47 +395,35 @@ export function HeroDashboardMockup(): React.ReactElement {
                   <span className="ms-label">Plans</span>
                 </div>
               </div>
-              <div className="ms-section">Intelligence</div>
-              <div className="ms-item">
-                <div className="ms-item-left">
-                  <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-                    <path d="M5 10 C5 5 19 5 19 10 L19 15 C19 19 5 19 5 15 Z" />
-                    <path d="M5 10 C4 7 2 6 3 4 C4 3 6 5 7 7" />
-                    <path d="M19 10 C20 7 22 6 21 4 C20 3 18 5 17 7" />
-                    <circle cx="9" cy="11" r="1" fill="currentColor" stroke="none" />
-                    <circle cx="15" cy="11" r="1" fill="currentColor" stroke="none" />
-                  </svg>
-                  <span className="ms-label">Watchdog</span>
-                </div>
-              </div>
-              <div className="ms-item">
-                <div className="ms-item-left">
-                  <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
-                  <span className="ms-label">Compete</span>
-                </div>
-              </div>
 
-              {/* AI Visibility — clickable, pulses after recovery */}
-              <div
-                className={`ms-item hm-aiv-nav-item${aivOpen ? ' active' : ''}${pulseAiv ? ' hm-aiv-pulse' : ''}`}
-                onClick={openAiv}
-                title="Try AI Visibility"
-              >
+              <div className="ms-divider" />
+              <div className="ms-section">Support</div>
+              <div className="ms-item">
                 <div className="ms-item-left">
-                  <svg width="13" height="13" fill="none" stroke={aivOpen ? 'currentColor' : '#1392FB'} strokeWidth="2" viewBox="0 0 24 24">
-                    <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
-                  </svg>
-                  <span className="ms-label" style={{ color: aivOpen ? undefined : '#1392FB', fontWeight: 700 }}>AI Visibility</span>
+                  <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                  <span className="ms-label">Support</span>
                 </div>
-                <span className="hm-aiv-new-badge">NEW</span>
-                {pulseAiv && <span className="hm-aiv-hint">← Try it</span>}
+              </div>
+              <div className="ms-item">
+                <div className="ms-item-left">
+                  <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" /><path strokeLinecap="round" strokeLinejoin="round" d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" /></svg>
+                  <span className="ms-label">Settings</span>
+                </div>
+              </div>
+              <div className="ms-item">
+                <div className="ms-item-left">
+                  <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><path strokeLinecap="round" strokeLinejoin="round" d="M9.09 9a3 3 0 015.83 1c0 2-3 2-3 4" /><line x1="12" y1="17" x2="12.01" y2="17" /></svg>
+                  <span className="ms-label">Help</span>
+                </div>
               </div>
             </div>
-            <div className="ms-bottom">
-              <div className="ms-credits">
-                <div className="ms-credits-title">✨ Earn Credits</div>
-                <div className="ms-credits-sub">Get up to £10/mo off your plan</div>
+            <div className="ms-user">
+              <div className="ms-user-avatar">A</div>
+              <div className="ms-user-info">
+                <div className="ms-user-name">Acme Agency</div>
+                <div className="ms-user-email">acmeagency@gmail.com</div>
               </div>
+              <svg width="10" height="10" fill="none" stroke="#94a3b8" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6" /></svg>
             </div>
           </div>
 
@@ -703,163 +508,73 @@ export function HeroDashboardMockup(): React.ReactElement {
                 ))}
               </div>
 
-              {/* Monitor table */}
-              <div className="mm-card">
-                <div className="mm-card-hdr">
-                  <div className="mm-card-title">
-                    Monitors
-                    {activeFilter && activeFilter !== 'all' && (
-                      <span className="hm-active-filter-tag">
-                        {activeFilter === 'up' ? 'Healthy' : activeFilter === 'down' ? 'Down' : 'Degraded'}
-                        <span className="hm-filter-clear" onClick={() => setActiveFilter(null)}>✕</span>
-                      </span>
-                    )}
+              {/* Incidents + Domains, side by side */}
+              <div className="hm-two-col">
+
+                {/* Recent Incidents */}
+                <div className="mm-card hm-incidents-card">
+                  <div className="mm-card-hdr">
+                    <div className="mm-card-title">Recent Incidents</div>
+                    <span className="hm-incidents-open-pill">{pd.stats.down > 0 ? pd.stats.down + 1 : RECENT_INCIDENTS.length} open</span>
                   </div>
-                  <div className="mm-card-search">
-                    <svg width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
-                    Search monitors…
+                  <div className="hm-incidents-list">
+                    {(pd.status === 'down' ? [
+                      { title: 'checkout.shop.io is DOWN', severity: 'P1', status: 'Open', time: 'just now' },
+                      ...RECENT_INCIDENTS,
+                    ] : RECENT_INCIDENTS).map((inc, i) => (
+                      <div key={i} className="hm-incident-row">
+                        <div className={`hm-incident-icon${inc.severity === 'P1' ? ' p1' : ''}`}>
+                          <svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><line x1="15" y1="9" x2="9" y2="15" /><line x1="9" y1="9" x2="15" y2="15" /></svg>
+                        </div>
+                        <div className="hm-incident-body">
+                          <div className="hm-incident-title">{inc.title}</div>
+                          <div className="hm-incident-meta">{inc.severity}</div>
+                        </div>
+                        <span className="hm-incident-status">{inc.status} · {inc.time}</span>
+                      </div>
+                    ))}
                   </div>
                 </div>
-                <table className="mm-table">
-                  <thead>
-                    <tr>
-                      <th style={{ width: '18px' }}><input type="checkbox" name="select-all" id="hm-select-all" style={{ accentColor: 'var(--brand-blue)', width: '10px', height: '10px' }} readOnly aria-label="Select all monitors" /></th>
-                      <th>Monitor</th><th>Type</th><th>Status</th><th>Uptime (90d)</th><th>Response</th><th>Last check</th>
-                    </tr>
-                  </thead>
-                  <tbody>
 
-                    {/* Row 1 */}
-                    <tr className="hm-clickable-row" onClick={() => toggleRow('r1')}>
-                      <td><input type="checkbox" name="hm-row-r1" id="hm-row-r1" style={{ accentColor: 'var(--brand-blue)', width: '10px', height: '10px' }} readOnly aria-label="Select row 1" /></td>
-                      <td><div className="mm-monitor-name">api.acmecorp.com</div><div className="mm-monitor-url">https://api.acmecorp.com/health</div></td>
-                      <td><span className="mm-type-tag">HTTP</span></td>
-                      <td><StatusBadge status="up" /></td>
-                      <td><div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}><UptimeBars bad={false} /><span className="mm-uptime-pct">99.98%</span></div></td>
-                      <td><span className="mm-response fast">142ms</span></td>
-                      <td style={{ fontSize: '9px', color: 'var(--text-muted)' }}>8s ago</td>
-                    </tr>
-                    {expandedRow === 'r1' && (
-                      <tr className="hm-row-detail-row"><td colSpan={7}>
-                        <div className="hm-row-detail">
-                          <div className="hm-detail-item">
-                            <span className="hm-detail-label">Response trend</span>
-                            <div className="hm-spark">{[142,138,145,141,149,143,142].map((v,i) => <div key={i} className="hm-spark-bar" style={{ height: `${Math.round(v/5)}px`, background: 'var(--color-up)' }} />)}</div>
+                {/* Domains */}
+                <div className="mm-card hm-domains-card">
+                  <div className="mm-card-hdr">
+                    <div className="mm-card-title">Domains</div>
+                    <div className="mm-btn-primary hm-clickable" style={{ fontSize: '10px', padding: '5px 10px' }} onClick={() => setShowModal(true)} title="Try it — add a monitor">
+                      <svg width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+                      Add Monitor
+                    </div>
+                  </div>
+                  <div className="hm-domains-list">
+                    {DOMAINS.map(d => {
+                      const isCheckout = d.domain === 'checkout.shop.io'
+                      const status = isCheckout ? pd.status : d.status
+                      const isDown = isCheckout ? phase === 'down' : status === 'down'
+                      const isDeg = isCheckout ? (phase === 'degrading' || phase === 'recovering') : status === 'degraded'
+                      return (
+                        <div key={d.domain} className="hm-domain-row">
+                          <div className="hm-domain-left">
+                            <span className={`hm-domain-dot${isDown ? ' down' : isDeg ? ' degraded' : ''}`} />
+                            <span className="hm-domain-name">{d.domain}</span>
                           </div>
-                          <div className="hm-detail-item"><span className="hm-detail-label">Avg response</span><span className="hm-detail-val hm-val-fast">143ms</span></div>
-                          <div className="hm-detail-item"><span className="hm-detail-label">Incidents (30d)</span><span className="hm-detail-val">0</span></div>
-                          <div className="hm-detail-item"><span className="hm-detail-label">SSL expires</span><span className="hm-detail-val">84 days</span></div>
+                          <span className={`hm-domain-badge${isDown ? ' down' : isDeg ? ' degraded' : ''}`}>
+                            {isDown ? 'Down' : isDeg ? 'Degraded' : 'Up'}
+                          </span>
                         </div>
-                      </td></tr>
-                    )}
-
-                    {/* Row 2 — checkout.shop.io (animated) */}
-                    <tr className="hm-clickable-row" style={{ background: pd.rowBg }} onClick={() => toggleRow('r2')}>
-                      <td><input type="checkbox" name="hm-row-r2" id="hm-row-r2" style={{ accentColor: 'var(--brand-blue)', width: '10px', height: '10px' }} readOnly aria-label="Select row 2" /></td>
-                      <td><div className="mm-monitor-name">checkout.shop.io</div><div className="mm-monitor-url">https://checkout.shop.io</div></td>
-                      <td><span className="mm-type-tag">HTTP</span></td>
-                      <td><StatusBadge status={pd.status} /></td>
-                      <td><div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}><UptimeBars bad={pd.uptimeBad} /><span className={`mm-uptime-pct${pd.uptimeBad ? ' bad' : ''}`}>{pd.uptime}</span></div></td>
-                      <td><span className={`mm-response ${pd.responseClass}`}>{pd.response}</span></td>
-                      <td style={{ fontSize: '9px', color: pd.stats.down > 0 ? 'var(--color-down)' : 'var(--text-muted)' }}>{pd.lastCheck}</td>
-                    </tr>
-                    {expandedRow === 'r2' && (
-                      <tr className="hm-row-detail-row" style={{ background: pd.rowBg }}><td colSpan={7}>
-                        <div className="hm-row-detail">
-                          <div className="hm-detail-item">
-                            <span className="hm-detail-label">Response trend</span>
-                            <div className="hm-spark">
-                              {CHECKOUT_SPARK.map((v,i) => (
-                                <div key={i} className="hm-spark-bar" style={{
-                                  height: v === 0 ? '4px' : `${Math.round(v)}px`,
-                                  background: v === 0 ? 'var(--color-down)' : i === 6 ? 'var(--color-warn)' : 'var(--color-up)',
-                                }} />
-                              ))}
-                            </div>
-                          </div>
-                          <div className="hm-detail-item"><span className="hm-detail-label">Current</span><StatusBadge status={pd.status} /></div>
-                          <div className="hm-detail-item"><span className="hm-detail-label">Incidents (30d)</span><span className="hm-detail-val" style={{ color: 'var(--color-down)' }}>1 open</span></div>
-                          <div className="hm-detail-item"><span className="hm-detail-label">SSL expires</span><span className="hm-detail-val">12 days</span></div>
+                      )
+                    })}
+                    {userMonitors.length > 0 && (
+                      <div className="hm-domain-row hm-new-row">
+                        <div className="hm-domain-left">
+                          <span className="hm-domain-dot pending" />
+                          <span className="hm-domain-name">{userMonitors[userMonitors.length - 1].url.replace(/^https?:\/\//, '')}</span>
                         </div>
-                      </td></tr>
+                        <span className="hm-domain-badge pending">Pending</span>
+                      </div>
                     )}
+                  </div>
+                </div>
 
-                    {/* Row 3 */}
-                    <tr className="hm-clickable-row" onClick={() => toggleRow('r3')}>
-                      <td><input type="checkbox" name="hm-row-r3" id="hm-row-r3" style={{ accentColor: 'var(--brand-blue)', width: '10px', height: '10px' }} readOnly aria-label="Select row 3" /></td>
-                      <td><div className="mm-monitor-name">cdn.assets.io</div><div className="mm-monitor-url">https://cdn.assets.io</div></td>
-                      <td><span className="mm-type-tag">HTTP</span></td>
-                      <td><StatusBadge status="up" /></td>
-                      <td><div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}><UptimeBars bad={false} /><span className="mm-uptime-pct">99.9%</span></div></td>
-                      <td><span className="mm-response fast">241ms</span></td>
-                      <td style={{ fontSize: '9px', color: 'var(--text-muted)' }}>1m ago</td>
-                    </tr>
-                    {expandedRow === 'r3' && (
-                      <tr className="hm-row-detail-row"><td colSpan={7}>
-                        <div className="hm-row-detail">
-                          <div className="hm-detail-item">
-                            <span className="hm-detail-label">Response trend</span>
-                            <div className="hm-spark">{[241,235,248,238,245,242,241].map((v,i) => <div key={i} className="hm-spark-bar" style={{ height: `${Math.round(v/8)}px`, background: 'var(--color-up)' }} />)}</div>
-                          </div>
-                          <div className="hm-detail-item"><span className="hm-detail-label">Avg response</span><span className="hm-detail-val hm-val-fast">241ms</span></div>
-                          <div className="hm-detail-item"><span className="hm-detail-label">Incidents (30d)</span><span className="hm-detail-val">0</span></div>
-                          <div className="hm-detail-item"><span className="hm-detail-label">SSL expires</span><span className="hm-detail-val">201 days</span></div>
-                        </div>
-                      </td></tr>
-                    )}
-
-                    {/* Row 4 */}
-                    <tr className="hm-clickable-row" onClick={() => toggleRow('r4')}>
-                      <td><input type="checkbox" name="hm-row-r4" id="hm-row-r4" style={{ accentColor: 'var(--brand-blue)', width: '10px', height: '10px' }} readOnly aria-label="Select row 4" /></td>
-                      <td><div className="mm-monitor-name">blog.example.com</div><div className="mm-monitor-url">https://blog.example.com</div></td>
-                      <td><span className="mm-type-tag">SSL</span></td>
-                      <td><StatusBadge status="up" /></td>
-                      <td><div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}><UptimeBars bad={false} /><span className="mm-uptime-pct">100%</span></div></td>
-                      <td><span className="mm-response fast">89ms</span></td>
-                      <td style={{ fontSize: '9px', color: 'var(--text-muted)' }}>3m ago</td>
-                    </tr>
-                    {expandedRow === 'r4' && (
-                      <tr className="hm-row-detail-row"><td colSpan={7}>
-                        <div className="hm-row-detail">
-                          <div className="hm-detail-item">
-                            <span className="hm-detail-label">Response trend</span>
-                            <div className="hm-spark">{[89,91,87,92,88,90,89].map((v,i) => <div key={i} className="hm-spark-bar" style={{ height: `${Math.round(v/3)}px`, background: 'var(--color-up)' }} />)}</div>
-                          </div>
-                          <div className="hm-detail-item"><span className="hm-detail-label">Avg response</span><span className="hm-detail-val hm-val-fast">89ms</span></div>
-                          <div className="hm-detail-item"><span className="hm-detail-label">SSL valid</span><span className="hm-detail-val" style={{ color: 'var(--color-up)' }}>✓ 347 days</span></div>
-                          <div className="hm-detail-item"><span className="hm-detail-label">Incidents (30d)</span><span className="hm-detail-val">0</span></div>
-                        </div>
-                      </td></tr>
-                    )}
-
-                    {/* User-added monitors */}
-                    {userMonitors.map(m => (
-                      <Fragment key={m.id}>
-                        <tr className="hm-clickable-row hm-new-row" onClick={() => toggleRow(m.id)}>
-                          <td><input type="checkbox" name={`hm-row-${m.id}`} id={`hm-row-${m.id}`} style={{ accentColor: 'var(--brand-blue)', width: '10px', height: '10px' }} readOnly aria-label={`Select ${m.name}`} /></td>
-                          <td><div className="mm-monitor-name">{m.name}</div><div className="mm-monitor-url">{m.url}</div></td>
-                          <td><span className="mm-type-tag">{m.type}</span></td>
-                          <td>
-                            <span className="badge badge-outline" style={{ fontSize: '9px', padding: '2px 7px' }}>
-                              <span style={{ width: '5px', height: '5px', background: 'var(--text-muted)', borderRadius: '50%', display: 'inline-block', animation: 'pulse 1.5s infinite' }} />{' '}Pending
-                            </span>
-                          </td>
-                          <td><span style={{ fontSize: '9px', color: 'var(--text-muted)' }}>Awaiting first check…</span></td>
-                          <td><span style={{ fontSize: '9px', color: 'var(--text-muted)' }}>—</span></td>
-                          <td style={{ fontSize: '9px', color: 'var(--text-muted)' }}>Just added</td>
-                        </tr>
-                        {expandedRow === m.id && (
-                          <tr className="hm-row-detail-row"><td colSpan={7}>
-                            <div className="hm-row-detail">
-                              <div className="hm-detail-item"><span className="hm-detail-label">Status</span><span className="hm-detail-val">First check in progress — usually takes 30s</span></div>
-                            </div>
-                          </td></tr>
-                        )}
-                      </Fragment>
-                    ))}
-
-                  </tbody>
-                </table>
               </div>
 
             </div>{/* /mm-content */}

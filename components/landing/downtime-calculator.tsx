@@ -18,8 +18,7 @@ export function DowntimeCalculator(): React.ReactElement {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          card.classList.add('buzz')
-          card.addEventListener('animationend', () => card.classList.remove('buzz'), { once: true })
+          card.classList.add('reveal-in')
           observer.disconnect()
         }
       },
@@ -45,11 +44,17 @@ export function DowntimeCalculator(): React.ReactElement {
 
   const sliderLabel = hours === 1 ? '1 hour' : `${hours} hours`
 
+  const breakdown = [
+    { label: 'Direct revenue loss', value: revLoss, note: 'Revenue per hour × hours down' },
+    { label: 'Customer churn', value: churn, note: '5% churn × £200 avg LTV' },
+    { label: 'Reputation damage', value: rep, note: 'Forrester trust multiplier' },
+  ]
+
   return (
     <section className="calculator-section">
       <div className="container">
         <div className="section-header">
-          <div className="section-eyebrow" style={{ color: '#ef4444' }}>The real cost of downtime</div>
+          <div className="section-eyebrow" style={{ color: '#d97706' }}>The real cost of downtime</div>
           <h2 className="section-title">It&apos;s not just lost revenue.<br />It&apos;s your reputation.</h2>
           <p className="section-sub">
             Every minute your site is down, customers are leaving, telling friends, and never coming back.
@@ -58,43 +63,33 @@ export function DowntimeCalculator(): React.ReactElement {
         </div>
 
         <div className="calculator-card" ref={cardRef}>
-          {/* Fear callout */}
-          <div className="calc-fear-intro">
-            <div className="calc-fear-icon">⚠️</div>
-            <div className="calc-fear-text">
-              <strong>88% of users are less likely to return</strong> after downtime.
-              For every £1 of visible revenue loss, research shows an additional £1.40 in hidden costs from churn and brand damage.
-              Only 8% of outages are detected by the business before a customer notices.
-              {' '}<span style={{ color: '#ef4444', fontWeight: 600 }}>Are you in the 8%?</span>
-            </div>
-          </div>
+          <div className="calc-grid">
+            {/* Left — inputs */}
+            <div className="calc-inputs-col">
+              <div className="calc-input-block">
+                <div className="calculator-label">Your monthly revenue</div>
+                <div className="calculator-input-wrap">
+                  <span className="calculator-prefix">£</span>
+                  <input
+                    type="number"
+                    id="calc-revenue"
+                    name="calc-revenue"
+                    className="calculator-input"
+                    aria-label="Your monthly revenue in pounds"
+                    autoComplete="off"
+                    value={revenue}
+                    min={1000}
+                    max={10000000}
+                    onChange={e => setRevenue(Math.max(1000, Number(e.target.value) || 1000))}
+                  />
+                </div>
+              </div>
 
-          {/* Inputs */}
-          <div className="calculator-inputs-row">
-            <div>
-              <div className="calculator-label">Your monthly revenue (£)</div>
-              <div className="calculator-input-wrap">
-                <span className="calculator-prefix">£</span>
-                <input
-                  type="number"
-                  id="calc-revenue"
-                  name="calc-revenue"
-                  className="calculator-input"
-                  aria-label="Your monthly revenue in pounds"
-                  autoComplete="off"
-                  value={revenue}
-                  min={1000}
-                  max={10000000}
-                  onChange={e => setRevenue(Math.max(1000, Number(e.target.value) || 1000))}
-                />
-              </div>
-            </div>
-            <div>
-              <div className="calculator-label">
-                Average downtime per month —{' '}
-                <span style={{ fontWeight: 800, color: '#ef4444' }}>{sliderLabel}</span>
-              </div>
-              <div style={{ paddingTop: 10 }}>
+              <div className="calc-input-block">
+                <div className="calculator-label">
+                  Average downtime per month —{' '}
+                  <span style={{ fontWeight: 800, color: 'var(--brand-blue)' }}>{sliderLabel}</span>
+                </div>
                 <input
                   type="range"
                   id="calc-downtime"
@@ -114,60 +109,45 @@ export function DowntimeCalculator(): React.ReactElement {
                   <span>24 hrs</span>
                 </div>
               </div>
-            </div>
-          </div>
 
-          {/* Breakdown cards */}
-          <div className="calculator-breakdown-row">
-            <div className="calc-row revenue">
-              <div className="calc-row-header">
-                <span className="calc-row-icon">💰</span>
-                <span className="calc-row-label">Revenue loss</span>
+              <div className="calc-fear-intro">
+                <div className="calc-fear-icon">⚠️</div>
+                <div className="calc-fear-text">
+                  <strong>88% of users are less likely to return</strong> after downtime.
+                  For every £1 of visible revenue loss, research shows an additional £1.40 in hidden costs from churn and brand damage.
+                </div>
               </div>
-              <div className="calc-row-value">{fmt(revLoss)}</div>
-              <small className="calc-row-note">Revenue per hour × hours down</small>
             </div>
 
-            <div className="calc-row churn">
-              <div className="calc-row-header">
-                <span className="calc-row-icon">👤</span>
-                <span className="calc-row-label">Customer churn</span>
+            {/* Right — result */}
+            <div className="calc-result-col">
+              <div className="calc-result-label">Estimated cost per incident</div>
+              <div className="calc-result-hero">{fmt(total)}</div>
+
+              <div className="calc-breakdown-list">
+                {breakdown.map(row => (
+                  <div key={row.label} className="calc-breakdown-row">
+                    <div className="calc-breakdown-row-top">
+                      <span>{row.label}</span>
+                      <span className="calc-breakdown-row-value">{fmt(row.value)}</span>
+                    </div>
+                    <div className="calc-breakdown-bar">
+                      <div
+                        className="calc-breakdown-bar-fill"
+                        style={{ width: `${total > 0 ? (row.value / total) * 100 : 0}%` }}
+                      />
+                    </div>
+                    <div className="calc-row-note">{row.note}</div>
+                  </div>
+                ))}
               </div>
-              <div className="calc-row-value">{fmt(churn)}</div>
-              <small className="calc-row-note">5% churn × £200 avg LTV</small>
-            </div>
 
-            <div className="calc-row rep">
-              <div className="calc-row-header">
-                <span className="calc-row-icon">📉</span>
-                <span className="calc-row-label">Reputation damage</span>
+              <div className="calc-yearly-banner">
+                <strong>{fmt(yearly)}</strong>
+                {' '}you&apos;re risking every year — from just <span>{sliderLabel}</span> of downtime per month
               </div>
-              <div className="calc-row-value">{fmt(rep)}</div>
-              <small className="calc-row-note">Forrester trust multiplier</small>
-            </div>
 
-            <div className="calc-row total">
-              <div className="calc-row-header">
-                <span className="calc-row-icon">🔴</span>
-                <span className="calc-row-label" style={{ color: '#ef4444' }}>Total impact</span>
-              </div>
-              <div className="calc-row-value" style={{ fontSize: 28 }}>{fmt(total)}</div>
-              <small className="calc-row-note">per incident</small>
-            </div>
-          </div>
-
-          {/* Yearly + CTA */}
-          <div className="calc-bottom-row">
-            <div className="calc-yearly-banner">
-              <strong>{fmt(yearly)}</strong>
-              {' '}you&apos;re risking every year — from just <span>{sliderLabel}</span> of downtime per month
-            </div>
-            <div className="calc-cta-col">
-              <Link
-                href="/signup"
-                className="btn btn-lg"
-                style={{ width: '88%', justifyContent: 'center', background: 'linear-gradient(135deg,#ef4444,#f97316)', color: '#fff', border: 'none', display: 'flex', alignItems: 'center', gap: 8, marginTop: '48px' }}
-              >
+              <Link href="/signup" className="btn btn-lg btn-primary calc-cta-btn">
                 <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                 Start Protecting Revenue Free
               </Link>

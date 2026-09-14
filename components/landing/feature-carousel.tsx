@@ -216,19 +216,23 @@ export function FeatureCarousel(): React.ReactElement {
             {visible.map((card) => (
               <div key={card.title} className="feature-card" data-cat={card.cat}>
                 <div className="feature-card-glow" style={{ background: card.glow }} />
-                <div
-                  className="feature-cat-badge"
-                  style={{ background: card.catBg, color: card.catColor, border: `1px solid ${card.catBorder}` }}
-                >
-                  {card.cat}
+                <div className="feature-card-left">
+                  <div
+                    className="feature-cat-badge"
+                    style={{ background: card.catBg, color: card.catColor, border: `1px solid ${card.catBorder}` }}
+                  >
+                    {card.cat}
+                  </div>
+                  <div className="feature-icon" style={{ background: card.iconBg }}>
+                    {card.icon}
+                  </div>
                 </div>
-                <div className="feature-icon" style={{ background: card.iconBg }}>
-                  {card.icon}
-                </div>
-                <div className="feature-title">{card.title}</div>
-                <div className="feature-desc">{card.desc}</div>
-                <div className="feature-tags">
-                  {card.tags.map(t => <span key={t} className="feature-tag">{t}</span>)}
+                <div className="feature-card-right">
+                  <div className="feature-title">{card.title}</div>
+                  <div className="feature-desc">{card.desc}</div>
+                  <div className="feature-tags">
+                    {card.tags.map(t => <span key={t} className="feature-tag">{t}</span>)}
+                  </div>
                 </div>
               </div>
             ))}
