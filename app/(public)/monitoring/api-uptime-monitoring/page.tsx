@@ -77,7 +77,7 @@ const data: IndustryLandingData = {
     },
     {
       q: 'What\'s the right check interval for an API?',
-      a: 'For customer-facing APIs, 1 minute is the standard. For internal APIs, 5 minutes is usually enough. For canary endpoints used to test new deploys, run them every 30 seconds during the rollout. Free plan includes 1-minute checks; Lite and above include 30-second checks.',
+      a: 'For customer-facing APIs, 1 minute is the standard. For internal APIs, 5 minutes is usually enough. For canary endpoints used to test new deploys, run them every 30 seconds during the rollout. Entry plans include 1-minute checks; higher tiers include 30-second checks.',
     },
     {
       q: 'How do I avoid alerting fatigue when an API has many endpoints?',

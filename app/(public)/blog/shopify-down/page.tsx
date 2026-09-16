@@ -261,10 +261,10 @@ export default function ShopifyDownPage(): React.ReactElement {
         <div className="blog-cta-section reveal">
           <h3>Know when your Shopify store is down before your customers do</h3>
           <p>
-            Free uptime monitoring for your store URL, checkout, and SSL certificate. Get alerted in 60 seconds when something breaks. No credit card required.
+            Free uptime monitoring for your store URL, checkout, and SSL certificate. Get alerted in 60 seconds when something breaks.
           </p>
           <Link href="https://upnotify-monitoring.vercel.app/signup" className="btn btn-primary btn-lg">
-            Start Monitoring Free
+            Start Monitoring
           </Link>
         </div>
 

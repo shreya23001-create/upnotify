@@ -80,7 +80,7 @@ export function AuthCanvas({ onSceneChange }: AuthCanvasProps): React.ReactEleme
       ctx.textAlign = 'center'
       t2('Monitors active', cx, cy+18, 11, 'rgba(255,255,255,0.7)', tAlpha, '600')
       rr(cx-30, cy+28, 60, 18, 9, '#3b82f622', '#3b82f655', tAlpha * 0.9)
-      t2('Free plan', cx, cy+40, 9, '#60a5fa', tAlpha, '700')
+      t2('From ₹999/yr', cx, cy+40, 9, '#60a5fa', tAlpha, '700')
       ctx.textAlign = 'left'
     }
 

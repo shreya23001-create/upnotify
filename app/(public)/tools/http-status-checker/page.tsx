@@ -171,7 +171,7 @@ export default function HttpStatusCheckerPage(): React.ReactElement {
               broken 301 chain doesn&apos;t silently kill SEO between deploys.
             </p>
             <a href="/signup" className="btn btn-primary btn-lg">
-              Start Monitoring Free
+              Start Monitoring
             </a>
           </div>
         </div>

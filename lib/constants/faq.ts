@@ -30,7 +30,7 @@ export const FAQ_ITEMS: FaqItem[] = [
   },
   {
     question: 'Is there a free plan?',
-    answer: 'Yes. The Free plan includes 3 monitors with 10-minute checks and email alerts. No credit card required to start. You can upgrade at any time as your needs grow.',
+    answer: 'Upnotify does not offer a free plan. Pricing starts at ₹999/website/year, which includes full monitor coverage, 1-minute checks, and every alert channel.',
   },
   {
     question: 'Can I cancel or pause my subscription?',

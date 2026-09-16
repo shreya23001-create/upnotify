@@ -61,8 +61,8 @@ export async function generateMetadata({ params }: { params: Promise<{ domain: s
   // (related sites + signup CTA) but don't index the URL.
   if (!monitorAny) {
     return {
-      title: `${canonicalDomain || 'Site'} not in tracker — monitor any site free | Upnotify`,
-      description: `${canonicalDomain || 'This site'} isn't in the public Upnotify tracker yet. Monitor it yourself in 2 minutes on the Free plan, or browse other tracked sites.`,
+      title: `${canonicalDomain || 'Site'} not in tracker — monitor any site | Upnotify`,
+      description: `${canonicalDomain || 'This site'} isn't in the public Upnotify tracker yet. Monitor it yourself in 2 minutes, or browse other tracked sites.`,
       robots: { index: false, follow: true },
     }
   }
@@ -419,10 +419,10 @@ export default async function TrackerDomainPage({
       <div className="tracker-promo-banner">
         <div className="tracker-promo-banner-text">
           <strong>Want this for your own website?</strong>
-          {' '}Get instant alerts the moment your site goes down — free to start.
+          {' '}Get instant alerts the moment your site goes down — from &#8377;999/year.
         </div>
         <Link href="/pricing" className="tracker-promo-banner-btn">
-          Monitor My Site Free →
+          Monitor My Site →
         </Link>
       </div>
 
@@ -576,7 +576,7 @@ export default async function TrackerDomainPage({
               Don&apos;t just track {siteName} — protect your own uptime. Upnotify monitors your website 24/7 and alerts you via email, SMS, or Slack.
             </p>
             <Link href="/pricing" className="tracker-reasons-cta-btn">
-              Start Free Monitoring →
+              Start Monitoring →
             </Link>
           </div>
         </div>
@@ -728,11 +728,11 @@ export default async function TrackerDomainPage({
         <h2>Monitor YOUR Website 24/7</h2>
         <p>
           Don&apos;t just check if {siteName} is down &mdash; monitor your own website around the clock.
-          Get instant uptime alerts, performance metrics, and public status pages. Free plan includes 5 monitors with 5-minute checks.
+          Get instant uptime alerts, performance metrics, and public status pages. Plans start at &#8377;999/year.
         </p>
         <div className="tracker-cta-buttons">
           <Link href="/" className="btn btn-primary">
-            Start Monitoring Free
+            Start Monitoring
           </Link>
           <Link href="/score" className="tracker-cta-secondary">
             Check Your Website Score

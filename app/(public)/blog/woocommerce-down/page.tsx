@@ -323,10 +323,10 @@ define( 'WP_DEBUG_DISPLAY', false );`}</code></pre>
         <div className="blog-cta-section">
           <h3>Monitor your WooCommerce store automatically</h3>
           <p>
-            Get alerted within 60 seconds if your shop, cart, or checkout goes down. Free plan available — no credit card required.
+            Get alerted within 60 seconds if your shop, cart, or checkout goes down. Plans start at &#8377;999/year.
           </p>
           <Link href="https://upnotify-monitoring.vercel.app/signup" className="btn btn-primary btn-lg">
-            Start Monitoring Free
+            Start Monitoring
           </Link>
         </div>
 

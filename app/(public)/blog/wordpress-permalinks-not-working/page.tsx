@@ -216,7 +216,7 @@ export default function WordPressPermalinksNotWorkingPage(): React.ReactElement 
         <h3>Step 2: Set up HTTP monitors on each page</h3>
 
         <ol>
-          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (paid plans from ₹999/year)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>HTTP/HTTPS</strong> as the monitor type</li>
           <li>Enter the full URL of one of your important inner pages</li>
@@ -337,7 +337,7 @@ export default function WordPressPermalinksNotWorkingPage(): React.ReactElement 
         <div className="blog-cta-section">
           <h3>Protect every URL on your WordPress site</h3>
           <p>
-            Free plan available. HTTP monitoring on multiple pages catches 404 errors that homepage-only monitoring misses. Two-confirmation alerts. Slack, email, and Teams. No credit card required.
+            Start monitoring in minutes. HTTP monitoring on multiple pages catches 404 errors that homepage-only monitoring misses. Two-confirmation alerts. Slack, email, and Teams.
           </p>
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             <Link href="/score" className="btn btn-primary btn-lg">

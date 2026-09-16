@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
+import { writeAuditLog } from '@/lib/db/audit'
 import type { Subscription, Invoice, Plan } from '@/lib/types'
 
 export async function getSubscription(orgId: string): Promise<Subscription | null> {
@@ -398,6 +399,63 @@ export async function addPendingWebsites(orgId: string, domains: string[]): Prom
   }
 
   return { added: uniqueNew.length, skipped }
+}
+
+/**
+ * Claims one purchased-but-unnamed website slot for `domain`, for the
+ * quantity-first Pro Plan purchase flow (see
+ * supabase/migrations/00132_website_subscription_quantity.sql). Called
+ * from createMonitorAction the moment a non-grandfathered org creates a
+ * monitor for a domain that isn't already covered by an active
+ * subscription — the slot is claimed automatically, with no separate
+ * "add a website" step. Race-safe via the claim_website_slot RPC
+ * (SELECT ... FOR UPDATE SKIP LOCKED), so concurrent monitor-creation
+ * requests can't double-claim the same slot.
+ */
+export async function claimWebsiteSlot(params: {
+  orgId: string
+  domain: string
+}): Promise<
+  | { ok: true; websiteSubscriptionId: string }
+  | { ok: false; reason: 'already_claimed' }
+  | { ok: false; reason: 'limit_exceeded' }
+> {
+  const { orgId, domain } = params
+  const supabase = createAdminClient()
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: existingRows } = await (supabase as any)
+    .from('website_subscriptions')
+    .select('domains')
+    .eq('org_id', orgId)
+    .neq('status', 'canceled') as { data: Array<{ domains: string[] }> | null }
+  const alreadyClaimed = (existingRows ?? []).some(r => (r.domains ?? []).includes(domain))
+  if (alreadyClaimed) {
+    return { ok: false, reason: 'already_claimed' }
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: claimedId, error } = await (supabase as any)
+    .rpc('claim_website_slot', { p_org_id: orgId, p_domain: domain }) as { data: string | null; error: { message: string } | null }
+
+  if (error) {
+    logger.error('claimWebsiteSlot: RPC failed', { error: error.message, orgId, domain })
+    return { ok: false, reason: 'limit_exceeded' }
+  }
+
+  if (!claimedId) {
+    return { ok: false, reason: 'limit_exceeded' }
+  }
+
+  await writeAuditLog({
+    orgId,
+    userId: null,
+    action: 'website_subscription.slot_claimed',
+    resourceType: 'website_subscription',
+    metadata: { domain, website_subscription_id: claimedId },
+  })
+
+  return { ok: true, websiteSubscriptionId: claimedId }
 }
 
 /** Invoices linked to a specific website_subscription row. */

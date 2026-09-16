@@ -3,7 +3,7 @@ import { getCurrentUser } from '@/lib/db/users'
 import { getCurrentOrganisation } from '@/lib/db/organisations'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
-import { verifyRazorpayPaymentSignature, fetchRazorpayPaymentAmount } from '@/lib/services/payments-razorpay'
+import { verifyRazorpayPaymentSignature, fetchRazorpayPaymentAmount, getRazorpay, razorpayErrorMessage } from '@/lib/services/payments-razorpay'
 import { activateWebsiteSubscription } from '@/lib/services/website-subscription-activation'
 import { checkRateLimit, API_V1_RATE_LIMIT } from '@/lib/utils/rate-limiter'
 
@@ -57,7 +57,9 @@ export async function POST(request: Request): Promise<NextResponse> {
       ? body.pendingWebsiteIds.filter((v): v is string => typeof v === 'string')
       : []
 
-    if (!razorpaySubscriptionId || !razorpayPaymentId || !razorpaySignature || pendingWebsiteIds.length === 0) {
+    // pendingWebsiteIds is optional — the quantity-first purchase flow has
+    // none (no domains are named at checkout time).
+    if (!razorpaySubscriptionId || !razorpayPaymentId || !razorpaySignature) {
       return NextResponse.json({ error: 'Missing payment confirmation details' }, { status: 400 })
     }
 
@@ -81,22 +83,46 @@ export async function POST(request: Request): Promise<NextResponse> {
 
     const supabase = createAdminClient()
 
-    // Re-fetch the pending rows fresh (never trust client-supplied domains
-    // directly) and confirm they still belong to this org.
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: pendingRows } = await (supabase as any)
-      .from('website_subscriptions')
-      .select('id, domains')
-      .eq('org_id', org.id)
-      .eq('status', 'incomplete')
-      .in('id', pendingWebsiteIds) as { data: Array<{ id: string; domains: string[] }> | null }
+    let domains: string[] = []
+    if (pendingWebsiteIds.length > 0) {
+      // Legacy name-first flow: re-fetch the pending rows fresh (never
+      // trust client-supplied domains directly) and confirm they still
+      // belong to this org.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: pendingRows } = await (supabase as any)
+        .from('website_subscriptions')
+        .select('id, domains')
+        .eq('org_id', org.id)
+        .eq('status', 'incomplete')
+        .in('id', pendingWebsiteIds) as { data: Array<{ id: string; domains: string[] }> | null }
 
-    if (!pendingRows || pendingRows.length === 0) {
-      // Already activated (e.g. the webhook won the race) — not an error.
-      return NextResponse.json({ success: true, alreadyActivated: true })
+      if (!pendingRows || pendingRows.length === 0) {
+        // Already activated (e.g. the webhook won the race) — not an error.
+        return NextResponse.json({ success: true, alreadyActivated: true })
+      }
+
+      domains = pendingRows.flatMap(r => r.domains ?? [])
     }
 
-    const domains = pendingRows.flatMap(r => r.domains ?? [])
+    // Authoritative quantity, read from Razorpay's own subscription object —
+    // never a client-supplied number. Mock subscriptions have no real
+    // Razorpay object to fetch (dev/staging only), so fall back to
+    // domains.length there.
+    let purchasedQuantity = domains.length
+    if (!isMock) {
+      try {
+        const rzp = getRazorpay()
+        const rzpSub = await rzp.subscriptions.fetch(razorpaySubscriptionId) as unknown as { notes?: Record<string, string> }
+        const notesQty = parseInt(rzpSub.notes?.purchased_quantity ?? '', 10)
+        if (Number.isFinite(notesQty) && notesQty > 0) purchasedQuantity = notesQty
+      } catch (err) {
+        logger.error('Website confirm: failed to fetch Razorpay subscription for quantity', {
+          razorpaySubscriptionId, error: razorpayErrorMessage(err),
+        })
+        return NextResponse.json({ error: 'Could not verify subscription details. Please refresh and check your Plans page.' }, { status: 500 })
+      }
+    }
+
     const amountPaise = isMock ? undefined : (await fetchRazorpayPaymentAmount(razorpayPaymentId)) ?? undefined
 
     const result = await activateWebsiteSubscription({
@@ -106,6 +132,7 @@ export async function POST(request: Request): Promise<NextResponse> {
       source: 'client_verified',
       amountPaise,
       razorpayPaymentId,
+      purchasedQuantity,
     })
 
     return NextResponse.json({ success: result.activated })

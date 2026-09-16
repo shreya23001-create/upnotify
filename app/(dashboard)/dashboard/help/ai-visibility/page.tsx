@@ -201,8 +201,8 @@ export default function AiVisibilityHelpPage(): React.ReactElement {
                 commas.
               </li>
               <li>
-                Select which <strong>AI engines</strong> to check. Free plan users can check free engines only.
-                Paid plans unlock all engines.
+                Select which <strong>AI engines</strong> to check. Some engines are limited to higher-tier plans —
+                see your Plans page for what's included.
               </li>
               <li>
                 Click <strong>Run Citation Check</strong>. The check runs asynchronously — it queries each AI

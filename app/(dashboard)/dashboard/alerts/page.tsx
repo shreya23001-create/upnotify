@@ -4,6 +4,7 @@ import { getAlertChannelsByOrgPaged } from '@/lib/db/alerts'
 import { AlertChannelsTable } from '@/components/alerts/alert-channels-table'
 import { parsePage, getPaginationMeta, DEFAULT_PAGE_SIZE } from '@/lib/utils/pagination'
 import Link from 'next/link'
+import { requireActivatedOrg } from '@/lib/auth/require-activated-org'
 
 export default async function AlertsPage({
   searchParams,
@@ -12,6 +13,7 @@ export default async function AlertsPage({
 }) {
   const user = await getCurrentUser()
   if (!user) redirect('/login')
+  await requireActivatedOrg(user.org_id)
 
   const { page: pageParam } = await searchParams
   const page = parsePage(pageParam)

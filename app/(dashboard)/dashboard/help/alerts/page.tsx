@@ -13,7 +13,7 @@ const FAQ_SCHEMA = {
       name: 'What alert channels does Upnotify support?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Upnotify supports email, Slack, Microsoft Teams, and webhook alerts. The Free plan includes email only. Lite and above unlock all channels.',
+        text: 'Upnotify supports email, Slack, Microsoft Teams, and webhook alerts on every website subscription.',
       },
     },
     {

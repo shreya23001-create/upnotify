@@ -193,7 +193,7 @@ export default function WordPressSiteHackedPage(): React.ReactElement {
         <h3>Step 1: Set up a keyword monitor for your brand name</h3>
 
         <ol>
-          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (paid plans from ₹999/year)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>Keyword</strong> as the monitor type</li>
           <li>Enter your homepage URL</li>
@@ -350,7 +350,7 @@ export default function WordPressSiteHackedPage(): React.ReactElement {
         <div className="blog-cta-section">
           <h3>Detect defacement in 60 seconds, not 12 hours</h3>
           <p>
-            Free plan available. Keyword monitoring that alerts you the instant your homepage content changes. Slack, email, Teams, and webhook alerts. No credit card required.
+            Start monitoring in minutes. Keyword monitoring that alerts you the instant your homepage content changes. Slack, email, Teams, and webhook alerts.
           </p>
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             <Link href="/score" className="btn btn-primary btn-lg">

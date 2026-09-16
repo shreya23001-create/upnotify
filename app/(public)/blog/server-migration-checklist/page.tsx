@@ -233,7 +233,7 @@ export default function ServerMigrationChecklistPage(): React.ReactElement {
             Set up monitoring on both old and new servers before the switch. See response times, uptime, and SSL status throughout the migration process.
           </p>
           <Link href="/signup" className="btn btn-primary btn-lg">
-            Start Free Monitoring
+            Start Monitoring
           </Link>
         </div>
 

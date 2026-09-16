@@ -4,6 +4,7 @@ import { getCurrentUser } from '@/lib/db/users'
 import { getCompetitorsByOrg } from '@/lib/db/competitor-monitors'
 import { checkCompetitorLimit } from '@/lib/utils/plan-limits'
 import { CompetitorDashboard } from '@/components/competitors/competitor-dashboard'
+import { requireActivatedOrg } from '@/lib/auth/require-activated-org'
 
 export const metadata: Metadata = {
   title: 'Competitor',
@@ -12,6 +13,7 @@ export const metadata: Metadata = {
 export default async function WatchdogPage(): Promise<React.ReactElement> {
   const user = await getCurrentUser()
   if (!user) redirect('/login')
+  await requireActivatedOrg(user.org_id)
 
   const [competitors, limitInfo] = await Promise.all([
     getCompetitorsByOrg(user.org_id),

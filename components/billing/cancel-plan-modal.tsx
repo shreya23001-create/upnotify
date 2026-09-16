@@ -221,7 +221,7 @@ export function CancelPlanModal({ planName, isOpen, isPaused, pauseUntil, onClos
           <div>
             <h2 style={{ fontSize: 18, fontWeight: 700, color: '#dc2626', marginBottom: 8 }}>Confirm Cancellation</h2>
             <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.7, marginBottom: 12 }}>
-              Your plan will remain active until the end of your current billing period. After that, you will be moved to the <strong>Free plan</strong>:
+              Your plan will remain active until the end of your current billing period. After that, <strong>monitoring stops</strong>:
             </p>
             <div style={{ background: 'var(--bg-secondary)', borderRadius: 8, padding: 14, marginBottom: 16, fontSize: 13, lineHeight: 1.8 }}>
               <div><strong>Monitors:</strong> limited to 3 (excess will be paused)</div>

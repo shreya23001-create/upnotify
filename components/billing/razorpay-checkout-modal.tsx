@@ -14,6 +14,12 @@ export interface MockCheckoutData {
   amountPaise: number
   userEmail: string
   orgName: string
+  /** Website count for a 'website' planSlug purchase — required for the
+   *  simulate route to activate the right number of purchased slots. */
+  quantity?: number
+  /** Where to send the browser after a simulated success. Defaults to the
+   *  legacy org-wide-plan billing settings page for other checkout flows. */
+  redirectOnSuccess?: string
 }
 
 export function MockRazorpayModal({
@@ -41,12 +47,13 @@ export function MockRazorpayModal({
           planSlug:       data.planSlug,
           billingCycle:   data.billingCycle,
           amountPaise:    data.amountPaise,
+          quantity:       data.quantity,
           outcome,
         }),
       })
       const result = await res.json() as { success: boolean; message?: string; error?: string }
       if (result.success) {
-        window.location.href = '/dashboard/settings?tab=billing&billing=success'
+        window.location.href = data.redirectOnSuccess ?? '/dashboard/settings?tab=billing&billing=success'
       } else {
         setError(result.message ?? result.error ?? 'Payment failed (simulated)')
         setIsPaying(false)

@@ -5,7 +5,7 @@ import Faq from '@/components/landing/faq'
 export const metadata: Metadata = {
   title: 'Upnotify Integrations — Slack, Microsoft Teams, Telegram, Webhooks',
   description:
-    'Send Upnotify monitoring alerts to Slack, Microsoft Teams, Telegram, or any signed webhook endpoint. Native formatting, severity-coded messages, one-click links to the monitor. Free plan supports email; Lite (£1/month) unlocks every channel.',
+    'Send Upnotify monitoring alerts to Slack, Microsoft Teams, Telegram, or any signed webhook endpoint. Native formatting, severity-coded messages, one-click links to the monitor. Entry plans support email; Pro Plan unlocks every channel.',
   alternates: { canonical: 'https://upnotify-monitoring.vercel.app/integrations' },
   openGraph: {
     title: 'Upnotify Integrations — Slack, Teams, Telegram, Webhooks',
@@ -57,8 +57,8 @@ const FAQ = [
     a: 'For team-wide visibility on incidents, Slack or Microsoft Teams. For mobile push to on-call engineers, Telegram. For wiring Upnotify into PagerDuty, Opsgenie, Datadog, or your own incident management, signed webhooks. Most customers run two or three channels in parallel for redundancy.',
   },
   {
-    q: 'Are integrations free?',
-    a: 'The Free plan includes email alerts on 3 monitors. Slack, Microsoft Teams, Telegram and signed webhook channels require a Lite plan or higher (Lite is £1/month or £10/year).',
+    q: 'Which plans include integrations?',
+    a: 'Every paid plan includes email alerts — Pre Plan starts at ₹999/year. Slack, Microsoft Teams, Telegram and signed webhook channels require Pro Plan or higher.',
   },
   {
     q: 'Can I send the same alert to multiple channels?',
@@ -114,7 +114,7 @@ export default function IntegrationsIndexPage(): React.ReactElement {
             Integrations
           </h1>
           <p style={{ fontSize: 18, color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: 28, maxWidth: 720, margin: '0 auto 28px' }}>
-            Pipe Upnotify uptime, SSL and security alerts into Slack, Microsoft Teams, Telegram, or any signed webhook endpoint. Free plan covers email; Lite (£1/month) unlocks every channel.
+            Pipe Upnotify uptime, SSL and security alerts into Slack, Microsoft Teams, Telegram, or any signed webhook endpoint. Entry plans cover email; Pro Plan unlocks every channel.
           </p>
         </div>
       </section>
@@ -202,7 +202,7 @@ export default function IntegrationsIndexPage(): React.ReactElement {
             <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
-            Start Monitoring Free
+            Start Monitoring
           </Link>
         </div>
       </main>

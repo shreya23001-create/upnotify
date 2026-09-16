@@ -218,7 +218,7 @@ export default function HostingWontTellYouSlowPage(): React.ReactElement {
         </p>
 
         <ol>
-          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (paid plans from ₹999/year)</li>
           <li>Add an HTTP monitor for your homepage</li>
           <li>Set a response time threshold of 3 seconds</li>
           <li>Configure alerts via Slack, email, or Microsoft Teams</li>
@@ -302,7 +302,7 @@ export default function HostingWontTellYouSlowPage(): React.ReactElement {
         <div className="blog-cta-section">
           <h3>Stop relying on your hosting provider to tell you the truth</h3>
           <p>
-            Free plan available. 60-second checks. Response time tracking on every request. Alerts the moment performance degrades. No credit card required.
+            Start monitoring in minutes. 60-second checks. Response time tracking on every request. Alerts the moment performance degrades.
           </p>
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             <Link href="/score" className="btn btn-primary btn-lg">

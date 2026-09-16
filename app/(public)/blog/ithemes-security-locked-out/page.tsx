@@ -231,7 +231,7 @@ export default function IthemesSecurityLockedOutPage(): React.ReactElement {
         <h3>Step 1: Set up HTTP monitoring to detect 403 lockout responses</h3>
 
         <ol>
-          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (paid plans from ₹999/year)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>HTTP/HTTPS</strong> as the monitor type</li>
           <li>Enter your homepage URL</li>
@@ -324,7 +324,7 @@ export default function IthemesSecurityLockedOutPage(): React.ReactElement {
         <div className="blog-cta-section">
           <h3>Detect security plugin lockouts before they cost you traffic</h3>
           <p>
-            Free plan available. Multi-location HTTP monitoring detects 403 lockout responses. Keyword monitoring catches lockout page text. No credit card required.
+            Start monitoring in minutes. Multi-location HTTP monitoring detects 403 lockout responses. Keyword monitoring catches lockout page text.
           </p>
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             <Link href="/score" className="btn btn-primary btn-lg">

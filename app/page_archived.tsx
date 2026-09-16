@@ -79,8 +79,8 @@ export default function LandingPage(): React.ReactElement {
           </div>
           <div className="hero-trust-pills">
             <span>No credit card required</span>
-            <span className="hero-trust-dot">·</span>
-            <span>3 monitors free forever</span>
+            {/* <span className="hero-trust-dot">·</span>
+            <span>3 monitors free forever</span> */}
             <span className="hero-trust-dot">·</span>
             <span>30-second check intervals</span>
             <span className="hero-trust-dot">·</span>

@@ -219,7 +219,7 @@ export default function UptimeCalculatorPage(): React.ReactElement {
             workers — alerting you the moment something goes wrong.
           </p>
           <a href="/signup" className="btn btn-primary btn-lg">
-            Start Monitoring Free
+            Start Monitoring
           </a>
         </div>
       </div>

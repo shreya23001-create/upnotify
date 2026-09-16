@@ -452,9 +452,9 @@ export default async function MonitoringTypePage({ params }: { params: Promise<{
         operatingSystem: 'Web',
         offers: {
           '@type': 'Offer',
-          price: '0',
-          priceCurrency: 'GBP',
-          description: 'Free plan available',
+          price: '999',
+          priceCurrency: 'INR',
+          description: 'Paid plans from ₹999/year',
         },
         publisher: {
           '@type': 'Organization',
@@ -531,7 +531,7 @@ export default async function MonitoringTypePage({ params }: { params: Promise<{
               <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
-              Start Monitoring Free
+              Start Monitoring
             </Link>
             <Link href="/monitoring" className="btn btn-ghost">← All Monitor Types</Link>
           </div>
@@ -605,7 +605,7 @@ export default async function MonitoringTypePage({ params }: { params: Promise<{
         }}>
           <div>
             <div style={{ fontWeight: 700, fontSize: 16, color: '#fff', marginBottom: 4 }}>Set up in 60 seconds</div>
-            <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)' }}>Free plan · 3 monitors · No credit card required</div>
+            <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)' }}>Plans from ₹999/year · Cancel or pause anytime</div>
           </div>
           <Link href="/signup" style={{
             background: '#fff',
@@ -677,7 +677,7 @@ export default async function MonitoringTypePage({ params }: { params: Promise<{
             Ready to set up {page.name}?
           </h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: 14, marginBottom: 24, maxWidth: 460, margin: '0 auto 24px' }}>
-            Join teams who monitor their infrastructure with Upnotify. Free plan, no credit card required.
+            Join teams who monitor their infrastructure with Upnotify. Plans from &#8377;999/year.
             {relatedTool && (
               <>
                 {' '}
@@ -693,7 +693,7 @@ export default async function MonitoringTypePage({ params }: { params: Promise<{
             <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
-            Start Monitoring Free
+            Start Monitoring
           </Link>
         </div>
 

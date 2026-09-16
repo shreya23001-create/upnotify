@@ -219,7 +219,7 @@ export default function WordPressRecoveryModePage(): React.ReactElement {
         <h3>Step 1: Set up a keyword monitor to detect the critical error text</h3>
 
         <ol>
-          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (paid plans from ₹999/year)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>Keyword</strong> as the monitor type</li>
           <li>Enter your homepage URL</li>
@@ -342,7 +342,7 @@ export default function WordPressRecoveryModePage(): React.ReactElement {
         <div className="blog-cta-section">
           <h3>Do not rely on WordPress to tell you it is broken</h3>
           <p>
-            Free plan available. Keyword monitoring that catches every fatal error. Alerts via Slack, Teams, email, and webhook. No credit card required.
+            Start monitoring in minutes. Keyword monitoring that catches every fatal error. Alerts via Slack, Teams, email, and webhook.
           </p>
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             <Link href="/score" className="btn btn-primary btn-lg">

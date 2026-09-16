@@ -380,7 +380,7 @@ export default function WebsiteMonitoringGuidePage(): React.ReactElement {
         <div className="blog-cta-section">
           <h3>Start monitoring your website in 60 seconds</h3>
           <p>
-            Free plan available. 10 monitor types. AI-powered reports. No credit card required.
+            Start monitoring in minutes. 10 monitor types. AI-powered reports.
           </p>
           <Link href="/signup" className="btn btn-primary btn-lg">
             Get Started Free

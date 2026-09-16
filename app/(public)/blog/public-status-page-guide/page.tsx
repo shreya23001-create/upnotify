@@ -38,7 +38,7 @@ const FAQ_DATA = [
   {
     question: 'Can I create a free status page?',
     answer:
-      'Yes. Several monitoring platforms, including Upnotify, offer free status pages. With Upnotify, you can create a branded public status page that automatically updates based on your monitor data — no coding required. The free plan includes one status page with up to 3 monitors displayed.',
+      'Some monitoring platforms offer standalone free status pages. With Upnotify, a branded public status page that automatically updates from your monitor data is included with your plan at no extra cost — no coding required.',
   },
 ]
 
@@ -325,7 +325,7 @@ export default function PublicStatusPageGuidePage(): React.ReactElement {
           <h3>Create your free status page</h3>
           <p>
             Set up a branded public status page in under 5 minutes. Automatic updates from your
-            monitors. No coding required. Free plan available.
+            monitors. No coding required.
           </p>
           <Link href="/signup" className="btn btn-primary btn-lg">
             Create Your Status Page

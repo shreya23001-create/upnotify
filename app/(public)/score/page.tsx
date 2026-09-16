@@ -70,7 +70,7 @@ const FAQ = [
   },
   {
     q: 'Can I monitor these checks continuously instead of one-off?',
-    a: 'Yes. The Free Upnotify plan includes 3 monitors at email-alerts. Each of the five score categories maps to a continuous monitor type: HTTP uptime, SSL certificate monitoring, DNS monitoring, security headers monitoring, and response time monitoring. Set up once, get alerted whenever something breaks.',
+    a: 'Yes. Continuous monitoring is available on any paid Upnotify plan, starting at ₹999/year with email alerts. Each of the five score categories maps to a continuous monitor type: HTTP uptime, SSL certificate monitoring, DNS monitoring, security headers monitoring, and response time monitoring. Set up once, get alerted whenever something breaks.',
   },
   {
     q: 'How is this different from PageSpeed or GTmetrix?',
@@ -173,11 +173,11 @@ export default function ScorePage(): React.ReactElement {
         <div className="landing-container">
           <h2 className="cta-title">Turn the score into peace of mind</h2>
           <p className="cta-subtitle">
-            The Free plan includes 3 monitors with email alerts. No credit card required.{' '}
-            <Link href="/signup">Start monitoring free</Link> in under 2 minutes.
+            Continuous monitoring with email alerts, from &#8377;999/year.{' '}
+            <Link href="/signup">Start monitoring</Link> in under 2 minutes.
           </p>
           <Link href="/signup" className="btn btn-primary btn-lg">
-            Sign Up Free
+            Get Started
           </Link>
         </div>
       </section>

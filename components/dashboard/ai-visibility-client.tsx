@@ -368,7 +368,7 @@ function LlmsTxtTab({ engines, generations, planSlug, canGenerate, blockReason }
           </button>
 
           {planSlug === 'free' && (
-            <p className="aiv-plan-note">Free plan: 1 generation. <a href="/dashboard/settings?tab=billing">Upgrade</a> for unlimited.</p>
+            <p className="aiv-plan-note">Your current plan includes 1 generation. <a href="/dashboard/settings?tab=billing">Upgrade</a> for unlimited.</p>
           )}
         </form>
       </div>
@@ -502,7 +502,7 @@ function CitationTab({ engines, freeEngineIds, runs, planSlug, runsThisMonth, mo
 
         {planSlug === 'free' && (
           <div className="aiv-notice aiv-notice-info">
-            <span><strong>Free plan:</strong> Free-tier engines only (Copilot, Exa).</span>
+            <span><strong>Your current plan:</strong> Free-tier engines only (Copilot, Exa).</span>
             <a href="/dashboard/settings?tab=billing" className="aiv-notice-link">Upgrade →</a>
           </div>
         )}
@@ -631,7 +631,7 @@ function ProfileTab({ engines, freeEngineIds, runs, planSlug, runsThisMonth, mon
 
         {planSlug === 'free' && (
           <div className="aiv-notice aiv-notice-info">
-            <span><strong>Free plan:</strong> Free-tier engines only (Copilot, Exa).</span>
+            <span><strong>Your current plan:</strong> Free-tier engines only (Copilot, Exa).</span>
             <a href="/dashboard/settings?tab=billing" className="aiv-notice-link">Upgrade →</a>
           </div>
         )}

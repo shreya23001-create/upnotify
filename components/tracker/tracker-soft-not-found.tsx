@@ -32,8 +32,8 @@ export function TrackerSoftNotFound({
 
   const subhead =
     variant === 'deactivated'
-      ? `This site was previously on our public tracker and has been removed. You can monitor it yourself on the Free plan, or browse other tracked services below.`
-      : `It's not on our public tracker right now. You can monitor it yourself in 2 minutes on the Free plan, or browse popular services we do track.`
+      ? `This site was previously on our public tracker and has been removed. You can monitor it yourself with an Upnotify plan, or browse other tracked services below.`
+      : `It's not on our public tracker right now. You can monitor it yourself in 2 minutes with an Upnotify plan, or browse popular services we do track.`
 
   return (
     <div style={{ maxWidth: 880, margin: '0 auto', padding: '64px 24px 80px' }}>
@@ -131,9 +131,9 @@ export function TrackerSoftNotFound({
           Want to monitor {requestedDomain} continuously?
         </h2>
         <p style={{ fontSize: 14, lineHeight: 1.65, color: 'var(--text-secondary)', marginBottom: 12 }}>
-          Upnotify's Free plan lets you monitor any public URL — including {requestedDomain} — with
+          Upnotify lets you monitor any public URL — including {requestedDomain} — with
           email alerts, response-time tracking, SSL expiry warnings and DNS change detection.
-          No credit card required.
+          Plans start at &#8377;999/year.
         </p>
         <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>
           Or run a one-off <Link href="/score">free Website Health Score</Link> on{' '}

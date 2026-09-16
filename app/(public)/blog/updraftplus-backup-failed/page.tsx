@@ -216,7 +216,7 @@ export default function UpdraftPlusBackupFailedPage(): React.ReactElement {
         <h3>Step 1: Set up HTTP monitoring on your homepage</h3>
 
         <ol>
-          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (paid plans from ₹999/year)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>HTTP/HTTPS</strong> as the monitor type</li>
           <li>Enter your homepage URL</li>
@@ -329,7 +329,7 @@ export default function UpdraftPlusBackupFailedPage(): React.ReactElement {
         <div className="blog-cta-section">
           <h3>Catch disk-full 500 errors before your visitors do</h3>
           <p>
-            Free plan available. HTTP monitoring that detects 500 errors in under 60 seconds. Keyword monitoring for content verification. Slack, email, Teams, and webhook alerts. No credit card required.
+            Start monitoring in minutes. HTTP monitoring that detects 500 errors in under 60 seconds. Keyword monitoring for content verification. Slack, email, Teams, and webhook alerts.
           </p>
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             <Link href="/score" className="btn btn-primary btn-lg">

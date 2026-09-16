@@ -269,7 +269,7 @@ export default function WordPressSSLExpiredPage(): React.ReactElement {
         <h3>Step 1: Add an SSL monitor for your domain</h3>
 
         <ol>
-          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (paid plans from ₹999/year)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>SSL Certificate</strong> as the monitor type</li>
           <li>Enter your domain name</li>
@@ -382,7 +382,7 @@ export default function WordPressSSLExpiredPage(): React.ReactElement {
         <div className="blog-cta-section">
           <h3>Never let your SSL certificate expire again</h3>
           <p>
-            Free plan available. SSL monitoring with 30/14/7 day expiry warnings. Certificate chain validation. No credit card required.
+            Start monitoring in minutes. SSL monitoring with 30/14/7 day expiry warnings. Certificate chain validation.
           </p>
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             <Link href="/tools/ssl-checker" className="btn btn-primary btn-lg">

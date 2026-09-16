@@ -10,6 +10,7 @@ interface ProvidersProps {
   user: User | null
   organisation: Organisation | null
   workspaces: Workspace[]
+  hasActivePlan: boolean
 }
 
 export function Providers({
@@ -17,10 +18,11 @@ export function Providers({
   user,
   organisation,
   workspaces,
+  hasActivePlan,
 }: ProvidersProps) {
   return (
     <AuthProvider initialUser={user}>
-      <WorkspaceProvider organisation={organisation} workspaces={workspaces}>
+      <WorkspaceProvider organisation={organisation} workspaces={workspaces} hasActivePlan={hasActivePlan}>
         <ToastProvider>
           {children}
         </ToastProvider>

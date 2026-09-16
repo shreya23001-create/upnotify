@@ -54,7 +54,7 @@ export function PublicNavClient({ links, ctaPrimary, ctaSecondary }: PublicNavCl
   function close(): void { setMobileOpen(false) }
 
   const primaryHref   = ctaPrimary?.href   ?? '/signup'
-  const primaryText   = ctaPrimary?.text   ?? 'Start Free'
+  const primaryText   = ctaPrimary?.text   ?? 'Start Monitoring'
   const secondaryHref = ctaSecondary?.href ?? '/login'
   const secondaryText = ctaSecondary?.text ?? 'Log in'
 

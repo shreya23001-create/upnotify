@@ -122,7 +122,7 @@ export default function PortCheckerPage(): React.ReactElement {
             issue from a host outage at a glance.
           </p>
           <a href="/signup" className="btn btn-primary btn-lg">
-            Start Monitoring Free
+            Start Monitoring
           </a>
         </div>
       </div>

@@ -231,7 +231,7 @@ export default function WordPressRedirectLoopPage(): React.ReactElement {
         <h3>Step 1: Set up an HTTP monitor on wp-admin</h3>
 
         <ol>
-          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (paid plans from ₹999/year)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>HTTP/HTTPS</strong> as the monitor type</li>
           <li>Enter your wp-admin URL: <code>https://yoursite.com/wp-admin/</code></li>
@@ -338,7 +338,7 @@ export default function WordPressRedirectLoopPage(): React.ReactElement {
         <div className="blog-cta-section">
           <h3>Detect WordPress admin redirect loops automatically</h3>
           <p>
-            Free plan available. HTTP monitoring that follows redirect chains. Keyword monitoring that checks actual content. No credit card required.
+            Start monitoring in minutes. HTTP monitoring that follows redirect chains. Keyword monitoring that checks actual content.
           </p>
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             <Link href="/score" className="btn btn-primary btn-lg">

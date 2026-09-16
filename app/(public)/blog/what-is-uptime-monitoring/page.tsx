@@ -249,7 +249,7 @@ export default function WhatIsUptimeMonitoringPage(): React.ReactElement {
         </p>
 
         <p>
-          Recovering lost rankings takes weeks or months. The cost of monitoring is zero on a free plan.
+          Recovering lost rankings takes weeks or months. The cost of monitoring is a few hundred rupees a year.
         </p>
 
         <h3>Trust is fragile</h3>
@@ -271,7 +271,7 @@ export default function WhatIsUptimeMonitoringPage(): React.ReactElement {
         </p>
 
         <ol>
-          <li>Go to <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> and create a free account</li>
+          <li>Go to <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> and create your account</li>
           <li>Click <strong>Add Monitor</strong></li>
           <li>Select <strong>HTTP/HTTPS</strong></li>
           <li>Enter your website URL</li>
@@ -353,13 +353,13 @@ export default function WhatIsUptimeMonitoringPage(): React.ReactElement {
         </p>
 
         <p>
-          The setup takes a minute. The free plan costs nothing. There is no reason not to do this right now.
+          The setup takes a minute, and plans start at &#8377;999/year. There is no reason not to do this right now.
         </p>
 
         <div className="blog-cta-section">
           <h3>Start monitoring your website for free</h3>
           <p>
-            Free plan. One-minute checks. HTTP, keyword, SSL, and DNS monitoring. Public status pages. No credit card required.
+            Start monitoring in minutes. One-minute checks. HTTP, keyword, SSL, and DNS monitoring. Public status pages.
           </p>
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             <Link href="/score" className="btn btn-primary btn-lg">

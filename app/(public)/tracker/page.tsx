@@ -41,11 +41,11 @@ const FAQ = [
   },
   {
     q: 'How can I add a site to the public tracker?',
-    a: 'The public tracker covers popular websites that everyone wants to know about. To monitor your own site, sign up for a free Upnotify account — you get HTTP, SSL, DNS and response-time monitoring with email alerts on the Free plan.',
+    a: 'The public tracker covers popular websites that everyone wants to know about. To monitor your own site, sign up for an Upnotify account — plans start at ₹999/year and include HTTP, SSL, DNS and response-time monitoring with email alerts.',
   },
   {
     q: 'Can I monitor my own site continuously instead of refreshing this page?',
-    a: 'Yes. The Free plan includes 3 monitors with email alerts. Each tracker site here corresponds to a continuous monitor type you can run on your own domain — HTTP uptime, SSL certificate, DNS, response time, and security headers.',
+    a: 'Yes. Continuous monitoring with email alerts is included on every paid plan, starting at ₹999/year. Each tracker site here corresponds to a continuous monitor type you can run on your own domain — HTTP uptime, SSL certificate, DNS, response time, and security headers.',
   },
   {
     q: 'Are the response times shown on the tracker accurate?',
@@ -53,7 +53,7 @@ const FAQ = [
   },
   {
     q: 'Is there a way to subscribe to alerts for specific sites?',
-    a: 'Subscriber alerts on the public tracker are coming. For now, the fastest path is to add the sites you care about as monitors in your own Upnotify account — you can monitor any public URL on the Free plan and receive email, Slack, Telegram, or Microsoft Teams alerts on every status change.',
+    a: 'Subscriber alerts on the public tracker are coming. For now, the fastest path is to add the sites you care about as monitors in your own Upnotify account — you can monitor any public URL on a paid plan and receive email alerts on every status change, with Slack, Telegram, and Microsoft Teams available on higher tiers.',
   },
 ]
 
@@ -308,10 +308,10 @@ export default async function TrackerDirectoryPage({
       <div className="tracker-cta-section">
         <h2>Monitor your own website</h2>
         <p>
-          Get instant alerts when your site goes down. Free plan available — no credit card required.
+          Get instant alerts when your site goes down. Plans start at &#8377;999/year.
         </p>
         <Link href="/signup" className="btn btn-primary">
-          Start Monitoring Free
+          Start Monitoring
         </Link>
       </div>
     </div>

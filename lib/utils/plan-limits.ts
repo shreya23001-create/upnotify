@@ -240,6 +240,32 @@ export async function checkWebsiteSubscriptionActive(orgId: string, targetDomain
   return Boolean(data)
 }
 
+/**
+ * Purchased-website slot usage for the quantity-first Pro Plan purchase
+ * flow (see supabase/migrations/00132_website_subscription_quantity.sql).
+ * `limit` is the org's total purchased capacity (SUM of purchased_quantity
+ * across active/cancelling/past_due rows), `used` counts domains already
+ * claimed against that capacity. Meaningless for grandfathered orgs —
+ * callers must check hasGrandfatheredBaseSubscription first and skip this
+ * for them (they're unlimited under the old org-wide plan system).
+ */
+export async function getWebsiteSlotUsage(orgId: string): Promise<{ limit: number; used: number; remaining: number }> {
+  const supabase = createAdminClient()
+  const [{ data: limitData }, { data: rows }] = await Promise.all([
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (supabase as any).rpc('org_purchased_website_limit', { p_org_id: orgId }) as Promise<{ data: number | null }>,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (supabase as any)
+      .from('website_subscriptions')
+      .select('domains')
+      .eq('org_id', orgId)
+      .in('status', ['active', 'cancelling', 'past_due']) as Promise<{ data: Array<{ domains: string[] }> | null }>,
+  ])
+  const limit = limitData ?? 0
+  const used = (rows ?? []).reduce((sum, r) => sum + (r.domains?.length ?? 0), 0)
+  return { limit, used, remaining: Math.max(limit - used, 0) }
+}
+
 /** Check if the org can create another workspace */
 export async function checkWorkspaceLimit(orgId: string): Promise<{
   allowed: boolean

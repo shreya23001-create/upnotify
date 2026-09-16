@@ -6,29 +6,27 @@
 
 -- ── 1. Extend page_sections ─────────────────────────────────────────────────
 ALTER TABLE public.page_sections
-  ADD COLUMN IF NOT EXISTS section_type TEXT NOT NULL DEFAULT 'custom',
-  ADD COLUMN IF NOT EXISTS theme        JSONB,
-  ADD COLUMN IF NOT EXISTS updated_by   UUID REFERENCES public.users(id);
+ADD COLUMN IF NOT EXISTS section_type TEXT NOT NULL DEFAULT 'custom',
+ADD COLUMN IF NOT EXISTS theme JSONB,
+ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES public.users (id);
 
 -- ── 2. Global theme table ────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS public.cms_theme (
-  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  key        TEXT UNIQUE NOT NULL DEFAULT 'global',
-  settings   JSONB NOT NULL DEFAULT '{}',
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_by UUID REFERENCES public.users(id)
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
+    key TEXT UNIQUE NOT NULL DEFAULT 'global',
+    settings JSONB NOT NULL DEFAULT '{}',
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_by UUID REFERENCES public.users (id)
 );
 
 ALTER TABLE public.cms_theme ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Public can read theme"
-  ON public.cms_theme FOR SELECT TO anon, authenticated
-  USING (true);
+CREATE POLICY "Public can read theme" ON public.cms_theme FOR
+SELECT TO anon, authenticated USING (true);
 
-CREATE POLICY "Super admin manages theme"
-  ON public.cms_theme FOR ALL TO authenticated
-  USING (public.is_super_admin())
-  WITH CHECK (public.is_super_admin());
+CREATE POLICY "Super admin manages theme" ON public.cms_theme FOR ALL TO authenticated USING (public.is_super_admin ())
+WITH
+    CHECK (public.is_super_admin ());
 
 -- Seed default brand theme
 INSERT INTO public.cms_theme (key, settings)
@@ -60,7 +58,6 @@ VALUES ('landing', 'hero', 'hero', $json${
   "cta_tertiary":   { "text": "Score Your Site Free",  "href": "/score" },
   "trust_items":    [
     "No credit card required",
-    "3 monitors free forever",
     "1-minute check intervals",
     "GDPR compliant · EU data"
   ]
@@ -317,7 +314,6 @@ VALUES ('landing', 'cta_band', 'cta_band', $json${
   "cta_primary":   { "text": "Start Monitoring Free", "href": "/signup" },
   "cta_secondary": { "text": "See All Features →",    "href": "/#features" },
   "trust_items": [
-    "3 monitors free forever",
     "No credit card required",
     "GDPR compliant · EU data",
     "1-minute check intervals"

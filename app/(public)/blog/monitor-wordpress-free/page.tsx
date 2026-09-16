@@ -4,31 +4,31 @@ import { JsonLd } from '@/components/seo/json-ld'
 import Faq from '@/components/landing/faq'
 
 export const metadata: Metadata = {
-  title: 'How to Monitor Your WordPress Site for Free in 2026',
+  title: 'How to Monitor Your WordPress Site in 2026',
   description:
-    'Learn how to monitor your WordPress site for free — uptime checks, SSL monitoring, performance tracking, and keyword monitoring. Set up in 60 seconds with Upnotify.',
+    'Learn how to monitor your WordPress site — uptime checks, SSL monitoring, performance tracking, and keyword monitoring. Set up in 60 seconds with Upnotify.',
   alternates: { canonical: 'https://upnotify-monitoring.vercel.app/blog/monitor-wordpress-free' },
   openGraph: {
-    title: 'How to Monitor Your WordPress Site for Free in 2026',
+    title: 'How to Monitor Your WordPress Site in 2026',
     description:
-      'Free WordPress monitoring covering uptime, SSL, performance, and content changes. No credit card required.',
+      'WordPress monitoring covering uptime, SSL, performance, and content changes.',
     url: 'https://upnotify-monitoring.vercel.app/blog/monitor-wordpress-free',
     type: 'article',
     images: [{ url: '/og-image.svg', width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'How to Monitor Your WordPress Site for Free in 2026',
+    title: 'How to Monitor Your WordPress Site in 2026',
     description:
-      'Free WordPress monitoring covering uptime, SSL, performance, and content changes. No credit card required.',
+      'WordPress monitoring covering uptime, SSL, performance, and content changes.',
   },
 }
 
 const FAQ_DATA = [
   {
-    question: 'Can I really monitor my WordPress site for free?',
+    question: 'How much does it cost to monitor my WordPress site?',
     answer:
-      'Yes. Upnotify offers a free plan that includes HTTP uptime monitoring, SSL certificate monitoring, and keyword monitoring. You get one-minute check intervals and alerts via email. No credit card is required to sign up.',
+      'Upnotify does not offer a free monitoring plan, but the entry plan starts at ₹999/year and includes HTTP uptime monitoring, SSL certificate monitoring, and keyword monitoring with alerts via email. You can also run one-off checks with our free tools without an account.',
   },
   {
     question: 'What should I monitor on my WordPress site?',
@@ -38,7 +38,7 @@ const FAQ_DATA = [
   {
     question: 'How often should my WordPress site be checked?',
     answer:
-      'Every 60 seconds is the standard for business-critical sites. If your site generates revenue, leads, or serves customers, a one-minute check interval means you know about problems within a minute instead of hours. Upnotify free plan supports one-minute checks.',
+      'Every 60 seconds is the standard for business-critical sites. If your site generates revenue, leads, or serves customers, a one-minute check interval means you know about problems within a minute instead of hours. Upnotify supports one-minute checks.',
   },
   {
     question: 'Will monitoring slow down my WordPress site?',
@@ -51,9 +51,9 @@ const FAQ_DATA = [
       'Keyword monitoring checks that specific text exists on your page. WordPress can return a 200 OK status code while showing error messages like "Error Establishing a Database Connection" or a white screen. A standard HTTP check sees "up" but keyword monitoring catches the broken content.',
   },
   {
-    question: 'How is Upnotify different from other free monitoring tools?',
+    question: 'How is Upnotify different from other monitoring tools?',
     answer:
-      'Most free monitoring tools only check HTTP status codes. Upnotify includes keyword monitoring on the free plan, which catches WordPress-specific failures like database errors, white screens, and hacked content that return 200 OK but show broken pages. You also get SSL monitoring and a public status page.',
+      'Most basic monitoring tools only check HTTP status codes. Upnotify includes keyword monitoring, which catches WordPress-specific failures like database errors, white screens, and hacked content that return 200 OK but show broken pages. You also get SSL monitoring and a public status page.',
   },
   {
     question: 'Do I need a plugin to monitor my WordPress site?',
@@ -206,13 +206,13 @@ export default function MonitorWordPressFreePage(): React.ReactElement {
         <h2>How to set up free WordPress monitoring with Upnotify</h2>
 
         <p>
-          <Link href="/signup">Upnotify</Link> covers all five of these monitoring types on the free plan. Here is how to set it up in under five minutes.
+          <Link href="/signup">Upnotify</Link> covers all five of these monitoring types. Here is how to set it up in under five minutes.
         </p>
 
-        <h3>Step 1: Create your free account</h3>
+        <h3>Step 1: Create your account</h3>
 
         <p>
-          Go to <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link>. Enter your email and you are in. No credit card, no trial expiry, no gotcha. The free plan is free forever.
+          Go to <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link>. Enter your email, pick a plan, and you are in. Plans start at &#8377;999/year — no trial expiry, no gotcha.
         </p>
 
         <h3>Step 2: Add an HTTP monitor</h3>
@@ -360,7 +360,7 @@ export default function MonitorWordPressFreePage(): React.ReactElement {
         <div className="blog-cta-section">
           <h3>Start monitoring your WordPress site for free</h3>
           <p>
-            Free plan. One-minute checks. HTTP, keyword, and SSL monitoring. No credit card required.
+            Start monitoring in minutes. One-minute checks. HTTP, keyword, and SSL monitoring.
           </p>
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             <Link href="/score" className="btn btn-primary btn-lg">

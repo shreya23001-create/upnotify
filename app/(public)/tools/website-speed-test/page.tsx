@@ -144,7 +144,7 @@ export default function WebsiteSpeedTestPage(): React.ReactElement {
             silently bloat the site — both contribute to slow page loads.
           </p>
           <a href="/signup" className="btn btn-primary btn-lg">
-            Start Monitoring Free
+            Start Monitoring
           </a>
         </div>
       </div>

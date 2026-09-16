@@ -43,7 +43,7 @@ const FAQ_DATA = [
   {
     question: 'How much does a status page cost?',
     answer:
-      'Dedicated status page providers charge between $29 and $399 per month. Upnotify includes a public status page on the free plan at no cost. The status page is connected to your monitors and updates automatically — no manual updating required during incidents.',
+      'Dedicated status page providers charge between $29 and $399 per month. Upnotify includes a public status page on every paid plan at no extra cost. The status page is connected to your monitors and updates automatically — no manual updating required during incidents.',
   },
   {
     question: 'Can I use a custom domain for my status page?',
@@ -238,7 +238,7 @@ export default function FreeStatusPageSaasPage(): React.ReactElement {
         <h2>How to set up a free status page with Upnotify</h2>
 
         <p>
-          <Link href="/signup">Upnotify</Link> includes public status pages on the free plan. The status page connects directly to your monitors — when a monitor detects a failure, the status page updates automatically. No manual intervention required.
+          <Link href="/signup">Upnotify</Link> includes public status pages on every paid plan at no extra cost. The status page connects directly to your monitors — when a monitor detects a failure, the status page updates automatically. No manual intervention required.
         </p>
 
         <h3>Step 1: Set up your monitors</h3>
@@ -350,7 +350,7 @@ export default function FreeStatusPageSaasPage(): React.ReactElement {
         </ul>
 
         <p>
-          <Link href="/signup">Upnotify</Link> includes public status pages on the free plan because we believe every SaaS — from day one — should have one. Monitor your service and communicate transparently without spending a penny.
+          <Link href="/signup">Upnotify</Link> includes public status pages on every paid plan because we believe every SaaS — from day one — should have one. Monitor your service and communicate transparently without paying status-page provider prices.
         </p>
 
         <h2>Your customers already expect this</h2>
@@ -366,7 +366,7 @@ export default function FreeStatusPageSaasPage(): React.ReactElement {
         <div className="blog-cta-section">
           <h3>Create your free status page in 5 minutes</h3>
           <p>
-            Free monitoring + free status page. Automatic incident detection. Custom domain support. No credit card required.
+            Free monitoring + free status page. Automatic incident detection. Custom domain support.
           </p>
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             <Link href="/score" className="btn btn-primary btn-lg">

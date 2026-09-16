@@ -21,7 +21,7 @@ const FAQ_SCHEMA = {
       name: 'How many sites can I track with Watchdog on each Upnotify plan?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Free plan: 3 sites. Lite plan: 5 sites. Builder plan: 10 sites. Scale plan: 25 sites. These limits are per workspace.',
+        text: 'The number of competitor sites you can track depends on your plan. There is no free plan — check your Plans page for your current limit.',
       },
     },
     {

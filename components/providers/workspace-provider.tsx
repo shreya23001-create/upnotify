@@ -16,6 +16,7 @@ interface WorkspaceContextType {
   workspaces: Workspace[]
   organisation: Organisation | null
   isAgency: boolean
+  hasActivePlan: boolean
   setCurrentWorkspace: (workspaceId: string) => void
 }
 
@@ -24,6 +25,7 @@ const WorkspaceContext = createContext<WorkspaceContextType>({
   workspaces: [],
   organisation: null,
   isAgency: false,
+  hasActivePlan: true, // default true so pre-hydration renders never show a false lock
   setCurrentWorkspace: () => { },
 })
 
@@ -35,12 +37,14 @@ interface WorkspaceProviderProps {
   children: React.ReactNode
   organisation: Organisation | null
   workspaces: Workspace[]
+  hasActivePlan: boolean
 }
 
 export function WorkspaceProvider({
   children,
   organisation,
   workspaces,
+  hasActivePlan,
 }: WorkspaceProviderProps) {
   const isAgency = organisation?.type === 'agency'
 
@@ -83,6 +87,7 @@ export function WorkspaceProvider({
         workspaces,
         organisation,
         isAgency,
+        hasActivePlan,
         setCurrentWorkspace,
       }}
     >

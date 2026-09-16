@@ -189,6 +189,7 @@ export async function createRazorpaySubscription(params: {
         is_website_sub: 'true',
         target_domain: params.targetDomain ?? '',
         domains: (params.websiteDomains ?? []).join(','),
+        purchased_quantity: String(params.quantity ?? (params.websiteDomains ?? []).length),
       } : {}),
     },
     notify_info: {

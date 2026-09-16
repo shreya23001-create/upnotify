@@ -8,7 +8,7 @@ const data: IndustryLandingData = {
     'Catch API regressions, login failures and silent partial outages before paying customers churn. Built for SaaS founders, engineering teams and platform operators.',
   seoTitle: 'SaaS Uptime Monitoring — API, Login & Status Page Reliability | Upnotify',
   seoDescription:
-    'SaaS uptime monitoring built for product teams: API endpoint checks, response time SLAs, login flow keyword detection, SSL expiry alerts, and a public status page on the Free plan. Stop losing customers to silent regressions.',
+    'SaaS uptime monitoring built for product teams: API endpoint checks, response time SLAs, login flow keyword detection, SSL expiry alerts, and a public status page included with your plan. Stop losing customers to silent regressions.',
   whyItMatters: [
     'Every minute of unscheduled downtime in a SaaS product is a churn event in slow motion. Customers who hit a broken login, a 502 on a critical API endpoint, or a checkout that quietly fails do not file a support ticket — they switch to a competitor and never come back.',
     'Worse, modern SaaS architectures fail in ways that 200-OK monitoring misses entirely: a new auth deploy that returns successful responses but rejects valid tokens, a third-party CDN that is up but serving stale assets, or a payment webhook that is silently dropping events. SaaS uptime monitoring needs to look at semantics, not just status codes.',
@@ -77,7 +77,7 @@ const data: IndustryLandingData = {
     },
     {
       q: 'How quickly will my engineering team be alerted to a problem?',
-      a: 'Within 30–60 seconds of two consecutive failed checks (we run two-confirmation to eliminate false positives). Email, Slack, Microsoft Teams, Telegram, and signed webhook alerts are all included on the Free plan. Smart Digest then collapses repeat events into a single follow-up so engineers are not paged 50 times during an outage.',
+      a: 'Within 30–60 seconds of two consecutive failed checks (we run two-confirmation to eliminate false positives). Email alerts are included on every paid plan, with Slack, Microsoft Teams, Telegram, and signed webhook alerts on Pro Plan and above. Smart Digest then collapses repeat events into a single follow-up so engineers are not paged 50 times during an outage.',
     },
     {
       q: 'Do you integrate with PagerDuty, Opsgenie, or similar?',

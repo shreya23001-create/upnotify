@@ -88,7 +88,7 @@ const FAQ_ITEMS = [
   },
   {
     q: 'Is there a free plan?',
-    a: 'Yes \u2014 3 monitors with email alerts, no credit card needed to get started. We also publish over a dozen free website monitoring tools, an SSL checker, DNS lookup, blacklist checker, and more, that anyone can use without an account.',
+    a: 'No \u2014 continuous monitoring is a paid product, with plans starting at \u20b9999/year. We do publish over a dozen free website monitoring tools, an SSL checker, DNS lookup, blacklist checker, and more, that anyone can use without an account.',
   },
   {
     q: 'How does Upnotify prevent false alerts?',
@@ -226,7 +226,7 @@ export default function AboutPage(): React.ReactElement {
               { '@type': 'Question', name: 'Who builds and operates Upnotify?', acceptedAnswer: { '@type': 'Answer', text: 'Upnotify is built and run by Crozent Techlabs Private Limited, registered at B-59, B-Block, Chipyana, Noida – 201009, Uttar Pradesh, India (GST 09AAMCC8947M1ZP).' } },
               { '@type': 'Question', name: 'What monitor types does Upnotify support?', acceptedAnswer: { '@type': 'Answer', text: 'There are 24 in total: HTTP/HTTPS uptime, SSL certificate expiry, DNS records, keyword detection, domain expiry, ports, ping, API endpoints, heartbeat, page change detection, security headers, response time, robots.txt, IP changes, MX health, WHOIS/registrar changes, sitemaps, redirect chains, SPF/DMARC, blacklists, page size, cookie consent, nameservers, and a WordPress site monitor plugin.' } },
               { '@type': 'Question', name: 'Where is my monitoring data stored?', acceptedAnswer: { '@type': 'Answer', text: 'Everything lives in the EU, on Supabase infrastructure in the Frankfurt region, encrypted both at rest and in transit. Row-level security keeps every organisation’s data fully isolated from every other.' } },
-              { '@type': 'Question', name: 'Is there a free plan?', acceptedAnswer: { '@type': 'Answer', text: 'Yes — 3 monitors with email alerts, no credit card needed to get started. We also publish over a dozen free website monitoring tools that anyone can use without an account.' } },
+              { '@type': 'Question', name: 'Is there a free plan?', acceptedAnswer: { '@type': 'Answer', text: 'No — continuous monitoring is a paid product, with plans starting at ₹999/year. We do publish over a dozen free website monitoring tools that anyone can use without an account.' } },
               { '@type': 'Question', name: 'How does Upnotify prevent false alerts?', acceptedAnswer: { '@type': 'Answer', text: 'That job falls to two-confirmation detection: the moment a check flags a possible issue, Upnotify runs a second check before doing anything else, and only opens an incident if both agree. We also ship Smart Digest — the first event goes out instantly, and later events fold into a single digest email.' } },
               { '@type': 'Question', name: 'How do I contact Upnotify?', acceptedAnswer: { '@type': 'Answer', text: 'Reach us at info@upnotify.com for billing questions, info@upnotify.com for product support, or through the contact form. We’re GDPR compliant, and a Data Processing Agreement is available for Agency customers.' } },
             ],

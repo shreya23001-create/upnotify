@@ -171,7 +171,7 @@ export default function RedirectChainCheckerPage(): React.ReactElement {
               <Link href="/monitoring/http-uptime-monitoring">HTTP uptime monitoring</Link> for end-to-end coverage.
             </p>
             <a href="/signup" className="btn btn-primary btn-lg">
-              Start Monitoring Free
+              Start Monitoring
             </a>
           </div>
         </div>

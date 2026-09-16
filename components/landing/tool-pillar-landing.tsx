@@ -236,10 +236,10 @@ export function ToolPillarLanding({ data }: { data: ToolPillarData }): React.Rea
         <div className="pillar-cta reveal">
           <div>
             <div className="pillar-cta-copy-title">Stop running one-off checks. Start monitoring.</div>
-            <div className="pillar-cta-copy-sub">Free plan · 3 monitors · No credit card required</div>
+            <div className="pillar-cta-copy-sub">Plans from ₹999/year · Cancel or pause anytime</div>
           </div>
           <Link href="/signup" className="pillar-cta-button">
-            Start Free →
+            Start Monitoring →
           </Link>
         </div>
 

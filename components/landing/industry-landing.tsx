@@ -72,9 +72,9 @@ export function IndustryLandingPage({ data }: { data: IndustryLandingData }): Re
                 operatingSystem: 'Web',
                 offers: {
                   '@type': 'Offer',
-                  price: '0',
-                  priceCurrency: 'GBP',
-                  description: 'Free plan available',
+                  price: '999',
+                  priceCurrency: 'INR',
+                  description: 'Paid plans from ₹999/year',
                 },
                 publisher: {
                   '@type': 'Organization',
@@ -126,7 +126,7 @@ export function IndustryLandingPage({ data }: { data: IndustryLandingData }): Re
               <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
-              Start Monitoring Free
+              Start Monitoring
             </Link>
             <Link href="/score" className="btn btn-ghost">Run Free Health Score</Link>
           </div>
@@ -255,7 +255,7 @@ export function IndustryLandingPage({ data }: { data: IndustryLandingData }): Re
         }}>
           <div>
             <div style={{ fontWeight: 700, fontSize: 16, color: '#fff', marginBottom: 4 }}>Set up in 60 seconds</div>
-            <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)' }}>Free plan · 3 monitors · No credit card required</div>
+            <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)' }}>Plans from ₹999/year · Cancel or pause anytime</div>
           </div>
           <Link href="/signup" style={{
             background: '#fff',
@@ -307,15 +307,15 @@ export function IndustryLandingPage({ data }: { data: IndustryLandingData }): Re
             Ready to set up monitoring?
           </h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: 14, marginBottom: 24, maxWidth: 520, margin: '0 auto 24px' }}>
-            Join teams who monitor their infrastructure with Upnotify. Free plan, no
-            credit card required. Or browse all{' '}
+            Join teams who monitor their infrastructure with Upnotify. Plans from
+            &#8377;999/year. Or browse all{' '}
             <Link href="/monitoring">24 monitor types</Link> first.
           </p>
           <Link href="/signup" className="btn btn-primary btn-lg">
             <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
-            Start Monitoring Free
+            Start Monitoring
           </Link>
         </div>
       </main>

@@ -2,9 +2,9 @@ import type { Metadata } from 'next'
 import { LoginForm } from '@/components/auth/login-form'
 
 export const metadata: Metadata = {
-  title: 'Sign Up Free',
+  title: 'Sign Up',
   description:
-    'Create a free Upnotify account. Start monitoring uptime, performance and infrastructure in 60 seconds. No credit card required.',
+    'Create your Upnotify account. Start monitoring uptime, performance and infrastructure in 60 seconds. Plans from ₹999/year.',
   alternates: { canonical: 'https://upnotify-monitoring.vercel.app/signup' },
 }
 

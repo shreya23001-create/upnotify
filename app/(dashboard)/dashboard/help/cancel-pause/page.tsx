@@ -53,16 +53,15 @@ export default function HelpCancelPausePage(): React.ReactElement {
 
           <section className="help-section">
             <h2 className="help-section-title">Canceling Your Subscription</h2>
-            <p>When you cancel, your account reverts to the <strong>Free plan</strong>. Here is what changes:</p>
+            <p>Upnotify does not offer a free plan, so when you cancel, your subscription remains active until the end of the billing period you have already paid for. After that:</p>
             <ul className="help-list">
-              <li><strong>Monitors</strong> — limited to 3 (excess monitors are paused, not deleted)</li>
-              <li><strong>Check interval</strong> — 10 minutes only</li>
-              <li><strong>Alerts</strong> — email only (Slack, Teams, and webhook channels are disabled)</li>
+              <li><strong>Monitors</strong> — deactivated (not deleted)</li>
+              <li><strong>Alerts</strong> — stop sending</li>
               <li><strong>Status pages</strong> — unpublished</li>
               <li><strong>AI reports</strong> — not available</li>
               <li><strong>API access</strong> — not available</li>
             </ul>
-            <p><strong>Your data is not deleted.</strong> You can upgrade again at any time and all your monitors, settings, and history will still be there.</p>
+            <p><strong>Your data is not deleted.</strong> You can resubscribe at any time and all your monitors, settings, and history will still be there.</p>
           </section>
 
           <section className="help-section">

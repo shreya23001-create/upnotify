@@ -43,14 +43,14 @@ function VisualField({ fieldKey, value, onChange }: {
 
   if (typeof value === 'string' || value === null) {
     const str = (value as string) ?? ''
-    const isUrl  = /href|url|src|link/i.test(fieldKey)
+    const isUrl = /href|url|src|link/i.test(fieldKey)
     const isHtml = fieldKey === 'html' || str.trim().startsWith('<')
     const isLong = str.length > 80 || str.includes('\n') || isHtml
     return (
       <div style={{ marginBottom: 14 }}>
         <label className="cms-field-label">
           {label}
-          {isUrl  && <span style={{ marginLeft: 6, fontSize: 10, fontWeight: 700, color: '#3b82f6' }}>URL</span>}
+          {isUrl && <span style={{ marginLeft: 6, fontSize: 10, fontWeight: 700, color: '#3b82f6' }}>URL</span>}
           {isHtml && <span style={{ marginLeft: 6, fontSize: 10, fontWeight: 700, color: '#0068DB' }}>HTML</span>}
         </label>
         {isLong ? (
@@ -257,7 +257,7 @@ function VisualEditor({ data, onChange }: {
 
 interface CmsManagerProps {
   initialSections: PageSection[]
-  initialTheme:    CmsTheme | null
+  initialTheme: CmsTheme | null
 }
 
 type Tab = 'sections' | 'theme'
@@ -265,29 +265,29 @@ type Tab = 'sections' | 'theme'
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 const SECTION_LABELS: Record<string, string> = {
-  hero:                'Hero',
-  trusted_logos:       'Trusted Logos',
-  stats_bar:           'Stats Bar',
-  features:            'Features',
-  how_it_works:        'How It Works',
-  ai_features:         'AI Features',
-  agency:              'Agency CTA',
-  faq:                 'FAQ',
-  testimonials:        'Testimonials',
-  comparison_table:    'Comparison Table',
-  cta_band:            'CTA Band',
-  ticker:              'Live Ticker',
-  pricing:             'Pricing Table',
+  hero: 'Hero',
+  trusted_logos: 'Trusted Logos',
+  stats_bar: 'Stats Bar',
+  features: 'Features',
+  how_it_works: 'How It Works',
+  ai_features: 'AI Features',
+  agency: 'Agency CTA',
+  faq: 'FAQ',
+  testimonials: 'Testimonials',
+  comparison_table: 'Comparison Table',
+  cta_band: 'CTA Band',
+  ticker: 'Live Ticker',
+  pricing: 'Pricing Table',
   downtime_calculator: 'Downtime Calculator',
-  blog_preview:        'Blog Preview',
-  nav:                 'Navigation (Header)',
-  footer:              'Footer',
-  custom:              'Custom',
+  blog_preview: 'Blog Preview',
+  nav: 'Navigation (Header)',
+  footer: 'Footer',
+  custom: 'Custom',
 }
 
 const PAGE_BADGE: Record<string, string> = {
   landing: '',
-  global:  'Global',
+  global: 'Global',
 }
 
 // These sections are structurally fixed — nav always top, footer always bottom
@@ -326,20 +326,20 @@ async function apiDelete(url: string): Promise<{ ok: boolean; error?: string }> 
 // ─── Section Editor ───────────────────────────────────────────────────────────
 
 interface SectionEditorProps {
-  section:   PageSection
-  onSave:    (id: string, content: Record<string, unknown>) => void
-  onClose:   () => void
-  saving:    boolean
+  section: PageSection
+  onSave: (id: string, content: Record<string, unknown>) => void
+  onClose: () => void
+  saving: boolean
 }
 
 type EditorMode = 'visual' | 'json' | 'html'
 
 function SectionEditor({ section, onSave, onClose, saving }: SectionEditorProps): React.ReactElement {
   const initialData = section.content as Record<string, unknown>
-  const [mode, setMode]       = useState<EditorMode>('visual')
-  const [data, setData]       = useState<Record<string, unknown>>(initialData)
+  const [mode, setMode] = useState<EditorMode>('visual')
+  const [data, setData] = useState<Record<string, unknown>>(initialData)
   const [rawJson, setRawJson] = useState(() => JSON.stringify(initialData, null, 2))
-  const [err, setErr]         = useState('')
+  const [err, setErr] = useState('')
   const hasHtml = typeof initialData?.html === 'string'
 
   function switchMode(next: EditorMode): void {
@@ -374,7 +374,7 @@ function SectionEditor({ section, onSave, onClose, saving }: SectionEditorProps)
 
   const modes: { id: EditorMode; label: string }[] = [
     { id: 'visual', label: 'Visual' },
-    { id: 'json',   label: 'Raw JSON' },
+    { id: 'json', label: 'Raw JSON' },
     ...(hasHtml ? [{ id: 'html' as EditorMode, label: 'HTML Preview' }] : []),
   ]
 
@@ -458,33 +458,33 @@ function SectionEditor({ section, onSave, onClose, saving }: SectionEditorProps)
 // ─── New Section Modal ────────────────────────────────────────────────────────
 
 interface NewSectionModalProps {
-  onSave:  (key: string, type: string, content: Record<string, unknown>, order: number, page: string) => void
+  onSave: (key: string, type: string, content: Record<string, unknown>, order: number, page: string) => void
   onClose: () => void
-  saving:  boolean
+  saving: boolean
   maxOrder: number
 }
 
 const SECTION_TEMPLATES: Record<string, Record<string, unknown>> = {
   custom: {
-    eyebrow:    'Optional label',
-    headline:   'Your Section Headline',
-    body:       'A short description for this section.',
-    cta_text:   'Learn More',
-    cta_href:   '/link',
-    align:      'center',
+    eyebrow: 'Optional label',
+    headline: 'Your Section Headline',
+    body: 'A short description for this section.',
+    cta_text: 'Learn More',
+    cta_href: '/link',
+    align: 'center',
     background: '',
   },
   hero: {
-    eyebrow:        '10 monitor types · 1-minute checks',
+    eyebrow: '10 monitor types · 1-minute checks',
     headline_line1: 'Know when your sites go down.',
     headline_line2: 'Before your customers do.',
-    subheadline:    'Uptime monitoring for agencies and teams.',
-    cta_primary:    { text: 'Start Free', href: '/signup' },
-    cta_secondary:  { text: 'See How It Works', href: '/#how-it-works' },
-    trust_items:    ['No credit card required', '3 monitors free forever'],
+    subheadline: 'Uptime monitoring for agencies and teams.',
+    cta_primary: { text: 'Start Monitoring', href: '/signup' },
+    cta_secondary: { text: 'See How It Works', href: '/#how-it-works' },
+    trust_items: ['Plans from ₹999/year'],
   },
   faq: {
-    eyebrow:  'FAQ',
+    eyebrow: 'FAQ',
     headline: 'Common questions',
     items: [
       { q: 'Question one?', a: 'Answer one.' },
@@ -500,14 +500,14 @@ function getTemplate(type: string): Record<string, unknown> {
 type NewEditorMode = 'visual' | 'json'
 
 function NewSectionModal({ onSave, onClose, saving, maxOrder }: NewSectionModalProps): React.ReactElement {
-  const [key,     setKey]     = useState('')
-  const [page,    setPage]    = useState('landing')
-  const [type,    setType]    = useState('custom')
-  const [mode,    setMode]    = useState<NewEditorMode>('visual')
-  const [data,    setData]    = useState<Record<string, unknown>>(() => getTemplate('custom'))
+  const [key, setKey] = useState('')
+  const [page, setPage] = useState('landing')
+  const [type, setType] = useState('custom')
+  const [mode, setMode] = useState<NewEditorMode>('visual')
+  const [data, setData] = useState<Record<string, unknown>>(() => getTemplate('custom'))
   const [rawJson, setRawJson] = useState(() => JSON.stringify(getTemplate('custom'), null, 2))
-  const [order,   setOrder]   = useState(maxOrder + 10)
-  const [err,     setErr]     = useState('')
+  const [order, setOrder] = useState(maxOrder + 10)
+  const [err, setErr] = useState('')
 
   function switchMode(next: NewEditorMode): void {
     if (mode === 'json') {
@@ -551,7 +551,7 @@ function NewSectionModal({ onSave, onClose, saving, maxOrder }: NewSectionModalP
 
   const editorModes: { id: NewEditorMode; label: string }[] = [
     { id: 'visual', label: 'Visual' },
-    { id: 'json',   label: 'Raw JSON' },
+    { id: 'json', label: 'Raw JSON' },
   ]
 
   return (
@@ -675,21 +675,21 @@ function NewSectionModal({ onSave, onClose, saving, maxOrder }: NewSectionModalP
 // ─── Theme Editor ─────────────────────────────────────────────────────────────
 
 interface ThemeEditorProps {
-  theme:   CmsTheme | null
-  onSave:  (settings: CmsThemeSettings) => void
-  saving:  boolean
+  theme: CmsTheme | null
+  onSave: (settings: CmsThemeSettings) => void
+  saving: boolean
 }
 
 const DEFAULT_THEME: CmsThemeSettings = {
   colors: {
-    brand_primary:   '#3b82f6',
+    brand_primary: '#3b82f6',
     brand_secondary: '#06b6d4',
-    accent:          '#0068DB',
-    success:         '#10b981',
-    warning:         '#f59e0b',
-    danger:          '#ef4444',
+    accent: '#0068DB',
+    success: '#10b981',
+    warning: '#f59e0b',
+    danger: '#ef4444',
   },
-  gradient:          'linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)',
+  gradient: 'linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)',
   dark_mode_default: true,
 }
 
@@ -708,12 +708,12 @@ function ThemeEditor({ theme, onSave, saving }: ThemeEditorProps): React.ReactEl
   }
 
   const colorFields: Array<{ key: keyof typeof colors; label: string }> = [
-    { key: 'brand_primary',   label: 'Brand Primary' },
+    { key: 'brand_primary', label: 'Brand Primary' },
     { key: 'brand_secondary', label: 'Brand Secondary' },
-    { key: 'accent',          label: 'Accent' },
-    { key: 'success',         label: 'Success' },
-    { key: 'warning',         label: 'Warning' },
-    { key: 'danger',          label: 'Danger' },
+    { key: 'accent', label: 'Accent' },
+    { key: 'success', label: 'Success' },
+    { key: 'warning', label: 'Warning' },
+    { key: 'danger', label: 'Danger' },
   ]
 
   return (
@@ -784,14 +784,14 @@ function ThemeEditor({ theme, onSave, saving }: ThemeEditorProps): React.ReactEl
 // ─── Main CmsManager ──────────────────────────────────────────────────────────
 
 export function CmsManager({ initialSections, initialTheme }: CmsManagerProps): React.ReactElement {
-  const [sections,   setSections]   = useState<PageSection[]>(initialSections)
-  const [theme,      setTheme]      = useState<CmsTheme | null>(initialTheme)
-  const [tab,        setTab]        = useState<Tab>('sections')
-  const [editingId,  setEditingId]  = useState<string | null>(null)
-  const [showNew,    setShowNew]    = useState(false)
-  const [toast,      setToast]      = useState<{ msg: string; type: 'success' | 'error' } | null>(null)
-  const [isPending,  startTransition] = useTransition()
-  const [savingIds,  setSavingIds]  = useState<Set<string>>(new Set())
+  const [sections, setSections] = useState<PageSection[]>(initialSections)
+  const [theme, setTheme] = useState<CmsTheme | null>(initialTheme)
+  const [tab, setTab] = useState<Tab>('sections')
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [showNew, setShowNew] = useState(false)
+  const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null)
+  const [isPending, startTransition] = useTransition()
+  const [savingIds, setSavingIds] = useState<Set<string>>(new Set())
 
   const editingSection = editingId ? sections.find(s => s.id === editingId) ?? null : null
   const maxOrder = sections.reduce((m, s) => Math.max(m, s.sort_order), 0)
@@ -838,8 +838,8 @@ export function CmsManager({ initialSections, initialTheme }: CmsManagerProps): 
     const swapWith = sorted[swapIdx]
     if (LOCKED_SECTIONS.has(swapWith.section_key)) return  // can't swap past a locked section
     const orders = [
-      { id: section.id,  sort_order: swapWith.sort_order },
-      { id: swapWith.id, sort_order: section.sort_order  },
+      { id: section.id, sort_order: swapWith.sort_order },
+      { id: swapWith.id, sort_order: section.sort_order },
     ]
 
     // Optimistic update

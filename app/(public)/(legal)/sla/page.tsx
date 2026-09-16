@@ -132,11 +132,13 @@ export default function SLAPage(): React.ReactElement {
         </li>
       </ul>
 
-      <h2>6. Free Plans</h2>
+      <h2>6. Plan Eligibility</h2>
       <p>
-        This SLA and the service credit mechanism apply to <strong>paid plans only</strong>. Free plan
-        users benefit from the same infrastructure and our best-effort availability, but are not
-        eligible for service credits.
+        Upnotify does not offer a free plan. This SLA and the service credit mechanism apply to{' '}
+        <strong>active, paid subscriptions in good standing</strong>. Accounts that are suspended for
+        non-payment, paused, or past the end of a cancelled billing period are not eligible for service
+        credits for the affected period. Free one-off tools available on our website without an account
+        are provided on a best-effort basis and are not covered by this SLA.
       </p>
 
       <h2>7. Sole Remedy</h2>

@@ -803,11 +803,82 @@ body::before {
   text-align: center;
 }
 
+/* Homepage-only split: copy on the left, static hero image on the right.
+   Scoped to .hero-text-col/.hero-image-col so it never touches the shared
+   .hero-content/.hero-headline/.hero-sub rules used by other pages
+   (monitoring, score, tracker, compete). */
+.hero-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: start;
+  gap: var(--space-12);
+  text-align: left;
+}
+
+.hero-text-col .hero-eyebrow,
+.hero-text-col .hero-headline,
+.hero-text-col .hero-sub {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.hero-text-col .hero-ctas,
+.hero-text-col .hero-trust {
+  justify-content: flex-start;
+}
+
+.hero-text-col .hero-trust {
+  flex-wrap: nowrap;
+  gap: var(--space-4);
+  white-space: nowrap;
+}
+
+.hero-image-col {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.hero-image {
+  width: 100%;
+  max-width: 640px;
+  height: auto;
+  display: block;
+}
+
+@media (max-width: 900px) {
+  .hero-split {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .hero-text-col .hero-eyebrow,
+  .hero-text-col .hero-headline,
+  .hero-text-col .hero-sub {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .hero-text-col .hero-ctas,
+  .hero-text-col .hero-trust {
+    justify-content: center;
+  }
+
+  .hero-text-col .hero-trust {
+    flex-wrap: wrap;
+    white-space: normal;
+  }
+
+  .hero-image-col {
+    order: -1;
+  }
+}
+
 .hero-eyebrow {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  margin-bottom: var(--space-6);
+  margin-bottom: 0;
   /* reset styles.css override — pill styling belongs on .hero-eyebrow-text only */
   padding: 0;
   border-radius: 0;
@@ -844,6 +915,7 @@ body::before {
   line-height: var(--lh-tight);
   letter-spacing: var(--tracking-tighter);
   color: var(--text-primary);
+  margin-top: var(--space-6);
   margin-bottom: var(--space-6);
   max-width: 780px;
   margin-left: auto;

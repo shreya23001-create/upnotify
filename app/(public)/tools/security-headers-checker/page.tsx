@@ -172,7 +172,7 @@ export default function SecurityHeadersCheckerPage(): React.ReactElement {
               transport-security picture.
             </p>
             <a href="/signup" className="btn btn-primary btn-lg">
-              Start Monitoring Free
+              Start Monitoring
             </a>
           </div>
         </div>

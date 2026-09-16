@@ -3,11 +3,12 @@
 import { useState, useTransition, useCallback, useEffect } from 'react'
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { Radio, Pause, Play, Trash2, Edit2 } from 'lucide-react'
+import { Radio, Search } from 'lucide-react'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { MonitorStatusBadge } from './monitor-status-badge'
 import { TimelineBarGraph } from '@/components/ui/timeline-bar-graph'
 import { MonitorTypeIcon } from './monitor-type-icon'
+import { MonitorRowActions } from './monitor-row-actions'
 import { pauseMonitorAction, resumeMonitorAction, deleteMonitorAction, bulkDeleteMonitorsAction, bulkPauseMonitorsAction, bulkResumeMonitorsAction } from '@/app/(dashboard)/dashboard/monitors/actions'
 import { Pagination } from '@/components/ui/pagination'
 import type { Monitor } from '@/lib/types'
@@ -142,12 +143,12 @@ export function MonitorTable({ monitors, uptimeData, initialSearch = '', initial
 
   if (monitors.length === 0 && !initialSearch && !initialStatus && !initialType) {
     return (
-      <div className="empty-state">
-        <div className="empty-state-icon"><Radio size={32} strokeWidth={1.5} /></div>
+      <div className="mon-empty-state">
+        <div className="mon-empty-state-icon"><Radio size={30} strokeWidth={1.5} /></div>
         <h3>No monitors yet</h3>
-        <p>Create your first monitor to get started.</p>
-        <Link href="/dashboard/monitors/scan" className="btn btn-primary" style={{ marginTop: 16 }}>
-          + Add Your First Monitor
+        <p>Start monitoring your websites, APIs, and other important endpoints — you&apos;ll see uptime, response time, and alerts here once you add one.</p>
+        <Link href="/dashboard/monitors/new/manual" className="btn btn-primary">
+          + Add Monitor
         </Link>
       </div>
     )
@@ -158,13 +159,16 @@ export function MonitorTable({ monitors, uptimeData, initialSearch = '', initial
       {/* Toolbar */}
       <div className="mon-toolbar">
         <div className="mon-toolbar-left">
-          <input
-            className="mon-search"
-            type="text"
-            placeholder="Search monitors…"
-            value={searchInput}
-            onChange={e => setSearchInput(e.target.value)}
-          />
+          <div className="mon-search-wrap">
+            <Search size={15} className="mon-search-icon" />
+            <input
+              className="mon-search"
+              type="text"
+              placeholder="Search monitors…"
+              value={searchInput}
+              onChange={e => setSearchInput(e.target.value)}
+            />
+          </div>
           <div className="mon-filter-row">
             <select
               className="mon-filter-select"
@@ -217,7 +221,10 @@ export function MonitorTable({ monitors, uptimeData, initialSearch = '', initial
       {/* Monitor rows */}
       <div className="mon-list">
         {monitors.length === 0 ? (
-          <div className="mon-empty-filtered">No monitors match your filters.</div>
+          <div className="mon-empty-filtered">
+            <Search size={22} strokeWidth={1.5} />
+            <span>No monitors match your filters.</span>
+          </div>
         ) : monitors.map(m => {
           const isSelected = selectedIds.has(m.id)
           const slotSeconds = Math.max(m.check_interval_seconds, Math.ceil(86400 / 288))
@@ -276,25 +283,14 @@ export function MonitorTable({ monitors, uptimeData, initialSearch = '', initial
               </div>
 
               <div className="mon-col-actions">
-                <Link href={`/dashboard/monitors/${m.id}/edit`} className="mon-action-btn" title="Edit">
-                  <Edit2 size={14} />
-                </Link>
-                <button
-                  className="mon-action-btn"
-                  title={m.is_paused ? 'Resume' : 'Pause'}
-                  onClick={() => setPendingConfirm({ type: 'pause', ids: [m.id], isPaused: m.is_paused })}
+                <MonitorRowActions
+                  detailHref={detailHref}
+                  editHref={`/dashboard/monitors/${m.id}/edit`}
+                  isPaused={m.is_paused}
                   disabled={isPending}
-                >
-                  {m.is_paused ? <Play size={14} /> : <Pause size={14} />}
-                </button>
-                <button
-                  className="mon-action-btn mon-action-btn--danger"
-                  title="Delete"
-                  onClick={() => setPendingConfirm({ type: 'delete', ids: [m.id] })}
-                  disabled={isPending}
-                >
-                  <Trash2 size={14} />
-                </button>
+                  onTogglePause={() => setPendingConfirm({ type: 'pause', ids: [m.id], isPaused: m.is_paused })}
+                  onDelete={() => setPendingConfirm({ type: 'delete', ids: [m.id] })}
+                />
               </div>
             </div>
           )

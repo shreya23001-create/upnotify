@@ -805,7 +805,7 @@ export default async function User360Page({
           <div className="card" style={{ padding: 16, marginBottom: 16 }}>
             <h3 style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-muted)' }}>Subscriptions</h3>
             {subs.length === 0 ? (
-              <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>Free plan — no subscription.</p>
+              <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>No active subscription.</p>
             ) : (
               <table className="table">
                 <thead>
@@ -894,7 +894,7 @@ export default async function User360Page({
               Plan Limits vs Actual Usage
             </h3>
             {!activePlan ? (
-              <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>Free plan — no subscription limits configured.</p>
+              <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>No subscription limits configured.</p>
             ) : (
               <table className="table">
                 <thead>

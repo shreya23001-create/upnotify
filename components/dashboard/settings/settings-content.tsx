@@ -297,7 +297,7 @@ export function SettingsContent({
           )}
           {billingResult === 'cancelled' && (
             <div className="alert alert-warning stt-banner">
-              <strong>Subscription cancelled.</strong> You keep full access until the end of your billing period. After that, your account moves to the Free plan.
+              <strong>Subscription cancelled.</strong> You keep full access until the end of your billing period. After that, monitoring stops and your monitors are deactivated until you resubscribe.
             </div>
           )}
           {billingResult === 'portal_return' && (
@@ -397,7 +397,7 @@ export function SettingsContent({
                     <div className="card-content">
                       {canInvite
                         ? <TeamInviteForm canInvite={canInvite} teamMemberLimit={teamMemberLimit} teamMemberCount={teamMemberCount} onInviteSent={handleInviteSent} />
-                        : <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>Team invites are not available on the Free plan. Upgrade to invite team members.</p>
+                        : <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>Team invites are not available on your current plan. Upgrade to invite team members.</p>
                       }
                     </div>
                   </div>

@@ -1,0 +1,36 @@
+import { Radio, Activity, PauseCircle, AlertTriangle } from 'lucide-react'
+
+interface Props {
+  total: number
+  active: number
+  paused: number
+  issues: number
+}
+
+export function MonitorStatsBar({ total, active, paused, issues }: Props): React.ReactElement {
+  const stats = [
+    { label: 'Total Monitors', value: total, icon: Radio, tone: 'neutral' as const },
+    { label: 'Active', value: active, icon: Activity, tone: 'up' as const },
+    { label: 'Paused', value: paused, icon: PauseCircle, tone: 'paused' as const },
+    { label: 'Issues Detected', value: issues, icon: AlertTriangle, tone: 'down' as const },
+  ]
+
+  return (
+    <div className="mon-stats-bar">
+      {stats.map(s => {
+        const Icon = s.icon
+        return (
+          <div key={s.label} className={`mon-stat-card mon-stat-card--${s.tone}`}>
+            <div className="mon-stat-icon">
+              <Icon size={16} strokeWidth={2} />
+            </div>
+            <div>
+              <div className="mon-stat-value">{s.value}</div>
+              <div className="mon-stat-label">{s.label}</div>
+            </div>
+          </div>
+        )
+      })}
+    </div>
+  )
+}

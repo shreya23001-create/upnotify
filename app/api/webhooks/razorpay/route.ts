@@ -145,9 +145,10 @@ async function handleWebsiteSubscriptionActivated(sub: RzpSubscription): Promise
   const orgId = sub.notes?.org_id
   const domainsStr = sub.notes?.domains || sub.notes?.target_domain // fall back to the older single-domain field
   const domains = domainsStr ? domainsStr.split(',').map(d => d.trim()).filter(Boolean) : []
+  const purchasedQuantity = parseInt(sub.notes?.purchased_quantity ?? '', 10) || domains.length
 
-  if (!orgId || domains.length === 0) {
-    logger.error('Razorpay webhook (website): missing org_id or domains in subscription notes', { subId: sub.id })
+  if (!orgId || (domains.length === 0 && purchasedQuantity < 1)) {
+    logger.error('Razorpay webhook (website): missing org_id, or no domains and no purchased quantity in subscription notes', { subId: sub.id })
     return
   }
 
@@ -161,6 +162,7 @@ async function handleWebsiteSubscriptionActivated(sub: RzpSubscription): Promise
     currentPeriodStart: periodStart,
     currentPeriodEnd: periodEnd,
     source: 'razorpay_webhook',
+    purchasedQuantity,
   })
 }
 

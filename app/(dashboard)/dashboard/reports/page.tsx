@@ -4,6 +4,7 @@ import { getReportsForOrgPaged } from '@/lib/db/reports'
 import { ReportsTable } from '@/components/reports/reports-table'
 import { parsePage, getPaginationMeta, DEFAULT_PAGE_SIZE } from '@/lib/utils/pagination'
 import Link from 'next/link'
+import { requireActivatedOrg } from '@/lib/auth/require-activated-org'
 
 export default async function ReportsPage({
   searchParams,
@@ -12,6 +13,7 @@ export default async function ReportsPage({
 }) {
   const user = await getCurrentUser()
   if (!user) redirect('/login')
+  await requireActivatedOrg(user.org_id)
 
   const { page: pageParam } = await searchParams
   const page = parsePage(pageParam)

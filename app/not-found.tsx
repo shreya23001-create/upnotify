@@ -66,7 +66,7 @@ export default function NotFound(): React.ReactElement {
 
       <p className="notfound-footnote">
         Want alerts like this the moment your <em>real</em> site goes down?{' '}
-        <Link href="/signup">Start monitoring free</Link>
+        <Link href="/signup">Start monitoring</Link>
       </p>
     </div>
   )

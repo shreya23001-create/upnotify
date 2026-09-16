@@ -1,9 +1,7 @@
 'use client'
 
-import { useEffect, useState, useMemo, useRef } from 'react'
-import { createPortal } from 'react-dom'
+import { useEffect, useState, useMemo } from 'react'
 import Link from 'next/link'
-import { Telescope, Pencil } from 'lucide-react'
 import { useWorkspace } from '@/components/providers/workspace-provider'
 import type { Monitor, Incident } from '@/lib/types'
 
@@ -97,61 +95,12 @@ function StatCards({ stats }: { stats: MonitorStats }) {
   )
 }
 
-function AddBtn({ hasMonitors }: { hasMonitors: boolean }): React.ReactElement {
-  const [open, setOpen] = useState(false)
-  const [menuPos, setMenuPos] = useState<{ top: number; right: number } | null>(null)
-  const ref = useRef<HTMLDivElement>(null)
-  const menuRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    function handler(e: MouseEvent): void {
-      const target = e.target as Node
-      if (ref.current?.contains(target)) return
-      if (menuRef.current?.contains(target)) return
-      setOpen(false)
-    }
-    document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)
-  }, [])
-
-  function toggleOpen(): void {
-    if (!open && ref.current) {
-      const rect = ref.current.getBoundingClientRect()
-      setMenuPos({ top: rect.bottom + 6, right: window.innerWidth - rect.right })
-    }
-    setOpen(o => !o)
-  }
-
-  if (!hasMonitors) {
-    return (
-      <Link href="/dashboard/monitors/scan" className="btn btn-primary btn-sm">
-        <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Add Monitor
-      </Link>
-    )
-  }
-
+function AddBtn(): React.ReactElement {
   return (
-    <div ref={ref} style={{ position: 'relative', display: 'inline-block' }}>
-      <button className="btn btn-primary btn-sm" onClick={toggleOpen}>
-        <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Add Monitor
-        <svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" style={{ marginLeft: 4 }}><polyline points="6 9 12 15 18 9"/></svg>
-      </button>
-      {open && menuPos && typeof document !== 'undefined' && createPortal(
-        <div ref={menuRef} style={{ position: 'fixed', top: menuPos.top, right: menuPos.right, background: 'var(--bg-card)', border: '1px solid var(--border-primary)', borderRadius: 10, boxShadow: '0 8px 28px rgba(0,0,0,0.14)', zIndex: 1000, minWidth: 210, overflow: 'hidden' }}>
-          <Link href="/dashboard/monitors/scan" onClick={() => setOpen(false)} style={{ display: 'block', padding: '11px 14px', textDecoration: 'none', borderBottom: '1px solid var(--border-primary)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontWeight: 600, fontSize: 13, color: 'var(--text-primary)', marginBottom: 2 }}><Telescope size={14} /> Scan a domain</div>
-            <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Auto-detect what needs monitoring</div>
-          </Link>
-          <Link href="/dashboard/monitors/new/manual" onClick={() => setOpen(false)} style={{ display: 'block', padding: '11px 14px', textDecoration: 'none' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontWeight: 600, fontSize: 13, color: 'var(--text-primary)', marginBottom: 2 }}><Pencil size={14} /> Add a specific monitor</div>
-            <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Choose a type and configure manually</div>
-          </Link>
-        </div>,
-        document.body
-      )}
-    </div>
+    <Link href="/dashboard/monitors/new/manual" className="btn btn-primary btn-sm">
+      <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Add Monitor
+    </Link>
   )
 }
 
@@ -239,7 +188,7 @@ function DomainCards({ monitors }: { monitors: Monitor[] }) {
       <div className="db-card-header">
         <div className="db-card-title">Domains</div>
         <div className="db-card-actions">
-          <AddBtn hasMonitors={monitors.length > 0} />
+          <AddBtn />
           <Link href="/dashboard/monitors" className="btn btn-ghost btn-sm" style={{ fontSize: 11 }}>View all monitors →</Link>
         </div>
       </div>
@@ -247,7 +196,7 @@ function DomainCards({ monitors }: { monitors: Monitor[] }) {
       {groups.length === 0 ? (
         <div className="db-home-domains-fill" style={{ padding: '32px 20px', textAlign: 'center' }}>
           <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 12 }}>No monitors yet. Add your first one to start tracking uptime.</p>
-          <Link href="/dashboard/monitors/scan" className="btn btn-primary btn-sm">+ Add Your First Monitor</Link>
+          <Link href="/dashboard/monitors/new/manual" className="btn btn-primary btn-sm">+ Add Your First Monitor</Link>
         </div>
       ) : (
         <div className="db-domains-scroll">

@@ -35,12 +35,19 @@ export async function activateWebsiteSubscription(params: {
   /** Razorpay payment id for this charge, used as the invoice's unique
    *  reference so repeat activation calls don't create duplicate invoices. */
   razorpayPaymentId?: string
+  /** Slots paid for in this checkout. Defaults to domains.length for
+   *  backward compatibility — the new quantity-first purchase flow always
+   *  passes this explicitly, since a fresh purchase names zero domains up
+   *  front (domains: []) and capacity is claimed later via
+   *  claim_website_slot as monitors get created. */
+  purchasedQuantity?: number
 }): Promise<{ activated: boolean; websiteSubscriptionId?: string }> {
   const supabase = createAdminClient()
   const { orgId, domains, razorpaySubscriptionId, source } = params
+  const purchasedQuantity = params.purchasedQuantity ?? domains.length
 
-  if (!orgId || domains.length === 0) {
-    logger.error('activateWebsiteSubscription: missing orgId or domains', { razorpaySubscriptionId, source })
+  if (!orgId || (domains.length === 0 && purchasedQuantity < 1)) {
+    logger.error('activateWebsiteSubscription: missing orgId, or no domains and no purchased quantity', { razorpaySubscriptionId, source })
     return { activated: false }
   }
 
@@ -61,7 +68,8 @@ export async function activateWebsiteSubscription(params: {
 
   // Remove the pending ('incomplete') single-domain rows this checkout was
   // for — they get merged into the one active row below, so a paid
-  // website never shows up twice.
+  // website never shows up twice. Safe no-op when domains=[] (a
+  // quantity-only purchase): .overlaps with an empty array matches nothing.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   await (supabase as any)
     .from('website_subscriptions')
@@ -80,7 +88,8 @@ export async function activateWebsiteSubscription(params: {
       status: 'active',
       current_period_start: periodStart,
       current_period_end: periodEnd,
-    })
+      purchased_quantity: purchasedQuantity,
+    } as Record<string, unknown>)
     .select('id')
     .single()
 
@@ -147,6 +156,7 @@ export async function activateWebsiteSubscription(params: {
     metadata: {
       razorpay_subscription_id: razorpaySubscriptionId,
       domains,
+      purchased_quantity: purchasedQuantity,
       currency: 'inr',
       source,
     },

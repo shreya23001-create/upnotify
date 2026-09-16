@@ -75,13 +75,13 @@ export default function MonitoringIndexPage() {
                 <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
-                Start Monitoring Free
+                Start Monitoring
               </Link>
               <Link href="/tools" className="btn btn-ghost btn-lg" style={{ whiteSpace: 'nowrap' }}>Try a Free Tool</Link>
               <Link href="/score" className="btn btn-ghost btn-lg" style={{ whiteSpace: 'nowrap' }}>Score Your Site Free</Link>
             </div>
             <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-              {['No credit card required', '3 monitors free forever', '1-minute check intervals'].map(t => (
+              {['Plans from ₹999/year', '1-minute check intervals'].map(t => (
                 <span key={t} style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 500 }}>✓ {t}</span>
               ))}
             </div>
@@ -147,7 +147,7 @@ export default function MonitoringIndexPage() {
         }}>
           <div>
             <div style={{ fontSize: 22, fontWeight: 800, color: '#fff', marginBottom: 6 }}>All 23 monitor types, live in minutes</div>
-            <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.75)' }}>Free plan included, no card required.</div>
+            <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.75)' }}>Simple per-website pricing, from ₹999/year.</div>
           </div>
           <Link href="/signup" style={{
             background: '#fff',
@@ -160,7 +160,7 @@ export default function MonitoringIndexPage() {
             whiteSpace: 'nowrap',
             flexShrink: 0,
           }}>
-            Start Free →
+            Start Monitoring →
           </Link>
         </div>
 

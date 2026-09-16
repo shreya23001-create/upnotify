@@ -309,7 +309,7 @@ sudo cat /var/log/letsencrypt/letsencrypt.log | tail -50`}</code></pre>
         <div className="blog-cta-section">
           <h3>Get SSL expiry alerts before visitors see warnings</h3>
           <p>
-            Upnotify monitors your SSL certificate daily and alerts you 30, 14, 7, and 1 day before expiry. Free plan available — set it up in under two minutes.
+            Upnotify monitors your SSL certificate daily and alerts you 30, 14, 7, and 1 day before expiry. Set it up in under two minutes.
           </p>
           <Link href="https://upnotify-monitoring.vercel.app/signup" className="btn btn-primary btn-lg">
             Get SSL Alerts Free

@@ -282,7 +282,7 @@ export function AdminBlogEditor({ post }: AdminBlogEditorProps): React.ReactElem
               </div>
               <div>
                 <label className="form-label">End-Article CTA</label>
-                <input className="form-input" value={endCta.heading} onChange={e => setEndCta({ ...endCta, heading: e.target.value })} placeholder="CTA heading (e.g. Start Monitoring Free)" style={{ marginBottom: 8 }} />
+                <input className="form-input" value={endCta.heading} onChange={e => setEndCta({ ...endCta, heading: e.target.value })} placeholder="CTA heading (e.g. Start Monitoring)" style={{ marginBottom: 8 }} />
                 <div style={{ display: 'flex', gap: 8 }}>
                   <input className="form-input" value={endCta.buttonLabel} onChange={e => setEndCta({ ...endCta, buttonLabel: e.target.value })} placeholder="Button label" style={{ flex: 1 }} />
                   <input className="form-input" value={endCta.buttonUrl} onChange={e => setEndCta({ ...endCta, buttonUrl: e.target.value })} placeholder="/signup" style={{ flex: 1 }} />

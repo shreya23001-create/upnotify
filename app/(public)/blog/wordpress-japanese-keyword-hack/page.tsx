@@ -264,7 +264,7 @@ export default function WordPressJapaneseKeywordHackPage(): React.ReactElement {
         <h3>Step 1: Monitor for unexpected Japanese characters</h3>
 
         <ol>
-          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (paid plans from ₹999/year)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>Keyword</strong> as the monitor type</li>
           <li>Enter your homepage URL</li>
@@ -369,7 +369,7 @@ export default function WordPressJapaneseKeywordHackPage(): React.ReactElement {
         <div className="blog-cta-section">
           <h3>Detect content injection and SEO hacks automatically</h3>
           <p>
-            Free plan available. Keyword monitoring that checks your actual page content. Instant alerts. No credit card required.
+            Start monitoring in minutes. Keyword monitoring that checks your actual page content. Instant alerts.
           </p>
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             <Link href="/score" className="btn btn-primary btn-lg">

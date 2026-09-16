@@ -16,9 +16,15 @@ export default async function NewMonitorManualPage(): Promise<React.ReactElement
   return (
     <div className="db-content">
       <div className="db-page-header">
-        <div className="db-page-title">Create Monitor</div>
+        <div>
+          <div className="db-page-title">Create a New Monitor</div>
+          <p className="db-page-subtitle">Set up monitoring for your website, domain, API, or other services.</p>
+        </div>
         <div className="db-page-actions">
-          <Link href="/dashboard/monitors" className="btn btn-ghost btn-sm">← Back</Link>
+          <Link href="/dashboard/monitors" className="mon-create-back-link">
+            <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" /></svg>
+            Back to Monitors
+          </Link>
         </div>
       </div>
       <CreateMonitorForm minCheckInterval={minCheckInterval} />

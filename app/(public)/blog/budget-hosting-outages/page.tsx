@@ -222,7 +222,7 @@ export default function BudgetHostingOutagesPage(): React.ReactElement {
         </p>
 
         <ol>
-          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (paid plans from ₹999/year)</li>
           <li>Add an HTTP monitor for your main URL</li>
           <li>Set a response time threshold of 3 seconds</li>
           <li>Configure alerts via Slack, email, or Teams</li>
@@ -288,7 +288,7 @@ export default function BudgetHostingOutagesPage(): React.ReactElement {
         <div className="blog-cta-section">
           <h3>Know before your customers do</h3>
           <p>
-            Free plan available. 60-second checks. Response time tracking. Instant alerts via Slack, email, and Teams. No credit card required.
+            Start monitoring in minutes. 60-second checks. Response time tracking. Instant alerts via Slack, email, and Teams.
           </p>
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             <Link href="/score" className="btn btn-primary btn-lg">

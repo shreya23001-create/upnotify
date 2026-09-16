@@ -22,14 +22,22 @@ const MAX_WEBSITES_PER_CHECKOUT = 50
 /**
  * POST /api/v1/billing/razorpay/website-checkout
  *
- * Creates ONE combined Razorpay subscription (billed yearly, auto-renewing)
- * covering every SELECTED pending website — ₹999/website/year + 18% GST,
- * one invoice. Body: { websiteSubscriptionIds: string[] } — ids of the
- * pending ('incomplete') website_subscriptions rows the user selected on
- * the Plans page (each holds exactly one domain — see addPendingWebsites).
+ * Creates ONE Razorpay subscription (billed yearly, auto-renewing) —
+ * ₹999/website/year + 18% GST, one invoice. Accepts two body shapes:
+ *
+ *  - { quantity: number } — the current, quantity-first purchase flow.
+ *    Buys N website slots with no domains named yet; domains.length is 0
+ *    at checkout time, and capacity is claimed later (see claimWebsiteSlot
+ *    in lib/db/subscriptions.ts) as monitors get created for new domains.
+ *  - { websiteSubscriptionIds: string[] } — legacy name-first flow. Ids of
+ *    pending ('incomplete') website_subscriptions rows the user selected
+ *    on the old Plans page checkbox list (each holds exactly one domain —
+ *    see addPendingWebsites). Kept working for any leftover pending rows
+ *    from before the quantity-first flow shipped.
  *
  * Adding more websites later, in a SEPARATE checkout, creates a new
- * combined subscription — batches are never merged.
+ * combined subscription — batches are never merged, so a top-up is always
+ * charged only for the new quantity.
  */
 export async function POST(request: Request): Promise<NextResponse> {
   try {
@@ -51,36 +59,55 @@ export async function POST(request: Request): Promise<NextResponse> {
     const org = await getCurrentOrganisation()
     if (!org) return NextResponse.json({ error: 'No organisation found' }, { status: 400 })
 
-    const body = await request.json().catch(() => ({})) as { websiteSubscriptionIds?: unknown }
+    const body = await request.json().catch(() => ({})) as { websiteSubscriptionIds?: unknown; quantity?: unknown }
     const ids = Array.isArray(body.websiteSubscriptionIds)
       ? body.websiteSubscriptionIds.filter((v): v is string => typeof v === 'string')
       : []
+    const rawQuantity = typeof body.quantity === 'number' ? body.quantity : null
 
-    if (ids.length === 0) {
+    if (rawQuantity !== null) {
+      if (!Number.isInteger(rawQuantity) || rawQuantity < 1) {
+        return NextResponse.json({ error: 'Enter a valid number of websites (1 or more).' }, { status: 400 })
+      }
+      if (rawQuantity > MAX_WEBSITES_PER_CHECKOUT) {
+        return NextResponse.json({ error: `You can purchase up to ${MAX_WEBSITES_PER_CHECKOUT} websites at once.` }, { status: 400 })
+      }
+    } else if (ids.length === 0) {
       return NextResponse.json({ error: 'Select at least one website' }, { status: 400 })
-    }
-    if (ids.length > MAX_WEBSITES_PER_CHECKOUT) {
+    } else if (ids.length > MAX_WEBSITES_PER_CHECKOUT) {
       return NextResponse.json({ error: `You can subscribe up to ${MAX_WEBSITES_PER_CHECKOUT} websites at once.` }, { status: 400 })
     }
 
     const supabase = createAdminClient()
 
-    // Only pending ('incomplete'), org-owned rows can be paid for — never
-    // trust client-supplied domains directly, only ids the org actually owns.
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: pendingRows } = await (supabase as any)
-      .from('website_subscriptions')
-      .select('id, domains')
-      .eq('org_id', org.id)
-      .eq('status', 'incomplete')
-      .in('id', ids) as { data: Array<{ id: string; domains: string[] }> | null }
+    let domains: string[] = []
+    let websiteCount: number
+    let pendingRowIds: string[] = []
 
-    if (!pendingRows || pendingRows.length === 0) {
-      return NextResponse.json({ error: 'Selected websites are no longer available. Please refresh and try again.' }, { status: 409 })
+    if (rawQuantity !== null) {
+      // New quantity-first flow — no domains named yet. Capacity is claimed
+      // later (see claimWebsiteSlot) as monitors get created for new domains.
+      websiteCount = rawQuantity
+    } else {
+      // Legacy flow — only pending ('incomplete'), org-owned rows can be
+      // paid for. Never trust client-supplied domains directly, only ids
+      // the org actually owns.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: pendingRows } = await (supabase as any)
+        .from('website_subscriptions')
+        .select('id, domains')
+        .eq('org_id', org.id)
+        .eq('status', 'incomplete')
+        .in('id', ids) as { data: Array<{ id: string; domains: string[] }> | null }
+
+      if (!pendingRows || pendingRows.length === 0) {
+        return NextResponse.json({ error: 'Selected websites are no longer available. Please refresh and try again.' }, { status: 409 })
+      }
+
+      domains = pendingRows.flatMap(r => r.domains ?? [])
+      websiteCount = domains.length
+      pendingRowIds = pendingRows.map(r => r.id)
     }
-
-    const domains = pendingRows.flatMap(r => r.domains ?? [])
-    const websiteCount = domains.length
 
     const { data: plan, error: planError } = await supabase
       .from('plans')
@@ -180,7 +207,7 @@ export async function POST(request: Request): Promise<NextResponse> {
       // webhook against). This client-verified path uses Razorpay's
       // payment signature (HMAC with RAZORPAY_KEY_SECRET) so it's not
       // trusting an unverified client claim.
-      pendingWebsiteIds: pendingRows.map(r => r.id),
+      pendingWebsiteIds: pendingRowIds,
     })
   } catch (error) {
     logger.error('Razorpay website checkout error', {

@@ -490,3 +490,35 @@ export async function getMonitorsByWorkspacePaged(
   }
   return { data: data ?? [], total: count ?? 0 }
 }
+
+export interface MonitorWorkspaceSummary {
+  total: number
+  active: number
+  paused: number
+  issues: number
+}
+
+/** Lightweight counts for the Monitors page summary cards — a single
+ *  `status` + `is_paused` column fetch, no joins. "Issues" counts monitors
+ *  currently down or degraded (the same statuses MonitorStatusBadge/mon-row
+ *  already surface per-row), not a separate incidents lookup. */
+export async function getMonitorWorkspaceSummary(workspaceId: string): Promise<MonitorWorkspaceSummary> {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('monitors')
+    .select('status, is_paused')
+    .eq('workspace_id', workspaceId)
+
+  if (error) {
+    logger.error('Failed to get monitor workspace summary', { error: error.message })
+    return { total: 0, active: 0, paused: 0, issues: 0 }
+  }
+
+  const rows = data ?? []
+  const total = rows.length
+  const paused = rows.filter(r => r.is_paused).length
+  const issues = rows.filter(r => !r.is_paused && (r.status === 'down' || r.status === 'degraded')).length
+  const active = total - paused
+
+  return { total, active, paused, issues }
+}

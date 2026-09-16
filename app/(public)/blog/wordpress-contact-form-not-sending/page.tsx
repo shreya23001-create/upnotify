@@ -202,7 +202,7 @@ export default function WordPressContactFormNotSendingPage(): React.ReactElement
         </p>
 
         <ol>
-          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (paid plans from ₹999/year)</li>
           <li>Click <strong>Add Monitor</strong></li>
           <li>Select <strong>Keyword</strong> as the monitor type</li>
           <li>Enter your contact page URL (e.g., <code>yoursite.com/contact</code>)</li>
@@ -296,7 +296,7 @@ export default function WordPressContactFormNotSendingPage(): React.ReactElement
         </p>
 
         <p>
-          How much does monitoring cost? Free to start. A few pounds per month for the full setup. The maths is not even close.
+          How much does monitoring cost? A few hundred rupees a year for the full setup. The maths is not even close.
         </p>
 
         <h2>Stop finding out from your customers</h2>
@@ -316,7 +316,7 @@ export default function WordPressContactFormNotSendingPage(): React.ReactElement
         <div className="blog-cta-section">
           <h3>Protect your contact form and your leads</h3>
           <p>
-            Free plan available. Keyword monitoring, HTTP checks, SSL monitoring. No credit card required.
+            Start monitoring in minutes. Keyword monitoring, HTTP checks, SSL monitoring.
           </p>
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             <Link href="/score" className="btn btn-primary btn-lg">

@@ -17,7 +17,15 @@ export default function PricingTable(): React.ReactElement {
     fetch('/api/v1/plans')
       .then(r => r.json())
       .then((data: { plans?: PlanDisplayData[] }) => {
-        if (data.plans) setPlans(data.plans.filter(p => p.is_visible))
+        // Upnotify does not offer a free plan. Guard against a legacy
+        // zero-priced `free` row in the plans table rendering a "₹0" card.
+        if (data.plans) {
+          setPlans(
+            data.plans.filter(
+              p => p.is_visible && p.slug !== 'free' && (p.price_monthly_inr > 0 || (p.price_annual_inr ?? 0) > 0)
+            )
+          )
+        }
         setLoading(false)
       })
       .catch(() => {
@@ -33,8 +41,8 @@ export default function PricingTable(): React.ReactElement {
       <div className="container">
         <div className="section-header">
           <div className="section-eyebrow">No surprises</div>
-          <h2 className="section-title pricing-title-gradient">Start free. Pay when you&apos;re <em>ready.</em></h2>
-          <p className="section-sub">No hidden fees. No credit card for the free plan. Cancel or pause anytime.</p>
+          <h2 className="section-title pricing-title-gradient">Simple pricing. No <em>surprises.</em></h2>
+          <p className="section-sub">No hidden fees. Cancel or pause anytime.</p>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 24, flexWrap: 'wrap', marginBottom: 8 }}>
@@ -61,7 +69,6 @@ export default function PricingTable(): React.ReactElement {
         )}
         <div className="pricing-grid">
           {plans.map((plan) => {
-            const isFree = plan.price_monthly_gbp === 0 && (!plan.price_annual_gbp || plan.price_annual_gbp === 0)
             const isHighlighted = plan.slug === highlightedSlug
             const features = getPlanFeatures(plan)
             const price = formatPlanPrice(plan, isAnnual, currency)
@@ -102,7 +109,7 @@ export default function PricingTable(): React.ReactElement {
                   className={`btn${isHighlighted ? ' btn-primary' : ' btn-ghost'}`}
                   style={{ width: '83%', justifyContent: 'center' }}
                 >
-                  {isFree ? 'Start Free' : `Get ${plan.name}`}
+                  {`Get ${plan.name}`}
                 </a>
               </div>
             )

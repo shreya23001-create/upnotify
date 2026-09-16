@@ -54,7 +54,7 @@ const PAGES: IntegrationPage[] = [
       'Same channel receives both incident-opened and incident-resolved alerts',
     ],
     faq: [
-      { q: 'Is the Slack integration free?', a: 'The Slack integration requires a Lite plan or higher. The Free plan includes email alerts on 3 monitors. Lite (£1/month or £10/year) unlocks Slack, Microsoft Teams, Telegram, and signed webhook channels.' },
+      { q: 'Is the Slack integration free?', a: 'The Slack integration requires a Lite plan or higher. Email alerts are included on every paid plan, starting at ₹999/year. Lite (£1/month or £10/year) unlocks Slack, Microsoft Teams, Telegram, and signed webhook channels.' },
       { q: 'How do I get the Slack webhook URL?', a: 'In Slack: workspace settings → "Incoming Webhooks" app → "Add to Slack" → choose the channel you want alerts in → copy the webhook URL. The full Slack walkthrough is in their official docs.' },
       { q: 'Can I send alerts to multiple Slack channels?', a: 'Yes. Create one alert channel per Slack channel (engineering, ops, customer-support etc.). You can attach multiple alert channels to a single monitor — for example, paging engineering on critical incidents while sending a degraded-status notice to the customer-support channel.' },
       { q: 'Does Upnotify support Slack threads or @mentions?', a: 'Each alert is a top-level message, not a thread. We do not currently inject @mentions into the message — but you can configure your Slack channel to notify specific users when keywords like "incident" or your monitor name appear.' },
@@ -89,7 +89,7 @@ const PAGES: IntegrationPage[] = [
       'Same channel receives both incident-opened and incident-resolved alerts',
     ],
     faq: [
-      { q: 'Is the Microsoft Teams integration free?', a: 'The Teams integration requires a Lite plan or higher. The Free plan includes email alerts on 3 monitors. Lite (£1/month or £10/year) unlocks Teams, Slack, Telegram and signed webhook channels.' },
+      { q: 'Is the Microsoft Teams integration free?', a: 'The Teams integration requires a Lite plan or higher. Email alerts are included on every paid plan, starting at ₹999/year. Lite (£1/month or £10/year) unlocks Teams, Slack, Telegram and signed webhook channels.' },
       { q: 'Where do I find the Incoming Webhook connector in Teams?', a: 'In the Teams channel where you want alerts: three-dot menu → Connectors → search for "Incoming Webhook" → Configure. You may need to be a Teams workspace admin to add new connectors. Microsoft\'s docs cover the steps in detail.' },
       { q: 'My organisation has disabled Office 365 Connectors. What can I do?', a: 'Some enterprise tenants disable third-party connectors. Workarounds: (1) ask IT to enable Incoming Webhook specifically for your channel, (2) use a Power Automate flow with the Upnotify webhook, or (3) use the Upnotify email channel and route into Teams via an Outlook/Teams email-to-channel rule.' },
       { q: 'Can I send alerts to multiple Teams channels?', a: 'Yes. Create one alert channel per Teams channel. You can attach multiple alert channels to a single monitor — useful for paging engineering on critical incidents and informing customer-support on degraded status.' },
@@ -124,7 +124,7 @@ const PAGES: IntegrationPage[] = [
       'Per-event delivery (Smart Digest is currently email-only — Telegram fires every event individually)',
     ],
     faq: [
-      { q: 'Is the Telegram integration free?', a: 'The Telegram integration requires a Lite plan or higher. The Free plan includes email alerts on 3 monitors. Lite (£1/month or £10/year) unlocks Telegram, Slack, Microsoft Teams, and signed webhook channels.' },
+      { q: 'Is the Telegram integration free?', a: 'The Telegram integration requires a Lite plan or higher. Email alerts are included on every paid plan, starting at ₹999/year. Lite (£1/month or £10/year) unlocks Telegram, Slack, Microsoft Teams, and signed webhook channels.' },
       { q: 'How do I find my Telegram chat ID?', a: 'For 1:1 chats with the Upnotify bot, the chat ID equals your Telegram user ID. For groups, the chat ID is the group ID (a negative number). The simplest way: add @userinfobot to your group temporarily, it tells you the chat ID, then remove it. The full setup walkthrough is in the dashboard.' },
       { q: 'Can the Upnotify Telegram bot read my messages?', a: 'No. The bot only posts alerts into the chats you explicitly add it to. It does not read messages, does not log any chat content, and cannot be made to do so. You can audit its presence at any time via Telegram\'s standard chat info screen.' },
       { q: 'Can I send alerts to multiple Telegram chats?', a: 'Yes. Create one alert channel per Telegram chat. Useful for splitting engineering alerts from customer-support notifications, or for routing different severities into different chats.' },
@@ -183,7 +183,7 @@ X-Upnotify-Signature: sha256=<hex digest of body>
   "timestamp": "2026-05-03T12:34:58.123Z"
 }`,
     faq: [
-      { q: 'Is the webhook integration free?', a: 'Webhook channels require a Lite plan or higher. The Free plan includes email alerts on 3 monitors. Lite (£1/month or £10/year) unlocks signed webhooks, Slack, Microsoft Teams, and Telegram.' },
+      { q: 'Is the webhook integration free?', a: 'Webhook channels require a Lite plan or higher. Email alerts are included on every paid plan, starting at ₹999/year. Lite (£1/month or £10/year) unlocks signed webhooks, Slack, Microsoft Teams, and Telegram.' },
       { q: 'How do I verify the X-Upnotify-Signature header?', a: 'Compute HMAC-SHA256 over the raw request body using the secret you set when creating the channel, hex-encode the digest, and compare it to the value in the header (after stripping the "sha256=" prefix). Use a constant-time comparison to defend against timing attacks. Most languages have a one-line implementation.' },
       { q: 'Can I use the webhook to wire Upnotify into PagerDuty or Opsgenie?', a: 'Yes. PagerDuty has a generic webhook integration; Opsgenie too. Map our event/incident/monitor fields to their expected schema (often a small Cloudflare Worker, Lambda, or n8n workflow does this in a few lines). Native PagerDuty/Opsgenie integrations are on the V1.5 roadmap.' },
       { q: 'What is the payload schema?', a: 'Top-level: event ("incident.created" or "incident.resolved"), incident object, monitor object, timestamp. The full sample is shown above. The schema is stable — we will version it (v2 etc.) before making any breaking changes, with notice.' },
@@ -309,7 +309,7 @@ export default async function IntegrationPage({ params }: { params: Promise<{ sl
               <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
-              Start Monitoring Free
+              Start Monitoring
             </Link>
             <Link href="/integrations" className="btn btn-ghost">← All Integrations</Link>
           </div>
@@ -418,7 +418,7 @@ export default async function IntegrationPage({ params }: { params: Promise<{ sl
           <div>
             <div style={{ fontWeight: 700, fontSize: 16, color: '#fff', marginBottom: 4 }}>Ready to wire it up?</div>
             <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)' }}>
-              {page.paidOnly ? 'Lite plan from £1/month · Free 3-monitor plan also available' : 'Free plan · No credit card required'}
+              {page.paidOnly ? 'Requires Pro Plan or higher' : 'Included on every paid plan · from ₹999/year'}
             </div>
           </div>
           <Link href="/signup" style={{
@@ -517,7 +517,7 @@ export default async function IntegrationPage({ params }: { params: Promise<{ sl
             <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
-            Start Monitoring Free
+            Start Monitoring
           </Link>
         </div>
       </main>

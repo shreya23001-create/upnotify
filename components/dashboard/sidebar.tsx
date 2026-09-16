@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
+import { Lock } from 'lucide-react'
 import { useWorkspace } from '@/components/providers/workspace-provider'
 import { useAuth } from '@/components/providers/auth-provider'
 import type { SupportedCurrency } from '@/lib/utils/currency'
@@ -12,6 +13,19 @@ import {
   IconHelpCircle, IconTrendingUp, IconWatchdog, IconInbox, IconCreditCard,
   IconServer,
 } from '@/components/icons'
+
+/** The 7 gated dashboard routes (see lib/auth/require-activated-org.ts) —
+ *  shown locked in the sidebar when the org has no active plan. Support,
+ *  Settings, Help, and Plans itself are never gated. */
+const GATED_HREFS: ReadonlySet<string> = new Set([
+  '/dashboard',
+  '/dashboard/monitors',
+  '/dashboard/alerts',
+  '/dashboard/incidents',
+  '/dashboard/status-pages',
+  '/dashboard/reports',
+  '/dashboard/watchdog',
+])
 
 interface NavSection {
   title: string
@@ -34,9 +48,9 @@ const mainNavItems: NavItem[] = [
   { href: '/dashboard/status-pages', label: 'Status Pages', icon: IconGlobe },
   { href: '/dashboard/reports', label: 'Reports', icon: IconTrendingUp },
   { href: '/dashboard/watchdog', label: 'Competitor', icon: IconWatchdog },
-  { href: '/dashboard/websites', label: 'Websites', icon: IconServer },
   { href: '/dashboard/plans', label: 'Plans', icon: IconCreditCard },
   // AI Visibility hidden per request
+  // Websites hidden per request
   // Compete hidden — launching in v1.5
 ]
 
@@ -53,7 +67,7 @@ interface SidebarProps {
 
 export function Sidebar({ forceExpanded = false }: SidebarProps): React.ReactElement {
   const pathname = usePathname()
-  const { isAgency } = useWorkspace()
+  const { isAgency, hasActivePlan } = useWorkspace()
   const { user } = useAuth()
   const [collapsed, setCollapsed] = useState(false)
   const effectiveCollapsed = forceExpanded ? false : collapsed
@@ -149,6 +163,7 @@ export function Sidebar({ forceExpanded = false }: SidebarProps): React.ReactEle
                 collapsed={effectiveCollapsed}
                 badge={item.badge}
                 badgeVariant={item.badgeVariant}
+                isLocked={!hasActivePlan && GATED_HREFS.has(item.href)}
               />
             ))}
           </div>
@@ -200,7 +215,7 @@ export function Sidebar({ forceExpanded = false }: SidebarProps): React.ReactEle
 }
 
 function SidebarLink({
-  href, label, icon: Icon, isActive, collapsed, badge, badgeVariant = 'red',
+  href, label, icon: Icon, isActive, collapsed, badge, badgeVariant = 'red', isLocked = false,
 }: {
   href: string
   label: string
@@ -209,21 +224,23 @@ function SidebarLink({
   collapsed: boolean
   badge?: number
   badgeVariant?: 'red' | 'blue'
+  isLocked?: boolean
 }): React.ReactElement {
   return (
     <Link
       href={href}
-      className={`sidebar-link${isActive ? ' active' : ''}`}
-      title={collapsed ? label : undefined}
+      className={`sidebar-link${isActive ? ' active' : ''}${isLocked ? ' sidebar-link-locked' : ''}`}
+      title={collapsed ? label : (isLocked ? `${label} — requires an active plan` : undefined)}
     >
       <span className="sidebar-link-icon" style={{ position: 'relative' }}>
         <Icon size={18} />
-        {collapsed && badge !== undefined && badge > 0 && (
+        {collapsed && badge !== undefined && badge > 0 && !isLocked && (
           <span className="sidebar-link-badge-dot" />
         )}
       </span>
       {!collapsed && <span className="sidebar-link-label">{label}</span>}
-      {!collapsed && badge !== undefined && badge > 0 && (
+      {isLocked && <Lock size={13} strokeWidth={2} className="sidebar-link-lock-icon" />}
+      {!collapsed && !isLocked && badge !== undefined && badge > 0 && (
         <span className={`sidebar-link-badge${badgeVariant === 'blue' ? ' sidebar-link-badge-blue' : ''}`}>
           {badge > 99 ? '99+' : badge}
         </span>

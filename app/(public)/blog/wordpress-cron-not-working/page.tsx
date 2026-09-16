@@ -264,7 +264,7 @@ export default function WordPressCronNotWorkingPage(): React.ReactElement {
         <h3>Step 2: Set up an Upnotify heartbeat monitor</h3>
 
         <ol>
-          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (paid plans from ₹999/year)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>Heartbeat</strong> as the monitor type</li>
           <li>Enter the URL: <code>https://yourdomain.com/wp-cron.php?doing_wp_cron</code></li>
@@ -364,7 +364,7 @@ export default function WordPressCronNotWorkingPage(): React.ReactElement {
         <div className="blog-cta-section">
           <h3>Keep your WordPress cron firing reliably</h3>
           <p>
-            Free plan available. Heartbeat monitoring that triggers wp-cron on a fixed schedule and alerts you if it stops responding. No credit card required.
+            Start monitoring in minutes. Heartbeat monitoring that triggers wp-cron on a fixed schedule and alerts you if it stops responding.
           </p>
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             <Link href="/score" className="btn btn-primary btn-lg">

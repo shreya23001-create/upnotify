@@ -223,7 +223,7 @@ export default function WooCommerceCheckoutNotWorkingPage(): React.ReactElement 
         <h3>Step 1: Set up a keyword monitor to verify the checkout page works</h3>
 
         <ol>
-          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (paid plans from ₹999/year)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>Keyword</strong> as the monitor type</li>
           <li>Enter your checkout page URL — typically <code>yourstore.com/checkout/</code></li>
@@ -346,7 +346,7 @@ export default function WooCommerceCheckoutNotWorkingPage(): React.ReactElement 
         <div className="blog-cta-section">
           <h3>Protect your WooCommerce revenue</h3>
           <p>
-            Free plan available. Keyword monitoring that watches your checkout page for errors. Alerts via Slack, Teams, email, and webhook. No credit card required.
+            Start monitoring in minutes. Keyword monitoring that watches your checkout page for errors. Alerts via Slack, Teams, email, and webhook.
           </p>
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             <Link href="/score" className="btn btn-primary btn-lg">

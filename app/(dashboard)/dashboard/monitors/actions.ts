@@ -7,6 +7,7 @@ import { getStatusPagesByMonitorId } from '@/lib/db/status-pages'
 import { getCurrentUser } from '@/lib/db/users'
 import { getWorkspacesByOrg } from '@/lib/db/workspaces'
 import { checkMonitorLimit, getPlanLimits, hasGrandfatheredBaseSubscription, checkWebsiteSubscriptionActive } from '@/lib/utils/plan-limits'
+import { claimWebsiteSlot } from '@/lib/db/subscriptions'
 import { targetToWebsiteDomain } from '@/lib/utils/validate-domain'
 import { logger } from '@/lib/utils/logger'
 import { devAuditLog } from '@/lib/db/audit'
@@ -115,7 +116,10 @@ export async function createMonitorAction(formData: FormData): Promise<{ error?:
   } else {
     const websiteActive = await checkWebsiteSubscriptionActive(user.org_id, targetDomain)
     if (!websiteActive) {
-      return { error: `This website isn't paid for yet. Add a ₹149/year plan for ${targetDomain} to start monitoring it.` }
+      const claim = await claimWebsiteSlot({ orgId: user.org_id, domain: targetDomain })
+      if (!claim.ok) {
+        return { error: 'You have reached your purchased website limit. Please upgrade your website limit to add more websites.' }
+      }
     }
   }
 
@@ -449,9 +453,14 @@ export async function toggleMonitorSelectionAction(
 
   // Never trust the client's "this website is paid" state — re-verify server-side.
   const isGrandfathered = await hasGrandfatheredBaseSubscription(user.org_id)
-  if (!isGrandfathered) {
+  if (!isGrandfathered && action === 'select') {
     const websiteActive = await checkWebsiteSubscriptionActive(user.org_id, domain)
-    if (!websiteActive) return { error: `This website isn't paid for yet.` }
+    if (!websiteActive) {
+      const claim = await claimWebsiteSlot({ orgId: user.org_id, domain })
+      if (!claim.ok) {
+        return { error: 'You have reached your purchased website limit. Please upgrade your website limit to add more websites.' }
+      }
+    }
   }
 
   const groups = await getMonitorsGroupedByWebsite(user.org_id)
@@ -553,12 +562,22 @@ export async function bulkCreateMonitorsAction(items: BulkCreateItem[]): Promise
     toCreate = items.slice(0, remaining)
     skipped = items.length - toCreate.length
   } else {
-    // Only create items whose website already has an active ₹149/year
-    // subscription; skip the rest rather than failing the whole batch.
+    // Only create items whose website is paid for — claim a purchased slot
+    // per unique new domain (once, not per item) and skip the rest rather
+    // than failing the whole batch.
+    const claimResultByDomain = new Map<string, boolean>()
     const filtered: BulkCreateItem[] = []
     for (const item of items) {
       const domain = targetToWebsiteDomain(normaliseTarget(item.target, item.type))
-      if (await checkWebsiteSubscriptionActive(user.org_id, domain)) {
+      let isActive = await checkWebsiteSubscriptionActive(user.org_id, domain)
+      if (!isActive) {
+        if (!claimResultByDomain.has(domain)) {
+          const claim = await claimWebsiteSlot({ orgId: user.org_id, domain })
+          claimResultByDomain.set(domain, claim.ok)
+        }
+        isActive = claimResultByDomain.get(domain) ?? false
+      }
+      if (isActive) {
         filtered.push(item)
       }
     }

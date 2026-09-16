@@ -131,7 +131,7 @@ export default function SpfDmarcCheckerPage(): React.ReactElement {
               never goes unnoticed — protecting your domain reputation before attackers exploit it.
             </p>
             <a href="/signup" className="btn btn-primary btn-lg">
-              Start Monitoring Free
+              Start Monitoring
             </a>
           </div>
         </div>

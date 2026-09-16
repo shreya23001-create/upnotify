@@ -457,7 +457,7 @@ export function SetupWizard({ onComplete }: SetupWizardProps): React.ReactElemen
               </div>
 
               <p className="wizard-trial-note">
-                You&apos;re on the Free plan. Upgrade anytime from Settings &gt; Billing.
+                You can change your plan anytime from Settings &gt; Billing.
               </p>
 
               <div className="wizard-actions">

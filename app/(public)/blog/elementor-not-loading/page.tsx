@@ -214,7 +214,7 @@ export default function ElementorNotLoadingPage(): React.ReactElement {
         <h3>Step 1: Set up HTTP monitoring to catch 500 errors</h3>
 
         <ol>
-          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (paid plans from ₹999/year)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>HTTP/HTTPS</strong> as the monitor type</li>
           <li>Enter your homepage URL</li>
@@ -328,7 +328,7 @@ export default function ElementorNotLoadingPage(): React.ReactElement {
         <div className="blog-cta-section">
           <h3>Stop finding out your site is broken from customers</h3>
           <p>
-            Free plan available. HTTP monitoring catches 500 errors. Keyword monitoring catches missing content. Alerts via Slack, email, and Teams. No credit card required.
+            Start monitoring in minutes. HTTP monitoring catches 500 errors. Keyword monitoring catches missing content. Alerts via Slack, email, and Teams.
           </p>
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             <Link href="/score" className="btn btn-primary btn-lg">

@@ -155,7 +155,7 @@ export default function NewEnginePage(): React.ReactElement {
             <div className="admin-toggle-row">
               <div>
                 <div className="admin-toggle-label">Free tier</div>
-                <div className="admin-toggle-hint">Free plan users can access this engine</div>
+                <div className="admin-toggle-hint">Included on the entry-level engine tier</div>
               </div>
               <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
                 <input type="checkbox" checked={form.is_free} onChange={e => set('is_free', e.target.checked)} />

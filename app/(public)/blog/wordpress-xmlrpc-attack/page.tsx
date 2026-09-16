@@ -260,7 +260,7 @@ export default function WordPressXmlrpcAttackPage(): React.ReactElement {
         <h3>Step 1: Set up an HTTP monitor with response time alerting</h3>
 
         <ol>
-          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (paid plans from ₹999/year)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>HTTP/HTTPS</strong> as the monitor type</li>
           <li>Enter your homepage URL</li>
@@ -366,7 +366,7 @@ export default function WordPressXmlrpcAttackPage(): React.ReactElement {
         <div className="blog-cta-section">
           <h3>Detect XML-RPC attacks before they crash your site</h3>
           <p>
-            Free plan available. HTTP monitoring with response time tracking. Alerts on Slack, email, Teams, and webhook. No credit card required.
+            Start monitoring in minutes. HTTP monitoring with response time tracking. Alerts on Slack, email, Teams, and webhook.
           </p>
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             <Link href="/score" className="btn btn-primary btn-lg">

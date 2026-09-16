@@ -254,7 +254,7 @@ export default async function ScoreResultsPage({ params }: PageProps): Promise<R
                 and performance continuously with Upnotify.
               </p>
               <Link href="/signup" className="btn btn-primary" style={{ marginTop: '16px' }}>
-                Start free monitoring
+                Start monitoring
               </Link>
             </div>
           </div>

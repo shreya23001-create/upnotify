@@ -140,7 +140,7 @@ export default function DnsLookupPage(): React.ReactElement {
               hijack or accidental edit reaches you within minutes — via email, Slack, Telegram, or webhook.
             </p>
             <a href="/signup" className="btn btn-primary btn-lg">
-              Start Monitoring Free
+              Start Monitoring
             </a>
           </div>
         </div>

@@ -18,6 +18,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
 import { isProduction } from '@/lib/utils/environment'
 import { enforceDowngradeLimits, notifyPlanChange } from '@/lib/services/plan-enforcement'
+import { activateWebsiteSubscription } from '@/lib/services/website-subscription-activation'
 
 export const dynamic = 'force-dynamic'
 
@@ -38,10 +39,11 @@ export async function POST(request: Request): Promise<NextResponse> {
     planSlug: string
     billingCycle: 'monthly' | 'annual'
     amountPaise: number
+    quantity?: number
     outcome: 'success' | 'fail'
   }
 
-  const { subscriptionId, planSlug, billingCycle, amountPaise, outcome } = body
+  const { subscriptionId, planSlug, billingCycle, amountPaise, quantity, outcome } = body
 
   if (!subscriptionId || !planSlug || !billingCycle) {
     return NextResponse.json({ error: 'subscriptionId, planSlug, billingCycle are required' }, { status: 400 })
@@ -50,6 +52,27 @@ export async function POST(request: Request): Promise<NextResponse> {
   if (outcome === 'fail') {
     logger.info('Razorpay simulate: payment failure selected', { orgId: org.id, planSlug })
     return NextResponse.json({ success: false, message: 'Payment failed (simulated).' })
+  }
+
+  // The quantity-first Pro Plan (per-website) purchase flow is a completely
+  // separate model from the legacy org-wide `subscriptions` table below —
+  // it lives in `website_subscriptions` and is activated via
+  // activateWebsiteSubscription, exactly like the real webhook/confirm
+  // paths, so mock-mode testing exercises the same code as production.
+  if (planSlug === 'website') {
+    const result = await activateWebsiteSubscription({
+      orgId: org.id,
+      domains: [],
+      razorpaySubscriptionId: subscriptionId,
+      source: 'client_verified',
+      amountPaise,
+      purchasedQuantity: quantity ?? 1,
+    })
+    if (!result.activated) {
+      return NextResponse.json({ error: 'Failed to activate website subscription (simulated)' }, { status: 500 })
+    }
+    logger.info('Razorpay simulate: website subscription activated', { orgId: org.id, subscriptionId, quantity })
+    return NextResponse.json({ success: true, message: 'Website subscription activated (simulated).' })
   }
 
   const supabase = createAdminClient()

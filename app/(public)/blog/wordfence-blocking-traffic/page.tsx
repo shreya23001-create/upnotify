@@ -259,7 +259,7 @@ export default function WordfenceBlockingTrafficPage(): React.ReactElement {
         <h3>Step 1: Set up HTTP monitoring from multiple locations</h3>
 
         <ol>
-          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (paid plans from ₹999/year)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>HTTP/HTTPS</strong> as the monitor type</li>
           <li>Enter your homepage URL</li>
@@ -350,7 +350,7 @@ export default function WordfenceBlockingTrafficPage(): React.ReactElement {
         <div className="blog-cta-section">
           <h3>Detect Wordfence blocks before they cost you customers</h3>
           <p>
-            Free plan available. Multi-location HTTP monitoring that catches IP-specific and region-specific blocks. Keyword monitoring for the Wordfence block page. No credit card required.
+            Start monitoring in minutes. Multi-location HTTP monitoring that catches IP-specific and region-specific blocks. Keyword monitoring for the Wordfence block page.
           </p>
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             <Link href="/score" className="btn btn-primary btn-lg">

@@ -5,6 +5,7 @@ import { getUserProfile } from '@/lib/db/users'
 import { getWorkspacesByOrg, getWorkspacesByOrgAdmin } from '@/lib/db/workspaces'
 import { getSubscriptionWithPlan } from '@/lib/db/subscriptions'
 import { getDefaultCurrency } from '@/lib/utils/geo.server'
+import { hasAnyActivePlan } from '@/lib/utils/plan-limits'
 import { Providers } from '@/components/providers'
 import { Sidebar } from '@/components/dashboard/sidebar'
 import { Header } from '@/components/dashboard/header'
@@ -43,12 +44,13 @@ export default async function DashboardLayout({ children }: { children: React.Re
   if (!profile) redirect('/login')
 
   const { user, organisation, isImpersonating } = profile
-  const [workspaces, subWithPlan, geoCurrency] = await Promise.all([
+  const [workspaces, subWithPlan, geoCurrency, hasActivePlan] = await Promise.all([
     isImpersonating
       ? getWorkspacesByOrgAdmin(organisation.id)
       : getWorkspacesByOrg(organisation.id),
     getSubscriptionWithPlan(organisation.id),
     getDefaultCurrency(),
+    hasAnyActivePlan(organisation.id),
   ])
 
   const sub = subWithPlan?.subscription as Record<string, unknown> | null
@@ -68,7 +70,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   ])
 
   return (
-    <Providers user={user} organisation={organisation} workspaces={workspaces}>
+    <Providers user={user} organisation={organisation} workspaces={workspaces} hasActivePlan={hasActivePlan}>
       <div className="app-shell">
         <Sidebar currency={sidebarCurrency} />
         <div className="main-wrapper">

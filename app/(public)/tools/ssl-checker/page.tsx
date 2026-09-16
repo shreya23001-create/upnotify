@@ -68,7 +68,7 @@ const faqSchema = {
       name: 'Can I monitor SSL certificates continuously, not just one-off checks?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Yes. Upnotify’s SSL Certificate Monitoring runs the same check every hour by default, alerts you if the certificate enters the expiry warning window, and notifies you via email, Slack, Telegram, or webhook when something changes. The Free plan includes 3 monitors so you can cover your most important domain at no cost.',
+        text: 'Yes. Upnotify’s SSL Certificate Monitoring runs the same check every hour by default, alerts you if the certificate enters the expiry warning window, and notifies you via email, Slack, Telegram, or webhook when something changes. Continuous monitoring is available on any paid plan, starting at ₹999/year.',
       },
     },
   ],
@@ -125,7 +125,7 @@ export default function SslCheckerPage(): React.ReactElement {
             so a TLS misconfiguration never goes unnoticed. Notifications via email, Slack, Telegram, or webhook.
           </p>
           <a href="/signup" className="btn btn-primary btn-lg">
-            Start Monitoring Free
+            Start Monitoring
           </a>
         </div>
 

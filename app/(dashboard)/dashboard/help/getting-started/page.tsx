@@ -29,7 +29,7 @@ const FAQ_SCHEMA = {
       name: 'Can I use Upnotify for free?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Yes. The Free plan includes 3 monitors with 10-minute check intervals and email alerts. No credit card required.',
+        text: 'Upnotify does not offer a free plan. Pricing starts at ₹999/website/year, which includes full monitor coverage and email alerts.',
       },
     },
   ],
@@ -110,7 +110,7 @@ export default function GettingStartedPage(): React.ReactElement {
               <li>Assign the channel to the monitors you want it to cover.</li>
             </ol>
             <p>
-              On the Free plan you get email alerts. Upgrade to Lite or above to unlock Slack, Teams, and webhooks.
+              Email, Slack, Microsoft Teams, and webhook alerts are all included on every website subscription.
             </p>
           </section>
 

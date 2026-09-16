@@ -319,16 +319,16 @@ export default function UptimeMonitoringToolsPage(): React.ReactElement {
         </p>
 
         <p>
-          The free plan includes 5 monitors with 5-minute check intervals — enough to evaluate whether Upnotify fits your needs. Paid plans start with 1-minute intervals and higher monitor counts.
+          Plans start at &#8377;999/year — an inexpensive way to evaluate whether Upnotify fits your needs. Higher tiers add faster check intervals and higher monitor counts.
         </p>
 
         <div className="blog-cta-section">
           <h3>Start monitoring your website in under two minutes</h3>
           <p>
-            Free plan available. HTTP, SSL, keyword, and DNS monitoring. Public status pages included. No credit card required.
+            Start monitoring in minutes. HTTP, SSL, keyword, and DNS monitoring. Public status pages included.
           </p>
           <Link href="https://upnotify-monitoring.vercel.app/signup" className="btn btn-primary btn-lg">
-            Start Free
+            Start Monitoring
           </Link>
         </div>
 

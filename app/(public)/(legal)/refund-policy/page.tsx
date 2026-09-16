@@ -4,7 +4,7 @@ import Link from 'next/link'
 export const metadata: Metadata = {
   title: 'Refund Policy — Upnotify',
   description:
-    'Upnotify refund policy covering free, Lite (annual), Builder, and Scale plans. Learn about cooling-off periods, cancellations, and how to request a refund.',
+    'Upnotify refund policy covering Lite (annual), Builder, and Scale plans. Learn about cooling-off periods, cancellations, and how to request a refund.',
   alternates: { canonical: 'https://upnotify-monitoring.vercel.app/refund-policy' },
 }
 
@@ -20,9 +20,12 @@ export default function RefundPolicyPage(): React.ReactElement {
         read alongside our <Link href="/terms">Terms of Service</Link>.
       </p>
 
-      <h2>1. Free Plan</h2>
+      <h2>1. Paid Plans Only</h2>
       <p>
-        The Upnotify Free plan does not require any payment. As no charges are made, no refund applies.
+        Upnotify does not offer a free plan or a free tier. All monitoring accounts require an active
+        paid subscription, and this policy applies to every Upnotify plan. Certain one-off tools on our
+        website (such as the SSL Checker and DNS Lookup) can be used without an account and without
+        payment; as no charges are made for those tools, no refund applies to them.
       </p>
 
       {/* TODO: legal review needed — this clause referenced UK/EU-specific compliance obligations tied to the old entity; verify with counsel whether it still applies or needs Indian-equivalent language */}
@@ -74,8 +77,12 @@ export default function RefundPolicyPage(): React.ReactElement {
       </p>
       <p>
         No refund is issued when pausing — billing simply stops for the pause period.
-        If you prefer a full cancellation instead, you may cancel at any time and your
-        account will revert to the Free plan.
+        If you prefer a full cancellation instead, you may cancel at any time. As there is no free
+        plan to fall back to, your subscription remains active until the end of the billing period you
+        have already paid for, after which monitoring stops and your monitors are deactivated. Your
+        account and historical data remain accessible in accordance with our{' '}
+        <Link href="/privacy">Privacy Policy</Link> data retention terms, and you can resubscribe at
+        any time.
       </p>
 
       <h2>5. Payment Processing</h2>

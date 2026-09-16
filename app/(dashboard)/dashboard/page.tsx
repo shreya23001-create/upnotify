@@ -3,12 +3,14 @@ import Link from 'next/link'
 import { getCurrentUser } from '@/lib/db/users'
 import { WorkspaceDashboard } from '@/components/dashboard/workspace-dashboard'
 import { redirect } from 'next/navigation'
+import { requireActivatedOrg } from '@/lib/auth/require-activated-org'
 
 export const metadata: Metadata = { title: 'Dashboard' }
 
 export default async function DashboardPage(): Promise<React.ReactElement> {
   const user = await getCurrentUser()
   if (!user) redirect('/login')
+  await requireActivatedOrg(user.org_id)
 
   return (
     <div className="db-content db-home">

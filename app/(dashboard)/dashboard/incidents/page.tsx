@@ -3,6 +3,7 @@ import { getCurrentUser } from '@/lib/db/users'
 import { getAllIncidentsGroupedByWebsite } from '@/lib/db/incidents'
 import { IncidentsTable } from '@/components/dashboard/incidents-table'
 import type { Metadata } from 'next'
+import { requireActivatedOrg } from '@/lib/auth/require-activated-org'
 
 export const dynamic = 'force-dynamic'
 
@@ -17,6 +18,7 @@ export default async function IncidentsPage({
 }): Promise<React.ReactElement> {
   const user = await getCurrentUser()
   if (!user) redirect('/login')
+  await requireActivatedOrg(user.org_id)
 
   const { tab: tabParam } = await searchParams
   const tab = tabParam === 'resolved' ? 'resolved' : tabParam === 'open' ? 'open' : undefined

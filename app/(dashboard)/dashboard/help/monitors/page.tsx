@@ -29,7 +29,7 @@ const FAQ_SCHEMA = {
       name: 'How often does Upnotify check my website?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Check intervals depend on your plan. Free plans check every 10 minutes. Lite, Builder, and Scale plans check every 1 minute.',
+        text: 'Check intervals depend on the monitor type — most run as often as every minute. There is no free plan; every website subscription includes full monitor coverage.',
       },
     },
   ],

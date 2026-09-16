@@ -235,7 +235,7 @@ export default function CheapHostingHiddenCostsPage(): React.ReactElement {
         </p>
 
         <ol>
-          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (paid plans from ₹999/year)</li>
           <li>Add an HTTP monitor for your homepage</li>
           <li>Set a response time threshold of 3 seconds</li>
           <li>Configure alerts via Slack, email, or Microsoft Teams</li>
@@ -293,7 +293,7 @@ export default function CheapHostingHiddenCostsPage(): React.ReactElement {
         <div className="blog-cta-section">
           <h3>See what your hosting is really doing to your site</h3>
           <p>
-            Free plan available. HTTP monitoring with response time tracking. Alerts via Slack, email, and Teams. No credit card required.
+            Start monitoring in minutes. HTTP monitoring with response time tracking. Alerts via Slack, email, and Teams.
           </p>
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             <Link href="/score" className="btn btn-primary btn-lg">

@@ -307,7 +307,7 @@ export default async function LeaderboardPage(): Promise<React.ReactElement> {
             <Link href="/signup">create an account</Link> to start.
           </p>
           <Link href="/signup" className="btn btn-primary btn-lg">
-            Start Monitoring Free
+            Start Monitoring
           </Link>
         </div>
       </div>

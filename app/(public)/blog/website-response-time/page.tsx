@@ -291,11 +291,11 @@ export default function WebsiteResponseTimePage(): React.ReactElement {
         <div className="blog-cta-section">
           <h3>Track your server response time on every check</h3>
           <p>
-            Upnotify measures TTFB every minute and alerts you when your server slows down — before it crashes completely. Free plan available, no credit card required.
+            Upnotify measures TTFB every minute and alerts you when your server slows down — before it crashes completely. Plans start at &#8377;999/year.
           </p>
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             <Link href="https://upnotify-monitoring.vercel.app/signup" className="btn btn-primary btn-lg">
-              Start Monitoring Free
+              Start Monitoring
             </Link>
           </div>
         </div>

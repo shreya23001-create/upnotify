@@ -278,7 +278,7 @@ export default function WordPressPharmaHackPage(): React.ReactElement {
         <h3>Step 1: Monitor for pharmaceutical keywords</h3>
 
         <ol>
-          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (paid plans from ₹999/year)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>Keyword</strong> as the monitor type</li>
           <li>Enter your homepage URL</li>
@@ -387,7 +387,7 @@ export default function WordPressPharmaHackPage(): React.ReactElement {
         <div className="blog-cta-section">
           <h3>Detect hidden pharma spam and SEO hacks automatically</h3>
           <p>
-            Free plan available. Keyword monitoring that scans your actual page HTML. Instant alerts on Slack, Teams, or email. No credit card required.
+            Start monitoring in minutes. Keyword monitoring that scans your actual page HTML. Instant alerts on Slack, Teams, or email.
           </p>
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             <Link href="/score" className="btn btn-primary btn-lg">

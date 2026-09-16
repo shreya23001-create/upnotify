@@ -340,7 +340,7 @@ export default function CdnVsBetterHostingPage(): React.ReactElement {
         <div className="blog-cta-section">
           <h3>Measure your actual website performance</h3>
           <p>
-            Free plan available. 60-second response time tracking. See your real TTFB, not what your hosting provider or CDN dashboard claims. No credit card required.
+            Start monitoring in minutes. 60-second response time tracking. See your real TTFB, not what your hosting provider or CDN dashboard claims.
           </p>
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             <Link href="/score" className="btn btn-primary btn-lg">

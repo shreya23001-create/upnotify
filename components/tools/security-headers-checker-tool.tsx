@@ -267,7 +267,7 @@ export function SecurityHeadersCheckerTool(): React.ReactElement {
                 <div className="card" style={{ padding: '1.25rem', marginTop: '0.5rem', background: 'var(--color-surface-secondary, #f8fafc)' }}>
                   <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--color-text-secondary)' }}>
                     <strong>Want automatic security header monitoring?</strong> Upnotify can check your headers daily and alert you when something changes or a header is removed.{' '}
-                    <a href="/signup" style={{ color: 'var(--color-primary)' }}>Start free →</a>
+                    <a href="/signup" style={{ color: 'var(--color-primary)' }}>Start monitoring →</a>
                   </p>
                 </div>
               )}

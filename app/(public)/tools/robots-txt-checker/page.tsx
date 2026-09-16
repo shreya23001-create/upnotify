@@ -125,7 +125,7 @@ export default function RobotsTxtCheckerPage(): React.ReactElement {
             sitemap reference never silently sinks your indexation.
           </p>
           <a href="/signup" className="btn btn-primary btn-lg">
-            Start Monitoring Free
+            Start Monitoring
           </a>
         </div>
       </div>

@@ -225,7 +225,7 @@ export default function WooCommercePaymentGatewayErrorPage(): React.ReactElement
         <h3>Step 1: Monitor your checkout page for error text</h3>
 
         <ol>
-          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (paid plans from ₹999/year)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>Keyword</strong> as the monitor type</li>
           <li>Enter your checkout page URL — typically <code>yourstore.com/checkout/</code></li>
@@ -344,7 +344,7 @@ export default function WooCommercePaymentGatewayErrorPage(): React.ReactElement
         <div className="blog-cta-section">
           <h3>Protect your WooCommerce revenue from payment failures</h3>
           <p>
-            Free plan available. Keyword monitoring on checkout pages detects gateway errors. HTTP monitoring on webhook endpoints catches communication failures. No credit card required.
+            Start monitoring in minutes. Keyword monitoring on checkout pages detects gateway errors. HTTP monitoring on webhook endpoints catches communication failures.
           </p>
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             <Link href="/score" className="btn btn-primary btn-lg">

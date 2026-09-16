@@ -347,10 +347,10 @@ export default function ToolsIndexPage(): React.ReactElement {
           <h2>Monitor your website 24/7</h2>
           <p>
             Go beyond one-time checks. Get continuous monitoring with instant alerts.
-            The Free plan includes 3 monitors — no credit card required.
+            Plans start at &#8377;999/year.
           </p>
           <Link href="/signup" className="btn btn-primary btn-lg">
-            Start Monitoring Free
+            Start Monitoring
           </Link>
         </div>
       </div>

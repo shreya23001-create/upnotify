@@ -30,7 +30,7 @@ const jsonLd = {
   url: 'https://upnotify-monitoring.vercel.app/monitoring/wordpress-site-monitor',
   applicationCategory: 'SecurityApplication',
   operatingSystem: 'WordPress',
-  offers: { '@type': 'Offer', price: '0', priceCurrency: 'GBP', description: 'Free plan available' },
+  offers: { '@type': 'Offer', price: '999', priceCurrency: 'INR', description: 'Paid plans from ₹999/year' },
   publisher: { '@type': 'Organization', name: 'Upnotify', url: 'https://upnotify-monitoring.vercel.app' },
 }
 
@@ -159,7 +159,7 @@ const faq = [
   },
   {
     q: 'How many WordPress sites can I monitor?',
-    a: 'Free plan: 0 sites. Lite plan: 1 site. Builder plan: up to 5 sites. Scale plan: up to 10 sites.',
+    a: 'Pre Plan: 1 site. Pro Plan: up to 5 sites. Scale plan: up to 10 sites.',
   },
   {
     q: 'What checks does the plugin run?',
@@ -599,7 +599,7 @@ export default function WordPressMonitorPage() {
                 Start monitoring your WordPress site from the inside
               </div>
               <div style={{ fontSize: 15, color: 'rgba(255,255,255,0.65)', marginBottom: 30, maxWidth: 480, margin: '0 auto 30px' }}>
-                Free plan · 2-minute plugin install · No inbound ports · Works on any WordPress host
+                From ₹999/year · 2-minute plugin install · No inbound ports · Works on any WordPress host
               </div>
               <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
                 <Link href="/signup" style={{
@@ -614,7 +614,7 @@ export default function WordPressMonitorPage() {
                   boxShadow: '0 4px 16px rgba(251, 168, 48,0.4)',
                 }}>
                   <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                  Create Free Account
+                  Create Account
                 </Link>
                 <a href="/downloads/Upnotify-monitor.zip" style={{
                   background: 'rgba(255,255,255,0.08)',

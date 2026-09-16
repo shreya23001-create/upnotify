@@ -277,7 +277,7 @@ export default function WordPressSlowTtfbPage(): React.ReactElement {
         <h3>Step 1: Set up an HTTP monitor with a response time threshold</h3>
 
         <ol>
-          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (free plan available)</li>
+          <li>Sign up at <Link href="/signup">upnotify-monitoring.vercel.app/signup</Link> (paid plans from ₹999/year)</li>
           <li>Click <strong>Add Monitor</strong> from your dashboard</li>
           <li>Select <strong>HTTP/HTTPS</strong> as the monitor type</li>
           <li>Enter your WordPress site URL</li>
@@ -347,7 +347,7 @@ export default function WordPressSlowTtfbPage(): React.ReactElement {
         <div className="blog-cta-section">
           <h3>Stop guessing. Start measuring TTFB.</h3>
           <p>
-            Free plan available. HTTP monitoring that tracks response time on every check and alerts when your server slows down. No credit card required.
+            Start monitoring in minutes. HTTP monitoring that tracks response time on every check and alerts when your server slows down.
           </p>
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             <Link href="/score" className="btn btn-primary btn-lg">

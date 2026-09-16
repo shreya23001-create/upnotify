@@ -115,8 +115,8 @@ export default function BillingPage(): React.ReactElement {
             <h2 className="help-section-title">Cancellation</h2>
             <p>
               You can cancel any time from <strong>Settings</strong> &rarr; <strong>Billing</strong>.
-              Your plan stays active until the end of the paid period. After that, your account
-              reverts to the Free plan. Monitors beyond the Free limit are paused, and your data
+              Your plan stays active until the end of the paid period. Upnotify does not offer a
+              free plan, so after that your monitors are deactivated (not deleted), and your data
               is retained for 30 days in case you change your mind.
             </p>
           </section>

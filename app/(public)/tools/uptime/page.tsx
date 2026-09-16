@@ -6,7 +6,7 @@ const data: ToolPillarData = {
   pillarSlug: 'uptime',
   seoTitle: 'Free Uptime & Performance Tools — Status Checker, Speed Test, SLA Calculator | Upnotify',
   seoDescription:
-    'Free uptime and performance tools: HTTP status checker, full website health score, response-time / TTFB speed test, and uptime SLA calculator. Run one-off checks now or set up continuous monitoring on the free plan.',
+    'Free uptime and performance tools: HTTP status checker, full website health score, response-time / TTFB speed test, and uptime SLA calculator. Run one-off checks now or set up continuous monitoring on a paid plan.',
   heroTitle: 'Free Uptime & Performance Tools',
   heroSubtitle:
     'Quick checks for whether a site is up, how fast it responds, and what its uptime really means in real time. No signup required.',

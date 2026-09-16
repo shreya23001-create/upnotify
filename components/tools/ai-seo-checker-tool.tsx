@@ -342,11 +342,11 @@ export function AiSeoCheckerTool() {
                         <div className="ai-llms-gate-icon">🔒</div>
                         <h3 className="ai-llms-gate-title">Get your full customised llms.txt</h3>
                         <p className="ai-llms-gate-desc">
-                          Sign up free to generate a complete llms.txt tailored to your site and
+                          Sign up to generate a complete llms.txt tailored to your site and
                           selected AI engines — Perplexity, ChatGPT, Claude, Gemini, and more.
                         </p>
-                        <a href="/signup" className="ai-llms-gate-btn">Sign up free — it takes 30 seconds</a>
-                        <p className="ai-llms-gate-sub">No credit card. Free plan includes 1 generation.</p>
+                        <a href="/signup" className="ai-llms-gate-btn">Sign up — it takes 30 seconds</a>
+                        <p className="ai-llms-gate-sub">Available on any paid plan, from &#8377;999/year.</p>
                       </>
                     )}
                   </div>
@@ -367,7 +367,7 @@ export function AiSeoCheckerTool() {
                 </div>
               </div>
             </div>
-            <a href="/signup" className="ai-monitor-cta-btn">Start free →</a>
+            <a href="/signup" className="ai-monitor-cta-btn">Start monitoring →</a>
           </div>
 
         </div>

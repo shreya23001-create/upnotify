@@ -98,7 +98,7 @@ export async function canGenerateLlmsTxt(orgId: string, planSlug: string): Promi
     return {
       allowed: false,
       reason: limit === 1
-        ? 'Free plan includes one llms.txt generation lifetime. Upgrade to generate unlimited files.'
+        ? 'Your current plan includes one llms.txt generation lifetime. Upgrade to generate unlimited files.'
         : `You have reached your llms.txt generation limit (${limit}) for this plan.`,
     }
   }
@@ -224,7 +224,7 @@ export async function canRunCitationCheck(
     if (hasNonFree) {
       return {
         allowed: false,
-        reason: 'Free plan can only check free engines (Copilot, Exa). Upgrade to access all engines.',
+        reason: 'Your current plan can only check free-tier engines (Copilot, Exa). Upgrade to access all engines.',
       }
     }
     return { allowed: true }

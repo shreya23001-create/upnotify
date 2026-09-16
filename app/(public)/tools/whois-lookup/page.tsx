@@ -131,7 +131,7 @@ export default function WhoisLookupPage(): React.ReactElement {
               unexpected ownership or registrar changes the moment they happen. Set up once and forget about it.
             </p>
             <a href="/signup" className="btn btn-primary btn-lg">
-              Start Monitoring Free
+              Start Monitoring
             </a>
           </div>
         </div>

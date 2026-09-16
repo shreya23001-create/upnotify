@@ -273,61 +273,70 @@ export default async function LandingPage(): Promise<React.ReactElement> {
             </svg>
             <div className="container">
               <div className="hero-content">
-                <div className="hero-eyebrow fade-up">
-                  <div className="hero-eyebrow-text">
-                    <span className="hero-eyebrow-dot" />
-                    24 monitor types · 1-minute checks · AI-powered reports
-                  </div>
-                </div>
-                <h1 className="hero-headline fade-up delay-1">
-                  Spot the outage first —<br />
-                  <span className="gradient-text hero-tweets-gradient">not after your customers do.</span>
-                </h1>
-                <p className="hero-sub fade-up delay-2">
-                  24 monitor types, checks as tight as every 60 seconds, and instant alerts wherever your team already lives — Slack, email, or webhook. Made for agencies and dev teams.
-                </p>
-                <div className="hero-ctas hero-ctas-desktop fade-up delay-3">
-                  <Link href={hero?.cta_primary?.href ?? '/signup'} className="btn btn-primary btn-lg">
-                    <Zap size={16} strokeWidth={2} />
-                    {hero?.cta_primary?.text ?? 'Start Monitoring Free'}
-                  </Link>
-                  <Link href={hero?.cta_secondary?.href ?? '/#how-it-works'} className="btn btn-ghost btn-lg">
-                    {hero?.cta_secondary?.text ?? 'See How It Works'}
-                  </Link>
-                  <Link href={hero?.cta_tertiary?.href ?? '/score'} className="btn btn-outline-brand btn-lg hero-score-cta">
-                    <Info size={14} strokeWidth={2} />
-                    {hero?.cta_tertiary?.text ?? 'Score Your Site Free'}
-                  </Link>
-                </div>
-                <div className="hero-trust hero-trust-desktop fade-up delay-3">
-                  {(hero?.trust_items ?? ['No credit card required', '3 monitors free forever', '1-minute check intervals', 'GDPR compliant · EU data']).map((item, i, arr) => (
-                    <span key={item} style={{ display: 'contents' }}>
-                      <div className="trust-item">{item}</div>
-                      {i < arr.length - 1 && <div className="trust-item trust-item-sep">·</div>}
-                    </span>
-                  ))}
-                </div>
+                <div className="hero-split">
+                  <div className="hero-text-col">
+                    <div className="hero-eyebrow fade-up">
+                      <div className="hero-eyebrow-text">
+                        <span className="hero-eyebrow-dot" />
+                        24 monitor types · 1-minute checks · AI-powered reports
+                      </div>
+                    </div>
+                    <h1 className="hero-headline fade-up delay-1">
+                      Spot the outage first —<br />
+                      <span className="gradient-text hero-tweets-gradient">not after your customers do.</span>
+                    </h1>
+                    <p className="hero-sub fade-up delay-2">
+                      24 monitor types, checks as tight as every 60 seconds, and instant alerts wherever your team already lives — Slack, email. Made for agencies and dev teams.
+                    </p>
+                    <div className="hero-ctas hero-ctas-desktop fade-up delay-3">
+                      <Link href={hero?.cta_primary?.href ?? '/signup'} className="btn btn-primary btn-lg">
+                        <Zap size={16} strokeWidth={2} />
+                        {hero?.cta_primary?.text ?? 'Start Monitoring'}
+                      </Link>
+                      <Link href={hero?.cta_secondary?.href ?? '/#how-it-works'} className="btn btn-ghost btn-lg">
+                        {hero?.cta_secondary?.text ?? 'See How It Works'}
+                      </Link>
+                      <Link href={hero?.cta_tertiary?.href ?? '/score'} className="btn btn-outline-brand btn-lg hero-score-cta">
+                        <Info size={14} strokeWidth={2} />
+                        {hero?.cta_tertiary?.text ?? 'Score Your Site Free'}
+                      </Link>
+                    </div>
+                    <div className="hero-trust hero-trust-desktop fade-up delay-3">
+                      {(hero?.trust_items ?? ['Plans from ₹999/year', '1-minute check intervals', 'GDPR compliant · EU data']).map((item, i, arr) => (
+                        <span key={item} style={{ display: 'contents' }}>
+                          <div className="trust-item">{item}</div>
+                          {i < arr.length - 1 && <div className="trust-item trust-item-sep">·</div>}
+                        </span>
+                      ))}
+                    </div>
 
-                {/* Mobile-only: dark checklist card + neon CTA pill */}
-                <div className="hero-mobile-card fade-up delay-3">
-                  <ul className="hero-mobile-checklist">
-                    {(hero?.trust_items ?? ['3 monitors free forever', '24 monitor types', 'Real-time alerts, email & Slack', 'Public status pages']).map((item) => (
-                      <li key={item}>
-                        <Check size={13} strokeWidth={3} />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                  <Link href={hero?.cta_primary?.href ?? '/signup'} className="hero-mobile-cta">
-                    {hero?.cta_primary?.text ?? 'Start monitoring in 30 seconds'}
-                  </Link>
-                  <div className="hero-mobile-links">
-                    <Link href={hero?.cta_secondary?.href ?? '/#how-it-works'}>
-                      {hero?.cta_secondary?.text ?? 'See How It Works'}
-                    </Link>
-                    <Link href={hero?.cta_tertiary?.href ?? '/score'}>
-                      {hero?.cta_tertiary?.text ?? 'Score Your Site Free'}
-                    </Link>
+                    {/* Mobile-only: dark checklist card + neon CTA pill */}
+                    <div className="hero-mobile-card fade-up delay-3">
+                      <ul className="hero-mobile-checklist">
+                        {(hero?.trust_items ?? ['24 monitor types', 'Real-time alerts, email & Slack', 'Public status pages']).map((item) => (
+                          <li key={item}>
+                            <Check size={13} strokeWidth={3} />
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+                      <Link href={hero?.cta_primary?.href ?? '/signup'} className="hero-mobile-cta">
+                        {hero?.cta_primary?.text ?? 'Start monitoring in 30 seconds'}
+                      </Link>
+                      <div className="hero-mobile-links">
+                        <Link href={hero?.cta_secondary?.href ?? '/#how-it-works'}>
+                          {hero?.cta_secondary?.text ?? 'See How It Works'}
+                        </Link>
+                        <Link href={hero?.cta_tertiary?.href ?? '/score'}>
+                          {hero?.cta_tertiary?.text ?? 'Score Your Site Free'}
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="hero-image-col fade-up delay-3">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="/transparent-image.png" alt="Upnotify" className="hero-image" />
                   </div>
                 </div>
 
@@ -676,7 +685,7 @@ export default async function LandingPage(): Promise<React.ReactElement> {
                       { feature: 'Public uptime leaderboard / tracker', values: [true, false, false], type: 'boolean' },
                       { feature: 'Public status pages', values: [true, true, true], type: 'boolean' },
                       { feature: 'Monitor types (HTTP, SSL, DNS, Keyword…)', values: ['24 types', '7 types', '6 types'], type: 'text', highlight: 0 },
-                      { feature: 'Free plan monitors', values: ['3 monitors', '3 monitors', '50 monitors'], type: 'text', highlight: 0 },
+                      { feature: 'Alert channels (email, Slack, Teams, Telegram, webhook)', values: ['5 channels', '4 channels', '3 channels'], type: 'text', highlight: 0 },
                       { feature: 'Starting price (paid plan)', values: [defaultCurrency === 'inr' ? '₹999/yr Lite' : '£10/yr Lite', '$24/mo', '$7/mo'], type: 'text', highlight: 0 },
                       { feature: 'GDPR · EU data storage', values: [true, true, false], type: 'boolean' },
                       { feature: 'AI outage blog auto-publish', values: [true, false, false], type: 'boolean' },
@@ -721,18 +730,18 @@ export default async function LandingPage(): Promise<React.ReactElement> {
                   {ctaBand?.eyebrow ?? 'Start in 2 minutes'}
                 </div>
                 <h2>{ctaBand?.headline ?? (<>Get the alert first.<br />Fix it before <em>anyone notices.</em></>)}</h2>
-                <p>{ctaBand?.subheadline ?? 'Upnotify watches your sites, APIs, and infrastructure 24/7 — and tells you first. Free plan. No credit card. Up in 2 minutes.'}</p>
+                <p>{ctaBand?.subheadline ?? 'Upnotify watches your sites, APIs, and infrastructure 24/7 — and tells you first. Plans from ₹999/year. Up in 2 minutes.'}</p>
                 <div className="cta-band-buttons">
                   <Link href={ctaBand?.cta_primary?.href ?? '/signup'} className="btn-cta-white">
                     <Zap size={16} strokeWidth={2.5} />
-                    {ctaBand?.cta_primary?.text ?? 'Start Monitoring Free'}
+                    {ctaBand?.cta_primary?.text ?? 'Start Monitoring'}
                   </Link>
                   <Link href={ctaBand?.cta_secondary?.href ?? '/#features'} className="btn-cta-outline">
                     {ctaBand?.cta_secondary?.text ?? 'See All Features →'}
                   </Link>
                 </div>
                 <div className="cta-band-trust">
-                  {(ctaBand?.trust_items ?? ['3 monitors free forever', 'No credit card required', 'GDPR compliant · EU data', '1-minute check intervals']).map((item, i, arr) => (
+                  {(ctaBand?.trust_items ?? ['Plans from ₹999/year', 'GDPR compliant · EU data', '1-minute check intervals']).map((item, i, arr) => (
                     <span key={item} style={{ display: 'contents' }}>
                       <span className="cta-band-trust-item">
                         <Check size={13} strokeWidth={2.5} />

@@ -122,7 +122,7 @@ export default function BlacklistCheckerPage(): React.ReactElement {
             never goes unnoticed.
           </p>
           <a href="/signup" className="btn btn-primary btn-lg">
-            Start Monitoring Free
+            Start Monitoring
           </a>
         </div>
       </div>

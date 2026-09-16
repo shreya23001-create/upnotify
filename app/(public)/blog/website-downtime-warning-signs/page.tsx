@@ -334,7 +334,7 @@ export default function WebsiteDowntimeWarningSignsPage(): React.ReactElement {
         <div className="blog-cta-section">
           <h3>Start monitoring your site in 60 seconds</h3>
           <p>
-            Free plan available. One-minute checks. HTTP, keyword, SSL, and DNS monitoring. No credit card required.
+            Start monitoring in minutes. One-minute checks. HTTP, keyword, SSL, and DNS monitoring.
           </p>
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             <Link href="/score" className="btn btn-primary btn-lg">

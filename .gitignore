@@ -57,3 +57,4 @@ next-env.d.ts
 # Lives inside the repo for convenience but must not be tracked by git.
 /public/downloads/wp_prg/
 **/.svn/
+.env*

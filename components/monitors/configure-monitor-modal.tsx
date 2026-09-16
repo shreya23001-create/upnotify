@@ -11,9 +11,10 @@ interface Props {
   onCancel: () => void
   isSaving?: boolean
   error?: string
+  keywordSuggestions?: { positive: string[]; negative: string[] }
 }
 
-export function ConfigureMonitorModal({ type, domain, initialConfig, onSave, onCancel, isSaving, error }: Props): React.ReactElement {
+export function ConfigureMonitorModal({ type, domain, initialConfig, onSave, onCancel, isSaving, error, keywordSuggestions }: Props): React.ReactElement {
   const [positiveKeywords, setPositiveKeywords] = useState<string[]>((initialConfig?.positiveKeywords as string[]) ?? [])
   const [negativeKeywords, setNegativeKeywords] = useState<string[]>((initialConfig?.negativeKeywords as string[]) ?? [])
   const [port, setPort] = useState<string>(initialConfig?.port ? String(initialConfig.port) : '')
@@ -78,6 +79,7 @@ export function ConfigureMonitorModal({ type, domain, initialConfig, onSave, onC
                 onChange={setPositiveKeywords}
                 variant="positive"
                 disabled={isSaving}
+                suggestions={keywordSuggestions?.positive}
               />
               <KeywordTagInput
                 label="Must Not Contain (negative keywords)"
@@ -86,6 +88,7 @@ export function ConfigureMonitorModal({ type, domain, initialConfig, onSave, onC
                 onChange={setNegativeKeywords}
                 variant="negative"
                 disabled={isSaving}
+                suggestions={keywordSuggestions?.negative}
               />
             </>
           )}

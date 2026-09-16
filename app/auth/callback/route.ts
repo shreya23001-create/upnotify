@@ -8,6 +8,7 @@ import { writeAuditLog } from '@/lib/db/audit'
 import { recordReferralSignup } from '@/lib/db/referrals'
 import { acceptTeamInvite } from '@/lib/db/team'
 import { markConverted } from '@/lib/aoe/db/aoe-outreach-log'
+import { hasAnyActivePlan } from '@/lib/utils/plan-limits'
 
 /**
  * Validates that a redirect path is safe (relative, no open-redirect vectors).
@@ -191,6 +192,16 @@ export async function GET(request: Request): Promise<NextResponse> {
           isNewUser,
         },
       })
+
+      // Match the password-based signup/login flow (lib/auth/actions.ts):
+      // an org with no active plan lands on Plans, not the dashboard. Only
+      // overrides the DEFAULT destination — an explicit `next` (e.g. an
+      // invite-acceptance deep link) is respected as-is; the per-page
+      // requireActivatedOrg() guards still catch it there if needed.
+      const finalOrgId = (dbUserForAudit?.org_id as string | undefined) ?? null
+      if (finalOrgId && nextPath === '/dashboard' && !(await hasAnyActivePlan(finalOrgId))) {
+        return NextResponse.redirect(`${origin}/dashboard/plans`)
+      }
     }
 
     return NextResponse.redirect(`${origin}${nextPath}`)

@@ -73,7 +73,7 @@ const data: IndustryLandingData = {
     },
     {
       q: 'How do we handle Black Friday or peak campaign traffic?',
-      a: 'Increase check frequency on critical paths (cart, checkout, payment) to 30 seconds in advance of the peak. Set tighter response-time thresholds. Connect alerts to Slack and a paging tool. Pre-publish a status page so customers see "we know" instead of refreshing in frustration. The Free plan includes 3 monitors — most retailers upgrade temporarily during peak season.',
+      a: 'Increase check frequency on critical paths (cart, checkout, payment) to 30 seconds in advance of the peak. Set tighter response-time thresholds. Connect alerts to Slack and a paging tool. Pre-publish a status page so customers see "we know" instead of refreshing in frustration. Most retailers upgrade to a higher tier temporarily during peak season.',
     },
     {
       q: 'Will monitoring add load to our checkout?',
