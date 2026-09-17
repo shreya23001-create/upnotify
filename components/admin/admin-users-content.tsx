@@ -547,24 +547,35 @@ export function AdminUsersContent(): React.ReactElement {
                                   {impersonatingId === p.userId ? 'Switching…' : '👁 Mimic User'}
                                 </button>
 
-                                <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', marginTop: 4 }}>Change Uptime Plan</div>
-                                <select
-                                  className="form-input"
-                                  style={{ fontSize: 12, padding: '5px 8px' }}
-                                  defaultValue=""
-                                  onChange={e => {
-                                    const planId = e.target.value
-                                    if (!planId) return
-                                    const plan = plans.find(pl => pl.id === planId)
-                                    setConfirmAction({ type: 'change_plan', userId: p.userId, userName: p.fullName ?? p.email, planId, planName: plan?.name ?? 'Unknown' })
-                                    e.target.value = ''
-                                  }}
-                                >
-                                  <option value="">Select plan…</option>
-                                  {plans.map(pl => (
-                                    <option key={pl.id} value={pl.id}>{pl.name}</option>
-                                  ))}
-                                </select>
+                                {p.planSlug === 'pro-plan-website' ? (
+                                  <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>
+                                    This org is on the current Pro Plan (per-website) — manage it from the org&apos;s Pro Plan rows on the{' '}
+                                    <Link href="/admin/plans" style={{ color: 'var(--accent)' }}>Plans page</Link> instead of the legacy plan selector below.
+                                  </div>
+                                ) : (
+                                  <>
+                                    <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', marginTop: 4 }}>
+                                      Assign Legacy Plan <span style={{ fontWeight: 400 }}>(grandfathered orgs only)</span>
+                                    </div>
+                                    <select
+                                      className="form-input"
+                                      style={{ fontSize: 12, padding: '5px 8px' }}
+                                      defaultValue=""
+                                      onChange={e => {
+                                        const planId = e.target.value
+                                        if (!planId) return
+                                        const plan = plans.find(pl => pl.id === planId)
+                                        setConfirmAction({ type: 'change_plan', userId: p.userId, userName: p.fullName ?? p.email, planId, planName: plan?.name ?? 'Unknown' })
+                                        e.target.value = ''
+                                      }}
+                                    >
+                                      <option value="">Select plan…</option>
+                                      {plans.map(pl => (
+                                        <option key={pl.id} value={pl.id}>{pl.name}</option>
+                                      ))}
+                                    </select>
+                                  </>
+                                )}
 
                                 {competePlans.length > 0 && (
                                   <>

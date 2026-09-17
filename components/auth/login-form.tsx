@@ -23,6 +23,7 @@ export function LoginForm({ mode = 'login', next }: { mode?: 'login' | 'signup';
   const [isPending, startTransition] = useTransition()
   const [hintEmail, setHintEmail] = useState('')
   const [agreedToTerms, setAgreedToTerms] = useState(false)
+  const [confirmationEmail, setConfirmationEmail] = useState<string | null>(null)
 
   useEffect(() => {
     if (mode === 'login') setHintEmail(readEmailHint())
@@ -52,15 +53,51 @@ export function LoginForm({ mode = 'login', next }: { mode?: 'login' | 'signup';
     const email = formData.get('email') as string
 
     startTransition(async () => {
-      const result = mode === 'signup'
-        ? await signUpWithPassword(formData)
-        : await signInWithPassword(formData)
+      if (mode === 'signup') {
+        const result = await signUpWithPassword(formData)
+        if (result?.error) {
+          setError(result.error)
+        } else if (result?.needsConfirmation) {
+          setConfirmationEmail(result.email ?? email ?? '')
+        } else if (email) {
+          setEmailHint(email)
+        }
+        return
+      }
+
+      const result = await signInWithPassword(formData)
       if (result?.error) {
         setError(result.error)
       } else if (email) {
         setEmailHint(email)
       }
     })
+  }
+
+  if (confirmationEmail) {
+    return (
+      <div className="auth-confirm-card">
+        <div className="auth-confirm-icon">✉️</div>
+        <div className="auth-form-heading">Check your email</div>
+        <p className="auth-form-sub">
+          We&apos;ve sent a confirmation link to <strong>{confirmationEmail}</strong>.
+          Click the link in that email to activate your account, then sign in below.
+        </p>
+        <a href="/login" className="auth-submit" style={{ display: 'inline-block', textDecoration: 'none', textAlign: 'center', width: 150, maxWidth: '100%' }}>
+          Go to Sign In →
+        </a>
+        <p className="auth-switch" style={{ marginTop: 16 }}>
+          Didn&apos;t get it? Check spam, or{' '}
+          <button
+            type="button"
+            onClick={() => setConfirmationEmail(null)}
+            style={{ background: 'none', border: 'none', padding: 0, color: 'inherit', textDecoration: 'underline', cursor: 'pointer', font: 'inherit' }}
+          >
+            try signing up again
+          </button>.
+        </p>
+      </div>
+    )
   }
 
   return (
@@ -74,7 +111,7 @@ export function LoginForm({ mode = 'login', next }: { mode?: 'login' | 'signup';
       )}
 
       <div className="auth-form-heading">
-        {mode === 'login' ? 'Welcome back' : 'Start monitoring free'}
+        {mode === 'login' ? 'Welcome back' : 'Start monitoring'}
       </div>
       <p className="auth-form-sub">
         {mode === 'login' ? 'Sign in to your Upnotify account' : ''}
@@ -160,13 +197,13 @@ export function LoginForm({ mode = 'login', next }: { mode?: 'login' | 'signup';
         <button type="submit" className="auth-submit" disabled={isPending || (mode === 'signup' && !agreedToTerms)}>
           {isPending
             ? (mode === 'login' ? 'Signing in…' : 'Creating account…')
-            : (mode === 'login' ? 'Log In →' : 'Create Free Account →')}
+            : (mode === 'login' ? 'Log In →' : 'Create Account →')}
         </button>
       </form>
 
       <p className="auth-switch">
         {mode === 'login'
-          ? <><a href="/signup">Don&apos;t have an account? Sign up free</a></>
+          ? <><a href="/signup">Don&apos;t have an account? Sign up</a></>
           : <><a href="/login">Already have an account? Sign in</a></>}
       </p>
       {mode === 'login' && (

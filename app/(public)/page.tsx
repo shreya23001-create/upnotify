@@ -52,12 +52,12 @@ export const revalidate = 600
 export const metadata: Metadata = {
   title: 'Monitoring Suite for Agencies & Teams — Upnotify',
   description:
-    'Monitor uptime, SSL, DNS, APIs & more across all your sites. 1-min checks, 2-region confirm, zero false alarms. Free — no card needed.',
+    'Monitor uptime, SSL, DNS, APIs & more across all your sites. 1-min checks, 2-region confirm, zero false alarms. Plans from ₹999/website/year.',
   alternates: { canonical: 'https://upnotify-monitoring.vercel.app' },
   openGraph: {
     title: 'Monitoring Suite for Agencies & Teams — Upnotify',
     description:
-      'Monitor uptime, SSL, DNS, APIs & more across all your sites. 1-min checks, 2-region confirm, zero false alarms. Free — no card needed.',
+      'Monitor uptime, SSL, DNS, APIs & more across all your sites. 1-min checks, 2-region confirm, zero false alarms. Plans from ₹999/website/year.',
     url: 'https://upnotify-monitoring.vercel.app',
   },
 }
@@ -282,11 +282,11 @@ export default async function LandingPage(): Promise<React.ReactElement> {
                       </div>
                     </div>
                     <h1 className="hero-headline fade-up delay-1">
-                      Spot the outage first —<br />
-                      <span className="gradient-text hero-tweets-gradient">not after your customers do.</span>
+                      Catch downtime before<br />
+                      <span className="gradient-text hero-tweets-gradient">your customers notice.</span>
                     </h1>
                     <p className="hero-sub fade-up delay-2">
-                      24 monitor types, checks as tight as every 60 seconds, and instant alerts wherever your team already lives — Slack, email. Made for agencies and dev teams.
+                      24 monitor types, 60-second checks, and instant Slack and email alerts — built for agencies and dev teams.
                     </p>
                     <div className="hero-ctas hero-ctas-desktop fade-up delay-3">
                       <Link href={hero?.cta_primary?.href ?? '/signup'} className="btn btn-primary btn-lg">
@@ -336,7 +336,7 @@ export default async function LandingPage(): Promise<React.ReactElement> {
 
                   <div className="hero-image-col fade-up delay-3">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src="/transparent-image.png" alt="Upnotify" className="hero-image" />
+                    <img src="/homepage.png" alt="Upnotify" className="hero-image" />
                   </div>
                 </div>
 

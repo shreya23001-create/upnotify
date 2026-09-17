@@ -7,10 +7,16 @@ import {
   getActiveProfilePrompts,
 } from '@/lib/db/ai-profile'
 import { getSubscriptionWithPlan } from '@/lib/db/subscriptions'
+import { hasActiveWebsitePlan } from '@/lib/utils/plan-limits'
 import { processProfileRun } from '@/lib/services/profile-introspector'
 import { logger } from '@/lib/utils/logger'
 import { checkRateLimit, AI_EXPENSIVE_RATE_LIMIT } from '@/lib/utils/rate-limiter'
 import { cleanDomainForAi } from '@/lib/utils/sanitize-ai-input'
+
+// Must match lib/db/ai-visibility.ts's PRO_PLAN_WEBSITE_SLUG — the current
+// Pro Plan (per-website) has no row in the legacy plans table.
+const PRO_PLAN_WEBSITE_SLUG = 'pro-plan-website'
+const PRO_PLAN_WEBSITE_CITATION_LIMIT = 4
 
 // 5 prompts × up to 7 engines × ~3s each = ~100s typical. Vercel Pro caps
 // per-function maxDuration at 300s — give ourselves headroom.
@@ -41,8 +47,13 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   // length. engineering-app#81.
   const cleanDomain = cleanDomainForAi(domain)
 
-  const sub             = await getSubscriptionWithPlan(user.org_id)
-  const planSlug        = sub?.plan?.slug ?? 'free'
+  const [sub, hasWebsitePlan] = await Promise.all([
+    getSubscriptionWithPlan(user.org_id),
+    hasActiveWebsitePlan(user.org_id),
+  ])
+  // A Pro Plan (per-website) org takes priority over any legacy plan row —
+  // paying customers must never be treated as 'free'.
+  const planSlug        = hasWebsitePlan ? PRO_PLAN_WEBSITE_SLUG : (sub?.plan?.slug ?? 'free')
   const allEngines      = await getActiveEngines()
   const freeEngineIds   = allEngines.filter(e => e.is_free).map(e => e.id)
   const validEngineIds  = engineIds.filter(id => allEngines.some(e => e.id === id && e.is_active))
@@ -76,7 +87,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   // Race-condition guard against the shared AI Visibility quota
   if (planSlug !== 'free') {
     const used         = await getAiVisibilityRunsThisMonth(user.org_id)
-    const monthlyLimit = sub?.plan?.citation_check_monthly_limit ?? 0
+    const monthlyLimit = hasWebsitePlan
+      ? PRO_PLAN_WEBSITE_CITATION_LIMIT
+      : sub?.plan?.citation_check_monthly_limit ?? 0
     if (monthlyLimit > 0 && used > monthlyLimit) {
       const { createAdminClient } = await import('@/lib/supabase/admin')
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

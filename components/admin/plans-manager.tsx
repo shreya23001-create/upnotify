@@ -1,24 +1,22 @@
 'use client'
 
-import { useState, useCallback } from 'react'
-import type { Plan, CreditRule } from '@/lib/types'
+import { useState, useCallback, Fragment } from 'react'
+import { ChevronDown, ChevronRight } from 'lucide-react'
+import type { CreditRule } from '@/lib/types'
 import type { CompetePlan } from '@/lib/db/compete-plans'
+import type { AdminWebsitePlanRow } from '@/lib/db/admin'
 import {
-  updatePlanAction,
-  togglePlanVisibilityAction,
   updateCreditRuleAction,
   toggleCreditRuleActiveAction,
   updateCompetePlanAction,
 } from '@/app/(admin)/admin/plans/actions'
 
 interface PlansManagerProps {
-  plans: Plan[]
+  websitePlanRows: AdminWebsitePlanRow[]
   creditRules: CreditRule[]
-  subscriberCounts: Record<string, number>
   competePlans: CompetePlan[]
 }
 
-type EditingPlan = Plan | null
 type EditingCreditRule = CreditRule | null
 type EditingCompetePlan = CompetePlan | null
 
@@ -28,15 +26,76 @@ function formatCurrency(pence: number | null | undefined, symbol: string): strin
   return `${symbol}${(pence / 100).toFixed(2)}`
 }
 
-export function PlansManager({ plans, creditRules, subscriberCounts, competePlans }: PlansManagerProps): React.ReactElement {
-  const [tab, setTab] = useState<'plans' | 'compete' | 'credits'>('plans')
-  const [editingPlan, setEditingPlan] = useState<EditingPlan>(null)
+function statusBadgeClass(status: string): string {
+  switch (status) {
+    case 'active': return 'badge-success'
+    case 'cancelling': return 'badge-outline'
+    case 'past_due': return 'badge-danger'
+    case 'canceled': return 'badge-muted'
+    case 'incomplete': return 'badge-outline'
+    default: return 'badge-muted'
+  }
+}
+
+interface OrgGroup {
+  orgId: string
+  orgName: string
+  rows: AdminWebsitePlanRow[]
+  totalPurchased: number
+  totalClaimed: number
+  totalPaidPaise: number
+  hasActive: boolean
+  latestPeriodEnd: string | null
+}
+
+function groupByOrg(rows: AdminWebsitePlanRow[]): OrgGroup[] {
+  const groups = new Map<string, OrgGroup>()
+  for (const row of rows) {
+    let group = groups.get(row.orgId)
+    if (!group) {
+      group = {
+        orgId: row.orgId,
+        orgName: row.orgName,
+        rows: [],
+        totalPurchased: 0,
+        totalClaimed: 0,
+        totalPaidPaise: 0,
+        hasActive: false,
+        latestPeriodEnd: null,
+      }
+      groups.set(row.orgId, group)
+    }
+    group.rows.push(row)
+    group.totalPurchased += row.purchasedQuantity
+    group.totalClaimed += row.domainsClaimed
+    group.totalPaidPaise += row.totalPaidPaise
+    if (['active', 'cancelling', 'past_due'].includes(row.status)) group.hasActive = true
+    if (row.currentPeriodEnd && (!group.latestPeriodEnd || row.currentPeriodEnd > group.latestPeriodEnd)) {
+      group.latestPeriodEnd = row.currentPeriodEnd
+    }
+  }
+  // Rows already arrive newest-first — keep groups in that same order
+  // (by their first-seen/most recent purchase) rather than re-sorting.
+  return Array.from(groups.values())
+}
+
+export function PlansManager({ websitePlanRows, creditRules, competePlans }: PlansManagerProps): React.ReactElement {
+  const [tab, setTab] = useState<'website' | 'compete' | 'credits'>('website')
   const [editingRule, setEditingRule] = useState<EditingCreditRule>(null)
   const [editingCompetePlan, setEditingCompetePlan] = useState<EditingCompetePlan>(null)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   const [syncing, setSyncing] = useState(false)
+  const [expandedOrgs, setExpandedOrgs] = useState<Set<string>>(new Set())
+
+  const toggleOrgExpanded = useCallback((orgId: string): void => {
+    setExpandedOrgs(prev => {
+      const next = new Set(prev)
+      if (next.has(orgId)) next.delete(orgId); else next.add(orgId)
+      return next
+    })
+  }, [])
 
   const clearMessages = useCallback((): void => {
     setError(null)
@@ -58,29 +117,6 @@ export function PlansManager({ plans, creditRules, subscriberCounts, competePlan
       setError('Razorpay sync failed — check console')
     } finally {
       setSyncing(false)
-    }
-  }, [clearMessages])
-
-  const handleTogglePlanVisibility = useCallback(async (id: string, currentVisible: boolean): Promise<void> => {
-    clearMessages()
-    const result = await togglePlanVisibilityAction(id, !currentVisible)
-    if (!result.success) {
-      setError(result.error ?? 'Failed to toggle plan')
-    } else {
-      setSuccess('Plan visibility updated')
-    }
-  }, [clearMessages])
-
-  const handleSavePlan = useCallback(async (formData: FormData): Promise<void> => {
-    clearMessages()
-    setSaving(true)
-    const result = await updatePlanAction(formData)
-    setSaving(false)
-    if (!result.success) {
-      setError(result.error ?? 'Failed to save plan')
-    } else {
-      setSuccess('Plan updated successfully')
-      setEditingPlan(null)
     }
   }, [clearMessages])
 
@@ -120,6 +156,12 @@ export function PlansManager({ plans, creditRules, subscriberCounts, competePlan
     }
   }, [clearMessages])
 
+  const totalWebsitesPurchased = websitePlanRows.reduce((sum, r) => sum + r.purchasedQuantity, 0)
+  const totalDomainsClaimed = websitePlanRows.reduce((sum, r) => sum + r.domainsClaimed, 0)
+  const totalRevenuePaise = websitePlanRows.reduce((sum, r) => sum + r.totalPaidPaise, 0)
+  const activeOrgCount = new Set(websitePlanRows.filter(r => ['active', 'cancelling', 'past_due'].includes(r.status)).map(r => r.orgId)).size
+  const orgGroups = groupByOrg(websitePlanRows)
+
   return (
     <div>
       {error && <div className="form-error">{error}</div>}
@@ -127,10 +169,10 @@ export function PlansManager({ plans, creditRules, subscriberCounts, competePlan
 
       <div className="tabs-list">
         <button
-          className={`tab-trigger${tab === 'plans' ? ' active' : ''}`}
-          onClick={() => { setTab('plans'); clearMessages() }}
+          className={`tab-trigger${tab === 'website' ? ' active' : ''}`}
+          onClick={() => { setTab('website'); clearMessages() }}
         >
-          Plans ({plans.length})
+          Pro Plan ({websitePlanRows.length})
         </button>
         <button
           className={`tab-trigger${tab === 'compete' ? ' active' : ''}`}
@@ -146,126 +188,114 @@ export function PlansManager({ plans, creditRules, subscriberCounts, competePlan
         </button>
       </div>
 
-      {tab === 'plans' && (
+      {tab === 'website' && (
         <div>
+          <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 16 }}>
+            The current Pro Plan — ₹999/website/year, quantity-first purchase. Each row is one purchase
+            (a top-up via &quot;Add More&quot; creates its own row for the same org). Grandfathered legacy-plan orgs
+            are not shown here — they&apos;re unaffected by this billing model.
+          </p>
+
+          <div className="admin-stats-grid" style={{ marginBottom: 20 }}>
+            <div className="admin-stat-card">
+              <div className="admin-stat-info">
+                <span className="admin-stat-number">{activeOrgCount}</span>
+                <span className="admin-stat-label">Orgs on Pro Plan</span>
+              </div>
+            </div>
+            <div className="admin-stat-card">
+              <div className="admin-stat-info">
+                <span className="admin-stat-number">{totalWebsitesPurchased}</span>
+                <span className="admin-stat-label">Websites Purchased</span>
+              </div>
+            </div>
+            <div className="admin-stat-card">
+              <div className="admin-stat-info">
+                <span className="admin-stat-number">{totalDomainsClaimed}</span>
+                <span className="admin-stat-label">Domains Claimed</span>
+              </div>
+            </div>
+            <div className="admin-stat-card">
+              <div className="admin-stat-info">
+                <span className="admin-stat-number">{'₹'}{(totalRevenuePaise / 100).toLocaleString('en-IN')}</span>
+                <span className="admin-stat-label">Total Revenue</span>
+              </div>
+            </div>
+          </div>
+
           <div className="plans-table-wrapper">
             <table className="plans-table">
               <thead>
                 <tr>
-                  <th>Plan</th>
-                  <th>Type</th>
-                  <th>GBP/mo</th>
-                  <th>GBP/yr</th>
-                  <th>USD/mo</th>
-                  <th>USD/yr</th>
-                  <th>INR/mo</th>
-                  <th>INR/yr</th>
-                  <th>Monitors</th>
-                  <th>Interval</th>
-                  <th>Workspaces</th>
-                  <th>Team</th>
-                  <th>Watchdog</th>
-                  <th>Subs</th>
-                  <th>Visible</th>
-                  <th>Actions</th>
+                  <th>Organisation</th>
+                  <th>Status</th>
+                  <th>Purchased</th>
+                  <th>Claimed</th>
+                  <th>Unused</th>
+                  <th>Paid</th>
+                  <th>Purchased On</th>
+                  <th>Renews / Ended</th>
                 </tr>
               </thead>
               <tbody>
-                {plans.map((plan) => (
-                  <tr key={plan.id}>
-                    <td><span style={{ fontWeight: 600 }}>{plan.name}</span><br /><span className="plans-slug">{plan.slug}</span></td>
-                    <td><span className="badge badge-outline" style={{ textTransform: 'capitalize' }}>{plan.type}</span></td>
-                    <td>{formatCurrency(plan.price_monthly_gbp, '\u00A3')}</td>
-                    <td>{formatCurrency(plan.price_annual_gbp, '\u00A3')}</td>
-                    <td>{formatCurrency(plan.price_monthly_usd, '$')}</td>
-                    <td>{formatCurrency(plan.price_annual_usd, '$')}</td>
-                    <td>{formatCurrency(plan.price_monthly_inr, '\u20B9')}</td>
-                    <td>{formatCurrency(plan.price_annual_inr, '\u20B9')}</td>
-                    <td>{plan.monitor_limit ?? 'Unlimited'}</td>
-                    <td>{plan.check_interval_seconds}s</td>
-                    <td>{plan.client_workspace_limit ?? 'Unlimited'}</td>
-                    <td>{plan.max_team_members}</td>
-                    <td>{(plan as unknown as Record<string, unknown>).competitor_limit as number ?? 3}</td>
-                    <td><span className="badge badge-muted">{subscriberCounts[plan.id] ?? 0}</span></td>
-                    <td>
-                      <label className="switch">
-                        <input
-                          type="checkbox"
-                          checked={plan.is_visible}
-                          onChange={() => handleTogglePlanVisibility(plan.id, plan.is_visible)}
-                        />
-                        <span className="switch-slider" />
-                      </label>
-                    </td>
-                    <td>
-                      <button
-                        className="btn btn-secondary btn-sm"
-                        onClick={() => { setEditingPlan(plan); clearMessages() }}
-                      >
-                        Edit
-                      </button>
+                {orgGroups.length === 0 ? (
+                  <tr>
+                    <td colSpan={8} style={{ textAlign: 'center', color: 'var(--text-muted)', padding: 24 }}>
+                      No one has purchased the Pro Plan yet.
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  orgGroups.map((group) => {
+                    const isExpanded = expandedOrgs.has(group.orgId)
+                    const hasMultiple = group.rows.length > 1
+                    return (
+                      <Fragment key={group.orgId}>
+                        <tr
+                          className={hasMultiple ? 'plans-table-group-row' : undefined}
+                          style={hasMultiple ? { cursor: 'pointer' } : undefined}
+                          onClick={hasMultiple ? () => toggleOrgExpanded(group.orgId) : undefined}
+                        >
+                          <td style={{ fontWeight: 600 }}>
+                            <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                              {hasMultiple ? (
+                                isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />
+                              ) : (
+                                <span style={{ width: 14, display: 'inline-block' }} />
+                              )}
+                              {group.orgName}
+                              {hasMultiple && (
+                                <span style={{ fontSize: 11, fontWeight: 500, color: 'var(--text-muted)' }}>
+                                  ({group.rows.length} purchases)
+                                </span>
+                              )}
+                            </span>
+                          </td>
+                          <td><span className={`badge ${statusBadgeClass(group.hasActive ? 'active' : group.rows[0].status)}`}>{group.hasActive ? 'active' : group.rows[0].status}</span></td>
+                          <td>{group.totalPurchased}</td>
+                          <td>{group.totalClaimed}</td>
+                          <td>{Math.max(0, group.totalPurchased - group.totalClaimed)}</td>
+                          <td>{formatCurrency(group.totalPaidPaise, '₹')}</td>
+                          <td>—</td>
+                          <td>{group.latestPeriodEnd ? new Date(group.latestPeriodEnd).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
+                        </tr>
+                        {hasMultiple && isExpanded && group.rows.map(row => (
+                          <tr key={row.id} className="plans-table-subrow">
+                            <td style={{ paddingLeft: 32, color: 'var(--text-muted)', fontSize: 13 }}>Purchase</td>
+                            <td><span className={`badge ${statusBadgeClass(row.status)}`}>{row.status}</span></td>
+                            <td>{row.purchasedQuantity}</td>
+                            <td>{row.domainsClaimed}</td>
+                            <td>{Math.max(0, row.purchasedQuantity - row.domainsClaimed)}</td>
+                            <td>{formatCurrency(row.totalPaidPaise, '₹')}</td>
+                            <td>{new Date(row.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</td>
+                            <td>{row.currentPeriodEnd ? new Date(row.currentPeriodEnd).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</td>
+                          </tr>
+                        ))}
+                      </Fragment>
+                    )
+                  })
+                )}
               </tbody>
             </table>
-          </div>
-
-          <div className="plans-features-section">
-            <h3 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 12 }}>FEATURE FLAGS PER PLAN</h3>
-            <div className="plans-table-wrapper">
-              <table className="plans-table">
-                <thead>
-                  <tr>
-                    <th>Plan</th>
-                    <th>API Access</th>
-                    <th>Email</th>
-                    <th>Slack/Teams</th>
-                    <th>Webhooks</th>
-                    <th>Status Pages</th>
-                    <th>Custom Domain</th>
-                    <th>AI Reports</th>
-                    <th>llms.txt</th>
-                    <th>Citation</th>
-                    <th>Watchdog</th>
-                    <th>API</th>
-                    <th>White Label</th>
-                    <th>Retention</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {plans.map((plan) => {
-                    const p = plan as unknown as Record<string, unknown>
-                    const yes = <span className="badge badge-success">Yes</span>
-                    const no = <span className="badge badge-outline">No</span>
-                    return (
-                    <tr key={plan.id}>
-                      <td style={{ fontWeight: 600 }}>{plan.name}</td>
-                      <td>{p.has_email_alerts !== false ? yes : no}</td>
-                      <td>{p.has_slack_teams ? yes : no}</td>
-                      <td>{p.has_webhooks ? yes : no}</td>
-                      <td>{p.has_status_pages ? (p.status_page_limit ? `${p.status_page_limit}` : 'Unlimited') : no}</td>
-                      <td>{plan.has_status_page_custom_domain ? yes : no}</td>
-                      <td>{plan.has_ai_predictive || (p.ai_report_limit as number) > 0 ? (p.ai_report_limit ? `${p.ai_report_limit}/mo` : 'Unlimited') : no}</td>
-                      <td>
-                        {(p.llms_txt_limit as number) === -1 ? 'Unlimited' :
-                         (p.llms_txt_limit as number) === 1  ? '1 (lifetime)' :
-                         (p.llms_txt_limit as number) === 0  ? no : `${p.llms_txt_limit}`}
-                      </td>
-                      <td>
-                        {(p.citation_check_monthly_limit as number) === -1 ? 'Unlimited' :
-                         (p.citation_check_monthly_limit as number) === 0  ? no : `${p.citation_check_monthly_limit}/mo`}
-                      </td>
-                      <td>{((p.competitor_limit as number) ?? 3)} sites</td>
-                      <td>{plan.has_api_access ? yes : no}</td>
-                      <td>{plan.has_white_label ? yes : no}</td>
-                      <td>{plan.data_retention_days ? `${plan.data_retention_days}d` : 'Unlimited'}</td>
-                    </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-            </div>
           </div>
         </div>
       )}
@@ -294,16 +324,16 @@ export function PlansManager({ plans, creditRules, subscriberCounts, competePlan
               </thead>
               <tbody>
                 {competePlans.map((cp) => (
-                  <>
-                    <tr key={cp.id}>
+                  <Fragment key={cp.id}>
+                    <tr>
                       <td style={{ fontWeight: 600 }}>{cp.name}</td>
                       <td><code style={{ fontSize: 11 }}>{cp.slug}</code></td>
-                      <td>{formatCurrency(cp.price_monthly_pence, '\u00A3')}</td>
-                      <td>{cp.has_yearly_discount ? formatCurrency(cp.price_yearly_pence, '\u00A3') : '\u2014'}</td>
+                      <td>{formatCurrency(cp.price_monthly_pence, '£')}</td>
+                      <td>{cp.has_yearly_discount ? formatCurrency(cp.price_yearly_pence, '£') : '—'}</td>
                       <td>{cp.product_limit.toLocaleString()}</td>
                       <td>{cp.max_extra_products}</td>
-                      <td>{formatCurrency(cp.extra_product_price_pence, '\u00A3')}/ea</td>
-                      <td>{cp.nudge_to_slug ?? '\u2014'}</td>
+                      <td>{formatCurrency(cp.extra_product_price_pence, '£')}/ea</td>
+                      <td>{cp.nudge_to_slug ?? '—'}</td>
                       <td>
                         {cp.stripe_monthly_price_id ? (
                           <span className="badge badge-success" title={cp.stripe_monthly_price_id}>Connected</span>
@@ -328,7 +358,7 @@ export function PlansManager({ plans, creditRules, subscriberCounts, competePlan
                       </td>
                     </tr>
                     {editingCompetePlan?.id === cp.id && (
-                      <tr key={`${cp.id}-edit`}>
+                      <tr>
                         <td colSpan={11} style={{ padding: '16px', background: 'var(--bg-secondary)' }}>
                           <form action={handleSaveCompetePlan} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
                             <input type="hidden" name="id" value={cp.id} />
@@ -386,7 +416,7 @@ export function PlansManager({ plans, creditRules, subscriberCounts, competePlan
                         </td>
                       </tr>
                     )}
-                  </>
+                  </Fragment>
                 ))}
               </tbody>
             </table>
@@ -427,10 +457,10 @@ export function PlansManager({ plans, creditRules, subscriberCounts, competePlan
                   <tr key={rule.id}>
                     <td><code className="plans-code">{rule.rule_key}</code></td>
                     <td style={{ fontWeight: 500 }}>{rule.display_name}</td>
-                    <td>{formatCurrency(rule.credit_amount_pence, '\u00A3')}</td>
+                    <td>{formatCurrency(rule.credit_amount_pence, '£')}</td>
                     <td><span className={`badge ${rule.credit_type === 'recurring' ? 'badge-success' : 'badge-outline'}`}>{rule.credit_type}</span></td>
                     <td>{rule.max_per_user}</td>
-                    <td>{formatCurrency(rule.max_credit_per_month_pence, '\u00A3')}</td>
+                    <td>{formatCurrency(rule.max_credit_per_month_pence, '£')}</td>
                     <td>
                       <label className="switch">
                         <input
@@ -453,244 +483,6 @@ export function PlansManager({ plans, creditRules, subscriberCounts, competePlan
                 ))}
               </tbody>
             </table>
-          </div>
-        </div>
-      )}
-
-      {/* Plan Edit Modal */}
-      {editingPlan && (
-        <div className="plans-modal-overlay" onClick={() => setEditingPlan(null)}>
-          <div className="plans-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="plans-modal-header">
-              <h2 style={{ fontSize: 18, fontWeight: 700 }}>Edit Plan: {editingPlan.name}</h2>
-              <button className="btn btn-ghost btn-sm" onClick={() => setEditingPlan(null)}>Close</button>
-            </div>
-            <form action={handleSavePlan} className="plans-modal-body">
-              <input type="hidden" name="id" value={editingPlan.id} />
-
-              <div className="plans-form-grid">
-                <div className="form-group">
-                  <label className="form-label">Name</label>
-                  <input className="form-input" name="name" defaultValue={editingPlan.name} required />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Slug</label>
-                  <input className="form-input" name="slug" defaultValue={editingPlan.slug} required />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Type</label>
-                  <select className="form-select" name="type" defaultValue={editingPlan.type}>
-                    <option value="direct">Direct</option>
-                    <option value="agency">Agency</option>
-                    <option value="free">Free</option>
-                  </select>
-                </div>
-              </div>
-
-              <h3 className="plans-section-title">Pricing (GBP - pence)</h3>
-              <div className="plans-form-grid">
-                <div className="form-group">
-                  <label className="form-label">Monthly (pence)</label>
-                  <input className="form-input" name="price_monthly_gbp" type="number" defaultValue={editingPlan.price_monthly_gbp} min={0} />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Annual (pence)</label>
-                  <input className="form-input" name="price_annual_gbp" type="number" defaultValue={editingPlan.price_annual_gbp ?? ''} placeholder="null = no annual" />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Onboarding Fee (pence)</label>
-                  <input className="form-input" name="onboarding_fee_gbp" type="number" defaultValue={editingPlan.onboarding_fee_gbp} min={0} />
-                </div>
-              </div>
-
-              <h3 className="plans-section-title">Pricing (USD - cents)</h3>
-              <div className="plans-form-grid">
-                <div className="form-group">
-                  <label className="form-label">Monthly (cents)</label>
-                  <input className="form-input" name="price_monthly_usd" type="number" defaultValue={editingPlan.price_monthly_usd} min={0} />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Annual (cents)</label>
-                  <input className="form-input" name="price_annual_usd" type="number" defaultValue={editingPlan.price_annual_usd ?? ''} placeholder="null = no annual" />
-                </div>
-              </div>
-
-              <h3 className="plans-section-title">Pricing (INR - paise)</h3>
-              <div className="plans-form-grid">
-                <div className="form-group">
-                  <label className="form-label">Monthly (paise)</label>
-                  <input className="form-input" name="price_monthly_inr" type="number" defaultValue={editingPlan.price_monthly_inr} min={0} />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Annual (paise)</label>
-                  <input className="form-input" name="price_annual_inr" type="number" defaultValue={editingPlan.price_annual_inr ?? ''} placeholder="null = no annual" />
-                </div>
-              </div>
-
-              <h3 className="plans-section-title">Limits</h3>
-              <div className="plans-form-grid">
-                <div className="form-group">
-                  <label className="form-label">Monitor Limit</label>
-                  <input className="form-input" name="monitor_limit" type="number" defaultValue={editingPlan.monitor_limit ?? ''} placeholder="empty = unlimited" />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Check Interval (seconds)</label>
-                  <input className="form-input" name="check_interval_seconds" type="number" defaultValue={editingPlan.check_interval_seconds} min={10} required />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Client Workspaces</label>
-                  <input className="form-input" name="client_workspace_limit" type="number" defaultValue={editingPlan.client_workspace_limit ?? ''} placeholder="empty = unlimited" />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Max Team Members</label>
-                  <input className="form-input" name="max_team_members" type="number" defaultValue={editingPlan.max_team_members} min={0} />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Data Retention (days)</label>
-                  <input className="form-input" name="data_retention_days" type="number" defaultValue={editingPlan.data_retention_days ?? ''} placeholder="empty = unlimited" />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Voice Call Limit/Month</label>
-                  <input className="form-input" name="voice_call_monthly_limit" type="number" defaultValue={editingPlan.voice_call_monthly_limit} min={0} />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Watchdog Limit (competitors)</label>
-                  <input className="form-input" name="competitor_limit" type="number" defaultValue={(editingPlan as unknown as Record<string, unknown>).competitor_limit as number ?? 3} min={0} />
-                  <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Max competitor sites tracked via Watchdog</span>
-                </div>
-              </div>
-
-              <h3 className="plans-section-title">Features</h3>
-              <div className="plans-features-grid">
-                <label className="plans-checkbox-label">
-                  <input type="hidden" name="has_email_alerts" value="false" />
-                  <input type="checkbox" name="has_email_alerts" value="true" defaultChecked={(editingPlan as unknown as Record<string, unknown>).has_email_alerts !== false} />
-                  <span>Email Alerts</span>
-                </label>
-                <label className="plans-checkbox-label">
-                  <input type="hidden" name="has_slack_teams" value="false" />
-                  <input type="checkbox" name="has_slack_teams" value="true" defaultChecked={Boolean((editingPlan as unknown as Record<string, unknown>).has_slack_teams)} />
-                  <span>Slack &amp; Teams Alerts</span>
-                </label>
-                <label className="plans-checkbox-label">
-                  <input type="hidden" name="has_webhooks" value="false" />
-                  <input type="checkbox" name="has_webhooks" value="true" defaultChecked={Boolean((editingPlan as unknown as Record<string, unknown>).has_webhooks)} />
-                  <span>Webhooks</span>
-                </label>
-                <label className="plans-checkbox-label">
-                  <input type="hidden" name="has_status_pages" value="false" />
-                  <input type="checkbox" name="has_status_pages" value="true" defaultChecked={Boolean((editingPlan as unknown as Record<string, unknown>).has_status_pages)} />
-                  <span>Status Pages</span>
-                </label>
-                <label className="plans-checkbox-label">
-                  <input type="hidden" name="has_status_page_custom_domain" value="false" />
-                  <input type="checkbox" name="has_status_page_custom_domain" value="true" defaultChecked={editingPlan.has_status_page_custom_domain} />
-                  <span>Custom Domain Status Pages</span>
-                </label>
-                <label className="plans-checkbox-label">
-                  <input type="hidden" name="has_ai_predictive" value="false" />
-                  <input type="checkbox" name="has_ai_predictive" value="true" defaultChecked={editingPlan.has_ai_predictive} />
-                  <span>AI Reports</span>
-                </label>
-                <label className="plans-checkbox-label">
-                  <input type="hidden" name="has_api_access" value="false" />
-                  <input type="checkbox" name="has_api_access" value="true" defaultChecked={editingPlan.has_api_access} />
-                  <span>API Access</span>
-                </label>
-                <label className="plans-checkbox-label">
-                  <input type="hidden" name="has_white_label" value="false" />
-                  <input type="checkbox" name="has_white_label" value="true" defaultChecked={editingPlan.has_white_label} />
-                  <span>White Label</span>
-                </label>
-                <label className="plans-checkbox-label">
-                  <input type="hidden" name="has_voice_calls" value="false" />
-                  <input type="checkbox" name="has_voice_calls" value="true" defaultChecked={editingPlan.has_voice_calls} />
-                  <span>Voice Calls</span>
-                </label>
-                <label className="plans-checkbox-label">
-                  <input type="hidden" name="is_visible" value="false" />
-                  <input type="checkbox" name="is_visible" value="true" defaultChecked={editingPlan.is_visible} />
-                  <span>Visible to Users</span>
-                </label>
-
-              <h3 className="plans-section-title">Limits</h3>
-              <div className="plans-form-grid">
-                <div className="form-group">
-                  <label className="form-label">Status Page Limit</label>
-                  <input className="form-input" name="status_page_limit" type="number" defaultValue={(editingPlan as unknown as Record<string, unknown>).status_page_limit as number ?? 0} min={0} />
-                  <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>0 = unlimited</span>
-                </div>
-                <div className="form-group">
-                  <label className="form-label">AI Reports/Month</label>
-                  <input className="form-input" name="ai_report_limit" type="number" defaultValue={(editingPlan as unknown as Record<string, unknown>).ai_report_limit as number ?? 0} min={0} />
-                  <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>0 = unlimited</span>
-                </div>
-                <div className="form-group">
-                  <label className="form-label">llms.txt Limit</label>
-                  <input className="form-input" name="llms_txt_limit" type="number"
-                    defaultValue={(editingPlan as unknown as Record<string, unknown>).llms_txt_limit as number ?? 1}
-                    min={-1} />
-                  <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>-1 = unlimited, 0 = disabled, 1 = one lifetime generation</span>
-                </div>
-                <div className="form-group">
-                  <label className="form-label">AI Citation Checks/Month</label>
-                  <input className="form-input" name="citation_check_monthly_limit" type="number"
-                    defaultValue={(editingPlan as unknown as Record<string, unknown>).citation_check_monthly_limit as number ?? 0}
-                    min={-1} />
-                  <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>-1 = unlimited, 0 = disabled, N = monthly limit</span>
-                </div>
-              </div>
-              </div>
-
-              <h3 className="plans-section-title">Enforcement Summary</h3>
-              <div style={{ background: 'var(--bg-secondary, #f8fafc)', borderRadius: 10, padding: 16, fontSize: 13, lineHeight: 1.8 }}>
-                <p><strong>What is enforced by this plan:</strong></p>
-                <ul style={{ paddingLeft: 18, color: 'var(--text-secondary)' }}>
-                  <li>Monitor limit: <strong>{editingPlan.monitor_limit ?? 'Unlimited'}</strong> — checked on monitor creation</li>
-                  <li>Check interval: <strong>{editingPlan.check_interval_seconds}s minimum</strong> — enforced on create + edit</li>
-                  <li>Team members: <strong>{editingPlan.max_team_members === 0 ? 'Solo only' : `${editingPlan.max_team_members} members`}</strong> — checked on invite</li>
-                  <li>Workspaces: <strong>{editingPlan.client_workspace_limit ?? 'Unlimited'}</strong> — checked on workspace creation</li>
-                  <li>Data retention: <strong>{editingPlan.data_retention_days ? `${editingPlan.data_retention_days} days` : 'Unlimited'}</strong> — applied on queries</li>
-                  <li>API access: <strong>{editingPlan.has_api_access ? 'Yes' : 'No'}</strong> — checked on API key creation</li>
-                  <li>Status page custom domain: <strong>{editingPlan.has_status_page_custom_domain ? 'Yes' : 'No'}</strong></li>
-                  <li>White label: <strong>{editingPlan.has_white_label ? 'Yes' : 'No'}</strong></li>
-                  <li>Voice calls: <strong>{editingPlan.has_voice_calls ? `Yes (${editingPlan.voice_call_monthly_limit}/mo)` : 'No'}</strong></li>
-                  <li>Watchdog: <strong>{(editingPlan as unknown as Record<string, unknown>).competitor_limit as number ?? 3} competitor{((editingPlan as unknown as Record<string, unknown>).competitor_limit as number ?? 3) === 1 ? '' : 's'}</strong> — checked on Watchdog add</li>
-                  <li>llms.txt Generator: <strong>{
-                    (editingPlan as unknown as Record<string, unknown>).llms_txt_limit === -1 ? 'Unlimited' :
-                    (editingPlan as unknown as Record<string, unknown>).llms_txt_limit === 1  ? '1 lifetime generation' :
-                    (editingPlan as unknown as Record<string, unknown>).llms_txt_limit === 0  ? 'Disabled' : `${(editingPlan as unknown as Record<string, unknown>).llms_txt_limit} generation(s)`
-                  }</strong></li>
-                  <li>AI Citation Monitor: <strong>{
-                    (editingPlan as unknown as Record<string, unknown>).citation_check_monthly_limit === -1 ? 'Unlimited' :
-                    (editingPlan as unknown as Record<string, unknown>).citation_check_monthly_limit === 0  ? 'Disabled' : `${(editingPlan as unknown as Record<string, unknown>).citation_check_monthly_limit} checks/month`
-                  }</strong></li>
-                  <li>Compete: <strong>Separate add-on</strong> — managed in Compete tab</li>
-                </ul>
-                <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 8 }}>
-                  All limits are enforced server-side via <code>lib/utils/plan-limits.ts</code>. Changes here update the single source of truth.
-                </p>
-              </div>
-
-              <h3 className="plans-section-title">Stripe</h3>
-              <div className="plans-form-grid">
-                <div className="form-group">
-                  <label className="form-label">Stripe Price ID (Monthly)</label>
-                  <input className="form-input" name="stripe_price_id_monthly" defaultValue={editingPlan.stripe_price_id_monthly ?? ''} placeholder="price_..." />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Stripe Price ID (Annual)</label>
-                  <input className="form-input" name="stripe_price_id_annual" defaultValue={editingPlan.stripe_price_id_annual ?? ''} placeholder="price_..." />
-                </div>
-              </div>
-
-              <div className="plans-modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={() => setEditingPlan(null)}>Cancel</button>
-                <button type="submit" className="btn btn-primary" disabled={saving}>
-                  {saving ? 'Saving...' : 'Save Changes'}
-                </button>
-              </div>
-            </form>
           </div>
         </div>
       )}

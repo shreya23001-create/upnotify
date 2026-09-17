@@ -56,62 +56,62 @@ export function EditStatusPageForm({ statusPage, monitors }: { statusPage: Statu
     <form action={handleSubmit}>
       {error && <div className="form-error">{error}</div>}
 
-      <div className="esp-layout">
+      {/* ── Top: settings (full width) ── */}
+      <div className="esp-settings esp-settings-full">
+        <div className="esp-section-title">Page Settings</div>
 
-        {/* ── Left: settings ── */}
-        <div className="esp-settings">
-          <div className="esp-section-title">Page Settings</div>
-
-          <div className="form-group">
-            <label className="form-label">Page Name</label>
-            <input className="form-input" name="name" required defaultValue={statusPage.name} disabled={isPending} />
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">Slug (URL)</label>
-            <div className="esp-slug-wrap">
-              <span className="esp-slug-prefix">/status/</span>
-              <input
-                className="form-input esp-slug-input"
-                name="slug"
-                required
-                defaultValue={statusPage.slug}
-                disabled={isPending}
-              />
-            </div>
-            <span className="form-hint">
-              Public URL: upnotify-monitoring.vercel.app/status/{statusPage.slug}
-            </span>
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">Visibility</label>
-            <select className="form-select" name="is_published" defaultValue={statusPage.is_published ? 'true' : 'false'} disabled={isPending}>
-              <option value="true">Published — visible to everyone</option>
-              <option value="false">Draft — only you can see it</option>
-            </select>
-          </div>
-
-          <div className="esp-preview-link">
-            <Globe size={13} />
-            <a href={`/status/${statusPage.slug}`} target="_blank" rel="noopener noreferrer">
-              Preview status page ↗
-            </a>
-          </div>
-
-          <button type="submit" className="btn btn-primary esp-save-btn" disabled={isPending}>
-            {isPending ? 'Saving…' : 'Save Changes'}
-          </button>
+        <div className="form-group">
+          <label className="form-label">Page Name</label>
+          <input className="form-input" name="name" required defaultValue={statusPage.name} disabled={isPending} />
         </div>
 
-        {/* ── Right: monitor picker ── */}
+        <div className="form-group">
+          <label className="form-label">Slug (URL)</label>
+          <div className="esp-slug-wrap">
+            <span className="esp-slug-prefix">/status/</span>
+            <input
+              className="form-input esp-slug-input"
+              name="slug"
+              required
+              defaultValue={statusPage.slug}
+              disabled={isPending}
+            />
+          </div>
+          <span className="form-hint">
+            Public URL: upnotify-monitoring.vercel.app/status/{statusPage.slug}
+          </span>
+        </div>
+
+        <div className="form-group">
+          <label className="form-label">Visibility</label>
+          <select className="form-select" name="is_published" defaultValue={statusPage.is_published ? 'true' : 'false'} disabled={isPending}>
+            <option value="true">Published — visible to everyone</option>
+            <option value="false">Draft — only you can see it</option>
+          </select>
+        </div>
+
+        <div className="esp-preview-link">
+          <Globe size={13} />
+          <a href={`/status/${statusPage.slug}`} target="_blank" rel="noopener noreferrer">
+            Preview status page ↗
+          </a>
+        </div>
+
+        <button type="submit" className="btn btn-primary esp-save-btn" disabled={isPending}>
+          {isPending ? 'Saving…' : 'Save Changes'}
+        </button>
+      </div>
+
+      {/* ── Bottom: monitors, 2-column ── */}
+      <div className="esp-layout">
+
+        {/* Left: monitors already on this page */}
         <div className="esp-picker">
           <div className="esp-section-title">
             Monitors on this page
             <span className="esp-count-pill">{selected.size}</span>
           </div>
 
-          {/* Added monitors */}
           <div className="esp-added">
             {addedMonitors.length === 0 ? (
               <div className="esp-added-empty">
@@ -143,11 +143,11 @@ export function EditStatusPageForm({ statusPage, monitors }: { statusPage: Statu
               ))
             )}
           </div>
+        </div>
 
-          {/* Divider */}
-          <div className="esp-divider">
-            <span>Add monitors</span>
-          </div>
+        {/* Right: add monitors */}
+        <div className="esp-picker">
+          <div className="esp-section-title">Add monitors</div>
 
           {/* Search */}
           <div className="esp-search-wrap">

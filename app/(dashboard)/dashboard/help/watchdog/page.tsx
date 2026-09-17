@@ -107,13 +107,10 @@ export default function WatchdogHelpPage(): React.ReactElement {
 
           <section className="help-section">
             <h2 className="help-section-title">Plan limits</h2>
-            <p>Each plan includes a set number of Watchdog slots:</p>
-            <ul className="help-list">
-              <li><strong>Free</strong> — 3 sites</li>
-              <li><strong>Lite</strong> — 5 sites</li>
-              <li><strong>Builder</strong> — 10 sites</li>
-              <li><strong>Scale</strong> — 25 sites</li>
-            </ul>
+            <p>
+              The Pro Plan includes up to <strong>5 Watchdog slots</strong> — enough to track
+              your key competitors alongside your own websites.
+            </p>
             <p>
               Watchdog slots are separate from your monitor limits. Adding Watchdog
               sites does not reduce the number of regular monitors you can create.

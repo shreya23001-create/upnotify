@@ -4,11 +4,11 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
 import { checkRateLimit, AUTH_RATE_LIMIT } from '@/lib/utils/rate-limiter'
 import { writeAuditLog } from '@/lib/db/audit'
-// Trial removed — users start on Free plan
 import { recordReferralSignup } from '@/lib/db/referrals'
 import { acceptTeamInvite } from '@/lib/db/team'
 import { markConverted } from '@/lib/aoe/db/aoe-outreach-log'
 import { hasAnyActivePlan } from '@/lib/utils/plan-limits'
+import { hasAdminAccess } from '@/lib/db/admin-roles'
 
 /**
  * Validates that a redirect path is safe (relative, no open-redirect vectors).
@@ -177,7 +177,7 @@ export async function GET(request: Request): Promise<NextResponse> {
         (user.app_metadata as { provider?: string } | null)?.provider ?? 'unknown'
       const { data: dbUserForAudit } = await adminClient
         .from('users')
-        .select('org_id')
+        .select('org_id, is_super_admin')
         .eq('id', user.id)
         .single()
       await writeAuditLog({
@@ -192,6 +192,13 @@ export async function GET(request: Request): Promise<NextResponse> {
           isNewUser,
         },
       })
+
+      // Admin accounts land in the admin portal only — never the customer
+      // dashboard. Checked before the default-destination override below so
+      // it applies even when `next` would otherwise send them to /dashboard.
+      if (nextPath === '/dashboard' && await hasAdminAccess(user.email ?? '', Boolean(dbUserForAudit?.is_super_admin))) {
+        return NextResponse.redirect(`${origin}/admin`)
+      }
 
       // Match the password-based signup/login flow (lib/auth/actions.ts):
       // an org with no active plan lands on Plans, not the dashboard. Only

@@ -12,6 +12,9 @@ import { recordReferralSignup } from '@/lib/db/referrals'
 import { acceptTeamInvite } from '@/lib/db/team'
 import { markConverted } from '@/lib/aoe/db/aoe-outreach-log'
 import { hasAnyActivePlan } from '@/lib/utils/plan-limits'
+import { isProduction } from '@/lib/utils/environment'
+import { isBlockedEmailDomain } from '@/lib/utils/business-email'
+import { hasAdminAccess } from '@/lib/db/admin-roles'
 
 /**
  * Send a magic-link OTP to the given email address.
@@ -167,11 +170,13 @@ async function runNewUserSetup(userId: string, email: string, refCode?: string |
 }
 
 /**
- * Create a new account with email + password. Supabase sends a verification
- * email, but the account and org are usable immediately per the DB trigger —
- * verification only gates certain flows if you later choose to require it.
+ * Create a new account with email + password. "Confirm email" is enabled
+ * in Supabase Auth, so signUp() returns a user but NO session until the
+ * confirmation link is clicked — this must NOT redirect into the app.
+ * Returns needsConfirmation:true so the login form can show a "check your
+ * email" screen instead.
  */
-export async function signUpWithPassword(formData: FormData): Promise<{ error?: string }> {
+export async function signUpWithPassword(formData: FormData): Promise<{ error?: string; needsConfirmation?: boolean; email?: string }> {
   const email = (formData.get('email') as string | null)?.trim()
   const password = formData.get('password') as string | null
   const fullname = (formData.get('fullname') as string | null)?.trim()
@@ -180,6 +185,12 @@ export async function signUpWithPassword(formData: FormData): Promise<{ error?: 
 
   if (!email) return { error: 'Email is required' }
   if (email.length > 254) return { error: 'Email address is too long.' }
+  // Business-account-only in production — Gmail/Yahoo/Mailinator/etc. stay
+  // fully allowed in development and preview so local/staging testing with
+  // any address keeps working.
+  if (isProduction() && isBlockedEmailDomain(email)) {
+    return { error: 'Please sign up with your business email address. Personal email providers (Gmail, Yahoo, Mailinator, etc.) are not accepted.' }
+  }
   if (!fullname) return { error: 'Full name is required' }
   if (fullname.length > 100) return { error: 'Full name must be 100 characters or fewer.' }
   if (!password) return { error: 'Password is required' }
@@ -222,6 +233,26 @@ export async function signUpWithPassword(formData: FormData): Promise<{ error?: 
 
   await runNewUserSetup(data.user.id, email, ref)
 
+  await writeAuditLog({
+    orgId: 'system',
+    userId: data.user.id,
+    action: 'auth.signup_pending_confirmation',
+    ipAddress: ipForAudit,
+    userAgent,
+    metadata: { email, provider: 'password', isNewUser: true },
+  })
+
+  // No session yet — "Confirm email" is required, so signUp() never issues
+  // one until the link is clicked. Redirecting into the dashboard here
+  // would just bounce straight back out to /login. Tell the form to show
+  // a "check your email" screen instead.
+  if (!data.session) {
+    return { needsConfirmation: true, email }
+  }
+
+  // Confirmation disabled in this project's Auth settings (not the current
+  // configuration, but kept for correctness if that ever changes) — a
+  // session exists immediately, so continue straight into the app.
   await writeAuditLog({
     orgId: 'system',
     userId: data.user.id,
@@ -277,7 +308,7 @@ export async function signInWithPassword(formData: FormData): Promise<{ error?: 
   const adminClient = createAdminClient()
   const { data: dbUser } = await adminClient
     .from('users')
-    .select('org_id')
+    .select('org_id, is_super_admin')
     .eq('id', data.user.id)
     .single()
 
@@ -289,6 +320,12 @@ export async function signInWithPassword(formData: FormData): Promise<{ error?: 
     userAgent,
     metadata: { email, provider, isNewUser: false },
   })
+
+  // Admin accounts land in the admin portal only — never the customer
+  // dashboard, which they should have no reason to use.
+  if (await hasAdminAccess(email, Boolean(dbUser?.is_super_admin))) {
+    redirect('/admin')
+  }
 
   const loginOrgId = dbUser?.org_id as string | undefined
   const loginLandingPage = loginOrgId && !(await hasAnyActivePlan(loginOrgId)) ? '/dashboard/plans' : '/dashboard'

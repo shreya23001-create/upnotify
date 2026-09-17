@@ -809,9 +809,9 @@ body::before {
    (monitoring, score, tracker, compete). */
 .hero-split {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  align-items: start;
-  gap: var(--space-12);
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  align-items: center;
+  gap: var(--space-16);
   text-align: left;
 }
 
@@ -822,28 +822,81 @@ body::before {
   margin-right: 0;
 }
 
+/* The split layout gives this column half the page width instead of the
+   full-width hero's original space — scale the type down to match, rather
+   than reusing --fs-h1/--fs-body-lg at full size (those are shared tokens
+   used elsewhere and must stay untouched). Specificity note: app/styles.css
+   has a later, higher-specificity `section.hero .hero-headline` rule
+   (clamp(36px, 5.5vw, 62px)) that otherwise wins the cascade over a plain
+   `.hero-text-col .hero-headline` — so this must match that same
+   `section.hero` prefix to actually take effect. */
+section.hero .hero-text-col .hero-headline {
+  font-size: clamp(28px, 2.6vw, 38px) !important;
+  max-width: none;
+}
+
+section.hero .hero-text-col .hero-sub {
+  font-size: 16px !important;
+  max-width: 480px;
+}
+
 .hero-text-col .hero-ctas,
 .hero-text-col .hero-trust {
   justify-content: flex-start;
 }
 
-.hero-text-col .hero-trust {
+/* Specificity note: app/styles.css has later, higher-specificity
+   `section.hero .hero-ctas` / `section.hero .hero-trust` rules that force
+   flex-wrap:wrap and otherwise win the cascade over a plain
+   `.hero-text-col .hero-ctas` selector — must match that same
+   `section.hero` prefix here to actually take effect. */
+section.hero .hero-text-col .hero-ctas {
   flex-wrap: nowrap;
-  gap: var(--space-4);
+  gap: var(--space-2);
+  justify-content: flex-start;
+}
+
+section.hero .hero-text-col .hero-ctas .btn {
+  padding-left: var(--space-4);
+  padding-right: var(--space-4);
   white-space: nowrap;
+  flex-shrink: 0;
+}
+
+section.hero .hero-text-col .hero-trust {
+  flex-wrap: nowrap;
+  gap: var(--space-3);
+  white-space: nowrap;
+  justify-content: flex-start;
+}
+
+section.hero .hero-text-col .hero-trust .trust-item {
+  font-size: 13px;
 }
 
 .hero-image-col {
   display: flex;
   justify-content: center;
   align-items: flex-start;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .hero-image {
   width: 100%;
-  max-width: 640px;
+  max-width: 1040px;
   height: auto;
   display: block;
+  border-radius: 20px;
+  box-shadow: 0 24px 60px -12px rgba(19, 146, 251, 0.28), 0 8px 24px rgba(15, 23, 42, 0.08);
+  -webkit-mask-image:
+    linear-gradient(to bottom, black 88%, transparent 100%),
+    linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to bottom, black 88%, transparent 100%),
+    linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
+  mask-composite: intersect;
 }
 
 @media (max-width: 900px) {

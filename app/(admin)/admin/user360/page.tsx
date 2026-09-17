@@ -63,7 +63,7 @@ export default async function User360Page({
   const sixMonthsAgo = new Date()
   sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6)
 
-  const [orgResult, usersResult, subsResult, invoicesResult, monitorsResult, incidentsResult, statusPagesResult, alertChannelsResult, auditLogResult, checkResultsResult, competeSubResult, ecomProductsResult, apiKeysResult] =
+  const [orgResult, usersResult, subsResult, invoicesResult, monitorsResult, incidentsResult, statusPagesResult, alertChannelsResult, auditLogResult, checkResultsResult, competeSubResult, ecomProductsResult, apiKeysResult, websiteSubsResult] =
     orgId
       ? await Promise.all([
           supabase.from('organisations').select('*, monitor_limit_override, wp_monitor_limit_override').eq('id', orgId).single(),
@@ -79,8 +79,10 @@ export default async function User360Page({
           supabase.from('compete_subscriptions').select('id, status, billing_cycle, current_period_end, extra_products_purchased, created_at, compete_plan_id').eq('org_id', orgId).eq('status', 'active').maybeSingle(),
           supabase.from('ecom_products').select('id', { count: 'exact', head: true }).eq('org_id', orgId).eq('is_active', true),
           supabase.from('api_keys').select('id, name, key_prefix, scopes, created_at, last_used_at, is_revoked').eq('org_id', orgId).eq('is_revoked', false).order('created_at', { ascending: false }),
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (supabase as any).from('website_subscriptions').select('id').eq('org_id', orgId).in('status', ['active', 'cancelling', 'past_due']).limit(1).maybeSingle() as Promise<{ data: { id: string } | null }>,
         ])
-      : Array(13).fill({ data: null, error: null, count: null })
+      : Array(14).fill({ data: null, error: null, count: null })
 
   const org = orgResult.data as Record<string, unknown> | null
   const monitorLimitOverride = (orgResult.data?.monitor_limit_override as number | null) ?? null
@@ -113,6 +115,8 @@ export default async function User360Page({
 
   const activeSub = subs.find(s => s.status === 'active')
   const activePlan = activeSub?.plans ?? null
+  const hasWebsitePlan = Boolean((websiteSubsResult as { data: { id: string } | null } | undefined)?.data)
+  const planDisplayName = hasWebsitePlan ? 'Pro Plan' : (activePlan?.name ?? 'No plan')
   const monitorUpCount = monitors.filter(m => m.status === 'up').length
   const monitorDownCount = monitors.filter(m => m.status === 'down').length
   const paidInvoices = invoices.filter(i => i.status === 'paid')
@@ -334,7 +338,7 @@ export default async function User360Page({
           {/* KPI strip */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 10, marginBottom: 20 }}>
             {[
-              { label: 'Plan', value: activeSub?.plans?.name ?? 'Free' },
+              { label: 'Plan', value: planDisplayName },
               { label: 'Billing', value: activeSub ? activeSub.billing_cycle : '—' },
               { label: 'Monitors', value: String(monitors.length) },
               { label: 'Up / Down', value: `${monitorUpCount} / ${monitorDownCount}` },

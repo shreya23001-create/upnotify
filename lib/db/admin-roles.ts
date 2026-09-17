@@ -280,3 +280,14 @@ export async function isAdminEmail(email: string): Promise<boolean> {
   if (!role) return false
   return role.is_active
 }
+
+/**
+ * True if this user should land in the admin portal only, never the
+ * customer dashboard — a super admin (users.is_super_admin) or anyone with
+ * an active admin_roles row. Mirrors the exact check app/(admin)/layout.tsx
+ * already uses to gate /admin itself.
+ */
+export async function hasAdminAccess(email: string, isSuperAdmin: boolean): Promise<boolean> {
+  if (isSuperAdmin) return true
+  return isAdminEmail(email)
+}

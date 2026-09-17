@@ -201,8 +201,7 @@ export default function AiVisibilityHelpPage(): React.ReactElement {
                 commas.
               </li>
               <li>
-                Select which <strong>AI engines</strong> to check. Some engines are limited to higher-tier plans —
-                see your Plans page for what's included.
+                Select which <strong>AI engines</strong> to check.
               </li>
               <li>
                 Click <strong>Run Citation Check</strong>. The check runs asynchronously — it queries each AI
@@ -221,16 +220,10 @@ export default function AiVisibilityHelpPage(): React.ReactElement {
 
           <section className="help-section">
             <h2 className="help-section-title">Plan limits</h2>
-            <p>AI Visibility limits depend on your plan:</p>
-            <ul className="help-list">
-              <li><strong>Free</strong> — 1 llms.txt generation (lifetime). Citation checks on free engines only.</li>
-              <li><strong>Lite</strong> — Unlimited llms.txt generations. 2 citation checks per month.</li>
-              <li><strong>Builder</strong> — Unlimited llms.txt generations. 4 citation checks per month.</li>
-              <li><strong>Scale</strong> — Unlimited llms.txt generations. 4 citation checks per month.</li>
-            </ul>
             <p>
-              Citation check limits reset on the 1st of each month.{' '}
-              <Link href="/dashboard/settings?tab=billing">Upgrade your plan</Link> to increase your limits.
+              Every website on the Pro Plan gets <strong>unlimited llms.txt generations</strong> and{' '}
+              <strong>4 citation/profile checks per month</strong> (citation checks and AI Profile
+              runs share the same monthly allowance). The limit resets on the 1st of each month.
             </p>
           </section>
 

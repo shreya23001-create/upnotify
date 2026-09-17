@@ -14,9 +14,9 @@ import {
   IconServer,
 } from '@/components/icons'
 
-/** The 7 gated dashboard routes (see lib/auth/require-activated-org.ts) —
- *  shown locked in the sidebar when the org has no active plan. Support,
- *  Settings, Help, and Plans itself are never gated. */
+/** The gated dashboard routes (see lib/auth/require-activated-org.ts) —
+ *  shown locked in the sidebar when the org has no active plan. Plans
+ *  itself is the only page never gated. */
 const GATED_HREFS: ReadonlySet<string> = new Set([
   '/dashboard',
   '/dashboard/monitors',
@@ -25,6 +25,9 @@ const GATED_HREFS: ReadonlySet<string> = new Set([
   '/dashboard/status-pages',
   '/dashboard/reports',
   '/dashboard/watchdog',
+  '/dashboard/support',
+  '/dashboard/settings',
+  '/dashboard/help',
 ])
 
 interface NavSection {

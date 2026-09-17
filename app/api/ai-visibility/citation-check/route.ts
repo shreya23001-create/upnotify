@@ -3,6 +3,12 @@ import { getCurrentUser } from '@/lib/db/users'
 import { getActiveEngines } from '@/lib/db/ai-engines'
 import { canRunCitationCheck, createCitationRun, getCitationRunsThisMonth } from '@/lib/db/ai-visibility'
 import { getSubscriptionWithPlan } from '@/lib/db/subscriptions'
+import { hasActiveWebsitePlan } from '@/lib/utils/plan-limits'
+
+// Must match lib/db/ai-visibility.ts's PRO_PLAN_WEBSITE_SLUG — the current
+// Pro Plan (per-website) has no row in the legacy plans table.
+const PRO_PLAN_WEBSITE_SLUG = 'pro-plan-website'
+const PRO_PLAN_WEBSITE_CITATION_LIMIT = 4
 import { processCitationRun } from '@/lib/services/citation-processor'
 import { logger } from '@/lib/utils/logger'
 import {
@@ -58,8 +64,13 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   const cleanKeywords = keywords.map(cleanKeywordForAi).filter(Boolean)
   const cleanBrand    = brand?.trim() ? cleanKeywordForAi(brand.trim()) : undefined
 
-  const sub           = await getSubscriptionWithPlan(user.org_id)
-  const planSlug      = sub?.plan?.slug ?? 'free'
+  const [sub, hasWebsitePlan] = await Promise.all([
+    getSubscriptionWithPlan(user.org_id),
+    hasActiveWebsitePlan(user.org_id),
+  ])
+  // A Pro Plan (per-website) org takes priority over any legacy plan row —
+  // paying customers must never be treated as 'free'.
+  const planSlug      = hasWebsitePlan ? PRO_PLAN_WEBSITE_SLUG : (sub?.plan?.slug ?? 'free')
   const allEngines    = await getActiveEngines()
   const freeEngineIds = allEngines.filter(e => e.is_free).map(e => e.id)
   const validEngineIds = engineIds.filter(id => allEngines.some(e => e.id === id && e.is_active))
@@ -76,7 +87,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   // Race-condition guard: re-check monthly count after insert
   if (planSlug !== 'free') {
     const used        = await getCitationRunsThisMonth(user.org_id)
-    const monthlyLimit = sub?.plan?.citation_check_monthly_limit ?? 0
+    const monthlyLimit = hasWebsitePlan
+      ? PRO_PLAN_WEBSITE_CITATION_LIMIT
+      : sub?.plan?.citation_check_monthly_limit ?? 0
     if (monthlyLimit > 0 && used > monthlyLimit) {
       const { createAdminClient } = await import('@/lib/supabase/admin')
       await createAdminClient().from('citation_check_runs').delete().eq('id', run.id)

@@ -71,7 +71,7 @@ function normaliseTarget(target: string, type: string): string {
   return target
 }
 
-export async function createMonitorAction(formData: FormData): Promise<{ error?: string }> {
+export async function createMonitorAction(formData: FormData): Promise<{ error?: string; monitorId?: string; wordpress?: boolean }> {
   const guard = await impersonationGuard()
   if (guard.isBlocked) return { error: guard.error }
 
@@ -193,10 +193,12 @@ export async function createMonitorAction(formData: FormData): Promise<{ error?:
 
   logger.info('Monitor created', { monitorId: monitor.id, name, type })
   await devAuditLog({ orgId: user.org_id, userId: user.id, action: 'monitor.created', resourceType: 'monitor', resourceId: monitor.id, metadata: { name, type } })
-  if (type === 'wordpress') {
-    redirect(`/dashboard/monitors/${monitor.id}/wordpress`)
-  }
-  redirect('/dashboard/monitors')
+  revalidatePath('/dashboard/monitors')
+  // No redirect here — the sole caller (create-monitor-form.tsx) calls this
+  // in a loop to create one monitor per selected type, then navigates once
+  // itself after the whole batch finishes. redirect() throws a control-flow
+  // exception that would otherwise abort the loop after the FIRST type.
+  return { monitorId: monitor.id, wordpress: type === 'wordpress' }
 }
 
 // engineering-app#55 — `createMonitorAfterPaymentAction` was removed here

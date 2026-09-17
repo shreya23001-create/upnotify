@@ -2,13 +2,14 @@
 
 import { useState, useTransition, useMemo, useEffect } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { createMonitorAction } from '@/app/(dashboard)/dashboard/monitors/actions'
 import { getKeywordSuggestions } from '@/lib/utils/keyword-suggestions'
 import { ConfigureMonitorModal } from './configure-monitor-modal'
 import { MONITOR_TYPES } from '@/lib/constants/monitor-types'
 import { CustomSelect } from '@/components/ui/custom-select'
 import { MonitorTypeIcon } from './monitor-type-icon'
-import { Globe, Settings2, X } from 'lucide-react'
+import { Globe, Settings2, X, Loader2 } from 'lucide-react'
 
 const CHECKLIST_TYPES = MONITOR_TYPES.filter(t => t.type !== 'wordpress')
 const MANUAL_CONFIG_TYPES = new Set(['keyword', 'port', 'api', 'heartbeat', 'competitor'])
@@ -62,6 +63,7 @@ function applyConfigToFormData(formData: FormData, type: string, config: Record<
 }
 
 export function CreateMonitorForm({ minCheckInterval = 600, defaultType = 'http' }: { minCheckInterval?: number; defaultType?: string }): React.ReactElement {
+  const router = useRouter()
   const [selectedTypes, setSelectedTypes] = useState<Set<string>>(new Set([defaultType]))
   const [configs, setConfigs] = useState<Record<string, Record<string, unknown>>>({})
   const [configuring, setConfiguring] = useState<string | null>(null)
@@ -70,6 +72,7 @@ export function CreateMonitorForm({ minCheckInterval = 600, defaultType = 'http'
   const [target, setTarget] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
+  const [progress, setProgress] = useState<{ done: number; total: number } | null>(null)
 
   // Interval/help text tracks the most recently checked type, since that
   // field is shared across every monitor this submission will create.
@@ -166,9 +169,11 @@ export function CreateMonitorForm({ minCheckInterval = 600, defaultType = 'http'
     if (selectedTypes.size === 0) { setError('Select at least one monitor type'); return }
 
     const types = Array.from(selectedTypes)
+    setProgress({ done: 0, total: types.length })
 
     startTransition(async () => {
-      for (const type of types) {
+      for (let i = 0; i < types.length; i++) {
+        const type = types[i]
         const fd = new FormData()
         fd.set('name', types.length > 1 ? `${name} — ${MONITOR_TYPES.find(t => t.type === type)?.name ?? type}` : name)
         fd.set('type', type)
@@ -182,9 +187,16 @@ export function CreateMonitorForm({ minCheckInterval = 600, defaultType = 'http'
         const result = await createMonitorAction(fd)
         if (result?.error) {
           setError(`${MONITOR_TYPES.find(t => t.type === type)?.name ?? type}: ${result.error}`)
+          setProgress(null)
           return
         }
+        setProgress({ done: i + 1, total: types.length })
       }
+      // createMonitorAction no longer redirects itself (it used to, which
+      // silently aborted this loop after the FIRST type via the redirect's
+      // control-flow exception) — navigate once here, after every selected
+      // type has actually been created.
+      router.push('/dashboard/monitors')
     })
   }
 
@@ -295,10 +307,21 @@ export function CreateMonitorForm({ minCheckInterval = 600, defaultType = 'http'
               </div>
             )}
 
+            {isPending && progress && (
+              <div className="mon-create-progress">
+                <Loader2 size={15} style={{ animation: 'spin 1s linear infinite' }} />
+                {progress.total > 1
+                  ? `Creating monitor ${Math.min(progress.done + 1, progress.total)} of ${progress.total}…`
+                  : 'Creating monitor…'}
+              </div>
+            )}
+
             <div className="mon-create-actions">
               <Link href="/dashboard/monitors" className="btn btn-ghost">Cancel</Link>
               <button type="submit" className="btn btn-primary" disabled={isPending}>
-                {isPending ? 'Creating…' : selectedTypes.size > 1 ? `Create ${selectedTypes.size} Monitors` : 'Create Monitor'}
+                {isPending ? (
+                  <><Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} /> Creating…</>
+                ) : selectedTypes.size > 1 ? `Create ${selectedTypes.size} Monitors` : 'Create Monitor'}
               </button>
             </div>
           </div>

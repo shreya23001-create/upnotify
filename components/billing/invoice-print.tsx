@@ -41,11 +41,6 @@ export function InvoicePrint({ invoice, organisation, userEmail, seller, domains
   const gstPaise = isInr ? totalPaise - baseAmountPaise : 0
   const perDomainBasePaise = domains.length > 0 ? Math.round(baseAmountPaise / domains.length) : baseAmountPaise
 
-  const taxLine =
-    seller.tax_label && seller.tax_number
-      ? `${seller.tax_label} No. ${seller.tax_number}`
-      : null
-
   return (
     <div className="invoice-page">
       {/* Print / Back bar — hidden when printing */}
@@ -65,7 +60,7 @@ export function InvoicePrint({ invoice, organisation, userEmail, seller, domains
         <div className="invoice-header">
           <div className="invoice-logo-block">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo.svg" alt="Upnotify" className="invoice-logo" />
+            <img src="/Logo_2.png" alt="Upnotify" className="invoice-logo" />
           </div>
           <div className="invoice-title-block">
             <div className="invoice-title">INVOICE</div>
@@ -80,25 +75,7 @@ export function InvoicePrint({ invoice, organisation, userEmail, seller, domains
           <div className="invoice-from">
             <div className="invoice-label">From</div>
             <div className="invoice-party-name">{seller.legal_name}</div>
-            {seller.address_lines.map((line, i) => (
-              <div key={i} className="invoice-party-detail">{line}</div>
-            ))}
-            {seller.registration_number && (
-              <div className="invoice-party-detail">{seller.registration_number}</div>
-            )}
-            {taxLine && (
-              <div className="invoice-party-detail">{taxLine}</div>
-            )}
-            {seller.pan && (
-              <div className="invoice-party-detail">PAN: {seller.pan}</div>
-            )}
-            {seller.tan && (
-              <div className="invoice-party-detail">TAN: {seller.tan}</div>
-            )}
             <div className="invoice-party-detail">{seller.email}</div>
-            {seller.website && (
-              <div className="invoice-party-detail">{seller.website}</div>
-            )}
           </div>
           <div className="invoice-to">
             <div className="invoice-label">Bill To</div>

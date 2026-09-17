@@ -105,13 +105,20 @@ export async function canRunProfileCheck(
     return { allowed: true }
   }
 
-  const adminClient = createAdminClient() as AnySupabase
-  const { data } = await adminClient
-    .from('plans')
-    .select('citation_check_monthly_limit')
-    .eq('slug', planSlug)
-    .single()
-  const monthlyLimit = (data?.citation_check_monthly_limit as number | undefined) ?? 0
+  // The current Pro Plan (per-website) has no row in the legacy plans table
+  // — mirrors lib/db/ai-visibility.ts's PRO_PLAN_WEBSITE_SLUG special case.
+  let monthlyLimit: number
+  if (planSlug === 'pro-plan-website') {
+    monthlyLimit = 4
+  } else {
+    const adminClient = createAdminClient() as AnySupabase
+    const { data } = await adminClient
+      .from('plans')
+      .select('citation_check_monthly_limit')
+      .eq('slug', planSlug)
+      .single()
+    monthlyLimit = (data?.citation_check_monthly_limit as number | undefined) ?? 0
+  }
 
   if (monthlyLimit === -1) return { allowed: true }
   if (monthlyLimit === 0) {

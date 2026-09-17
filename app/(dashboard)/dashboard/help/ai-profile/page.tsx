@@ -167,9 +167,9 @@ export default function AiProfileHelpPage(): React.ReactElement {
         <section className="help-section">
           <h2 className="help-section-title">Quota and pricing</h2>
           <p>
-            AI Profile runs share the monthly AI Visibility quota with citation checks. One profile
-            run consumes one slot of your plan&apos;s monthly limit. Free-tier users can run AI Profile
-            with the free engines (Copilot, Exa). Paid plans access all engines.
+            AI Profile runs share the monthly AI Visibility quota with citation checks — every
+            website on the Pro Plan gets 4 combined checks per month, and access to every AI
+            engine (not just the free-tier ones like Copilot and Exa).
           </p>
         </section>
 

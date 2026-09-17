@@ -48,7 +48,7 @@ export function CurrentPlan({ plan, subscription }: Props) {
             </div>
             <div>
               <div className="cp-plan-name">No plan yet</div>
-              <div className="cp-plan-meta">₹149/year per website you monitor</div>
+              <div className="cp-plan-meta">₹999/website/year</div>
             </div>
           </div>
           <a href="/dashboard/plans" className="btn btn-primary btn-sm">

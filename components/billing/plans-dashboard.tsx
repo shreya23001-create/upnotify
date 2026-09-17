@@ -158,7 +158,7 @@ export function PlansDashboard({ rows, isGrandfathered, slotUsage }: Props): Rea
         description: isTestKey
           ? `${data.planName ?? 'Pro Plan'} · TEST MODE — Use card: 5267 3181 8797 5449 (Razorpay test Mastercard)`
           : `${data.planName ?? 'Pro Plan'} · Yearly (incl. 18% GST)`,
-        image: `${process.env.NEXT_PUBLIC_APP_URL ?? 'https://upnotify-monitoring.vercel.app'}/logo.svg`,
+        image: `${process.env.NEXT_PUBLIC_APP_URL ?? 'https://upnotify-monitoring.vercel.app'}/Logo_2.png`,
         prefill: { email: data.userEmail ?? '', name: data.orgName ?? '' },
         theme: { color: '#FBA830' },
         handler: (response: unknown) => {

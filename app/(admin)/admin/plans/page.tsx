@@ -1,13 +1,12 @@
-import { getAllPlans, getSubscriberCountsByPlan } from '@/lib/db/plans'
 import { getAllCreditRules } from '@/lib/db/credit-rules'
 import { getAllCompetePlansAdmin } from '@/lib/db/compete-plans'
+import { getAllWebsiteSubscriptionsAdmin } from '@/lib/db/admin'
 import { PlansManager } from '@/components/admin/plans-manager'
 
 export default async function AdminPlansPage(): Promise<React.ReactElement> {
-  const [plans, creditRules, subscriberCounts, competePlans] = await Promise.all([
-    getAllPlans(),
+  const [websitePlanRows, creditRules, competePlans] = await Promise.all([
+    getAllWebsiteSubscriptionsAdmin(),
     getAllCreditRules(),
-    getSubscriberCountsByPlan(),
     getAllCompetePlansAdmin(),
   ])
 
@@ -17,18 +16,17 @@ export default async function AdminPlansPage(): Promise<React.ReactElement> {
         <div>
           <h1 className="admin-page-title">Plans &amp; Pricing</h1>
           <p className="admin-page-subtitle">
-            Single source of truth for all pricing. Changes here affect the landing page, billing, and plan enforcement.
+            The current Pro Plan (per-website, quantity-first), the Compete add-on, and credit rules.
           </p>
         </div>
         <div className="admin-page-header-stat">
-          <span className="admin-page-header-stat-number">{plans.length}</span>
-          <span className="admin-page-header-stat-label">plans</span>
+          <span className="admin-page-header-stat-number">{websitePlanRows.length}</span>
+          <span className="admin-page-header-stat-label">purchases</span>
         </div>
       </div>
       <PlansManager
-        plans={plans}
+        websitePlanRows={websitePlanRows}
         creditRules={creditRules}
-        subscriberCounts={subscriberCounts}
         competePlans={competePlans}
       />
     </div>

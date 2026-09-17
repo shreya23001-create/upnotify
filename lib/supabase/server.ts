@@ -16,9 +16,17 @@ export async function createClient() {
           return cookieStore.getAll()
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            cookieStore.set(name, value, options)
-          })
+          try {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              cookieStore.set(name, value, options)
+            })
+          } catch {
+            // Called from a Server Component render, where cookies cannot
+            // be set — safe to ignore. proxy.ts already refreshes the
+            // session cookie on every request; this is only a best-effort
+            // mirror for the (Server Action / Route Handler) contexts
+            // where a write is actually possible.
+          }
         },
       },
     }

@@ -1,8 +1,10 @@
 'use client'
 
-import { IconMenu } from '@/components/icons'
+import { useState, useRef, useEffect } from 'react'
+import { IconMenu, IconLogOut } from '@/components/icons'
 import { usePathname } from 'next/navigation'
 import { AdminSearch } from '@/components/admin/admin-search'
+import { signOut } from '@/lib/auth/actions'
 
 interface AdminHeaderProps {
   userEmail: string
@@ -40,6 +42,18 @@ function getPageTitle(pathname: string): string {
 export function AdminHeader({ userEmail, onMenuToggle }: AdminHeaderProps): React.ReactElement {
   const pathname = usePathname()
   const title = getPageTitle(pathname)
+  const [dropdownOpen, setDropdownOpen] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent): void {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   return (
     <header className="admin-topbar">
@@ -58,11 +72,19 @@ export function AdminHeader({ userEmail, onMenuToggle }: AdminHeaderProps): Reac
       </div>
       <div className="admin-topbar-right">
         <AdminSearch />
-        <div className="admin-topbar-user">
+        <div className="admin-topbar-user" ref={dropdownRef} style={{ position: 'relative', cursor: 'pointer' }} onClick={() => setDropdownOpen(v => !v)}>
           <div className="admin-topbar-avatar">
             {userEmail.charAt(0).toUpperCase()}
           </div>
           <span className="admin-topbar-email">{userEmail}</span>
+          {dropdownOpen && (
+            <div className="header-dropdown admin-header-dropdown" style={{ position: 'absolute', top: '100%', right: 0, marginTop: 8, zIndex: 100 }}>
+              <button className="hd-item hd-item-danger" onClick={() => void signOut()}>
+                <span className="hd-item-icon hd-item-icon-danger"><IconLogOut size={14} /></span>
+                <span className="hd-item-label">Log out</span>
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </header>

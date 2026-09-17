@@ -57,8 +57,8 @@ export default function GettingStartedPage(): React.ReactElement {
           <div className="help-article-hero">
             <h1 className="help-article-title">Getting Started with Upnotify</h1>
             <p className="help-article-intro">
-              You signed up so you're never the last to know your site is down.
-              Smart move. Here's how to get set up in under five minutes.
+              You signed up so you&apos;re never the last to know your site is down.
+              Smart move. Here&apos;s how to get set up in under five minutes.
             </p>
           </div>
 
@@ -129,7 +129,7 @@ export default function GettingStartedPage(): React.ReactElement {
               <li>Share the link with your users or embed it on your site.</li>
             </ol>
             <p>
-              Status pages are available on the Lite plan and above.
+              Status pages are included with every website on the Pro Plan.
             </p>
           </section>
 

@@ -184,18 +184,9 @@ export default function MonitorsPage(): React.ReactElement {
           <section className="help-section">
             <h2 className="help-section-title">Check intervals explained</h2>
             <p>
-              The check interval is how often Upnotify visits your site. Shorter intervals mean
-              faster detection, but they use more of your plan&rsquo;s allowance.
-            </p>
-            <ul className="help-list">
-              <li><strong>Free</strong> -- every 10 minutes</li>
-              <li><strong>Lite &amp; Builder</strong> -- every 1 minute</li>
-              <li><strong>Scale</strong> -- every 1 minute</li>
-            </ul>
-            <p>
-              For most websites, 1-minute checks strike the right balance between speed and
-              detection speed. Scale plan checks run continuously so you catch issues as fast
-              as possible.
+              The check interval is how often Upnotify visits your site. The Pro Plan checks
+              every website as often as <strong>once a minute</strong> — the same interval for
+              every website, with no tier to upgrade into.
             </p>
           </section>
 

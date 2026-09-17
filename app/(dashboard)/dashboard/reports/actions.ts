@@ -8,7 +8,7 @@ import { generateReport, type ReportType } from '@/lib/services/reports'
 import { logger } from '@/lib/utils/logger'
 import { impersonationGuard } from '@/lib/auth/impersonation-guard'
 import { getServerConfig } from '@/lib/utils/config'
-import { getPlanLimits, checkAiReportLimit } from '@/lib/utils/plan-limits'
+import { checkAiReportLimit } from '@/lib/utils/plan-limits'
 
 export async function generateReportAction(formData: FormData): Promise<{ error?: string }> {
   const guard = await impersonationGuard()
@@ -21,13 +21,8 @@ export async function generateReportAction(formData: FormData): Promise<{ error?
   const workspace = workspaces[0]
   if (!workspace) return { error: 'No workspace found' }
 
-  // Enforce plan gating — reports require a paid plan
-  const planLimits = await getPlanLimits(user.org_id)
-  if (!planLimits.hasAiPredictive && planLimits.aiReportLimit === 0) {
-    return { error: 'Reports are not available on the Free plan. Upgrade to unlock this feature.' }
-  }
-
-  // Enforce monthly limit for plans with a finite aiReportLimit (e.g. Builder: 5/mo)
+  // Enforce monthly report limit — checkAiReportLimit already accounts for
+  // grandfathered legacy plans vs. the per-website Pro Plan's fixed cap.
   const reportLimit = await checkAiReportLimit(user.org_id)
   if (!reportLimit.allowed) {
     return { error: `You have reached your monthly report limit (${reportLimit.currentCount}/${reportLimit.limit}). Your limit resets on the 1st of next month.` }

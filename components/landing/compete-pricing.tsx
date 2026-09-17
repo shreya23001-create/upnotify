@@ -123,7 +123,7 @@ export default function CompetePricing(): React.ReactElement {
         </div>
 
         <p style={{ textAlign: 'center', fontSize: 13, color: 'var(--text-muted)', marginTop: 24 }}>
-          Requires any paid monitoring plan (Lite, Builder, or Scale). Cannot be purchased standalone.
+          Requires an active Pro Plan website. Cannot be purchased standalone.
         </p>
       </div>
     </section>

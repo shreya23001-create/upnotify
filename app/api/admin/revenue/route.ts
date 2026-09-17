@@ -64,6 +64,7 @@ interface InvoiceRow {
   period_end: string | null
   created_at: string
   subscription_id: string | null
+  website_subscription_id: string | null
   organisations: { name: string } | null
   subscriptions: {
     billing_cycle: string
@@ -162,6 +163,33 @@ export async function GET(request: Request): Promise<NextResponse> {
   const competeSubs = (competeSubsRaw ?? []) as unknown as CompeteSubRow[]
 
   // -------------------------------------------------------------------------
+  // 2b. Active per-website Pro Plan subscriptions (current billing model —
+  // separate from the legacy `subscriptions` table above). purchased_quantity
+  // isn't in generated types (added after codegen), so cast through `any`.
+  // -------------------------------------------------------------------------
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: websiteSubsRaw } = await (supabase as any)
+    .from('website_subscriptions')
+    .select('id, org_id, status, purchased_quantity, current_period_start, current_period_end')
+    .in('status', ['active', 'cancelling', 'past_due'])
+
+  const websiteSubs = (websiteSubsRaw ?? []) as Array<{
+    id: string
+    org_id: string
+    status: string
+    purchased_quantity: number | null
+    current_period_start: string | null
+    current_period_end: string | null
+  }>
+
+  const WEBSITE_PLAN_ANNUAL_PAISE = 99900 // ₹999/website/year, incl. nothing extra — GST is billed on top at checkout, not part of MRR
+  let websiteMrrPaise = 0
+  for (const sub of websiteSubs) {
+    const qty = sub.purchased_quantity ?? 0
+    websiteMrrPaise += Math.round((qty * WEBSITE_PLAN_ANNUAL_PAISE) / 12)
+  }
+
+  // -------------------------------------------------------------------------
   // 3. Users keyed by org_id (for email lookup)
   // -------------------------------------------------------------------------
   const { data: usersRaw } = await supabase
@@ -198,7 +226,7 @@ export async function GET(request: Request): Promise<NextResponse> {
   let invoiceQuery = supabase
     .from('invoices')
     .select(
-      'id, org_id, amount_gbp, currency, status, invoice_pdf_url, period_start, period_end, created_at, subscription_id, organisations(name), subscriptions(billing_cycle, plans(name, slug))',
+      'id, org_id, amount_gbp, currency, status, invoice_pdf_url, period_start, period_end, created_at, subscription_id, website_subscription_id, organisations(name), subscriptions(billing_cycle, plans(name, slug))',
       { count: 'exact' }
     )
     .order(sortBy, { ascending })
@@ -233,7 +261,9 @@ export async function GET(request: Request): Promise<NextResponse> {
     period_start:    inv.period_start,
     period_end:      inv.period_end,
     created_at:      inv.created_at,
-    planName:        inv.subscriptions?.plans?.name ?? planByOrgId.get(inv.org_id)?.name ?? null,
+    planName:        inv.subscriptions?.plans?.name
+                       ?? planByOrgId.get(inv.org_id)?.name
+                       ?? (inv.website_subscription_id ? 'Pro Plan (per-website)' : null),
     billingCycle:    inv.subscriptions?.billing_cycle ?? planByOrgId.get(inv.org_id)?.billing_cycle ?? null,
   }))
 
@@ -296,15 +326,17 @@ export async function GET(request: Request): Promise<NextResponse> {
     mrr: {
       basePence:    baseMrrPence,
       basePaise:    baseMrrPaise,
+      websitePaise: websiteMrrPaise,
       competePence: competeMrrPence,
       totalPence:   baseMrrPence + competeMrrPence,
-      totalPaise:   baseMrrPaise,
+      totalPaise:   baseMrrPaise + websiteMrrPaise,
     },
     planBreakdown,
     competeBreakdown,
     totalRevenuePence,
     revenueByCurrency,
     activeSubscriptions:       subs.length,
+    activeWebsiteSubscriptions: websiteSubs.length,
     activeCompeteSubscriptions: competeSubs.length,
     invoices: enrichedInvoices,
     pagination: {

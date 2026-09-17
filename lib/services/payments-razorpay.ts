@@ -246,6 +246,44 @@ export async function fetchRazorpayPaymentAmount(paymentId: string): Promise<num
   }
 }
 
+/** Fetch a subscription's current state directly from Razorpay — used by
+ *  the razorpay-recovery cron to poll for renewals in place of a webhook
+ *  (this account has no dashboard access to register one). Returns null
+ *  for mock subscription ids (never a real Razorpay object) or on error. */
+export async function fetchRazorpaySubscriptionState(
+  subscriptionId: string
+): Promise<RazorpaySubscriptionResult | null> {
+  if (subscriptionId.startsWith('mock_') || subscriptionId.startsWith('manual_sim_pay_')) return null
+  try {
+    const rzp = getRazorpay()
+    return await rzp.subscriptions.fetch(subscriptionId) as unknown as RazorpaySubscriptionResult
+  } catch (err) {
+    logger.error('Failed to fetch Razorpay subscription state', { subscriptionId, error: razorpayErrorMessage(err) })
+    return null
+  }
+}
+
+/** Fetch the most recent paid invoice for a subscription — gives us a real
+ *  payment_id + amount to record, matching the same idempotency key format
+ *  (`rzp_<paymentId>`) the webhook handler uses for `invoices.stripe_invoice_id`. */
+export async function fetchLatestRazorpayInvoiceForSubscription(
+  subscriptionId: string
+): Promise<{ paymentId: string; amountPaise: number } | null> {
+  try {
+    const rzp = getRazorpay()
+    const result = await rzp.invoices.all({ subscription_id: subscriptionId, count: 1 })
+    const invoice = result.items?.[0]
+    if (!invoice?.payment_id) return null
+    return {
+      paymentId: invoice.payment_id,
+      amountPaise: invoice.amount_paid ?? 0,
+    }
+  } catch (err) {
+    logger.error('Failed to fetch latest Razorpay invoice for subscription', { subscriptionId, error: razorpayErrorMessage(err) })
+    return null
+  }
+}
+
 // ─── Webhook signature verification ──────────────────────────────────────────
 
 /**

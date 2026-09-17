@@ -26,7 +26,7 @@ export default function HelpCompetePage(): React.ReactElement {
 
           <section className="help-section">
             <h2 className="help-section-title">How to Subscribe</h2>
-            <p>Compete is a separate add-on with its own pricing. Go to <Link href="/dashboard/compete">Dashboard &gt; Compete</Link> to see plans and subscribe. You need an active paid monitoring plan (Lite, Builder, or Scale) first.</p>
+            <p>Compete is a separate add-on with its own pricing. Go to <Link href="/dashboard/compete">Dashboard &gt; Compete</Link> to see plans and subscribe. You need an active Pro Plan website first.</p>
           </section>
 
           <section className="help-section">

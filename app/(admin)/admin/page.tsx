@@ -3,6 +3,10 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { getSubmissionStats } from '@/lib/db/credit-submissions'
 import { MonitoringOverview } from '@/components/admin/monitoring-overview'
 import Link from 'next/link'
+import {
+  CreditCard, UserPlus, AlertTriangle, Radar, Users, Building2, Tag,
+  Globe, MessageSquareText, BadgeCheck, LifeBuoy, Settings,
+} from 'lucide-react'
 
 async function getAdminMetrics(): Promise<{
   totalMonitors: number
@@ -98,24 +102,36 @@ export default async function AdminDashboardPage(): Promise<React.ReactElement> 
       {/* Secondary metrics */}
       <div className="admin-stats-grid" style={{ marginTop: 16 }}>
         <div className="admin-stat-card">
+          <div className="admin-stat-icon admin-stat-icon-purple">
+            <CreditCard size={22} strokeWidth={2} />
+          </div>
           <div className="admin-stat-info">
             <span className="admin-stat-number">{metrics.activeSubscriptions}</span>
             <span className="admin-stat-label">Paid Subscriptions</span>
           </div>
         </div>
         <div className="admin-stat-card">
+          <div className="admin-stat-icon admin-stat-icon-green">
+            <UserPlus size={22} strokeWidth={2} />
+          </div>
           <div className="admin-stat-info">
             <span className="admin-stat-number">{metrics.recentSignups}</span>
             <span className="admin-stat-label">Signups (7 days)</span>
           </div>
         </div>
         <div className="admin-stat-card">
+          <div className={`admin-stat-icon ${metrics.openIncidents > 0 ? 'admin-stat-icon-red' : 'admin-stat-icon-green'}`}>
+            <AlertTriangle size={22} strokeWidth={2} />
+          </div>
           <div className="admin-stat-info">
             <span className="admin-stat-number" style={{ color: metrics.openIncidents > 0 ? '#ef4444' : undefined }}>{metrics.openIncidents}</span>
             <span className="admin-stat-label">Open Incidents</span>
           </div>
         </div>
         <Link href="/admin/tracker" className="admin-stat-card">
+          <div className="admin-stat-icon admin-stat-icon-blue">
+            <Radar size={22} strokeWidth={2} />
+          </div>
           <div className="admin-stat-info">
             <span className="admin-stat-number">{metrics.trackedSites}</span>
             <span className="admin-stat-label">Tracked Sites</span>
@@ -126,6 +142,9 @@ export default async function AdminDashboardPage(): Promise<React.ReactElement> 
       {/* Pending actions */}
       {metrics.pendingCredits > 0 && (
         <Link href="/admin/credits" className="admin-stat-card" style={{ marginTop: 16, display: 'flex', alignItems: 'center', gap: 12, borderLeft: '4px solid #f59e0b' }}>
+          <div className="admin-stat-icon admin-stat-icon-amber">
+            <BadgeCheck size={22} strokeWidth={2} />
+          </div>
           <div className="admin-stat-info">
             <span className="admin-stat-number" style={{ color: '#f59e0b' }}>{metrics.pendingCredits}</span>
             <span className="admin-stat-label">Pending credit approvals — review now</span>
@@ -137,34 +156,42 @@ export default async function AdminDashboardPage(): Promise<React.ReactElement> 
         <h2 className="admin-section-title">Quick Links</h2>
         <div className="admin-quick-links-grid">
           <Link href="/admin/users" className="admin-quick-link">
+            <div className="admin-quick-link-icon admin-stat-icon-blue"><Users size={18} strokeWidth={2} /></div>
             <span className="admin-quick-link-label">Manage Users</span>
             <span className="admin-quick-link-desc">View all users, impersonate, manage roles</span>
           </Link>
           <Link href="/admin/organisations" className="admin-quick-link">
+            <div className="admin-quick-link-icon admin-stat-icon-green"><Building2 size={18} strokeWidth={2} /></div>
             <span className="admin-quick-link-label">Manage Organisations</span>
             <span className="admin-quick-link-desc">View all organisations and their details</span>
           </Link>
           <Link href="/admin/plans" className="admin-quick-link">
+            <div className="admin-quick-link-icon admin-stat-icon-purple"><Tag size={18} strokeWidth={2} /></div>
             <span className="admin-quick-link-label">Plans & Pricing</span>
             <span className="admin-quick-link-desc">Edit plans, pricing, Compete add-on, credit rules</span>
           </Link>
           <Link href="/admin/tracker" className="admin-quick-link">
+            <div className="admin-quick-link-icon admin-stat-icon-blue"><Globe size={18} strokeWidth={2} /></div>
             <span className="admin-quick-link-label">Public Tracker</span>
             <span className="admin-quick-link-desc">{metrics.trackedSites} sites tracked for SEO</span>
           </Link>
           <Link href="/admin/messages" className="admin-quick-link">
+            <div className="admin-quick-link-icon admin-stat-icon-amber"><MessageSquareText size={18} strokeWidth={2} /></div>
             <span className="admin-quick-link-label">Messages & Broadcasts</span>
             <span className="admin-quick-link-desc">Send announcements to users by plan type</span>
           </Link>
           <Link href="/admin/credits" className="admin-quick-link">
+            <div className="admin-quick-link-icon admin-stat-icon-green"><BadgeCheck size={18} strokeWidth={2} /></div>
             <span className="admin-quick-link-label">Credit Approvals</span>
             <span className="admin-quick-link-desc">Review submissions, approve or reject</span>
           </Link>
           <Link href="/admin/support" className="admin-quick-link">
+            <div className="admin-quick-link-icon admin-stat-icon-purple"><LifeBuoy size={18} strokeWidth={2} /></div>
             <span className="admin-quick-link-label">Support Tickets</span>
             <span className="admin-quick-link-desc">View and respond to customer support requests</span>
           </Link>
           <Link href="/admin/settings" className="admin-quick-link">
+            <div className="admin-quick-link-icon admin-stat-icon-blue"><Settings size={18} strokeWidth={2} /></div>
             <span className="admin-quick-link-label">Settings</span>
             <span className="admin-quick-link-desc">Trusted logos, landing page content</span>
           </Link>

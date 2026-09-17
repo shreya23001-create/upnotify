@@ -13,7 +13,7 @@ const FAQ_SCHEMA = {
       name: 'How does the Upnotify referral program work?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Share your unique referral link with a friend. When they sign up and upgrade to any paid plan, you both get one month free on your current plan. You can refer up to 5 friends for a maximum of 25 pounds in total value.',
+        text: 'Share your unique referral link with a friend. When they sign up and purchase the Pro Plan, you both get a 5 pound account credit. You can refer up to 5 friends for a maximum of 25 pounds in total credit.',
       },
     },
     {
@@ -29,7 +29,7 @@ const FAQ_SCHEMA = {
       name: 'Is there a limit to how many people I can refer to Upnotify?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Yes. The referral programme is capped at 5 successful referrals per account, which gives you up to 25 pounds in total value (5 months free).',
+        text: 'Yes. The referral programme is capped at 5 successful referrals per account, which gives you up to 25 pounds in total account credit.',
       },
     },
   ],
@@ -58,7 +58,7 @@ export default function ReferralsHelpPage(): React.ReactElement {
             <h1 className="help-article-title">Referral Program</h1>
             <p className="help-article-intro">
               Good tools spread by word of mouth. If you like Upnotify enough to
-              recommend it, we want to say thanks -- with free monitoring for you
+              recommend it, we want to say thanks -- with account credit for you
               and the person you refer.
             </p>
           </div>
@@ -71,12 +71,12 @@ export default function ReferralsHelpPage(): React.ReactElement {
             <ol className="help-steps">
               <li>You share your unique referral link with a friend or colleague.</li>
               <li>They sign up using that link.</li>
-              <li>They upgrade to any paid plan (Lite, Builder, or Scale).</li>
-              <li>You both get <strong>one month free</strong> on your current plan.</li>
+              <li>They purchase the Pro Plan.</li>
+              <li>You both get a <strong>£5 account credit</strong>.</li>
             </ol>
             <p>
-              No special codes, no complicated tiers. One link, one upgrade, one
-              free month each.
+              No special codes, no complicated tiers. One link, one purchase, one
+              credit each.
             </p>
           </section>
 

@@ -1,6 +1,13 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import {
+  Globe, Lock, Radio, Search, CalendarClock, Plug, Wifi, Zap, HeartPulse,
+  Eye, ShieldCheck, Timer, Bot, MapPin, Mail, Landmark, Map as MapIcon, Link2,
+  MailCheck, Ban, Package, Cookie, Network, AlertTriangle, CheckCircle2,
+  Gauge,
+} from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 
 interface AdminMonitor {
   id: string
@@ -17,6 +24,25 @@ interface Summary {
   up: number
   down: number
   degraded: number
+}
+
+const MONITOR_TYPE_ICONS: Record<string, LucideIcon> = {
+  http: Globe, ssl: Lock, dns: Radio, keyword: Search, domain: CalendarClock,
+  port: Plug, ping: Wifi, api: Zap, heartbeat: HeartPulse, competitor: Eye,
+  'security-headers': ShieldCheck, 'response-time': Timer, 'robots-txt': Bot,
+  'ip-change': MapPin, 'mx-health': Mail, 'whois-change': Landmark, sitemap: MapIcon,
+  'redirect-chain': Link2, 'spf-dmarc': MailCheck, blacklist: Ban,
+  'page-size': Package, 'cookie-consent': Cookie, 'nameserver-change': Network,
+}
+
+const MONITOR_TYPE_LABELS: Record<string, string> = {
+  http: 'HTTP/HTTPS', ssl: 'SSL Certificate', dns: 'DNS Records', keyword: 'Keyword',
+  domain: 'Domain Expiry', port: 'Port Check', ping: 'Ping', api: 'API Endpoint',
+  heartbeat: 'Heartbeat', competitor: 'Page Change', 'security-headers': 'Security Headers',
+  'response-time': 'Response Time', 'robots-txt': 'robots.txt', 'ip-change': 'IP Change',
+  'mx-health': 'MX Health', 'whois-change': 'WHOIS Change', sitemap: 'Sitemap',
+  'redirect-chain': 'Redirect Chain', 'spf-dmarc': 'SPF/DMARC', blacklist: 'Blacklist',
+  'page-size': 'Page Size', 'cookie-consent': 'Cookie Consent', 'nameserver-change': 'Nameserver',
 }
 
 export function MonitoringOverview(): React.ReactElement {
@@ -39,92 +65,115 @@ export function MonitoringOverview(): React.ReactElement {
 
   useEffect(() => { fetchData() }, [fetchData])
 
-  if (loading) return <p style={{ color: 'var(--text-muted)', padding: 20 }}>Loading monitoring data...</p>
+  if (loading) {
+    return (
+      <div style={{ marginTop: 32 }}>
+        <h2 className="admin-section-title">Monitoring Overview</h2>
+        <div className="admin-mon-skeleton" />
+      </div>
+    )
+  }
 
   const total = summary.total || 1
   const upPct = Math.round((summary.up / total) * 100)
   const downPct = Math.round((summary.down / total) * 100)
   const degradedPct = Math.round((summary.degraded / total) * 100)
-  const pausedPct = 100 - upPct - downPct - degradedPct
+  const pausedPct = Math.max(0, 100 - upPct - downPct - degradedPct)
 
-  // Type breakdown
   const typeMap = new Map<string, number>()
   for (const m of monitors) {
     typeMap.set(m.type, (typeMap.get(m.type) ?? 0) + 1)
   }
   const typeBreakdown = [...typeMap.entries()].sort((a, b) => b[1] - a[1])
+  const maxTypeCount = typeBreakdown[0]?.[1] ?? 1
 
-  // Top 5 slowest
   const slowest = [...monitors]
     .filter(m => m.responseTimeMs !== null && m.responseTimeMs > 0)
     .sort((a, b) => (b.responseTimeMs ?? 0) - (a.responseTimeMs ?? 0))
     .slice(0, 5)
 
-  // Currently down
   const downMonitors = monitors.filter(m => m.status === 'down').slice(0, 5)
 
   return (
-    <div style={{ marginTop: 24 }}>
+    <div style={{ marginTop: 32 }}>
       <h2 className="admin-section-title">Monitoring Overview</h2>
 
-      {/* Status distribution bar */}
-      <div style={{ marginBottom: 20 }}>
-        <div style={{ display: 'flex', height: 28, borderRadius: 8, overflow: 'hidden', border: '1px solid var(--border-primary)' }}>
-          {upPct > 0 && <div style={{ width: `${upPct}%`, background: '#22c55e', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 11, fontWeight: 600 }}>{upPct}%</div>}
-          {downPct > 0 && <div style={{ width: `${downPct}%`, background: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 11, fontWeight: 600 }}>{downPct}%</div>}
-          {degradedPct > 0 && <div style={{ width: `${degradedPct}%`, background: '#f59e0b', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 11, fontWeight: 600 }}>{degradedPct}%</div>}
-          {pausedPct > 0 && <div style={{ width: `${pausedPct}%`, background: 'var(--bg-secondary, #e2e8f0)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, color: 'var(--text-muted)' }}></div>}
+      <div className="admin-mon-distribution">
+        <div className="admin-mon-bar">
+          {upPct > 0 && <div className="admin-mon-bar-seg admin-mon-bar-up" style={{ width: `${upPct}%` }}>{upPct}%</div>}
+          {downPct > 0 && <div className="admin-mon-bar-seg admin-mon-bar-down" style={{ width: `${downPct}%` }}>{downPct}%</div>}
+          {degradedPct > 0 && <div className="admin-mon-bar-seg admin-mon-bar-degraded" style={{ width: `${degradedPct}%` }}>{degradedPct}%</div>}
+          {pausedPct > 0 && <div className="admin-mon-bar-seg admin-mon-bar-paused" style={{ width: `${pausedPct}%` }} />}
         </div>
-        <div style={{ display: 'flex', gap: 16, marginTop: 6, fontSize: 12, color: 'var(--text-muted)' }}>
-          <span><span style={{ color: '#22c55e', fontWeight: 600 }}>{'\u25CF'}</span> Up: {summary.up}</span>
-          <span><span style={{ color: '#ef4444', fontWeight: 600 }}>{'\u25CF'}</span> Down: {summary.down}</span>
-          <span><span style={{ color: '#f59e0b', fontWeight: 600 }}>{'\u25CF'}</span> Degraded: {summary.degraded}</span>
-          <span>Total: {summary.total}</span>
+        <div className="admin-mon-legend">
+          <span className="admin-mon-legend-item"><span className="admin-mon-dot admin-mon-dot-up" />Up: <strong>{summary.up}</strong></span>
+          <span className="admin-mon-legend-item"><span className="admin-mon-dot admin-mon-dot-down" />Down: <strong>{summary.down}</strong></span>
+          <span className="admin-mon-legend-item"><span className="admin-mon-dot admin-mon-dot-degraded" />Degraded: <strong>{summary.degraded}</strong></span>
+          <span className="admin-mon-legend-item admin-mon-legend-total">Total: <strong>{summary.total}</strong></span>
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-        {/* Type breakdown */}
-        <div className="card" style={{ padding: 16 }}>
-          <h3 style={{ fontSize: 13, fontWeight: 700, marginBottom: 12 }}>By Monitor Type</h3>
-          {typeBreakdown.map(([type, count]) => (
-            <div key={type} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-              <span style={{ fontSize: 12, fontWeight: 500, width: 60, textTransform: 'uppercase', color: 'var(--text-muted)' }}>{type}</span>
-              <div style={{ flex: 1, height: 16, background: 'var(--bg-secondary)', borderRadius: 4, overflow: 'hidden' }}>
-                <div style={{ width: `${(count / total) * 100}%`, height: '100%', background: 'var(--accent-gradient)', borderRadius: 4, minWidth: 2 }} />
-              </div>
-              <span style={{ fontSize: 12, fontWeight: 600, width: 30, textAlign: 'right' }}>{count}</span>
-            </div>
-          ))}
+      <div className="admin-mon-grid">
+        <div className="card admin-mon-card">
+          <div className="admin-mon-card-header">
+            <Gauge size={16} strokeWidth={2} />
+            <h3>By Monitor Type</h3>
+          </div>
+          <div className="admin-mon-type-list">
+            {typeBreakdown.map(([type, count]) => {
+              const Icon = MONITOR_TYPE_ICONS[type] ?? Globe
+              return (
+                <div key={type} className="admin-mon-type-row">
+                  <span className="admin-mon-type-icon"><Icon size={13} strokeWidth={2} /></span>
+                  <span className="admin-mon-type-label">{MONITOR_TYPE_LABELS[type] ?? type}</span>
+                  <div className="admin-mon-type-track">
+                    <div className="admin-mon-type-fill" style={{ width: `${(count / maxTypeCount) * 100}%` }} />
+                  </div>
+                  <span className="admin-mon-type-count">{count}</span>
+                </div>
+              )
+            })}
+          </div>
         </div>
 
-        {/* Down monitors */}
-        <div className="card" style={{ padding: 16 }}>
-          <h3 style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, color: downMonitors.length > 0 ? '#ef4444' : undefined }}>
-            {downMonitors.length > 0 ? `Currently Down (${downMonitors.length})` : 'All Clear'}
-          </h3>
+        <div className="card admin-mon-card">
+          <div className="admin-mon-card-header">
+            {downMonitors.length > 0 ? <AlertTriangle size={16} strokeWidth={2} color="#ef4444" /> : <CheckCircle2 size={16} strokeWidth={2} color="#22c55e" />}
+            <h3 style={{ color: downMonitors.length > 0 ? '#ef4444' : undefined }}>
+              {downMonitors.length > 0 ? `Currently Down (${downMonitors.length})` : 'All Clear'}
+            </h3>
+          </div>
           {downMonitors.length === 0 ? (
-            <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>No monitors are currently down.</p>
+            <p className="admin-mon-empty">No monitors are currently down.</p>
           ) : (
-            downMonitors.map(m => (
-              <div key={m.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid var(--border-primary)', fontSize: 13 }}>
-                <span style={{ fontWeight: 500 }}>{m.name}</span>
-                <span className="badge badge-danger">{m.severity}</span>
-              </div>
-            ))
+            <div className="admin-mon-down-list">
+              {downMonitors.map(m => (
+                <div key={m.id} className="admin-mon-down-row">
+                  <span className="admin-mon-down-name">{m.name}</span>
+                  <span className="badge badge-danger">{m.severity}</span>
+                </div>
+              ))}
+            </div>
           )}
         </div>
       </div>
 
-      {/* Slowest monitors */}
       {slowest.length > 0 && (
-        <div className="card" style={{ padding: 16, marginTop: 16 }}>
-          <h3 style={{ fontSize: 13, fontWeight: 700, marginBottom: 12 }}>Slowest Response Times</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <div className="card admin-mon-card" style={{ marginTop: 16 }}>
+          <div className="admin-mon-card-header">
+            <Timer size={16} strokeWidth={2} />
+            <h3>Slowest Response Times</h3>
+          </div>
+          <div className="admin-mon-slow-list">
             {slowest.map(m => (
-              <div key={m.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', fontSize: 13 }}>
-                <span>{m.name} <span style={{ color: 'var(--text-muted)', fontSize: 11 }}>({m.orgName})</span></span>
-                <span style={{ fontWeight: 600, color: (m.responseTimeMs ?? 0) > 3000 ? '#ef4444' : (m.responseTimeMs ?? 0) > 1000 ? '#f59e0b' : undefined }}>{m.responseTimeMs}ms</span>
+              <div key={m.id} className="admin-mon-slow-row">
+                <span>{m.name} <span className="admin-mon-slow-org">({m.orgName})</span></span>
+                <span
+                  className="admin-mon-slow-time"
+                  style={{ color: (m.responseTimeMs ?? 0) > 3000 ? '#ef4444' : (m.responseTimeMs ?? 0) > 1000 ? '#f59e0b' : undefined }}
+                >
+                  {m.responseTimeMs}ms
+                </span>
               </div>
             ))}
           </div>

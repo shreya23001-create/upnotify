@@ -12,12 +12,14 @@ import { getDefaultCurrency, type SupportedCurrency } from '@/lib/utils/geo.serv
 import { getAllLandingSections, getCmsTheme } from '@/lib/db/page-sections'
 import { getServerConfig } from '@/lib/utils/config'
 import { SettingsContent } from '@/components/dashboard/settings/settings-content'
+import { requireActivatedOrg } from '@/lib/auth/require-activated-org'
 
 export default async function SettingsPage(): Promise<React.ReactElement> {
   const profile = await getUserProfile()
   if (!profile) redirect('/login')
 
   const { user, organisation } = profile
+  await requireActivatedOrg(organisation.id)
   const config = getServerConfig()
   const isSuperAdmin = config.adminEmails.includes((user.email ?? '').toLowerCase())
 

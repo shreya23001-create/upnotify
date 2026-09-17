@@ -193,6 +193,24 @@ export async function hasGrandfatheredBaseSubscription(orgId: string): Promise<b
 }
 
 /**
+ * True if the org has at least one active/cancelling/past_due Pro Plan
+ * (per-website) subscription — the current billing model, tracked in
+ * website_subscriptions rather than the legacy subscriptions table.
+ */
+export async function hasActiveWebsitePlan(orgId: string): Promise<boolean> {
+  const supabase = createAdminClient()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data } = await (supabase as any)
+    .from('website_subscriptions')
+    .select('id')
+    .eq('org_id', orgId)
+    .in('status', ['active', 'cancelling', 'past_due'])
+    .limit(1)
+    .maybeSingle() as { data: { id: string } | null }
+  return Boolean(data)
+}
+
+/**
  * True if the org has ANY plan at all — either a grandfathered base
  * subscription, or at least one active per-website subscription. Used to
  * decide the post-login/signup landing page: orgs with no plan yet land on
@@ -200,19 +218,11 @@ export async function hasGrandfatheredBaseSubscription(orgId: string): Promise<b
  * normal /dashboard.
  */
 export async function hasAnyActivePlan(orgId: string): Promise<boolean> {
-  const supabase = createAdminClient()
-  const [hasGrandfathered, websiteResult] = await Promise.all([
+  const [hasGrandfathered, hasWebsitePlan] = await Promise.all([
     hasGrandfatheredBaseSubscription(orgId),
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (supabase as any)
-      .from('website_subscriptions')
-      .select('id')
-      .eq('org_id', orgId)
-      .in('status', ['active', 'cancelling', 'past_due'])
-      .limit(1)
-      .maybeSingle() as Promise<{ data: { id: string } | null }>,
+    hasActiveWebsitePlan(orgId),
   ])
-  return hasGrandfathered || Boolean(websiteResult.data)
+  return hasGrandfathered || hasWebsitePlan
 }
 
 /**
@@ -238,6 +248,38 @@ export async function checkWebsiteSubscriptionActive(orgId: string, targetDomain
     .limit(1)
     .maybeSingle()
   return Boolean(data)
+}
+
+/**
+ * The plan label to actually show a human (admin or customer) — never
+ * defaults to "Free" for an org that's genuinely paying via the current
+ * per-website Pro Plan model. Checks website_subscriptions first (the
+ * current model), then falls back to the legacy subscriptions/plans join
+ * for grandfathered orgs, and only returns null when neither exists.
+ */
+export async function getEffectivePlanLabel(orgId: string): Promise<string | null> {
+  const supabase = createAdminClient()
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: websiteSub } = await (supabase as any)
+    .from('website_subscriptions')
+    .select('id')
+    .eq('org_id', orgId)
+    .in('status', ['active', 'cancelling', 'past_due'])
+    .limit(1)
+    .maybeSingle() as { data: { id: string } | null }
+
+  if (websiteSub) return 'Pro Plan'
+
+  const { data: legacySub } = await supabase
+    .from('subscriptions')
+    .select('plans(name)')
+    .eq('org_id', orgId)
+    .in('status', ['active', 'cancelling', 'paused', 'past_due', 'trialing'])
+    .limit(1)
+    .maybeSingle() as { data: { plans: { name: string } | null } | null }
+
+  return legacySub?.plans?.name ?? null
 }
 
 /**
@@ -307,28 +349,52 @@ export async function checkFeatureAccess(
   return limits[feature]
 }
 
-/** Check if the org can create another status page */
+/**
+ * Check if the org can create another status page.
+ *
+ * Status pages are unlimited for any org with an active plan — either a
+ * grandfathered legacy subscription or the current per-website Pro Plan —
+ * since "one plan, everything included" is the whole point of that pricing
+ * model and a status page costs nothing incremental to serve (it's just a
+ * read-only view over monitors already being checked). The old FREE_DEFAULTS
+ * tier gate (hasStatusPages/statusPageLimit from getPlanLimits) predates the
+ * per-website model and only ever applies now to an org with NO active plan
+ * at all — which today can't reach this page anyway (requireActivatedOrg
+ * gates it), but is kept as a defensive fallback rather than removed.
+ */
 export async function checkStatusPageLimit(orgId: string): Promise<{
   allowed: boolean
   currentCount: number
-  limit: number
+  limit: number | null
 }> {
   const supabase = createAdminClient()
-  const limits = await getPlanLimits(orgId)
-
-  if (!limits.hasStatusPages) return { allowed: false, currentCount: 0, limit: 0 }
 
   const { count } = await supabase
     .from('status_pages')
     .select('id', { count: 'exact', head: true })
     .eq('org_id', orgId)
-
   const currentCount = count ?? 0
+
+  if (await hasAnyActivePlan(orgId)) {
+    return { allowed: true, currentCount, limit: null }
+  }
+
+  const limits = await getPlanLimits(orgId)
+  if (!limits.hasStatusPages) return { allowed: false, currentCount, limit: 0 }
+
   const limit = limits.statusPageLimit
   const allowed = limit === 0 || currentCount < limit
 
   return { allowed, currentCount, limit }
 }
+
+/**
+ * Every non-grandfathered per-website Pro Plan org gets this many AI
+ * report generations per month — a real cap, not unlimited, since each
+ * generation is a real Claude API call and costs money. Grandfathered
+ * legacy orgs keep using their own plan's aiReportLimit unchanged.
+ */
+const PRO_PLAN_MONTHLY_AI_REPORT_LIMIT = 10
 
 /** Check if the org can generate another AI report this month */
 export async function checkAiReportLimit(orgId: string): Promise<{
@@ -337,14 +403,6 @@ export async function checkAiReportLimit(orgId: string): Promise<{
   limit: number
 }> {
   const supabase = createAdminClient()
-  const limits = await getPlanLimits(orgId)
-
-  if (limits.aiReportLimit === 0) {
-    return { allowed: false, currentCount: 0, limit: 0 }
-  }
-  if (limits.aiReportLimit === -1) {
-    return { allowed: true, currentCount: 0, limit: -1 } // unlimited
-  }
 
   const startOfMonth = new Date()
   startOfMonth.setDate(1)
@@ -355,12 +413,32 @@ export async function checkAiReportLimit(orgId: string): Promise<{
     .select('id', { count: 'exact', head: true })
     .eq('org_id', orgId)
     .gte('generated_at', startOfMonth.toISOString())
-
   const currentCount = count ?? 0
+
+  // The old FREE_DEFAULTS tier gate (aiReportLimit from getPlanLimits)
+  // predates the per-website model and defaults to 0 for any org with no
+  // legacy `subscriptions` row — which is every per-website customer, so
+  // it was falsely blocking paying orgs. Grandfathered orgs keep using
+  // their own plan's real limit; everyone else gets a fixed monthly cap.
+  if (await hasGrandfatheredBaseSubscription(orgId)) {
+    const limits = await getPlanLimits(orgId)
+    if (limits.aiReportLimit === 0) {
+      return { allowed: false, currentCount: 0, limit: 0 }
+    }
+    if (limits.aiReportLimit === -1) {
+      return { allowed: true, currentCount: 0, limit: -1 } // unlimited
+    }
+    return {
+      allowed: currentCount < limits.aiReportLimit,
+      currentCount,
+      limit: limits.aiReportLimit,
+    }
+  }
+
   return {
-    allowed: currentCount < limits.aiReportLimit,
+    allowed: currentCount < PRO_PLAN_MONTHLY_AI_REPORT_LIMIT,
     currentCount,
-    limit: limits.aiReportLimit,
+    limit: PRO_PLAN_MONTHLY_AI_REPORT_LIMIT,
   }
 }
 
@@ -438,6 +516,13 @@ export async function checkCompeteProductLimit(orgId: string): Promise<{
   return { allowed, currentCount, limit: totalLimit, nudgeToSlug }
 }
 
+/** Flat Watchdog/Competitor slot allowance for the current per-website Pro
+ *  Plan — getPlanLimits()'s FREE_DEFAULTS fallback (3) predates this model
+ *  and would otherwise apply to Pro Plan orgs (they have no legacy plans
+ *  row), so this is checked first, mirroring the same precedent used for
+ *  status pages (see checkStatusPageLimit above). */
+const PRO_PLAN_COMPETITOR_LIMIT = 5
+
 /** Check if the org can add another competitor monitor */
 export async function checkCompetitorLimit(orgId: string): Promise<{
   allowed: boolean
@@ -445,7 +530,10 @@ export async function checkCompetitorLimit(orgId: string): Promise<{
   limit: number
 }> {
   const supabase = createAdminClient()
-  const limits = await getPlanLimits(orgId)
+  const [hasWebsitePlan, limits] = await Promise.all([
+    hasActiveWebsitePlan(orgId),
+    getPlanLimits(orgId),
+  ])
 
   const { count } = await supabase
     .from('competitor_monitors')
@@ -453,7 +541,7 @@ export async function checkCompetitorLimit(orgId: string): Promise<{
     .eq('org_id', orgId)
 
   const currentCount = count ?? 0
-  const limit = limits.competitors
+  const limit = hasWebsitePlan ? PRO_PLAN_COMPETITOR_LIMIT : limits.competitors
   const allowed = currentCount < limit
 
   return { allowed, currentCount, limit }

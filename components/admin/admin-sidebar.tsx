@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { UptrueLogo } from '@/components/ui/uptrue-logo'
 import {
   IconDashboard, IconUsers, IconBuilding, IconCreditCard,
   IconGlobe, IconToggle, IconEdit, IconMail, IconSettings, IconX, IconShield,
@@ -145,7 +144,8 @@ export function AdminSidebar({ isOpen, onClose, pendingBlogCount }: AdminSidebar
         {/* Logo */}
         <div className="admin-sidebar-logo">
           <Link href="/admin" onClick={onClose} style={{ display: 'flex', alignItems: 'center' }}>
-            <UptrueLogo variant="light" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/Logo_2.png" alt="Upnotify" style={{ height: 32, width: 'auto' }} />
           </Link>
           <button
             className="admin-sidebar-close"
@@ -219,13 +219,6 @@ export function AdminSidebar({ isOpen, onClose, pendingBlogCount }: AdminSidebar
           })}
         </nav>
 
-        {/* Footer */}
-        <div className="admin-sidebar-footer">
-          <Link href="/dashboard" className="admin-sidebar-back" onClick={onClose}>
-            <IconDashboard size={16} />
-            <span>Back to Dashboard</span>
-          </Link>
-        </div>
       </aside>
     </>
   )

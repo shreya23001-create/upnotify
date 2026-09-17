@@ -20,7 +20,7 @@ export function OrganizationJsonLd(): React.ReactElement {
     name: 'Upnotify',
     legalName: 'Crozent Techlabs Private Limited',
     url: 'https://upnotify-monitoring.vercel.app',
-    logo: 'https://upnotify-monitoring.vercel.app/logo.svg',
+    logo: 'https://upnotify-monitoring.vercel.app/Logo_2.png',
     description:
       'Uptime, performance and infrastructure monitoring platform for agencies and teams.',
     foundingDate: '2026',

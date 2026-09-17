@@ -5,6 +5,7 @@ import { getCurrentUser } from '@/lib/db/users'
 import { getTicketById, getMessages } from '@/lib/db/support'
 import { TicketThread } from '@/components/support/ticket-thread'
 import { IconArrowLeft } from '@/components/icons'
+import { requireActivatedOrg } from '@/lib/auth/require-activated-org'
 
 export const metadata: Metadata = { title: 'Ticket — Upnotify Support' }
 
@@ -15,6 +16,7 @@ interface PageProps {
 export default async function SupportTicketPage({ params }: PageProps): Promise<React.ReactElement> {
   const user = await getCurrentUser()
   if (!user) redirect('/login')
+  await requireActivatedOrg(user.org_id)
 
   const { id } = await params
   const [ticket, messages] = await Promise.all([

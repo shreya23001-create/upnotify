@@ -61,7 +61,21 @@ export interface CitationCheckResult {
 // ---------------------------------------------------------------------------
 // Plan limits — read from DB (single source of truth)
 // ---------------------------------------------------------------------------
+
+/** The current per-website Pro Plan has no row in the legacy `plans` table
+ *  (it's tracked via `website_subscriptions`, not `subscriptions`), so its
+ *  AI Visibility limits are fixed here rather than looked up — unlimited
+ *  llms.txt generation, 4 citation/profile checks per month (same cap the
+ *  old top legacy tier had, chosen since each check has a real per-run cost
+ *  across multiple LLM engine APIs). Callers pass this synthetic slug for
+ *  any org whose plan comes from website_subscriptions instead of the
+ *  legacy subscriptions/plans join. */
+const PRO_PLAN_WEBSITE_SLUG = 'pro-plan-website'
+const PRO_PLAN_WEBSITE_LIMITS = { llmsTxtLimit: -1, citationMonthlyLimit: 4 } as const
+
 async function getAiVisibilityPlanLimits(planSlug: string): Promise<{ llmsTxtLimit: number; citationMonthlyLimit: number }> {
+  if (planSlug === PRO_PLAN_WEBSITE_SLUG) return PRO_PLAN_WEBSITE_LIMITS
+
   const adminClient = createAdminClient() as AnySupabase
   const { data } = await adminClient
     .from('plans')

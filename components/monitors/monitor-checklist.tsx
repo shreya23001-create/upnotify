@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState, useTransition, useEffect, useRef } from 'react'
 import { ChevronDown, ChevronRight } from 'lucide-react'
 import { MONITOR_TYPES } from '@/lib/constants/monitor-types'
 import { MonitorTypeIcon } from './monitor-type-icon'
@@ -24,6 +24,32 @@ export function MonitorChecklist({ domain, monitors: initialMonitors }: Props): 
   const [configuring, setConfiguring] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
+  // Reconcile with the server's own view whenever it changes (e.g. a
+  // revalidatePath triggered by a rapid sequence of checkbox clicks) —
+  // without this, useState's initial value is frozen after first mount and
+  // a mid-sequence server refresh would never reach this component, so an
+  // in-flight optimistic update from one click could be overwritten by a
+  // stale re-render of a DIFFERENT click still in flight.
+  const pendingTypesRef = useRef<Set<string>>(new Set())
+  useEffect(() => {
+    // A type present in the fresh server snapshot is confirmed — no longer
+    // needs protecting from being overwritten.
+    for (const m of initialMonitors) pendingTypesRef.current.delete(m.type)
+
+    setMonitors(prev => {
+      const merged = new Map(initialMonitors.map(m => [m.type, m]))
+      // Keep any optimistic (not-yet-confirmed) entries the server snapshot
+      // doesn't know about yet, so a click that's still in flight isn't
+      // wiped out by an earlier click's revalidation landing first.
+      for (const m of prev) {
+        if (pendingTypesRef.current.has(m.type) && !merged.has(m.type)) {
+          merged.set(m.type, m)
+        }
+      }
+      return Array.from(merged.values())
+    })
+  }, [initialMonitors])
+
   const byType = new Map(monitors.map(m => [m.type, m]))
 
   function handleToggle(type: string, checked: boolean): void {
@@ -41,15 +67,20 @@ export function MonitorChecklist({ domain, monitors: initialMonitors }: Props): 
 
   function runToggle(type: string, action: 'select' | 'deselect', config?: Record<string, unknown>): void {
     setBusyType(type)
+    if (action === 'select') pendingTypesRef.current.add(type)
     startTransition(async () => {
       const res = await toggleMonitorSelectionAction({ domain, type, action, config })
       if (res.error) {
         setError(res.error)
+        pendingTypesRef.current.delete(type)
       } else {
         if (action === 'deselect') {
           setMonitors(prev => prev.filter(m => m.type !== type))
         } else {
           // Refresh isn't critical for the checkbox state — mark as selected optimistically.
+          // Stays in pendingTypesRef until the next server-driven prop
+          // update actually contains this type, so a concurrent click's
+          // revalidation can't wipe it out first.
           setMonitors(prev => {
             if (prev.some(m => m.type === type)) return prev
             return [...prev, { id: `temp-${type}`, type } as Monitor]

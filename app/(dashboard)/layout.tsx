@@ -6,6 +6,7 @@ import { getWorkspacesByOrg, getWorkspacesByOrgAdmin } from '@/lib/db/workspaces
 import { getSubscriptionWithPlan } from '@/lib/db/subscriptions'
 import { getDefaultCurrency } from '@/lib/utils/geo.server'
 import { hasAnyActivePlan } from '@/lib/utils/plan-limits'
+import { hasAdminAccess } from '@/lib/db/admin-roles'
 import { Providers } from '@/components/providers'
 import { Sidebar } from '@/components/dashboard/sidebar'
 import { Header } from '@/components/dashboard/header'
@@ -44,6 +45,15 @@ export default async function DashboardLayout({ children }: { children: React.Re
   if (!profile) redirect('/login')
 
   const { user, organisation, isImpersonating } = profile
+
+  // Admins land in the admin portal only — never the customer dashboard —
+  // except while actively impersonating a customer, which is a legitimate
+  // admin workflow that must keep working. `user` during impersonation is
+  // the IMPERSONATED customer's own record, so this check is naturally
+  // skipped for that case rather than needing a separate flag lookup.
+  if (!isImpersonating && await hasAdminAccess(user.email, Boolean(user.is_super_admin))) {
+    redirect('/admin')
+  }
   const [workspaces, subWithPlan, geoCurrency, hasActivePlan] = await Promise.all([
     isImpersonating
       ? getWorkspacesByOrgAdmin(organisation.id)

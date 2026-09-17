@@ -17,13 +17,21 @@ export function ReportMonitorBreakdown({ monitors }: { monitors: MonitorMetric[]
         <div className="card-title">Per-Monitor Breakdown</div>
       </div>
       <div className="card-content">
-        <table className="table">
+        <table className="table report-breakdown-table">
+          <colgroup>
+            <col style={{ width: '32%' }} />
+            <col style={{ width: '13%' }} />
+            <col style={{ width: '17%' }} />
+            <col style={{ width: '17%' }} />
+            <col style={{ width: '11%' }} />
+            <col style={{ width: '10%' }} />
+          </colgroup>
           <thead>
             <tr>
               <th>Monitor</th>
               <th>Uptime</th>
               <th>Avg Response</th>
-              <th>Min / Max</th>
+              <th>Min/Max</th>
               <th>Checks</th>
               <th>Incidents</th>
             </tr>
@@ -32,9 +40,9 @@ export function ReportMonitorBreakdown({ monitors }: { monitors: MonitorMetric[]
             {monitors.map(m => (
               <tr key={m.monitorId}>
                 <td>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <MonitorTypeIcon type={m.type} />
-                    <span style={{ fontWeight: 600 }}>{m.name}</span>
+                  <span className="report-breakdown-monitor">
+                    <MonitorTypeIcon type={m.type} iconOnly iconSize={14} />
+                    <span className="report-breakdown-monitor-name">{m.name}</span>
                   </span>
                 </td>
                 <td>
@@ -42,8 +50,8 @@ export function ReportMonitorBreakdown({ monitors }: { monitors: MonitorMetric[]
                     {m.uptimePercent}%
                   </span>
                 </td>
-                <td>{m.avgResponseMs}ms</td>
-                <td className="table-muted">{m.minResponseMs}ms / {m.maxResponseMs}ms</td>
+                <td className="table-muted">{m.avgResponseMs}ms</td>
+                <td className="table-muted">{m.minResponseMs}/{m.maxResponseMs}ms</td>
                 <td className="table-muted">{m.totalChecks}</td>
                 <td>
                   {m.incidentCount > 0 ? (

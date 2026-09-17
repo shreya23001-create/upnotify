@@ -20,12 +20,13 @@ interface EnrichedInvoice {
 }
 
 interface RevenueData {
-  mrr: { basePence: number; basePaise: number; competePence: number; totalPence: number; totalPaise: number }
+  mrr: { basePence: number; basePaise: number; websitePaise: number; competePence: number; totalPence: number; totalPaise: number }
   planBreakdown: Record<string, { count: number; mrrPence: number; mrrPaise: number }>
   competeBreakdown: Record<string, { count: number; mrrPence: number }>
   totalRevenuePence: number
   revenueByCurrency: Record<string, number>
   activeSubscriptions: number
+  activeWebsiteSubscriptions: number
   activeCompeteSubscriptions: number
   invoices: EnrichedInvoice[]
   pagination: { page: number; limit: number; total: number; totalPages: number }
@@ -142,24 +143,23 @@ export default function AdminRevenuePage(): React.ReactElement {
       <div className="admin-page-header">
         <div>
           <h1 className="admin-page-title">Revenue &amp; Billing</h1>
-          <p className="admin-page-subtitle">Financial overview of all subscriptions and invoices.</p>
+          <p className="admin-page-subtitle">Financial overview of the Pro Plan, Compete add-on, and any legacy subscriptions.</p>
         </div>
         <Link href="/admin/user360" className="btn btn-secondary" style={{ fontSize: 13 }}>
           👤 User 360 View
         </Link>
       </div>
 
-      {/* Top KPI stats */}
+      {/* Top KPI stats — INR/Razorpay first, since that's the current billing model */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 12, marginBottom: 16 }}>
         {[
-          { label: 'GBP MRR (Stripe)', value: gbp(data?.mrr.totalPence ?? 0), color: 'var(--success)' },
-          ...(data?.mrr.totalPaise ? [{ label: 'INR MRR (Razorpay)', value: inr(data.mrr.totalPaise), color: 'var(--success)' }] : []),
-          { label: 'Base Plan MRR (£)', value: gbp(data?.mrr.basePence ?? 0), color: 'var(--accent)' },
-          ...(data?.mrr.basePaise ? [{ label: 'Base Plan MRR (₹)', value: inr(data.mrr.basePaise), color: 'var(--accent)' }] : []),
-          { label: 'Compete MRR (£)', value: gbp(data?.mrr.competePence ?? 0), color: 'var(--accent)' },
-          { label: 'GBP Revenue', value: gbp(data?.totalRevenuePence ?? 0), color: 'var(--success)' },
-          { label: 'Active Subs', value: String(data?.activeSubscriptions ?? 0), color: 'var(--text-primary)' },
+          { label: 'Total MRR (INR)', value: inr(data?.mrr.totalPaise ?? 0), color: 'var(--success)' },
+          { label: 'Pro Plan MRR', value: inr(data?.mrr.websitePaise ?? 0), color: 'var(--accent)' },
+          { label: 'Pro Plan Orgs', value: String(data?.activeWebsiteSubscriptions ?? 0), color: 'var(--text-primary)' },
           { label: 'Compete Subs', value: String(data?.activeCompeteSubscriptions ?? 0), color: 'var(--text-primary)' },
+          ...(data?.mrr.basePaise ? [{ label: 'Legacy Plan MRR', value: inr(data.mrr.basePaise), color: 'var(--accent)' }] : []),
+          ...(data?.activeSubscriptions ? [{ label: 'Legacy Subs', value: String(data.activeSubscriptions), color: 'var(--text-primary)' }] : []),
+          ...(data?.mrr.basePence ? [{ label: 'Legacy MRR (GBP)', value: gbp(data.mrr.basePence), color: 'var(--text-muted)' }] : []),
         ].map(s => (
           <div key={s.label} className="card" style={{ padding: '14px 16px' }}>
             <div style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600, marginBottom: 4 }}>{s.label}</div>
@@ -186,21 +186,35 @@ export default function AdminRevenuePage(): React.ReactElement {
       )}
 
       {/* Plan breakdowns */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 24 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16, marginBottom: 24 }}>
         <div className="card" style={{ padding: 16 }}>
-          <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 12 }}>Base Plan Breakdown</h3>
+          <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 4 }}>Pro Plan (per-website)</h3>
+          <p style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 12 }}>₹999/website/year — the current billing model.</p>
+          <table className="table">
+            <thead><tr><th>Orgs</th><th>MRR</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>{data?.activeWebsiteSubscriptions ?? 0}</td>
+                <td style={{ fontWeight: 600, color: 'var(--success)' }}>{inr(data?.mrr.websitePaise ?? 0)}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div className="card" style={{ padding: 16 }}>
+          <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 4 }}>Legacy Plan Breakdown</h3>
+          <p style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 12 }}>Grandfathered orgs still on the old org-wide plan system.</p>
           {planEntries.length === 0 ? (
-            <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>No active subscriptions.</p>
+            <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>No active legacy subscriptions.</p>
           ) : (
             <table className="table">
-              <thead><tr><th>Plan</th><th>Subscribers</th><th>MRR (£)</th><th>MRR (₹)</th></tr></thead>
+              <thead><tr><th>Plan</th><th>Subscribers</th><th>MRR (₹)</th><th>MRR (£)</th></tr></thead>
               <tbody>
                 {planEntries.map(([name, info]) => (
                   <tr key={name}>
                     <td style={{ fontWeight: 600 }}>{name}</td>
                     <td>{info.count}</td>
-                    <td style={{ fontWeight: 600, color: 'var(--success)' }}>{info.mrrPence ? gbp(info.mrrPence) : '—'}</td>
                     <td style={{ fontWeight: 600, color: 'var(--success)' }}>{info.mrrPaise ? inr(info.mrrPaise) : '—'}</td>
+                    <td style={{ fontWeight: 600, color: 'var(--text-muted)' }}>{info.mrrPence ? gbp(info.mrrPence) : '—'}</td>
                   </tr>
                 ))}
               </tbody>
@@ -239,7 +253,7 @@ export default function AdminRevenuePage(): React.ReactElement {
             <div style={{ display: 'flex', gap: 0 }}>
               <input
                 className="form-input"
-                style={{ fontSize: 13, padding: '6px 10px', width: 200, borderRadius: '6px 0 0 6px' }}
+                style={{ fontSize: 13, height: 34, padding: '0 10px', width: 200, borderRadius: '6px 0 0 6px' }}
                 placeholder="Search email or org…"
                 value={searchInput}
                 onChange={e => setSearchInput(e.target.value)}
@@ -247,14 +261,14 @@ export default function AdminRevenuePage(): React.ReactElement {
               />
               <button
                 className="btn btn-secondary"
-                style={{ fontSize: 12, padding: '6px 10px', borderRadius: '0 6px 6px 0', borderLeft: 'none' }}
+                style={{ fontSize: 12, height: 34, padding: '0 10px', borderRadius: '0 6px 6px 0', borderLeft: 'none' }}
                 onClick={() => setSearch(searchInput)}
               >Search</button>
             </div>
             {/* Status filter */}
             <select
               className="form-input"
-              style={{ fontSize: 13, padding: '6px 10px', width: 120 }}
+              style={{ fontSize: 13, height: 34, padding: '0 10px', width: 120 }}
               value={status}
               onChange={e => setStatus(e.target.value)}
             >
@@ -315,7 +329,7 @@ export default function AdminRevenuePage(): React.ReactElement {
                         ) : <span style={{ color: 'var(--text-muted)' }}>—</span>}
                       </td>
                       <td style={{ fontWeight: 700, color: 'var(--success)', whiteSpace: 'nowrap' }}>
-                        {formatAmount(inv.amount_gbp, inv.currency ?? 'gbp')}
+                        {formatAmount(inv.amount_gbp, inv.currency ?? 'inr')}
                       </td>
                       <td>
                         <span className={`badge ${inv.status === 'paid' ? 'badge-success' : inv.status === 'open' ? 'badge-warning' : 'badge-neutral'}`}>
@@ -328,7 +342,7 @@ export default function AdminRevenuePage(): React.ReactElement {
                       <td>
                         {inv.invoice_pdf_url ? (
                           <a href={inv.invoice_pdf_url} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: 'var(--accent)' }}>PDF ↗</a>
-                        ) : <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>—</span>}
+                        ) : <span style={{ color: 'var(--text-muted)', fontSize: 12 }} title="Razorpay invoices don't generate a PDF URL — view the printed invoice from the customer's own Billing page.">No PDF</span>}
                       </td>
                     </tr>
                   ))}

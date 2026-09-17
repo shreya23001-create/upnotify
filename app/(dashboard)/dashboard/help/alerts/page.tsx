@@ -29,7 +29,7 @@ const FAQ_SCHEMA = {
       name: 'Can I send alerts to Slack?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Yes. On Lite plans and above, you can connect a Slack workspace and choose which channel receives alerts. You will need to create an incoming webhook in Slack and paste the URL into Upnotify.',
+        text: 'Yes. Every website on the Pro Plan can connect a Slack workspace and choose which channel receives alerts. You will need to create an incoming webhook in Slack and paste the URL into Upnotify.',
       },
     },
   ],
@@ -73,7 +73,6 @@ export default function AlertsPage(): React.ReactElement {
             <h3 className="help-subsection-title">Email</h3>
             <p>
               The simplest option. Enter the email addresses of the people who should be notified.
-              Available on all plans, including Free.
             </p>
 
             <h3 className="help-subsection-title">Slack</h3>
@@ -118,16 +117,11 @@ export default function AlertsPage(): React.ReactElement {
           </section>
 
           <section className="help-section">
-            <h2 className="help-section-title">Plan restrictions</h2>
+            <h2 className="help-section-title">Available channels</h2>
             <p>
-              What you can use depends on your plan:
+              The Pro Plan includes every alert channel — email, Slack, Microsoft Teams, and
+              webhooks — with no limits and no separate tier to unlock them.
             </p>
-            <ul className="help-list">
-              <li><strong>Free</strong> -- Email alerts only.</li>
-              <li><strong>Lite</strong> -- Email, Slack, Teams, and webhooks.</li>
-              <li><strong>Builder</strong> -- Everything in Lite, plus webhooks.</li>
-              <li><strong>Scale</strong> -- All channels, no limits.</li>
-            </ul>
           </section>
 
           <section className="help-section">

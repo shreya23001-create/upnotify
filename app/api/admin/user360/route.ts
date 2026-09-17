@@ -60,7 +60,7 @@ function calcScore(profile: Omit<User360Profile, 'score' | 'scoreBreakdown'>): {
 
   // Plan score: 0–20 pts
   const planScores: Record<string, number> = {
-    'free': 0, 'lite': 5, 'starter': 10, 'pro': 20, 'agency': 20,
+    'free': 0, 'lite': 5, 'starter': 10, 'pro': 20, 'agency': 20, 'pro-plan-website': 20,
   }
   const planScore = planScores[profile.planSlug?.toLowerCase() ?? 'free'] ?? 0
 
@@ -88,6 +88,7 @@ export async function GET(): Promise<NextResponse> {
     { data: usersRaw },
     { data: orgsRaw },
     { data: subsRaw },
+    { data: websiteSubsRaw },
     { data: invoicesRaw },
     { data: monitorsRaw },
     { data: alertsRaw },
@@ -98,6 +99,8 @@ export async function GET(): Promise<NextResponse> {
     supabase.from('users').select('id, email, full_name, org_id, is_active, created_at').order('created_at', { ascending: false }),
     supabase.from('organisations').select('id, name, health_score, health_score_label, health_score_at'),
     supabase.from('subscriptions').select('org_id, status, billing_cycle, current_period_end, plan_id, plans(name, slug)'),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (supabase as any).from('website_subscriptions').select('org_id, status').in('status', ['active', 'cancelling', 'past_due']) as Promise<{ data: Array<{ org_id: string; status: string }> | null }>,
     supabase.from('invoices').select('org_id, amount_gbp, currency, status, created_at').eq('status', 'paid'),
     supabase.from('monitors').select('org_id, status'),
     supabase.from('alert_channels').select('org_id').eq('is_enabled', true),
@@ -127,6 +130,11 @@ export async function GET(): Promise<NextResponse> {
       subByOrg.set(s.org_id, s)
     }
   }
+
+  // Orgs with an active/cancelling/past_due Pro Plan (per-website) subscription —
+  // takes priority over the legacy plans table below so a paying Pro Plan
+  // customer never shows as "Free" just because they have no legacy row.
+  const orgsWithWebsitePlan = new Set((websiteSubsRaw ?? []).map(s => s.org_id))
 
   // Invoice aggregates by org_id
   type InvRow = { org_id: string; amount_gbp: number; currency: string; status: string; created_at: string }
@@ -180,8 +188,9 @@ export async function GET(): Promise<NextResponse> {
     const invoiceData = invoicesByOrg.get(u.org_id) ?? { totalGbp: 0, totalInr: 0, billingCurrency: 'gbp' as const, count: 0, lastAt: null }
     const monitors = monitorsByOrg.get(u.org_id) ?? { total: 0, active: 0 }
 
-    const planName = sub?.plans?.name ?? 'Free'
-    const planSlug = sub?.plans?.slug ?? 'free'
+    const hasWebsitePlan = orgsWithWebsitePlan.has(u.org_id)
+    const planName = hasWebsitePlan ? 'Pro Plan' : (sub?.plans?.name ?? 'No plan')
+    const planSlug = hasWebsitePlan ? 'pro-plan-website' : (sub?.plans?.slug ?? 'free')
     const orgData = orgMap.get(u.org_id)
 
     const base: Omit<User360Profile, 'score' | 'scoreBreakdown'> = {

@@ -163,7 +163,7 @@ export function PricingTable({ plans, currentPlanSlug, subscription, creditBalan
         description:      isTestKey
           ? `${data.planName ?? planSlug} · TEST MODE — Use card: 5267 3181 8797 5449 (Razorpay test Mastercard)`
           : `${data.planName ?? planSlug} · ${billingCycle === 'annual' ? 'Annual' : 'Monthly'} (incl. 18% GST)`,
-        image:            `${process.env.NEXT_PUBLIC_APP_URL ?? 'https://upnotify-monitoring.vercel.app'}/logo.svg`,
+        image:            `${process.env.NEXT_PUBLIC_APP_URL ?? 'https://upnotify-monitoring.vercel.app'}/Logo_2.png`,
         prefill:          { email: data.userEmail ?? '', name: data.orgName ?? '' },
         theme:            { color: '#1392FB' },
         handler:          (_response: unknown) => {
@@ -230,7 +230,7 @@ export function PricingTable({ plans, currentPlanSlug, subscription, creditBalan
         description:      isTestKey
           ? `${data.planName ?? 'Add On Plan'} · TEST MODE — Use card: 5267 3181 8797 5449 (Razorpay test Mastercard)`
           : `${data.planName ?? 'Add On Plan'} · Annual (incl. 18% GST)`,
-        image:            `${process.env.NEXT_PUBLIC_APP_URL ?? 'https://upnotify-monitoring.vercel.app'}/logo.svg`,
+        image:            `${process.env.NEXT_PUBLIC_APP_URL ?? 'https://upnotify-monitoring.vercel.app'}/Logo_2.png`,
         prefill:          { email: data.userEmail ?? '', name: data.orgName ?? '' },
         theme:            { color: '#FBA830' },
         handler:          (_response: unknown) => {

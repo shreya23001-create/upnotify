@@ -30,7 +30,7 @@ export function ReportPrintWrapper({ title, period, generatedAt, hasWhiteLabel =
         {/* Page header */}
         <div className="report-page-header">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.svg" alt="Upnotify" height={28} style={{ display: 'block' }} />
+          <img src="/Logo_2.png" alt="Upnotify" style={{ display: 'block', height: 34, width: 'auto', maxWidth: 160, objectFit: 'contain', objectPosition: 'left center' }} />
           <div style={{ textAlign: 'right' }}>
             <div style={{ fontSize: 13, fontWeight: 600, color: '#1a1a2e' }}>{title}</div>
             <div style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>{period}</div>

@@ -18,14 +18,6 @@ const FAQ_SCHEMA = {
     },
     {
       '@type': 'Question',
-      name: 'Can I use a custom domain for my status page?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Yes. On the Scale plan, you can point your own domain (e.g. status.yourcompany.com) to your Upnotify status page by adding a CNAME record to your DNS.',
-      },
-    },
-    {
-      '@type': 'Question',
       name: 'Can visitors subscribe to status page updates?',
       acceptedAnswer: {
         '@type': 'Answer',
@@ -106,32 +98,11 @@ export default function StatusPagesPage(): React.ReactElement {
           </section>
 
           <section className="help-section">
-            <h2 className="help-section-title">Custom domains</h2>
-            <p>
-              On the <strong>Scale</strong> plan, you can use your own domain for the status page.
-              For example, instead of <code>upnotify-monitoring.vercel.app/your-company</code>, you can use
-              <code>status.yourcompany.com</code>.
-            </p>
-            <ol className="help-steps">
-              <li>Open your status page settings and enter your custom domain.</li>
-              <li>Go to your DNS provider and add a CNAME record pointing to the address Upnotify gives you.</li>
-              <li>Wait for DNS to propagate (usually a few minutes, sometimes up to 24 hours).</li>
-              <li>Upnotify automatically provisions an SSL certificate for your domain.</li>
-            </ol>
-            <p>
-              Custom domains make your status page feel like a natural extension of your product
-              rather than a third-party tool.
-            </p>
-          </section>
-
-          <section className="help-section">
             <h2 className="help-section-title">Plan availability</h2>
-            <ul className="help-list">
-              <li><strong>Free</strong> -- Status pages are not available.</li>
-              <li><strong>Lite</strong> -- 1 branded status page on an Upnotify subdomain.</li>
-              <li><strong>Builder</strong> -- Up to 5 status pages with custom domain support.</li>
-              <li><strong>Scale</strong> -- Unlimited status pages with custom domains.</li>
-            </ul>
+            <p>
+              Status pages are unlimited for every website on the Pro Plan — create as many as
+              you need, each on an <code>upnotify-monitoring.vercel.app/status/&lt;slug&gt;</code> URL.
+            </p>
           </section>
 
           <div className="help-next-links">
