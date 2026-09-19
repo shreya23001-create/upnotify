@@ -345,6 +345,12 @@ export async function checkFeatureAccess(
     | 'hasVoiceCalls'
   >
 ): Promise<boolean> {
+  // Pro Plan (per-website) orgs get every feature included — there is no
+  // legacy plans row to read has_api_access etc. from, so FREE_DEFAULTS
+  // would otherwise wrongly gate a paying customer. Mirrors the same
+  // precedent already used for status pages and competitor slots.
+  if (feature === 'hasApiAccess' && await hasActiveWebsitePlan(orgId)) return true
+
   const limits = await getPlanLimits(orgId)
   return limits[feature]
 }
@@ -570,6 +576,14 @@ export async function checkWpMonitorLimit(orgId: string): Promise<{
   return { allowed, currentCount, limit: effectiveLimit }
 }
 
+/** Flat team-member seat count (including the owner) for the current
+ *  per-website Pro Plan — getPlanLimits()'s FREE_DEFAULTS fallback (0)
+ *  predates this model and would otherwise treat every Pro Plan org as a
+ *  solo account with no invites allowed, since they have no legacy plans
+ *  row to read max_team_members from. Same precedent as the competitor
+ *  slot / API access fixes above. */
+const PRO_PLAN_TEAM_MEMBER_LIMIT = 5
+
 /** Check if the org can add another team member */
 export async function checkTeamMemberLimit(orgId: string): Promise<{
   allowed: boolean
@@ -577,7 +591,10 @@ export async function checkTeamMemberLimit(orgId: string): Promise<{
   limit: number
 }> {
   const supabase = createAdminClient()
-  const limits = await getPlanLimits(orgId)
+  const [hasWebsitePlan, limits] = await Promise.all([
+    hasActiveWebsitePlan(orgId),
+    getPlanLimits(orgId),
+  ])
 
   const { count } = await supabase
     .from('users')
@@ -585,7 +602,7 @@ export async function checkTeamMemberLimit(orgId: string): Promise<{
     .eq('org_id', orgId)
 
   const currentCount = count ?? 0
-  const limit = limits.maxTeamMembers
+  const limit = hasWebsitePlan ? PRO_PLAN_TEAM_MEMBER_LIMIT : limits.maxTeamMembers
   // limit of 0 means solo account — no additional members allowed beyond the owner
   // We count all users including owner, so for limit > 0 allowed = currentCount < limit + 1
   const allowed = limit === 0 ? false : currentCount < limit + 1

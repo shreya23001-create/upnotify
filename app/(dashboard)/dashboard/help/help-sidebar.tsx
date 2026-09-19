@@ -30,13 +30,6 @@ export const helpTopics: HelpTopic[] = [
     keywords: ['monitor', 'http', 'ssl', 'dns', 'ping', 'keyword', 'port', 'api', 'heartbeat', 'check', 'uptime'],
   },
   {
-    href: '/dashboard/help/wordpress',
-    title: 'WordPress Plugin',
-    description: 'Install the free Upnotify plugin to monitor your WordPress site from the inside.',
-    icon: '__wp__',
-    keywords: ['wordpress', 'plugin', 'wp', 'file injection', 'security', 'health', 'agent', 'brute force', 'foreign language'],
-  },
-  {
     href: '/dashboard/help/alerts',
     title: 'Setting Up Alerts',
     description: 'Get notified by email, Slack, Teams, or webhooks when something goes wrong.',
@@ -134,7 +127,7 @@ interface SidebarSection {
 }
 
 function buildSections(topics: HelpTopic[]): SidebarSection[] {
-  const monitoring = ['getting-started', 'monitors', 'wordpress', 'alerts', 'status-pages', 'incidents']
+  const monitoring = ['getting-started', 'monitors', 'alerts', 'status-pages', 'incidents']
   const features   = ['watchdog', 'ai-visibility', 'ai-profile', 'tools', 'compete']
   const account    = ['billing', 'credits', 'referrals', 'cancel-pause']
 

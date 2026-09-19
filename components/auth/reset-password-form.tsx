@@ -13,23 +13,21 @@ export function ResetPasswordForm() {
   const [sessionReady, setSessionReady] = useState(false)
   const [sessionError, setSessionError] = useState(false)
 
-  // Supabase's password-recovery link lands here with a `code` param that
-  // needs exchanging for a session before updateUser({ password }) can work.
+  // The password-recovery link now routes through /auth/callback first,
+  // which exchanges the code for a session server-side (same code path as
+  // email confirmation) before redirecting here — so by the time this page
+  // loads, the session cookie is already set. Exchanging the code directly
+  // in the browser client used to fail here (mismatched PKCE verifier
+  // cookie vs. the one written when resetPasswordForEmail ran server-side),
+  // which showed as an immediately "expired" link no matter how fast the
+  // user clicked.
   useEffect(() => {
     const supabase = createClient()
-    const params = new URLSearchParams(window.location.search)
-    const code = params.get('code')
-
-    if (!code) {
-      setSessionError(true)
-      return
-    }
-
-    supabase.auth.exchangeCodeForSession(code).then(({ error: exchangeError }) => {
-      if (exchangeError) {
-        setSessionError(true)
-      } else {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
         setSessionReady(true)
+      } else {
+        setSessionError(true)
       }
     })
   }, [])

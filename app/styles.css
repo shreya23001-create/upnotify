@@ -6699,7 +6699,8 @@ html.dark .status-pill-paused {
 }
 
 .esp-save-btn {
-  width: 10%;
+  width: auto;
+  min-width: 180px;
   justify-content: center;
 }
 

@@ -370,8 +370,15 @@ export async function requestPasswordReset(formData: FormData): Promise<{ error?
   const userAgent = hdrs.get('user-agent') ?? undefined
   const ipForAudit = ip === 'unknown' ? undefined : ip
 
+  // Route through /auth/callback (server-side code exchange, same as email
+  // confirmation) instead of exchanging the code in the browser — the PKCE
+  // verifier cookie is written here, server-side, when resetPasswordForEmail
+  // is called, and must be read back server-side too. Exchanging it in the
+  // browser client (a separate cookie-write path) always failed with
+  // "Invalid Refresh Token" / an immediately "expired" link, regardless of
+  // how fast the user clicked.
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${baseUrl}/reset-password`,
+    redirectTo: `${baseUrl}/auth/callback?next=${encodeURIComponent('/reset-password')}`,
   })
 
   if (error) {
