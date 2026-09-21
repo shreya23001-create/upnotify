@@ -400,7 +400,7 @@ export async function checkStatusPageLimit(orgId: string): Promise<{
  * generation is a real Claude API call and costs money. Grandfathered
  * legacy orgs keep using their own plan's aiReportLimit unchanged.
  */
-const PRO_PLAN_MONTHLY_AI_REPORT_LIMIT = 10
+const PRO_PLAN_MONTHLY_AI_REPORT_LIMIT = 5
 
 /** Check if the org can generate another AI report this month */
 export async function checkAiReportLimit(orgId: string): Promise<{

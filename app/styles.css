@@ -7169,8 +7169,8 @@ html.dark .status-pill-paused {
 }
 
 .pro-plan-columns-centered {
-  grid-template-columns: 1fr;
-  justify-items: center;
+  display: flex;
+  justify-content: center;
 }
 
 /* /dashboard/websites — two-column layout, same pattern as the Plans page */
@@ -7199,7 +7199,7 @@ html.dark .status-pill-paused {
 }
 
 .pro-plan-col-solo {
-  width: 100%;
+  flex: 1 1 520px;
   max-width: 520px;
   min-width: 320px;
 }
@@ -16136,10 +16136,10 @@ html.dark .contact-office-icon {
 }
 
 .contact-form {
-  display: flex;
+  /* display: flex; */
   flex-direction: column;
   gap: 20px;
-  margin-top: 32px;
+  /* margin-top: 32px; */
 }
 
 .contact-form-row {

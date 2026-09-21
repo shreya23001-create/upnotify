@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { getCurrentUser } from '@/lib/db/users'
 import {
   getAllEmailTemplates,
   updateEmailTemplate,
@@ -8,15 +8,10 @@ import {
 
 export const dynamic = 'force-dynamic'
 
-async function isAdmin(supabase: Awaited<ReturnType<typeof createClient>>): Promise<{ isAdmin: boolean; email: string }> {
-  const { data: { user } } = await supabase.auth.getUser()
+async function isAdmin(): Promise<{ isAdmin: boolean; email: string }> {
+  const user = await getCurrentUser()
   if (!user?.email) return { isAdmin: false, email: '' }
-
-  const adminEmailsRaw = process.env.ADMIN_EMAILS || ''
-  const adminEmails = adminEmailsRaw.split(',').map(e => e.trim().toLowerCase()).filter(Boolean)
-  const isAdminUser = adminEmails.includes(user.email.toLowerCase())
-
-  return { isAdmin: isAdminUser, email: user.email }
+  return { isAdmin: Boolean(user.is_super_admin), email: user.email }
 }
 
 // ---------------------------------------------------------------------------
@@ -24,8 +19,7 @@ async function isAdmin(supabase: Awaited<ReturnType<typeof createClient>>): Prom
 // ---------------------------------------------------------------------------
 
 export async function GET(): Promise<NextResponse> {
-  const supabase = await createClient()
-  const { isAdmin: admin } = await isAdmin(supabase)
+  const { isAdmin: admin } = await isAdmin()
 
   if (!admin) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
@@ -40,8 +34,7 @@ export async function GET(): Promise<NextResponse> {
 // ---------------------------------------------------------------------------
 
 export async function PATCH(request: Request): Promise<NextResponse> {
-  const supabase = await createClient()
-  const { isAdmin: admin } = await isAdmin(supabase)
+  const { isAdmin: admin } = await isAdmin()
 
   if (!admin) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })

@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import { getCurrentUser } from '@/lib/db/users'
+import { canAccessAdminModule } from '@/lib/db/admin-roles'
 import { getTicketById, getMessages } from '@/lib/db/support'
 import { TicketThread } from '@/components/support/ticket-thread'
 import { IconArrowLeft } from '@/components/icons'
@@ -16,8 +17,8 @@ export default async function AdminSupportTicketPage({ params }: PageProps): Pro
   const user = await getCurrentUser()
   if (!user) redirect('/login')
 
-  const adminEmails = (process.env.ADMIN_EMAILS ?? '').split(',').map(e => e.trim())
-  if (!adminEmails.includes(user.email)) redirect('/dashboard')
+  const canRead = await canAccessAdminModule(user.email, Boolean(user.is_super_admin), 'support')
+  if (!canRead) redirect('/admin')
 
   const { id } = await params
   const [ticket, messages] = await Promise.all([

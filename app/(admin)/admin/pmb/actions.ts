@@ -1,7 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { createClient } from '@/lib/supabase/server'
+import { getCurrentUser } from '@/lib/db/users'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
 import {
@@ -56,11 +56,8 @@ function guessPmbCategory(displayName: string, domain: string, existingCategory:
 }
 
 async function getAdminEmail(): Promise<string | null> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user?.email) return null
-  const adminEmails = (process.env.ADMIN_EMAILS ?? '').split(',').map(e => e.trim().toLowerCase()).filter(Boolean)
-  if (!adminEmails.includes(user.email.toLowerCase())) return null
+  const user = await getCurrentUser()
+  if (!user?.email || !user.is_super_admin) return null
   return user.email
 }
 

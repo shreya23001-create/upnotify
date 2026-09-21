@@ -97,7 +97,9 @@ export function TeamInviteForm({
         body: JSON.stringify({ inviteId }),
       })
       if (res.ok) {
-        setInvites((prev) => prev.filter((inv) => inv.id !== inviteId))
+        // Keep the row visible with an updated status rather than removing
+        // it — this list shows full invite history, not just pending ones.
+        setInvites((prev) => prev.map((inv) => inv.id === inviteId ? { ...inv, status: 'cancelled' } : inv))
       }
     } catch {
       // Silently fail
@@ -168,7 +170,7 @@ export function TeamInviteForm({
         <p style={{ color: '#059669', fontSize: 13, marginTop: 8 }}>{success}</p>
       )}
 
-      {/* Pending invites section */}
+      {/* Invited members section — full history, not just currently pending */}
       {!loadingInvites && invites.length > 0 && (
         <div style={{ marginTop: 20 }}>
           <h4 style={{
@@ -177,64 +179,78 @@ export function TeamInviteForm({
             color: 'var(--text-primary)',
             marginBottom: 12,
           }}>
-            Pending Invites
+            Invited Members
           </h4>
           <div style={{
             border: '1px solid var(--border-primary)',
             borderRadius: 8,
             overflow: 'hidden',
           }}>
-            {invites.map((inv, index) => (
-              <div
-                key={inv.id}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: '10px 16px',
-                  borderTop: index > 0 ? '1px solid var(--border-primary)' : 'none',
-                  background: 'var(--bg-primary)',
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <span style={{ fontSize: 14, color: 'var(--text-primary)' }}>
-                    {inv.email}
-                  </span>
-                  <span
-                    className="badge badge-outline"
-                    style={{ textTransform: 'capitalize', fontSize: 11 }}
-                  >
-                    {inv.role}
-                  </span>
-                  <span style={{
-                    display: 'inline-block',
-                    padding: '2px 8px',
-                    borderRadius: 9999,
-                    fontSize: 11,
-                    fontWeight: 600,
-                    backgroundColor: '#fef3c7',
-                    color: '#92400e',
-                  }}>
-                    Pending
-                  </span>
+            {invites.map((inv, index) => {
+              const isExpired = inv.status === 'pending' && new Date(inv.expires_at) < new Date()
+              const displayStatus = isExpired ? 'expired' : inv.status
+              const STATUS_STYLES: Record<string, { bg: string; color: string; label: string }> = {
+                pending:   { bg: '#fef3c7', color: '#92400e', label: 'Pending' },
+                accepted:  { bg: '#d1fae5', color: '#065f46', label: 'Accepted' },
+                cancelled: { bg: '#f3f4f6', color: '#6b7280', label: 'Cancelled' },
+                expired:   { bg: '#fee2e2', color: '#991b1b', label: 'Expired' },
+              }
+              const statusStyle = STATUS_STYLES[displayStatus] ?? STATUS_STYLES.pending
+              const canCancel = inv.status === 'pending' && !isExpired
+
+              return (
+                <div
+                  key={inv.id}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '10px 16px',
+                    borderTop: index > 0 ? '1px solid var(--border-primary)' : 'none',
+                    background: 'var(--bg-primary)',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <span style={{ fontSize: 14, color: 'var(--text-primary)' }}>
+                      {inv.email}
+                    </span>
+                    <span
+                      className="badge badge-outline"
+                      style={{ textTransform: 'capitalize', fontSize: 11 }}
+                    >
+                      {inv.role}
+                    </span>
+                    <span style={{
+                      display: 'inline-block',
+                      padding: '2px 8px',
+                      borderRadius: 9999,
+                      fontSize: 11,
+                      fontWeight: 600,
+                      backgroundColor: statusStyle.bg,
+                      color: statusStyle.color,
+                    }}>
+                      {statusStyle.label}
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+                      {inv.status === 'pending'
+                        ? `Expires ${new Date(inv.expires_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}`
+                        : `Sent ${new Date(inv.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}`}
+                    </span>
+                    {canCancel && (
+                      <button
+                        className="btn btn-ghost btn-sm"
+                        style={{ color: '#ef4444', fontSize: 13 }}
+                        onClick={() => { void handleCancelInvite(inv.id) }}
+                      >
+                        Cancel
+                      </button>
+                    )}
+                  </div>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-                    Expires {new Date(inv.expires_at).toLocaleDateString('en-GB', {
-                      day: 'numeric',
-                      month: 'short',
-                    })}
-                  </span>
-                  <button
-                    className="btn btn-ghost btn-sm"
-                    style={{ color: '#ef4444', fontSize: 13 }}
-                    onClick={() => { void handleCancelInvite(inv.id) }}
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       )}

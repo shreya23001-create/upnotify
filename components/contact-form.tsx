@@ -53,8 +53,8 @@ export function ContactForm(): React.ReactElement {
     setErrorMsg('')
 
     const form = e.currentTarget
-    const nameVal    = (form.elements.namedItem('name')    as HTMLInputElement).value
-    const emailVal   = (form.elements.namedItem('email')   as HTMLInputElement).value
+    const nameVal = (form.elements.namedItem('name') as HTMLInputElement).value
+    const emailVal = (form.elements.namedItem('email') as HTMLInputElement).value
     const subjectVal = (form.elements.namedItem('subject') as HTMLSelectElement).value
     const messageVal = (form.elements.namedItem('message') as HTMLTextAreaElement).value
 
@@ -67,8 +67,8 @@ export function ContactForm(): React.ReactElement {
     setState('submitting')
 
     const payload = {
-      name:    nameVal,
-      email:   emailVal,
+      name: nameVal,
+      email: emailVal,
       subject: subjectVal,
       message: messageVal,
     }
@@ -96,7 +96,7 @@ export function ContactForm(): React.ReactElement {
   // Post-verification redirect states
   if (verifiedStatus === 'true') {
     return (
-      <div className="contact-form" style={{ textAlign: 'center', padding: '40px 24px' }}>
+      <div className="contact-form" style={{ textAlign: 'center' }}>
         <div style={{ fontSize: 40, marginBottom: 16 }}>✅</div>
         <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>Message sent!</h3>
         <p style={{ color: 'var(--text-muted)', fontSize: 15 }}>
@@ -108,7 +108,7 @@ export function ContactForm(): React.ReactElement {
 
   if (verifiedStatus === 'already') {
     return (
-      <div className="contact-form" style={{ textAlign: 'center', padding: '40px 24px' }}>
+      <div className="contact-form" style={{ textAlign: 'center' }}>
         <div style={{ fontSize: 40, marginBottom: 16 }}>ℹ️</div>
         <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>Already confirmed</h3>
         <p style={{ color: 'var(--text-muted)', fontSize: 15 }}>This message was already verified and sent to our team.</p>
@@ -118,7 +118,7 @@ export function ContactForm(): React.ReactElement {
 
   if (verifiedStatus === 'expired') {
     return (
-      <div className="contact-form" style={{ textAlign: 'center', padding: '40px 24px' }}>
+      <div className="contact-form" style={{ textAlign: 'center' }}>
         <div style={{ fontSize: 40, marginBottom: 16 }}>⏰</div>
         <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>Confirmation link expired</h3>
         <p style={{ color: 'var(--text-muted)', fontSize: 15, marginBottom: 20 }}>
@@ -131,7 +131,7 @@ export function ContactForm(): React.ReactElement {
 
   if (state === 'sent') {
     return (
-      <div className="contact-form" style={{ textAlign: 'center', padding: '40px 24px' }}>
+      <div className="contact-form" style={{ textAlign: 'center' }}>
         <div style={{ fontSize: 40, marginBottom: 16 }}>📬</div>
         <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>Check your inbox</h3>
         <p style={{ color: 'var(--text-muted)', fontSize: 15 }}>

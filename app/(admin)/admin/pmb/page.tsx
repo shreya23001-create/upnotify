@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic'
 
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { getCurrentUser } from '@/lib/db/users'
 import {
   getPmbCategories,
   getPmbMonitors,
@@ -11,14 +11,6 @@ import {
 } from '@/lib/db/pmb'
 import { PmbClient } from './pmb-client'
 
-async function isAdmin(): Promise<boolean> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user?.email) return false
-  const adminEmails = (process.env.ADMIN_EMAILS ?? '').split(',').map(e => e.trim().toLowerCase()).filter(Boolean)
-  return adminEmails.includes(user.email.toLowerCase())
-}
-
 const PMB_CRON_PATHS = [
   '/api/cron/pmb/daily-publisher',
   '/api/cron/pmb/monthly-generator',
@@ -26,7 +18,9 @@ const PMB_CRON_PATHS = [
 ]
 
 export default async function PmbPage(): Promise<React.ReactElement> {
-  if (!(await isAdmin())) redirect('/admin')
+  const user = await getCurrentUser()
+  if (!user) redirect('/login')
+  if (!user.is_super_admin) redirect('/admin')
 
   const today = new Date().toISOString().split('T')[0]
   const weekStart = (() => {

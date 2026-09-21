@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { getCurrentUser } from '@/lib/db/users'
 import {
   getAllSubmissions,
   getAllPendingSubmissions,
@@ -12,13 +12,9 @@ import { sendUserMessage } from '@/lib/db/user-messages'
 export const dynamic = 'force-dynamic'
 
 async function isAdmin(): Promise<{ isAdmin: boolean; email: string }> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const user = await getCurrentUser()
   if (!user?.email) return { isAdmin: false, email: '' }
-
-  const adminEmailsRaw = process.env.ADMIN_EMAILS || ''
-  const adminEmails = adminEmailsRaw.split(',').map(e => e.trim().toLowerCase()).filter(Boolean)
-  return { isAdmin: adminEmails.includes(user.email.toLowerCase()), email: user.email }
+  return { isAdmin: Boolean(user.is_super_admin), email: user.email }
 }
 
 export async function GET(): Promise<NextResponse> {

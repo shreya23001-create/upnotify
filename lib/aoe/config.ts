@@ -83,6 +83,6 @@ export const AOE_CONFIG: AoeConfig = {
     burstHour: 23,       // 11pm UTC — last day burst
     cooldownDays: 30,    // never email same domain more than once per 30 days
     fromName: 'Upnotify',
-    fromEmail: 'shreya23001@gmail.com',
+    fromEmail: 'noreply@crozent.com',
   },
 }

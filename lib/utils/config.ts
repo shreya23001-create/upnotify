@@ -143,7 +143,7 @@ export function getServerConfig(): ServerConfig {
     return {
       ...publicConfig,
       supabase: { ...publicConfig.supabase, serviceRoleKey: '' },
-      resend: { apiKey: '', fromEmail: 'shreya23001@gmail.com', fromName: 'Upnotify Alerts' },
+      resend: { apiKey: '', fromEmail: 'noreply@crozent.com', fromName: 'Upnotify Alerts' },
       stripe: { secretKey: '', webhookSecret: '' },
       razorpay: { keyId: '', keySecret: '', webhookSecret: '' },
       anthropic: { apiKey: '' },
@@ -158,7 +158,7 @@ export function getServerConfig(): ServerConfig {
   }
 
   const resendApiKey = process.env.RESEND_API_KEY ?? ''
-  const resendFromEmail = process.env.RESEND_FROM_EMAIL || 'shreya23001@gmail.com'
+  const resendFromEmail = process.env.RESEND_FROM_EMAIL || 'noreply@crozent.com'
   const resendFromName = process.env.RESEND_FROM_NAME || 'Upnotify Alerts'
 
   const stripeSecretKey = process.env.STRIPE_SECRET_KEY ?? ''

@@ -1,15 +1,12 @@
 import { NextResponse, type NextRequest } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { getCurrentUser } from '@/lib/db/users'
 import { createAdminClient } from '@/lib/supabase/admin'
 
 export const dynamic = 'force-dynamic'
 
 async function isAdmin(): Promise<boolean> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user?.email) return false
-  const adminEmails = (process.env.ADMIN_EMAILS || '').split(',').map(e => e.trim().toLowerCase()).filter(Boolean)
-  return adminEmails.includes(user.email.toLowerCase())
+  const user = await getCurrentUser()
+  return Boolean(user?.is_super_admin)
 }
 
 export async function GET(request: NextRequest): Promise<NextResponse> {

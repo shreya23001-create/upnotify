@@ -5,8 +5,8 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
   IconDashboard, IconUsers, IconBuilding, IconCreditCard,
-  IconGlobe, IconToggle, IconEdit, IconMail, IconSettings, IconX, IconShield,
-  IconBell, IconTag, IconActivity, IconFileText, IconChevronDown,
+  IconGlobe, IconEdit, IconMail, IconSettings, IconX, IconShield,
+  IconBell, IconActivity, IconFileText, IconChevronDown,
 } from '@/components/icons'
 
 interface AdminSidebarProps {
@@ -52,14 +52,14 @@ const NAV_GROUPS: NavGroup[] = [
       { href: '/admin/plans', label: 'Plans & Pricing', icon: IconCreditCard },
       { href: '/admin/revenue', label: 'Revenue', icon: IconCreditCard },
       { href: '/admin/revenue/entities', label: 'Vision vs Crozent', icon: IconBuilding },
-      { href: '/admin/credits', label: 'Credit Approvals', icon: IconTag },
+      // Credit Approvals hidden per request
     ],
   },
   {
     label: 'Product',
     items: [
       { href: '/admin/tracker', label: 'Public Tracker', icon: IconGlobe },
-      { href: '/admin/feature-flags', label: 'Feature Flags', icon: IconToggle },
+      // Feature Flags hidden per request
       { href: '/admin/ai-engines', label: 'AI Engines', icon: IconActivity },
       { href: '/admin/ai-profile-prompts', label: 'AI Profile Prompts', icon: IconEdit },
     ],

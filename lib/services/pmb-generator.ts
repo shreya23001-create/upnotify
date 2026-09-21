@@ -79,7 +79,7 @@ async function fetchStatusPageSummary(domain: string, statusPageUrl?: string): P
       const timeout = setTimeout(() => controller.abort(), 8000)
       const res = await fetch(url, {
         signal: controller.signal,
-        headers: { 'User-Agent': 'Uptrue/1.0 (uptime monitor; shreya23001@gmail.com)' },
+        headers: { 'User-Agent': 'Uptrue/1.0 (uptime monitor; noreply@crozent.com)' },
       })
       clearTimeout(timeout)
       if (!res.ok) continue

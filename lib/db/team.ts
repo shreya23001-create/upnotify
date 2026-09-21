@@ -164,6 +164,10 @@ export async function cancelTeamInvite(
 /**
  * Returns all pending (non-expired) invites for an organisation.
  */
+/** All invites ever sent for this org, most recent first — includes
+ *  pending, accepted, and cancelled, so the Team settings page can show a
+ *  full "who did we invite and what happened" history rather than only
+ *  ever-currently-pending invites. */
 export async function getOrgInvites(orgId: string): Promise<TeamInvite[]> {
   const supabase = createAdminClient()
 
@@ -171,8 +175,6 @@ export async function getOrgInvites(orgId: string): Promise<TeamInvite[]> {
     .from('team_invites')
     .select('*')
     .eq('org_id', orgId)
-    .eq('status', 'pending')
-    .gte('expires_at', new Date().toISOString())
     .order('created_at', { ascending: false })
 
   if (error) {
