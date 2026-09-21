@@ -97,13 +97,13 @@ export default function ContactPage(): React.ReactElement {
 
       {/* Company address */}
       <section className="landing-section">
-        <div className="landing-container contact-office">
-          <div className="contact-office-icon"><MapPin size={22} /></div>
-          <h2 className="landing-section-title">Our Office</h2>
-          <p className="about-text">
-            <strong>Crozent Techlabs Private Limited</strong><br />
-            Noida, Uttar Pradesh, India
-          </p>
+        <div className="landing-container" style={{ maxWidth: 640 }}>
+          <div className="contact-office-card">
+            <div className="contact-office-icon"><MapPin size={22} /></div>
+            <div className="contact-office-label">Our Office</div>
+            <div className="contact-office-name">Crozent Techlabs Private Limited</div>
+            <div className="contact-office-address">Noida, Uttar Pradesh, India</div>
+          </div>
         </div>
       </section>
 

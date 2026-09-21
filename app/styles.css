@@ -16105,12 +16105,17 @@ html.dark .contact-channel-icon {
   margin-top: 0;
 }
 
-.contact-office {
+.contact-office-card {
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  max-width: 540px;
+  gap: 4px;
+  padding: 40px 32px;
+  border: 1px solid var(--border-primary);
+  border-radius: 16px;
+  background: var(--bg-card);
+  box-shadow: var(--shadow-sm);
 }
 
 .contact-office-icon {
@@ -16119,7 +16124,7 @@ html.dark .contact-channel-icon {
   justify-content: center;
   width: 52px;
   height: 52px;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   border-radius: 14px;
   background: linear-gradient(135deg, rgba(19, 146, 251, 0.12), rgba(0, 104, 219, 0.12));
   color: #1392FB;
@@ -16130,9 +16135,24 @@ html.dark .contact-office-icon {
   color: #0068DB;
 }
 
-.contact-office .about-text {
-  font-size: 16px;
-  line-height: 1.8;
+.contact-office-label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.contact-office-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.contact-office-address {
+  font-size: 15px;
+  color: var(--text-secondary);
 }
 
 .contact-form {
