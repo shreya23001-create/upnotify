@@ -52,16 +52,27 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
     }
   }
 
-  // Admin routes: verify admin access via env whitelist OR admin_roles table
+  // Admin routes: verify admin access via users.is_super_admin, env
+  // whitelist, OR admin_roles table — must match the checks used by
+  // app/(admin)/layout.tsx and lib/db/admin-roles.ts's hasAdminAccess(),
+  // otherwise a super admin not also in ADMIN_EMAILS/admin_roles gets
+  // bounced here while the layout lets them through, causing a redirect
+  // loop between /admin and /dashboard.
   if (isAdminRoute(pathname)) {
     const adminEmailsRaw = process.env.ADMIN_EMAILS || ''
     const adminEmails = adminEmailsRaw.split(',').map(e => e.trim().toLowerCase()).filter(Boolean)
     const userEmail = (user.email || '').toLowerCase().trim()
 
-    // Check env whitelist first (fast path for super admin)
-    let hasAccess = adminEmails.includes(userEmail)
+    const { data: userRow } = await supabase
+      .from('users')
+      .select('is_super_admin')
+      .eq('id', user.id)
+      .single()
 
-    // If not in env whitelist, check admin_roles table
+    // Check super admin flag and env whitelist first (fast path)
+    let hasAccess = userRow?.is_super_admin === true || adminEmails.includes(userEmail)
+
+    // If neither, check admin_roles table
     if (!hasAccess) {
       const { data: adminRole } = await supabase
         .from('admin_roles')
