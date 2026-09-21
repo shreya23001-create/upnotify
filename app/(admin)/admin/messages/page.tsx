@@ -15,11 +15,8 @@ interface Broadcast {
 
 const AUDIENCES = [
   { value: 'all', label: 'All Users' },
-  { value: 'free', label: 'Free Plan Users' },
-  { value: 'lite', label: 'Lite Plan Users' },
-  { value: 'builder', label: 'Builder Plan Users' },
-  { value: 'scale', label: 'Scale Plan Users' },
-  { value: 'trial', label: 'Trial Users (no subscription)' },
+  { value: 'pro_plan', label: 'Pro Plan Users' },
+  { value: 'no_plan', label: 'No Plan Users' },
 ]
 
 const MESSAGE_TYPES = [

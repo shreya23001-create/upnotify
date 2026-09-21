@@ -63,7 +63,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     title: body.title,
     body: body.body,
     type: (body.type ?? 'info') as 'info' | 'warning' | 'success' | 'error' | 'system',
-    audience: body.audience as 'all' | 'free' | 'lite' | 'builder' | 'scale' | 'trial' | 'agency',
+    audience: body.audience as 'all' | 'pro_plan' | 'no_plan',
     sentBy: email,
     actionUrl: body.actionUrl,
     actionLabel: body.actionLabel,

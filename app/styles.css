@@ -7169,7 +7169,8 @@ html.dark .status-pill-paused {
 }
 
 .pro-plan-columns-centered {
-  justify-content: center;
+  grid-template-columns: 1fr;
+  justify-items: center;
 }
 
 /* /dashboard/websites — two-column layout, same pattern as the Plans page */
@@ -7198,7 +7199,8 @@ html.dark .status-pill-paused {
 }
 
 .pro-plan-col-solo {
-  flex: 0 1 520px;
+  width: 100%;
+  max-width: 520px;
   min-width: 320px;
 }
 
@@ -15131,7 +15133,7 @@ html.dark .blog-article-body ol li::before {
   margin: 48px 0;
   padding: 40px 32px;
   border-radius: 16px;
-  background: linear-gradient(135deg, #1392FB, #FBA830);
+  background: linear-gradient(135deg, #1392fb, #cbb698);
   text-align: center;
   box-shadow: 0 20px 45px rgba(19, 146, 251, 0.22);
 }

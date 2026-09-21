@@ -54,7 +54,7 @@ export function DowntimeCalculator(): React.ReactElement {
     <section className="calculator-section">
       <div className="container">
         <div className="section-header">
-          <div className="section-eyebrow" style={{ color: '#d97706' }}>The real cost of downtime</div>
+          <div className="section-eyebrow">The real cost of downtime</div>
           <h2 className="section-title">It&apos;s not just lost revenue.<br />It&apos;s your reputation.</h2>
           <p className="section-sub">
             Every minute your site is down, customers are leaving, telling friends, and never coming back.

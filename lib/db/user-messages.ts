@@ -116,7 +116,7 @@ export async function broadcastMessage(params: {
   body: string
   type?: 'info' | 'warning' | 'success' | 'error' | 'system'
   category?: string
-  audience: 'all' | 'free' | 'lite' | 'builder' | 'scale' | 'trial' | 'agency'
+  audience: 'all' | 'pro_plan' | 'no_plan'
   sentBy: string
   actionUrl?: string
   actionLabel?: string
@@ -129,33 +129,32 @@ export async function broadcastMessage(params: {
   if (params.audience === 'all') {
     const { data } = await supabase.from('users').select('id')
     userIds = (data ?? []).map(u => u.id)
-  } else if (params.audience === 'trial') {
-    // Users on trial (no active subscription)
-    const { data: allUsers } = await supabase.from('users').select('id, org_id')
-    const { data: activeSubs } = await supabase
-      .from('subscriptions')
-      .select('org_id')
-      .eq('status', 'active')
-
-    const activeOrgIds = new Set((activeSubs ?? []).map(s => s.org_id))
-    userIds = (allUsers ?? []).filter(u => !activeOrgIds.has(u.org_id)).map(u => u.id)
   } else {
-    // Filter by plan slug
-    const { data: orgs } = await supabase
-      .from('subscriptions')
-      .select('org_id, plans!inner(slug)')
-      .eq('status', 'active')
-      .eq('plans.slug', params.audience)
+    // "Has any active plan" mirrors lib/utils/plan-limits.ts's
+    // hasAnyActivePlan — a grandfathered legacy subscription OR an active
+    // per-website Pro Plan subscription — computed in bulk across every
+    // org rather than one hasAnyActivePlan() call per org.
+    const { data: allUsers } = await supabase.from('users').select('id, org_id')
+    const [{ data: legacySubs }, { data: websiteSubs }] = await Promise.all([
+      supabase
+        .from('subscriptions')
+        .select('org_id')
+        .in('status', ['active', 'cancelling', 'paused', 'past_due', 'trialing']),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (supabase as any)
+        .from('website_subscriptions')
+        .select('org_id')
+        .in('status', ['active', 'cancelling', 'past_due']) as Promise<{ data: Array<{ org_id: string }> | null }>,
+    ])
 
-    const orgIds = (orgs ?? []).map((o: Record<string, unknown>) => o.org_id as string)
-    if (orgIds.length > 0) {
-      const { data: users } = await supabase
-        .from('users')
-        .select('id')
-        .in('org_id', orgIds)
+    const activeOrgIds = new Set([
+      ...(legacySubs ?? []).map(s => s.org_id),
+      ...(websiteSubs ?? []).map(s => s.org_id),
+    ])
 
-      userIds = (users ?? []).map(u => u.id)
-    }
+    userIds = (allUsers ?? [])
+      .filter(u => params.audience === 'pro_plan' ? activeOrgIds.has(u.org_id) : !activeOrgIds.has(u.org_id))
+      .map(u => u.id)
   }
 
   if (userIds.length === 0) {

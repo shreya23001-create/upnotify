@@ -227,8 +227,8 @@ VALUES ('landing', 'faq', 'faq', $json${
       "answer": "Yes, you can cancel your subscription at any time from the Billing section of your dashboard. You'll keep access to paid features until the end of your billing period. No cancellation fees."
     },
     {
-      "question": "What is Watchdog (Compete)?",
-      "answer": "Watchdog is Uptrue's competitor intelligence add-on. It tracks your competitors' pricing pages, availability, and product changes — alerting you whenever something changes. Useful for e-commerce and SaaS teams who want to stay ahead."
+      "question": "What is Competitor (Compete)?",
+      "answer": "Competitor is Uptrue's intelligence add-on. It tracks your competitors' pricing pages, availability, and product changes — alerting you whenever something changes. Useful for e-commerce and SaaS teams who want to stay ahead."
     },
     {
       "question": "Is my data stored in the EU? Is Uptrue GDPR-compliant?",
