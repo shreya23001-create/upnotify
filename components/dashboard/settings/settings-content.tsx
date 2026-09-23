@@ -262,22 +262,6 @@ export function SettingsContent({
     <>
       <div className="stt-root">
 
-        {/* ── Sidebar ── */}
-        <nav className="stt-sidebar">
-          <div className="stt-nav-group">
-            {visibleNav.map(n => (
-              <button
-                key={n.id}
-                className={`stt-nav-item${tab === n.id ? ' stt-nav-active' : ''}`}
-                onClick={() => setTab(n.id)}
-              >
-                <span className="stt-nav-icon">{n.icon}</span>
-                {n.label}
-              </button>
-            ))}
-          </div>
-        </nav>
-
         {/* ── Main panel ── */}
         <div className="stt-panel">
 
@@ -312,7 +296,7 @@ export function SettingsContent({
                 onClick={() => setTab(n.id)}
               >
                 {n.icon}
-                <span>{n.short}</span>
+                <span>{n.label}</span>
               </button>
             ))}
           </div>

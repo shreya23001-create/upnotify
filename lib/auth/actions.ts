@@ -213,7 +213,7 @@ export async function signUpWithPassword(formData: FormData): Promise<{ error?: 
     password,
     options: {
       data: { full_name: fullname },
-      emailRedirectTo: `${baseUrl}/dashboard`,
+      emailRedirectTo: `${baseUrl}/auth/callback?next=${encodeURIComponent('/dashboard')}`,
     },
   })
 
@@ -229,6 +229,19 @@ export async function signUpWithPassword(formData: FormData): Promise<{ error?: 
 
   if (!data.user) {
     return { error: 'Failed to create account. Please try again.' }
+  }
+
+  // Supabase's signUp() does NOT return an error for an email that's already
+  // registered — to avoid leaking which emails exist, it instead returns a
+  // 200 with an obfuscated user object that has an empty identities array
+  // and no session. Without this check, that response was silently treated
+  // as "new account created", which both showed the wrong "check your
+  // email" message to an existing user AND ran runNewUserSetup (org
+  // creation, referral recording, auto-accepting team invites) against a
+  // fake/unrelated user id.
+  if (data.user.identities && data.user.identities.length === 0) {
+    await writeAuditLog({ orgId: 'system', userId: null, action: 'auth.signup_duplicate_email', ipAddress: ipForAudit, userAgent, metadata: { email } })
+    return { error: 'An account with this email already exists. Try logging in instead.' }
   }
 
   await runNewUserSetup(data.user.id, email, ref)
@@ -301,6 +314,12 @@ export async function signInWithPassword(formData: FormData): Promise<{ error?: 
   if (error) {
     logger.warn('Password login failed', { email, error: error.message })
     await writeAuditLog({ orgId: 'system', userId: null, action: 'auth.login.failed', ipAddress: ipForAudit, userAgent, metadata: { email, reason: error.message } })
+    // Supabase returns a distinct error code for this — surface it plainly
+    // instead of folding it into "Invalid email or password", which left
+    // users with a correct password no way to tell what was actually wrong.
+    if (error.code === 'email_not_confirmed') {
+      return { error: 'Please confirm your email address before logging in. Check your inbox for the confirmation link.' }
+    }
     return { error: 'Invalid email or password.' }
   }
 

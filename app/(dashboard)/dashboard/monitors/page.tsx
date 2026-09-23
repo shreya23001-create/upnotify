@@ -3,7 +3,7 @@ import { getMonitorsByWorkspacePaged, getMonitorsGroupedByWebsite, getMonitorWor
 import { getWorkspacesByOrg } from '@/lib/db/workspaces'
 import { getWebsiteSubscriptions } from '@/lib/db/subscriptions'
 import { hasGrandfatheredBaseSubscription, getWebsiteSlotUsage } from '@/lib/utils/plan-limits'
-import { getUptimeBarData } from '@/lib/db/check-results'
+import { getUptimeBarData, getRecentCheckResultsByMonitorIds } from '@/lib/db/check-results'
 import { MonitorTable } from '@/components/monitors/monitor-table'
 import { MonitorChecklist } from '@/components/monitors/monitor-checklist'
 import { AddMonitorButton } from '@/components/monitors/add-monitor-button'
@@ -50,6 +50,13 @@ export default async function MonitorsPage({
     canAddMonitor = slotUsage.remaining > 0
   }
 
+  // Real uptime/response-time/status for each domain group's command-center
+  // row — fetched once for all grouped monitors' ids and sliced per domain.
+  const groupedMonitorIds = paidDomains.flatMap(d => (groupedByDomain[d]?.monitors ?? []).map(m => m.id))
+  const domainCheckResults = groupedMonitorIds.length > 0
+    ? await getRecentCheckResultsByMonitorIds(groupedMonitorIds, 30)
+    : []
+
   const workspaces = await getWorkspacesByOrg(user.org_id)
   const defaultWorkspace = workspaces[0]
   const [{ data: monitors, total }, summary] = defaultWorkspace
@@ -94,12 +101,13 @@ export default async function MonitorsPage({
       <MonitorStatsBar total={summary.total} active={summary.active} paused={summary.paused} issues={summary.issues} />
 
       {!isGrandfathered && paidDomains.length > 0 && (
-        <div className="mon-website-groups">
+        <div className="mon-domain-list">
           {paidDomains.map(domain => (
             <MonitorChecklist
               key={domain}
               domain={domain}
               monitors={groupedByDomain[domain]?.monitors ?? []}
+              checkResults={domainCheckResults}
             />
           ))}
         </div>

@@ -1,7 +1,7 @@
 import './landing.css'
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { Zap, Info, Check, Bot, Search, Newspaper, Lightbulb, Tag, Users, Coins, FileBarChart, BarChart3, Sparkles } from 'lucide-react'
+import { Zap, Info, Check, FileBarChart, Search, Lightbulb, AlertTriangle } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { BlogPreview } from '@/components/landing/blog-preview'
 import ProPlanPricing from '@/components/landing/pro-plan-pricing'
@@ -10,7 +10,8 @@ import { HeroDashboardMockup } from '@/components/landing/hero-dashboard-mockup'
 import { FeatureCarousel } from '@/components/landing/feature-carousel'
 import { DowntimeCalculator } from '@/components/landing/downtime-calculator'
 import Faq from '@/components/landing/faq'
-import { AgencyWaitlistCta } from '@/components/landing/agency-waitlist-cta'
+import { AgencyCommandCenter } from '@/components/landing/agency-command-center'
+import { ComparisonMatrix } from '@/components/landing/comparison-matrix'
 import { TrustedLogos } from '@/components/landing/trusted-logos'
 import { TestimonialsShowcase } from './testimonials-showcase'
 import { ScrollReveal } from '@/components/landing/scroll-reveal'
@@ -68,14 +69,7 @@ export const metadata: Metadata = {
 // the CMS `icon` field still stores legacy emoji strings (DB row seeded before
 // icons existed) but React components can't be stored in JSON, so we ignore
 // that field entirely rather than trying to keep it in sync.
-const AI_FEATURE_ICONS: LucideIcon[] = [Bot, Search, Newspaper, Lightbulb]
-const AGENCY_BADGE_ICONS: LucideIcon[] = [Tag, Users, Coins, FileBarChart, BarChart3]
-
-// CMS-seeded badge strings have emoji baked in (see migration 00068) —
-// strip it so we can render a matching Lucide icon instead.
-function stripLeadingEmoji(text: string): string {
-  return text.replace(/^\p{Emoji_Presentation}\p{Extended_Pictographic}?\s*/u, '').trim()
-}
+const AI_FEATURE_ICONS: LucideIcon[] = [FileBarChart, Search, Lightbulb]
 
 const DEFAULT_STEPS = [
   {
@@ -431,9 +425,8 @@ export default async function LandingPage(): Promise<React.ReactElement> {
                   </p>
                   <div className="ai-features-list reveal-stagger">
                     {(aiFeatures?.features ?? [
-                      { icon: '🤖', color: 'purple', title: 'Executive AI Reports', description: 'One click and Claude analyses 90 days of uptime data, incident patterns, and performance trends — generating a polished summary you can send to clients or stakeholders.' },
+                      { icon: '📊', color: 'purple', title: 'Instant Health Reports', description: 'Pick a website and a period — daily, weekly, monthly, or yearly — and get a clean report built straight from your real uptime, response time, and incident data. No waiting, no AI black box.' },
                       { icon: '🔍', color: 'cyan', title: 'Outage Pattern Detection', description: "Upnotify learns your monitor's normal behaviour and flags anomalies before they become incidents. Recurring issues are spotted and surfaced automatically." },
-                      { icon: '📰', color: 'pink', title: 'AI Outage News & Blog', description: 'When a public service goes down, Upnotify researches and publishes an outage report automatically — with your logo and brand. Real-time SEO content on autopilot.' },
                       { icon: '💡', color: 'blue', title: 'Plain Language Incident Summaries', description: 'Every incident automatically gets a human-readable summary. No log-diving, no decoding stack traces. Just "your checkout was down for 8 minutes on Tuesday."' },
                     ]).map((f, i) => {
                       const AiFeatureIcon = AI_FEATURE_ICONS[i % AI_FEATURE_ICONS.length]
@@ -461,38 +454,96 @@ export default async function LandingPage(): Promise<React.ReactElement> {
                         <span /><span /><span />
                       </div>
                       <div className="ai-report-badge">
-                        <Sparkles size={11} strokeWidth={2.5} />
-                        AI Generated
+                        <Check size={11} strokeWidth={2.5} />
+                        Live Report
                       </div>
                     </div>
 
-                    <div className="ai-report-body">
-                      <div className="ai-report-title">Monthly Performance Report</div>
-                      <div className="ai-report-meta">Acme Agency · March 2026 · 24 monitors</div>
-
-                      <div className="ai-stat-row">
-                        <div className="ai-stat-box green"><div className="val">99.94%</div><div className="lbl">Avg Uptime</div></div>
-                        <div className="ai-stat-box red"><div className="val">3</div><div className="lbl">Incidents</div></div>
-                        <div className="ai-stat-box blue"><div className="val">142ms</div><div className="lbl">Avg Response</div></div>
-                      </div>
-
-                      <div className="ai-report-insight">
-                        <div className="ai-insight-icon"><Lightbulb size={16} strokeWidth={2} /></div>
-                        <div className="ai-insight-text">
-                          <strong>AI Insight —</strong> checkout.shop.io has experienced 3 slowdowns on Tuesday mornings between 09:00–10:00 UTC. This pattern suggests a scheduled job or traffic spike. Recommend investigating backend cron tasks.
+                    <div className="ai-report-body rpt-page" style={{ padding: '20px 22px', gap: 16 }}>
+                      <div className="rpt-header" style={{ paddingBottom: 12 }}>
+                        <div className="rpt-header-left">
+                          <span className="favicon-fallback" style={{ width: 24, height: 24, fontSize: 13, lineHeight: '24px' }}>A</span>
+                          <div>
+                            <div className="rpt-header-domain" style={{ fontSize: 14 }}>acmecorp.com</div>
+                            <div className="rpt-header-monitor">24 monitors</div>
+                          </div>
+                        </div>
+                        <div className="rpt-header-right">
+                          <div className="rpt-header-period-label">Monthly Report</div>
+                          <div className="rpt-header-period-range">March 2026</div>
+                          <span className="rpt-health-badge rpt-health-badge--operational">
+                            <span className="status-dot" style={{ background: 'var(--color-up)' }} />
+                            Operational
+                          </span>
                         </div>
                       </div>
 
-                      <div className="ai-report-section-label">Recommendations</div>
-                      <ul className="ai-report-reco-list">
-                        <li>Move the Tuesday cron job outside peak checkout hours</li>
-                        <li>Add a dedicated monitor for the payment webhook endpoint</li>
-                        <li>Review CDN cache rules for <em>cdn.assets.io</em></li>
-                      </ul>
+                      <div className="rpt-hero">
+                        <div className="rpt-health-ring" style={{ width: 108 }}>
+                          <svg width="88" height="88" viewBox="0 0 88 88">
+                            <circle cx="44" cy="44" r="36" fill="none" stroke="var(--border-primary)" strokeWidth={8} />
+                            <circle cx="44" cy="44" r="36" fill="none" stroke="var(--color-up)" strokeWidth={8}
+                              strokeDasharray="221 226" strokeLinecap="round" transform="rotate(-90 44 44)" />
+                            <text x="44" y="40" textAnchor="middle" fontSize="16" fontWeight="800" fill="var(--text-primary)">99.94%</text>
+                            <text x="44" y="53" textAnchor="middle" fontSize="9" fill="var(--text-muted)">Health</text>
+                          </svg>
+                          <div className="rpt-health-ring-text">
+                            <div className="rpt-health-ring-label" style={{ color: 'var(--color-up)' }}>Excellent</div>
+                          </div>
+                        </div>
+                        <div className="rpt-hero-stats">
+                          <div className="rpt-hero-stat"><span className="rpt-hero-stat-value">99.94%</span><span className="rpt-hero-stat-label">Uptime</span></div>
+                          <div className="rpt-hero-stat"><span className="rpt-hero-stat-value">12m</span><span className="rpt-hero-stat-label">Total Downtime</span></div>
+                          <div className="rpt-hero-stat"><span className="rpt-hero-stat-value">142ms</span><span className="rpt-hero-stat-label">Avg Response Time</span></div>
+                          <div className="rpt-hero-stat"><span className="rpt-hero-stat-value">3</span><span className="rpt-hero-stat-label">Incidents</span></div>
+                        </div>
+                      </div>
+
+                      <div className="rpt-panel">
+                        <div className="rpt-panel-title">Key Insights</div>
+                        <ul className="rpt-insights-list">
+                          <li className="rpt-insight-row rpt-insight-row--warning">
+                            <AlertTriangle size={14} strokeWidth={2.25} />
+                            <span>3 downtime incidents recorded, totalling 12m of downtime.</span>
+                          </li>
+                          <li className="rpt-insight-row rpt-insight-row--positive">
+                            <Lightbulb size={14} strokeWidth={2.25} />
+                            <span>Average response time was 142ms — fast and consistent.</span>
+                          </li>
+                        </ul>
+                      </div>
+
+                      <div className="rpt-panel rpt-panel--breakdown">
+                        <div className="rpt-panel-title">Monitor Breakdown</div>
+                        <table className="rpt-breakdown-table">
+                          <thead>
+                            <tr><th>Monitor</th><th>Status</th><th>Uptime</th><th>Incidents</th></tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td className="rpt-breakdown-name-cell"><span className="rpt-breakdown-name">checkout.shop.io — HTTP Uptime</span></td>
+                              <td><span className="status-dot rpt-breakdown-dot" style={{ background: 'var(--color-up)' }} /></td>
+                              <td className="rpt-breakdown-uptime">99.9%</td>
+                              <td className="rpt-breakdown-incidents">—</td>
+                            </tr>
+                            <tr>
+                              <td className="rpt-breakdown-name-cell"><span className="rpt-breakdown-name">api.acmecorp.com — SSL Certificate</span></td>
+                              <td><span className="status-dot rpt-breakdown-dot" style={{ background: 'var(--color-up)' }} /></td>
+                              <td className="rpt-breakdown-uptime">100.0%</td>
+                              <td className="rpt-breakdown-incidents">—</td>
+                            </tr>
+                            <tr>
+                              <td className="rpt-breakdown-name-cell"><span className="rpt-breakdown-name">cdn.assets.io — Response Time</span></td>
+                              <td><span className="status-dot rpt-breakdown-dot" style={{ background: 'var(--color-warn)' }} /></td>
+                              <td className="rpt-breakdown-uptime">97.4%</td>
+                              <td className="rpt-breakdown-incidents">2</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
 
                       <div className="ai-report-cta">
                         <button className="btn-ai-primary">Download PDF Report</button>
-                        <button className="btn-ai-ghost">Share</button>
                       </div>
                     </div>
                   </div>
@@ -557,57 +608,14 @@ export default async function LandingPage(): Promise<React.ReactElement> {
 
       case 'agency':
         return (
-          <section key="agency" className="agency-section" id="agency">
-            <div className="container">
-              <div className="agency-card">
-                <div className="agency-text">
-                  <span className="agency-coming-badge">{agency?.badge ?? 'Coming Soon · Join Waitlist'}</span>
-                  <h2>{agency?.headline ?? 'Monitor hundreds of client sites under your brand'}</h2>
-                  <p>{agency?.description ?? 'The Agency tier gives you full white-label, multi-tenant workspaces, revenue sharing, custom analytics, and AI reports branded with your agency name. Built for agencies managing dozens of clients.'}</p>
-                </div>
-
-                <div className="agency-right">
-                  <div className="agency-clients-mock" aria-hidden="true">
-                    <div className="agency-clients-mock-hdr">
-                      <span className="agency-clients-mock-brand">Your Agency</span>
-                      <span className="agency-clients-mock-live">● Live</span>
-                    </div>
-                    {[
-                      { name: 'clientco.com', pct: '99.98%', status: 'up' as const },
-                      { name: 'shopfront.io', pct: '99.91%', status: 'up' as const },
-                      { name: 'checkout.acme.dev', pct: '97.4%', status: 'warn' as const },
-                    ].map(c => (
-                      <div key={c.name} className="agency-clients-mock-row">
-                        <span className={`agency-clients-mock-dot ${c.status}`} />
-                        <span className="agency-clients-mock-name">{c.name}</span>
-                        <span className="agency-clients-mock-pct">{c.pct}</span>
-                      </div>
-                    ))}
-                    <div className="agency-clients-mock-footer">+ 47 more client sites</div>
-                  </div>
-
-                  <div className="agency-badges">
-                    {(agency?.badges ?? ['Full white-label', 'Multi-tenant workspaces', 'Revenue sharing', 'Branded AI reports', 'Custom analytics']).map((badge, i) => {
-                      const BadgeIcon = AGENCY_BADGE_ICONS[i % AGENCY_BADGE_ICONS.length]
-                      return (
-                        <div key={badge} className="agency-badge">
-                          <BadgeIcon size={13} />
-                          {stripLeadingEmoji(badge)}
-                        </div>
-                      )
-                    })}
-                  </div>
-
-                  <div className="agency-cta-row">
-                    <AgencyWaitlistCta />
-                    <span className="agency-cta-note">
-                      {agency?.cta_note ?? 'No commitment · Early access pricing'}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
+          <AgencyCommandCenter
+            key="agency"
+            badge={agency?.badge}
+            headline={agency?.headline ?? 'Monitor hundreds of client sites under your brand'}
+            description={agency?.description ?? 'The Agency tier gives you full white-label, multi-tenant workspaces, revenue sharing, custom analytics, and AI reports branded with your agency name. Built for agencies managing dozens of clients.'}
+            badges={agency?.badges}
+            ctaNote={agency?.cta_note}
+          />
         )
 
       case 'faq':
@@ -640,80 +648,40 @@ export default async function LandingPage(): Promise<React.ReactElement> {
 
       case 'comparison_table':
         return (
-          <section key="comparison_table" className="comparison-section">
-            <div className="container">
-              <div className="section-header reveal-title">
-                <div className="section-eyebrow">{comparison?.eyebrow ?? 'Side by side'}</div>
-                <h2 className="section-title">
-                  {(() => {
-                    const headline = comparison?.headline
-                    if (typeof headline === 'string' && headline.startsWith('Upnotify ')) {
-                      return (
-                        <>
-                          <span className="uptrue-col-name">Upnotify</span>{headline.slice('Upnotify'.length)}
-                        </>
-                      )
-                    }
-                    return headline ?? (<>The honest comparison<br />nobody <em>else</em> will show you.</>)
-                  })()}
-                </h2>
-                <p className="section-sub">{comparison?.subheadline ?? "We checked. The others don't offer AI reports, citation monitoring, or 24 monitor types. Upnotify does."}</p>
-              </div>
-              <div className="comparison-scroll-hint">Swipe to compare →</div>
-              <div className="comparison-table-wrap reveal">
-                <table className="comparison-table">
-                  <thead>
-                    <tr>
-                      <th>Feature</th>
-                      {compCols.map((col, i) => (
-                        <th key={col} className={i === 0 ? 'col-uptrue' : undefined}>
-                          {i === 0 ? (
-                            <div className="uptrue-col-header">
-                              <span className="uptrue-col-name">{col}</span><span className="uptrue-col-badge">Best value</span>
-                            </div>
-                          ) : col}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {(comparison?.rows ?? [
-                      { feature: 'Fastest check interval', values: ['1 minute', '30 seconds', '5 minutes'], type: 'text', highlight: 0 },
-                      { feature: 'Two-region false alarm prevention', values: [true, true, false], type: 'boolean' },
-                      { feature: 'AI-powered reports', values: [true, false, false], type: 'boolean' },
-                      { feature: 'Watchdog (competitor tracking)', values: [true, false, false], type: 'boolean' },
-                      { feature: 'Public uptime leaderboard / tracker', values: [true, false, false], type: 'boolean' },
-                      { feature: 'Public status pages', values: [true, true, true], type: 'boolean' },
-                      { feature: 'Monitor types (HTTP, SSL, DNS, Keyword…)', values: ['24 types', '7 types', '6 types'], type: 'text', highlight: 0 },
-                      { feature: 'Alert channels (email, Slack, Teams, Telegram, webhook)', values: ['5 channels', '4 channels', '3 channels'], type: 'text', highlight: 0 },
-                      { feature: 'Starting price (paid plan)', values: [defaultCurrency === 'inr' ? '₹999/yr Lite' : '£10/yr Lite', '$24/mo', '$7/mo'], type: 'text', highlight: 0 },
-                      { feature: 'GDPR · EU data storage', values: [true, true, false], type: 'boolean' },
-                      { feature: 'AI outage blog auto-publish', values: [true, false, false], type: 'boolean' },
-                      { feature: 'Free AI SEO Checker (4-category audit)', values: [true, false, false], type: 'boolean' },
-                      { feature: 'llms.txt Generator', values: [true, false, false], type: 'boolean' },
-                      { feature: 'AI Citation Monitoring (Perplexity, ChatGPT…)', values: [true, false, false], type: 'boolean' },
-                    ] as Array<{ feature: string; values: Array<boolean | string>; type: string; highlight?: number }>).map((row) => (
-                      <tr key={row.feature}>
-                        <td>{row.feature}</td>
-                        {row.values.map((val, colIdx) => (
-                          <td key={colIdx} className={colIdx === 0 ? 'col-uptrue' : undefined}>
-                            {row.type === 'boolean' ? (
-                              <span className={val ? 'comp-yes' : 'comp-no'}>{val ? '✓' : '—'}</span>
-                            ) : (
-                              <span className={`comp-val${row.highlight === colIdx ? ' highlight' : ''}`}>{String(val)}</span>
-                            )}
-                          </td>
-                        ))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              <p style={{ textAlign: 'center', fontSize: '11px', color: 'var(--text-muted)', marginTop: 'var(--space-5)' }}>
-                {comparison?.footnote ?? 'Comparison based on publicly available information as of April 2026. Features may vary by plan.'}
-              </p>
-            </div>
-          </section>
+          <ComparisonMatrix
+            key="comparison_table"
+            eyebrow={comparison?.eyebrow ?? 'Side by side'}
+            headline={(() => {
+              const headline = comparison?.headline
+              if (typeof headline === 'string' && headline.startsWith('Upnotify ')) {
+                return (
+                  <>
+                    <span className="cmx-headline-brand">Upnotify</span>{headline.slice('Upnotify'.length)}
+                  </>
+                )
+              }
+              return headline ?? (<>The honest comparison<br />nobody <em>else</em> will show you.</>)
+            })()}
+            subheadline={comparison?.subheadline ?? "We checked. The others don't offer AI reports, citation monitoring, or 24 monitor types. Upnotify does."}
+            competitors={compCols}
+            rows={comparison?.rows ?? [
+              { feature: 'Fastest check interval', values: ['1 minute', '30 seconds', '5 minutes'], type: 'text', highlight: 0 },
+              { feature: 'Two-region false alarm prevention', values: [true, true, false], type: 'boolean' },
+              { feature: 'AI-powered reports', values: [true, false, false], type: 'boolean' },
+              { feature: 'Watchdog (competitor tracking)', values: [true, false, false], type: 'boolean' },
+              { feature: 'Public uptime leaderboard / tracker', values: [true, false, false], type: 'boolean' },
+              { feature: 'Public status pages', values: [true, true, true], type: 'boolean' },
+              { feature: 'Monitor types (HTTP, SSL, DNS, Keyword…)', values: ['24 types', '7 types', '6 types'], type: 'text', highlight: 0 },
+              { feature: 'Alert channels (email, Slack, Teams, Telegram, webhook)', values: ['5 channels', '4 channels', '3 channels'], type: 'text', highlight: 0 },
+              { feature: 'Starting price (paid plan)', values: [defaultCurrency === 'inr' ? '₹999/yr Lite' : '£10/yr Lite', '$24/mo', '$7/mo'], type: 'text', highlight: 0 },
+              { feature: 'GDPR · EU data storage', values: [true, true, false], type: 'boolean' },
+              { feature: 'AI outage blog auto-publish', values: [true, false, false], type: 'boolean' },
+              { feature: 'Free AI SEO Checker (4-category audit)', values: [true, false, false], type: 'boolean' },
+              { feature: 'llms.txt Generator', values: [true, false, false], type: 'boolean' },
+              { feature: 'AI Citation Monitoring (Perplexity, ChatGPT…)', values: [true, false, false], type: 'boolean' },
+            ]}
+            footnote={comparison?.footnote}
+          />
         )
 
       case 'blog_preview':

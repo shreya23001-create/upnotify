@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { Sparkline } from '@/components/ui/sparkline'
 
 /* ─── Types ─────────────────────────────────────────────────────────────── */
 type Phase = 'normal' | 'degrading' | 'down' | 'recovering'
@@ -66,10 +67,20 @@ const RECENT_INCIDENTS = [
 ]
 
 const DOMAINS = [
-  { domain: 'checkout.shop.io', monitors: 24, status: 'down' as const },
-  { domain: 'api.acmecorp.com', monitors: 24, status: 'up' as const },
-  { domain: 'cdn.assets.io', monitors: 24, status: 'degraded' as const },
-  { domain: 'blog.example.com', monitors: 24, status: 'up' as const },
+  { domain: 'checkout.shop.io', monitors: 24, status: 'down' as const, uptime: '0.0%', response: '—', trend: [420, 610, 900, 1400, 2100, 3000], lastChecked: 'just now' },
+  { domain: 'api.acmecorp.com', monitors: 18, status: 'up' as const, uptime: '99.98%', response: '182ms', trend: [190, 175, 188, 165, 179, 182], lastChecked: '30s ago' },
+  { domain: 'cdn.assets.io', monitors: 9, status: 'degraded' as const, uptime: '97.4%', response: '640ms', trend: [220, 310, 480, 590, 610, 640], lastChecked: '1m ago' },
+  { domain: 'blog.example.com', monitors: 4, status: 'up' as const, uptime: '100.0%', response: '96ms', trend: [102, 98, 94, 91, 97, 96], lastChecked: '45s ago' },
+]
+
+type ActivityKind = 'monitor_created' | 'incident_opened' | 'incident_resolved'
+const RECENT_ACTIVITY: { kind: ActivityKind; title: string; subtitle: string; time: string }[] = [
+  { kind: 'incident_opened', title: 'Incident detected', subtitle: 'Domain registration expiring soon', time: '1d ago' },
+  { kind: 'incident_opened', title: 'Incident detected', subtitle: 'Domain or IP is on a blacklist', time: '1d ago' },
+  { kind: 'incident_resolved', title: 'Incident resolved', subtitle: 'SSL certificate renewed', time: '2d ago' },
+  { kind: 'monitor_created', title: 'Monitor created', subtitle: 'blog.example.com — HTTP Uptime', time: '4d ago' },
+  { kind: 'incident_opened', title: 'Incident detected', subtitle: 'XML sitemap is invalid or unreachable', time: '1d ago' },
+  { kind: 'monitor_created', title: 'Monitor created', subtitle: 'cdn.assets.io — Response Time', time: '5d ago' },
 ]
 
 /* ─── Sub-components ────────────────────────────────────────────────────── */
@@ -332,7 +343,6 @@ export function HeroDashboardMockup(): React.ReactElement {
               </div>
             </div>
             <div className="ms-nav">
-              <div className="ms-section">Main</div>
               <div className="ms-item active">
                 <div className="ms-item-left">
                   <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /></svg>
@@ -373,31 +383,11 @@ export function HeroDashboardMockup(): React.ReactElement {
               </div>
               <div className="ms-item">
                 <div className="ms-item-left">
-                  <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-                    <path d="M5 10 C5 5 19 5 19 10 L19 15 C19 19 5 19 5 15 Z" />
-                    <path d="M5 10 C4 7 2 6 3 4 C4 3 6 5 7 7" />
-                    <path d="M19 10 C20 7 22 6 21 4 C20 3 18 5 17 7" />
-                    <circle cx="9" cy="11" r="1" fill="currentColor" stroke="none" />
-                    <circle cx="15" cy="11" r="1" fill="currentColor" stroke="none" />
-                  </svg>
-                  <span className="ms-label">Competitor</span>
-                </div>
-              </div>
-              <div className="ms-item">
-                <div className="ms-item-left">
-                  <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
-                  <span className="ms-label">Websites</span>
-                </div>
-              </div>
-              <div className="ms-item">
-                <div className="ms-item-left">
                   <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2" /><line x1="3" y1="10" x2="21" y2="10" /><line x1="7" y1="15" x2="11" y2="15" /></svg>
                   <span className="ms-label">Plans</span>
                 </div>
               </div>
 
-              <div className="ms-divider" />
-              <div className="ms-section">Support</div>
               <div className="ms-item">
                 <div className="ms-item-left">
                   <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
@@ -536,10 +526,10 @@ export function HeroDashboardMockup(): React.ReactElement {
                   </div>
                 </div>
 
-                {/* Domains */}
+                {/* Websites */}
                 <div className="mm-card hm-domains-card">
                   <div className="mm-card-hdr">
-                    <div className="mm-card-title">Domains</div>
+                    <div className="mm-card-title">Websites</div>
                     <div className="mm-btn-primary hm-clickable" style={{ fontSize: '10px', padding: '5px 10px' }} onClick={() => setShowModal(true)} title="Try it — add a monitor">
                       <svg width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
                       Add Monitor
@@ -551,30 +541,66 @@ export function HeroDashboardMockup(): React.ReactElement {
                       const status = isCheckout ? pd.status : d.status
                       const isDown = isCheckout ? phase === 'down' : status === 'down'
                       const isDeg = isCheckout ? (phase === 'degrading' || phase === 'recovering') : status === 'degraded'
+                      const uptime = isCheckout ? pd.uptime : d.uptime
+                      const response = isCheckout ? pd.response : d.response
+                      const trendColor = isDown ? '#ef4444' : isDeg ? '#f59e0b' : '#10b981'
                       return (
                         <div key={d.domain} className="hm-domain-row">
-                          <div className="hm-domain-left">
-                            <span className={`hm-domain-dot${isDown ? ' down' : isDeg ? ' degraded' : ''}`} />
-                            <span className="hm-domain-name">{d.domain}</span>
-                          </div>
+                          <span className={`hm-domain-dot${isDown ? ' down' : isDeg ? ' degraded' : ''}`} />
                           <span className={`hm-domain-badge${isDown ? ' down' : isDeg ? ' degraded' : ''}`}>
                             {isDown ? 'Down' : isDeg ? 'Degraded' : 'Up'}
                           </span>
+                          <span className="hm-domain-uptime">{uptime}</span>
+                          <span className="hm-domain-response">{response}</span>
+                          <span className="hm-domain-sparkline"><Sparkline values={d.trend} color={trendColor} width={54} height={18} /></span>
+                          <span className="hm-domain-monitors">{d.monitors} monitor{d.monitors === 1 ? '' : 's'}</span>
+                          <span className="hm-domain-lastchecked">{d.lastChecked}</span>
                         </div>
                       )
                     })}
                     {userMonitors.length > 0 && (
                       <div className="hm-domain-row hm-new-row">
-                        <div className="hm-domain-left">
-                          <span className="hm-domain-dot pending" />
-                          <span className="hm-domain-name">{userMonitors[userMonitors.length - 1].url.replace(/^https?:\/\//, '')}</span>
-                        </div>
+                        <span className="hm-domain-dot pending" />
                         <span className="hm-domain-badge pending">Pending</span>
+                        <span className="hm-domain-uptime">—</span>
+                        <span className="hm-domain-response">—</span>
+                        <span className="hm-domain-sparkline" />
+                        <span className="hm-domain-monitors">{userMonitors[userMonitors.length - 1].url.replace(/^https?:\/\//, '')}</span>
+                        <span className="hm-domain-lastchecked">now</span>
                       </div>
                     )}
                   </div>
                 </div>
 
+              </div>
+
+              {/* Recent Activity */}
+              <div className="mm-card hm-activity-card">
+                <div className="mm-card-hdr">
+                  <div className="mm-card-title">Recent Activity</div>
+                </div>
+                <div className="hm-activity-list">
+                  {RECENT_ACTIVITY.map((item, i) => (
+                    <div key={i} className="hm-activity-row">
+                      <span className={`hm-activity-icon hm-activity-icon--${item.kind === 'incident_opened' ? 'down' : item.kind === 'incident_resolved' ? 'up' : 'info'}`}>
+                        {item.kind === 'incident_opened' && (
+                          <svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
+                        )}
+                        {item.kind === 'incident_resolved' && (
+                          <svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" /></svg>
+                        )}
+                        {item.kind === 'monitor_created' && (
+                          <svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="16" /><line x1="8" y1="12" x2="16" y2="12" /></svg>
+                        )}
+                      </span>
+                      <div className="hm-activity-body">
+                        <span className="hm-activity-title">{item.title}</span>
+                        <span className="hm-activity-subtitle">{item.subtitle}</span>
+                      </div>
+                      <span className="hm-activity-time">{item.time}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
 
             </div>{/* /mm-content */}

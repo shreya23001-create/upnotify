@@ -316,6 +316,25 @@ export async function resolveIncident(monitorId: string): Promise<Incident | nul
   return { ...incident, status: 'resolved', resolved_at: resolvedAt, duration_seconds: durationSeconds } as Incident
 }
 
+/** Incidents that started within a date range, for a single monitor — used
+ *  by the deterministic report engine's incident summary/timeline. */
+export async function getIncidentsForMonitorInRange(monitorId: string, since: Date, until: Date): Promise<Incident[]> {
+  const supabase = createAdminClient()
+  const { data, error } = await supabase
+    .from('incidents')
+    .select('*')
+    .eq('monitor_id', monitorId)
+    .gte('started_at', since.toISOString())
+    .lt('started_at', until.toISOString())
+    .order('started_at', { ascending: false })
+
+  if (error) {
+    logger.error('getIncidentsForMonitorInRange failed', { monitorId, error: error.message })
+    return []
+  }
+  return data ?? []
+}
+
 export async function getOpenIncidentForMonitor(monitorId: string): Promise<Incident | null> {
   const supabase = createAdminClient()
   const { data, error } = await supabase

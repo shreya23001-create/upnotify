@@ -1,5 +1,6 @@
 'use client'
 
+import { Fragment } from 'react'
 import Link from 'next/link'
 import { IconWordpress } from '@/components/icons'
 
@@ -49,13 +50,6 @@ export const helpTopics: HelpTopic[] = [
     description: 'Understand the plans, upgrade or downgrade, and manage your subscription.',
     icon: <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>,
     keywords: ['plan', 'billing', 'price', 'upgrade', 'downgrade', 'subscription', 'free', 'lite', 'builder', 'scale'],
-  },
-  {
-    href: '/dashboard/help/watchdog',
-    title: 'Watchdog — Competitor Tracking',
-    description: 'Monitor competitor uptime, compare reliability, and benchmark your performance.',
-    icon: <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>,
-    keywords: ['watchdog', 'competitor', 'compare', 'benchmark', 'rival', 'uptime', 'tracking'],
   },
   {
     href: '/dashboard/help/credits',
@@ -128,7 +122,7 @@ interface SidebarSection {
 
 function buildSections(topics: HelpTopic[]): SidebarSection[] {
   const monitoring = ['getting-started', 'monitors', 'alerts', 'status-pages', 'incidents']
-  const features   = ['watchdog', 'ai-visibility', 'ai-profile', 'tools', 'compete']
+  const features   = ['ai-visibility', 'ai-profile', 'tools', 'compete']
   const account    = ['billing', 'credits', 'referrals', 'cancel-pause']
 
   function slug(href: string) { return href.split('/').pop() ?? '' }
@@ -154,25 +148,21 @@ export function HelpSidebar({ currentPath, isSuperAdmin = false }: HelpSidebarPr
         <Link href="/dashboard/help" className="help-sidebar-brand-label">Help Center</Link>
       </div>
       {sections.map((section, i) => (
-        <div key={section.label}>
-          {i > 0 && <div className="help-sidebar-divider" />}
-          <div className="help-sidebar-section">{section.label}</div>
-          <ul className="help-sidebar-list">
-            {section.topics.map((topic) => (
-              <li key={topic.href}>
-                <Link
-                  href={topic.href}
-                  className={`help-sidebar-link${currentPath === topic.href ? ' active' : ''}`}
-                >
-                  <span className="help-sidebar-icon">
-                    {topic.icon === '__wp__' ? <IconWordpress size={15} /> : topic.icon}
-                  </span>
-                  <span>{topic.title}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <Fragment key={section.label}>
+          {i > 0 && <span className="help-sidebar-divider" aria-hidden="true" />}
+          {section.topics.map((topic) => (
+            <Link
+              key={topic.href}
+              href={topic.href}
+              className={`help-sidebar-link${currentPath === topic.href ? ' active' : ''}`}
+            >
+              <span className="help-sidebar-icon">
+                {topic.icon === '__wp__' ? <IconWordpress size={15} /> : topic.icon}
+              </span>
+              <span>{topic.title}</span>
+            </Link>
+          ))}
+        </Fragment>
       ))}
     </nav>
   )

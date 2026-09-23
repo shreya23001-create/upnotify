@@ -254,3 +254,82 @@ export async function getUptimeBarDataForRange(monitorId: string, range: string)
     status:    row.status as UptimeSlot['status'],
   }))
 }
+
+/** Exact uptime % for an arbitrary date range, via HEAD+count so it isn't
+ *  subject to PostgREST's 1,000-row cap on plain SELECTs (see
+ *  getUptimePercentage in lib/db/status-pages.ts, the same pattern). */
+export async function getUptimePercentageForRange(monitorId: string, since: Date, until: Date): Promise<number | null> {
+  const supabase = createAdminClient()
+  const [totalRes, upRes] = await Promise.all([
+    supabase.from('check_results')
+      .select('*', { count: 'exact', head: true })
+      .eq('monitor_id', monitorId)
+      .gte('checked_at', since.toISOString())
+      .lt('checked_at', until.toISOString()),
+    supabase.from('check_results')
+      .select('*', { count: 'exact', head: true })
+      .eq('monitor_id', monitorId)
+      .eq('status', 'up')
+      .gte('checked_at', since.toISOString())
+      .lt('checked_at', until.toISOString()),
+  ])
+
+  if (totalRes.error || upRes.error) {
+    logger.error('getUptimePercentageForRange failed', { error: (totalRes.error ?? upRes.error)?.message, monitorId })
+    return null
+  }
+  const total = totalRes.count ?? 0
+  if (total === 0) return null
+  return Math.round(((upRes.count ?? 0) / total) * 10000) / 100
+}
+
+export async function getCheckCountsForRange(monitorId: string, since: Date, until: Date): Promise<{ total: number; up: number; down: number; degraded: number } | null> {
+  const supabase = createAdminClient()
+  const base = () => supabase.from('check_results')
+    .select('*', { count: 'exact', head: true })
+    .eq('monitor_id', monitorId)
+    .gte('checked_at', since.toISOString())
+    .lt('checked_at', until.toISOString())
+
+  const [totalRes, upRes, downRes, degradedRes] = await Promise.all([
+    base(),
+    base().eq('status', 'up'),
+    base().eq('status', 'down'),
+    base().eq('status', 'degraded'),
+  ])
+
+  if (totalRes.error) {
+    logger.error('getCheckCountsForRange failed', { error: totalRes.error.message, monitorId })
+    return null
+  }
+  return {
+    total: totalRes.count ?? 0,
+    up: upRes.count ?? 0,
+    down: downRes.count ?? 0,
+    degraded: degradedRes.count ?? 0,
+  }
+}
+
+export interface ReportCheckResult { status: string; response_time_ms: number | null; checked_at: string; metadata: Record<string, unknown> | null }
+
+/** Full rows for a single monitor within a date range, chunked to respect
+ *  PostgREST's row cap. Used to compute trend series and per-type metadata
+ *  metrics (SSL days-remaining, DNS records, keyword misses, etc.) — NOT
+ *  for counting totals, which must go through the HEAD+count helpers above. */
+export async function getCheckResultsForMonitorInRange(monitorId: string, since: Date, until: Date, maxRows: number = 5000): Promise<ReportCheckResult[]> {
+  const supabase = createAdminClient()
+  const { data, error } = await supabase
+    .from('check_results')
+    .select('status, response_time_ms, checked_at, metadata')
+    .eq('monitor_id', monitorId)
+    .gte('checked_at', since.toISOString())
+    .lt('checked_at', until.toISOString())
+    .order('checked_at', { ascending: true })
+    .limit(maxRows)
+
+  if (error) {
+    logger.error('getCheckResultsForMonitorInRange failed', { error: error.message, monitorId })
+    return []
+  }
+  return (data ?? []) as ReportCheckResult[]
+}

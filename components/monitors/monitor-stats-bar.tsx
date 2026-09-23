@@ -22,9 +22,9 @@ export function MonitorStatsBar({ total, active, paused, issues }: Props): React
         return (
           <div key={s.label} className={`mon-stat-card mon-stat-card--${s.tone}`}>
             <div className="mon-stat-icon">
-              <Icon size={16} strokeWidth={2} />
+              <Icon size={15} strokeWidth={2.25} />
             </div>
-            <div>
+            <div className="mon-stat-body">
               <div className="mon-stat-value">{s.value}</div>
               <div className="mon-stat-label">{s.label}</div>
             </div>

@@ -107,17 +107,8 @@ export function getPlanFeatures(p: PlanDisplayData): PlanFeature[] {
   // Webhooks
   features.push({ text: 'Webhooks', included: p.has_webhooks })
 
-  // AI reports
-  if (p.has_ai_predictive || p.ai_report_limit > 0) {
-    features.push({
-      text: p.ai_report_limit > 0
-        ? `${p.ai_report_limit} AI reports/month`
-        : 'Unlimited AI reports',
-      included: true,
-    })
-  } else {
-    features.push({ text: 'AI reports', included: false })
-  }
+  // Monitoring reports (deterministic, unlimited — no AI-report quota anymore)
+  features.push({ text: 'Monitoring reports', included: true })
 
   // Watchdog
   const watchdog = p.competitor_limit ?? 3

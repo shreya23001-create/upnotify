@@ -10,7 +10,7 @@ import type { SupportedCurrency } from '@/lib/utils/currency'
 import {
   IconDashboard, IconActivity, IconGlobe, IconAlertTriangle,
   IconBuilding, IconSettings, IconShield, IconChevronLeft, IconChevronRight,
-  IconHelpCircle, IconTrendingUp, IconWatchdog, IconInbox, IconCreditCard,
+  IconHelpCircle, IconTrendingUp, IconInbox, IconCreditCard,
   IconServer,
 } from '@/components/icons'
 
@@ -50,11 +50,11 @@ const mainNavItems: NavItem[] = [
   { href: '/dashboard/incidents', label: 'Incidents', icon: IconAlertTriangle },
   { href: '/dashboard/status-pages', label: 'Status Pages', icon: IconGlobe },
   { href: '/dashboard/reports', label: 'Reports', icon: IconTrendingUp },
-  { href: '/dashboard/watchdog', label: 'Competitor', icon: IconWatchdog },
   { href: '/dashboard/plans', label: 'Plans', icon: IconCreditCard },
   // AI Visibility hidden per request
   // Websites hidden per request
   // Compete hidden — launching in v1.5
+  // Competitor hidden per request
 ]
 
 const secondaryNavItems: NavItem[] = [
@@ -149,13 +149,8 @@ export function Sidebar({ forceExpanded = false }: SidebarProps): React.ReactEle
       </div>
 
       <nav className="sidebar-nav">
-        {sections.map((section, sIdx) => (
+        {sections.map((section) => (
           <div key={section.title} className="sidebar-section">
-            {!effectiveCollapsed && sIdx > 0 && <div className="sidebar-divider" />}
-            {!effectiveCollapsed && (
-              <div className="sidebar-section-title">{section.title}</div>
-            )}
-            {effectiveCollapsed && sIdx > 0 && <div className="sidebar-divider" />}
             {section.items.map((item) => (
               <SidebarLink
                 key={item.href}

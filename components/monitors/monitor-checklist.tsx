@@ -1,11 +1,17 @@
 'use client'
 
-import { useState, useTransition, useEffect, useRef } from 'react'
-import { ChevronDown, ChevronRight } from 'lucide-react'
+import { useState, useTransition, useEffect, useRef, useMemo } from 'react'
+import { ChevronDown, Settings2, Check } from 'lucide-react'
 import { MONITOR_TYPES } from '@/lib/constants/monitor-types'
 import { MonitorTypeIcon } from './monitor-type-icon'
 import { ConfigureMonitorModal } from './configure-monitor-modal'
+import { Favicon } from '@/components/ui/favicon'
+import { Sparkline } from '@/components/ui/sparkline'
 import { toggleMonitorSelectionAction } from '@/app/(dashboard)/dashboard/monitors/actions'
+import {
+  aggregateDomainGroup, timeAgoShort, STATUS_LABEL, STATUS_DOT_COLOR, STATUS_BADGE_CLASS,
+  type CheckResultLite,
+} from '@/lib/utils/monitor-aggregation'
 import type { Monitor } from '@/lib/types'
 
 const CHECKLIST_TYPES = MONITOR_TYPES.filter(t => t.type !== 'wordpress')
@@ -14,9 +20,10 @@ const MANUAL_CONFIG_TYPES = new Set(['keyword', 'port', 'api', 'heartbeat', 'com
 interface Props {
   domain: string
   monitors: Monitor[]
+  checkResults?: CheckResultLite[]
 }
 
-export function MonitorChecklist({ domain, monitors: initialMonitors }: Props): React.ReactElement {
+export function MonitorChecklist({ domain, monitors: initialMonitors, checkResults = [] }: Props): React.ReactElement {
   const [expanded, setExpanded] = useState(false)
   const [monitors, setMonitors] = useState(initialMonitors)
   const [pending, startTransition] = useTransition()
@@ -51,6 +58,7 @@ export function MonitorChecklist({ domain, monitors: initialMonitors }: Props): 
   }, [initialMonitors])
 
   const byType = new Map(monitors.map(m => [m.type, m]))
+  const agg = useMemo(() => aggregateDomainGroup(domain, monitors, checkResults), [domain, monitors, checkResults])
 
   function handleToggle(type: string, checked: boolean): void {
     setError(null)
@@ -95,46 +103,74 @@ export function MonitorChecklist({ domain, monitors: initialMonitors }: Props): 
   const selectedCount = monitors.length
 
   return (
-    <div className="mon-website-group">
-      <button className="mon-website-group-header" onClick={() => setExpanded(v => !v)}>
-        {expanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-        <span className="mon-website-group-name">{domain || 'Other monitors'}</span>
-        <span className="mon-website-group-count">{selectedCount} monitor{selectedCount === 1 ? '' : 's'}</span>
+    <div className={`mon-domain-card${expanded ? ' mon-domain-card--expanded' : ''}`}>
+      <button className="mon-domain-header" onClick={() => setExpanded(v => !v)} aria-expanded={expanded}>
+        <span className="mon-domain-header-lead">
+          <Favicon domain={domain || 'Other'} size={22} />
+          <span className="mon-domain-name">{domain || 'Other monitors'}</span>
+          <span className={`db-badge ${STATUS_BADGE_CLASS[agg.status]} mon-domain-status-badge`}>
+            <span className="status-dot" style={{ background: STATUS_DOT_COLOR[agg.status] }} />
+            {STATUS_LABEL[agg.status]}
+          </span>
+        </span>
+
+        <span className="mon-domain-header-metrics">
+          <span className="mon-domain-metric">
+            <span className="mon-domain-metric-value">{agg.uptimePct !== null ? `${agg.uptimePct.toFixed(1)}%` : '—'}</span>
+            <span className="mon-domain-metric-label">Uptime</span>
+          </span>
+          <span className="mon-domain-metric">
+            <span className="mon-domain-metric-value">{agg.avgResponseMs !== null ? `${agg.avgResponseMs}ms` : '—'}</span>
+            <span className="mon-domain-metric-label">Response</span>
+          </span>
+          <span className="mon-domain-metric-sparkline">
+            {agg.trend.length >= 2 && <Sparkline values={agg.trend} color={STATUS_DOT_COLOR[agg.status]} />}
+          </span>
+          <span className="mon-domain-metric mon-domain-metric-muted">
+            <span className="mon-domain-metric-value">{selectedCount}</span>
+            <span className="mon-domain-metric-label">monitor{selectedCount === 1 ? '' : 's'}</span>
+          </span>
+          <span className="mon-domain-metric-time">{timeAgoShort(agg.lastCheckedAt)}</span>
+          <ChevronDown size={16} className="mon-domain-chevron" />
+        </span>
       </button>
 
       {expanded && (
         <div className="mon-checklist">
           {error && <div className="form-error" style={{ margin: '0 0 12px' }}>{error}</div>}
-          {CHECKLIST_TYPES.map(mt => {
-            const existing = byType.get(mt.type)
-            const checked = Boolean(existing)
-            const isManual = MANUAL_CONFIG_TYPES.has(mt.type)
-            const isBusy = pending && busyType === mt.type
+          <div className="mon-check-grid">
+            {CHECKLIST_TYPES.map(mt => {
+              const existing = byType.get(mt.type)
+              const checked = Boolean(existing)
+              const isManual = MANUAL_CONFIG_TYPES.has(mt.type)
+              const isBusy = pending && busyType === mt.type
 
-            return (
-              <div key={mt.type} className="mon-check-row">
-                <label className="mon-check-label">
+              return (
+                <label key={mt.type} className={`mon-check-tile${checked ? ' mon-check-tile--selected' : ''}${isBusy ? ' mon-check-tile--busy' : ''}`}>
                   <input
                     type="checkbox"
                     checked={checked}
                     disabled={isBusy}
                     onChange={e => handleToggle(mt.type, e.target.checked)}
                   />
-                  <MonitorTypeIcon type={mt.type} iconOnly iconSize={16} />
-                  <span>{mt.name}</span>
+                  <span className="mon-check-tile-icon"><MonitorTypeIcon type={mt.type} iconOnly iconSize={15} /></span>
+                  <span className="mon-check-tile-name">{mt.name}</span>
+                  {checked && <span className="mon-check-tile-check"><Check size={11} strokeWidth={3} /></span>}
+                  {isManual && (
+                    <button
+                      type="button"
+                      className="mon-check-tile-configure"
+                      onClick={e => { e.preventDefault(); setConfiguring(mt.type) }}
+                      disabled={isBusy}
+                    >
+                      <Settings2 size={11} />
+                      {checked ? 'Edit' : 'Configure'}
+                    </button>
+                  )}
                 </label>
-                {isManual && (
-                  <button
-                    className="mon-check-configure-btn"
-                    onClick={() => setConfiguring(mt.type)}
-                    disabled={isBusy}
-                  >
-                    {checked ? 'Edit config' : 'Configure'}
-                  </button>
-                )}
-              </div>
-            )
-          })}
+              )
+            })}
+          </div>
         </div>
       )}
 
