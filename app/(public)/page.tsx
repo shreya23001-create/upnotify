@@ -1,7 +1,7 @@
 import './landing.css'
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { Zap, Info, Check, FileBarChart, Search, Lightbulb, AlertTriangle } from 'lucide-react'
+import { Zap, Info, Check, FileBarChart, Search, Lightbulb, AlertTriangle, Globe2 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { BlogPreview } from '@/components/landing/blog-preview'
 import ProPlanPricing from '@/components/landing/pro-plan-pricing'
@@ -69,7 +69,7 @@ export const metadata: Metadata = {
 // the CMS `icon` field still stores legacy emoji strings (DB row seeded before
 // icons existed) but React components can't be stored in JSON, so we ignore
 // that field entirely rather than trying to keep it in sync.
-const AI_FEATURE_ICONS: LucideIcon[] = [FileBarChart, Search, Lightbulb]
+const AI_FEATURE_ICONS: LucideIcon[] = [FileBarChart, Search, Lightbulb, Globe2]
 
 const DEFAULT_STEPS = [
   {
@@ -428,6 +428,7 @@ export default async function LandingPage(): Promise<React.ReactElement> {
                       { icon: '📊', color: 'purple', title: 'Instant Health Reports', description: 'Pick a website and a period — daily, weekly, monthly, or yearly — and get a clean report built straight from your real uptime, response time, and incident data. No waiting, no AI black box.' },
                       { icon: '🔍', color: 'cyan', title: 'Outage Pattern Detection', description: "Upnotify learns your monitor's normal behaviour and flags anomalies before they become incidents. Recurring issues are spotted and surfaced automatically." },
                       { icon: '💡', color: 'blue', title: 'Plain Language Incident Summaries', description: 'Every incident automatically gets a human-readable summary. No log-diving, no decoding stack traces. Just "your checkout was down for 8 minutes on Tuesday."' },
+                      { icon: '🌐', color: 'pink', title: 'AI Visibility & Citation Monitoring', description: 'Checks whether ChatGPT, Perplexity, Gemini, and Claude actually cite your site when people ask about your product — plus an auto-generated llms.txt so AI search engines can index you correctly.' },
                     ]).map((f, i) => {
                       const AiFeatureIcon = AI_FEATURE_ICONS[i % AI_FEATURE_ICONS.length]
                       return (
