@@ -20,12 +20,18 @@ export async function PUT(request: Request): Promise<NextResponse> {
 
     const user = await getCurrentUser()
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    if (user.role !== 'admin' && user.role !== 'owner') {
+      return NextResponse.json({ error: 'Only admins can update company details' }, { status: 403 })
+    }
 
     const raw: unknown = await request.json()
-    // Strip empty strings so optional shortTextSchema fields (min(1)) don't
-    // reject blank form inputs — empty = "leave unchanged" not "clear field".
+    // Strip empty/absent values so optional shortTextSchema fields (min(1))
+    // don't reject blank or missing form inputs — that means "leave
+    // unchanged", not "clear field". FormData.get() returns null for a field
+    // that isn't present in the form at all, which must be treated the same
+    // way as an empty string here.
     const body: unknown = typeof raw === 'object' && raw !== null
-      ? Object.fromEntries(Object.entries(raw as Record<string, unknown>).filter(([, v]) => v !== ''))
+      ? Object.fromEntries(Object.entries(raw as Record<string, unknown>).filter(([, v]) => v !== '' && v !== null && v !== undefined))
       : raw
     const parsed = validateInput(companyDetailsSchema, body, 'company-details-update')
     if (!parsed.success) return parsed.response

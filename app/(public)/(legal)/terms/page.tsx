@@ -44,8 +44,7 @@ export default function TermsOfServicePage(): React.ReactElement {
         <li>Public and private status pages</li>
         <li>Public Tracker &mdash; publicly visible uptime monitoring of major third-party websites and services, provided for informational purposes</li>
         <li>Upnotify Score &mdash; a free website health assessment tool that scans a given URL and displays a publicly visible health score and diagnostic summary</li>
-        <li>Upnotify Compete &mdash; competitive intelligence features including price tracking and stock monitoring for ecommerce websites (coming soon; availability subject to separate terms when launched)</li>
-        <li>AI-powered performance and incident reports</li>
+        <li>Performance and incident reports</li>
         <li>Incident management and resolution tracking</li>
         <li>White-label agency monitoring and client management</li>
       </ul>
@@ -301,16 +300,6 @@ export default function TermsOfServicePage(): React.ReactElement {
         <li>
           Circumvent or attempt to circumvent any rate limits, usage limits, or security measures.
         </li>
-        <li>
-          Use the Upnotify Compete feature (or any competitive intelligence functionality) to violate the
-          terms of service of any target website, or to circumvent access controls, CAPTCHAs, or
-          anti-scraping measures employed by any third-party website.
-        </li>
-        <li>
-          Use the Upnotify Compete feature to collect, store, or redistribute data from third-party
-          websites in a manner that infringes the intellectual property rights or data protection
-          rights of the website operator or any third party.
-        </li>
       </ul>
       <p>
         Violation of this section may result in immediate suspension or termination of your account. See
@@ -412,49 +401,6 @@ export default function TermsOfServicePage(): React.ReactElement {
       <p>
         You use the Service at your own risk. Any reliance on monitoring data, reports, AI-generated
         summaries, or alerts is at your sole discretion and risk.
-      </p>
-
-      <h2>11A. Watchdog — Competitor Monitoring</h2>
-      <p>
-        The Watchdog feature allows you to monitor the uptime and response time of third-party websites
-        (&quot;Tracked Sites&quot;) by sending standard HTTP requests to their publicly accessible URLs,
-        the same way any web browser or visitor would.
-      </p>
-      <p>
-        By using Watchdog, you acknowledge and agree that:
-      </p>
-      <ul>
-        <li>
-          <strong>Informational use only.</strong> Data collected by Watchdog is provided for your internal
-          benchmarking and informational purposes only. It does not constitute a legal, commercial, or
-          technical assessment of any Tracked Site or its operator.
-        </li>
-        <li>
-          <strong>No affiliation.</strong> Upnotify has no affiliation, partnership, or commercial
-          relationship with any Tracked Site. Monitoring a site does not imply any endorsement,
-          sponsorship, or association.
-        </li>
-        <li>
-          <strong>Accuracy.</strong> Watchdog reflects observations made from Upnotify&apos;s monitoring
-          infrastructure at the time of each check. Results may not reflect the experience of all users
-          of a Tracked Site and may be affected by geographic, network, or temporary factors outside
-          our control.
-        </li>
-        <li>
-          <strong>Permitted use.</strong> You must not use Watchdog to facilitate unauthorised access to,
-          denial of service against, or any other harmful activity directed at any Tracked Site. You
-          are solely responsible for ensuring that your use of Watchdog complies with all applicable laws
-          and does not violate the terms of service of any Tracked Site.
-        </li>
-        <li>
-          <strong>AI summaries.</strong> Where Watchdog includes AI-generated summaries or analysis,
-          these are generated automatically and may contain errors or omissions. They do not constitute
-          professional advice of any kind.
-        </li>
-      </ul>
-      <p>
-        We reserve the right to restrict, suspend, or remove Watchdog access if we reasonably believe
-        it is being used in a manner that is harmful, unlawful, or inconsistent with these Terms.
       </p>
 
       <h2>11B. Force Majeure</h2>

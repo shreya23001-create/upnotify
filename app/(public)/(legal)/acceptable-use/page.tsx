@@ -132,35 +132,6 @@ export default function AcceptableUsePolicyPage(): React.ReactElement {
         </li>
       </ul>
 
-      <h3>1.6 Competitive Intelligence (Upnotify Compete)</h3>
-      <p>
-        If you use or access the Upnotify Compete feature (competitive intelligence, price tracking,
-        stock monitoring), you must comply with the following additional restrictions:
-      </p>
-      <ul>
-        <li>
-          You must not use Upnotify Compete to scrape, collect, or store data from any website that
-          prohibits such activity in its terms of service or robots.txt file.
-        </li>
-        <li>
-          You must not use Upnotify Compete to circumvent access controls, CAPTCHAs, rate limits, or
-          other technical measures employed by any third-party website.
-        </li>
-        <li>
-          You must respect the robots.txt directives of any website monitored through Upnotify Compete.
-          Upnotify will make reasonable efforts to honour robots.txt restrictions automatically, but
-          you remain responsible for ensuring your use is compliant.
-        </li>
-        <li>
-          You must not use data obtained through Upnotify Compete to engage in price fixing, market
-          manipulation, or any other activity that would violate competition law.
-        </li>
-        <li>
-          You must not redistribute, resell, or publicly publish raw data obtained through Upnotify
-          Compete without our prior written consent.
-        </li>
-      </ul>
-
       <h3>1.7 Public Tracker Disclaimer</h3>
       <p>
         The Upnotify Public Tracker displays uptime and performance data for selected third-party

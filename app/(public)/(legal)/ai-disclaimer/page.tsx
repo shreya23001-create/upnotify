@@ -27,10 +27,6 @@ export default function AIDisclaimerPage(): React.ReactElement {
           <strong>Score analysis:</strong> AI-powered commentary on website health scores, including
           recommendations and risk assessments.
         </li>
-        <li>
-          <strong>Competitive intelligence:</strong> AI-assisted analysis of competitor data, trends,
-          and market positioning (where available).
-        </li>
       </ul>
 
       <h2>2. Informational Purposes Only</h2>

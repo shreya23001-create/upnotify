@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { HelpSidebar } from '../help-sidebar'
+import { HelpSidebar, getTopicIcon } from '../help-sidebar'
 
 const FAQ_SCHEMA = {
   '@context': 'https://schema.org',
@@ -55,7 +55,10 @@ export default function BillingPage(): React.ReactElement {
 
         <article className="help-article">
           <div className="help-article-hero">
-            <h1 className="help-article-title">Plans &amp; Billing</h1>
+            <div className="help-article-title-row">
+              <span className="help-article-icon">{getTopicIcon('/dashboard/help/billing')}</span>
+              <h1 className="help-article-title">Plans &amp; Billing</h1>
+            </div>
             <p className="help-article-intro">
               Upnotify runs on a single Pro Plan, priced per website. No tiers to compare,
               no feature gating — every website you monitor gets the full product.

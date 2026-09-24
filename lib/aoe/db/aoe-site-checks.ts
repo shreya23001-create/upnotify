@@ -87,8 +87,6 @@ export async function categorizeSite(
     category = 'ssl_expiry'
   } else if (slowCount >= 4) {
     category = 'slow'
-  } else if (platform === 'shopify' || platform === 'woocommerce') {
-    category = 'compete' // no issues, but ecommerce — pitch Compete
   } else if (hasLlmsTxt === false) {
     category = 'no_llms_txt' // healthy site missing llms.txt — pitch AI SEO tools
   }

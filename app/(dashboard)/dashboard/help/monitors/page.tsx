@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { HelpSidebar } from '../help-sidebar'
+import { HelpSidebar, getTopicIcon } from '../help-sidebar'
 
 const FAQ_SCHEMA = {
   '@context': 'https://schema.org',
@@ -55,7 +55,10 @@ export default function MonitorsPage(): React.ReactElement {
 
         <article className="help-article">
           <div className="help-article-hero">
-            <h1 className="help-article-title">Understanding Monitors</h1>
+            <div className="help-article-title-row">
+              <span className="help-article-icon">{getTopicIcon('/dashboard/help/monitors')}</span>
+              <h1 className="help-article-title">Understanding Monitors</h1>
+            </div>
             <p className="help-article-intro">
               A monitor keeps an eye on something important so you do not have to. You tell it what
               to watch, how often to check, and what counts as a problem. Upnotify handles the rest.

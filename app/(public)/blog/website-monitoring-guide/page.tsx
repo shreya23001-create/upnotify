@@ -213,14 +213,6 @@ export default function WebsiteMonitoringGuidePage(): React.ReactElement {
           stopped running.
         </p>
 
-        <h3>10. Competitor monitoring</h3>
-        <p>
-          A newer addition to the monitoring world. Competitor monitoring tracks your competitors&apos;
-          website performance, uptime, and changes — giving you an edge in understanding the
-          landscape. We cover this in detail in our{' '}
-          <Link href="/blog/competitor-analysis-ecommerce">competitor analysis guide</Link>.
-        </p>
-
         <h2>How to choose a website monitoring tool</h2>
 
         <p>

@@ -70,13 +70,13 @@ export function InvoiceList({ invoices }: { invoices: Invoice[] }) {
       <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
         {i.invoice_pdf_url ? (
           // Stripe invoices: open Stripe-hosted PDF directly (includes full VAT breakdown)
-          <a href={i.invoice_pdf_url} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-secondary">
-            View Invoice
+          <a href={i.invoice_pdf_url} target="_blank" rel="noopener noreferrer" className="stt-invoice-link">
+            View
           </a>
         ) : (
           // Razorpay / manual invoices: our branded print page
-          <a href={`/dashboard/billing/invoice/${i.id}`} className="btn btn-sm btn-secondary">
-            View Invoice
+          <a href={`/dashboard/billing/invoice/${i.id}`} className="stt-invoice-link">
+            View
           </a>
         )}
       </div>

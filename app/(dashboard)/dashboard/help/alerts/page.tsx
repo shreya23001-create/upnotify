@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { HelpSidebar } from '../help-sidebar'
+import { HelpSidebar, getTopicIcon } from '../help-sidebar'
 
 const FAQ_SCHEMA = {
   '@context': 'https://schema.org',
@@ -55,7 +55,10 @@ export default function AlertsPage(): React.ReactElement {
 
         <article className="help-article">
           <div className="help-article-hero">
-            <h1 className="help-article-title">Setting Up Alerts</h1>
+            <div className="help-article-title-row">
+              <span className="help-article-icon">{getTopicIcon('/dashboard/help/alerts')}</span>
+              <h1 className="help-article-title">Setting Up Alerts</h1>
+            </div>
             <p className="help-article-intro">
               Monitoring without alerts is like a smoke detector without a siren. Alerts make sure
               the right people know the moment something breaks, wherever they are.

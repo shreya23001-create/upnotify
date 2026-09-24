@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { HelpSidebar } from '../help-sidebar'
+import { HelpSidebar, getTopicIcon } from '../help-sidebar'
 
 const FAQ_SCHEMA = {
   '@context': 'https://schema.org',
@@ -63,7 +63,10 @@ export default function AiVisibilityHelpPage(): React.ReactElement {
 
         <article className="help-article">
           <div className="help-article-hero">
-            <h1 className="help-article-title">AI Visibility — llms.txt &amp; Citation Monitor</h1>
+            <div className="help-article-title-row">
+              <span className="help-article-icon">{getTopicIcon('/dashboard/help/ai-visibility')}</span>
+              <h1 className="help-article-title">AI Visibility — llms.txt &amp; Citation Monitor</h1>
+            </div>
             <p className="help-article-intro">
               Search is changing. ChatGPT, Perplexity, Gemini, and Claude are answering questions
               directly — and the sites they cite get the traffic. AI Visibility helps you control
@@ -287,8 +290,8 @@ export default function AiVisibilityHelpPage(): React.ReactElement {
 
           <div className="help-next-links">
             <p className="help-next-label">Next up</p>
-            <Link href="/dashboard/help/watchdog" className="help-next-link">
-              Watchdog — Competitor Tracking &rarr;
+            <Link href="/dashboard/help/credits" className="help-next-link">
+              Community Credits &rarr;
             </Link>
           </div>
         </article>

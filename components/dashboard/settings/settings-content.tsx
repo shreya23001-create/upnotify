@@ -14,9 +14,7 @@ import { PricingTable } from '@/components/billing/pricing-table'
 import { InvoiceList } from '@/components/billing/invoice-list'
 import { CreditsSection } from '@/components/billing/credits-section'
 import { ReferralSection } from '@/components/billing/referral-section'
-import { CompanyDetailsForm } from '@/components/dashboard/settings/company-details-form'
-import { OrgSettingsForm } from '@/components/dashboard/settings/org-settings-form'
-import { LogoUpload } from '@/components/ui/logo-upload'
+import { OrganisationCompanyForm } from '@/components/dashboard/settings/organisation-company-form'
 import { TeamInviteForm } from '@/components/dashboard/settings/team-invite-form'
 import { CmsManager } from '@/components/admin/cms-manager'
 
@@ -71,7 +69,8 @@ export function SettingsContent({
 }: SettingsContentProps): React.ReactElement {
   const searchParams = useSearchParams()
   const router = useRouter()
-  const initialTab = searchParams.get('tab') || 'organisation'
+  const rawInitialTab = searchParams.get('tab') || 'organisation'
+  const initialTab = rawInitialTab === 'company' ? 'organisation' : rawInitialTab
   const [tab, setTab] = useState(initialTab)
   const billingResult = searchParams.get('billing') // 'success' | 'canceled' | null
 
@@ -177,32 +176,7 @@ export function SettingsContent({
   }, [removeTarget])
 
   const canManageTeam = currentUserRole === 'owner' || currentUserRole === 'admin'
-
-  const memberColumns: Column<User>[] = [
-    { key: 'full_name', label: 'Name', render: (m) => (
-      <span style={{ fontWeight: 500 }}>
-        {m.full_name ?? '\u2014'}
-        {m.id === currentUserId && <span style={{ marginLeft: 8, fontSize: 12, color: '#a1a1aa' }}>(you)</span>}
-      </span>
-    )},
-    { key: 'email', label: 'Email' },
-    { key: 'role', label: 'Role', render: (m) => <span className="badge badge-outline" style={{ textTransform: 'capitalize' }}>{m.role}</span> },
-    ...(canManageTeam ? [{
-      key: 'actions' as keyof User,
-      label: '',
-      render: (m: User) => (
-        m.id !== currentUserId && m.role !== 'owner' ? (
-          <button
-            className="btn btn-ghost btn-sm"
-            style={{ color: '#ef4444', fontSize: 13 }}
-            onClick={() => setRemoveTarget(m.id)}
-          >
-            Remove
-          </button>
-        ) : null
-      ),
-    }] : []),
-  ]
+  const canManageOrg = currentUserRole === 'owner' || currentUserRole === 'admin'
 
   const apiKeyColumns: Column<ApiKey>[] = [
     { key: 'name', label: 'Name', render: (k) => <span style={{ fontWeight: 500 }}>{k.name}</span> },
@@ -231,7 +205,6 @@ export function SettingsContent({
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        company_name: formData.get('company_name'),
         billing_email: formData.get('billing_email'),
         company_address_line1: formData.get('company_address_line1'),
         company_address_line2: formData.get('company_address_line2'),
@@ -247,16 +220,15 @@ export function SettingsContent({
     return {}
   }
 
-  type NavItem = { id: string; label: string; short: string; icon: React.ReactElement; adminOnly?: boolean }
+  type NavItem = { id: string; label: string; short: string; icon: React.ReactElement; hidden?: boolean }
   const navItems: NavItem[] = [
-    { id: 'organisation', label: 'Organisation', short: 'Org',      icon: <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> },
-    { id: 'company',      label: 'Company',      short: 'Company',  icon: <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg> },
-    { id: 'team',         label: 'Team',         short: 'Team',     icon: <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> },
+    { id: 'organisation', label: 'Company',      short: 'Company',  icon: <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg> },
+    { id: 'team',         label: 'Team',         short: 'Team',     icon: <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>, hidden: !canManageTeam },
     { id: 'billing',      label: 'Billing',      short: 'Billing',  icon: <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> },
-    { id: 'landing',      label: 'CMS',          short: 'CMS',      icon: <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>, adminOnly: true },
+    { id: 'landing',      label: 'CMS',          short: 'CMS',      icon: <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>, hidden: !isSuperAdmin },
   ]
 
-  const visibleNav = navItems.filter(n => !n.adminOnly || isSuperAdmin)
+  const visibleNav = navItems.filter(n => !n.hidden)
 
   return (
     <>
@@ -301,89 +273,43 @@ export function SettingsContent({
             ))}
           </div>
 
-          {/* ── Tab: Organisation ── */}
+          {/* ── Tab: Organisation (merged into one unified Company Details panel) ── */}
           {tab === 'organisation' && (
             <div className="stt-section">
-              <div className="stt-section-header">
-                <div className="stt-section-icon">
-                  <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                </div>
-                <div>
-                  <div className="stt-section-title">Organisation</div>
-                  <div className="stt-section-sub">Your workspace name and primary settings.</div>
-                </div>
-              </div>
-              <OrgSettingsForm organisation={organisation} />
-            </div>
-          )}
-
-          {/* ── Tab: Company ── */}
-          {tab === 'company' && (
-            <div className="stt-section">
-              <div className="stt-section-header">
-                <div className="stt-section-icon">
-                  <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-                </div>
-                <div>
-                  <div className="stt-section-title">Company</div>
-                  <div className="stt-section-sub">Logo and billing address for invoices.</div>
-                </div>
-              </div>
-              <div className="space-y">
-                <div className="card">
-                  <div className="card-header"><div className="card-title">Organisation Logo</div></div>
-                  <div className="card-content">
-                    <LogoUpload currentLogoUrl={organisation.logo_url} orgName={organisation.name} onUpload={uploadLogo} />
-                  </div>
-                </div>
-                <div className="card">
-                  <div className="card-header"><div className="card-title">Company Details</div></div>
-                  <div className="card-content">
-                    <CompanyDetailsForm organisation={organisation} onSave={saveCompanyDetails} />
-                  </div>
-                </div>
-              </div>
+              <OrganisationCompanyForm
+                organisation={organisation}
+                onUploadLogo={uploadLogo}
+                onSaveCompanyDetails={saveCompanyDetails}
+                canEdit={canManageOrg}
+              />
             </div>
           )}
 
           {/* ── Tab: Team ── */}
-          {tab === 'team' && (
+          {tab === 'team' && canManageTeam && (
             <div className="stt-section">
               <div className="stt-section-header">
                 <div className="stt-section-icon">
                   <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                 </div>
-                <div>
+                <div className="stt-section-header-text">
                   <div className="stt-section-title">Team</div>
-                  <div className="stt-section-sub">Manage members and send invites.</div>
                 </div>
               </div>
-              <div className="space-y">
-                <div className="card">
-                  <div className="card-header"><div className="card-title">Team Members</div></div>
-                  <div className="card-content">
-                    <DataTable columns={memberColumns} data={teamMembers} searchPlaceholder="Search members..." emptyMessage="No team members yet." />
+
+              {canManageTeam && (
+                <div className="stt-form-card">
+                  <div className="stt-form-card-header">
+                    <div className="stt-form-card-title">Invite Team Member</div>
+                  </div>
+                  <div className="stt-form-card-body">
+                    {canInvite
+                      ? <TeamInviteForm canInvite={canInvite} teamMemberLimit={teamMemberLimit} teamMemberCount={teamMemberCount} onInviteSent={handleInviteSent} />
+                      : <p className="stt-upgrade-notice">Team invites are not available on your current plan. Upgrade to invite team members.</p>
+                    }
                   </div>
                 </div>
-                {canManageTeam && (
-                  <div className="card">
-                    <div className="card-header">
-                      <div className="card-title">Invite Team Member</div>
-                      <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 2 }}>
-                        {canInvite
-                          ? `${teamMemberCount} of ${teamMemberLimit === 0 ? '∞' : teamMemberLimit} seats used`
-                          : 'Team member limit reached. Upgrade your plan to invite more.'}
-                      </p>
-                    </div>
-                    <div className="card-content">
-                      {canInvite
-                        ? <TeamInviteForm canInvite={canInvite} teamMemberLimit={teamMemberLimit} teamMemberCount={teamMemberCount} onInviteSent={handleInviteSent} />
-                        : <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>Team invites are not available on your current plan. Upgrade to invite team members.</p>
-                      }
-                    </div>
-                  </div>
-                )}
-              </div>
+              )}
             </div>
           )}
 
@@ -394,7 +320,7 @@ export function SettingsContent({
                 <div className="stt-section-icon">
                   <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
                 </div>
-                <div>
+                <div className="stt-section-header-text">
                   <div className="stt-section-title">Billing</div>
                   <div className="stt-section-sub">Your plan, invoices and payment details.</div>
                 </div>
@@ -420,7 +346,7 @@ export function SettingsContent({
                 <div className="stt-section-icon">
                   <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
                 </div>
-                <div>
+                <div className="stt-section-header-text">
                   <div className="stt-section-title">Credits</div>
                   <div className="stt-section-sub">Earn and spend credits across Upnotify features.</div>
                 </div>
@@ -436,7 +362,7 @@ export function SettingsContent({
                 <div className="stt-section-icon">
                   <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
                 </div>
-                <div>
+                <div className="stt-section-header-text">
                   <div className="stt-section-title">Referrals</div>
                   <div className="stt-section-sub">Share your link and earn credits for every sign-up.</div>
                 </div>
@@ -452,7 +378,7 @@ export function SettingsContent({
                 <div className="stt-section-icon">
                   <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
                 </div>
-                <div>
+                <div className="stt-section-header-text">
                   <div className="stt-section-title">API Keys</div>
                   <div className="stt-section-sub">Authenticate with the Upnotify API. Keys are shown once.</div>
                 </div>
@@ -491,7 +417,7 @@ export function SettingsContent({
                 <div className="card-header card-header-row">
                   <div>
                     <div className="card-title">API Keys</div>
-                    <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 2 }}>Used to authenticate with the Upnotify API and Compete webhooks.</p>
+                    <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 2 }}>Used to authenticate with the Upnotify API.</p>
                   </div>
                   {currentPlan?.has_api_access && (
                     <button className="btn btn-primary btn-sm" onClick={() => { setShowCreateForm(f => !f); setCreateError(null) }}>
@@ -523,7 +449,7 @@ export function SettingsContent({
                 <div className="stt-section-icon">
                   <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
                 </div>
-                <div>
+                <div className="stt-section-header-text">
                   <div className="stt-section-title">CMS</div>
                   <div className="stt-section-sub">Manage landing page content and theme.</div>
                 </div>

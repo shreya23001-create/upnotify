@@ -82,7 +82,7 @@ export default function WatchdogHelpPage(): React.ReactElement {
           <section className="help-section">
             <h2 className="help-section-title">How to add a site to Watchdog</h2>
             <ol className="help-steps">
-              <li>Go to <strong>Watchdog</strong> in the sidebar.</li>
+              <li>Go to <Link href="/dashboard/watchdog">Watchdog</Link>.</li>
               <li>Click <strong>Add Site</strong>.</li>
               <li>Enter their domain (e.g. <code>example.com</code>).</li>
               <li>Upnotify starts monitoring immediately — the first data point appears within minutes.</li>

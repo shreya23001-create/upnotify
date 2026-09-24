@@ -50,7 +50,7 @@ const TYPE_OPTIONS = [
   { label: 'Ping', value: 'ping' },
   { label: 'API', value: 'api' },
   { label: 'Heartbeat', value: 'heartbeat' },
-  { label: 'Competitor', value: 'competitor' },
+  { label: 'Page Change', value: 'competitor' },
   { label: 'Security Headers', value: 'security-headers' },
   { label: 'Response Time', value: 'response-time' },
   { label: 'robots.txt', value: 'robots-txt' },

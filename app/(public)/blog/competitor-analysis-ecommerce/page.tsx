@@ -327,32 +327,6 @@ export default function CompetitorAnalysisEcommercePage(): React.ReactElement {
           it cheaper elsewhere.
         </p>
 
-        <h2>Introducing Upnotify Compete</h2>
-
-        <p>
-          We are building something specifically for this use case. Upnotify Compete is our
-          upcoming competitor monitoring feature that combines uptime tracking, performance
-          benchmarking, SSL monitoring, and content change detection into a single competitive
-          intelligence dashboard.
-        </p>
-
-        <p>
-          Instead of cobbling together four different tools, you get a unified view: your
-          performance versus your competitors&apos;, updated every minute, with alerts when something
-          significant changes. Early access is launching soon for Upnotify users.
-        </p>
-
-        <div className="blog-cta-section">
-          <h3>Get early access to Upnotify Compete</h3>
-          <p>
-            Competitive intelligence meets monitoring. Track competitor performance, uptime, SSL,
-            and content changes — all from one dashboard. Sign up to be first in line.
-          </p>
-          <Link href="/signup" className="btn btn-primary btn-lg">
-            Get Early Access
-          </Link>
-        </div>
-
         <h2>Common mistakes in competitor analysis</h2>
 
         <h3>Monitoring too many competitors</h3>

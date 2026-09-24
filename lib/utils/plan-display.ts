@@ -110,10 +110,6 @@ export function getPlanFeatures(p: PlanDisplayData): PlanFeature[] {
   // Monitoring reports (deterministic, unlimited — no AI-report quota anymore)
   features.push({ text: 'Monitoring reports', included: true })
 
-  // Watchdog
-  const watchdog = p.competitor_limit ?? 3
-  features.push({ text: `Watchdog — ${watchdog} competitor${watchdog === 1 ? '' : 's'}`, included: true })
-
   // llms.txt Generator
   if (p.llms_txt_limit === -1) {
     features.push({ text: 'llms.txt Generator (unlimited)', included: true })

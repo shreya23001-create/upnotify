@@ -28,7 +28,7 @@ interface ComparisonMatrixProps {
 const GROUPS: Array<{ label: string; icon: LucideIcon; keywords: string[] }> = [
   { label: 'Monitoring', icon: Activity, keywords: ['check interval', 'monitor types', 'status page', 'alert channels'] },
   { label: 'Reliability', icon: ShieldCheck, keywords: ['false alarm', 'gdpr', 'eu data'] },
-  { label: 'Intelligence', icon: Sparkles, keywords: ['ai-powered', 'ai outage', 'ai seo', 'ai citation', 'llms.txt', 'watchdog'] },
+  { label: 'Intelligence', icon: Sparkles, keywords: ['ai-powered', 'ai outage', 'ai seo', 'ai citation', 'llms.txt'] },
   { label: 'Reporting', icon: FileBarChart, keywords: ['leaderboard', 'tracker', 'report'] },
   { label: 'Business', icon: Building2, keywords: ['price', 'plan'] },
 ]

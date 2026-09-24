@@ -20,10 +20,6 @@
       "schedule": "0 3 * * 1"
     },
     {
-      "path": "/api/cron/compete-checks",
-      "schedule": "0 9 * * *"
-    },
-    {
       "path": "/api/cron/aoe/quota-manager",
       "schedule": "0 0 * * *"
     },
@@ -46,14 +42,6 @@
     {
       "path": "/api/cron/aoe/daily-snapshot",
       "schedule": "0 9 * * *"
-    },
-    {
-      "path": "/api/cron/compete-brief",
-      "schedule": "0 8 * * 1"
-    },
-    {
-      "path": "/api/cron/competitor-checks",
-      "schedule": "0 10 * * *"
     },
     {
       "path": "/api/cron/razorpay-recovery",

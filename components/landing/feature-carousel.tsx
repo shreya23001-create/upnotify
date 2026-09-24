@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import {
   Wifi, ShieldCheck, BellRing, LayoutDashboard, BrainCircuit,
-  Eye, Zap, TrendingUp, Sparkles, Building2,
+  Zap, TrendingUp, Sparkles, Building2,
   Activity, Bell, BarChart2, Cpu, Settings, ChevronLeft, ChevronRight,
 } from 'lucide-react'
 
@@ -26,7 +26,7 @@ const CARDS: FeatureCard[] = [
     glow: 'linear-gradient(90deg,#3b82f6,#06b6d4)',
     iconBg: 'linear-gradient(135deg,rgba(59,130,246,0.15),rgba(6,182,212,0.15))',
     icon: (<Wifi size={22} strokeWidth={1.8} color="#3b82f6" />), title: 'Uptime Monitoring',
-    desc: '10 monitor types including HTTP, SSL, DNS, keyword detection, domain expiry, port, ping, API endpoint, heartbeat, and Watchdog tracking.',
+    desc: '24 monitor types including HTTP, SSL, DNS, keyword detection, domain expiry, port, ping, API endpoint, and heartbeat.',
     tags: ['HTTP/HTTPS', 'SSL', 'DNS', 'Keyword', 'Port', 'Ping'],
   },
   {
@@ -57,19 +57,10 @@ const CARDS: FeatureCard[] = [
     cat: 'Reporting', catColor: '#ec4899', catBg: 'rgba(236,72,153,0.1)', catBorder: 'rgba(236,72,153,0.2)',
     glow: 'linear-gradient(90deg,#ec4899,#0068DB)',
     iconBg: 'linear-gradient(135deg,rgba(236,72,153,0.12),rgba(0, 104, 219,0.12))',
-    icon: (<BrainCircuit size={22} strokeWidth={1.8} color="#ec4899" />), title: 'AI-Powered Reports',
-    desc: 'Claude AI analyses uptime trends, incident patterns, and performance metrics to generate executive summaries in plain, actionable language.',
-    tags: ['Claude AI', 'Executive summary', 'Insights'],
+    icon: (<BrainCircuit size={22} strokeWidth={1.8} color="#ec4899" />), title: 'Instant Health Reports',
+    desc: 'Deterministic reports built straight from your real uptime, response time, and incident data — daily, weekly, monthly, or yearly. No AI black box.',
+    tags: ['Uptime trends', 'Incident history', 'Response time'],
   },
-  {
-    cat: 'Intelligence', catColor: '#06b6d4', catBg: 'rgba(6,182,212,0.1)', catBorder: 'rgba(6,182,212,0.2)',
-    glow: 'linear-gradient(90deg,#06b6d4,#10b981)',
-    iconBg: 'linear-gradient(135deg,rgba(6,182,212,0.12),rgba(16,185,129,0.12))',
-    icon: (<Eye size={22} strokeWidth={1.8} color="#06b6d4" />), title: 'Watchdog',
-    desc: 'Monitor any website automatically. See when rivals go down before their customers do — and benchmark your reliability against the competition.',
-    tags: ['Uptime tracking', 'Incident alerts', 'Benchmarking'],
-  },
-  // Compete card hidden — launching in v1.5
   {
     cat: 'Free Tool', catColor: '#10b981', catBg: 'rgba(16,185,129,0.1)', catBorder: 'rgba(16,185,129,0.2)',
     glow: 'linear-gradient(90deg,#10b981,#3b82f6)',

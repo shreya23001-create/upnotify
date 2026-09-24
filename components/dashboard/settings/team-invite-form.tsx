@@ -108,27 +108,22 @@ export function TeamInviteForm({
 
   if (!canInvite) {
     return (
-      <div style={{
-        padding: '12px 16px',
-        background: 'var(--bg-muted)',
-        borderRadius: 8,
-        border: '1px solid var(--border-primary)',
-        marginBottom: 16,
-      }}>
+      <p className="stt-upgrade-notice">
         {teamMemberLimit === 0
           ? 'Your current plan does not include team members. Upgrade to add teammates.'
           : `Team member limit reached (${teamMemberCount - 1}/${teamMemberLimit}). Upgrade your plan to invite more members.`}
-      </div>
+      </p>
     )
   }
 
   return (
-    <div style={{ marginBottom: 24 }}>
-      <form className="team-invite-form" onSubmit={(e) => { void handleSubmit(e) }}>
-        <div className="team-invite-field" style={{ flex: 2 }}>
-          <label htmlFor="invite-email">Email Address</label>
+    <div>
+      <form className="stt-invite-form" onSubmit={(e) => { void handleSubmit(e) }}>
+        <div className="form-group stt-invite-field-email">
+          <label className="form-label" htmlFor="invite-email">Email Address</label>
           <input
             id="invite-email"
+            className="form-input"
             type="email"
             placeholder="colleague@company.com"
             value={email}
@@ -136,10 +131,11 @@ export function TeamInviteForm({
             required
           />
         </div>
-        <div className="team-invite-field" style={{ flex: 1, minWidth: 140 }}>
-          <label htmlFor="invite-role">Role</label>
+        <div className="form-group stt-invite-field-role">
+          <label className="form-label" htmlFor="invite-role">Role</label>
           <select
             id="invite-role"
+            className="form-select"
             value={role}
             onChange={(e) => setRole(e.target.value as 'member' | 'admin')}
           >
@@ -149,99 +145,62 @@ export function TeamInviteForm({
         </div>
         <button
           type="submit"
-          className="btn btn-primary btn-sm"
+          className="stt-save-btn stt-invite-submit"
           disabled={loading}
-          style={{ alignSelf: 'flex-end', whiteSpace: 'nowrap' }}
         >
-          {loading ? 'Sending...' : '+ Invite Member'}
+          {loading ? 'Sending…' : '+ Invite Member'}
         </button>
       </form>
 
       {teamMemberLimit > 0 && (
-        <p className="team-limit-notice">
+        <p className="stt-invite-hint">
           {teamMemberCount - 1} of {teamMemberLimit} team member slots used (excludes owner).
         </p>
       )}
 
-      {error && (
-        <p style={{ color: '#ef4444', fontSize: 13, marginTop: 8 }}>{error}</p>
-      )}
-      {success && (
-        <p style={{ color: '#059669', fontSize: 13, marginTop: 8 }}>{success}</p>
-      )}
+      {error && <p className="stt-invite-error">{error}</p>}
+      {success && <p className="stt-invite-success">{success}</p>}
 
       {/* Invited members section — full history, not just currently pending */}
       {!loadingInvites && invites.length > 0 && (
-        <div style={{ marginTop: 20 }}>
-          <h4 style={{
-            fontSize: 14,
-            fontWeight: 600,
-            color: 'var(--text-primary)',
-            marginBottom: 12,
-          }}>
-            Invited Members
-          </h4>
-          <div style={{
-            border: '1px solid var(--border-primary)',
-            borderRadius: 8,
-            overflow: 'hidden',
-          }}>
-            {invites.map((inv, index) => {
+        <div className="stt-subsection stt-invite-history">
+          <div className="stt-subsection-label">Invited Members</div>
+          <div className="stt-invite-list">
+            {invites.map((inv) => {
               const isExpired = inv.status === 'pending' && new Date(inv.expires_at) < new Date()
               const displayStatus = isExpired ? 'expired' : inv.status
-              const STATUS_STYLES: Record<string, { bg: string; color: string; label: string }> = {
-                pending:   { bg: '#fef3c7', color: '#92400e', label: 'Pending' },
-                accepted:  { bg: '#d1fae5', color: '#065f46', label: 'Accepted' },
-                cancelled: { bg: '#f3f4f6', color: '#6b7280', label: 'Cancelled' },
-                expired:   { bg: '#fee2e2', color: '#991b1b', label: 'Expired' },
+              const STATUS_CLASS: Record<string, string> = {
+                pending: 'stt-invite-status--pending',
+                accepted: 'stt-invite-status--accepted',
+                cancelled: 'stt-invite-status--cancelled',
+                expired: 'stt-invite-status--expired',
               }
-              const statusStyle = STATUS_STYLES[displayStatus] ?? STATUS_STYLES.pending
+              const STATUS_LABEL: Record<string, string> = {
+                pending: 'Pending',
+                accepted: 'Accepted',
+                cancelled: 'Cancelled',
+                expired: 'Expired',
+              }
               const canCancel = inv.status === 'pending' && !isExpired
 
               return (
-                <div
-                  key={inv.id}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: '10px 16px',
-                    borderTop: index > 0 ? '1px solid var(--border-primary)' : 'none',
-                    background: 'var(--bg-primary)',
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <span style={{ fontSize: 14, color: 'var(--text-primary)' }}>
-                      {inv.email}
-                    </span>
-                    <span
-                      className="badge badge-outline"
-                      style={{ textTransform: 'capitalize', fontSize: 11 }}
-                    >
-                      {inv.role}
-                    </span>
-                    <span style={{
-                      display: 'inline-block',
-                      padding: '2px 8px',
-                      borderRadius: 9999,
-                      fontSize: 11,
-                      fontWeight: 600,
-                      backgroundColor: statusStyle.bg,
-                      color: statusStyle.color,
-                    }}>
-                      {statusStyle.label}
+                <div key={inv.id} className="stt-invite-row">
+                  <div className="stt-invite-row-main">
+                    <span className="stt-invite-email">{inv.email}</span>
+                    <span className="badge badge-outline stt-invite-role-badge">{inv.role}</span>
+                    <span className={`stt-invite-status ${STATUS_CLASS[displayStatus] ?? STATUS_CLASS.pending}`}>
+                      {STATUS_LABEL[displayStatus] ?? STATUS_LABEL.pending}
                     </span>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+                  <div className="stt-invite-row-meta">
+                    <span className="stt-invite-date">
                       {inv.status === 'pending'
                         ? `Expires ${new Date(inv.expires_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}`
                         : `Sent ${new Date(inv.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}`}
                     </span>
                     {canCancel && (
                       <button
-                        className="btn btn-ghost btn-sm"
-                        style={{ color: '#ef4444', fontSize: 13 }}
+                        className="btn btn-ghost btn-sm stt-invite-cancel-btn"
                         onClick={() => { void handleCancelInvite(inv.id) }}
                       >
                         Cancel

@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { HelpSidebar } from '../help-sidebar'
+import { HelpSidebar, getTopicIcon } from '../help-sidebar'
 
 export default function HelpIncidentsPage(): React.ReactElement {
   const pathname = usePathname()
@@ -12,7 +12,10 @@ export default function HelpIncidentsPage(): React.ReactElement {
       <div className="help-main">
         <article className="help-article">
           <div className="help-article-hero">
-            <h1 className="help-article-title">Incidents</h1>
+            <div className="help-article-title-row">
+              <span className="help-article-icon">{getTopicIcon('/dashboard/help/incidents')}</span>
+              <h1 className="help-article-title">Incidents</h1>
+            </div>
             <p className="help-article-intro">Incidents are created automatically when a monitor confirms downtime. They track the lifecycle of an outage from detection to resolution.</p>
           </div>
 

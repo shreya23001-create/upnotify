@@ -110,6 +110,12 @@ export const helpTopics: HelpTopic[] = [
   },
 ]
 
+export function getTopicIcon(href: string): React.ReactElement | null {
+  const topic = helpTopics.find((t) => t.href === href)
+  if (!topic) return null
+  return topic.icon === '__wp__' ? <IconWordpress size={22} /> : topic.icon
+}
+
 interface HelpSidebarProps {
   currentPath: string
   isSuperAdmin?: boolean
@@ -122,7 +128,7 @@ interface SidebarSection {
 
 function buildSections(topics: HelpTopic[]): SidebarSection[] {
   const monitoring = ['getting-started', 'monitors', 'alerts', 'status-pages', 'incidents']
-  const features   = ['ai-visibility', 'ai-profile', 'tools', 'compete']
+  const features   = ['ai-visibility', 'ai-profile', 'tools']
   const account    = ['billing', 'credits', 'referrals', 'cancel-pause']
 
   function slug(href: string) { return href.split('/').pop() ?? '' }

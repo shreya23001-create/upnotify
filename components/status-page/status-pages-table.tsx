@@ -2,17 +2,20 @@
 
 import { useState, useTransition } from 'react'
 import Link from 'next/link'
-import { Globe, ExternalLink, Edit2, Trash2 } from 'lucide-react'
+import { Globe, ExternalLink, Edit2, Trash2, Search } from 'lucide-react'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { deleteStatusPageAction } from '@/app/(dashboard)/dashboard/status-pages/actions'
 import type { StatusPage } from '@/lib/types'
 import { Pagination } from '@/components/ui/pagination'
 import type { PaginationMeta } from '@/lib/utils/pagination'
 
+type StatusFilter = 'all' | 'published' | 'draft'
+
 export function StatusPagesTable({ pages, pagination }: { pages: StatusPage[]; pagination?: PaginationMeta }) {
   const [isPending, startTransition] = useTransition()
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [search, setSearch] = useState('')
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
 
   function executeDelete(): void {
     if (!deleteId) return
@@ -21,12 +24,18 @@ export function StatusPagesTable({ pages, pagination }: { pages: StatusPage[]; p
     startTransition(async () => { await deleteStatusPageAction(id) })
   }
 
-  const filtered = search
+  const bySearch = search
     ? pages.filter(p =>
         p.name.toLowerCase().includes(search.toLowerCase()) ||
         p.slug.toLowerCase().includes(search.toLowerCase())
       )
     : pages
+
+  const filtered = bySearch.filter(p => {
+    if (statusFilter === 'published') return p.is_published
+    if (statusFilter === 'draft') return !p.is_published
+    return true
+  })
 
   if (pages.length === 0) {
     return (
@@ -43,15 +52,30 @@ export function StatusPagesTable({ pages, pagination }: { pages: StatusPage[]; p
 
   return (
     <>
-      {/* Search */}
+      {/* Search + filters */}
       <div className="spt-toolbar">
-        <input
-          className="data-table-search"
-          type="text"
-          placeholder="Search status pages..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-        />
+        <div className="spt-search-wrap">
+          <Search size={14} className="spt-search-icon" />
+          <input
+            className="form-input spt-search"
+            type="text"
+            placeholder="Search status pages..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
+        </div>
+        <div className="spt-filter-chips">
+          {(['all', 'published', 'draft'] as StatusFilter[]).map(f => (
+            <button
+              key={f}
+              type="button"
+              className={`spt-filter-chip${statusFilter === f ? ' active' : ''}`}
+              onClick={() => setStatusFilter(f)}
+            >
+              {f === 'all' ? 'All' : f === 'published' ? 'Published' : 'Draft'}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Desktop table header */}
@@ -68,14 +92,14 @@ export function StatusPagesTable({ pages, pagination }: { pages: StatusPage[]; p
         {filtered.length === 0 ? (
           <div className="spt-empty">No status pages match your search.</div>
         ) : (
-          filtered.map(p => {
+          filtered.map((p, i) => {
             const monitorCount = ((p.monitor_ids || []) as string[]).length
             return (
-              <div key={p.id} className="spt-row">
+              <div key={p.id} className="spt-row" style={{ animationDelay: `${i * 40}ms` }}>
                 {/* Name + inline status badge (badge hidden on desktop, shown on mobile) */}
                 <div className="spt-col-name">
                   <div className="spt-name-icon">
-                    <Globe size={14} />
+                    <Globe size={15} />
                   </div>
                   <span className="spt-name">{p.name}</span>
                   <span className={`spt-status-badge spt-status-mobile ${p.is_published ? 'published' : 'draft'}`}>
@@ -121,11 +145,12 @@ export function StatusPagesTable({ pages, pagination }: { pages: StatusPage[]; p
                     <span>Edit</span>
                   </Link>
                   <button
-                    className="btn btn-sm btn-ghost spt-action-btn spt-delete-btn"
+                    className="spt-delete-btn"
                     onClick={() => setDeleteId(p.id)}
                     disabled={isPending}
+                    aria-label="Delete status page"
                   >
-                    <Trash2 size={13} />
+                    <Trash2 size={14} />
                   </button>
                 </div>
               </div>

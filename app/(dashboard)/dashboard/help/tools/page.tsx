@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { HelpSidebar } from '../help-sidebar'
+import { HelpSidebar, getTopicIcon } from '../help-sidebar'
 
 const FAQ_SCHEMA = {
   '@context': 'https://schema.org',
@@ -55,7 +55,10 @@ export default function ToolsHelpPage(): React.ReactElement {
 
         <article className="help-article">
           <div className="help-article-hero">
-            <h1 className="help-article-title">Free Tools</h1>
+            <div className="help-article-title-row">
+              <span className="help-article-icon">{getTopicIcon('/dashboard/help/tools')}</span>
+              <h1 className="help-article-title">Free Tools</h1>
+            </div>
             <p className="help-article-intro">
               Sometimes you just need a quick answer -- is my SSL valid, how much
               downtime does 99.9% actually mean, is my site healthy? Our free tools

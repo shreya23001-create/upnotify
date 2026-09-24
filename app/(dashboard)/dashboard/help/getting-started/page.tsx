@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { HelpSidebar } from '../help-sidebar'
+import { HelpSidebar, getTopicIcon } from '../help-sidebar'
 
 const FAQ_SCHEMA = {
   '@context': 'https://schema.org',
@@ -55,7 +55,10 @@ export default function GettingStartedPage(): React.ReactElement {
 
         <article className="help-article">
           <div className="help-article-hero">
-            <h1 className="help-article-title">Getting Started with Upnotify</h1>
+            <div className="help-article-title-row">
+              <span className="help-article-icon">{getTopicIcon('/dashboard/help/getting-started')}</span>
+              <h1 className="help-article-title">Getting Started with Upnotify</h1>
+            </div>
             <p className="help-article-intro">
               You signed up so you&apos;re never the last to know your site is down.
               Smart move. Here&apos;s how to get set up in under five minutes.

@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { HelpSidebar } from '../help-sidebar'
+import { HelpSidebar, getTopicIcon } from '../help-sidebar'
 
 const FAQ_SCHEMA = {
   '@context': 'https://schema.org',
@@ -55,7 +55,10 @@ export default function ReferralsHelpPage(): React.ReactElement {
 
         <article className="help-article">
           <div className="help-article-hero">
-            <h1 className="help-article-title">Referral Program</h1>
+            <div className="help-article-title-row">
+              <span className="help-article-icon">{getTopicIcon('/dashboard/help/referrals')}</span>
+              <h1 className="help-article-title">Referral Program</h1>
+            </div>
             <p className="help-article-intro">
               Good tools spread by word of mouth. If you like Upnotify enough to
               recommend it, we want to say thanks -- with account credit for you

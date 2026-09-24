@@ -26,7 +26,6 @@ const ENTRIES = [
       { type: 'new',      text: 'AI SEO Checker — free public tool to score any website\'s AI readiness across 4 categories' },
       { type: 'new',      text: 'AI Visibility dashboard — monitor how AI engines like ChatGPT, Perplexity, and Gemini cite your site' },
       { type: 'new',      text: 'Public Tracker — real-time uptime leaderboard for 100+ major websites and services' },
-      { type: 'new',      text: 'Competitor Watchdog — track price and availability changes on competitor product pages' },
       { type: 'new',      text: 'Dark mode — full dark theme with system preference detection and manual toggle on all pages' },
       { type: 'new',      text: 'India pricing — INR billing via Razorpay with 18% GST, auto-detected by IP' },
       { type: 'new',      text: 'Blog RSS feed — machine-readable feed at /blog/feed.xml for RSS readers and aggregators' },

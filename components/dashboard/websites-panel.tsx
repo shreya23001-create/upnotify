@@ -9,23 +9,15 @@ import {
   STATUS_LABEL, STATUS_DOT_COLOR, STATUS_BADGE_CLASS,
   type CheckResultLite, type DomainAggregate,
 } from '@/lib/utils/monitor-aggregation'
+import { targetToWebsiteDomain } from '@/lib/utils/validate-domain'
 import type { Monitor } from '@/lib/types'
 
 type CheckResult = CheckResultLite
 
-function extractDomain(target: string): string {
-  try {
-    const withProto = target.startsWith('http') ? target : `https://${target}`
-    return new URL(withProto).hostname
-  } catch {
-    return target.split('/')[0] ?? target
-  }
-}
-
 function groupByDomain(monitors: Monitor[], checkResults: CheckResult[]): DomainAggregate[] {
   const map: Record<string, Monitor[]> = {}
   for (const m of monitors) {
-    const d = extractDomain(m.target)
+    const d = targetToWebsiteDomain(m.target) || m.name || m.target
     if (!map[d]) map[d] = []
     map[d].push(m)
   }
@@ -37,8 +29,16 @@ function groupByDomain(monitors: Monitor[], checkResults: CheckResult[]): Domain
 
 const timeAgo = timeAgoShort
 
+function truncateWords(text: string, wordCount: number): string {
+  const words = text.trim().split(/\s+/)
+  if (words.length <= wordCount) return text
+  return `${words.slice(0, wordCount).join(' ')}...`
+}
+
+const MAX_WEBSITES_SHOWN = 5
+
 export function WebsitesPanel({ monitors, checkResults }: { monitors: Monitor[]; checkResults: CheckResult[] }): React.ReactElement {
-  const groups = useMemo(() => groupByDomain(monitors, checkResults), [monitors, checkResults])
+  const groups = useMemo(() => groupByDomain(monitors, checkResults).slice(0, MAX_WEBSITES_SHOWN), [monitors, checkResults])
 
   return (
     <div className="db-card websites-panel">
@@ -72,8 +72,8 @@ export function WebsitesPanel({ monitors, checkResults }: { monitors: Monitor[];
 
               <span className="websites-row-name">{g.domain}</span>
 
-              <span className={`db-badge ${STATUS_BADGE_CLASS[g.status]} websites-row-status`}>
-                {STATUS_LABEL[g.status]}
+              <span className="websites-row-monitor-name">
+                {g.monitors[0] ? truncateWords(g.monitors[0].name, 6) : '—'}
               </span>
 
               <span className="websites-row-metric">
@@ -92,7 +92,12 @@ export function WebsitesPanel({ monitors, checkResults }: { monitors: Monitor[];
 
               <span className="websites-row-count">{g.monitors.length} monitor{g.monitors.length === 1 ? '' : 's'}</span>
 
-              <span className="websites-row-time">{timeAgo(g.lastCheckedAt)}</span>
+              <span className="websites-row-meta">
+                <span className={`db-badge ${STATUS_BADGE_CLASS[g.status]} websites-row-status`}>
+                  {STATUS_LABEL[g.status]}
+                </span>
+                <span className="websites-row-time">{timeAgo(g.lastCheckedAt)}</span>
+              </span>
             </Link>
           ))}
         </div>

@@ -261,7 +261,6 @@ function CompletedState({ run, results, engineMap }: {
               </div>
             ))}
           </div>
-          <a href="/dashboard/watchdog" className="crd-watchdog-link">Track these competitors in Watchdog →</a>
         </div>
       )}
 

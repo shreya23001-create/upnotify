@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useCallback } from 'react'
+import { X } from 'lucide-react'
 
 interface LogoUploadProps {
   currentLogoUrl: string | null
@@ -78,13 +79,12 @@ export function LogoUpload({ currentLogoUrl, orgName, onUpload }: LogoUploadProp
   const [isUploading, setIsUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
+  const [isDragOver, setIsDragOver] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const handleFileSelect = useCallback(async (e: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
+  const processFile = useCallback(async (file: File): Promise<void> => {
     setError(null)
     setSuccess(false)
-    const file = e.target.files?.[0]
-    if (!file) return
 
     if (!ACCEPTED_TYPES.includes(file.type)) {
       setError('Please select a JPG, PNG, SVG, or WebP image.')
@@ -104,6 +104,29 @@ export function LogoUpload({ currentLogoUrl, orgName, onUpload }: LogoUploadProp
       setError('Failed to process image. Please try a different file.')
     }
   }, [])
+
+  const handleFileSelect = useCallback(async (e: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    await processFile(file)
+  }, [processFile])
+
+  const handleDragOver = useCallback((e: React.DragEvent): void => {
+    e.preventDefault()
+    setIsDragOver(true)
+  }, [])
+
+  const handleDragLeave = useCallback((e: React.DragEvent): void => {
+    e.preventDefault()
+    setIsDragOver(false)
+  }, [])
+
+  const handleDrop = useCallback((e: React.DragEvent): void => {
+    e.preventDefault()
+    setIsDragOver(false)
+    const file = e.dataTransfer.files?.[0]
+    if (file) void processFile(file)
+  }, [processFile])
 
   const handleUpload = useCallback(async (): Promise<void> => {
     if (!pendingBase64) return
@@ -139,7 +162,12 @@ export function LogoUpload({ currentLogoUrl, orgName, onUpload }: LogoUploadProp
   const initials = getInitials(orgName || 'O')
 
   return (
-    <div className="logo-upload">
+    <div
+      className={`logo-upload${isDragOver ? ' logo-upload--drag-over' : ''}`}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+    >
       <div className="logo-upload-preview-area">
         <div className="logo-upload-preview">
           {preview ? (
@@ -175,11 +203,13 @@ export function LogoUpload({ currentLogoUrl, orgName, onUpload }: LogoUploadProp
             {preview && (
               <button
                 type="button"
-                className="btn btn-sm logo-upload-remove-btn"
+                className="logo-upload-remove-btn"
                 onClick={handleRemove}
                 disabled={isUploading}
+                aria-label="Remove logo"
+                title="Remove"
               >
-                Remove
+                <X size={14} strokeWidth={2.25} />
               </button>
             )}
           </div>

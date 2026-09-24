@@ -47,7 +47,7 @@ const displayNames: Record<string, string> = {
   ping: 'Ping',
   api: 'API Endpoint',
   heartbeat: 'Heartbeat',
-  competitor: 'Competitor',
+  competitor: 'Page Change',
   server: 'Server',
   'security-headers': 'Security Headers',
   'response-time': 'Response Time',

@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { HelpSidebar } from '../help-sidebar'
+import { HelpSidebar, getTopicIcon } from '../help-sidebar'
 
 const FAQ_SCHEMA = {
   '@context': 'https://schema.org',
@@ -47,7 +47,10 @@ export default function StatusPagesPage(): React.ReactElement {
 
         <article className="help-article">
           <div className="help-article-hero">
-            <h1 className="help-article-title">Public Status Pages</h1>
+            <div className="help-article-title-row">
+              <span className="help-article-icon">{getTopicIcon('/dashboard/help/status-pages')}</span>
+              <h1 className="help-article-title">Public Status Pages</h1>
+            </div>
             <p className="help-article-intro">
               When your site has a wobble, your inbox fills up with &ldquo;Is it down for everyone
               or just me?&rdquo; emails. A status page answers that question for you, automatically,

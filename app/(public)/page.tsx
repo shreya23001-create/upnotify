@@ -663,23 +663,20 @@ export default async function LandingPage(): Promise<React.ReactElement> {
               }
               return headline ?? (<>The honest comparison<br />nobody <em>else</em> will show you.</>)
             })()}
-            subheadline={comparison?.subheadline ?? "We checked. The others don't offer AI reports, citation monitoring, or 24 monitor types. Upnotify does."}
+            subheadline={comparison?.subheadline ?? "We checked. The others don't offer instant reports, citation monitoring, or 24 monitor types. Upnotify does."}
             competitors={compCols}
             rows={comparison?.rows ?? [
               { feature: 'Fastest check interval', values: ['1 minute', '30 seconds', '5 minutes'], type: 'text', highlight: 0 },
               { feature: 'Two-region false alarm prevention', values: [true, true, false], type: 'boolean' },
-              { feature: 'AI-powered reports', values: [true, false, false], type: 'boolean' },
-              { feature: 'Watchdog (competitor tracking)', values: [true, false, false], type: 'boolean' },
+              { feature: 'Reports', values: [true, false, false], type: 'boolean' },
               { feature: 'Public uptime leaderboard / tracker', values: [true, false, false], type: 'boolean' },
               { feature: 'Public status pages', values: [true, true, true], type: 'boolean' },
-              { feature: 'Monitor types (HTTP, SSL, DNS, Keyword…)', values: ['24 types', '7 types', '6 types'], type: 'text', highlight: 0 },
-              { feature: 'Alert channels (email, Slack, Teams, Telegram, webhook)', values: ['5 channels', '4 channels', '3 channels'], type: 'text', highlight: 0 },
-              { feature: 'Starting price (paid plan)', values: [defaultCurrency === 'inr' ? '₹999/yr Lite' : '£10/yr Lite', '$24/mo', '$7/mo'], type: 'text', highlight: 0 },
+              { feature: 'Monitor types (HTTP, SSL, DNS, Keyword…)', values: ['10+ types', '7 types', '6 types'], type: 'text', highlight: 0 },
+              { feature: 'Paid plan', values: [defaultCurrency === 'inr' ? '₹999/yr' : '£10/yr', '$24/mo', '$7/mo'], type: 'text', highlight: 0 },
               { feature: 'GDPR · EU data storage', values: [true, true, false], type: 'boolean' },
               { feature: 'AI outage blog auto-publish', values: [true, false, false], type: 'boolean' },
-              { feature: 'Free AI SEO Checker (4-category audit)', values: [true, false, false], type: 'boolean' },
+              { feature: 'AI SEO Checker (4-category audit)', values: [true, false, false], type: 'boolean' },
               { feature: 'llms.txt Generator', values: [true, false, false], type: 'boolean' },
-              { feature: 'AI Citation Monitoring (Perplexity, ChatGPT…)', values: [true, false, false], type: 'boolean' },
             ]}
             footnote={comparison?.footnote}
           />

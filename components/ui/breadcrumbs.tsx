@@ -31,12 +31,15 @@ function ChevronRight() {
 
 export function Breadcrumbs() {
   const pathname = usePathname()
-  const segments = pathname.split('/').filter(Boolean)
+  const allSegments = pathname.split('/').filter(Boolean)
+  // Every dashboard route starts with "dashboard" — drop it so the trail
+  // starts at the page itself instead of a redundant "Dashboard /" prefix.
+  const segments = allSegments[0] === 'dashboard' ? allSegments.slice(1) : allSegments
 
-  if (segments.length <= 1) return null
+  if (segments.length === 0) return null
 
   const crumbs = segments.map((seg, i) => {
-    const href = '/' + segments.slice(0, i + 1).join('/')
+    const href = '/' + allSegments.slice(0, allSegments.length - segments.length + i + 1).join('/')
     const label = labelMap[seg] ?? (seg.length > 24 ? seg.slice(0, 10) + '…' : seg)
     const isLast = i === segments.length - 1
     return { href, label, isLast }

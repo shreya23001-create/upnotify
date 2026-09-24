@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { HelpSidebar } from '../help-sidebar'
+import { HelpSidebar, getTopicIcon } from '../help-sidebar'
 
 export default function HelpCancelPausePage(): React.ReactElement {
   const pathname = usePathname()
@@ -18,7 +18,10 @@ export default function HelpCancelPausePage(): React.ReactElement {
 
         <article className="help-article">
           <div className="help-article-hero">
-            <h1 className="help-article-title">Cancel or Pause Your Subscription</h1>
+            <div className="help-article-title-row">
+              <span className="help-article-icon">{getTopicIcon('/dashboard/help/cancel-pause')}</span>
+              <h1 className="help-article-title">Cancel or Pause Your Subscription</h1>
+            </div>
             <p className="help-article-intro">You can cancel or pause your subscription at any time from your billing settings. We offer a pause option so you can take a break without losing your setup.</p>
           </div>
 
