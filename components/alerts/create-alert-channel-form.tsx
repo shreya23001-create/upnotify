@@ -24,7 +24,7 @@ const SEVERITIES = [
 export function CreateAlertChannelForm({ monitors = [] }: { monitors?: MonitorOption[] }) {
   const [type, setType] = useState('email')
   const [selectedSeverities, setSelectedSeverities] = useState<string[]>(['P1', 'P2', 'P3', 'P4'])
-  const [selectedMonitorIds, setSelectedMonitorIds] = useState<string[]>([])
+  const [selectedDomains, setSelectedDomains] = useState<string[]>([])
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 
@@ -37,7 +37,7 @@ export function CreateAlertChannelForm({ monitors = [] }: { monitors?: MonitorOp
   function handleSubmit(formData: FormData): void {
     setError(null)
     formData.set('severity_filter', selectedSeverities.join(','))
-    formData.set('monitor_ids', selectedMonitorIds.join(','))
+    formData.set('target_domains', selectedDomains.join(','))
     startTransition(async () => {
       const result = await createAlertChannelAction(formData)
       if (result?.error) setError(result.error)
@@ -227,14 +227,13 @@ export function CreateAlertChannelForm({ monitors = [] }: { monitors?: MonitorOp
         </>
       )}
 
-      {/* Monitor scope */}
+      {/* Website scope */}
       <div className="ac-form-section">
-        <label className="ac-form-label">Monitor <span className="ac-form-optional">optional</span></label>
-        <p className="ac-form-sublabel">Choose which monitor sends alerts to this channel. Leave as &quot;All monitors&quot; to apply to everything.</p>
+        <label className="ac-form-label">Website <span className="ac-form-optional">optional</span></label>
         <MonitorScopeSelect
           monitors={monitors}
-          selected={selectedMonitorIds}
-          onChange={setSelectedMonitorIds}
+          selected={selectedDomains}
+          onChange={setSelectedDomains}
           disabled={isPending}
         />
       </div>

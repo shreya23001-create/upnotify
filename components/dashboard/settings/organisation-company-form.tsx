@@ -112,13 +112,6 @@ export function OrganisationCompanyForm({ organisation, onUploadLogo, onRemoveLo
 
       <form onSubmit={handleSubmit}>
         <div className="stt-form-card-body stt-merged-body">
-          {/* ── Logo sidebar (sticky within the panel) ── */}
-          {canEdit && (
-            <div className="stt-merged-sidebar">
-              <LogoUpload currentLogoUrl={organisation.logo_url} orgName={organisation.name} onUpload={onUploadLogo} onRemove={onRemoveLogo} />
-            </div>
-          )}
-
           {/* ── Fields ── */}
           <div className="stt-merged-fields">
             {error && <div className="form-error">{error}</div>}
@@ -126,6 +119,11 @@ export function OrganisationCompanyForm({ organisation, onUploadLogo, onRemoveLo
             {/* Basic Info */}
             <div className="stt-subsection">
               <div className="stt-subsection-label"><Building2 size={12} strokeWidth={2.25} /> Basic Info</div>
+              {canEdit && (
+                <div className="stt-logo-row">
+                  <LogoUpload currentLogoUrl={organisation.logo_url} orgName={organisation.name} onUpload={onUploadLogo} onRemove={onRemoveLogo} />
+                </div>
+              )}
               <div className="stt-field-grid stt-field-grid--2">
                 <div className="form-group">
                   <label className="form-label">Company Name <span style={{ color: 'var(--error, #ef4444)' }}>*</span></label>

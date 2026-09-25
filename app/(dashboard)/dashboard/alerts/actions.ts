@@ -81,8 +81,8 @@ export async function createAlertChannelAction(formData: FormData): Promise<{ er
   const severityStr = formData.get('severity_filter') as string
   const severityFilter = severityStr ? severityStr.split(',') : ['P1', 'P2', 'P3', 'P4']
 
-  const monitorIdsStr = formData.get('monitor_ids') as string | null
-  const monitorIds = monitorIdsStr ? monitorIdsStr.split(',').filter(Boolean) : []
+  const targetDomainsStr = formData.get('target_domains') as string | null
+  const targetDomains = targetDomainsStr ? targetDomainsStr.split(',').filter(Boolean) : []
 
   const channel = await createAlertChannel({
     org_id: user.org_id,
@@ -91,7 +91,7 @@ export async function createAlertChannelAction(formData: FormData): Promise<{ er
     name,
     config,
     severity_filter: severityFilter,
-    monitor_ids: monitorIds,
+    target_domains: targetDomains,
   })
 
   if (!channel) return { error: 'Failed to create alert channel' }
@@ -151,10 +151,10 @@ export async function updateAlertChannelAction(channelId: string, formData: Form
   const severityStr = formData.get('severity_filter') as string
   const severityFilter = severityStr ? severityStr.split(',') : ['P1', 'P2', 'P3', 'P4']
 
-  const monitorIdsStr = formData.get('monitor_ids') as string | null
-  const monitorIds = monitorIdsStr ? monitorIdsStr.split(',').filter(Boolean) : []
+  const targetDomainsStr = formData.get('target_domains') as string | null
+  const targetDomains = targetDomainsStr ? targetDomainsStr.split(',').filter(Boolean) : []
 
-  const channel = await updateAlertChannel(channelId, { name, config, severity_filter: severityFilter, monitor_ids: monitorIds })
+  const channel = await updateAlertChannel(channelId, { name, config, severity_filter: severityFilter, target_domains: targetDomains })
   if (!channel) return { error: 'Failed to update alert channel' }
 
   logger.info('Alert channel updated', { channelId })

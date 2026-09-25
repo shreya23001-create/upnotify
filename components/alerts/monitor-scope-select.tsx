@@ -12,33 +12,36 @@ export interface MonitorOption {
 
 interface WebsiteGroup {
   domain: string
-  monitors: MonitorOption[]
+  count: number
 }
 
 function groupByWebsite(monitors: MonitorOption[]): WebsiteGroup[] {
-  const groups = new Map<string, MonitorOption[]>()
+  const counts = new Map<string, number>()
   for (const m of monitors) {
     const key = m.target_domain?.trim() || 'Other'
-    const list = groups.get(key)
-    if (list) list.push(m)
-    else groups.set(key, [m])
+    counts.set(key, (counts.get(key) ?? 0) + 1)
   }
-  return Array.from(groups.entries())
-    .map(([domain, list]) => ({ domain, monitors: list }))
+  return Array.from(counts.entries())
+    .map(([domain, count]) => ({ domain, count }))
     .sort((a, b) => a.domain.localeCompare(b.domain))
 }
 
 interface MonitorScopeSelectProps {
   monitors: MonitorOption[]
   selected: string[]
-  onChange: (ids: string[]) => void
+  onChange: (domains: string[]) => void
   disabled?: boolean
 }
 
+/**
+ * Website-level scope picker. `selected` holds website (target_domain)
+ * values, not monitor IDs — picking a website automatically covers every
+ * monitor under it, including ones added later (dynamic domain matching,
+ * resolved at alert-dispatch time against each monitor's current domain).
+ */
 export function MonitorScopeSelect({ monitors, selected, onChange, disabled }: MonitorScopeSelectProps) {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
-  const [collapsed, setCollapsed] = useState<Set<string>>(new Set())
   const rootRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -51,54 +54,29 @@ export function MonitorScopeSelect({ monitors, selected, onChange, disabled }: M
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [open])
 
-  function toggleMonitor(id: string): void {
-    if (selected.includes(id)) onChange(selected.filter(s => s !== id))
-    else onChange([...selected, id])
+  function toggleWebsite(domain: string): void {
+    if (selected.includes(domain)) onChange(selected.filter(s => s !== domain))
+    else onChange([...selected, domain])
   }
 
-  function toggleGroup(domain: string): void {
-    setCollapsed(prev => {
-      const next = new Set(prev)
-      if (next.has(domain)) next.delete(domain)
-      else next.add(domain)
-      return next
-    })
-  }
-
-  function toggleGroupSelection(group: WebsiteGroup): void {
-    const groupIds = group.monitors.map(m => m.id)
-    const allSelected = groupIds.every(id => selected.includes(id))
-    if (allSelected) {
-      onChange(selected.filter(id => !groupIds.includes(id)))
-    } else {
-      onChange([...new Set([...selected, ...groupIds])])
-    }
-  }
+  const allGroups = useMemo(() => groupByWebsite(monitors), [monitors])
 
   const summary =
     selected.length === 0
-      ? 'All monitors'
+      ? 'All websites'
       : selected.length === 1
-        ? (monitors.find(m => m.id === selected[0])?.name ?? '1 monitor selected')
-        : `${selected.length} monitors selected`
+        ? selected[0]
+        : `${selected.length} websites selected`
 
-  const filtered = useMemo(() => {
+  const filteredGroups = useMemo(() => {
     const q = query.trim().toLowerCase()
-    if (!q) return monitors
-    return monitors.filter(m =>
-      m.name.toLowerCase().includes(q) ||
-      m.target.toLowerCase().includes(q) ||
-      (m.target_domain ?? '').toLowerCase().includes(q)
-    )
-  }, [monitors, query])
-
-  const groups = useMemo(() => groupByWebsite(filtered), [filtered])
-
-  const showGrouping = groups.length > 1
+    if (!q) return allGroups
+    return allGroups.filter(g => g.domain.toLowerCase().includes(q))
+  }, [allGroups, query])
 
   if (monitors.length === 0) {
     return (
-      <p className="ac-form-hint">You don&apos;t have any monitors yet — this channel will apply to all monitors once you add some.</p>
+      <p className="ac-form-hint">You don&apos;t have any websites yet — this channel will apply to all websites once you add some.</p>
     )
   }
 
@@ -117,12 +95,12 @@ export function MonitorScopeSelect({ monitors, selected, onChange, disabled }: M
 
       {open && (
         <div className="ac-monitor-dropdown-panel">
-          {monitors.length > 8 && (
+          {allGroups.length > 8 && (
             <div className="ac-monitor-dropdown-search">
               <Search size={13} />
               <input
                 type="text"
-                placeholder="Search monitors or websites…"
+                placeholder="Search websites…"
                 value={query}
                 onChange={e => setQuery(e.target.value)}
                 autoFocus
@@ -139,61 +117,31 @@ export function MonitorScopeSelect({ monitors, selected, onChange, disabled }: M
               disabled={disabled}
             />
             <span className="ac-monitor-option-text">
-              <span className="ac-monitor-option-name">All monitors</span>
+              <span className="ac-monitor-option-name">All websites</span>
             </span>
             {selected.length === 0 && <Check size={14} className="ac-monitor-option-check" />}
           </label>
 
-          {groups.length === 0 && (
-            <p className="ac-form-hint" style={{ padding: '10px 14px' }}>No monitors match &ldquo;{query}&rdquo;.</p>
+          {filteredGroups.length === 0 && (
+            <p className="ac-form-hint" style={{ padding: '10px 14px' }}>No websites match &ldquo;{query}&rdquo;.</p>
           )}
 
-          {groups.map(group => {
-            const isCollapsed = showGrouping && collapsed.has(group.domain)
-            const groupIds = group.monitors.map(m => m.id)
-            const allGroupSelected = groupIds.every(id => selected.includes(id))
+          {filteredGroups.map(group => {
+            const active = selected.includes(group.domain)
             return (
-              <div key={group.domain} className="ac-monitor-group">
-                {showGrouping && (
-                  <div className="ac-monitor-group-header">
-                    <button
-                      type="button"
-                      className="ac-monitor-group-toggle"
-                      onClick={() => toggleGroup(group.domain)}
-                    >
-                      <ChevronDown size={12} className={`ac-monitor-group-chevron${isCollapsed ? '' : ' ac-monitor-group-chevron--open'}`} />
-                      <span className="ac-monitor-group-name">{group.domain}</span>
-                      <span className="ac-monitor-group-count">{group.monitors.length}</span>
-                    </button>
-                    <button
-                      type="button"
-                      className="ac-monitor-group-selectall"
-                      onClick={() => toggleGroupSelection(group)}
-                      disabled={disabled}
-                    >
-                      {allGroupSelected ? 'Clear' : 'Select all'}
-                    </button>
-                  </div>
-                )}
-                {!isCollapsed && group.monitors.map(m => {
-                  const active = selected.includes(m.id)
-                  return (
-                    <label key={m.id} className={`ac-monitor-option${active ? ' ac-monitor-option--active' : ''}${showGrouping ? ' ac-monitor-option--nested' : ''}`}>
-                      <input
-                        type="checkbox"
-                        checked={active}
-                        onChange={() => toggleMonitor(m.id)}
-                        disabled={disabled}
-                      />
-                      <span className="ac-monitor-option-text">
-                        <span className="ac-monitor-option-name">{m.name}</span>
-                        <span className="ac-monitor-option-target">{m.target}</span>
-                      </span>
-                      {active && <Check size={14} className="ac-monitor-option-check" />}
-                    </label>
-                  )
-                })}
-              </div>
+              <label key={group.domain} className={`ac-monitor-option${active ? ' ac-monitor-option--active' : ''}`}>
+                <input
+                  type="checkbox"
+                  checked={active}
+                  onChange={() => toggleWebsite(group.domain)}
+                  disabled={disabled}
+                />
+                <span className="ac-monitor-option-text">
+                  <span className="ac-monitor-option-name">{group.domain}</span>
+                  <span className="ac-monitor-option-target">{group.count} monitor{group.count === 1 ? '' : 's'}</span>
+                </span>
+                {active && <Check size={14} className="ac-monitor-option-check" />}
+              </label>
             )
           })}
         </div>

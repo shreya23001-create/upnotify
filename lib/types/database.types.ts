@@ -136,6 +136,7 @@ export type Database = {
           name: string
           org_id: string
           severity_filter: string[]
+          target_domains: string[] | null
           type: string
           updated_at: string
           workspace_id: string | null
@@ -149,6 +150,7 @@ export type Database = {
           name: string
           org_id: string
           severity_filter?: string[]
+          target_domains?: string[] | null
           type: string
           updated_at?: string
           workspace_id?: string | null
@@ -162,6 +164,7 @@ export type Database = {
           name?: string
           org_id?: string
           severity_filter?: string[]
+          target_domains?: string[] | null
           type?: string
           updated_at?: string
           workspace_id?: string | null

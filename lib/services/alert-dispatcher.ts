@@ -45,10 +45,22 @@ export async function dispatchAlerts(incident: Incident, monitor: Monitor): Prom
     return
   }
 
-  // Filter channels by severity, then by monitor scope (empty/null monitor_ids = all monitors)
+  // Filter channels by severity, then by scope. Website scope (target_domains)
+  // is the current mechanism — dynamic domain matching means any monitor on
+  // a selected domain matches, including ones added after the channel was
+  // saved. monitor_ids is kept as a legacy fallback for channels saved
+  // before the website-selector existed; a channel never has both set from
+  // the UI going forward, but if it does, target_domains takes priority.
   const matchingChannels = channels.filter((ch: AlertChannel) => {
     const severityFilter = ch.severity_filter as string[]
     if (!severityFilter.includes(incident.severity)) return false
+
+    const targetDomains = ch.target_domains as string[] | null
+    if (targetDomains && targetDomains.length > 0) {
+      const monitorDomain = (monitor as unknown as { target_domain: string | null }).target_domain
+      if (!monitorDomain || !targetDomains.includes(monitorDomain)) return false
+      return true
+    }
 
     const monitorIds = ch.monitor_ids as string[] | null
     if (monitorIds && monitorIds.length > 0 && !monitorIds.includes(monitor.id)) return false

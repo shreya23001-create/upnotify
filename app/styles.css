@@ -22621,6 +22621,10 @@ html.dark .stt-mobile-tab:hover {
   margin-top: 0;
 }
 
+.stt-logo-row {
+  margin-bottom: 16px;
+}
+
 @media (max-width: 760px) {
   .stt-merged-body {
     grid-template-columns: 1fr;
@@ -27040,7 +27044,7 @@ html.dark .mon-action-btn {
 .ac-header,
 .ac-row {
   display: grid;
-  grid-template-columns: 36px 220px 440px 130px 110px 140px;
+  grid-template-columns: 36px 220px 390px 180px 110px 140px;
   align-items: center;
   gap: 0;
 }
@@ -27188,7 +27192,7 @@ html.dark .ac-row--selected {
 .ac-severity-chips {
   display: flex;
   gap: 4px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 
 .ac-severity-chip {
