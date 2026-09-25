@@ -1,7 +1,32 @@
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { logger } from '@/lib/utils/logger'
+import { targetToWebsiteDomain } from '@/lib/utils/validate-domain'
+import { worstStatus } from '@/lib/utils/monitor-aggregation'
 import type { Monitor } from '@/lib/types'
+
+/** Groups monitors by website domain and returns the worst status per
+ *  website (down > degraded > paused > up), for stat cards that should
+ *  count "how many websites are down", not "how many monitors are down" —
+ *  one website commonly has several monitor types (HTTP, SSL, DNS, ...). */
+function summarizeByWebsite(monitors: Monitor[]): { total: number; up: number; down: number; degraded: number; paused: number } {
+  const byDomain = new Map<string, Monitor[]>()
+  for (const m of monitors) {
+    const domain = targetToWebsiteDomain(m.target)
+    const existing = byDomain.get(domain)
+    if (existing) existing.push(m)
+    else byDomain.set(domain, [m])
+  }
+
+  const summary = { total: byDomain.size, up: 0, down: 0, degraded: 0, paused: 0 }
+  for (const group of byDomain.values()) {
+    const status = worstStatus(group)
+    if (status === 'up' || status === 'down' || status === 'degraded' || status === 'paused') {
+      summary[status]++
+    }
+  }
+  return summary
+}
 
 export async function getMonitorsByWorkspace(workspaceId: string): Promise<Monitor[]> {
   const supabase = await createClient()
@@ -36,23 +61,27 @@ export async function getMonitorById(id: string): Promise<Monitor | null> {
 export async function getMonitorStats(
   orgId: string,
   workspaceId?: string
-): Promise<{ total: number; up: number; down: number; degraded: number; paused: number }> {
+): Promise<{ total: number; websites: number; up: number; down: number; degraded: number; paused: number }> {
   const supabase = await createClient()
-  let query = supabase.from('monitors').select('status').eq('org_id', orgId)
+  let query = supabase.from('monitors').select('status, is_paused, type, target').eq('org_id', orgId)
   if (workspaceId) query = query.eq('workspace_id', workspaceId)
 
   const { data, error } = await query
   if (error || !data) {
     logger.error('Failed to get monitor stats', { error: error?.message })
-    return { total: 0, up: 0, down: 0, degraded: 0, paused: 0 }
+    return { total: 0, websites: 0, up: 0, down: 0, degraded: 0, paused: 0 }
   }
+
+  const monitors = data as unknown as Monitor[]
+  const websiteSummary = summarizeByWebsite(monitors)
 
   return {
     total: data.length,
-    up: data.filter(m => m.status === 'up').length,
-    down: data.filter(m => m.status === 'down').length,
-    degraded: data.filter(m => m.status === 'degraded').length,
-    paused: data.filter(m => m.status === 'paused').length,
+    websites: websiteSummary.total,
+    up: websiteSummary.up,
+    down: websiteSummary.down,
+    degraded: websiteSummary.degraded,
+    paused: websiteSummary.paused,
   }
 }
 
@@ -493,32 +522,36 @@ export async function getMonitorsByWorkspacePaged(
 
 export interface MonitorWorkspaceSummary {
   total: number
+  websites: number
   active: number
   paused: number
   issues: number
 }
 
 /** Lightweight counts for the Monitors page summary cards — a single
- *  `status` + `is_paused` column fetch, no joins. "Issues" counts monitors
- *  currently down or degraded (the same statuses MonitorStatusBadge/mon-row
- *  already surface per-row), not a separate incidents lookup. */
+ *  `status` + `is_paused` + `type` + `target` column fetch, no joins.
+ *  All four numbers are per-WEBSITE (grouped by domain, worst-status-wins
+ *  via the same worstStatus() the Websites panel uses), not per-monitor-row —
+ *  one website commonly has several monitor types, and a single failing
+ *  monitor shouldn't be double-counted as extra "issues". */
 export async function getMonitorWorkspaceSummary(workspaceId: string): Promise<MonitorWorkspaceSummary> {
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('monitors')
-    .select('status, is_paused')
+    .select('status, is_paused, type, target')
     .eq('workspace_id', workspaceId)
 
   if (error) {
     logger.error('Failed to get monitor workspace summary', { error: error.message })
-    return { total: 0, active: 0, paused: 0, issues: 0 }
+    return { total: 0, websites: 0, active: 0, paused: 0, issues: 0 }
   }
 
-  const rows = data ?? []
-  const total = rows.length
-  const paused = rows.filter(r => r.is_paused).length
-  const issues = rows.filter(r => !r.is_paused && (r.status === 'down' || r.status === 'degraded')).length
-  const active = total - paused
+  const monitors = (data ?? []) as unknown as Monitor[]
+  const total = monitors.length
+  const websiteSummary = summarizeByWebsite(monitors)
+  const active = websiteSummary.up
+  const paused = websiteSummary.paused
+  const issues = websiteSummary.down + websiteSummary.degraded
 
-  return { total, active, paused, issues }
+  return { total, websites: websiteSummary.total, active, paused, issues }
 }

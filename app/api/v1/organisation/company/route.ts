@@ -29,9 +29,12 @@ export async function PUT(request: Request): Promise<NextResponse> {
     // don't reject blank or missing form inputs — that means "leave
     // unchanged", not "clear field". FormData.get() returns null for a field
     // that isn't present in the form at all, which must be treated the same
-    // way as an empty string here.
+    // way as an empty string here. logo_url is the one exception: null there
+    // is an explicit "remove the logo" signal from the client, not "absent".
     const body: unknown = typeof raw === 'object' && raw !== null
-      ? Object.fromEntries(Object.entries(raw as Record<string, unknown>).filter(([, v]) => v !== '' && v !== null && v !== undefined))
+      ? Object.fromEntries(Object.entries(raw as Record<string, unknown>).filter(([key, v]) =>
+          key === 'logo_url' ? v !== '' && v !== undefined : v !== '' && v !== null && v !== undefined
+        ))
       : raw
     const parsed = validateInput(companyDetailsSchema, body, 'company-details-update')
     if (!parsed.success) return parsed.response

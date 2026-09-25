@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { getCurrentUser } from '@/lib/db/users'
 import { requireActivatedOrg } from '@/lib/auth/require-activated-org'
+import { requireTabAccess } from '@/lib/auth/require-tab-access'
+import './help.css'
 
 export const metadata: Metadata = {
   title: 'Help Center — Upnotify',
@@ -12,6 +14,7 @@ export default async function HelpLayout({ children }: { children: React.ReactNo
   const user = await getCurrentUser()
   if (!user) redirect('/login')
   await requireActivatedOrg(user.org_id)
+  requireTabAccess(user, '/dashboard/help')
 
   return <>{children}</>
 }

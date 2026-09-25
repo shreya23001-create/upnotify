@@ -532,6 +532,64 @@ export async function sendTeamInviteEmail(params: TeamInviteEmailParams): Promis
 }
 
 // ---------------------------------------------------------------------------
+// Team member credentials email (admin-created accounts)
+// ---------------------------------------------------------------------------
+
+interface MemberCredentialsEmailParams {
+  to: string
+  name: string
+  orgName: string
+  role: string
+  addedByName: string
+  tempPassword: string
+  loginUrl: string
+}
+
+/**
+ * Sends login credentials to a team member whose account was created
+ * directly by an admin (rather than via the self-service invite-link flow).
+ */
+export async function sendMemberCredentialsEmail(params: MemberCredentialsEmailParams): Promise<EmailResult> {
+  const subject = `Welcome to the ${params.orgName} team on Upnotify`
+
+  const html = baseTemplate(`
+    <h2 style="margin:0 0 8px;font-size:18px;color:#111827;">Welcome to the team, ${escapeHtml(params.name)}!</h2>
+    <p style="margin:0 0 20px;font-size:14px;color:#6b7280;line-height:1.6;">
+      ${escapeHtml(params.addedByName)} has added you to <strong>${escapeHtml(params.orgName)}</strong>'s
+      Upnotify workspace as a <strong>${escapeHtml(params.role)}</strong>. Use the credentials
+      below to sign in.
+    </p>
+
+    <table style="width:100%;border-collapse:collapse;margin:0 0 20px;">
+      <tr>
+        <td style="padding:10px 14px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px 8px 0 0;font-size:13px;color:#6b7280;">Email</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 14px 14px;background:#f9fafb;border-left:1px solid #e5e7eb;border-right:1px solid #e5e7eb;font-size:14px;color:#111827;font-family:ui-monospace,monospace;">${escapeHtml(params.to)}</td>
+      </tr>
+      <tr>
+        <td style="padding:10px 14px 0;background:#f9fafb;border-left:1px solid #e5e7eb;border-right:1px solid #e5e7eb;font-size:13px;color:#6b7280;">Temporary password</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 14px 14px;background:#f9fafb;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px;font-size:14px;color:#111827;font-family:ui-monospace,monospace;">${escapeHtml(params.tempPassword)}</td>
+      </tr>
+    </table>
+
+    <p style="margin:0 0 8px;font-size:14px;color:#6b7280;">
+      We recommend changing your password after your first sign-in.
+    </p>
+
+    ${actionButton('Sign In', params.loginUrl)}
+
+    <p style="margin:24px 0 0;font-size:12px;color:#9ca3af;line-height:1.5;">
+      If you did not expect this email, please contact your organisation admin.
+    </p>
+  `)
+
+  return sendEmail(params.to, subject, html, 'team_invite')
+}
+
+// ---------------------------------------------------------------------------
 // Blog approval email
 // ---------------------------------------------------------------------------
 

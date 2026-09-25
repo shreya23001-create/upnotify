@@ -11,6 +11,7 @@ import { MonitorStatsBar } from '@/components/monitors/monitor-stats-bar'
 import { redirect } from 'next/navigation'
 import { parsePage, getPaginationMeta, DEFAULT_PAGE_SIZE } from '@/lib/utils/pagination'
 import { requireActivatedOrg } from '@/lib/auth/require-activated-org'
+import { requireTabAccess } from '@/lib/auth/require-tab-access'
 
 export default async function MonitorsPage({
   searchParams,
@@ -20,6 +21,7 @@ export default async function MonitorsPage({
   const user = await getCurrentUser()
   if (!user) redirect('/login')
   await requireActivatedOrg(user.org_id)
+  requireTabAccess(user, '/dashboard/monitors')
 
   const { search, status, type, page: pageParam } = await searchParams
   const page = parsePage(pageParam)
@@ -64,7 +66,7 @@ export default async function MonitorsPage({
         getMonitorsByWorkspacePaged(defaultWorkspace.id, page, pageSize, { search, status, type, excludeDomains: paidDomains }),
         getMonitorWorkspaceSummary(defaultWorkspace.id),
       ])
-    : [{ data: [], total: 0 }, { total: 0, active: 0, paused: 0, issues: 0 }]
+    : [{ data: [], total: 0 }, { total: 0, websites: 0, active: 0, paused: 0, issues: 0 }]
 
   const pagination = getPaginationMeta(page, pageSize, total)
 
@@ -98,7 +100,7 @@ export default async function MonitorsPage({
         </div>
       </div>
 
-      <MonitorStatsBar total={summary.total} active={summary.active} paused={summary.paused} issues={summary.issues} />
+      <MonitorStatsBar websites={summary.websites} active={summary.active} paused={summary.paused} issues={summary.issues} />
 
       {!isGrandfathered && paidDomains.length > 0 && (
         <div className="mon-domain-list">

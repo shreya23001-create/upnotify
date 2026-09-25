@@ -5,8 +5,8 @@ import { logger } from '@/lib/utils/logger'
 
 /**
  * GET /api/v1/monitors/count
- * Returns the total number of monitors for the current user's org.
- * Used by the sidebar badge to show monitor count.
+ * Returns the number of distinct websites monitored for the current user's
+ * org. Used by the sidebar badge to show website count.
  */
 export async function GET(): Promise<NextResponse> {
   try {
@@ -17,7 +17,7 @@ export async function GET(): Promise<NextResponse> {
 
     const stats = await getMonitorStats(user.org_id)
 
-    return NextResponse.json({ success: true, count: stats.total })
+    return NextResponse.json({ success: true, count: stats.websites })
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Unknown error'
     logger.error('Monitors count API error', { error: message })

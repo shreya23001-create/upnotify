@@ -41,6 +41,7 @@ type OrgRecord = Record<string, unknown>
 interface Props {
   organisation: Organisation
   onUploadLogo: (base64Data: string) => Promise<{ error?: string }>
+  onRemoveLogo: () => Promise<{ error?: string }>
   onSaveCompanyDetails: (formData: FormData) => Promise<{ error?: string }>
   canEdit: boolean
 }
@@ -49,7 +50,7 @@ function getFieldValue(org: OrgRecord, key: string): string {
   return (org[key] as string) || ''
 }
 
-export function OrganisationCompanyForm({ organisation, onUploadLogo, onSaveCompanyDetails, canEdit }: Props): React.ReactElement {
+export function OrganisationCompanyForm({ organisation, onUploadLogo, onRemoveLogo, onSaveCompanyDetails, canEdit }: Props): React.ReactElement {
   const org = organisation as OrgRecord
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
@@ -114,7 +115,7 @@ export function OrganisationCompanyForm({ organisation, onUploadLogo, onSaveComp
           {/* ── Logo sidebar (sticky within the panel) ── */}
           {canEdit && (
             <div className="stt-merged-sidebar">
-              <LogoUpload currentLogoUrl={organisation.logo_url} orgName={organisation.name} onUpload={onUploadLogo} />
+              <LogoUpload currentLogoUrl={organisation.logo_url} orgName={organisation.name} onUpload={onUploadLogo} onRemove={onRemoveLogo} />
             </div>
           )}
 

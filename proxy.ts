@@ -39,17 +39,18 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
     return response()
   }
 
-  // Check if user is deactivated
-  if (pathname !== '/deactivated') {
-    const { data: userData } = await supabase
-      .from('users')
-      .select('is_active')
-      .eq('id', user.id)
-      .single()
+  // Fetch both is_active and is_super_admin in one round trip — every
+  // request needs is_active, and admin routes also need is_super_admin, so
+  // there's no case where fetching them separately saves a query.
+  const needsAdminCheck = isAdminRoute(pathname)
+  const { data: userData } = await supabase
+    .from('users')
+    .select('is_active, is_super_admin')
+    .eq('id', user.id)
+    .single()
 
-    if (userData && userData.is_active === false) {
-      return NextResponse.redirect(new URL('/deactivated', request.url))
-    }
+  if (pathname !== '/deactivated' && userData?.is_active === false) {
+    return NextResponse.redirect(new URL('/deactivated', request.url))
   }
 
   // Admin routes: verify admin access via users.is_super_admin, env
@@ -58,19 +59,13 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
   // otherwise a super admin not also in ADMIN_EMAILS/admin_roles gets
   // bounced here while the layout lets them through, causing a redirect
   // loop between /admin and /dashboard.
-  if (isAdminRoute(pathname)) {
+  if (needsAdminCheck) {
     const adminEmailsRaw = process.env.ADMIN_EMAILS || ''
     const adminEmails = adminEmailsRaw.split(',').map(e => e.trim().toLowerCase()).filter(Boolean)
     const userEmail = (user.email || '').toLowerCase().trim()
 
-    const { data: userRow } = await supabase
-      .from('users')
-      .select('is_super_admin')
-      .eq('id', user.id)
-      .single()
-
     // Check super admin flag and env whitelist first (fast path)
-    let hasAccess = userRow?.is_super_admin === true || adminEmails.includes(userEmail)
+    let hasAccess = userData?.is_super_admin === true || adminEmails.includes(userEmail)
 
     // If neither, check admin_roles table
     if (!hasAccess) {

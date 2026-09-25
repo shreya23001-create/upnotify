@@ -4,6 +4,7 @@ import { getAllIncidentsGroupedByWebsite } from '@/lib/db/incidents'
 import { IncidentsTable } from '@/components/dashboard/incidents-table'
 import type { Metadata } from 'next'
 import { requireActivatedOrg } from '@/lib/auth/require-activated-org'
+import { requireTabAccess } from '@/lib/auth/require-tab-access'
 
 export const dynamic = 'force-dynamic'
 
@@ -19,6 +20,7 @@ export default async function IncidentsPage({
   const user = await getCurrentUser()
   if (!user) redirect('/login')
   await requireActivatedOrg(user.org_id)
+  requireTabAccess(user, '/dashboard/incidents')
 
   const { tab: tabParam } = await searchParams
   const tab = tabParam === 'resolved' ? 'resolved' : tabParam === 'open' ? 'open' : undefined

@@ -7,6 +7,7 @@ interface LogoUploadProps {
   currentLogoUrl: string | null
   orgName: string
   onUpload: (base64Data: string) => Promise<{ error?: string }>
+  onRemove: () => Promise<{ error?: string }>
 }
 
 const MAX_FILE_SIZE = 2 * 1024 * 1024 // 2MB
@@ -73,10 +74,11 @@ function compressImage(file: File): Promise<string> {
   })
 }
 
-export function LogoUpload({ currentLogoUrl, orgName, onUpload }: LogoUploadProps): React.ReactElement {
+export function LogoUpload({ currentLogoUrl, orgName, onUpload, onRemove }: LogoUploadProps): React.ReactElement {
   const [preview, setPreview] = useState<string | null>(currentLogoUrl)
   const [pendingBase64, setPendingBase64] = useState<string | null>(null)
   const [isUploading, setIsUploading] = useState(false)
+  const [isRemoving, setIsRemoving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
   const [isDragOver, setIsDragOver] = useState(false)
@@ -149,15 +151,41 @@ export function LogoUpload({ currentLogoUrl, orgName, onUpload }: LogoUploadProp
     }
   }, [pendingBase64, onUpload])
 
-  const handleRemove = useCallback((): void => {
-    setPreview(null)
-    setPendingBase64(null)
+  const handleRemove = useCallback(async (): Promise<void> => {
     setError(null)
     setSuccess(false)
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ''
+
+    // A pending (unsaved) selection is just cancelled locally — nothing has
+    // been persisted yet, so there's nothing to remove server-side.
+    if (pendingBase64) {
+      setPreview(currentLogoUrl)
+      setPendingBase64(null)
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
+      return
     }
-  }, [])
+
+    // Otherwise this is an already-saved logo — actually delete it.
+    if (!currentLogoUrl) return
+    setIsRemoving(true)
+    try {
+      const result = await onRemove()
+      if (result?.error) {
+        setError(result.error)
+      } else {
+        setPreview(null)
+        setSuccess(true)
+      }
+    } catch {
+      setError('Failed to remove logo. Please try again.')
+    } finally {
+      setIsRemoving(false)
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
+    }
+  }, [pendingBase64, currentLogoUrl, onRemove])
 
   const initials = getInitials(orgName || 'O')
 
@@ -177,10 +205,7 @@ export function LogoUpload({ currentLogoUrl, orgName, onUpload }: LogoUploadProp
           )}
         </div>
         <div className="logo-upload-info">
-          <div className="logo-upload-title">Organisation Logo</div>
-          <div className="logo-upload-desc">
-            JPG, PNG, SVG, or WebP. Max 2MB. Will be cropped to a square and resized to 200x200px.
-          </div>
+          {/* <div className="logo-upload-title">Organisation Logo</div> */}
           <div className="logo-upload-actions">
             <button
               type="button"
@@ -204,8 +229,8 @@ export function LogoUpload({ currentLogoUrl, orgName, onUpload }: LogoUploadProp
               <button
                 type="button"
                 className="logo-upload-remove-btn"
-                onClick={handleRemove}
-                disabled={isUploading}
+                onClick={() => { void handleRemove() }}
+                disabled={isUploading || isRemoving}
                 aria-label="Remove logo"
                 title="Remove"
               >

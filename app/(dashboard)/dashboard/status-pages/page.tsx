@@ -7,6 +7,7 @@ import { parsePage, getPaginationMeta, DEFAULT_PAGE_SIZE } from '@/lib/utils/pag
 import Link from 'next/link'
 import { Globe, CheckCircle2, Activity } from 'lucide-react'
 import { requireActivatedOrg } from '@/lib/auth/require-activated-org'
+import { requireTabAccess } from '@/lib/auth/require-tab-access'
 
 export default async function StatusPagesPage({
   searchParams,
@@ -16,6 +17,7 @@ export default async function StatusPagesPage({
   const user = await getCurrentUser()
   if (!user) redirect('/login')
   await requireActivatedOrg(user.org_id)
+  requireTabAccess(user, '/dashboard/status-pages')
 
   const { page: pageParam } = await searchParams
   const page = parsePage(pageParam)

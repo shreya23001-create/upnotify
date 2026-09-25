@@ -29,19 +29,34 @@ function ChevronRight() {
   )
 }
 
+// Matches a raw database ID segment (UUID, or any long opaque id-looking
+// string) in the URL — this component has no access to the actual record
+// (e.g. a team member's name) behind that id, so rather than show a
+// meaningless truncated UUID, that segment is dropped from the trail
+// entirely. The page's own in-content breadcrumb/heading is expected to
+// show the real, human-readable name instead.
+const ID_SEGMENT_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
 export function Breadcrumbs() {
   const pathname = usePathname()
   const allSegments = pathname.split('/').filter(Boolean)
   // Every dashboard route starts with "dashboard" — drop it so the trail
   // starts at the page itself instead of a redundant "Dashboard /" prefix.
-  const segments = allSegments[0] === 'dashboard' ? allSegments.slice(1) : allSegments
+  const startIndex = allSegments[0] === 'dashboard' ? 1 : 0
 
-  if (segments.length === 0) return null
+  // Pair each visible segment with its real index into allSegments so hrefs
+  // stay correct even after filtering out raw id segments below.
+  const indexed = allSegments
+    .map((seg, i) => ({ seg, i }))
+    .slice(startIndex)
+    .filter(({ seg }) => !ID_SEGMENT_PATTERN.test(seg))
 
-  const crumbs = segments.map((seg, i) => {
-    const href = '/' + allSegments.slice(0, allSegments.length - segments.length + i + 1).join('/')
+  if (indexed.length === 0) return null
+
+  const crumbs = indexed.map(({ seg, i }, pos) => {
+    const href = '/' + allSegments.slice(0, i + 1).join('/')
     const label = labelMap[seg] ?? (seg.length > 24 ? seg.slice(0, 10) + '…' : seg)
-    const isLast = i === segments.length - 1
+    const isLast = pos === indexed.length - 1
     return { href, label, isLast }
   })
 

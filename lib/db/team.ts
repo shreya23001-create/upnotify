@@ -393,3 +393,148 @@ export async function removeTeamMember(
 
   return { success: true }
 }
+
+// ---------------------------------------------------------------------------
+// Admin-created member (direct account creation, not invite-link based)
+// ---------------------------------------------------------------------------
+
+interface CreateMemberResult {
+  success: boolean
+  error?: string
+  userId?: string
+}
+
+/**
+ * Creates a real Supabase Auth user directly (admin sets the password) and
+ * places them straight into the inviting org, then applies the requested
+ * per-tab access restriction. Unlike the invite-link flow, this passes
+ * org_id/workspace_id/role in the new auth user's metadata BEFORE the
+ * `on_auth_user_created` trigger fires (00009_auth_trigger.sql), so the
+ * trigger's own "invited user: join existing org" branch runs immediately —
+ * no create-then-patch step, no risk of the account landing in a separate
+ * solo org (the failure mode documented for the invite-link flow).
+ */
+export async function createTeamMemberDirectly(params: {
+  orgId: string
+  name: string
+  email: string
+  password: string
+  role: 'admin' | 'member'
+  tabAccess: string[] | null
+}): Promise<CreateMemberResult> {
+  const supabase = createAdminClient()
+  const email = params.email.toLowerCase().trim()
+
+  const { data: existingMember } = await supabase
+    .from('users')
+    .select('id')
+    .eq('email', email)
+    .eq('org_id', params.orgId)
+    .single()
+
+  if (existingMember) {
+    return { success: false, error: 'This user is already a member of your organisation.' }
+  }
+
+  const { data: workspace } = await supabase
+    .from('workspaces')
+    .select('id')
+    .eq('org_id', params.orgId)
+    .order('created_at', { ascending: true })
+    .limit(1)
+    .single()
+
+  if (!workspace) {
+    return { success: false, error: 'No workspace found for this organisation.' }
+  }
+
+  const userRole = inviteRoleToUserRole(params.role)
+
+  const { data: created, error: createError } = await supabase.auth.admin.createUser({
+    email,
+    password: params.password,
+    email_confirm: true,
+    user_metadata: {
+      full_name: params.name,
+      org_id: params.orgId,
+      workspace_id: workspace.id,
+      role: userRole,
+    },
+  })
+
+  if (createError || !created.user) {
+    logger.error('Failed to create team member auth account', {
+      error: createError?.message,
+      orgId: params.orgId,
+      email,
+    })
+    if (createError?.message?.toLowerCase().includes('already') || createError?.message?.toLowerCase().includes('registered')) {
+      return { success: false, error: 'An account with this email already exists.' }
+    }
+    return { success: false, error: 'Failed to create the account. Please try again.' }
+  }
+
+  // The trigger has already inserted the users row with the right org/role.
+  // Apply the requested tab restriction as a follow-up update — the trigger
+  // itself doesn't know about tab_access.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error: updateError } = await (supabase as any)
+    .from('users')
+    .update({ tab_access: params.tabAccess })
+    .eq('id', created.user.id)
+
+  if (updateError) {
+    logger.error('Failed to set tab_access for new team member', {
+      error: updateError.message,
+      userId: created.user.id,
+    })
+    // Non-fatal — the account exists and works, just unrestricted for now.
+  }
+
+  return { success: true, userId: created.user.id }
+}
+
+/**
+ * Updates an existing member's role and/or tab access. Does not touch
+ * password or email — this is for the "Edit" action on an already-created
+ * member, not account recovery.
+ */
+export async function updateTeamMemberAccess(
+  orgId: string,
+  userId: string,
+  updates: { role: 'admin' | 'member'; tabAccess: string[] | null }
+): Promise<MutationResult> {
+  const supabase = createAdminClient()
+
+  const { data: member } = await supabase
+    .from('users')
+    .select('id, role')
+    .eq('id', userId)
+    .eq('org_id', orgId)
+    .single()
+
+  if (!member) {
+    return { success: false, error: 'User not found in this organisation.' }
+  }
+
+  const userRole = inviteRoleToUserRole(updates.role)
+  const tabAccess = updates.role === 'admin' ? null : updates.tabAccess
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabase as any)
+    .from('users')
+    .update({ role: userRole, tab_access: tabAccess })
+    .eq('id', userId)
+    .eq('org_id', orgId)
+
+  if (error) {
+    logger.error('Failed to update team member access', {
+      error: error.message,
+      orgId,
+      userId,
+    })
+    return { success: false, error: 'Failed to update member. Please try again.' }
+  }
+
+  return { success: true }
+}

@@ -1,10 +1,10 @@
-import { Activity, CheckCircle2, XCircle } from 'lucide-react'
+import { Globe, CheckCircle2, XCircle } from 'lucide-react'
 
-interface MonitorStats { total: number; up: number; down: number; degraded: number; paused: number }
+interface MonitorStats { total: number; websites: number; up: number; down: number; degraded: number; paused: number }
 
 export function DashboardStatsBar({ stats }: { stats: MonitorStats }): React.ReactElement {
   const cards = [
-    { label: 'Total Monitors', value: stats.total, icon: Activity, tone: 'neutral' as const },
+    { label: 'Total Websites', value: stats.websites, icon: Globe, tone: 'neutral' as const },
     { label: 'Healthy', value: stats.up, icon: CheckCircle2, tone: 'up' as const },
     { label: 'Down', value: stats.down, icon: XCircle, tone: 'down' as const },
   ]

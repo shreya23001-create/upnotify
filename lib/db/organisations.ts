@@ -56,7 +56,7 @@ export async function updateCompanyDetails(
     company_registration_number?: string
     company_vat_number?: string
     billing_email?: string
-    logo_url?: string
+    logo_url?: string | null
   }
 ): Promise<Organisation | null> {
   const supabase = createAdminClient()

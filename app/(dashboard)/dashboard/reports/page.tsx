@@ -2,12 +2,14 @@ import { redirect } from 'next/navigation'
 import { getCurrentUser } from '@/lib/db/users'
 import { getMonitorsGroupedByWebsite } from '@/lib/db/monitors'
 import { requireActivatedOrg } from '@/lib/auth/require-activated-org'
+import { requireTabAccess } from '@/lib/auth/require-tab-access'
 import { ReportExplorer } from '@/components/reports/report-explorer'
 
 export default async function ReportsPage(): Promise<React.ReactElement> {
   const user = await getCurrentUser()
   if (!user) redirect('/login')
   await requireActivatedOrg(user.org_id)
+  requireTabAccess(user, '/dashboard/reports')
 
   const groups = await getMonitorsGroupedByWebsite(user.org_id)
   const websites = groups

@@ -4,6 +4,7 @@ import { getCurrentUser } from '@/lib/db/users'
 import { WorkspaceDashboard } from '@/components/dashboard/workspace-dashboard'
 import { redirect } from 'next/navigation'
 import { requireActivatedOrg } from '@/lib/auth/require-activated-org'
+import { requireTabAccess } from '@/lib/auth/require-tab-access'
 
 export const metadata: Metadata = { title: 'Dashboard' }
 
@@ -11,6 +12,7 @@ export default async function DashboardPage(): Promise<React.ReactElement> {
   const user = await getCurrentUser()
   if (!user) redirect('/login')
   await requireActivatedOrg(user.org_id)
+  requireTabAccess(user, '/dashboard')
 
   return (
     <div className="db-content db-home">

@@ -15,7 +15,7 @@ import { InvoiceList } from '@/components/billing/invoice-list'
 import { CreditsSection } from '@/components/billing/credits-section'
 import { ReferralSection } from '@/components/billing/referral-section'
 import { OrganisationCompanyForm } from '@/components/dashboard/settings/organisation-company-form'
-import { TeamInviteForm } from '@/components/dashboard/settings/team-invite-form'
+import { TeamMembersTable } from '@/components/dashboard/settings/team-members-table'
 import { CmsManager } from '@/components/admin/cms-manager'
 
 interface SettingsContentProps {
@@ -148,10 +148,13 @@ export function SettingsContent({
     setTimeout(() => setCopiedKey(false), 2000)
   }, [newKeyResult])
 
-  const handleInviteSent = useCallback((): void => {
-    // Invites are managed separately — no need to update team members list here.
-    // The team-invite-form component fetches its own invites list.
-  }, [])
+  const openAddMember = useCallback((): void => {
+    router.push('/dashboard/settings/team/new')
+  }, [router])
+
+  const openEditMember = useCallback((member: User): void => {
+    router.push(`/dashboard/settings/team/${member.id}/edit`)
+  }, [router])
 
   const executeRemoveMember = useCallback(async (): Promise<void> => {
     if (!removeTarget) return
@@ -197,6 +200,19 @@ export function SettingsContent({
     })
     const data: Record<string, unknown> = await res.json()
     if (!res.ok) return { error: (data.error as string) || 'Failed to upload logo.' }
+    router.refresh()
+    return {}
+  }
+
+  async function removeLogo(): Promise<{ error?: string }> {
+    const res = await fetch('/api/v1/organisation/company', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ logo_url: null }),
+    })
+    const data: Record<string, unknown> = await res.json()
+    if (!res.ok) return { error: (data.error as string) || 'Failed to remove logo.' }
+    router.refresh()
     return {}
   }
 
@@ -279,6 +295,7 @@ export function SettingsContent({
               <OrganisationCompanyForm
                 organisation={organisation}
                 onUploadLogo={uploadLogo}
+                onRemoveLogo={removeLogo}
                 onSaveCompanyDetails={saveCompanyDetails}
                 canEdit={canManageOrg}
               />
@@ -295,21 +312,32 @@ export function SettingsContent({
                 <div className="stt-section-header-text">
                   <div className="stt-section-title">Team</div>
                 </div>
+                <span className="stt-seat-count">
+                  {teamMemberLimit === 0 ? `${teamMemberCount} members` : `${teamMemberCount} of ${teamMemberLimit} team member slots used`}
+                </span>
               </div>
 
-              {canManageTeam && (
-                <div className="stt-form-card">
-                  <div className="stt-form-card-header">
-                    <div className="stt-form-card-title">Invite Team Member</div>
-                  </div>
-                  <div className="stt-form-card-body">
-                    {canInvite
-                      ? <TeamInviteForm canInvite={canInvite} teamMemberLimit={teamMemberLimit} teamMemberCount={teamMemberCount} onInviteSent={handleInviteSent} />
-                      : <p className="stt-upgrade-notice">Team invites are not available on your current plan. Upgrade to invite team members.</p>
-                    }
-                  </div>
+              <div className="stt-form-card">
+                <div className="stt-form-card-header stt-form-card-header--split">
+                  <div className="stt-form-card-title">Team Members</div>
+                  {canInvite ? (
+                    <button type="button" className="stt-save-btn" onClick={openAddMember}>
+                      + Invite Member
+                    </button>
+                  ) : (
+                    <span className="stt-upgrade-notice" style={{ padding: '4px 10px' }}>Upgrade to add more members</span>
+                  )}
                 </div>
-              )}
+                <div className="stt-form-card-body">
+                  <TeamMembersTable
+                    members={teamMembers}
+                    currentUserId={currentUserId}
+                    canManageTeam={canManageTeam}
+                    onRemove={setRemoveTarget}
+                    onEdit={openEditMember}
+                  />
+                </div>
+              </div>
             </div>
           )}
 

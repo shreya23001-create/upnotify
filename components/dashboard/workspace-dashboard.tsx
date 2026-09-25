@@ -11,7 +11,7 @@ import type { Monitor, Incident } from '@/lib/types'
 
 // ─── Types (unchanged contract with GET /api/v1/dashboard/stats) ─────────────
 
-interface MonitorStats { total: number; up: number; down: number; degraded: number; paused: number }
+interface MonitorStats { total: number; websites: number; up: number; down: number; degraded: number; paused: number }
 interface CheckResult   { status: string; response_time_ms?: number | null; checked_at: string; monitor_id: string }
 interface DashboardData {
   stats: MonitorStats
@@ -51,7 +51,6 @@ export function WorkspaceDashboard(): React.ReactElement {
   const [data, setData] = useState<DashboardData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
-  const [lastLoadedAt, setLastLoadedAt] = useState<Date | null>(null)
   const [retryToken, setRetryToken] = useState(0)
 
   useEffect(() => {
@@ -73,7 +72,6 @@ export function WorkspaceDashboard(): React.ReactElement {
         if (!cancelled) {
           if (json.success) {
             setData(json)
-            setLastLoadedAt(new Date())
           } else {
             setError(true)
           }
@@ -92,35 +90,13 @@ export function WorkspaceDashboard(): React.ReactElement {
   if (loading) return <Skeleton />
   if (error && !data) return <ErrorState onRetry={() => setRetryToken(t => t + 1)} />
 
-  const stats        = data?.stats        ?? { total: 0, up: 0, down: 0, degraded: 0, paused: 0 }
+  const stats        = data?.stats        ?? { total: 0, websites: 0, up: 0, down: 0, degraded: 0, paused: 0 }
   const monitors     = data?.monitors     ?? []
   const incidents    = data?.incidents    ?? []
   const checkResults = data?.checkResults ?? []
 
-  const overallLabel = stats.total === 0
-    ? 'No monitors yet'
-    : stats.down > 0
-      ? `${stats.down} monitor${stats.down === 1 ? '' : 's'} down`
-      : stats.degraded > 0
-        ? `${stats.degraded} monitor${stats.degraded === 1 ? '' : 's'} degraded`
-        : 'All systems operational'
-  const overallState: 'up' | 'warn' | 'down' | 'neutral' = stats.total === 0 ? 'neutral' : stats.down > 0 ? 'down' : stats.degraded > 0 ? 'warn' : 'up'
-
   return (
     <div className="db-dashboard">
-      <div className="db-status-strip">
-        <span className={`db-status-strip-dot db-status-strip-dot--${overallState}`} />
-        <span className="db-status-strip-label">{overallLabel}</span>
-        <span className="db-status-strip-sep">·</span>
-        <span className="db-status-strip-meta">{stats.total} monitor{stats.total === 1 ? '' : 's'} monitored</span>
-        {lastLoadedAt && (
-          <>
-            <span className="db-status-strip-sep">·</span>
-            <span className="db-status-strip-meta">Last checked {lastLoadedAt.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}</span>
-          </>
-        )}
-      </div>
-
       <DashboardStatsBar stats={stats} />
 
       <div className="db-home-split db-home-split--equal">

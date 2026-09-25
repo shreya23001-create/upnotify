@@ -1,15 +1,15 @@
-import { Radio, Activity, PauseCircle, AlertTriangle } from 'lucide-react'
+import { Globe, Activity, PauseCircle, AlertTriangle } from 'lucide-react'
 
 interface Props {
-  total: number
+  websites: number
   active: number
   paused: number
   issues: number
 }
 
-export function MonitorStatsBar({ total, active, paused, issues }: Props): React.ReactElement {
+export function MonitorStatsBar({ websites, active, paused, issues }: Props): React.ReactElement {
   const stats = [
-    { label: 'Total Monitors', value: total, icon: Radio, tone: 'neutral' as const },
+    { label: 'Total Websites', value: websites, icon: Globe, tone: 'neutral' as const },
     { label: 'Active', value: active, icon: Activity, tone: 'up' as const },
     { label: 'Paused', value: paused, icon: PauseCircle, tone: 'paused' as const },
     { label: 'Issues Detected', value: issues, icon: AlertTriangle, tone: 'down' as const },

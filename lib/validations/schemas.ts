@@ -127,6 +127,7 @@ export const companyDetailsSchema = z
     logo_url: z
       .string()
       .max(500000, 'Logo data must not exceed 500KB')
+      .nullable()
       .optional(),
   })
   .refine(

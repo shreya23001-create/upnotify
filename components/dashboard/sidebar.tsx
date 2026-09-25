@@ -113,6 +113,18 @@ export function Sidebar({ forceExpanded = false }: SidebarProps): React.ReactEle
     return pathname.startsWith(href)
   }
 
+  // Per-member tab restriction: only applies to role === 'viewer' (the
+  // actual DB value for a non-admin team member — see
+  // lib/auth/require-tab-access.ts for why it's not 'member') with a
+  // non-null tab_access array. Admins, and viewers with tab_access left
+  // null (unrestricted), see everything as before.
+  const tabAccess = (user as { tab_access?: string[] | null } | null)?.tab_access ?? null
+  const isRestrictedMember = user?.role === 'viewer' && Array.isArray(tabAccess)
+  function isTabVisible(href: string): boolean {
+    if (!isRestrictedMember) return true
+    return (tabAccess as string[]).includes(href)
+  }
+
   const sections: NavSection[] = []
 
   /* Main navigation section */
@@ -130,11 +142,11 @@ export function Sidebar({ forceExpanded = false }: SidebarProps): React.ReactEle
     }
     return item
   })
-  mainItems.push(...itemsWithBadges)
+  mainItems.push(...itemsWithBadges.filter(item => isTabVisible(item.href)))
   sections.push({ title: 'MAIN', items: mainItems })
 
   /* Secondary section */
-  sections.push({ title: 'SUPPORT', items: secondaryNavItems })
+  sections.push({ title: 'SUPPORT', items: secondaryNavItems.filter(item => isTabVisible(item.href)) })
 
   return (
     <aside className={effectiveCollapsed ? 'sidebar sidebar-collapsed' : 'sidebar'}>
