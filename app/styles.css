@@ -6984,6 +6984,27 @@ html.dark .status-pill-paused {
   justify-content: center;
 }
 
+.esp-settings-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.esp-settings-row .esp-save-btn {
+  align-self: end;
+}
+
+.esp-settings-row .form-group {
+  margin-bottom: 0;
+}
+
+@media (max-width: 640px) {
+  .esp-settings-row {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ── added monitors ── */
 .esp-added {
   display: flex;
@@ -27186,6 +27207,19 @@ html.dark .ac-row--selected {
   overflow: hidden;
   text-overflow: ellipsis;
   display: block;
+}
+
+.ac-dest-more {
+  display: inline-block;
+  margin-top: 2px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--bg-muted);
+  border: 1px solid var(--border-light);
+  border-radius: 5px;
+  padding: 1px 6px;
+  cursor: default;
 }
 
 /* Severity chips */

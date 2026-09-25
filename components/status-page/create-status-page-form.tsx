@@ -2,8 +2,7 @@
 
 import { useState, useTransition, useMemo } from 'react'
 import { createStatusPageAction } from '@/app/(dashboard)/dashboard/status-pages/actions'
-import { MonitorTypeIcon } from '@/components/monitors/monitor-type-icon'
-import { Plus, X, Search, CheckCircle2 } from 'lucide-react'
+import { Plus, X, Search, Globe, CheckCircle2 } from 'lucide-react'
 import type { Monitor } from '@/lib/types'
 
 const STATUS_DOT: Record<string, string> = {
@@ -13,6 +12,36 @@ const STATUS_DOT: Record<string, string> = {
   paused:   '#94a3b8',
 }
 
+interface WebsiteGroup {
+  domain: string
+  monitors: Monitor[]
+}
+
+function monitorDomain(m: Monitor): string {
+  return (m as unknown as { target_domain: string | null }).target_domain?.trim() || 'Other'
+}
+
+function groupByWebsite(monitors: Monitor[]): WebsiteGroup[] {
+  const groups = new Map<string, Monitor[]>()
+  for (const m of monitors) {
+    const key = monitorDomain(m)
+    const list = groups.get(key)
+    if (list) list.push(m)
+    else groups.set(key, [m])
+  }
+  return Array.from(groups.entries())
+    .map(([domain, list]) => ({ domain, monitors: list }))
+    .sort((a, b) => a.domain.localeCompare(b.domain))
+}
+
+/** Worst status among a website's monitors, for the group's summary dot. */
+function worstDot(monitors: Monitor[]): string {
+  if (monitors.some(m => m.status === 'down')) return STATUS_DOT.down
+  if (monitors.some(m => m.status === 'degraded')) return STATUS_DOT.degraded
+  if (monitors.some(m => m.status === 'paused')) return STATUS_DOT.paused
+  return STATUS_DOT.up
+}
+
 export function CreateStatusPageForm({ monitors }: { monitors: Monitor[] }) {
   const [name, setName] = useState('')
   const [selected, setSelected] = useState<Set<string>>(new Set())
@@ -20,35 +49,38 @@ export function CreateStatusPageForm({ monitors }: { monitors: Monitor[] }) {
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 
-  function add(id: string): void {
-    setSelected(prev => new Set([...prev, id]))
+  function addWebsite(group: WebsiteGroup): void {
+    setSelected(prev => new Set([...prev, ...group.monitors.map(m => m.id)]))
   }
 
-  function remove(id: string): void {
-    setSelected(prev => { const n = new Set(prev); n.delete(id); return n })
+  function removeWebsite(group: WebsiteGroup): void {
+    const ids = new Set(group.monitors.map(m => m.id))
+    setSelected(prev => new Set(Array.from(prev).filter(id => !ids.has(id))))
   }
 
-  const available = useMemo(() =>
-    monitors.filter(m => {
-      if (selected.has(m.id)) return false
-      if (!search) return true
-      const q = search.toLowerCase()
-      return m.name.toLowerCase().includes(q) || m.type.toLowerCase().includes(q)
-    }),
-    [monitors, selected, search]
+  const allGroups = useMemo(() => groupByWebsite(monitors), [monitors])
+
+  const addedGroups = useMemo(() =>
+    allGroups
+      .map(g => ({ domain: g.domain, monitors: g.monitors.filter(m => selected.has(m.id)) }))
+      .filter(g => g.monitors.length > 0),
+    [allGroups, selected]
   )
 
-  const addedMonitors = useMemo(() =>
-    monitors.filter(m => selected.has(m.id)),
-    [monitors, selected]
-  )
+  const availableGroups = useMemo(() => {
+    const q = search.trim().toLowerCase()
+    return allGroups
+      .map(g => ({ domain: g.domain, monitors: g.monitors.filter(m => !selected.has(m.id)) }))
+      .filter(g => g.monitors.length > 0)
+      .filter(g => !q || g.domain.toLowerCase().includes(q))
+  }, [allGroups, selected, search])
 
   const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
 
   function handleSubmit(formData: FormData): void {
     setError(null)
     if (selected.size === 0) {
-      setError('Please select at least one monitor to display on this status page.')
+      setError('Please select at least one website to display on this status page.')
       return
     }
     formData.set('slug', slug)
@@ -67,69 +99,73 @@ export function CreateStatusPageForm({ monitors }: { monitors: Monitor[] }) {
       <div className="esp-settings esp-settings-full">
         <div className="esp-section-title">Page Settings</div>
 
-        <div className="form-group">
-          <label className="form-label">Page Name</label>
-          <input className="form-input" name="name" required value={name} onChange={e => setName(e.target.value)} placeholder="My Service Status" disabled={isPending} />
-        </div>
+        <div className="esp-settings-row">
+          <div className="form-group">
+            <label className="form-label">Page Name</label>
+            <input className="form-input" name="name" required value={name} onChange={e => setName(e.target.value)} placeholder="My Service Status" disabled={isPending} />
+          </div>
 
-        <div className="form-group">
-          <label className="form-label">Slug (URL)</label>
-          <div className="esp-slug-wrap">
-            <span className="esp-slug-prefix">/status/</span>
-            <input className="form-input esp-slug-input" name="slug" value={slug} readOnly disabled={isPending} />
+          <div className="form-group">
+            <label className="form-label">Slug (URL)</label>
+            <div className="esp-slug-wrap">
+              <span className="esp-slug-prefix">/status/</span>
+              <input className="form-input esp-slug-input" name="slug" value={slug} readOnly disabled={isPending} />
+            </div>
           </div>
         </div>
 
-        <div className="form-group">
-          <label className="form-label">Visibility</label>
-          <select className="form-select" name="is_published" disabled={isPending}>
-            <option value="true">Published — visible to public</option>
-            <option value="false">Draft — only visible to you</option>
-          </select>
-        </div>
+        <div className="esp-settings-row">
+          <div className="form-group">
+            <label className="form-label">Visibility</label>
+            <select className="form-select" name="is_published" disabled={isPending}>
+              <option value="true">Published — visible to public</option>
+              <option value="false">Draft — only visible to you</option>
+            </select>
+          </div>
 
-        <button type="submit" className="btn btn-primary esp-save-btn" disabled={isPending}>
-          {isPending ? 'Creating…' : 'Create Status Page'}
-        </button>
+          <button type="submit" className="btn btn-primary esp-save-btn" disabled={isPending}>
+            {isPending ? 'Creating…' : 'Create Status Page'}
+          </button>
+        </div>
       </div>
 
       {monitors.length === 0 ? (
         <p style={{ color: 'var(--text-secondary)', fontSize: 14 }}>No monitors available. Create monitors first.</p>
       ) : (
-        /* ── Bottom: monitors, 2-column ── */
+        /* ── Bottom: websites, 2-column ── */
         <div className="esp-layout">
 
-          {/* Left: monitors added to this page */}
+          {/* Left: websites added to this page */}
           <div className="esp-picker">
             <div className="esp-section-title">
-              Monitors on this page
+              Websites on this page
               <span className="esp-count-pill">{selected.size}</span>
             </div>
 
             <div className="esp-added">
-              {addedMonitors.length === 0 ? (
+              {addedGroups.length === 0 ? (
                 <div className="esp-added-empty">
                   <CheckCircle2 size={20} strokeWidth={1.5} />
-                  <span>No monitors added yet</span>
+                  <span>No websites added yet</span>
                 </div>
               ) : (
-                addedMonitors.map(m => (
-                  <div key={m.id} className="esp-added-row">
+                addedGroups.map(g => (
+                  <div key={g.domain} className="esp-added-row">
                     <div className="esp-added-icon">
-                      <MonitorTypeIcon type={m.type} iconOnly iconSize={14} />
+                      <Globe size={14} />
                     </div>
-                    <span className="esp-added-name">{m.name}</span>
+                    <span className="esp-added-name">{g.domain}</span>
+                    <span className="esp-avail-type">{g.monitors.length} monitor{g.monitors.length === 1 ? '' : 's'}</span>
                     <span
                       className="esp-added-dot"
-                      style={{ background: STATUS_DOT[m.status] ?? STATUS_DOT.paused }}
-                      title={m.status}
+                      style={{ background: worstDot(g.monitors) }}
                     />
                     <button
                       type="button"
                       className="esp-remove-btn"
-                      onClick={() => remove(m.id)}
+                      onClick={() => removeWebsite(g)}
                       disabled={isPending}
-                      aria-label={`Remove ${m.name}`}
+                      aria-label={`Remove ${g.domain}`}
                     >
                       <X size={13} />
                     </button>
@@ -139,49 +175,48 @@ export function CreateStatusPageForm({ monitors }: { monitors: Monitor[] }) {
             </div>
           </div>
 
-          {/* Right: add monitors */}
+          {/* Right: add websites */}
           <div className="esp-picker">
-            <div className="esp-section-title">Add monitors</div>
+            <div className="esp-section-title">Add websites</div>
 
             <div className="esp-search-wrap">
               <Search size={14} className="esp-search-icon" />
               <input
                 className="esp-search"
                 type="text"
-                placeholder="Search by name or type…"
+                placeholder="Search by website…"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
               />
             </div>
 
             <div className="esp-available">
-              {available.length === 0 ? (
+              {availableGroups.length === 0 ? (
                 <div className="esp-available-empty">
-                  {monitors.length === selected.size
-                    ? 'All monitors are already added.'
-                    : 'No monitors match your search.'}
+                  {allGroups.every(g => g.monitors.every(m => selected.has(m.id)))
+                    ? 'All websites are already added.'
+                    : 'No websites match your search.'}
                 </div>
               ) : (
-                available.map(m => (
-                  <div key={m.id} className="esp-avail-row">
+                availableGroups.map(g => (
+                  <div key={g.domain} className="esp-avail-row">
                     <div className="esp-avail-icon">
-                      <MonitorTypeIcon type={m.type} iconOnly iconSize={14} />
+                      <Globe size={14} />
                     </div>
                     <div className="esp-avail-info">
-                      <span className="esp-avail-name">{m.name}</span>
-                      <span className="esp-avail-type">{m.type}</span>
+                      <span className="esp-avail-name">{g.domain}</span>
+                      <span className="esp-avail-type">{g.monitors.length} monitor{g.monitors.length === 1 ? '' : 's'}</span>
                     </div>
                     <span
                       className="esp-added-dot"
-                      style={{ background: STATUS_DOT[m.status] ?? STATUS_DOT.paused }}
-                      title={m.status}
+                      style={{ background: worstDot(g.monitors) }}
                     />
                     <button
                       type="button"
                       className="esp-add-btn"
-                      onClick={() => add(m.id)}
+                      onClick={() => addWebsite(g)}
                       disabled={isPending}
-                      aria-label={`Add ${m.name}`}
+                      aria-label={`Add ${g.domain}`}
                     >
                       <Plus size={14} />
                     </button>

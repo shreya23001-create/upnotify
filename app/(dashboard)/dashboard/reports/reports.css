@@ -59,11 +59,16 @@
   border-right: none;
 }
 
-.rpt-period-btn:hover {
+.rpt-period-btn:hover:not(.rpt-period-btn--active) {
   background: var(--bg-muted);
 }
 
 .rpt-period-btn--active {
+  background: var(--accent, #1392FB);
+  color: #fff;
+}
+
+.rpt-period-btn--active:hover {
   background: var(--accent, #1392FB);
   color: #fff;
 }

@@ -74,8 +74,6 @@ export default async function SettingsPage(): Promise<React.ReactElement> {
         plans={plans}
         currentPlan={currentPlan}
         addonSubscriptions={addonSubscriptions}
-        teamMemberLimit={teamLimit.limit}
-        teamMemberCount={teamLimit.currentCount}
         canInvite={teamLimit.allowed}
         credits={credits}
         creditBalance={creditBalance}

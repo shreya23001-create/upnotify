@@ -47,6 +47,14 @@ export default async function MonitorsPage({
         .flatMap(s => s.domains ?? [])
     ))
     groupedByDomain = Object.fromEntries(groups.map(g => [g.domain, g]))
+    // Show the most recently added website first — ranked by the newest
+    // monitor's created_at within each domain group (groups already come
+    // back with monitors newest-first from getMonitorsGroupedByWebsite).
+    const latestCreatedAt = (domain: string): string =>
+      groupedByDomain[domain]?.monitors[0]?.created_at ?? ''
+    paidDomains = paidDomains
+      .slice()
+      .sort((a, b) => latestCreatedAt(b).localeCompare(latestCreatedAt(a)))
     // Add Monitor is disabled once purchased capacity is fully used —
     // buying more websites is required before adding anything else.
     canAddMonitor = slotUsage.remaining > 0

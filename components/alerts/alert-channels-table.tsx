@@ -24,6 +24,7 @@ const DEFAULT_META = { label: 'Channel', icon: <BellOff size={16} />, color: '#6
 
 interface ChannelConfig {
   email?: string
+  emails?: string[]
   slackWebhookUrl?: string
   slackChannel?: string
   teamsWebhookUrl?: string
@@ -31,16 +32,35 @@ interface ChannelConfig {
   telegramChatId?: string
 }
 
+function getAllEmails(config: ChannelConfig): string[] {
+  return Array.from(new Set([config.email, ...(config.emails ?? [])].filter((e): e is string => Boolean(e?.trim()))))
+}
+
+/** Full destination text (all emails, untruncated) — used for the hover title. */
 function getDestination(channel: AlertChannel): string {
   const config = channel.config as ChannelConfig
   switch (channel.type) {
-    case 'email': return config.email || '—'
+    case 'email': {
+      const all = getAllEmails(config)
+      return all.length > 0 ? all.join(', ') : '—'
+    }
     case 'slack': return config.slackChannel || (config.slackWebhookUrl ? config.slackWebhookUrl.slice(0, 36) + '…' : '—')
     case 'teams': return config.teamsWebhookUrl ? config.teamsWebhookUrl.slice(0, 36) + '…' : '—'
     case 'webhook': return config.webhookUrl ? config.webhookUrl.slice(0, 36) + '…' : '—'
     case 'telegram': return config.telegramChatId ? `Chat ID: ${config.telegramChatId}` : '—'
     default: return '—'
   }
+}
+
+/** Compact destination for the table row — first email + "+N more" badge
+ * instead of a comma-joined string that overflows with several recipients. */
+function getDestinationDisplay(channel: AlertChannel): { primary: string; extraCount: number } {
+  if (channel.type === 'email') {
+    const all = getAllEmails(channel.config as ChannelConfig)
+    if (all.length === 0) return { primary: '—', extraCount: 0 }
+    return { primary: all[0], extraCount: all.length - 1 }
+  }
+  return { primary: getDestination(channel), extraCount: 0 }
 }
 
 interface PendingConfirm {
@@ -192,7 +212,10 @@ export function AlertChannelsTable({ channels, pagination }: { channels: AlertCh
               </div>
 
               <div className="ac-col-dest">
-                <span className="ac-dest">{getDestination(ch)}</span>
+                <span className="ac-dest" title={getDestination(ch)}>{getDestinationDisplay(ch).primary}</span>
+                {getDestinationDisplay(ch).extraCount > 0 && (
+                  <span className="ac-dest-more" title={getDestination(ch)}>+{getDestinationDisplay(ch).extraCount} more</span>
+                )}
               </div>
 
               <div className="ac-col-severity">
@@ -260,7 +283,7 @@ export function AlertChannelsTable({ channels, pagination }: { channels: AlertCh
                 </div>
 
                 <div className="ac-mobile-dest">
-                  <span className="ac-dest">{getDestination(ch)}</span>
+                  <span className="ac-dest" title={getDestination(ch)}>{getDestination(ch)}</span>
                 </div>
 
                 <div className="ac-mobile-row3">

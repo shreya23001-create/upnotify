@@ -29,8 +29,6 @@ interface SettingsContentProps {
   plans: Plan[]
   currentPlan: Plan | null
   addonSubscriptions?: AddonSubscription[]
-  teamMemberLimit: number
-  teamMemberCount: number
   canInvite: boolean
   credits: UserCredit[]
   creditBalance: number
@@ -54,8 +52,6 @@ export function SettingsContent({
   plans,
   currentPlan,
   addonSubscriptions = [],
-  teamMemberLimit,
-  teamMemberCount,
   canInvite,
   credits,
   creditBalance,
@@ -312,9 +308,6 @@ export function SettingsContent({
                 <div className="stt-section-header-text">
                   <div className="stt-section-title">Team</div>
                 </div>
-                <span className="stt-seat-count">
-                  {teamMemberLimit === 0 ? `${teamMemberCount} members` : `${teamMemberCount} of ${teamMemberLimit} team member slots used`}
-                </span>
               </div>
 
               <div className="stt-form-card">

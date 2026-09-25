@@ -59,7 +59,7 @@ export function sortByWorstStatus(groups: DomainAggregate[]): DomainAggregate[] 
 }
 
 export const STATUS_LABEL: Record<AggStatus, string> = {
-  down: 'Down', degraded: 'Degraded', paused: 'Paused', up: 'Operational', unknown: 'Unknown',
+  down: 'Down', degraded: 'Degraded', paused: 'Paused', up: 'Operational', unknown: 'Checking',
 }
 export const STATUS_DOT_COLOR: Record<AggStatus, string> = {
   down: 'var(--color-down)', degraded: 'var(--color-warn)', paused: 'var(--text-muted)', up: 'var(--color-up)', unknown: 'var(--text-muted)',
