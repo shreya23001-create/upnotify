@@ -6993,6 +6993,10 @@ html.dark .status-pill-paused {
 
 .esp-settings-row .esp-save-btn {
   align-self: end;
+  justify-self: end;
+  width: auto;
+  min-width: 180px;
+  max-width: 240px;
 }
 
 .esp-settings-row .form-group {
