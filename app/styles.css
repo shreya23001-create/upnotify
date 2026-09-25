@@ -913,7 +913,7 @@ html.dark .hd-item-danger:hover {
   flex-direction: column;
   gap: 8px;
   padding: 8px;
-  border: 1.5px dashed var(--border-primary);
+  /* border: 1.5px dashed var(--border-primary); */
   border-radius: 12px;
   background: var(--bg-muted);
   transition: border-color 180ms ease, background 180ms ease;
